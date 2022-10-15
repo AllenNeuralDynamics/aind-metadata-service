@@ -6,6 +6,9 @@
 REST service to retrieve data from LabTracks.
 
 ## Installation
+Installing `pyodbc` on Linux.
+- You may need to install `unixodbc-dev`. You can follow this [https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver16](link) for instructions depending on your os.
+
 To use the software, in the root directory, run
 ```
 pip install -e .
