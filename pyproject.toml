@@ -13,7 +13,7 @@ classifiers = [
 dynamic = ["version", "readme"]
 
 dependencies = [
-    'pandas'
+    'pyodbc'
 ]
 
 [project.optional-dependencies]
