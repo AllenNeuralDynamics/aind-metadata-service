@@ -3,8 +3,8 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "hello_world"
-description = "Prints messages to stdout. Simple boilerplate for libraries."
+name = "aind_labtracks_service"
+description = "REST service to retrive data from labtracks db."
 license = {text = "MIT"}
 requires-python = ">=3.7"
 classifiers = [
@@ -31,7 +31,7 @@ dev = [
 where = ["src"]
 
 [tool.setuptools.dynamic]
-version = {attr = "hello_world.__version__"}
+version = {attr = "aind_labtracks_service.__version__"}
 readme = {file = ["README.md"]}
 
 [tool.black]
@@ -57,7 +57,7 @@ exclude = '''
 
 [tool.coverage.run]
 omit = ["*__init__*"]
-source = ["hello_world", "tests"]
+source = ["aind_labtracks_service", "tests"]
 
 [tool.coverage.report]
 exclude_lines = ["if __name__ == .__main__.:"]
