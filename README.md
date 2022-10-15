@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE)
 ![Code Style](https://img.shields.io/badge/code%20style-black-black)
 
-Template for a minimal, basic repository for an AIND library.
+REST service to retrieve data from LabTracks.
 
 ## Installation
 To use the software, in the root directory, run
