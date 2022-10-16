@@ -9,6 +9,13 @@ REST service to retrieve data from LabTracks.
 Installing `pyodbc`.
 - You may need to install `unixodbc-dev`. You can follow this [https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver16](link) for instructions depending on your os.
 
+- You may need to run `docker system prune` before building the docker image if you're getting erros running apt-get:
+```
+#10 23.69 Err:1 http://deb.debian.org/debian bullseye/main amd64 libodbc1 amd64 2.3.6-0.1+b1
+#10 23.69   Could not connect to debian.map.fastlydns.net:80 (146.75.42.132). - connect (111: Connection refused) Unable to connect to deb.debian.org:http:
+
+```
+
 To use the software, in the root directory, run
 ```
 pip install -e .

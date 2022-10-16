@@ -1,6 +1,6 @@
 FROM python:3
 WORKDIR /app
-ADD src .
+ADD src ./src
 ADD pyproject.toml .
 ADD setup.py .
 
