@@ -1,8 +1,8 @@
 FROM python:3
 WORKDIR /app
 ADD src .
-ADD pyproject.toml
-ADD setup.py
+ADD pyproject.toml .
+ADD setup.py .
 
 # Install FreeTDS and dependencies
 RUN apt-get update \
