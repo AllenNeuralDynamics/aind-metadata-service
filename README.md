@@ -1,9 +1,9 @@
-# library-repo-template
+# aind-metadata-service
 
 [![License](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE)
 ![Code Style](https://img.shields.io/badge/code%20style-black-black)
 
-REST service to retrieve data from LabTracks.
+REST service to retrieve metadata from databases.
 
 ## Installation
 To use the software, in the root directory, run
