@@ -1,10 +1,10 @@
-"""Tests aind_labtracks_service methods."""
+"""Tests aind_metadata_service methods."""
 
 import unittest
 
 import pandas as pd
 
-from aind_labtracks_service import message_handlers
+from aind_metadata_service import message_handlers
 
 
 class MessageHandlerTest(unittest.TestCase):
