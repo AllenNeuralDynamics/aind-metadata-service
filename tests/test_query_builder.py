@@ -2,7 +2,7 @@
 
 import unittest
 
-from aind_labtracks_service import query_builder
+from aind_metadata_service import query_builder
 
 
 class QueryBuilderTest(unittest.TestCase):
