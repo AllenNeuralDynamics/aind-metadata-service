@@ -3,8 +3,8 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "aind_labtracks_service"
-description = "REST service to retrive data from labtracks db."
+name = "aind_metadata_service"
+description = "REST service to retrive metadata from databases."
 license = {text = "MIT"}
 requires-python = ">=3.7"
 classifiers = [
@@ -31,7 +31,7 @@ dev = [
 where = ["src"]
 
 [tool.setuptools.dynamic]
-version = {attr = "aind_labtracks_service.__version__"}
+version = {attr = "aind_metadata_service.__version__"}
 readme = {file = ["README.md"]}
 
 [tool.black]
@@ -57,7 +57,7 @@ exclude = '''
 
 [tool.coverage.run]
 omit = ["*__init__*"]
-source = ["aind_labtracks_service", "tests"]
+source = ["aind_metadata_service", "tests"]
 
 [tool.coverage.report]
 exclude_lines = ["if __name__ == .__main__.:"]
