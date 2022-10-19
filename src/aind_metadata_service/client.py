@@ -1,60 +1,110 @@
+"""Module to create clients to connect to databases."""
+
+from enum import Enum
+
 import pyodbc
-from flask.json import JSONEncoder
-from datetime import date
+
+
+class ErrorResponses(Enum):
+    """Enum of Error messages. TODO: Better way to do this?"""
+
+    pyodbc_error = "Error connecting to LabTracks Server."
 
 
 class LabTracksClient:
-
-    class CustomJSONEncoder(JSONEncoder):
-        def default(self, obj):
-            try:
-                if isinstance(obj, date):
-                    return obj.isoformat()
-                iterable = iter(obj)
-            except TypeError:
-                pass
-            else:
-                return list(iterable)
-            return JSONEncoder.default(self, obj)
+    """This class contains the api to connect to LabTracks db."""
 
     def __init__(self, driver, server, port, db, user, password):
+        """
+        Initialize a client
+        Parameters
+        ----------
+        driver : str
+            ODBC Driver, example {FreeTDS}
+        server : str
+           Server DNS or IP
+        port : int
+           Server port
+        db : str
+           LabTracks Database name to connect to
+        user : str
+            LabTracks user
+        password : str
+            Password for LabTracks user
+        """
         self.driver = driver
         self.server = server
         self.port = port
         self.db = db
         self.user = user
         self.password = password
-        self.connection_str = (f"Driver={driver};"
-                               f"Server={server};"
-                               f"Port={port};"
-                               f"Database={db};"
-                               f"UID={user};"
-                               f"PWD={password};")
+        self.connection_str = (
+            f"Driver={driver};"
+            f"Server={server};"
+            f"Port={port};"
+            f"Database={db};"
+            f"UID={user};"
+            f"PWD={password};"
+        )
 
     def create_session(self):
+        """Use pyodbc to create a connection to sqlserver"""
+
         return pyodbc.connect(self.connection_str)
 
     @staticmethod
     def submit_query(session, query):
+        """
+        Submit a query using session connection.
+
+        Parameters
+        ----------
+        session : A pyodbc connection
+        query :  str
+            The sql query to submit to LabTracks sqlserver
+
+        Returns
+        -------
+            dict
+                Returns a {msg: [row]} or {msg: Error String} object
+
+        """
         try:
             cursor = session.cursor()
             cursor.execute(query)
-            columns = [column[0].lower() for column in cursor.description]
+            column_names = cursor.description
+            columns = [column[0].lower() for column in column_names]
             results = []
-            for row in cursor.fetchall():
+            fetched_rows = cursor.fetchall()
+            for row in fetched_rows:
                 results.append(dict(zip(columns, row)))
-            return {'msg': results}
-        except pyodbc.ProgrammingError:
-            return {'msg': "Something went wrong"}
+            return {"msg": results}
+        except pyodbc.Error as ex:
+            # TODO: Handle errors more gracefully?
+            return {
+                "msg": f"{ErrorResponses.pyodbc_error.value}: "
+                f"{ex.__class__.__name__}"
+            }
 
     @staticmethod
     def close_session(session):
+        """Closes a pyodbc session connection"""
         session.close()
 
     @staticmethod
     def handle_response(response):
-        msg = response['msg']
-        if msg != "Something went wrong":
-            return msg[0]
-        else:
-            return msg
+        """
+        Handles the response received from the sqlserver
+        Parameters
+        ----------
+        response : dict
+            Something like {msg: [row]} or {msg: Error String}
+
+        Returns
+        -------
+            json or error msg
+
+        """
+        msg = response["msg"]
+        # TODO: Better handling here or rely on requester to handle responses?
+        return msg
