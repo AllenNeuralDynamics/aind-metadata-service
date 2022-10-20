@@ -2,13 +2,12 @@
 
 import os
 from datetime import date
+from typing import Any
 
 from client import LabTracksClient
 from flask import Flask, jsonify, request
 from flask.json import JSONEncoder
 from query_builder import LabTracksQueries
-
-from typing import Any
 
 
 class CustomJSONEncoder(JSONEncoder):  # pragma: no cover

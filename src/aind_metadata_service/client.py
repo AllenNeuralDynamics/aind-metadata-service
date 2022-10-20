@@ -15,13 +15,15 @@ class ErrorResponses(Enum):
 class LabTracksClient:
     """This class contains the api to connect to LabTracks db."""
 
-    def __init__(self,
-                 driver: str,
-                 server: str,
-                 port: str,
-                 db: str,
-                 user: str,
-                 password: str) -> None:
+    def __init__(
+        self,
+        driver: str,
+        server: str,
+        port: str,
+        db: str,
+        user: str,
+        password: str,
+    ) -> None:
         """
         Initialize a client
         Parameters
@@ -60,8 +62,7 @@ class LabTracksClient:
         return pyodbc.connect(self.connection_str)
 
     @staticmethod
-    def submit_query(session: pyodbc.Connection,
-                     query: str) -> dict:
+    def submit_query(session: pyodbc.Connection, query: str) -> dict:
         """
         Submit a query using session connection.
 

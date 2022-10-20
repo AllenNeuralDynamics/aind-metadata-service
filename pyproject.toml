@@ -6,6 +6,9 @@ build-backend = "setuptools.build_meta"
 name = "aind_metadata_service"
 description = "REST service to retrive metadata from databases."
 license = {text = "MIT"}
+authors = [
+    {name = "Allen Institute for Neural Dynamics"}
+]
 requires-python = ">=3.7"
 classifiers = [
     "Programming Language :: Python :: 3"

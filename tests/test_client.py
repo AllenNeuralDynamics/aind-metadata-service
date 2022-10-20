@@ -2,8 +2,7 @@
 
 import decimal
 import unittest
-from unittest.mock import patch
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import pyodbc
 
@@ -44,8 +43,7 @@ class TestLabTracksClient(unittest.TestCase):
         )
 
     @patch("pyodbc.connect")
-    def test_labtracks_client_create_session(self,
-                                             mock_connect: Mock) -> None:
+    def test_labtracks_client_create_session(self, mock_connect: Mock) -> None:
         """
         Tests client session method with mocked responses
         Parameters
@@ -87,8 +85,9 @@ class TestLabTracksClient(unittest.TestCase):
         self.lb_client.close_session(session)
 
     @patch("pyodbc.connect")
-    def test_labtracks_client_submit_query_error(self,
-                                                 mock_connect: Mock) -> None:
+    def test_labtracks_client_submit_query_error(
+        self, mock_connect: Mock
+    ) -> None:
         """
         Tests that pyodbc errors are returned to client properly
         Parameters
