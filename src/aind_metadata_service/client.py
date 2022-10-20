@@ -1,6 +1,7 @@
 """Module to create clients to connect to databases."""
 
 from enum import Enum
+from typing import Union
 
 import pyodbc
 
@@ -14,7 +15,13 @@ class ErrorResponses(Enum):
 class LabTracksClient:
     """This class contains the api to connect to LabTracks db."""
 
-    def __init__(self, driver, server, port, db, user, password):
+    def __init__(self,
+                 driver: str,
+                 server: str,
+                 port: str,
+                 db: str,
+                 user: str,
+                 password: str) -> None:
         """
         Initialize a client
         Parameters
@@ -47,13 +54,14 @@ class LabTracksClient:
             f"PWD={password};"
         )
 
-    def create_session(self):
+    def create_session(self) -> pyodbc.Connection:
         """Use pyodbc to create a connection to sqlserver"""
 
         return pyodbc.connect(self.connection_str)
 
     @staticmethod
-    def submit_query(session, query):
+    def submit_query(session: pyodbc.Connection,
+                     query: str) -> dict:
         """
         Submit a query using session connection.
 
@@ -76,6 +84,7 @@ class LabTracksClient:
             columns = [column[0].lower() for column in column_names]
             results = []
             fetched_rows = cursor.fetchall()
+            cursor.close()
             for row in fetched_rows:
                 results.append(dict(zip(columns, row)))
             return {"msg": results}
@@ -87,12 +96,12 @@ class LabTracksClient:
             }
 
     @staticmethod
-    def close_session(session):
+    def close_session(session: pyodbc.Connection) -> None:
         """Closes a pyodbc session connection"""
         session.close()
 
     @staticmethod
-    def handle_response(response):
+    def handle_response(response: dict) -> Union[list, str]:
         """
         Handles the response received from the sqlserver
         Parameters

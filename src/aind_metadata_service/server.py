@@ -8,13 +8,15 @@ from flask import Flask, jsonify, request
 from flask.json import JSONEncoder
 from query_builder import LabTracksQueries
 
+from typing import Any
+
 
 class CustomJSONEncoder(JSONEncoder):  # pragma: no cover
     """This class customizes the json returned by sqlserver.
     TODO: There is a warning that using JSONEncoder is deprecated?
     """
 
-    def default(self, obj):
+    def default(self, obj: Any) -> Any:
         """
         Formats date objects into iso standard.
 

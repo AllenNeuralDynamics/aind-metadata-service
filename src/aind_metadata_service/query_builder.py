@@ -5,7 +5,7 @@ class LabTracksQueries:
     """Class to hold sql query strings for LabTracks"""
 
     @staticmethod
-    def subject_from_specimen_id(specimen_id):
+    def subject_from_specimen_id(specimen_id: str) -> str:
         """
         Retrieves the information to populate metadata about subjects.
 
