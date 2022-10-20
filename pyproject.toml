@@ -6,6 +6,9 @@ build-backend = "setuptools.build_meta"
 name = "aind_metadata_service"
 description = "REST service to retrive metadata from databases."
 license = {text = "MIT"}
+authors = [
+    {name = "Allen Institute for Neural Dynamics"}
+]
 requires-python = ">=3.7"
 classifiers = [
     "Programming Language :: Python :: 3"
@@ -13,7 +16,8 @@ classifiers = [
 dynamic = ["version", "readme"]
 
 dependencies = [
-    'pandas'
+    'pyodbc',
+    'flask'
 ]
 
 [project.optional-dependencies]
@@ -60,7 +64,12 @@ omit = ["*__init__*"]
 source = ["aind_metadata_service", "tests"]
 
 [tool.coverage.report]
-exclude_lines = ["if __name__ == .__main__.:"]
+exclude_lines = [
+    "if __name__ == .__main__.:",
+    "from",
+    "import",
+    "pragma: no cover"
+]
 fail_under = 100
 
 [tool.isort]
