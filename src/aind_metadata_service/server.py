@@ -4,10 +4,11 @@ import os
 from datetime import date
 from typing import Any
 
-from client import LabTracksClient
-from flask import Flask, jsonify, request
+from flask import Flask, request
 from flask.json import JSONEncoder
-from query_builder import LabTracksQueries
+
+from aind_metadata_service.labtracks.client import LabTracksClient
+from aind_metadata_service.labtracks.query_builder import LabTracksQueries
 
 
 class CustomJSONEncoder(JSONEncoder):  # pragma: no cover
@@ -79,6 +80,7 @@ if __name__ == "__main__":
         session = lb_client.create_session()
         lb_response = lb_client.submit_query(session, query)
         lb_client.close_session(session)
-        return jsonify(lb_response)
+        handled_response = lb_client.handle_response(lb_response)
+        return handled_response
 
     app.run(host=flask_host)

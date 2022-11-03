@@ -1,24 +1,16 @@
 aind\_metadata\_service package
 ===============================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   aind_metadata_service.labtracks
+
 Submodules
 ----------
-
-aind\_metadata\_service.client module
--------------------------------------
-
-.. automodule:: aind_metadata_service.client
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-aind\_metadata\_service.query\_builder module
----------------------------------------------
-
-.. automodule:: aind_metadata_service.query_builder
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 aind\_metadata\_service.server module
 -------------------------------------
