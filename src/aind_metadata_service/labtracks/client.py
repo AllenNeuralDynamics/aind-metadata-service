@@ -124,8 +124,7 @@ class LabTracksClient:
 
         """
         lth = LabTracksResponseHandler()
-        handled_response = (
-            lth.map_response_to_subject(response))
+        handled_response = lth.map_response_to_subject(response)
         # TODO: Better handling here or rely on requester to handle responses?
         return handled_response
 
@@ -257,38 +256,41 @@ class LabTracksResponseHandler:
         """
         # TODO: Handle errors
         contents = response["msg"][0]
-        class_values = contents[SubjectQueryColumns.CLASS_VALUES.value]
-        full_genotype = self._map_class_values_to_genotype(class_values)
-        sex: Optional[Sex] = self._map_sex(
-            contents[SubjectQueryColumns.SEX.value]
-        )
-        species = self._map_species(
-            contents[SubjectQueryColumns.SPECIES_NAME.value]
-        )
-        paternal_genotype = self._map_class_values_to_genotype(
-            contents[SubjectQueryColumns.PATERNAL_CLASS_VALUES.value]
-        )
-        maternal_genotype = self._map_class_values_to_genotype(
-            contents[SubjectQueryColumns.MATERNAL_CLASS_VALUES.value]
-        )
-        paternal_id = contents[SubjectQueryColumns.PATERNAL_ID.value]
-        maternal_id = contents[SubjectQueryColumns.MATERNAL_ID.value]
-        subject_id = contents[SubjectQueryColumns.ID.value]
-        date_of_birth = contents[SubjectQueryColumns.BIRTH_DATE.value]
-        subject_response = SubjectResponse(
-            subject_id=subject_id,
-            species=species,
-            paternal_genotype=paternal_genotype,
-            paternal_id=paternal_id,
-            maternal_genotype=maternal_genotype,
-            maternal_id=maternal_id,
-            sex=sex,
-            date_of_birth=date_of_birth,
-            genotype=full_genotype,
-        )
+        try:
+            class_values = contents[SubjectQueryColumns.CLASS_VALUES.value]
+            full_genotype = self._map_class_values_to_genotype(class_values)
+            sex: Optional[Sex] = self._map_sex(
+                contents[SubjectQueryColumns.SEX.value]
+            )
+            species = self._map_species(
+                contents[SubjectQueryColumns.SPECIES_NAME.value]
+            )
+            paternal_genotype = self._map_class_values_to_genotype(
+                contents[SubjectQueryColumns.PATERNAL_CLASS_VALUES.value]
+            )
+            maternal_genotype = self._map_class_values_to_genotype(
+                contents[SubjectQueryColumns.MATERNAL_CLASS_VALUES.value]
+            )
+            paternal_id = contents[SubjectQueryColumns.PATERNAL_ID.value]
+            maternal_id = contents[SubjectQueryColumns.MATERNAL_ID.value]
+            subject_id = contents[SubjectQueryColumns.ID.value]
+            date_of_birth = contents[SubjectQueryColumns.BIRTH_DATE.value]
+            subject_response = SubjectResponse(
+                subject_id=subject_id,
+                species=species,
+                paternal_genotype=paternal_genotype,
+                paternal_id=paternal_id,
+                maternal_genotype=maternal_genotype,
+                maternal_id=maternal_id,
+                sex=sex,
+                date_of_birth=date_of_birth,
+                genotype=full_genotype,
+            )
 
-        subject = Subject.parse_obj(dataclasses.asdict(subject_response)).json(
-            exclude_none=True
-        )
+            subject = Subject.parse_obj(
+                dataclasses.asdict(subject_response)
+            ).json(exclude_none=True)
 
-        return subject
+            return subject
+        except KeyError:
+            return "Unable to parse message."

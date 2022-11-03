@@ -4,7 +4,7 @@ import os
 from datetime import date
 from typing import Any
 
-from flask import Flask, jsonify, request
+from flask import Flask, request
 from flask.json import JSONEncoder
 
 from aind_metadata_service.labtracks.client import LabTracksClient

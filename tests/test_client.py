@@ -79,10 +79,7 @@ class TestLabTracksClient(unittest.TestCase):
         example_query = "SELECT TOP 2 ANIMAL_STATUS, ID FROM ANIMALS_COMMON;"
         response = self.lb_client.submit_query(session, example_query)
         handled_response = self.lb_client.handle_response(response)
-        expected_handled_response = [
-            {"animal_status": "A", "id": decimal.Decimal("403231")},
-            {"animal_status": "A", "id": decimal.Decimal("499294")},
-        ]
+        expected_handled_response = "Unable to parse message."
         mock_connect.assert_called()
         self.assertEqual(expected_handled_response, handled_response)
         self.lb_client.close_session(session)
