@@ -6,7 +6,10 @@ from unittest.mock import Mock, patch
 
 import pyodbc
 
-from aind_metadata_service.client import ErrorResponses, LabTracksClient
+from aind_metadata_service.labtracks.client import (
+    ErrorResponses,
+    LabTracksClient,
+)
 
 
 class TestLabTracksClient(unittest.TestCase):
@@ -110,7 +113,7 @@ class TestLabTracksClient(unittest.TestCase):
         session = self.lb_client.create_session()
         response1 = self.lb_client.submit_query(session, "SOMETHING BAD")
         expected_response = {
-            "msg": f"{ErrorResponses.pyodbc_error.value}: " f"ProgrammingError"
+            "msg": f"{ErrorResponses.PYODBC_ERROR.value}: " f"ProgrammingError"
         }
         mock_connect.assert_called()
         self.assertEqual(response1, expected_response)

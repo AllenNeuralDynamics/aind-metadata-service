@@ -1,21 +1,42 @@
-"""Tests query builder methods."""
-
-import unittest
-
-from aind_metadata_service.labtracks.query_builder import (
-    LabTracksQueries,
-    SubjectQueryColumns,
-)
+"""Module that returns appropriate sql query strings"""
+from enum import Enum
 
 
-class TestLabTracksQueryBuilder(unittest.TestCase):
-    """Tests LabTracksQueries methods."""
+class SubjectQueryColumns(Enum):
+    """Expected columns in the subject query response."""
 
-    def test_subject_from_species(self):
-        """Tests sql string is created correctly."""
-        specimen_id = "625464"
-        actual_output = LabTracksQueries.subject_from_specimen_id(specimen_id)
-        expected_output = (
+    ID = "id"
+    CLASS_VALUES = "class_values"
+    SEX = "sex"
+    BIRTH_DATE = "birth_date"
+    PATERNAL_ID = "paternal_id"
+    PATERNAL_CLASS_VALUES = "paternal_class_values"
+    MATERNAL_ID = "maternal_id"
+    MATERNAL_CLASS_VALUES = "maternal_class_values"
+    SPECIES_NAME = "species_name"
+
+
+class LabTracksQueries:
+    """Class to hold sql query strings for LabTracks"""
+
+    @staticmethod
+    def subject_from_specimen_id(specimen_id: str) -> str:
+        """
+        Retrieves the information to populate metadata about subjects.
+
+        Parameters
+        ----------
+        specimen_id : str
+            This is the id in the LabTracks ANIMALS_COMMON table
+
+        Returns
+        -------
+            str
+                SQL query that can be used to retrieve the data from LabTracks
+                sqlserver db.
+
+        """
+        return (
             "SELECT"
             f"    AC.ID AS {SubjectQueryColumns.ID.value},"
             f"    AC.CLASS_VALUES AS {SubjectQueryColumns.CLASS_VALUES.value},"
@@ -37,8 +58,3 @@ class TestLabTracksQueryBuilder(unittest.TestCase):
             "    ON AC.SPECIES_ID = S.ID"
             f" WHERE AC.ID={specimen_id};"
         )
-        self.assertEqual(expected_output, actual_output)
-
-
-if __name__ == "__main__":
-    unittest.main()
