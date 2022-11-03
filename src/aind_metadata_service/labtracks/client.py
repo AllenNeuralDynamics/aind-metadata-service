@@ -1,8 +1,4 @@
 """Module to create clients to connect to databases."""
-import dataclasses
-import datetime
-import decimal
-from dataclasses import dataclass
 from enum import Enum
 from typing import Optional, Union
 from xml.etree import ElementTree as ET
@@ -155,23 +151,6 @@ class LabTracksSpecies(Enum):
     RAT = "rat"
 
 
-@dataclass(frozen=True)
-class SubjectResponse:
-    """An intermediate data class. The json response from LabTracks will be
-    parsed and stored in this data class. This class can then be mapped easily
-    to the aind_data_schema.subject.Subject class"""
-
-    subject_id: decimal.Decimal
-    species: Optional[Species]
-    paternal_genotype: Optional[str]
-    paternal_id: decimal.Decimal
-    maternal_genotype: Optional[str]
-    maternal_id: decimal.Decimal
-    sex: Optional[Sex]
-    date_of_birth: datetime.datetime
-    genotype: Optional[str]
-
-
 class LabTracksResponseHandler:
     """This class will contain methods to handle the response from LabTracks"""
 
@@ -275,7 +254,7 @@ class LabTracksResponseHandler:
             maternal_id = contents[SubjectQueryColumns.MATERNAL_ID.value]
             subject_id = contents[SubjectQueryColumns.ID.value]
             date_of_birth = contents[SubjectQueryColumns.BIRTH_DATE.value]
-            subject_response = SubjectResponse(
+            subject = Subject(
                 subject_id=subject_id,
                 species=species,
                 paternal_genotype=paternal_genotype,
@@ -285,10 +264,6 @@ class LabTracksResponseHandler:
                 sex=sex,
                 date_of_birth=date_of_birth,
                 genotype=full_genotype,
-            )
-
-            subject = Subject.parse_obj(
-                dataclasses.asdict(subject_response)
             ).json(exclude_none=True)
 
             return subject
