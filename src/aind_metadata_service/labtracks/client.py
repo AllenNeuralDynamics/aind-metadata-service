@@ -123,9 +123,11 @@ class LabTracksClient:
             json or error msg
 
         """
-        msg = response["msg"]
+        lth = LabTracksResponseHandler()
+        handled_response = (
+            lth.map_response_to_subject(response))
         # TODO: Better handling here or rely on requester to handle responses?
-        return msg
+        return handled_response
 
 
 class MouseCustomClassFields(Enum):

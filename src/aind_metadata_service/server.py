@@ -80,6 +80,7 @@ if __name__ == "__main__":
         session = lb_client.create_session()
         lb_response = lb_client.submit_query(session, query)
         lb_client.close_session(session)
-        return jsonify(lb_response)
+        handled_response = lb_client.handle_response(lb_response)
+        return handled_response
 
     app.run(host=flask_host)
