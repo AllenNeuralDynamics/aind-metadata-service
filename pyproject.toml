@@ -17,6 +17,7 @@ dynamic = ["version", "readme"]
 
 dependencies = [
     'pyodbc',
+    'aind-data-schema',
     'flask'
 ]
 
