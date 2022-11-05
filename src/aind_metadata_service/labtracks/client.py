@@ -1,6 +1,6 @@
 """Module to create clients to connect to databases."""
 from enum import Enum
-from typing import Optional, Union
+from typing import Optional
 from xml.etree import ElementTree as ET
 
 import pyodbc
@@ -106,7 +106,7 @@ class LabTracksClient:
         session.close()
 
     @staticmethod
-    def handle_response(response: dict) -> Union[list, str]:
+    def handle_response(response: dict) -> dict:
         """
         Handles the response received from the sqlserver
         Parameters
@@ -219,7 +219,7 @@ class LabTracksResponseHandler:
         else:
             return None
 
-    def map_response_to_subject(self, response) -> str:
+    def map_response_to_subject(self, response) -> dict:
         """
         Maps a response from LabTracks to an aind_data_schema.Subject json str
         Parameters
@@ -229,8 +229,7 @@ class LabTracksResponseHandler:
 
         Returns
         -------
-          A json string representation of an aind_data_schema.subject.Subject
-          instance.
+          A dict
 
         """
         # TODO: Handle errors
@@ -264,8 +263,8 @@ class LabTracksResponseHandler:
                 sex=sex,
                 date_of_birth=date_of_birth,
                 genotype=full_genotype,
-            ).json(exclude_none=True)
+            )
 
-            return subject
+            return {"message": subject}
         except KeyError:
-            return "Unable to parse message."
+            return {"message": "Unable to parse message."}
