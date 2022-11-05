@@ -13,8 +13,8 @@ class TestLabTracksQueryBuilder(unittest.TestCase):
 
     def test_subject_from_species(self):
         """Tests sql string is created correctly."""
-        specimen_id = "625464"
-        actual_output = LabTracksQueries.subject_from_specimen_id(specimen_id)
+        subject_id = "625464"
+        actual_output = LabTracksQueries.subject_from_subject_id(subject_id)
         expected_output = (
             "SELECT"
             f"    AC.ID AS {SubjectQueryColumns.ID.value},"
@@ -35,7 +35,7 @@ class TestLabTracksQueryBuilder(unittest.TestCase):
             "    ON AC.PATERNAL_INDEX = PATERNAL.ID"
             "    LEFT OUTER JOIN SPECIES S "
             "    ON AC.SPECIES_ID = S.ID"
-            f" WHERE AC.ID={specimen_id};"
+            f" WHERE AC.ID={subject_id};"
         )
         self.assertEqual(expected_output, actual_output)
 
