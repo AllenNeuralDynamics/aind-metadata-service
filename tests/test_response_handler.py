@@ -1,6 +1,5 @@
 """Module to test LabTracksResponseHandler methods."""
 import datetime
-import json
 import unittest
 from decimal import Decimal
 
@@ -11,6 +10,8 @@ from aind_metadata_service.labtracks.client import (
     LabTracksSex,
     LabTracksSpecies,
 )
+
+from aind_data_schema import Subject
 
 
 class TestLabTracksResponseHandler(unittest.TestCase):
@@ -64,8 +65,8 @@ class TestLabTracksResponseHandler(unittest.TestCase):
         "https://github.com/AllenNeuralDynamics/data_schema/blob/main/schemas/"
         "subject.py"
     )
-    expected_subject = json.dumps(
-        {
+
+    expected_subject = Subject.parse_obj({
             "describedBy": described_by_str,
             "schema_version": "0.2.0",
             "species": "Mus musculus",
@@ -77,17 +78,17 @@ class TestLabTracksResponseHandler(unittest.TestCase):
             "maternal_genotype": "wt/wt",
             "paternal_id": "617425",
             "paternal_genotype": "Adora2a-Cre/wt",
-        }
-    )
+        })
 
     rh = LabTracksResponseHandler()
 
     def test_map_response_to_subject(self):
         """Tests that the response gets mapped to the subject."""
-        actual_subject = self.rh.map_response_to_subject(self.test_response)
+        actual_subject = (
+            self.rh.map_response_to_subject(self.test_response)['message'])
 
         self.assertEqual(
-            json.loads(self.expected_subject), json.loads(actual_subject)
+            self.expected_subject, actual_subject
         )
 
     def test_map_class_values_to_genotype(self):

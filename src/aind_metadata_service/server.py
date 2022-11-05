@@ -30,7 +30,7 @@ async def retrieve_subject(subject_id):
         user=user,
         password=password,
     )
-    query = LabTracksQueries.subject_from_specimen_id(subject_id)
+    query = LabTracksQueries.subject_from_subject_id(subject_id)
     session = lb_client.create_session()
     lb_response = lb_client.submit_query(session, query)
     lb_client.close_session(session)
