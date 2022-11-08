@@ -7,7 +7,6 @@ from fastapi import FastAPI
 from aind_metadata_service.labtracks.client import LabTracksClient
 from aind_metadata_service.labtracks.query_builder import LabTracksQueries
 
-
 app = FastAPI()
 
 # TODO: Handle configs better?

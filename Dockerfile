@@ -16,8 +16,8 @@ RUN apt-get update \
 # Populate "ocbcinst.ini" as this is where ODBC driver config sits
 RUN echo "[FreeTDS]\n\
 Description = FreeTDS Driver\n\
-Driver = /usr/lib/aarch64-linux-gnu/odbc/libtdsodbc.so\n\
-Setup = /usr/lib/aarch64-linux-gnu/odbc/libtdsS.so" >> /etc/odbcinst.ini
+Driver = /usr/lib/x86_64-linux-gnu/odbc/libtdsodbc.so\n\
+Setup = /usr/lib/x86_64-linux-gnu/odbc/libtdsS.so" >> /etc/odbcinst.ini
 
 # Pip command
 RUN pip install .

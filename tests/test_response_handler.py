@@ -3,6 +3,7 @@ import datetime
 import unittest
 from decimal import Decimal
 
+from aind_data_schema import Subject
 from aind_data_schema.subject import Sex, Species
 
 from aind_metadata_service.labtracks.client import (
@@ -10,8 +11,6 @@ from aind_metadata_service.labtracks.client import (
     LabTracksSex,
     LabTracksSpecies,
 )
-
-from aind_data_schema import Subject
 
 
 class TestLabTracksResponseHandler(unittest.TestCase):
