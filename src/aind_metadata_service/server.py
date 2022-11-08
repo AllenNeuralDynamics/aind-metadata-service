@@ -22,6 +22,9 @@ password = os.getenv("LABTRACKS_PASSWORD")
 
 @app.get("/subject/{subject_id}")
 async def retrieve_subject(subject_id):
+    """
+    Retrieves subject from Labtracks server
+    """
     lb_client = LabTracksClient(
         driver=driver,
         server=server,

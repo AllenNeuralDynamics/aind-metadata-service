@@ -63,7 +63,7 @@ exclude = '''
 '''
 
 [tool.coverage.run]
-omit = ["*__init__*"]
+omit = ["*__init__*","*server*"]
 source = ["aind_metadata_service", "tests"]
 
 [tool.coverage.report]
