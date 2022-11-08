@@ -66,7 +66,8 @@ class TestLabTracksResponseHandler(unittest.TestCase):
         "subject.py"
     )
 
-    expected_subject = Subject.parse_obj({
+    expected_subject = Subject.parse_obj(
+        {
             "describedBy": described_by_str,
             "schema_version": "0.2.0",
             "species": "Mus musculus",
@@ -78,18 +79,18 @@ class TestLabTracksResponseHandler(unittest.TestCase):
             "maternal_genotype": "wt/wt",
             "paternal_id": "617425",
             "paternal_genotype": "Adora2a-Cre/wt",
-        })
+        }
+    )
 
     rh = LabTracksResponseHandler()
 
     def test_map_response_to_subject(self):
         """Tests that the response gets mapped to the subject."""
-        actual_subject = (
-            self.rh.map_response_to_subject(self.test_response)['message'])
+        actual_subject = self.rh.map_response_to_subject(self.test_response)[
+            "message"
+        ]
 
-        self.assertEqual(
-            self.expected_subject, actual_subject
-        )
+        self.assertEqual(self.expected_subject, actual_subject)
 
     def test_map_class_values_to_genotype(self):
         """Tests that the genotype is extracted from the xml string."""
