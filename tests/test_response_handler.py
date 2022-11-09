@@ -56,6 +56,7 @@ class TestLabTracksResponseHandler(unittest.TestCase):
                 "maternal_id": Decimal("618504"),
                 "maternal_class_values": maternal_class_values_str,
                 "species_name": "mouse",
+                "group_name": "group_name",
             }
         ]
     }
@@ -78,6 +79,7 @@ class TestLabTracksResponseHandler(unittest.TestCase):
             "maternal_genotype": "wt/wt",
             "paternal_id": "617425",
             "paternal_genotype": "Adora2a-Cre/wt",
+            "breeding_group": "group_name",
         }
     )
 
@@ -88,7 +90,8 @@ class TestLabTracksResponseHandler(unittest.TestCase):
         actual_subject = self.rh.map_response_to_subject(self.test_response)[
             "message"
         ]
-
+        print("actual subject", actual_subject)
+        print(self.expected_subject)
         self.assertEqual(self.expected_subject, actual_subject)
 
     def test_map_class_values_to_genotype(self):
