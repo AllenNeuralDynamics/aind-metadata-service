@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3-slim
 WORKDIR /app
 ADD src ./src
 ADD pyproject.toml .
@@ -21,3 +21,5 @@ Setup = /usr/lib/x86_64-linux-gnu/odbc/libtdsS.so" >> /etc/odbcinst.ini
 
 # Pip command
 RUN pip install .
+
+CMD ["uvicorn", "aind_metadata_service.server:app", "--host", "0.0.0.0", "--port", "5000"]

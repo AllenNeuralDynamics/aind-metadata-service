@@ -19,7 +19,8 @@ dynamic = ["version"]
 dependencies = [
     'pyodbc',
     'aind-data-schema',
-    'flask'
+    'fastapi',
+    'uvicorn[standard]'
 ]
 
 [project.optional-dependencies]
@@ -62,7 +63,7 @@ exclude = '''
 '''
 
 [tool.coverage.run]
-omit = ["*__init__*"]
+omit = ["*__init__*","*server*"]
 source = ["aind_metadata_service", "tests"]
 
 [tool.coverage.report]

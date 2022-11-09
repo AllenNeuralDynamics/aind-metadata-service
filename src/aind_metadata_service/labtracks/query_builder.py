@@ -20,13 +20,13 @@ class LabTracksQueries:
     """Class to hold sql query strings for LabTracks"""
 
     @staticmethod
-    def subject_from_specimen_id(specimen_id: str) -> str:
+    def subject_from_subject_id(subject_id: str) -> str:
         """
         Retrieves the information to populate metadata about subjects.
 
         Parameters
         ----------
-        specimen_id : str
+        subject_id : str
             This is the id in the LabTracks ANIMALS_COMMON table
 
         Returns
@@ -56,5 +56,5 @@ class LabTracksQueries:
             "    ON AC.PATERNAL_INDEX = PATERNAL.ID"
             "    LEFT OUTER JOIN SPECIES S "
             "    ON AC.SPECIES_ID = S.ID"
-            f" WHERE AC.ID={specimen_id};"
+            f" WHERE AC.ID={subject_id};"
         )
