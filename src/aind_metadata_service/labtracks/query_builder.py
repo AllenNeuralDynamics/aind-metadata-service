@@ -58,6 +58,7 @@ class LabTracksQueries:
             "    ON AC.PATERNAL_INDEX = PATERNAL.ID"
             "    LEFT OUTER JOIN SPECIES S "
             "    ON AC.SPECIES_ID = S.ID"
-            "    LEFT OUTER JOIN GROUPS ON MATERNAL.GROUP_ID=GROUPS.ID"
+            "    LEFT OUTER JOIN GROUPS "
+            "    ON MATERNAL.GROUP_ID=GROUPS.ID"
             f" WHERE AC.ID={subject_id};"
         )
