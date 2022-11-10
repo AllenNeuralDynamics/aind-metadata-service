@@ -56,7 +56,7 @@ class TestLabTracksResponseHandler(unittest.TestCase):
                 "maternal_id": Decimal("618504"),
                 "maternal_class_values": maternal_class_values_str,
                 "species_name": "mouse",
-                "group_name": "group_name",
+                "group_name": "Adora2a-Cre(ND)",
             }
         ]
     }
@@ -79,7 +79,7 @@ class TestLabTracksResponseHandler(unittest.TestCase):
             "maternal_genotype": "wt/wt",
             "paternal_id": "617425",
             "paternal_genotype": "Adora2a-Cre/wt",
-            "breeding_group": "group_name",
+            "breeding_group": "Adora2a-Cre(ND)",
         }
     )
 
