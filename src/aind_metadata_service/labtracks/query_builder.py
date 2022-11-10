@@ -14,6 +14,7 @@ class SubjectQueryColumns(Enum):
     MATERNAL_ID = "maternal_id"
     MATERNAL_CLASS_VALUES = "maternal_class_values"
     SPECIES_NAME = "species_name"
+    GROUP_NAME = "group_name"
 
 
 class LabTracksQueries:
@@ -48,7 +49,8 @@ class LabTracksQueries:
             f"    MATERNAL.ID AS {SubjectQueryColumns.MATERNAL_ID.value},"
             f"    MATERNAL.CLASS_VALUES "
             f"      AS {SubjectQueryColumns.MATERNAL_CLASS_VALUES.value},"
-            f"    S.SPECIES_NAME AS {SubjectQueryColumns.SPECIES_NAME.value}"
+            f"    S.SPECIES_NAME AS {SubjectQueryColumns.SPECIES_NAME.value},"
+            f"    GROUPS.GROUP_NAME AS {SubjectQueryColumns.GROUP_NAME.value}"
             "  FROM ANIMALS_COMMON AC"
             "    LEFT OUTER JOIN ANIMALS_COMMON MATERNAL"
             "    ON AC.MATERNAL_INDEX = MATERNAL.ID"
@@ -56,5 +58,7 @@ class LabTracksQueries:
             "    ON AC.PATERNAL_INDEX = PATERNAL.ID"
             "    LEFT OUTER JOIN SPECIES S "
             "    ON AC.SPECIES_ID = S.ID"
+            "    LEFT OUTER JOIN GROUPS "
+            "    ON MATERNAL.GROUP_ID=GROUPS.ID"
             f" WHERE AC.ID={subject_id};"
         )
