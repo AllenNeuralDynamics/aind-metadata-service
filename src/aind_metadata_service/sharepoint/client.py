@@ -1,6 +1,7 @@
 """Module to create client to connect to sharepoint database"""
 
-import sharepy
+from office365.runtime.auth.authentication_context import AuthenticationContext
+from office365.sharepoint.client_context import ClientContext
 
 
 class SharePointClient:
@@ -9,13 +10,13 @@ class SharePointClient:
     def __init__(
         self,
         server: str,
-        db: str,
-        user: str,
+        url: str,
+        username: str,
         password: str
     ) -> None:
         self.server = server
-        self.db = db
-        self.user = user
+        self.url = url
+        self.username = username
         self.password = password
 
     def create_session(self) -> sharepy.connection:
