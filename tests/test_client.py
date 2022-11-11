@@ -6,7 +6,10 @@ from unittest.mock import Mock, patch
 
 import pyodbc
 
-from aind_metadata_service.client import ErrorResponses, LabTracksClient
+from aind_metadata_service.labtracks.client import (
+    ErrorResponses,
+    LabTracksClient,
+)
 
 
 class TestLabTracksClient(unittest.TestCase):
@@ -76,10 +79,7 @@ class TestLabTracksClient(unittest.TestCase):
         example_query = "SELECT TOP 2 ANIMAL_STATUS, ID FROM ANIMALS_COMMON;"
         response = self.lb_client.submit_query(session, example_query)
         handled_response = self.lb_client.handle_response(response)
-        expected_handled_response = [
-            {"animal_status": "A", "id": decimal.Decimal("403231")},
-            {"animal_status": "A", "id": decimal.Decimal("499294")},
-        ]
+        expected_handled_response = {"message": "Unable to parse message."}
         mock_connect.assert_called()
         self.assertEqual(expected_handled_response, handled_response)
         self.lb_client.close_session(session)
@@ -110,7 +110,7 @@ class TestLabTracksClient(unittest.TestCase):
         session = self.lb_client.create_session()
         response1 = self.lb_client.submit_query(session, "SOMETHING BAD")
         expected_response = {
-            "msg": f"{ErrorResponses.pyodbc_error.value}: " f"ProgrammingError"
+            "msg": f"{ErrorResponses.PYODBC_ERROR.value}: " f"ProgrammingError"
         }
         mock_connect.assert_called()
         self.assertEqual(response1, expected_response)
