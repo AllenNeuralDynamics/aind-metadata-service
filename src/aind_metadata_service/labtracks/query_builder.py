@@ -60,8 +60,6 @@ class LabTracksQueries:
             "    LEFT OUTER JOIN SPECIES S "
             "    ON AC.SPECIES_ID = S.ID"
             "    LEFT OUTER JOIN GROUPS "
-            "    ON MATERNAL.GROUP_ID=GROUPS.ID"
-            "    INNER JOIN GROUPS "
-            "    ON AC.GROUP_ID=GROUPS.ID "
+            "    ON AC.GROUP_ID = GROUPS.ID"
             f" WHERE AC.ID={subject_id};"
         )
