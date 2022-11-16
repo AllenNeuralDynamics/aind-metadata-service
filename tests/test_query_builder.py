@@ -28,7 +28,8 @@ class TestLabTracksQueryBuilder(unittest.TestCase):
             f"    MATERNAL.CLASS_VALUES "
             f"      AS {SubjectQueryColumns.MATERNAL_CLASS_VALUES.value},"
             f"    S.SPECIES_NAME AS {SubjectQueryColumns.SPECIES_NAME.value},"
-            f"    GROUPS.GROUP_NAME AS {SubjectQueryColumns.GROUP_NAME.value}"
+            f"    GROUPS.GROUP_NAME AS {SubjectQueryColumns.GROUP_NAME.value},"
+            f"    GROUPS.GROUP_DESCRIPTION AS {SubjectQueryColumns.GROUP_DESCRIPTION.value}"
             "  FROM ANIMALS_COMMON AC"
             "    LEFT OUTER JOIN ANIMALS_COMMON MATERNAL"
             "    ON AC.MATERNAL_INDEX = MATERNAL.ID"
@@ -37,7 +38,7 @@ class TestLabTracksQueryBuilder(unittest.TestCase):
             "    LEFT OUTER JOIN SPECIES S "
             "    ON AC.SPECIES_ID = S.ID"
             "    LEFT OUTER JOIN GROUPS "
-            "    ON MATERNAL.GROUP_ID=GROUPS.ID"
+            "    ON AC.GROUP_ID = GROUPS.ID"
             f" WHERE AC.ID={subject_id};"
         )
         self.assertEqual(expected_output, actual_output)
