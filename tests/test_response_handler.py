@@ -18,46 +18,42 @@ class TestLabTracksResponseHandler(unittest.TestCase):
 
     class_values_str = (
         '<?xml version="1.0" encoding="utf-16"?>\r\n<MouseCustomClass '
-        'xmlns:xsd="http://www.w3.org/2001/XMLSchema" '
-        'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\r\n  '
-        "<Reserved_by>Jane Doe</Reserved_by>\r\n  "
-        "<Reserve_Date>2022-07-21T00:00:00-07:00</Reserve_Date>\r\n  "
-        "<Solution>1xPBS</Solution>\r\n  "
-        "<Full_Genotype>Adora2a-Cre/wt</Full_Genotype>\r\n</MouseCustomClass>"
+        'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
+        'xmlns:xsd="http://www.w3.org/2001/XMLSchema">\r\n '
+        "<Reserved_by>James J. Harrington</Reserved_by>\r\n "
+        "<Reserve_Date>2013-07-10T00:00:00-07:00</Reserve_Date>\r\n "
+        "<Reason>Maintenance Breeding</Reason>\r\n</MouseCustomClass> "
     )
     paternal_class_values_str = (
         '<?xml version="1.0" encoding="utf-16"?>\r\n<MouseCustomClass '
-        'xmlns:xsd="http://www.w3.org/2001/XMLSchema" '
-        'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\r\n  '
-        "<Reserved_by>Mary Smith </Reserved_by>\r\n  "
-        "<Reserve_Date>2022-06-27T00:00:00</Reserve_Date>\r\n  "
-        "<Reason>EU-retire</Reason>\r\n  "
-        "<Full_Genotype>Adora2a-Cre/wt</Full_Genotype>\r\n</MouseCustomClass>"
+        'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
+        'xmlns:xsd="http://www.w3.org/2001/XMLSchema">\r\n '
+        "<Reserved_by>James J. Harrington</Reserved_by>\r\n "
+        "<Reserve_Date>2013-01-30T00:00:00-08:00</Reserve_Date>\r\n "
+        "<Reason>Breeder Refresh</Reason>\r\n</MouseCustomClass> "
     )
     maternal_class_values_str = (
         '<?xml version="1.0" encoding="utf-16"?>\r\n<MouseCustomClass '
-        'xmlns:xsd="http://www.w3.org/2001/XMLSchema" '
-        'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\r\n  '
-        "<Reserved_by>Mary Smith </Reserved_by>\r\n  "
-        "<Reserve_Date>2022-06-27T00:00:00</Reserve_Date>\r\n  "
-        "<Reason>EU-retire</Reason>\r\n  "
-        "<Full_Genotype>wt/wt</Full_Genotype>\r\n</MouseCustomClass>"
+        'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
+        'xmlns:xsd="http://www.w3.org/2001/XMLSchema">\r\n '
+        "<Reserved_by>James J. Harrington</Reserved_by>\r\n "
+        "<Reserve_Date>2013-01-30T00:00:00-08:00</Reserve_Date>\r\n "
+        "<Reason>Breeder Refresh</Reason>\r\n</MouseCustomClass> "
     )
     test_response = {
         "msg": [
             {
-                "id": Decimal("625463"),
+                "id": Decimal("115977"),
                 "class_values": class_values_str,
                 "sex": "M",
-                "birth_date": datetime.datetime(2022, 3, 12, 0, 0),
-                "mouse_comment": "PF 10/7/22",
-                "paternal_id": Decimal("617425"),
+                "birth_date": datetime.datetime(2012, 5, 13, 0, 0),
+                "paternal_id": Decimal("107384"),
                 "paternal_class_values": paternal_class_values_str,
-                "maternal_id": Decimal("618504"),
+                "maternal_id": Decimal("107392"),
                 "maternal_class_values": maternal_class_values_str,
                 "species_name": "mouse",
-                "group_name": "Adora2a-Cre(ND)",
-                "group_description": None,
+                "group_name": "C57BL6J_OLD",
+                "group_description": "C57BL/6J",
             }
         ]
     }
@@ -72,16 +68,16 @@ class TestLabTracksResponseHandler(unittest.TestCase):
             "describedBy": described_by_str,
             "schema_version": "0.2.0",
             "species": "Mus musculus",
-            "subject_id": "625463",
+            "subject_id": "115977",
             "sex": "Male",
-            "date_of_birth": "2022-03-12",
-            "genotype": "Adora2a-Cre/wt",
-            "maternal_id": "618504",
-            "maternal_genotype": "wt/wt",
-            "paternal_id": "617425",
-            "paternal_genotype": "Adora2a-Cre/wt",
-            "breeding_group": "Adora2a-Cre(ND)",
-            "background_strain": None,
+            "date_of_birth": "2012-05-13",
+            "genotype": "None",
+            "maternal_id": "107392",
+            "maternal_genotype": "None",
+            "paternal_id": "107384",
+            "paternal_genotype": "None",
+            "breeding_group": "C57BL6J_OLD",
+            "background_strain": "C57BL/6J",
         }
     )
 
