@@ -57,7 +57,7 @@ class TestLabTracksResponseHandler(unittest.TestCase):
                 "maternal_class_values": maternal_class_values_str,
                 "species_name": "mouse",
                 "group_name": "Adora2a-Cre(ND)",
-                "background_strain": "None",
+                "group_description": "None",
             }
         ]
     }
