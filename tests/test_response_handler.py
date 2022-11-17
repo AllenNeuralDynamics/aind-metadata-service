@@ -92,6 +92,8 @@ class TestLabTracksResponseHandler(unittest.TestCase):
         actual_subject = self.rh.map_response_to_subject(self.test_response)[
             "message"
         ]
+        print(self.expected_subject)
+        print(actual_subject)
         self.assertEqual(self.expected_subject, actual_subject)
 
     def test_map_class_values_to_genotype(self):
