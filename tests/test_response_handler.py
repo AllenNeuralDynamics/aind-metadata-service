@@ -63,8 +63,8 @@ class TestLabTracksResponseHandler(unittest.TestCase):
     }
 
     described_by_str = (
-        "https://github.com/AllenNeuralDynamics/aind-data-schema/blob/main/src/aind_data_schema"
-        "subject.py"
+        "https://github.com/AllenNeuralDynamics/aind-data-schema/"
+        "blob/main/src/aind_data_schema/subject.py"
     )
 
     expected_subject = Subject.parse_obj(
