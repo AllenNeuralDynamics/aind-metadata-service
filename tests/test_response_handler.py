@@ -57,7 +57,7 @@ class TestLabTracksResponseHandler(unittest.TestCase):
                 "maternal_class_values": maternal_class_values_str,
                 "species_name": "mouse",
                 "group_name": "C57BL6J_OLD",
-                "background_strain": "C57BL/6J",
+                "group_description": "C57BL/6J",
             }
         ]
     }
