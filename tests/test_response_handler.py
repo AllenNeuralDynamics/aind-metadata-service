@@ -20,7 +20,7 @@ class TestLabTracksResponseHandler(unittest.TestCase):
         '<?xml version="1.0" encoding="utf-16"?>\r\n<MouseCustomClass '
         'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
         'xmlns:xsd="http://www.w3.org/2001/XMLSchema">\r\n '
-        "<Reserved_by>James J. Harrington</Reserved_by>\r\n "
+        "<Reserved_by>Jane Doe</Reserved_by>\r\n "
         "<Reserve_Date>2013-07-10T00:00:00-07:00</Reserve_Date>\r\n "
         "<Reason>Maintenance Breeding</Reason>\r\n "
         "<Full_Genotype>Adora2a-Cre/wt</Full_Genotype>\r\n</MouseCustomClass> "
@@ -29,7 +29,7 @@ class TestLabTracksResponseHandler(unittest.TestCase):
         '<?xml version="1.0" encoding="utf-16"?>\r\n<MouseCustomClass '
         'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
         'xmlns:xsd="http://www.w3.org/2001/XMLSchema">\r\n '
-        "<Reserved_by>James J. Harrington</Reserved_by>\r\n "
+        "<Reserved_by>Jane Doe</Reserved_by>\r\n "
         "<Reserve_Date>2013-01-30T00:00:00-08:00</Reserve_Date>\r\n "
         "<Reason>Breeder Refresh</Reason>\r\n "
         "<Full_Genotype>Adora2a-Cre/wt</Full_Genotype>\r\n</MouseCustomClass>"
@@ -38,7 +38,7 @@ class TestLabTracksResponseHandler(unittest.TestCase):
         '<?xml version="1.0" encoding="utf-16"?>\r\n<MouseCustomClass '
         'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
         'xmlns:xsd="http://www.w3.org/2001/XMLSchema">\r\n '
-        "<Reserved_by>James J. Harrington</Reserved_by>\r\n "
+        "<Reserved_by>Jane Doe</Reserved_by>\r\n "
         "<Reserve_Date>2013-01-30T00:00:00-08:00</Reserve_Date>\r\n "
         "<Reason>Breeder Refresh</Reason>\r\n "
         "<Full_Genotype>wt/wt</Full_Genotype>\r\n</MouseCustomClass> "
@@ -50,7 +50,7 @@ class TestLabTracksResponseHandler(unittest.TestCase):
                 "class_values": class_values_str,
                 "sex": "M",
                 "birth_date": datetime.datetime(2012, 5, 13, 0, 0),
-                "mouse_comment": "None",
+                "mouse_comment": None,
                 "paternal_id": Decimal("107384"),
                 "paternal_class_values": paternal_class_values_str,
                 "maternal_id": Decimal("107392"),
