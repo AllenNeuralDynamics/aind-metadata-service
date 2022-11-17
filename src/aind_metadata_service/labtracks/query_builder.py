@@ -64,6 +64,6 @@ class LabTracksQueries:
             "    LEFT OUTER JOIN GROUPS AS G "
             "    ON AC.GROUP_ID = G.ID"
             "    LEFT OUTER JOIN GROUPS "
-            "    ON AC.GROUP_ID = GROUPS.ID"
+            "    ON MATERNAL.GROUP_ID = GROUPS.ID"
             f" WHERE AC.ID={subject_id};"
         )

@@ -47,6 +47,7 @@ class TestLabTracksResponseHandler(unittest.TestCase):
                 "class_values": class_values_str,
                 "sex": "M",
                 "birth_date": datetime.datetime(2012, 5, 13, 0, 0),
+                "mouse_comment": "None",
                 "paternal_id": Decimal("107384"),
                 "paternal_class_values": paternal_class_values_str,
                 "maternal_id": Decimal("107392"),
