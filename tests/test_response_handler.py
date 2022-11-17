@@ -22,7 +22,8 @@ class TestLabTracksResponseHandler(unittest.TestCase):
         'xmlns:xsd="http://www.w3.org/2001/XMLSchema">\r\n '
         "<Reserved_by>James J. Harrington</Reserved_by>\r\n "
         "<Reserve_Date>2013-07-10T00:00:00-07:00</Reserve_Date>\r\n "
-        "<Reason>Maintenance Breeding</Reason>\r\n</MouseCustomClass> "
+        "<Reason>Maintenance Breeding</Reason>\r\n "
+        "<Full_Genotype>Adora2a-Cre/wt</Full_Genotype>\r\n</MouseCustomClass> "
     )
     paternal_class_values_str = (
         '<?xml version="1.0" encoding="utf-16"?>\r\n<MouseCustomClass '
@@ -30,7 +31,8 @@ class TestLabTracksResponseHandler(unittest.TestCase):
         'xmlns:xsd="http://www.w3.org/2001/XMLSchema">\r\n '
         "<Reserved_by>James J. Harrington</Reserved_by>\r\n "
         "<Reserve_Date>2013-01-30T00:00:00-08:00</Reserve_Date>\r\n "
-        "<Reason>Breeder Refresh</Reason>\r\n</MouseCustomClass> "
+        "<Reason>Breeder Refresh</Reason>\r\n "
+        "<Full_Genotype>Adora2a-Cre/wt</Full_Genotype>\r\n</MouseCustomClass>"
     )
     maternal_class_values_str = (
         '<?xml version="1.0" encoding="utf-16"?>\r\n<MouseCustomClass '
@@ -38,7 +40,8 @@ class TestLabTracksResponseHandler(unittest.TestCase):
         'xmlns:xsd="http://www.w3.org/2001/XMLSchema">\r\n '
         "<Reserved_by>James J. Harrington</Reserved_by>\r\n "
         "<Reserve_Date>2013-01-30T00:00:00-08:00</Reserve_Date>\r\n "
-        "<Reason>Breeder Refresh</Reason>\r\n</MouseCustomClass> "
+        "<Reason>Breeder Refresh</Reason>\r\n "
+        "<Full_Genotype>wt/wt</Full_Genotype>\r\n</MouseCustomClass> "
     )
     test_response = {
         "msg": [
@@ -54,7 +57,7 @@ class TestLabTracksResponseHandler(unittest.TestCase):
                 "maternal_class_values": maternal_class_values_str,
                 "species_name": "mouse",
                 "group_name": "C57BL6J_OLD",
-                "group_description": "C57BL/6J",
+                "background_strain": "C57BL/6J",
             }
         ]
     }
@@ -72,11 +75,11 @@ class TestLabTracksResponseHandler(unittest.TestCase):
             "subject_id": "115977",
             "sex": "Male",
             "date_of_birth": "2012-05-13",
-            "genotype": "None",
+            "genotype": "Adora2a-Cre/wt",
             "maternal_id": "107392",
-            "maternal_genotype": "None",
+            "maternal_genotype": "wt/wt",
             "paternal_id": "107384",
-            "paternal_genotype": "None",
+            "paternal_genotype": "Adora2a-Cre/wt",
             "breeding_group": "C57BL6J_OLD",
             "background_strain": "C57BL/6J",
         }
