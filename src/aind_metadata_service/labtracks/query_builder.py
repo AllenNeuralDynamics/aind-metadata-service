@@ -15,7 +15,7 @@ class SubjectQueryColumns(Enum):
     MATERNAL_CLASS_VALUES = "maternal_class_values"
     SPECIES_NAME = "species_name"
     GROUP_NAME = "group_name"
-    GROUP_DESCRIPTION = "background_strain"
+    GROUP_DESCRIPTION = "group_description"
 
 
 class LabTracksQueries:
