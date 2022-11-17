@@ -254,6 +254,7 @@ class LabTracksResponseHandler:
             subject_id = contents[SubjectQueryColumns.ID.value]
             date_of_birth = contents[SubjectQueryColumns.BIRTH_DATE.value]
             breeding_group = contents[SubjectQueryColumns.GROUP_NAME.value]
+            background_strain = contents[SubjectQueryColumns.GROUP_DESCRIPTION.value]
             subject = Subject(
                 subject_id=subject_id,
                 species=species,
@@ -265,6 +266,7 @@ class LabTracksResponseHandler:
                 date_of_birth=date_of_birth,
                 genotype=full_genotype,
                 breeding_group=breeding_group,
+                background_strain=background_strain,
             )
 
             return {"message": subject}
