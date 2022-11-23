@@ -122,6 +122,10 @@ class LabTracksClient:
         lth = LabTracksResponseHandler()
         handled_response = lth.map_response_to_subject(response)
         # TODO: Better handling here or rely on requester to handle responses?
+        for key, value in handled_response.items():
+            if value is '{msg:Error String}': 
+                # IndexError: list index out of range
+                # pydantic.error_wrappers.ValidationError
         return handled_response
 
 
