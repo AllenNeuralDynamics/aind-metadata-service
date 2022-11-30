@@ -4,33 +4,34 @@ on:
     branches:
       - main
 jobs:
+  extract_version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.getversion.outputs.version }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Extract version from file
+        id: getversion
+        run: |
+          pkg_name=$(grep -P 'version = \{attr = .*\}' pyproject.toml | grep -oP '\w+.__version__')
+          init_file="./src/${pkg_name//.__version__}/__init__.py"
+          new_tag=$(grep -Po '__version__ = "\K.*?(?=")' $init_file)
+          echo "version=$new_tag" >> $GITHUB_OUTPUT
   tag:
     runs-on: ubuntu-latest
+    needs: extract_version
     steps:
-      - uses: actions/checkout@v2
-      - name: Extract version from file
-        id: getversion
-        run: |
-          pkg_name=$(grep -P 'version = \{attr = .*\}' pyproject.toml | grep -oP '\w+.__version__')
-          init_file="./src/${pkg_name//.__version__}/__init__.py"
-          new_tag=$(grep -Po '__version__ = "\K.*?(?=")' $init_file)
-          echo "::set-output name=version::$new_tag"
+      - uses: actions/checkout@v3
       - name: Bump tag
-        uses: mathieudutour/github-tag-action@v6.0
+        uses: mathieudutour/github-tag-action@v6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          custom_tag: ${{ steps.getversion.outputs.version }}
+          custom_tag: ${{ needs.extract_version.outputs.version }}
   publish:
     runs-on: ubuntu-latest
+    needs: extract_version
     steps:
-      - uses: actions/checkout@v2
-      - name: Extract version from file
-        id: getversion
-        run: |
-          pkg_name=$(grep -P 'version = \{attr = .*\}' pyproject.toml | grep -oP '\w+.__version__')
-          init_file="./src/${pkg_name//.__version__}/__init__.py"
-          new_tag=$(grep -Po '__version__ = "\K.*?(?=")' $init_file)
-          echo "::set-output name=version::$new_tag"
+      - uses: actions/checkout@v3
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v2
@@ -41,11 +42,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build image and push to GitHub Container Registry
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           # relative path to the place where source code with Dockerfile is located
           context: .
           push: true
           tags: |
-            ghcr.io/alleninstitute/aind-metadata-service:${{ steps.getversion.outputs.version }}
+            ghcr.io/alleninstitute/aind-metadata-service:${{ needs.extract_version.outputs.version }}
             ghcr.io/alleninstitute/aind-metadata-service:latest
