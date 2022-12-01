@@ -48,5 +48,5 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/alleninstitute/aind-metadata-service:${{ needs.extract_version.outputs.version }}
-            ghcr.io/alleninstitute/aind-metadata-service:latest
+            ghcr.io/allenneuraldynamics/aind-metadata-service:${{ needs.extract_version.outputs.version }}
+            ghcr.io/allenneuraldynamics/aind-metadata-service:latest
