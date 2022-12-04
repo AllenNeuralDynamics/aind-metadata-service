@@ -54,7 +54,7 @@ async def retrieve_procedures(subject_id):
     sharepoint_client = SharePointClient(
         site_url=sharepoint_url,
         client_id=sharepoint_user,
-        client_secret=sharepoint_password
+        client_secret=sharepoint_password,
     )
 
     response = sharepoint_client.get_procedure_info(subject_id=subject_id)
