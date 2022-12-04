@@ -185,6 +185,8 @@ class NeurosurgeryAndBehaviorList2019:
 class ListVersions(Enum):
     VERSION_2019 = ({"list_title": "SWR 2019-Present",
                      "view_title": "New Request"})
+    DEFAULT = ({"list_title": "SWR 2019-Present",
+                 "view_title": "New Request"})
 
 
 class SharePointClient:
@@ -221,11 +223,14 @@ class SharePointClient:
             f"{NeurosurgeryAndBehaviorList2019.ListFields.LAB_TRACKS_ID.value}"
             f" eq {subject_id}"
         )
+        version_2019 = (
+            f"{NeurosurgeryAndBehaviorList2019.ListFields.LAB_TRACKS_ID.value}"
+            f" eq {subject_id}"
+        )
         # TODO: Handle other versions
+        filter_string = default
         if version == ListVersions.VERSION_2019:
-            filter_string = default
-        else:
-            filter_string = default
+            filter_string = version_2019
         return filter_string
 
     def get_procedure_info(self,
