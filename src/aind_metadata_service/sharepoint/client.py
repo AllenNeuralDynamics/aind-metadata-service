@@ -258,9 +258,10 @@ class SharePointClient:
 
     @staticmethod
     def _map_list_item_to_procedure(list_item: ListItem):
+        sharepoint_data = list_item.to_json()
         subject_id = (
-            list_item[(NeurosurgeryAndBehaviorList2019.
-                       ListFields.LAB_TRACKS_ID.value)]
+            sharepoint_data[(NeurosurgeryAndBehaviorList2019.
+                             ListFields.LAB_TRACKS_ID.value)]
         )
 
         return Procedures(subject_id=subject_id)
