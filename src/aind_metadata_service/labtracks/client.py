@@ -3,6 +3,9 @@ from enum import Enum
 from typing import Optional
 from xml.etree import ElementTree as ET
 
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+
 import pyodbc
 from aind_data_schema import Subject
 from aind_data_schema.subject import Sex, Species
@@ -122,11 +125,21 @@ class LabTracksClient:
         lth = LabTracksResponseHandler()
         handled_response = lth.map_response_to_subject(response)
         # TODO: Better handling here or rely on requester to handle responses?
-        for key, value in handled_response.items():
+        '''for key, value in handled_response.items():
             if value is '{msg:Error String}': 
+                return JSONResponse(status_code=418, 
+                content={"message": f"An error", "data": {}})
+
                 # IndexError: list index out of range
-                # pydantic.error_wrappers.ValidationError
+                # pydantic.error_wrappers.ValidationError'''
         return handled_response
+    
+app = FastAPI()
+
+@app.exception_handler(LabTracksClient)
+async def ltc_exeception_handler(request: Request, exc: LabTracksClient):
+    return JSONResponse(status_code=418, 
+        content={"message": f"An error", "data": {}})
 
 
 class MouseCustomClassFields(Enum):
