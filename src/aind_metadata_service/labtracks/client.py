@@ -254,7 +254,9 @@ class LabTracksResponseHandler:
             subject_id = contents[SubjectQueryColumns.ID.value]
             date_of_birth = contents[SubjectQueryColumns.BIRTH_DATE.value]
             breeding_group = contents[SubjectQueryColumns.GROUP_NAME.value]
-            background_strain = contents[SubjectQueryColumns.GROUP_DESCRIPTION.value]
+            background_strain = contents[
+                SubjectQueryColumns.GROUP_DESCRIPTION.value
+            ]
             subject = Subject(
                 subject_id=subject_id,
                 species=species,

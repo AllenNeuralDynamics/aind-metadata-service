@@ -62,7 +62,6 @@ class TestLabTracksResponseHandler(unittest.TestCase):
         ]
     }
 
-
     expected_subject = Subject.parse_obj(
         {
             "schema_version": "0.2.2",
