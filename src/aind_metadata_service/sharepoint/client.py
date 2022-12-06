@@ -2,31 +2,38 @@
 
 from enum import Enum
 
-from aind_data_schema import Procedures
+from aind_data_schema.procedures import (
+    FiberImplant,
+    Headframe,
+    Injection,
+    Procedures,
+)
 from office365.runtime.auth.client_credential import ClientCredential
+from office365.runtime.client_object import ClientObject
 from office365.sharepoint.client_context import ClientContext
 from office365.sharepoint.listitems.collection import ListItemCollection
-from office365.sharepoint.listitems.listitem import ListItem
 
 
 class NeurosurgeryAndBehaviorList2019:
-    class ViewFields(Enum):
-        ID = "ID"
-        LINK_TITLE = "LinkTitle"
-        PI = "PI"
-        IACUC_PROTOCOL = "IACUC_x0020_Protocol_x0020__x002"
-        PROJECT_ID = ("Project_x0020_ID_x0020__x0028_te",)
-        PROCEDURE = ("Procedure",)
-        LIMS_TASK_FLOW = ("LIMStaskflow1",)
-        DATE_RANGE_START = ("DateRangeStart",)
-        CREATED = ("Created",)
-        MODIFIED = ("Modified",)
-        EDITOR = ("Editor",)
-        LABTRACKS_GROUP = ("LabTracks_x0020_Group",)
-        REQUESTOR_COMMENTS = ("LongRequestorComments",)
-        IMPLANT_ID_COVER_SLIP_TYPE = "ImplantIDCoverslipType"
+    """Class to contain helful info to parse the 2019 SharePoint List"""
 
-    class ListFields(Enum):
+    class StringParserHelper(Enum):
+        """Enum class for SharePoint's response strings"""
+
+        # Not really why, but some response fields return 'Select...'
+        SELECT_STR = "Select..."
+        PROCEDURE_TYPE_SPLITTER = "+"
+
+    class ProcedureType(Enum):
+        """Enum class for SharePoint's Procedure Type"""
+
+        HEAD_PLANT = "HP"
+        INJECTION = "Injection"
+        OPTIC_FIBER_IMPLANT = "Optic Fiber Implant"
+
+    class ListField(Enum):
+        """Enum class for fields in List Item object response"""
+
         FILE_SYSTEM_OBJECT_TYPE = "FileSystemObjectType"
         ID = "Id"
         SERVER_REDIRECTED_EMBED_URI = "ServerRedirectedEmbedUri"
@@ -182,6 +189,8 @@ class NeurosurgeryAndBehaviorList2019:
 
 
 class ListVersions(Enum):
+    """Enum class to handle different SharePoint list versions."""
+
     VERSION_2019 = {
         "list_title": "SWR 2019-Present",
         "view_title": "New Request",
@@ -190,7 +199,7 @@ class ListVersions(Enum):
 
 
 class SharePointClient:
-    """This class contains the api to connect to LabTracks db."""
+    """This class contains the api to connect to SharePoint db."""
 
     def __init__(
         self, site_url: str, client_id: str, client_secret: str
@@ -215,14 +224,33 @@ class SharePointClient:
         )
 
     @staticmethod
-    def _get_filter_string(version, subject_id):
+    def _get_filter_string(version: ListVersions, subject_id: str) -> str:
+        """
+        Helper method to return a filter on the list
+        Parameters
+        ----------
+        version : ListVersions
+          Which version of the backend is being queried
+        subject_id : str
+          ID of the subject being queried for
+
+        Returns
+        -------
+        str
+          A string to pass into a query filter
+
+        """
         default = (
-            f"{NeurosurgeryAndBehaviorList2019.ListFields.LAB_TRACKS_ID.value}"
-            f" eq {subject_id}"
+            f"substringof("
+            f"{subject_id}, "
+            f"{NeurosurgeryAndBehaviorList2019.ListField.LAB_TRACKS_ID.value}"
+            f")"
         )
         version_2019 = (
-            f"{NeurosurgeryAndBehaviorList2019.ListFields.LAB_TRACKS_ID.value}"
-            f" eq {subject_id}"
+            f"substringof("
+            f"{subject_id}, "
+            f"{NeurosurgeryAndBehaviorList2019.ListField.LAB_TRACKS_ID.value}"
+            f")"
         )
         # TODO: Handle other versions
         filter_string = default
@@ -231,37 +259,148 @@ class SharePointClient:
         return filter_string
 
     def get_procedure_info(
-        self, subject_id, version=ListVersions.VERSION_2019
-    ):
+        self,
+        subject_id: str,
+        version: ListVersions = ListVersions.VERSION_2019,
+    ) -> dict:
+        """
+        Primary interface. Maps a subject_id to a response.
+        Parameters
+        ----------
+        subject_id : str
+          ID of the subject being queried for.
+        version : ListVersions
+          Version of the SharePoint List being queried against
+
+        Returns
+        -------
+        dict
+          A response
+
+        """
         filter_string = self._get_filter_string(version, subject_id)
         ctx = self.client_context
-        list_views = ctx.web.lists.get_by_title(
+        list_view = ctx.web.lists.get_by_title(
             version.value["list_title"]
         ).views.get_by_title(version.value["view_title"])
-        ctx.load(list_views)
+        ctx.load(list_view)
         ctx.execute_query()
-        list_items = list_views.get_items().filter(filter_string)
+        list_items = list_view.get_items().filter(filter_string)
         ctx.load(list_items)
         ctx.execute_query()
-        response = self._handle_response(list_items)
+        response = self._handle_response_from_sharepoint(
+            list_items, subject_id=subject_id
+        )
 
         return response
 
-    def _handle_response(self, list_items: ListItemCollection) -> dict:
+    # TODO: Refactor to make less complex?
+    def _handle_response_from_sharepoint(  # noqa: C901
+        self, list_items: ListItemCollection, subject_id: str
+    ) -> dict:
+        """
+        Maps the response from SharePoint into a Procedures model
+        Parameters
+        ----------
+        list_items : ListItemCollection
+          SharePoint returns a ListItemCollection given a query
+        subject_id : str
+          ID of the subject being queried for.
+
+        Returns
+        -------
+        dict
+          Either a Procedures model or an error response
+
+        """
         if list_items:
-            # TODO: Handle case where more than one item is returned?
-            list_item = list_items[0]
-            procedures = self._map_list_item_to_procedure(list_item)
+            list_fields = NeurosurgeryAndBehaviorList2019.ListField
+            str_helpers = NeurosurgeryAndBehaviorList2019.StringParserHelper
+            nsb_proc_types = NeurosurgeryAndBehaviorList2019.ProcedureType
+            procedures = Procedures.construct(subject_id=subject_id)
+            head_frames = []
+            injections = []
+            fiber_implants = []
+            for list_item in list_items:
+                if list_item.get_property(list_fields.PROCEDURE.value):
+                    procedure_types = list_item.get_property(
+                        list_fields.PROCEDURE.value
+                    ).split(str_helpers.PROCEDURE_TYPE_SPLITTER.value)
+                else:
+                    procedure_types = []
+                for procedure_type in procedure_types:
+                    if procedure_type == nsb_proc_types.HEAD_PLANT.value:
+                        head_frames.append(
+                            self._map_list_item_to_head_frame(list_item)
+                        )
+                    if procedure_type == nsb_proc_types.INJECTION.value:
+                        injections.append(
+                            self._map_list_item_to_injection(list_item)
+                        )
+                    if (
+                        procedure_type
+                        == nsb_proc_types.OPTIC_FIBER_IMPLANT.value
+                    ):
+                        fiber_implants.append(
+                            self._map_list_item_to_fiber_implant(list_item)
+                        )
+                if head_frames:
+                    procedures.headframes = head_frames
+                if injections:
+                    procedures.injections = injections
+                if fiber_implants:
+                    procedures.fiber_implants = fiber_implants
             response = procedures
         else:
             response = {"message": "Nothing Found"}
         return response
 
     @staticmethod
-    def _map_list_item_to_procedure(list_item: ListItem):
-        sharepoint_data = list_item.to_json()
-        subject_id = sharepoint_data[
-            (NeurosurgeryAndBehaviorList2019.ListFields.LAB_TRACKS_ID.value)
-        ]
+    def _map_list_item_to_injection(list_item: ClientObject) -> Injection:
+        """Maps a SharePoint ClientObject to an Injection model"""
+        list_fields = NeurosurgeryAndBehaviorList2019.ListField
+        start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
+        end_date = list_item.get_property(list_fields.DATE_RANGE_END.value)
+        experimenter_full_name = list_item.get_property(
+            list_fields.LAB_TRACKS_REQUESTOR.value
+        )
+        injection = Injection.construct(
+            start_date=start_date,
+            end_date=end_date,
+            experimenter_full_name=experimenter_full_name,
+        )
+        return injection
 
-        return Procedures(subject_id=subject_id)
+    @staticmethod
+    def _map_list_item_to_fiber_implant(
+        list_item: ClientObject,
+    ) -> FiberImplant:
+        """Maps a SharePoint ListItem to a FiberImplant model"""
+        list_fields = NeurosurgeryAndBehaviorList2019.ListField
+        start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
+        end_date = list_item.get_property(list_fields.DATE_RANGE_END.value)
+        experimenter_full_name = list_item.get_property(
+            list_fields.LAB_TRACKS_REQUESTOR.value
+        )
+        fiber_implant = FiberImplant.construct(
+            start_date=start_date,
+            end_date=end_date,
+            experimenter_full_name=experimenter_full_name,
+        )
+        return fiber_implant
+
+    @staticmethod
+    def _map_list_item_to_head_frame(list_item: ClientObject) -> Headframe:
+        """Maps a SharePoint ListItem to a HeadFrame model"""
+        list_fields = NeurosurgeryAndBehaviorList2019.ListField
+        start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
+        end_date = list_item.get_property(list_fields.DATE_RANGE_END.value)
+        experimenter_full_name = list_item.get_property(
+            list_fields.LAB_TRACKS_REQUESTOR.value
+        )
+        head_frame = Headframe.construct(
+            start_date=start_date,
+            end_date=end_date,
+            experimenter_full_name=experimenter_full_name,
+        )
+        return head_frame

@@ -1,6 +1,13 @@
+"""Module to test SharePoint Client methods"""
+
 import unittest
 
-from aind_data_schema import Procedures
+from aind_data_schema.procedures import (
+    FiberImplant,
+    Headframe,
+    Injection,
+    Procedures,
+)
 from office365.sharepoint.client_context import ClientContext
 from office365.sharepoint.listitems.collection import ListItemCollection
 from office365.sharepoint.listitems.listitem import ListItem
@@ -12,9 +19,11 @@ from aind_metadata_service.sharepoint.client import (
 
 
 class Examples:
+    """Class to hold some examples to compare against"""
 
     lims_link = "<a href='http://lims2/specimens?search650102'>Search</a>"
     project_id = "122-01-001-10 Neural Dynamics Scientific Activities"
+    # TODO: Move this to JSON file in resources
     list_item_json = {
         "FileSystemObjectType": 0,
         "Id": 5554,
@@ -174,49 +183,106 @@ class Examples:
         "https://raw.githubusercontent.com/AllenNeuralDynamics/"
         "aind-data-schema/main/site-packages/aind_data_schema/procedures.py"
     )
-    procedures1 = Procedures(
-        describedBy=described_by, schema_version="0.4.2", subject_id="650102"
+    expected_procedures1 = Procedures.construct(
+        describedBy=described_by,
+        schema_version="0.4.2",
+        subject_id="650102",
+        headframes=(
+            [
+                Headframe.construct(
+                    type=None,
+                    start_date="2022-12-05T08:00:00Z",
+                    end_date="2022-12-09T08:00:00Z",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol=None,
+                    animal_weight=None,
+                    notes=None,
+                    well_part_number=None,
+                    well_type=None,
+                )
+            ]
+        ),
+        injections=(
+            [
+                Injection.construct(
+                    type=None,
+                    start_date="2022-12-05T08:00:00Z",
+                    end_date="2022-12-09T08:00:00Z",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol=None,
+                    animal_weight=None,
+                    notes=None,
+                    injection_materials=None,
+                )
+            ]
+        ),
+        fiber_implants=(
+            [
+                FiberImplant.construct(
+                    type=None,
+                    start_date="2022-12-05T08:00:00Z",
+                    end_date="2022-12-09T08:00:00Z",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol=None,
+                    animal_weight=None,
+                    notes=None,
+                )
+            ]
+        ),
     )
 
 
 class TestSharepointClient(unittest.TestCase):
+    """Class to test methods for SharePointClient."""
+
     client = SharePointClient(
         site_url="a_url", client_id="an_id", client_secret="a_secret"
     )
 
     def test_get_filter_string(self):
+        """Tests that the filter string is constructed correctly."""
         version_2019 = self.client._get_filter_string(
             version=ListVersions.VERSION_2019, subject_id="652464"
         )
         default = self.client._get_filter_string(
             version=ListVersions.DEFAULT, subject_id="652464"
         )
-        expected_string = "LabTracks_x0020_ID eq 652464"
+        expected_string = "substringof(652464, LabTracks_x0020_ID)"
         self.assertEqual(version_2019, expected_string)
         self.assertEqual(default, expected_string)
 
-    def test_map_list_item(self):
-        # TODO: Mocked methods might be better
-        blank_ctx = ClientContext(base_url=self.client.site_url)
-        list_item = ListItem(blank_ctx)
-        # Override to_json method to return example
-        list_item.to_json = lambda: Examples.list_item_json
-        actual_procedures = self.client._map_list_item_to_procedure(list_item)
-        expected_procedures = Examples.procedures1
-        self.assertEqual(actual_procedures, expected_procedures)
-
     def test_handle_response(self):
+        """Tests that the responses returned are what's expected."""
+        subject_id = "650102"
         blank_ctx = ClientContext(base_url=self.client.site_url)
         list_item_collection = ListItemCollection(context=blank_ctx)
-        empty_msg = self.client._handle_response(list_item_collection)
+        # A completely empty list_item_collection
+        empty_msg = self.client._handle_response_from_sharepoint(
+            list_item_collection, subject_id=subject_id
+        )
+
+        # Add a list item with no procedures info
         list_item = ListItem(context=blank_ctx)
-        list_item.to_json = lambda: Examples.list_item_json
         list_item_collection.add_child(list_item)
-        msg1 = self.client._handle_response(list_item_collection)
-        self.assertEqual(empty_msg, {"message": "Nothing Found"})
-        self.assertEqual(msg1, Examples.procedures1)
+        msg = self.client._handle_response_from_sharepoint(
+            list_item_collection, subject_id=subject_id
+        )
+        expected_msg = Procedures.construct(subject_id=subject_id)
+
+        # Add a list item with contents
+        list_item_collection = ListItemCollection(context=blank_ctx)
+        list_item2 = ListItem(context=blank_ctx)
+        list_item2.get_property = lambda x: Examples.list_item_json[x]
+        list_item_collection.add_child(list_item2)
+        msg1 = self.client._handle_response_from_sharepoint(
+            list_item_collection, subject_id=subject_id
+        )
+        self.assertEqual({"message": "Nothing Found"}, empty_msg)
+        self.assertEqual(expected_msg, msg)
+        self.assertEqual(Examples.expected_procedures1, msg1)
 
     def test_get_procedure_info(self):
+        """Basic test on the main interface."""
         blank_ctx = ClientContext(base_url=self.client.site_url)
         list_item_collection = ListItemCollection(context=blank_ctx)
         list_item = ListItem(context=blank_ctx)

@@ -1,3 +1,1 @@
-"""REST service to retrieve metadata from databases.
-"""
-__version__ = "0.0.1"
+"""Package to manage interfacing with SharePoint."""
