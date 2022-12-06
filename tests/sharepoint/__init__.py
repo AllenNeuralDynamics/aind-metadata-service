@@ -1,1 +1,1 @@
-"""Package to manage testing of ShjarePoint Client."""
+"""Package to manage testing of SharePoint Client."""
