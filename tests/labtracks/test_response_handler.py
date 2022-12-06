@@ -62,10 +62,9 @@ class TestLabTracksResponseHandler(unittest.TestCase):
         ]
     }
 
-
     expected_subject = Subject.parse_obj(
         {
-            "schema_version": "0.2.0",
+            "schema_version": "0.2.2",
             "species": "Mus musculus",
             "subject_id": "115977",
             "sex": "Male",
