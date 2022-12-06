@@ -12,7 +12,7 @@ from aind_data_schema.subject import Sex, Species
 
 from aind_metadata_service.labtracks.query_builder import SubjectQueryColumns
 
-
+# wrap in ErrorResponseHandler
 class ErrorResponses(Enum):
     """Enum of Error messages. TODO: Better way to do this?"""
 
@@ -134,7 +134,6 @@ class LabTracksClient:
                 # pydantic.error_wrappers.ValidationError'''
         return handled_response
     
-app = FastAPI()
 
 @app.exception_handler(LabTracksClient)
 async def ltc_exeception_handler(request: Request, exc: LabTracksClient):
@@ -271,9 +270,7 @@ class LabTracksResponseHandler:
             subject_id = contents[SubjectQueryColumns.ID.value]
             date_of_birth = contents[SubjectQueryColumns.BIRTH_DATE.value]
             breeding_group = contents[SubjectQueryColumns.GROUP_NAME.value]
-            background_strain = contents[
-                SubjectQueryColumns.GROUP_DESCRIPTION.value
-            ]
+            background_strain = contents[SubjectQueryColumns.GROUP_DESCRIPTION.value]
             subject = Subject(
                 subject_id=subject_id,
                 species=species,
