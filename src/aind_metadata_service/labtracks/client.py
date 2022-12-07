@@ -3,7 +3,6 @@ from enum import Enum
 from typing import Optional
 from xml.etree import ElementTree as ET
 
-from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 import pyodbc
@@ -12,11 +11,14 @@ from aind_data_schema.subject import Sex, Species
 
 from aind_metadata_service.labtracks.query_builder import SubjectQueryColumns
 
-# wrap in ErrorResponseHandler
-class ErrorResponses(Enum):
-    """Enum of Error messages. TODO: Better way to do this?"""
+class ErrorResponseHandler:
 
-    PYODBC_ERROR = "Error connecting to LabTracks Server."
+    class ErrorResponses(Enum):
+        """Enum of Error messages. TODO: Better way to do this?"""
+
+        PYODBC_ERROR = "Error connecting to LabTracks Server."
+        ID_ERROR = f"Subject {id} not found."
+        VALIDATION_ERROR = f"Subject {id} missing required fields."
 
 
 class LabTracksClient:
@@ -99,7 +101,7 @@ class LabTracksClient:
         except pyodbc.Error as ex:
             # TODO: Handle errors more gracefully?
             return {
-                "msg": f"{ErrorResponses.PYODBC_ERROR.value}: "
+                "msg": f"{ErrorResponseHandler.ErrorResponses.PYODBC_ERROR.value}: "
                 f"{ex.__class__.__name__}"
             }
 
@@ -125,22 +127,8 @@ class LabTracksClient:
         lth = LabTracksResponseHandler()
         handled_response = lth.map_response_to_subject(response)
         # TODO: Better handling here or rely on requester to handle responses?
-        '''for key, value in handled_response.items():
-            if value is '{msg:Error String}': 
-                return JSONResponse(status_code=418, 
-                content={"message": f"An error", "data": {}})
-
-                # IndexError: list index out of range
-                # pydantic.error_wrappers.ValidationError'''
         return handled_response
     
-
-@app.exception_handler(LabTracksClient)
-async def ltc_exeception_handler(request: Request, exc: LabTracksClient):
-    return JSONResponse(status_code=418, 
-        content={"message": f"An error", "data": {}})
-
-
 class MouseCustomClassFields(Enum):
     """
     LabTracks stores an XML string in the class_values field. We can extract
@@ -249,7 +237,13 @@ class LabTracksResponseHandler:
 
         """
         # TODO: Handle errors
-        contents = response["msg"][0]
+        try: 
+            contents = response["msg"][0]
+        except IndexError: 
+            return JSONResponse(status_code=418, 
+                content={"message": f"An error", 
+                "data": {ErrorResponseHandler.ErrorResponses.ID_ERROR}})
+        
         try:
             class_values = contents[SubjectQueryColumns.CLASS_VALUES.value]
             full_genotype = self._map_class_values_to_genotype(class_values)
@@ -284,7 +278,6 @@ class LabTracksResponseHandler:
                 breeding_group=breeding_group,
                 background_strain=background_strain,
             )
-
             return {"message": subject}
         except KeyError:
             return {"message": "Unable to parse message."}
