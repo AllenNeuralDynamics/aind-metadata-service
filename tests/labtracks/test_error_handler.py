@@ -13,7 +13,7 @@ class TestLabTracksErrorResponseHandler(unittest.TestCase):
     rh = LabTracksResponseHandler()
     def test_id_does_not_exist(self):
         expected_response = {
-            "msg": f"{ErrorResponseHandler.ErrorResponses.ID_ERROR.value}: " f"ProgrammingError"
+            "msg": f"{ErrorResponseHandler.ErrorResponses.ID_ERROR.value}: " f"InternalError"
         }
         actual_response = self.rh.map_response_to_subject(self.test_response)
         self.assertEqual(expected_response,actual_response)

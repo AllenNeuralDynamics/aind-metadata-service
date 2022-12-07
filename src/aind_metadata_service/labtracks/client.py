@@ -10,6 +10,7 @@ from aind_data_schema import Subject
 from aind_data_schema.subject import Sex, Species
 
 from aind_metadata_service.labtracks.query_builder import SubjectQueryColumns
+from aind_metadata_service.labtracks.query_builder import LabTracksQueries
 
 class ErrorResponseHandler:
 
@@ -17,8 +18,8 @@ class ErrorResponseHandler:
         """Enum of Error messages. TODO: Better way to do this?"""
 
         PYODBC_ERROR = "Error connecting to LabTracks Server."
-        ID_ERROR = f"Subject {id} not found."
-        VALIDATION_ERROR = f"Subject {id} missing required fields."
+        ID_ERROR = "The given subject id was not found."
+        VALIDATION_ERROR = "Subject id missing required fields."
 
 
 class LabTracksClient:
@@ -129,6 +130,25 @@ class LabTracksClient:
         # TODO: Better handling here or rely on requester to handle responses?
         return handled_response
     
+    def get_subject_from_subject_id(self, subject_id):
+        """
+        Method to retrieve subject from subject_id (int)
+        Parameters
+        ----------
+        lb_client : LabTracksClient
+        subject_id: int
+        """
+        query = LabTracksQueries.subject_from_subject_id(subject_id)
+        session = self.create_session()
+        lb_response = self.submit_query(session, query)
+        self.close_session(session)
+        # if lb_response is empty, id error
+        if len(lb_response) == 0: 
+            return JSONResponse(status_code=418, 
+                content={"message": f"An error", 
+                "data": {ErrorResponseHandler.ErrorResponses.ID_ERROR}})
+        return self.handle_response(lb_response)
+
 class MouseCustomClassFields(Enum):
     """
     LabTracks stores an XML string in the class_values field. We can extract
@@ -237,13 +257,8 @@ class LabTracksResponseHandler:
 
         """
         # TODO: Handle errors
-        try: 
-            contents = response["msg"][0]
-        except IndexError: 
-            return JSONResponse(status_code=418, 
-                content={"message": f"An error", 
-                "data": {ErrorResponseHandler.ErrorResponses.ID_ERROR}})
-        
+        contents = response["msg"][0]
+
         try:
             class_values = contents[SubjectQueryColumns.CLASS_VALUES.value]
             full_genotype = self._map_class_values_to_genotype(class_values)
