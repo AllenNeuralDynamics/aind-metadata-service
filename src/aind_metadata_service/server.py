@@ -22,7 +22,7 @@ sharepoint_url = os.getenv("SHAREPOINT_URL")
 sharepoint_user = os.getenv("SHAREPOINT_USER")
 sharepoint_password = os.getenv("SHAREPOINT_PASSWORD")
 
-#TODO: get_subject_from_subjectid method after creating client 
+
 @app.get("/subject/{subject_id}")
 async def retrieve_subject(subject_id):
     """

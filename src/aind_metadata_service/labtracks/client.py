@@ -3,16 +3,19 @@ from enum import Enum
 from typing import Optional
 from xml.etree import ElementTree as ET
 
-from fastapi.responses import JSONResponse
-
 import pyodbc
 from aind_data_schema import Subject
 from aind_data_schema.subject import Sex, Species
+from fastapi.responses import JSONResponse
 
-from aind_metadata_service.labtracks.query_builder import SubjectQueryColumns
-from aind_metadata_service.labtracks.query_builder import LabTracksQueries
+from aind_metadata_service.labtracks.query_builder import (
+    LabTracksQueries,
+    SubjectQueryColumns,
+)
+
 
 class ErrorResponseHandler:
+    """This class handles error responses"""
 
     class ErrorResponses(Enum):
         """Enum of Error messages. TODO: Better way to do this?"""
@@ -101,8 +104,9 @@ class LabTracksClient:
             return {"msg": results}
         except pyodbc.Error as ex:
             # TODO: Handle errors more gracefully?
+            ERH = ErrorResponseHandler()
             return {
-                "msg": f"{ErrorResponseHandler.ErrorResponses.PYODBC_ERROR.value}: "
+                "msg": f"{ERH.ErrorResponses.PYODBC_ERROR.value}: "
                 f"{ex.__class__.__name__}"
             }
 
@@ -129,7 +133,7 @@ class LabTracksClient:
         handled_response = lth.map_response_to_subject(response)
         # TODO: Better handling here or rely on requester to handle responses?
         return handled_response
-    
+
     def get_subject_from_subject_id(self, subject_id):
         """
         Method to retrieve subject from subject_id (int)
@@ -143,12 +147,19 @@ class LabTracksClient:
         lb_response = self.submit_query(session, query)
         self.close_session(session)
 
-        try: 
+        try:
             return self.handle_response(lb_response)
-        except IndexError: 
-            return JSONResponse(status_code=418, 
-                content={"message": f"{ErrorResponseHandler.ErrorResponses.ID_ERROR.value}: "
-                f"subject {str(subject_id)} does not exist", "data":lb_response})
+        except IndexError:
+            ERH = ErrorResponseHandler()
+            return JSONResponse(
+                status_code=418,
+                content={
+                    "message": f"{ERH.ErrorResponses.ID_ERROR.value}: "
+                    f"subject {str(subject_id)} does not exist",
+                    "data": lb_response,
+                },
+            )
+
 
 class MouseCustomClassFields(Enum):
     """
@@ -257,7 +268,6 @@ class LabTracksResponseHandler:
           A dict
 
         """
-        # TODO: Handle errors
         contents = response["msg"][0]
 
         try:
@@ -280,7 +290,9 @@ class LabTracksResponseHandler:
             subject_id = contents[SubjectQueryColumns.ID.value]
             date_of_birth = contents[SubjectQueryColumns.BIRTH_DATE.value]
             breeding_group = contents[SubjectQueryColumns.GROUP_NAME.value]
-            background_strain = contents[SubjectQueryColumns.GROUP_DESCRIPTION.value]
+            background_strain = contents[
+                SubjectQueryColumns.GROUP_DESCRIPTION.value
+            ]
             subject = Subject(
                 subject_id=subject_id,
                 species=species,

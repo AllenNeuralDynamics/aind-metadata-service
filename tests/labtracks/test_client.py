@@ -7,10 +7,8 @@ from unittest.mock import Mock, patch
 import pyodbc
 from fastapi.responses import JSONResponse
 
-from aind_metadata_service.labtracks.client import (
-    ErrorResponseHandler,
-    LabTracksClient,
-)
+from aind_metadata_service.labtracks.client import ErrorResponseHandler as ERH
+from aind_metadata_service.labtracks.client import LabTracksClient
 
 
 class TestLabTracksClient(unittest.TestCase):
@@ -111,18 +109,18 @@ class TestLabTracksClient(unittest.TestCase):
         session = self.lb_client.create_session()
         response1 = self.lb_client.submit_query(session, "SOMETHING BAD")
         expected_response = {
-            "msg": f"{ErrorResponseHandler.ErrorResponses.PYODBC_ERROR.value}: " f"ProgrammingError"
+            "msg": f"{ERH.ErrorResponses.PYODBC_ERROR.value}: "
+            f"ProgrammingError"
         }
         mock_connect.assert_called()
         self.assertEqual(response1, expected_response)
         self.lb_client.close_session(session)
 
-
     @patch("pyodbc.connect")
     def test_id_does_not_exist(self, mock_connect: Mock) -> None:
         """
         Tests that JSONResponse error is returned to client properly
-        when queried subject_id does not exist. 
+        when queried subject_id does not exist.
         Parameters
         ----------
         mock_connect : Mock
@@ -133,15 +131,22 @@ class TestLabTracksClient(unittest.TestCase):
         -------
             pass
         """
-        test_response = {"msg":[]}
-        subject_id = decimal.Decimal('0000')
-        expected_response = JSONResponse(status_code=418, 
-                content={"message": f"{ErrorResponseHandler.ErrorResponses.ID_ERROR.value}: "
-                f"subject {str(subject_id)} does not exist", "data": test_response})
+        test_response = {"msg": []}
+        subject_id = decimal.Decimal("0000")
+        expected_response = JSONResponse(
+            status_code=418,
+            content={
+                "message": f"{ERH.ErrorResponses.ID_ERROR.value}: "
+                f"subject {str(subject_id)} does not exist",
+                "data": test_response,
+            },
+        )
 
-        actual_response = self.lb_client.get_subject_from_subject_id(subject_id)
-        self.assertEqual(expected_response.body,actual_response.body)
-    
+        actual_response = self.lb_client.get_subject_from_subject_id(
+            subject_id
+        )
+        self.assertEqual(expected_response.body, actual_response.body)
+
 
 if __name__ == "__main__":
     unittest.main()
