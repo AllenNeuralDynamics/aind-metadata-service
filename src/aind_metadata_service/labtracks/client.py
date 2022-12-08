@@ -17,9 +17,9 @@ class ErrorResponseHandler:
     class ErrorResponses(Enum):
         """Enum of Error messages. TODO: Better way to do this?"""
 
-        PYODBC_ERROR = "Error connecting to LabTracks Server."
-        ID_ERROR = "The given subject id was not found."
-        VALIDATION_ERROR = "Subject id missing required fields."
+        PYODBC_ERROR = "Error connecting to LabTracks Server"
+        ID_ERROR = "Error finding subject"
+        VALIDATION_ERROR = "Subject id missing required fields"
 
 
 class LabTracksClient:
@@ -142,11 +142,12 @@ class LabTracksClient:
         session = self.create_session()
         lb_response = self.submit_query(session, query)
         self.close_session(session)
-        # if lb_response is empty, id error
-        if len(lb_response) == 0: 
+        
+        if len(lb_response) == 1: 
             return JSONResponse(status_code=418, 
-                content={"message": f"An error", 
-                "data": {ErrorResponseHandler.ErrorResponses.ID_ERROR}})
+                content={"message": f"{ErrorResponseHandler.ErrorResponses.ID_ERROR.value}: "
+                f"subject {subject_id} does not exist", "data":lb_response})
+        
         return self.handle_response(lb_response)
 
 class MouseCustomClassFields(Enum):

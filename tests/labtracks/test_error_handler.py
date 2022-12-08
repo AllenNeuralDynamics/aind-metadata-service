@@ -1,22 +1,42 @@
 """Module to test LabTracksResponseHandler methods."""
 import unittest
+from unittest.mock import Mock, patch
+from fastapi.responses import JSONResponse
 
 from aind_metadata_service.labtracks.client import (
     ErrorResponseHandler,
-    LabTracksResponseHandler
+    LabTracksClient
 )
-
 
 class TestLabTracksErrorResponseHandler(unittest.TestCase):
     """Class for unit tests on LabTracksErrorResponseHandler."""
-    test_response = 'null'
-    rh = LabTracksResponseHandler()
-    def test_id_does_not_exist(self):
-        expected_response = {
-            "msg": f"{ErrorResponseHandler.ErrorResponses.ID_ERROR.value}: " f"InternalError"
-        }
-        actual_response = self.rh.map_response_to_subject(self.test_response)
-        self.assertEqual(expected_response,actual_response)
+    driver = "{FreeTDS}"
+    server = "0.0.0.0"
+    port = "1234"
+    db = "LabTracksDB"
+    user = "LabTracksUser"
+    password = "LabTracksPassword"
+    lb_client = LabTracksClient(
+        driver=driver,
+        server=server,
+        port=port,
+        db=db,
+        user=user,
+        password=password,
+    )
+
+    test_response = {"msg":[]}
+    subject_id = '0000'
+
+    @patch("pyodbc.connect")
+    def test_id_does_not_exist(self, mock_connect: Mock):
+
+        expected_response = JSONResponse(status_code=418, 
+                content={"message": f"{ErrorResponseHandler.ErrorResponses.ID_ERROR.value}: "
+                f"subject {self.subject_id} does not exist", "data": self.test_response})
+
+        actual_response = self.lb_client.get_subject_from_subject_id(self.subject_id)
+        self.assertEqual(expected_response.body,actual_response.body)
         
 
 if __name__ == "__main__":
