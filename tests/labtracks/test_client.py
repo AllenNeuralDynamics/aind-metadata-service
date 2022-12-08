@@ -5,6 +5,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 import pyodbc
+from fastapi.responses import JSONResponse
 
 from aind_metadata_service.labtracks.client import (
     ErrorResponseHandler,
@@ -116,6 +117,31 @@ class TestLabTracksClient(unittest.TestCase):
         self.assertEqual(response1, expected_response)
         self.lb_client.close_session(session)
 
+
+    @patch("pyodbc.connect")
+    def test_id_does_not_exist(self, mock_connect: Mock) -> None:
+        """
+        Tests that JSONResponse error is returned to client properly
+        when queried subject_id does not exist. 
+        Parameters
+        ----------
+        mock_connect : Mock
+            A mocked Connection class that can be used to override methods
+            without connecting to sqlserver
+
+        Returns
+        -------
+            pass
+        """
+        test_response = {"msg":[]}
+        subject_id = '0000'
+        expected_response = JSONResponse(status_code=418, 
+                content={"message": f"{ErrorResponseHandler.ErrorResponses.ID_ERROR.value}: "
+                f"subject {subject_id} does not exist", "data": test_response})
+
+        actual_response = self.lb_client.get_subject_from_subject_id(subject_id)
+        self.assertEqual(expected_response.body,actual_response.body)
+    
 
 if __name__ == "__main__":
     unittest.main()
