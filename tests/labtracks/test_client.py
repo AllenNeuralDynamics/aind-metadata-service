@@ -134,10 +134,10 @@ class TestLabTracksClient(unittest.TestCase):
             pass
         """
         test_response = {"msg":[]}
-        subject_id = '0000'
+        subject_id = decimal.Decimal('0000')
         expected_response = JSONResponse(status_code=418, 
                 content={"message": f"{ErrorResponseHandler.ErrorResponses.ID_ERROR.value}: "
-                f"subject {subject_id} does not exist", "data": test_response})
+                f"subject {str(subject_id)} does not exist", "data": test_response})
 
         actual_response = self.lb_client.get_subject_from_subject_id(subject_id)
         self.assertEqual(expected_response.body,actual_response.body)

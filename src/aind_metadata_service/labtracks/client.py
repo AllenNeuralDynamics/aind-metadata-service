@@ -142,13 +142,13 @@ class LabTracksClient:
         session = self.create_session()
         lb_response = self.submit_query(session, query)
         self.close_session(session)
-        
-        if len(lb_response) == 1: 
+
+        try: 
+            return self.handle_response(lb_response)
+        except IndexError: 
             return JSONResponse(status_code=418, 
                 content={"message": f"{ErrorResponseHandler.ErrorResponses.ID_ERROR.value}: "
-                f"subject {subject_id} does not exist", "data":lb_response})
-        
-        return self.handle_response(lb_response)
+                f"subject {str(subject_id)} does not exist", "data":lb_response})
 
 class MouseCustomClassFields(Enum):
     """
