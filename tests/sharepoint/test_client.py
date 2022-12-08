@@ -185,7 +185,7 @@ class Examples:
     )
     expected_procedures1 = Procedures.construct(
         describedBy=described_by,
-        schema_version="0.4.3",
+        schema_version="0.4.4",
         subject_id="650102",
         headframes=(
             [
