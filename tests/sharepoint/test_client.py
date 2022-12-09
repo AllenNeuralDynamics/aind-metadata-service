@@ -12,6 +12,7 @@ from office365.sharepoint.client_context import ClientContext
 from office365.sharepoint.listitems.collection import ListItemCollection
 from office365.sharepoint.listitems.listitem import ListItem
 
+from aind_metadata_service.response_handler import Responses
 from aind_metadata_service.sharepoint.client import (
     ListVersions,
     SharePointClient,
@@ -267,7 +268,9 @@ class TestSharepointClient(unittest.TestCase):
         msg = self.client._handle_response_from_sharepoint(
             list_item_collection, subject_id=subject_id
         )
-        expected_msg = Procedures.construct(subject_id=subject_id)
+        expected_msg = Responses.model_response(
+            Procedures.construct(subject_id=subject_id)
+        )
 
         # Add a list item with contents
         list_item_collection = ListItemCollection(context=blank_ctx)
@@ -277,9 +280,14 @@ class TestSharepointClient(unittest.TestCase):
         msg1 = self.client._handle_response_from_sharepoint(
             list_item_collection, subject_id=subject_id
         )
-        self.assertEqual({"message": "Nothing Found"}, empty_msg)
-        self.assertEqual(expected_msg, msg)
-        self.assertEqual(Examples.expected_procedures1, msg1)
+        expected_msg1 = Responses.model_response(Examples.expected_procedures1)
+        empty_response = Responses.no_data_found_response()
+        self.assertEqual(empty_response.status_code, empty_msg.status_code)
+        self.assertEqual(empty_response.body, empty_msg.body)
+        self.assertEqual(expected_msg.status_code, msg.status_code)
+        self.assertEqual(expected_msg.body, msg.body)
+        self.assertEqual(expected_msg1.status_code, msg1.status_code)
+        self.assertEqual(expected_msg1.body, msg1.body)
 
     def test_get_procedure_info(self):
         """Basic test on the main interface."""
@@ -290,7 +298,9 @@ class TestSharepointClient(unittest.TestCase):
         list_item_collection.add_child(list_item)
         self.client.client_context.execute_query = lambda: list_item_collection
         response = self.client.get_procedure_info("0000")
-        self.assertEqual(response, {"message": "Nothing Found"})
+        empty_response = Responses.no_data_found_response()
+        self.assertEqual(response.status_code, empty_response.status_code)
+        self.assertEqual(response.body, empty_response.body)
 
 
 if __name__ == "__main__":

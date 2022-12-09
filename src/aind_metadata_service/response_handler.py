@@ -1,11 +1,16 @@
+"""Module to handle responses"""
+
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, validate_model
 
 
 class Responses:
+    """Class with methods to map responses."""
+
     @staticmethod
     def internal_server_error_response() -> JSONResponse:
+        """Map to an internal server error"""
         response = JSONResponse(
             status_code=500,
             content=({"message": "Internal Server Error.", "data": None}),
@@ -14,6 +19,7 @@ class Responses:
 
     @staticmethod
     def no_data_found_response() -> JSONResponse:
+        """Map to a 404 error."""
         response = JSONResponse(
             status_code=404,
             content=({"message": "No Data Found.", "data": None}),
@@ -22,6 +28,7 @@ class Responses:
 
     @staticmethod
     def model_response(model: BaseModel) -> JSONResponse:
+        """Parse model to a response."""
         *_, validation_error = validate_model(model.__class__, model.__dict__)
         model_json = jsonable_encoder(model)
         if validation_error:
@@ -37,8 +44,6 @@ class Responses:
         else:
             response = JSONResponse(
                 status_code=200,
-                content=(
-                    {"message": "Found valid data.", "data": model_json}
-                ),
+                content=({"message": "Found valid data.", "data": model_json}),
             )
         return response

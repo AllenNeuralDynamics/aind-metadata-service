@@ -5,7 +5,7 @@ from xml.etree import ElementTree as ET
 
 import pyodbc
 from aind_data_schema import Subject
-from aind_data_schema.subject import Sex, Species
+from aind_data_schema.subject import BackgroundStrain, Sex, Species
 from fastapi.responses import JSONResponse
 
 from aind_metadata_service.labtracks.query_builder import (
@@ -128,6 +128,14 @@ class LabTracksSpecies(Enum):
     RAT = "rat"
 
 
+class LabTracksBgStrain(Enum):
+    """How LabTracks labels its strains"""
+
+    # TODO: Double check this
+    C57BL_6J = "C57BL/6J"
+    BALB_c = "BALB/c"
+
+
 class LabTracksResponseHandler:
     """This class will contain methods to handle the response from LabTracks"""
 
@@ -205,6 +213,31 @@ class LabTracksResponseHandler:
         else:
             return None
 
+    @staticmethod
+    def _map_to_background_strain(
+        bg_strain: Optional[str],
+    ) -> Optional[BackgroundStrain]:
+        """
+        Maps the LabTracks BG Strain enum to the
+        aind_data_schema.subject.BackgroundStrain
+        Parameters
+        ----------
+        bg_strain : Optional[str]
+
+        Returns
+        -------
+        Optional[BackgroundStrain]
+        """
+
+        if bg_strain is None:
+            return None
+        if bg_strain.lower() == LabTracksBgStrain.C57BL_6J.value.lower():
+            return BackgroundStrain.C57BL_6J
+        elif bg_strain.lower() == LabTracksBgStrain.BALB_c.value.lower():
+            return BackgroundStrain.BALB_c
+        else:
+            return None
+
     def map_response_to_subject(self, results: List[dict]) -> List[Subject]:
         """
         Maps a response from LabTracks to an aind_data_schema.Subject
@@ -224,9 +257,7 @@ class LabTracksResponseHandler:
         for result in results:
             class_values = result.get(SubjectQueryColumns.CLASS_VALUES.value)
             full_genotype = self._map_class_values_to_genotype(class_values)
-            sex: Optional[Sex] = self._map_sex(
-                result.get(SubjectQueryColumns.SEX.value)
-            )
+            sex = self._map_sex(result.get(SubjectQueryColumns.SEX.value))
             species = self._map_species(
                 result.get(SubjectQueryColumns.SPECIES_NAME.value)
             )
@@ -237,20 +268,28 @@ class LabTracksResponseHandler:
                 result.get(SubjectQueryColumns.MATERNAL_CLASS_VALUES.value)
             )
             paternal_id = result.get(SubjectQueryColumns.PATERNAL_ID.value)
+            paternal_id_str = str(paternal_id) if paternal_id else None
             maternal_id = result.get(SubjectQueryColumns.MATERNAL_ID.value)
+            maternal_id_str = str(maternal_id) if maternal_id else None
             subject_id = result.get(SubjectQueryColumns.ID.value)
-            date_of_birth = result.get(SubjectQueryColumns.BIRTH_DATE.value)
+            subject_id_str = str(subject_id) if subject_id else None
+            datetime_of_birth = result.get(
+                SubjectQueryColumns.BIRTH_DATE.value
+            )
+            date_of_birth = (
+                datetime_of_birth.date() if datetime_of_birth else None
+            )
             breeding_group = result.get(SubjectQueryColumns.GROUP_NAME.value)
-            background_strain = result.get(
-                SubjectQueryColumns.GROUP_DESCRIPTION.value
+            background_strain = self._map_to_background_strain(
+                result.get(SubjectQueryColumns.GROUP_DESCRIPTION.value)
             )
             subject = Subject.construct(
-                subject_id=subject_id,
+                subject_id=subject_id_str,
                 species=species,
                 paternal_genotype=paternal_genotype,
-                paternal_id=paternal_id,
+                paternal_id=paternal_id_str,
                 maternal_genotype=maternal_genotype,
-                maternal_id=maternal_id,
+                maternal_id=maternal_id_str,
                 sex=sex,
                 date_of_birth=date_of_birth,
                 genotype=full_genotype,

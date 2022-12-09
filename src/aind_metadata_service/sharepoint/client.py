@@ -18,7 +18,7 @@ from aind_metadata_service.response_handler import Responses
 
 
 class NeurosurgeryAndBehaviorList2019:
-    """Class to contain helful info to parse the 2019 SharePoint List"""
+    """Class to contain helpful info to parse the 2019 SharePoint List"""
 
     class StringParserHelper(Enum):
         """Enum class for SharePoint's response strings"""
