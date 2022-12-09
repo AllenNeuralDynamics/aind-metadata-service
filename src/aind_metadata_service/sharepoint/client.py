@@ -8,14 +8,17 @@ from aind_data_schema.procedures import (
     Injection,
     Procedures,
 )
+from fastapi.responses import JSONResponse
 from office365.runtime.auth.client_credential import ClientCredential
 from office365.runtime.client_object import ClientObject
 from office365.sharepoint.client_context import ClientContext
 from office365.sharepoint.listitems.collection import ListItemCollection
 
+from aind_metadata_service.response_handler import Responses
+
 
 class NeurosurgeryAndBehaviorList2019:
-    """Class to contain helful info to parse the 2019 SharePoint List"""
+    """Class to contain helpful info to parse the 2019 SharePoint List"""
 
     class StringParserHelper(Enum):
         """Enum class for SharePoint's response strings"""
@@ -262,7 +265,7 @@ class SharePointClient:
         self,
         subject_id: str,
         version: ListVersions = ListVersions.VERSION_2019,
-    ) -> dict:
+    ) -> JSONResponse:
         """
         Primary interface. Maps a subject_id to a response.
         Parameters
@@ -274,10 +277,11 @@ class SharePointClient:
 
         Returns
         -------
-        dict
+        JSONResponse
           A response
 
         """
+        # TODO: Add try to handle internal server error response.
         filter_string = self._get_filter_string(version, subject_id)
         ctx = self.client_context
         list_view = ctx.web.lists.get_by_title(
@@ -297,7 +301,7 @@ class SharePointClient:
     # TODO: Refactor to make less complex?
     def _handle_response_from_sharepoint(  # noqa: C901
         self, list_items: ListItemCollection, subject_id: str
-    ) -> dict:
+    ) -> JSONResponse:
         """
         Maps the response from SharePoint into a Procedures model
         Parameters
@@ -309,7 +313,7 @@ class SharePointClient:
 
         Returns
         -------
-        dict
+        JSONResponse
           Either a Procedures model or an error response
 
         """
@@ -350,9 +354,9 @@ class SharePointClient:
                     procedures.injections = injections
                 if fiber_implants:
                     procedures.fiber_implants = fiber_implants
-            response = procedures
+            response = Responses.model_response(procedures)
         else:
-            response = {"message": "Nothing Found"}
+            response = Responses.no_data_found_response()
         return response
 
     @staticmethod

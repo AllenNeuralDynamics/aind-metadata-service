@@ -1,19 +1,18 @@
 """Module to create clients to connect to databases."""
 from enum import Enum
-from typing import Optional
+from typing import List, Optional
 from xml.etree import ElementTree as ET
 
 import pyodbc
 from aind_data_schema import Subject
-from aind_data_schema.subject import Sex, Species
+from aind_data_schema.subject import BackgroundStrain, Sex, Species
+from fastapi.responses import JSONResponse
 
-from aind_metadata_service.labtracks.query_builder import SubjectQueryColumns
-
-
-class ErrorResponses(Enum):
-    """Enum of Error messages. TODO: Better way to do this?"""
-
-    PYODBC_ERROR = "Error connecting to LabTracks Server."
+from aind_metadata_service.labtracks.query_builder import (
+    LabTracksQueries,
+    SubjectQueryColumns,
+)
+from aind_metadata_service.response_handler import Responses
 
 
 class LabTracksClient:
@@ -66,63 +65,41 @@ class LabTracksClient:
         return pyodbc.connect(self.connection_str)
 
     @staticmethod
-    def submit_query(session: pyodbc.Connection, query: str) -> dict:
-        """
-        Submit a query using session connection.
-
-        Parameters
-        ----------
-        session : A pyodbc connection
-        query :  str
-            The sql query to submit to LabTracks sqlserver
-
-        Returns
-        -------
-            dict
-                Returns a {msg: [row]} or {msg: Error String} object
-
-        """
-        try:
-            cursor = session.cursor()
-            cursor.execute(query)
-            column_names = cursor.description
-            columns = [column[0].lower() for column in column_names]
-            results = []
-            fetched_rows = cursor.fetchall()
-            cursor.close()
-            for row in fetched_rows:
-                results.append(dict(zip(columns, row)))
-            return {"msg": results}
-        except pyodbc.Error as ex:
-            # TODO: Handle errors more gracefully?
-            return {
-                "msg": f"{ErrorResponses.PYODBC_ERROR.value}: "
-                f"{ex.__class__.__name__}"
-            }
-
-    @staticmethod
     def close_session(session: pyodbc.Connection) -> None:
         """Closes a pyodbc session connection"""
         session.close()
 
-    @staticmethod
-    def handle_response(response: dict) -> dict:
+    def get_subject_info(self, subject_id: str) -> JSONResponse:
         """
-        Handles the response received from the sqlserver
+        Method to retrieve subject from subject_id (int)
         Parameters
         ----------
-        response : dict
-            Something like {msg: [row]} or {msg: Error String}
-
-        Returns
-        -------
-            json or error msg
-
+        subject_id: str
         """
-        lth = LabTracksResponseHandler()
-        handled_response = lth.map_response_to_subject(response)
-        # TODO: Better handling here or rely on requester to handle responses?
-        return handled_response
+        try:
+            query = LabTracksQueries.subject_from_subject_id(subject_id)
+            session = self.create_session()
+            cursor = session.cursor()
+            cursor.execute(query)
+            column_names = cursor.description
+            columns = [column[0].lower() for column in column_names]
+            fetched_rows = cursor.fetchall()
+            cursor.close()
+            self.close_session(session)
+            results = []
+            for row in fetched_rows:
+                results.append(dict(zip(columns, row)))
+            if not results:
+                return Responses.no_data_found_response()
+            else:
+                lth = LabTracksResponseHandler()
+                subjects = lth.map_response_to_subject(results)
+                # TODO: Handle situation if more than subject is returned?
+                subject = subjects[0]
+                response = Responses.model_response(subject)
+                return response
+        except pyodbc.Error:
+            return Responses.internal_server_error_response()
 
 
 class MouseCustomClassFields(Enum):
@@ -151,16 +128,26 @@ class LabTracksSpecies(Enum):
     RAT = "rat"
 
 
+class LabTracksBgStrain(Enum):
+    """How LabTracks labels its strains"""
+
+    # TODO: Double check this
+    C57BL_6J = "C57BL/6J"
+    BALB_C = "BALB/c"
+
+
 class LabTracksResponseHandler:
     """This class will contain methods to handle the response from LabTracks"""
 
     @staticmethod
-    def _map_class_values_to_genotype(class_values: str) -> Optional[str]:
+    def _map_class_values_to_genotype(
+        class_values: Optional[str],
+    ) -> Optional[str]:
         """
         Extracts the full genotype from the class values field.
         Parameters
         ----------
-        class_values : str
+        class_values : Optional[str]
           XML string that is expected to have a Full_Genotype field.
 
         Returns
@@ -169,18 +156,21 @@ class LabTracksResponseHandler:
           does not contain the Full_Genotype.
 
         """
-        xml_root = ET.fromstring(class_values)
-        full_genotype = xml_root.find(
-            MouseCustomClassFields.FULL_GENOTYPE.value
-        )
-        if full_genotype is not None:
-            full_genotype_text = full_genotype.text
-            return full_genotype_text
-        else:
+        if class_values is None:
             return None
+        else:
+            xml_root = ET.fromstring(class_values)
+            full_genotype = xml_root.find(
+                MouseCustomClassFields.FULL_GENOTYPE.value
+            )
+            if full_genotype is not None:
+                full_genotype_text = full_genotype.text
+                return full_genotype_text
+            else:
+                return None
 
     @staticmethod
-    def _map_species(species: str) -> Optional[Species]:
+    def _map_species(species: Optional[str]) -> Optional[Species]:
         """
         Maps the LabTracks species to the aind_data_schema.subject.Species
         Parameters
@@ -193,18 +183,20 @@ class LabTracksResponseHandler:
           An aind_data_schema.subject.Species or None if no mapping exists.
 
         """
+        if species is None:
+            return None
         if species.lower() == LabTracksSpecies.MOUSE.value.lower():
             return Species.MUS_MUSCULUS
         else:
             return None
 
     @staticmethod
-    def _map_sex(sex: str) -> Optional[Sex]:
+    def _map_sex(sex: Optional[str]) -> Optional[Sex]:
         """
         Maps the LabTracks Sex enum to the aind_data_schema.subject.Sex
         Parameters
         ----------
-        sex : str
+        sex : Optional[str]
           LabTracks sex name
 
         Returns
@@ -212,6 +204,8 @@ class LabTracksResponseHandler:
           An aind_data_schema.subject.Sex or None if no such mapping exists.
 
         """
+        if sex is None:
+            return None
         if sex.lower() == LabTracksSex.MALE.value.lower():
             return Sex.MALE
         elif sex.lower() == LabTracksSex.FEMALE.value.lower():
@@ -219,58 +213,88 @@ class LabTracksResponseHandler:
         else:
             return None
 
-    def map_response_to_subject(self, response) -> dict:
+    @staticmethod
+    def _map_to_background_strain(
+        bg_strain: Optional[str],
+    ) -> Optional[BackgroundStrain]:
         """
-        Maps a response from LabTracks to an aind_data_schema.Subject json str
+        Maps the LabTracks BG Strain enum to the
+        aind_data_schema.subject.BackgroundStrain
         Parameters
         ----------
-        response : dict
-          The Response is a dict like {'msg': [rows]}
+        bg_strain : Optional[str]
 
         Returns
         -------
-          A dict
+        Optional[BackgroundStrain]
+        """
+
+        if bg_strain is None:
+            return None
+        if bg_strain.lower() == LabTracksBgStrain.C57BL_6J.value.lower():
+            return BackgroundStrain.C57BL_6J
+        elif bg_strain.lower() == LabTracksBgStrain.BALB_C.value.lower():
+            return BackgroundStrain.BALB_c
+        else:
+            return None
+
+    def map_response_to_subject(self, results: List[dict]) -> List[Subject]:
+        """
+        Maps a response from LabTracks to an aind_data_schema.Subject
+        Parameters
+        ----------
+        results : List[dict]
+          Results pulled from LabTracks. In the form of [row]
+
+        Returns
+        -------
+          A List of mapped Subjects (not validated)
 
         """
-        # TODO: Handle errors
-        contents = response["msg"][0]
-        try:
-            class_values = contents[SubjectQueryColumns.CLASS_VALUES.value]
+
+        subjects = []
+
+        for result in results:
+            class_values = result.get(SubjectQueryColumns.CLASS_VALUES.value)
             full_genotype = self._map_class_values_to_genotype(class_values)
-            sex: Optional[Sex] = self._map_sex(
-                contents[SubjectQueryColumns.SEX.value]
-            )
+            sex = self._map_sex(result.get(SubjectQueryColumns.SEX.value))
             species = self._map_species(
-                contents[SubjectQueryColumns.SPECIES_NAME.value]
+                result.get(SubjectQueryColumns.SPECIES_NAME.value)
             )
             paternal_genotype = self._map_class_values_to_genotype(
-                contents[SubjectQueryColumns.PATERNAL_CLASS_VALUES.value]
+                result.get(SubjectQueryColumns.PATERNAL_CLASS_VALUES.value)
             )
             maternal_genotype = self._map_class_values_to_genotype(
-                contents[SubjectQueryColumns.MATERNAL_CLASS_VALUES.value]
+                result.get(SubjectQueryColumns.MATERNAL_CLASS_VALUES.value)
             )
-            paternal_id = contents[SubjectQueryColumns.PATERNAL_ID.value]
-            maternal_id = contents[SubjectQueryColumns.MATERNAL_ID.value]
-            subject_id = contents[SubjectQueryColumns.ID.value]
-            date_of_birth = contents[SubjectQueryColumns.BIRTH_DATE.value]
-            breeding_group = contents[SubjectQueryColumns.GROUP_NAME.value]
-            background_strain = contents[
-                SubjectQueryColumns.GROUP_DESCRIPTION.value
-            ]
-            subject = Subject(
-                subject_id=subject_id,
+            paternal_id = result.get(SubjectQueryColumns.PATERNAL_ID.value)
+            paternal_id_str = str(paternal_id) if paternal_id else None
+            maternal_id = result.get(SubjectQueryColumns.MATERNAL_ID.value)
+            maternal_id_str = str(maternal_id) if maternal_id else None
+            subject_id = result.get(SubjectQueryColumns.ID.value)
+            subject_id_str = str(subject_id) if subject_id else None
+            datetime_of_birth = result.get(
+                SubjectQueryColumns.BIRTH_DATE.value
+            )
+            date_of_birth = (
+                datetime_of_birth.date() if datetime_of_birth else None
+            )
+            breeding_group = result.get(SubjectQueryColumns.GROUP_NAME.value)
+            background_strain = self._map_to_background_strain(
+                result.get(SubjectQueryColumns.GROUP_DESCRIPTION.value)
+            )
+            subject = Subject.construct(
+                subject_id=subject_id_str,
                 species=species,
                 paternal_genotype=paternal_genotype,
-                paternal_id=paternal_id,
+                paternal_id=paternal_id_str,
                 maternal_genotype=maternal_genotype,
-                maternal_id=maternal_id,
+                maternal_id=maternal_id_str,
                 sex=sex,
                 date_of_birth=date_of_birth,
                 genotype=full_genotype,
                 breeding_group=breeding_group,
                 background_strain=background_strain,
             )
-
-            return {"message": subject}
-        except KeyError:
-            return {"message": "Unable to parse message."}
+            subjects.append(subject)
+        return subjects
