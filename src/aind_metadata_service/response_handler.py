@@ -1,5 +1,4 @@
 """Module to handle responses"""
-
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, validate_model
@@ -7,7 +6,7 @@ from typing import Union
 
 
 class Responses:
-    """Class with methods to map responses."""
+    """This class contains methods to map responses from server."""
 
     @staticmethod
     def internal_server_error_response() -> JSONResponse:
@@ -29,7 +28,14 @@ class Responses:
 
     @staticmethod
     def model_response(model: BaseModel) -> Union[JSONResponse, BaseModel]:
-        """Parse model to a response or return model if valid."""
+        """
+        Parse model to a response or return model if valid.
+        Handles validation errors.
+        Parameters
+        ----------
+        model : BaseModel
+            model response from server
+            """
         *_, validation_error = validate_model(model.__class__, model.__dict__)
         model_json = jsonable_encoder(model)
         if validation_error:
