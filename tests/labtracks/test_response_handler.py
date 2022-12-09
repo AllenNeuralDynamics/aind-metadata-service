@@ -137,7 +137,7 @@ class TestLabTracksResponseHandler(unittest.TestCase):
 
     def test_map_bg_strain(self):
         """Tests that the LabTracks strain is mapped correctly"""
-        strain1 = LabTracksBgStrain.BALB_c.value
+        strain1 = LabTracksBgStrain.BALB_C.value
         strain2 = LabTracksBgStrain.C57BL_6J.value
 
         subject_strain1 = self.rh._map_to_background_strain(strain1)

@@ -133,7 +133,7 @@ class LabTracksBgStrain(Enum):
 
     # TODO: Double check this
     C57BL_6J = "C57BL/6J"
-    BALB_c = "BALB/c"
+    BALB_C = "BALB/c"
 
 
 class LabTracksResponseHandler:
@@ -233,7 +233,7 @@ class LabTracksResponseHandler:
             return None
         if bg_strain.lower() == LabTracksBgStrain.C57BL_6J.value.lower():
             return BackgroundStrain.C57BL_6J
-        elif bg_strain.lower() == LabTracksBgStrain.BALB_c.value.lower():
+        elif bg_strain.lower() == LabTracksBgStrain.BALB_C.value.lower():
             return BackgroundStrain.BALB_c
         else:
             return None

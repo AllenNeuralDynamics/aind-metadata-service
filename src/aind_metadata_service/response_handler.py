@@ -3,6 +3,7 @@
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, validate_model
+from typing import Union
 
 
 class Responses:
@@ -27,8 +28,8 @@ class Responses:
         return response
 
     @staticmethod
-    def model_response(model: BaseModel) -> JSONResponse:
-        """Parse model to a response."""
+    def model_response(model: BaseModel) -> Union[JSONResponse, BaseModel]:
+        """Parse model to a response or return model if valid."""
         *_, validation_error = validate_model(model.__class__, model.__dict__)
         model_json = jsonable_encoder(model)
         if validation_error:
@@ -42,8 +43,5 @@ class Responses:
                 ),
             )
         else:
-            response = JSONResponse(
-                status_code=200,
-                content=({"message": "Found valid data.", "data": model_json}),
-            )
+            response = model
         return response
