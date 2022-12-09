@@ -185,7 +185,7 @@ class Examples:
     )
     expected_procedures1 = Procedures.construct(
         describedBy=described_by,
-        schema_version="0.4.2",
+        schema_version="0.4.3",
         subject_id="650102",
         headframes=(
             [
@@ -247,7 +247,7 @@ class TestSharepointClient(unittest.TestCase):
         default = self.client._get_filter_string(
             version=ListVersions.DEFAULT, subject_id="652464"
         )
-        expected_string = "substringof(652464, LabTracks_x0020_ID)"
+        expected_string = "substringof('652464', LabTracks_x0020_ID)"
         self.assertEqual(version_2019, expected_string)
         self.assertEqual(default, expected_string)
 
