@@ -36,8 +36,8 @@ async def retrieve_subject(subject_id):
         user=labtracks_user,
         password=labtracks_password,
     )
-    handled_response = lb_client.get_subject_from_subject_id(subject_id)
-    return handled_response
+    response = lb_client.get_subject_info(subject_id)
+    return response
 
 
 @app.get("/procedures/{subject_id}")

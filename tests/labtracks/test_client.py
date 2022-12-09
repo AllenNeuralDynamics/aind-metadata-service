@@ -142,9 +142,7 @@ class TestLabTracksClient(unittest.TestCase):
             },
         )
 
-        actual_response = self.lb_client.get_subject_from_subject_id(
-            subject_id
-        )
+        actual_response = self.lb_client.get_subject_info(subject_id)
         self.assertEqual(expected_response.body, actual_response.body)
 
 
