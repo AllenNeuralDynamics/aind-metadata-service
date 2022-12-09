@@ -245,13 +245,13 @@ class SharePointClient:
         """
         default = (
             f"substringof("
-            f"{subject_id}, "
+            f"'{subject_id}', "
             f"{NeurosurgeryAndBehaviorList2019.ListField.LAB_TRACKS_ID.value}"
             f")"
         )
         version_2019 = (
             f"substringof("
-            f"{subject_id}, "
+            f"'{subject_id}', "
             f"{NeurosurgeryAndBehaviorList2019.ListField.LAB_TRACKS_ID.value}"
             f")"
         )
