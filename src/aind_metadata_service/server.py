@@ -5,7 +5,6 @@ import os
 from fastapi import FastAPI
 
 from aind_metadata_service.labtracks.client import LabTracksClient
-from aind_metadata_service.labtracks.query_builder import LabTracksQueries
 from aind_metadata_service.sharepoint.client import SharePointClient
 
 app = FastAPI()
@@ -37,13 +36,8 @@ async def retrieve_subject(subject_id):
         user=labtracks_user,
         password=labtracks_password,
     )
-    query = LabTracksQueries.subject_from_subject_id(subject_id)
-    session = lb_client.create_session()
-    lb_response = lb_client.submit_query(session, query)
-    lb_client.close_session(session)
-    handled_response = lb_client.handle_response(lb_response)
-
-    return handled_response
+    response = lb_client.get_subject_info(subject_id)
+    return response
 
 
 @app.get("/procedures/{subject_id}")
