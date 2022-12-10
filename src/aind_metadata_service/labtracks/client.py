@@ -96,8 +96,8 @@ class LabTracksClient:
                 subjects = lth.map_response_to_subject(results)
                 # Check if multiple unique items are returned
                 if len(set([s.json() for s in subjects])) > 1:
-                    response = (
-                        Responses.multiple_items_found_response(subjects)
+                    response = Responses.multiple_items_found_response(
+                        subjects
                     )
                     return response
                 else:

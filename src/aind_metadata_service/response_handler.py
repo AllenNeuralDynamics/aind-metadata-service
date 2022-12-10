@@ -1,8 +1,9 @@
 """Module to handle responses"""
+from typing import List, Union
+
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, validate_model
-from typing import Union, List
 
 
 class Responses:
@@ -32,8 +33,9 @@ class Responses:
         models_json = [jsonable_encoder(model) for model in models]
         response = JSONResponse(
             status_code=418,
-            content=({"message": "Multiple Items Found.",
-                      "data": models_json}),
+            content=(
+                {"message": "Multiple Items Found.", "data": models_json}
+            ),
         )
         return response
 
@@ -46,7 +48,7 @@ class Responses:
         ----------
         model : BaseModel
             model response from server
-            """
+        """
         *_, validation_error = validate_model(model.__class__, model.__dict__)
         model_json = jsonable_encoder(model)
         if validation_error:

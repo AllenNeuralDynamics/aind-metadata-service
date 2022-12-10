@@ -6,10 +6,10 @@ import unittest
 from unittest.mock import Mock, patch
 
 import pyodbc
+from aind_data_schema.subject import Sex
 
 from aind_metadata_service.labtracks.client import LabTracksClient
 from aind_metadata_service.response_handler import Responses
-from aind_data_schema.subject import Subject,Sex
 
 from .test_response_handler import TestResponseExamples
 
@@ -175,9 +175,7 @@ class TestLabTracksClient(unittest.TestCase):
         self.assertEqual(
             expected_response.status_code, actual_response.status_code
         )
-        self.assertEqual(
-            expected_response.body, actual_response.body
-        )
+        self.assertEqual(expected_response.body, actual_response.body)
 
     @patch("pyodbc.connect")
     def test_multiple_ids_exist(self, mock_connect: Mock) -> None:
@@ -249,7 +247,7 @@ class TestLabTracksClient(unittest.TestCase):
                         "mouse",
                         "C57BL6J_OLD",
                         "C57BL/6J",
-                    ]
+                    ],
                 ]
 
             @staticmethod
@@ -270,9 +268,7 @@ class TestLabTracksClient(unittest.TestCase):
         self.assertEqual(
             expected_response.status_code, actual_response.status_code
         )
-        self.assertEqual(
-            expected_response.body, actual_response.body
-        )
+        self.assertEqual(expected_response.body, actual_response.body)
 
 
 if __name__ == "__main__":
