@@ -168,8 +168,14 @@ class TestLabTracksClient(unittest.TestCase):
         type(mock_connect.return_value).cursor = MockCursor
 
         actual_response = self.lb_client.get_subject_info(subject_id)
+        expected_response = Responses.model_response(
+            TestResponseExamples.expected_subject
+        )
         self.assertEqual(
-            TestResponseExamples.expected_subject, actual_response
+            expected_response.status_code, actual_response.status_code
+        )
+        self.assertEqual(
+            expected_response.body, actual_response.body
         )
 
 

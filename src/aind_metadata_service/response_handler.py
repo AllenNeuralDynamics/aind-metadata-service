@@ -49,5 +49,13 @@ class Responses:
                 ),
             )
         else:
-            response = model
+            response = JSONResponse(
+                status_code=200,
+                content=(
+                    {
+                        "message": "Valid Model.",
+                        "data": model_json,
+                    }
+                ),
+            )
         return response
