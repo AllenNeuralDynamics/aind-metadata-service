@@ -94,10 +94,16 @@ class LabTracksClient:
             else:
                 lth = LabTracksResponseHandler()
                 subjects = lth.map_response_to_subject(results)
-                # TODO: Handle situation if more than subject is returned?
-                subject = subjects[0]
-                response = Responses.model_response(subject)
-                return response
+                # Check if multiple unique items are returned
+                if len(set([s.json() for s in subjects])) > 1:
+                    response = (
+                        Responses.multiple_items_found_response(subjects)
+                    )
+                    return response
+                else:
+                    subject = subjects[0]
+                    response = Responses.model_response(subject)
+                    return response
         except pyodbc.Error:
             return Responses.internal_server_error_response()
 

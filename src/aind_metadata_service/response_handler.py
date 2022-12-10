@@ -2,7 +2,7 @@
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, validate_model
-from typing import Union
+from typing import Union, List
 
 
 class Responses:
@@ -23,6 +23,17 @@ class Responses:
         response = JSONResponse(
             status_code=404,
             content=({"message": "No Data Found.", "data": None}),
+        )
+        return response
+
+    @staticmethod
+    def multiple_items_found_response(models: List[BaseModel]) -> JSONResponse:
+        """Map to a 418 error."""
+        models_json = [jsonable_encoder(model) for model in models]
+        response = JSONResponse(
+            status_code=418,
+            content=({"message": "Multiple Items Found.",
+                      "data": models_json}),
         )
         return response
 
