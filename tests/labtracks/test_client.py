@@ -6,6 +6,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 import pyodbc
+from aind_data_schema.subject import Sex
 
 from aind_metadata_service.labtracks.client import LabTracksClient
 from aind_metadata_service.response_handler import Responses
@@ -168,9 +169,106 @@ class TestLabTracksClient(unittest.TestCase):
         type(mock_connect.return_value).cursor = MockCursor
 
         actual_response = self.lb_client.get_subject_info(subject_id)
-        self.assertEqual(
-            TestResponseExamples.expected_subject, actual_response
+        expected_response = Responses.model_response(
+            TestResponseExamples.expected_subject
         )
+        self.assertEqual(
+            expected_response.status_code, actual_response.status_code
+        )
+        self.assertEqual(expected_response.body, actual_response.body)
+
+    @patch("pyodbc.connect")
+    def test_multiple_ids_exist(self, mock_connect: Mock) -> None:
+        """
+        Tests that JSONResponse error is returned to client properly
+        when queried subject_id does not exist.
+        Parameters
+        ----------
+        mock_connect : Mock
+            A mocked Connection class that can be used to override methods
+            without connecting to sqlserver
+
+        Returns
+        -------
+            pass
+        """
+
+        class MockCursor:
+            """Mocked cursor object"""
+
+            description = [
+                ["id"],
+                ["class_values"],
+                ["sex"],
+                ["birth_date"],
+                ["mouse_comment"],
+                ["paternal_id"],
+                ["paternal_class_values"],
+                ["maternal_id"],
+                ["maternal_class_values"],
+                ["species_name"],
+                ["group_name"],
+                ["group_description"],
+            ]
+
+            @staticmethod
+            def execute(_):
+                """Mock execute"""
+                return None
+
+            @staticmethod
+            def fetchall():
+                """Mock fetchall"""
+                return [
+                    [
+                        decimal.Decimal("115977"),
+                        TestResponseExamples.class_values_str,
+                        "M",
+                        datetime.datetime(2012, 5, 13, 0, 0),
+                        None,
+                        decimal.Decimal("107384"),
+                        TestResponseExamples.paternal_class_values_str,
+                        decimal.Decimal("107392"),
+                        TestResponseExamples.maternal_class_values_str,
+                        "mouse",
+                        "C57BL6J_OLD",
+                        "C57BL/6J",
+                    ],
+                    [
+                        decimal.Decimal("115977"),
+                        TestResponseExamples.class_values_str,
+                        "F",
+                        datetime.datetime(2012, 5, 13, 0, 0),
+                        None,
+                        decimal.Decimal("107384"),
+                        TestResponseExamples.paternal_class_values_str,
+                        decimal.Decimal("107392"),
+                        TestResponseExamples.maternal_class_values_str,
+                        "mouse",
+                        "C57BL6J_OLD",
+                        "C57BL/6J",
+                    ],
+                ]
+
+            @staticmethod
+            def close():
+                """Mock close"""
+                return None
+
+        subject_id = "115977"
+
+        type(mock_connect.return_value).cursor = MockCursor
+
+        actual_response = self.lb_client.get_subject_info(subject_id)
+        expected_subject2 = TestResponseExamples.expected_subject.copy()
+        expected_subject2.sex = Sex.FEMALE
+        expected_response = Responses.multiple_items_found_response(
+            [TestResponseExamples.expected_subject, expected_subject2]
+        )
+        self.assertEqual(
+            expected_response.status_code, actual_response.status_code
+        )
+        self.assertEqual(expected_response.body, actual_response.body)
 
 
 if __name__ == "__main__":
