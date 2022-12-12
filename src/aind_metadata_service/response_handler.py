@@ -1,5 +1,5 @@
 """Module to handle responses"""
-from typing import List, Union
+from typing import List
 
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -40,7 +40,7 @@ class Responses:
         return response
 
     @staticmethod
-    def model_response(model: BaseModel) -> Union[JSONResponse, BaseModel]:
+    def model_response(model: BaseModel) -> JSONResponse:
         """
         Parse model to a response or return model if valid.
         Handles validation errors.
