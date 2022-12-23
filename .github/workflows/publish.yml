@@ -5,7 +5,7 @@ on:
       - main
 jobs:
   tag:
-    uses: AllenNeuralDynamics/aind-reusable-workflows/.github/workflows/tag.yml@main
+    uses: AllenNeuralDynamics/aind-github-actions/.github/workflows/tag.yml@main
     secrets:
       SERVICE_TOKEN: ${{ secrets.SERVICE_TOKEN }} # required
   
