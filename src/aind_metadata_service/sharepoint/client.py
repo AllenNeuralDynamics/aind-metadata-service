@@ -194,11 +194,15 @@ class NeurosurgeryAndBehaviorList2019:
 class ListVersions(Enum):
     """Enum class to handle different SharePoint list versions."""
 
-    VERSION_2019 = {
-        "list_title": "SWR 2019-Present",
+    VERSION_2023 = {
+        "list_title": "SWR 2023-Present",
         "view_title": "New Request",
     }
-    DEFAULT = {"list_title": "SWR 2019-Present", "view_title": "New Request"}
+    VERSION_2019 = {
+        "list_title": "SWR 2019-2022",
+        "view_title": "New Request",
+    }
+    DEFAULT = {"list_title": "SWR 2019-2022", "view_title": "New Request"}
 
 
 class SharePointClient:
@@ -250,6 +254,12 @@ class SharePointClient:
             f")"
         )
         version_2019 = (
+            f"substringof("
+            f"'{subject_id}', "
+            f"{NeurosurgeryAndBehaviorList2019.ListField.LAB_TRACKS_ID.value}"
+            f")"
+        )
+        version_2023 = (
             f"substringof("
             f"'{subject_id}', "
             f"{NeurosurgeryAndBehaviorList2019.ListField.LAB_TRACKS_ID.value}"
