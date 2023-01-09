@@ -364,7 +364,6 @@ class ListVersions(Enum):
         "list_title": "SWR 2019-2022",
         "view_title": "New Request",
     }
-    DEFAULT = {"list_title": "SWR 2019-2022", "view_title": "New Request"}
 
 
 class SharePointClient:
@@ -427,7 +426,6 @@ class SharePointClient:
             f"{NeurosurgeryAndBehaviorList2023.ListField.LAB_TRACKS_ID.value}"
             f")"
         )
-        # TODO: Handle other versions
         filter_string = default
         if version == ListVersions.VERSION_2019:
             filter_string = version_2019
@@ -438,7 +436,6 @@ class SharePointClient:
     def get_procedure_info(
         self,
         subject_id: str,
-        version: ListVersions = ListVersions.VERSION_2019,
     ) -> JSONResponse:
         """
         Primary interface. Maps a subject_id to a response.
@@ -446,8 +443,6 @@ class SharePointClient:
         ----------
         subject_id : str
           ID of the subject being queried for.
-        version : ListVersions
-          Version of the SharePoint List being queried against
 
         Returns
         -------
@@ -456,25 +451,27 @@ class SharePointClient:
 
         """
         # TODO: Add try to handle internal server error response.
-        filter_string = self._get_filter_string(version, subject_id)
-        ctx = self.client_context
-        list_view = ctx.web.lists.get_by_title(
-            version.value["list_title"]
-        ).views.get_by_title(version.value["view_title"])
-        ctx.load(list_view)
-        ctx.execute_query()
-        list_items = list_view.get_items().filter(filter_string)
-        ctx.load(list_items)
-        ctx.execute_query()
-        response = self._handle_response_from_sharepoint(
-            list_items, subject_id=subject_id
-        )
-
+        # default response?
+        for version in ListVersions:
+            filter_string = self._get_filter_string(version, subject_id)
+            ctx = self.client_context
+            list_view = ctx.web.lists.get_by_title(
+                version.value["list_title"]
+            ).views.get_by_title(version.value["view_title"])
+            ctx.load(list_view)
+            ctx.execute_query()
+            # list_items append
+            list_items = list_view.get_items().filter(filter_string)
+            ctx.load(list_items)
+            ctx.execute_query()
+            response = self._handle_response_from_sharepoint(
+                list_items, subject_id=subject_id
+            )
         return response
 
     # TODO: Refactor to make less complex?
     def _handle_response_from_sharepoint(  # noqa: C901
-        self, list_items: ListItemCollection, subject_id: str
+        self, list_items: ListItemCollection, subject_id: str, version: ListVersions
     ) -> JSONResponse:
         """
         Maps the response from SharePoint into a Procedures model
@@ -484,6 +481,8 @@ class SharePointClient:
           SharePoint returns a ListItemCollection given a query
         subject_id : str
           ID of the subject being queried for.
+        version: ListVersions
+          Sharepoint DB version (2019,2023)
 
         Returns
         -------
@@ -492,9 +491,15 @@ class SharePointClient:
 
         """
         if list_items:
-            list_fields = NeurosurgeryAndBehaviorList2019.ListField
-            str_helpers = NeurosurgeryAndBehaviorList2019.StringParserHelper
-            nsb_proc_types = NeurosurgeryAndBehaviorList2019.ProcedureType
+            # TODO: default version? for now 2019
+            if version == ListVersions.VERSION_2023:
+                list_fields = NeurosurgeryAndBehaviorList2023.ListField
+                str_helpers = NeurosurgeryAndBehaviorList2023.StringParserHelper
+                nsb_proc_types = NeurosurgeryAndBehaviorList2023.ProcedureType
+            else:
+                list_fields = NeurosurgeryAndBehaviorList2019.ListField
+                str_helpers = NeurosurgeryAndBehaviorList2019.StringParserHelper
+                nsb_proc_types = NeurosurgeryAndBehaviorList2019.ProcedureType
             procedures = Procedures.construct(subject_id=subject_id)
             head_frames = []
             injections = []
@@ -534,14 +539,23 @@ class SharePointClient:
         return response
 
     @staticmethod
-    def _map_list_item_to_injection(list_item: ClientObject) -> Injection:
+    def _map_list_item_to_injection(list_item: ClientObject, version: ListVersions) -> Injection:
         """Maps a SharePoint ClientObject to an Injection model"""
-        list_fields = NeurosurgeryAndBehaviorList2019.ListField
-        start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
-        end_date = list_item.get_property(list_fields.DATE_RANGE_END.value)
-        experimenter_full_name = list_item.get_property(
-            list_fields.LAB_TRACKS_REQUESTOR.value
-        )
+        if version == ListVersions.VERSION_2023:
+            list_fields = NeurosurgeryAndBehaviorList2023.ListField
+            start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
+            end_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
+            experimenter_full_name = list_item.get_property(
+                list_fields.LAB_TRACKS_REQUESTOR.value
+            )
+        else:
+            list_fields = NeurosurgeryAndBehaviorList2019.ListField
+            start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
+            end_date = list_item.get_property(list_fields.DATE_RANGE_END.value)
+            experimenter_full_name = list_item.get_property(
+                list_fields.LAB_TRACKS_REQUESTOR.value
+            )
+
         injection = Injection.construct(
             start_date=start_date,
             end_date=end_date,
@@ -551,15 +565,23 @@ class SharePointClient:
 
     @staticmethod
     def _map_list_item_to_fiber_implant(
-        list_item: ClientObject,
+        list_item: ClientObject, version: ListVersions
     ) -> FiberImplant:
         """Maps a SharePoint ListItem to a FiberImplant model"""
-        list_fields = NeurosurgeryAndBehaviorList2019.ListField
-        start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
-        end_date = list_item.get_property(list_fields.DATE_RANGE_END.value)
-        experimenter_full_name = list_item.get_property(
-            list_fields.LAB_TRACKS_REQUESTOR.value
-        )
+        if version == ListVersions.VERSION_2023:
+            list_fields = NeurosurgeryAndBehaviorList2023.ListField
+            start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
+            end_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
+            experimenter_full_name = list_item.get_property(
+                list_fields.LAB_TRACKS_REQUESTOR.value
+            )
+        else:
+            list_fields = NeurosurgeryAndBehaviorList2019.ListField
+            start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
+            end_date = list_item.get_property(list_fields.DATE_RANGE_END.value)
+            experimenter_full_name = list_item.get_property(
+                list_fields.LAB_TRACKS_REQUESTOR.value
+            )
         fiber_implant = FiberImplant.construct(
             start_date=start_date,
             end_date=end_date,
@@ -568,14 +590,22 @@ class SharePointClient:
         return fiber_implant
 
     @staticmethod
-    def _map_list_item_to_head_frame(list_item: ClientObject) -> Headframe:
+    def _map_list_item_to_head_frame(list_item: ClientObject, version: ListVersions) -> Headframe:
         """Maps a SharePoint ListItem to a HeadFrame model"""
-        list_fields = NeurosurgeryAndBehaviorList2019.ListField
-        start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
-        end_date = list_item.get_property(list_fields.DATE_RANGE_END.value)
-        experimenter_full_name = list_item.get_property(
-            list_fields.LAB_TRACKS_REQUESTOR.value
-        )
+        if version == ListVersions.VERSION_2023:
+            list_fields = NeurosurgeryAndBehaviorList2023.ListField
+            start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
+            end_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
+            experimenter_full_name = list_item.get_property(
+                list_fields.LAB_TRACKS_REQUESTOR.value
+            )
+        else:
+            list_fields = NeurosurgeryAndBehaviorList2019.ListField
+            start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
+            end_date = list_item.get_property(list_fields.DATE_RANGE_END.value)
+            experimenter_full_name = list_item.get_property(
+                list_fields.LAB_TRACKS_REQUESTOR.value
+            )
         head_frame = Headframe.construct(
             start_date=start_date,
             end_date=end_date,
