@@ -1,6 +1,8 @@
 """Module to create client to connect to sharepoint database"""
 
 from enum import Enum
+from typing import Optional
+from aind_data_schema.procedures import Anaesthetic
 
 from aind_data_schema.procedures import (
     FiberImplant,
@@ -359,19 +361,56 @@ class SharePointClient:
             response = Responses.no_data_found_response()
         return response
 
+    # TODO: refactor to map general procedure info separately from procedure-specific ones?
     @staticmethod
-    def _map_list_item_to_injection(list_item: ClientObject) -> Injection:
+    def _map_anaesthesia(list_item, list_fields) -> Optional[Anaesthetic]:
+        """Maps anaesthesic type, duration, level"""
+        # TODO: make separate anaesthesia mappings for diff procedures
+        anaesthetic_type = "isoflurane"
+        first = True
+        if first:
+            duration = list_item.get_property(list_fields.FIRST_INJECTION_ISO_DURATION.value)
+            level = list_item.get_property(list_fields.ROUND1_INJ_ISOLEVEL.value)
+        else:
+            duration = list_item.get_property(list_fields.SECOND_INJECTION_ISO_DURATION.value)
+            level = list_item.get_property(list_fields.ROUND2_INJ_ISOLEVEL.value)
+        anaesthetic = Anaesthetic.construct(
+            type=anaesthetic_type,
+            duration=duration,
+            level=level,
+        )
+        return anaesthetic
+
+    def _map_list_item_to_injection(self, list_item: ClientObject) -> Injection:
         """Maps a SharePoint ClientObject to an Injection model"""
+        # TODO: map to BrainInjection model instead?
+        # missing protocol_id and injection_materials
+        # TODO: somehow track list_item's injection count and construct injection for each one
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
         start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
         end_date = list_item.get_property(list_fields.DATE_RANGE_END.value)
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
         )
+        iacuc_protocol = list_item.get_property(list_fields.IACUC_PROTOCOL.value)
+        animal_weight = list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER.value)
+        anaesthesia = self._map_anaesthesia(list_item, list_fields)
+        # TODO: parse data for time (str) and convert to datetime time
+        injection_duration = list_item.get_property(list_fields.INJ1_LENGHTOF_TIME.value)
+        recovery_time = list_item.get_property(list_fields.FIRST_INJ_RECOVERY.value)
+        workstation_id = list_item.get_property(list_fields.WORK_STATION1ST_INJECTION.value)
+        # TODO: map instrument_id (theres 4? 2 for nano 2 for ionto)
+        # TODO: ^ related, how do we want to map the diff types of injections?
         injection = Injection.construct(
             start_date=start_date,
             end_date=end_date,
             experimenter_full_name=experimenter_full_name,
+            iacuc_protocol=iacuc_protocol,
+            animal_weight=animal_weight,
+            anaesthesia=anaesthesia,
+            injection_duration=injection_duration,
+            recovery_time=recovery_time,
+            workstation_id=workstation_id,
         )
         return injection
 
