@@ -11,6 +11,7 @@ from aind_data_schema.procedures import (
     BrainInjection,
     NanojectInjection,
     IontophoresisInjection,
+    Craniotomy,
     Procedures,
 )
 from fastapi.responses import JSONResponse
@@ -35,9 +36,10 @@ class NeurosurgeryAndBehaviorList2019:
     class ProcedureType(Enum):
         """Enum class for SharePoint's Procedure Type"""
 
-        HEAD_PLANT = "HP"
-        INJECTION = "Injection"
+        HEAD_PLANT = "HP" #craniotomy
+        INJECTION = "Stereotaxic Injection" # or INJ or Injection ?
         OPTIC_FIBER_IMPLANT = "Optic Fiber Implant"
+        HEADFRAME = "Headframe"
 
     class ListField(Enum):
         """Enum class for fields in List Item object response"""
@@ -340,7 +342,7 @@ class SharePointClient:
                 for procedure_type in procedure_types:
                     if procedure_type == nsb_proc_types.HEAD_PLANT.value:
                         head_frames.append(
-                            self._map_list_item_to_head_frame(list_item)
+                            self._map_list_item_to_craniotomy(list_item)
                         )
                     if procedure_type == nsb_proc_types.INJECTION.value:
                         injections.append(
@@ -366,9 +368,8 @@ class SharePointClient:
 
     # TODO: refactor
     @staticmethod
-    def _map_anaesthesia(list_item, list_fields) -> Optional[Anaesthetic]:
-        """Maps anaesthesic type, duration, level"""
-        # TODO: make separate anaesthesia mappings for diff procedures
+    def _map_injection_anaesthesia(list_item, list_fields) -> Optional[Anaesthetic]:
+        """Maps anaesthesic type, duration, level for Injection"""
         anaesthetic_type = "isoflurane"
         first = True
         if first:
@@ -410,7 +411,8 @@ class SharePointClient:
         # TODO: handle 2 values for depth (maybe its 1st inj, 2nd inj?)
         injection_coordinate_depth = list_item.get_property(list_fields.VIRUS_D_V.value)
         injection_angle = list_item.get_property(list_fields.INJ1ANGLE0.value)
-        # TODO: check type of INJ1_TYPE.value (might need to make an Enum class)
+        # notes = list_item.get_property(list_fields.ST_ROUND_INJECTION_COMMENTS.value)
+        # TODO: check type of INJ1_TYPE.value (might need to make an Enum class to 2019 List)
         if injection_type is "Iontophoresis":
             instrument_id = list_item.get_property(list_fields.IONTO_NUMBER_INJ1.value)
             injection_current = list_item.get_property(list_fields.INJ1_CURRENT.value)
@@ -477,6 +479,52 @@ class SharePointClient:
                 injection_angle=injection_angle,
             )
         return injection
+
+    @staticmethod
+    def _map_hp_anaesthesia(list_item, list_fields) -> Optional[Anaesthetic]:
+        """Maps anaesthesic type, duration, level for HP/craniotomy"""
+        anaesthetic_type = "isoflurane"
+        # TODO: map duration
+        level = list_item.get_property(list_fields.HP_ISO_LEVEL.value)
+        anaesthetic = Anaesthetic.construct(
+            type=anaesthetic_type,
+            level=level,
+        )
+        return anaesthetic
+
+    def _map_list_item_to_craniotomy(self, list_item: ClientObject) -> Craniotomy:
+        """Maps a SharePoint ListItem to a Craniotomy model"""
+        #TODO: craniotomy type?
+        list_fields = NeurosurgeryAndBehaviorList2019.ListField
+        start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
+        end_date = list_item.get_property(list_fields.DATE_RANGE_END.value)
+        experimenter_full_name = list_item.get_property(
+            list_fields.LAB_TRACKS_REQUESTOR.value
+        )
+        iacuc_protocol = list_item.get_property(list_fields.IACUC_PROTOCOL.value)
+        animal_weight = list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER.value)
+        anaesthesia = self._map_hp_anaesthesia(list_item, list_fields) # 2 ?
+        craniotomy_coordinates_ml = list_item.get_property(list_fields.HP_M_L.value)
+        craniotomy_coordinates_ap = list_item.get_property(list_fields.HP_A_P.value)
+        craniotomy_size = list_item.get_property(list_fields.HP_DIAMETER.value)
+        # TODO: implant_part_number (IMPLANT_ID_COVERSLIP_TYPE)
+        dura_removed = list_item.get_property(list_fields.HP_DUROTOMY.value)
+        # TODO: protective_material
+        workstation_id = list_item.get_property(list_fields.HP_WORK_STATION.value)
+        craniotomy = Craniotomy.construct(
+            start_date=start_date,
+            end_date=end_date,
+            experimenter_full_name=experimenter_full_name,
+            iacuc_protocol=iacuc_protocol,
+            animal_weight=animal_weight,
+            anaesthesia=anaesthesia,
+            craniotomy_coordinates_ml=craniotomy_coordinates_ml,
+            craniotomy_coordinates_ap=craniotomy_coordinates_ap,
+            craniotomy_size=craniotomy_size,
+            dura_removed=dura_removed,
+            workstation_id=workstation_id,
+        )
+        return craniotomy
 
     @staticmethod
     def _map_list_item_to_fiber_implant(
