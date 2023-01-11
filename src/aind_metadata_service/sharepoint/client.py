@@ -36,11 +36,10 @@ class NeurosurgeryAndBehaviorList2019:
 
     class ProcedureType(Enum):
         """Enum class for SharePoint's Procedure Type"""
-
-        HEAD_PLANT = "HP" #craniotomy
-        INJECTION = "Stereotaxic Injection" # or INJ or Injection ?
+        # TODO: add full list of procedure types
+        HEAD_PLANT = "HP"
+        INJECTION = "Injection" # Stereotaxic Injection, INJ , Injection etc?
         OPTIC_FIBER_IMPLANT = "Optic Fiber Implant"
-        HEADFRAME = "Headframe"
 
     class ListField(Enum):
         """Enum class for fields in List Item object response"""
@@ -407,13 +406,13 @@ class SharePointClient:
         injection_type = list_item.get_property(list_fields.INJ1_TYPE.value)
         injection_hemisphere = list_item.get_property(list_fields.VIRUS_HEMISPHERE.value)
         injection_coordinate_ml = list_item.get_property(list_fields.VIRUS_M_L.value)
-        # TODO: handle # and direction for ap
+        # TODO: handle # and direction for ap (parse dir to
         injection_coordinate_ap = list_item.get_property(list_fields.VIRUS_A_P.value)
         # TODO: handle 2 values for depth (maybe its 1st inj, 2nd inj?)
         injection_coordinate_depth = list_item.get_property(list_fields.VIRUS_D_V.value)
         injection_angle = list_item.get_property(list_fields.INJ1ANGLE0.value)
         # notes = list_item.get_property(list_fields.ST_ROUND_INJECTION_COMMENTS.value)
-        # TODO: check type of INJ1_TYPE.value (might need to make an Enum class to 2019 List)
+        # TODO: might need to make an Enum class in 2019 List for injection types
         if injection_type is "Iontophoresis":
             instrument_id = list_item.get_property(list_fields.IONTO_NUMBER_INJ1.value)
             injection_current = list_item.get_property(list_fields.INJ1_CURRENT.value)
@@ -495,6 +494,7 @@ class SharePointClient:
 
     def _map_list_item_to_craniotomy(self, list_item: ClientObject) -> Craniotomy:
         """Maps a SharePoint ListItem to a Craniotomy model"""
+        # TODO: map to head post instead (adding to data schema)
         #TODO: craniotomy type?
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
         start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
@@ -536,6 +536,8 @@ class SharePointClient:
         # core_diameter
         # numerical_aperture
         # ferrule_material
+        # angle
+        # notes
         # TODO: meaning of FiberImplant1 TRUE/FALSE
         stereotactic_coordinate_ml = list_item.get_property(list_fields.VIRUS_M_L.value)
         stereotactic_coordinate_ap = list_item.get_property(list_fields.VIRUS_A_P.value)
