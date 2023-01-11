@@ -12,6 +12,7 @@ from aind_data_schema.procedures import (
     NanojectInjection,
     IontophoresisInjection,
     Craniotomy,
+    OphysProbe,
     Procedures,
 )
 from fastapi.responses import JSONResponse
@@ -527,7 +528,27 @@ class SharePointClient:
         return craniotomy
 
     @staticmethod
+    def _map_list_item_to_ophys_probe(list_item: ClientObject,list_fields) -> OphysProbe:
+        """Maps a Sharepoint ListItem to a OphysProbe model"""
+        #  name
+        # manufacturer
+        # part_number
+        # core_diameter
+        # numerical_aperture
+        # ferrule_material
+        # TODO: meaning of FiberImplant1 TRUE/FALSE
+        stereotactic_coordinate_ml = list_item.get_property(list_fields.VIRUS_M_L.value)
+        stereotactic_coordinate_ap = list_item.get_property(list_fields.VIRUS_A_P.value)
+        stereotactic_coordinate_dv = list_item.get_property(list_fields.FIBER_IMPLANT1_DV.value)
+        ophys_probe = OphysProbe.construct(
+            stereotactic_coordinate_ml=stereotactic_coordinate_ml,
+            stereotactic_coordinate_ap=stereotactic_coordinate_ap,
+            stereotactic_coordinate_dv=stereotactic_coordinate_dv,
+        )
+        return ophys_probe
+
     def _map_list_item_to_fiber_implant(
+        self,
         list_item: ClientObject,
     ) -> FiberImplant:
         """Maps a SharePoint ListItem to a FiberImplant model"""
@@ -537,10 +558,13 @@ class SharePointClient:
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
         )
+        # TODO: probes is a list, figure out how probes correlates with list item obj
+        probes = self._map_list_item_to_ophys_probe(list_item, list_fields)
         fiber_implant = FiberImplant.construct(
             start_date=start_date,
             end_date=end_date,
             experimenter_full_name=experimenter_full_name,
+            probes=probes,
         )
         return fiber_implant
 
