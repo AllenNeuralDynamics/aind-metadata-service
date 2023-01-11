@@ -8,6 +8,9 @@ from aind_data_schema.procedures import (
     FiberImplant,
     Headframe,
     Injection,
+    BrainInjection,
+    NanojectInjection,
+    IontophoresisInjection,
     Procedures,
 )
 from fastapi.responses import JSONResponse
@@ -361,7 +364,7 @@ class SharePointClient:
             response = Responses.no_data_found_response()
         return response
 
-    # TODO: refactor to map general procedure info separately from procedure-specific ones?
+    # TODO: refactor
     @staticmethod
     def _map_anaesthesia(list_item, list_fields) -> Optional[Anaesthetic]:
         """Maps anaesthesic type, duration, level"""
@@ -383,9 +386,8 @@ class SharePointClient:
 
     def _map_list_item_to_injection(self, list_item: ClientObject) -> Injection:
         """Maps a SharePoint ClientObject to an Injection model"""
-        # TODO: map to BrainInjection model instead?
         # missing protocol_id and injection_materials
-        # TODO: somehow track list_item's injection count and construct injection for each one
+        # TODO: track list_item's injection count and construct injection for each one
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
         start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
         end_date = list_item.get_property(list_fields.DATE_RANGE_END.value)
@@ -394,24 +396,86 @@ class SharePointClient:
         )
         iacuc_protocol = list_item.get_property(list_fields.IACUC_PROTOCOL.value)
         animal_weight = list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER.value)
+        # TODO: all fields after this have diff field names for 2nd inj! handle this!
         anaesthesia = self._map_anaesthesia(list_item, list_fields)
         # TODO: parse data for time (str) and convert to datetime time
         injection_duration = list_item.get_property(list_fields.INJ1_LENGHTOF_TIME.value)
         recovery_time = list_item.get_property(list_fields.FIRST_INJ_RECOVERY.value)
         workstation_id = list_item.get_property(list_fields.WORK_STATION1ST_INJECTION.value)
-        # TODO: map instrument_id (theres 4? 2 for nano 2 for ionto)
-        # TODO: ^ related, how do we want to map the diff types of injections?
-        injection = Injection.construct(
-            start_date=start_date,
-            end_date=end_date,
-            experimenter_full_name=experimenter_full_name,
-            iacuc_protocol=iacuc_protocol,
-            animal_weight=animal_weight,
-            anaesthesia=anaesthesia,
-            injection_duration=injection_duration,
-            recovery_time=recovery_time,
-            workstation_id=workstation_id,
-        )
+        injection_type = list_item.get_property(list_fields.INJ1_TYPE.value)
+        injection_hemisphere = list_item.get_property(list_fields.VIRUS_HEMISPHERE.value)
+        injection_coordinate_ml = list_item.get_property(list_fields.VIRUS_M_L.value)
+        # TODO: handle # and direction for ap
+        injection_coordinate_ap = list_item.get_property(list_fields.VIRUS_A_P.value)
+        # TODO: handle 2 values for depth (maybe its 1st inj, 2nd inj?)
+        injection_coordinate_depth = list_item.get_property(list_fields.VIRUS_D_V.value)
+        injection_angle = list_item.get_property(list_fields.INJ1ANGLE0.value)
+        # TODO: check type of INJ1_TYPE.value (might need to make an Enum class)
+        if injection_type is "Iontophoresis":
+            instrument_id = list_item.get_property(list_fields.IONTO_NUMBER_INJ1.value)
+            injection_current = list_item.get_property(list_fields.INJ1_CURRENT.value)
+            alternating_current = list_item.get_property(list_fields.INJ1_ALTERNATING_TIME.value)
+            injection = IontophoresisInjection.construct(
+                start_date=start_date,
+                end_date=end_date,
+                experimenter_full_name=experimenter_full_name,
+                iacuc_protocol=iacuc_protocol,
+                animal_weight=animal_weight,
+                anaesthesia=anaesthesia,
+                injection_duration=injection_duration,
+                recovery_time=recovery_time,
+                workstation_id=workstation_id,
+                instrument_id=instrument_id,
+                injection_hemisphere=injection_hemisphere,
+                injection_coordinate_ml=injection_coordinate_ml,
+                injection_coordinate_ap=injection_coordinate_ap,
+                injection_coordinate_depth=injection_coordinate_depth,
+                injection_angle=injection_angle,
+                injection_type=injection_type,
+                injection_current=injection_current,
+                alternating_current=alternating_current,
+            )
+        elif injection_type is "Nanoject (Pressure)":
+            instrument_id = list_item.get_property(list_fields.NANOJECT_NUMBER_INJ10.value)
+            injection_volume = list_item.get_property(list_fields.INJ1_VOL)
+            injection = NanojectInjection.construct(
+                start_date=start_date,
+                end_date=end_date,
+                experimenter_full_name=experimenter_full_name,
+                iacuc_protocol=iacuc_protocol,
+                animal_weight=animal_weight,
+                anaesthesia=anaesthesia,
+                injection_duration=injection_duration,
+                recovery_time=recovery_time,
+                workstation_id=workstation_id,
+                instrument_id=instrument_id,
+                injection_hemisphere=injection_hemisphere,
+                injection_coordinate_ml=injection_coordinate_ml,
+                injection_coordinate_ap=injection_coordinate_ap,
+                injection_coordinate_depth=injection_coordinate_depth,
+                injection_angle=injection_angle,
+                injection_type=injection_type,
+                injection_volume=injection_volume,
+            )
+        else:
+            # default is to create BrainInjection (is this necessary)
+            injection = BrainInjection.construct(
+                start_date=start_date,
+                end_date=end_date,
+                experimenter_full_name=experimenter_full_name,
+                iacuc_protocol=iacuc_protocol,
+                animal_weight=animal_weight,
+                anaesthesia=anaesthesia,
+                injection_duration=injection_duration,
+                recovery_time=recovery_time,
+                workstation_id=workstation_id,
+                # instrument_id=instrument_id,
+                injection_hemisphere=injection_hemisphere,
+                injection_coordinate_ml=injection_coordinate_ml,
+                injection_coordinate_ap=injection_coordinate_ap,
+                injection_coordinate_depth=injection_coordinate_depth,
+                injection_angle=injection_angle,
+            )
         return injection
 
     @staticmethod
