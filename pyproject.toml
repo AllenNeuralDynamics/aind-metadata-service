@@ -15,14 +15,14 @@ classifiers = [
 ]
 readme = "README.md"
 dynamic = ["version"]
-aind-data-schema = "0.7.4"
 
 dependencies = [
     'pyodbc',
     'office365-rest-python-client',
     'aind-data-schema',
     'fastapi',
-    'uvicorn[standard]'
+    'uvicorn[standard]',
+    'aind-data-schema'
 ]
 
 [project.optional-dependencies]
