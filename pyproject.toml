@@ -21,7 +21,8 @@ dependencies = [
     'office365-rest-python-client',
     'aind-data-schema',
     'fastapi',
-    'uvicorn[standard]'
+    'uvicorn[standard]',
+    'python-dateutil'
 ]
 
 [project.optional-dependencies]

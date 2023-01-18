@@ -394,7 +394,6 @@ class SharePointClient:
         # TODO: missing protocol_id and injection_materials
         # TODO: track list_item's injection count and construct injection for each one
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
-        # TODO: start_date and end_date to datetime date
         start_date = parser.isoparse(list_item.get_property(list_fields.DATE_RANGE_START.value)).date()
         end_date = parser.isoparse(list_item.get_property(list_fields.DATE_RANGE_END.value)).date()
         experimenter_full_name = list_item.get_property(
@@ -404,7 +403,6 @@ class SharePointClient:
         animal_weight = list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER.value)
         # TODO: all fields after this have diff field names for 2nd inj! handle this!
         anaesthesia = self._map_injection_anaesthesia(list_item, list_fields)
-        # TODO: parse data for time (str) and convert to datetime time
         injection_duration = self._convert_str_to_time(list_item.get_property(list_fields.INJ1_LENGHTOF_TIME.value))
         injection_volume = list_item.get_property(list_fields.INJ1_VOL.value)
         recovery_time = list_item.get_property(list_fields.FIRST_INJ_RECOVERY.value)
