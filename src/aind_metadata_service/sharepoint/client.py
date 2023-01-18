@@ -9,6 +9,9 @@ from aind_data_schema.procedures import (
     NanojectInjection,
     IontophoresisInjection,
     Procedures,
+    Side,
+    FiberImplant,
+    Headframe,
 )
 from fastapi.responses import JSONResponse
 from office365.runtime.auth.client_credential import ClientCredential
@@ -34,10 +37,13 @@ class NeurosurgeryAndBehaviorList2019:
         """Enum class for SharePoint's Procedure Type"""
         # TODO: add full list of procedure types
         HEAD_PLANT = "HP"
-        STEREOTAXIC_INJECTION = "Stereotaxic Injection"
         INJECTION = "Stereotaxic Injection (Coordinate)"
         OPTIC_FIBER_IMPLANT = "Optic Fiber Implant"
-        WHC_NP = "Whole Hemisphere Craniotomy Neuropixel"
+
+    class InjectionType(Enum):
+        """Enum class for Injection Types"""
+        IONTOPHORESIS = "Iontophoresis"
+        NANOJECT = "Nanoject (Pressure)"
 
     class ListField(Enum):
         """Enum class for fields in List Item object response"""
@@ -340,7 +346,7 @@ class SharePointClient:
                 for procedure_type in procedure_types:
                     if procedure_type == nsb_proc_types.HEAD_PLANT.value:
                         head_frames.append(
-                            self._map_list_item_to_craniotomy(list_item)
+                            self._map_list_item_to_head_frame(list_item)
                         )
                     if procedure_type == nsb_proc_types.INJECTION.value:
                         injections.append(
@@ -364,6 +370,7 @@ class SharePointClient:
             response = Responses.no_data_found_response()
         return response
 
+    # TODO: refactor! create file for helper methods
     @staticmethod
     def _map_injection_anaesthesia(list_item, list_fields) -> Optional[Anaesthetic]:
         """Maps anaesthesic type, duration, level for Injection"""
@@ -382,6 +389,13 @@ class SharePointClient:
         )
         return anaesthetic
 
+    @staticmethod
+    def _map_hemisphere(response_hemisphere) -> Optional[Side]:
+        """Maps response string to Side object"""
+        if response_hemisphere == Side.LEFT.value:
+            return Side.LEFT
+        elif response_hemisphere == Side.RIGHT.value:
+            return Side.RIGHT
 
     @staticmethod
     def _convert_str_to_time(time_string):
@@ -389,10 +403,16 @@ class SharePointClient:
         import re
         return int(re.search(r'\d+', time_string).group())
 
-    def _map_list_item_to_injection(self, list_item: ClientObject) -> BrainInjection:
+    @staticmethod
+    def _parse_str_into_float(input_string):
+        """Parses int from string and converts to float"""
+        import string
+        if "," in input_string:
+            input_string = input_string.split(",")[0]
+        return float(input_string.strip(string.ascii_letters))
+
+    def _map_list_item_to_injection(self, list_item: ClientObject):
         """Maps a SharePoint ClientObject to an Injection model"""
-        # TODO: missing protocol_id and injection_materials
-        # TODO: track list_item's injection count and construct injection for each one
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
         start_date = parser.isoparse(list_item.get_property(list_fields.DATE_RANGE_START.value)).date()
         end_date = parser.isoparse(list_item.get_property(list_fields.DATE_RANGE_END.value)).date()
@@ -401,25 +421,21 @@ class SharePointClient:
         )
         iacuc_protocol = list_item.get_property(list_fields.IACUC_PROTOCOL.value)
         animal_weight = list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER.value)
-        # TODO: all fields after this have diff field names for 2nd inj! handle this!
+        # TODO: all fields after this have diff field names for 2nd inj! handle this !
         anaesthesia = self._map_injection_anaesthesia(list_item, list_fields)
         injection_duration = self._convert_str_to_time(list_item.get_property(list_fields.INJ1_LENGHTOF_TIME.value))
-        injection_volume = list_item.get_property(list_fields.INJ1_VOL.value)
         recovery_time = list_item.get_property(list_fields.FIRST_INJ_RECOVERY.value)
         workstation_id = list_item.get_property(list_fields.WORK_STATION1ST_INJECTION.value)
         injection_type = list_item.get_property(list_fields.INJ1_TYPE.value)
-        injection_hemisphere = list_item.get_property(list_fields.VIRUS_HEMISPHERE.value)
-        injection_coordinate_ml = list_item.get_property(list_fields.VIRUS_M_L.value)
-        # TODO: handle extra fields error for ml, ap, depth, and angle
-        # TODO: handle  value is not a valid float error for ap, depth, and angle
-        # TODO: handle # and direction for ap
-        injection_coordinate_ap = list_item.get_property(list_fields.VIRUS_A_P.value)
-        # TODO: handle 2 values for depth (maybe its 1st inj, 2nd inj?)
-        injection_coordinate_depth = list_item.get_property(list_fields.VIRUS_D_V.value)
-        injection_angle = list_item.get_property(list_fields.INJ1ANGLE0.value)
-        # notes = list_item.get_property(list_fields.ST_ROUND_INJECTION_COMMENTS.value)
-        # TODO: might need to make an Enum class in 2019 List for injection types
-        if injection_type is "Iontophoresis":
+        injection_hemisphere = self._map_hemisphere(list_item.get_property(list_fields.VIRUS_HEMISPHERE.value))
+        injection_coordinate_ml = self._parse_str_into_float(list_item.get_property(list_fields.VIRUS_M_L.value))
+        # TODO: handle direction for coordinate ap
+        injection_coordinate_ap = self._parse_str_into_float(list_item.get_property(list_fields.VIRUS_A_P.value))
+        # TODO: handle 2 values for depth (for now using 1st value)
+        injection_coordinate_depth = self._parse_str_into_float(list_item.get_property(list_fields.VIRUS_D_V.value))
+        injection_angle = self._parse_str_into_float(list_item.get_property(list_fields.INJ1ANGLE0.value))
+        notes = list_item.get_property(list_fields.ST_ROUND_INJECTION_COMMENTS.value)
+        if injection_type == NeurosurgeryAndBehaviorList2019.InjectionType.IONTOPHORESIS.value:
             instrument_id = list_item.get_property(list_fields.IONTO_NUMBER_INJ1.value)
             injection_current = list_item.get_property(list_fields.INJ1_CURRENT.value)
             alternating_current = list_item.get_property(list_fields.INJ1_ALTERNATING_TIME.value)
@@ -443,9 +459,9 @@ class SharePointClient:
                 injection_current=injection_current,
                 alternating_current=alternating_current,
             )
-        elif injection_type is "Nanoject (Pressure)":
+        elif injection_type == NeurosurgeryAndBehaviorList2019.InjectionType.NANOJECT.value:
             instrument_id = list_item.get_property(list_fields.NANOJECT_NUMBER_INJ10.value)
-            injection_volume = list_item.get_property(list_fields.INJ1_VOL)
+            injection_volume = list_item.get_property(list_fields.INJ1_VOL.value)
             injection = NanojectInjection.construct(
                 start_date=start_date,
                 end_date=end_date,
@@ -464,9 +480,10 @@ class SharePointClient:
                 injection_angle=injection_angle,
                 injection_type=injection_type,
                 injection_volume=injection_volume,
+                notes=notes,
             )
         else:
-            # default is to create BrainInjection (is this necessary)
+            # default is to create BrainInjection (is this necessary?)
             injection = BrainInjection.construct(
                 start_date=start_date,
                 end_date=end_date,
@@ -477,11 +494,45 @@ class SharePointClient:
                 injection_duration=injection_duration,
                 recovery_time=recovery_time,
                 workstation_id=workstation_id,
-                # instrument_id=instrument_id,
                 injection_hemisphere=injection_hemisphere,
                 injection_coordinate_ml=injection_coordinate_ml,
                 injection_coordinate_ap=injection_coordinate_ap,
                 injection_coordinate_depth=injection_coordinate_depth,
                 injection_angle=injection_angle,
+                notes=notes,
             )
         return injection
+
+    @staticmethod
+    def _map_list_item_to_fiber_implant(
+            list_item: ClientObject,
+    ) -> FiberImplant:
+        """Maps a SharePoint ListItem to a FiberImplant model"""
+        list_fields = NeurosurgeryAndBehaviorList2019.ListField
+        start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
+        end_date = list_item.get_property(list_fields.DATE_RANGE_END.value)
+        experimenter_full_name = list_item.get_property(
+            list_fields.LAB_TRACKS_REQUESTOR.value
+        )
+        fiber_implant = FiberImplant.construct(
+            start_date=start_date,
+            end_date=end_date,
+            experimenter_full_name=experimenter_full_name,
+        )
+        return fiber_implant
+
+    @staticmethod
+    def _map_list_item_to_head_frame(list_item: ClientObject) -> Headframe:
+        """Maps a SharePoint ListItem to a HeadFrame model"""
+        list_fields = NeurosurgeryAndBehaviorList2019.ListField
+        start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
+        end_date = list_item.get_property(list_fields.DATE_RANGE_END.value)
+        experimenter_full_name = list_item.get_property(
+            list_fields.LAB_TRACKS_REQUESTOR.value
+        )
+        head_frame = Headframe.construct(
+            start_date=start_date,
+            end_date=end_date,
+            experimenter_full_name=experimenter_full_name,
+        )
+        return head_frame
