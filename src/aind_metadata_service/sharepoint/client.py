@@ -49,7 +49,7 @@ class NeurosurgeryAndBehaviorList2019:
     class InjectionType(Enum):
         """Enum class for Injection Types"""
 
-        IONTOPHORESIS = "Iontophoresis"
+        IONTO = "Iontophoresis"
         NANOJECT = "Nanoject (Pressure)"
 
     class ListField(Enum):
@@ -457,8 +457,8 @@ class SharePointClient:
             list_fields.ST_ROUND_INJECTION_COMMENTS.value
         )
         if (
-            injection_type ==
-            NeurosurgeryAndBehaviorList2019.InjectionType.IONTOPHORESIS.value
+            injection_type
+            == NeurosurgeryAndBehaviorList2019.InjectionType.IONTO.value
         ):
             instrument_id = list_item.get_property(
                 list_fields.IONTO_NUMBER_INJ1.value
