@@ -9,7 +9,7 @@ from aind_metadata_service.labtracks.client import LabTracksClient
 from aind_metadata_service.sharepoint.client import SharePointClient
 
 app = FastAPI()
-favicon_path = 'favicon.ico'
+favicon_path = 'https://alleninstitute.org/static/images/favicons/alleninstitute/favicon.png'
 
 # TODO: Handle configs better?
 
