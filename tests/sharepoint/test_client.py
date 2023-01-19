@@ -7,6 +7,7 @@ from aind_data_schema.procedures import (
     Headframe,
     Injection,
     Procedures,
+    Anaesthetic
 )
 from office365.sharepoint.client_context import ClientContext
 from office365.sharepoint.listitems.collection import ListItemCollection
@@ -92,7 +93,7 @@ class Examples:
         "Inj2Type": "Nanoject (Pressure)",
         "Inj1Vol": "400",
         "Inj2Vol": "400",
-        "Inj1LenghtofTime": None,
+        "Inj1LenghtofTime": "5min",
         "Inj2LenghtofTime": None,
         "Inj1Current": None,
         "Inj2Current": None,
@@ -144,7 +145,7 @@ class Examples:
         "IontoNumberHPINJ": None,
         "inj1volperdepth": None,
         "inj2volperdepth": None,
-        "Inj1angle0": "Select...",
+        "Inj1angle0": "0 degrees",
         "Inj2angle0": "Select...",
         "Contusion": "Select...",
         "HPSurgeonComments": None,
@@ -184,6 +185,11 @@ class Examples:
         "https://raw.githubusercontent.com/AllenNeuralDynamics/"
         "aind-data-schema/main/site-packages/aind_data_schema/procedures.py"
     )
+    anaesthetic = Anaesthetic.construct(
+        type="isoflurane",
+        duration=None,
+        level="Select...",
+    )
     expected_procedures1 = Procedures.construct(
         describedBy=described_by,
         schema_version="0.4.4",
@@ -207,13 +213,25 @@ class Examples:
             [
                 Injection.construct(
                     type=None,
-                    start_date="2022-12-05T08:00:00Z",
-                    end_date="2022-12-09T08:00:00Z",
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
                     experimenter_full_name="Mary Smith",
-                    iacuc_protocol=None,
+                    iacuc_protocol="2115",
                     animal_weight=None,
+                    anaesthesia=anaesthetic,
                     notes=None,
                     injection_materials=None,
+                    injection_duration=5,
+                    recovery_time=None,
+                    workstation_id="SWS 3",
+                    instrument_id="Select...",
+                    injection_hemisphere="Left",
+                    injection_coordinate_ml=-3.3,
+                    injection_coordinate_ap=-1.6,
+                    injection_coordinate_depth=4.3,
+                    injection_angle=0.0,
+                    injection_type="Nanoject (Pressure)",
+                    injection_volume="400",
                 )
             ]
         ),

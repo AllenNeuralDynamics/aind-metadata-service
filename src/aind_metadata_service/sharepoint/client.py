@@ -37,7 +37,9 @@ class NeurosurgeryAndBehaviorList2019:
         """Enum class for SharePoint's Procedure Type"""
         # TODO: add full list of procedure types
         HEAD_PLANT = "HP"
-        INJECTION = "Stereotaxic Injection (Coordinate)"
+        STEREOTAXIC_INJECTION = "Stereotaxic Injection (Coordinate)"
+        INJECTION = "Injection"
+        INJ = "INJ"
         OPTIC_FIBER_IMPLANT = "Optic Fiber Implant"
 
     class InjectionType(Enum):
@@ -348,7 +350,11 @@ class SharePointClient:
                         head_frames.append(
                             self._map_list_item_to_head_frame(list_item)
                         )
-                    if procedure_type == nsb_proc_types.INJECTION.value:
+                    if procedure_type in {
+                        nsb_proc_types.STEREOTAXIC_INJECTION.value,
+                        nsb_proc_types.INJECTION.value,
+                        nsb_proc_types.INJ.value
+                    }:
                         injections.append(
                             self._map_list_item_to_injection(list_item)
                         )
@@ -414,8 +420,8 @@ class SharePointClient:
     def _map_list_item_to_injection(self, list_item: ClientObject):
         """Maps a SharePoint ClientObject to an Injection model"""
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
-        start_date = parser.isoparse(list_item.get_property(list_fields.DATE_RANGE_START.value)).date()
-        end_date = parser.isoparse(list_item.get_property(list_fields.DATE_RANGE_END.value)).date()
+        start_date = parser.isoparse(list_item.get_property(list_fields.DATE1ST_INJECTION.value)).date()
+        end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
         )
