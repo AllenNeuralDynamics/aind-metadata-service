@@ -3,11 +3,11 @@
 import unittest
 
 from aind_data_schema.procedures import (
+    Anaesthetic,
     FiberImplant,
     Headframe,
     Injection,
     Procedures,
-    Anaesthetic
 )
 from office365.sharepoint.client_context import ClientContext
 from office365.sharepoint.listitems.collection import ListItemCollection
@@ -185,7 +185,7 @@ class Examples:
         "https://raw.githubusercontent.com/AllenNeuralDynamics/"
         "aind-data-schema/main/site-packages/aind_data_schema/procedures.py"
     )
-    anaesthetic = Anaesthetic.construct(
+    expected_anaesthetic = Anaesthetic.construct(
         type="isoflurane",
         duration=None,
         level="Select...",
@@ -218,7 +218,7 @@ class Examples:
                     experimenter_full_name="Mary Smith",
                     iacuc_protocol="2115",
                     animal_weight=None,
-                    anaesthesia=anaesthetic,
+                    anaesthesia=expected_anaesthetic,
                     notes=None,
                     injection_materials=None,
                     injection_duration=5,
