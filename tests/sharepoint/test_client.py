@@ -2,6 +2,7 @@
 
 import json
 import unittest
+from pathlib import Path
 
 from aind_data_schema.procedures import (
     Anaesthetic,
@@ -25,11 +26,15 @@ from aind_metadata_service.sharepoint.client import (
 class Examples:
     """Class to hold some examples to compare against"""
 
-    list_item1_filepath = "tests/sharepoint/resources/list_item1.json"
+    list_item1_filepath = (
+        Path("tests") / "sharepoint" / "resources" / "list_item1.json"
+    )
     with open(list_item1_filepath) as f:
         list_item1_json = json.load(f)
 
-    list_item2_filepath = "tests/sharepoint/resources/list_item2.json"
+    list_item2_filepath = (
+        Path("tests") / "sharepoint" / "resources" / "list_item2.json"
+    )
     with open(list_item2_filepath) as f:
         list_item2_json = json.load(f)
 
