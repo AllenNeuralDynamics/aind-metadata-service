@@ -10,25 +10,17 @@ def map_hemisphere(response_hemisphere) -> Optional[Side]:
     """Maps response string to Side object"""
     if response_hemisphere == Side.LEFT.value:
         return Side.LEFT
-    elif response_hemisphere == Side.RIGHT.value:
-        return Side.RIGHT
     else:
-        return None
+        return Side.RIGHT
 
 
 def convert_str_to_time(time_string):
     """converts duration"""
-    if time_string:
-        return int(re.search(r"\d+", time_string).group())
-    else:
-        return None
+    return int(re.search(r"\d+", time_string).group())
 
 
 def parse_str_into_float(input_string):
     """Parses int from string and converts to float"""
-    if input_string:
-        if "," in input_string:
-            input_string = input_string.split(",")[0]
-        return float(input_string.strip(string.ascii_letters))
-    else:
-        return None
+    if "," in input_string:
+        input_string = input_string.split(",")[0]
+    return float(input_string.strip(string.ascii_letters))

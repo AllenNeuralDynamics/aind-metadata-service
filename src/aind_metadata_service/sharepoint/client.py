@@ -480,10 +480,7 @@ class SharePointClient:
                 injection_current=injection_current,
                 alternating_current=alternating_current,
             )
-        elif (
-            injection_type
-            == NeurosurgeryAndBehaviorList2019.InjectionType.NANOJECT.value
-        ):
+        else:
             instrument_id = list_item.get_property(
                 list_fields.NANOJECT_NUMBER_INJ10.value
             )
@@ -508,25 +505,6 @@ class SharePointClient:
                 injection_angle=injection_angle,
                 injection_type=injection_type,
                 injection_volume=injection_volume,
-                notes=notes,
-            )
-        else:
-            # default is to create BrainInjection (is this necessary?)
-            injection = BrainInjection.construct(
-                start_date=start_date,
-                end_date=end_date,
-                experimenter_full_name=experimenter_full_name,
-                iacuc_protocol=iacuc_protocol,
-                animal_weight=animal_weight,
-                anaesthesia=anaesthesia,
-                injection_duration=injection_duration,
-                recovery_time=recovery_time,
-                workstation_id=workstation_id,
-                injection_hemisphere=injection_hemisphere,
-                injection_coordinate_ml=injection_coordinate_ml,
-                injection_coordinate_ap=injection_coordinate_ap,
-                injection_coordinate_depth=injection_coordinate_depth,
-                injection_angle=injection_angle,
                 notes=notes,
             )
         return injection
