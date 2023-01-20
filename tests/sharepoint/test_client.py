@@ -1,7 +1,7 @@
 """Module to test SharePoint Client methods"""
 
-import unittest
 import json
+import unittest
 
 from aind_data_schema.procedures import (
     Anaesthetic,
@@ -145,7 +145,7 @@ class Examples:
                     injection_angle=0.0,
                     injection_type="Iontophoresis",
                     injection_current="5uA",
-                    alternating_current="7/7"
+                    alternating_current="7/7",
                 )
             ]
         ),
@@ -163,8 +163,6 @@ class Examples:
             ]
         ),
     )
-
-
 
 
 class TestSharepointClient(unittest.TestCase):

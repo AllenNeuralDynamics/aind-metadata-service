@@ -5,7 +5,6 @@ from typing import Optional
 
 from aind_data_schema.procedures import (
     Anaesthetic,
-    BrainInjection,
     FiberImplant,
     Headframe,
     IontophoresisInjection,
@@ -389,9 +388,7 @@ class SharePointClient:
         duration = list_item.get_property(
             list_fields.FIRST_INJECTION_ISO_DURATION.value
         )
-        level = list_item.get_property(
-            list_fields.ROUND1_INJ_ISOLEVEL.value
-        )
+        level = list_item.get_property(list_fields.ROUND1_INJ_ISOLEVEL.value)
         anaesthetic = Anaesthetic.construct(
             type=anaesthetic_type,
             duration=duration,
