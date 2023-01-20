@@ -6,7 +6,8 @@ from aind_data_schema.procedures import (
     Anaesthetic,
     FiberImplant,
     Headframe,
-    Injection,
+    BrainInjection,
+    NanojectInjection,
     Procedures,
 )
 from office365.sharepoint.client_context import ClientContext
@@ -47,7 +48,7 @@ class Examples:
         "Lims_x0020_Project_x0020_Code": "Select...",
         "Virus_x0020_M_x002f_L": "-3.3",
         "Virus_x0020_A_x002f_P": "-1.6",
-        "Virus_x0020_D_x002f_V": "4.3",
+        "Virus_x0020_D_x002f_V": "4.3, 2.6",
         "Virus_x0020_Hemisphere": "Left",
         "HP_x0020_M_x002f_L": None,
         "HP_x0020_A_x002f_P": None,
@@ -183,7 +184,7 @@ class Examples:
 
     described_by = (
         "https://raw.githubusercontent.com/AllenNeuralDynamics/"
-        "aind-data-schema/main/site-packages/aind_data_schema/procedures.py"
+        "aind-data-schema/main/src/aind_data_schema/procedures.py"
     )
     expected_anaesthetic = Anaesthetic.construct(
         type="isoflurane",
@@ -192,7 +193,7 @@ class Examples:
     )
     expected_procedures1 = Procedures.construct(
         describedBy=described_by,
-        schema_version="0.4.4",
+        schema_version="0.5.2",
         subject_id="650102",
         headframes=(
             [
@@ -211,7 +212,7 @@ class Examples:
         ),
         injections=(
             [
-                Injection.construct(
+                NanojectInjection.construct(
                     type=None,
                     start_date="2022-12-06",
                     end_date="2022-12-06",

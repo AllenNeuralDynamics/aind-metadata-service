@@ -20,7 +20,7 @@ from office365.sharepoint.client_context import ClientContext
 from office365.sharepoint.listitems.collection import ListItemCollection
 
 from aind_metadata_service.response_handler import Responses
-from aind_metadata_service.sharepoint.util.mapping_utils import (
+from aind_metadata_service.sharepoint.utils import (
     convert_str_to_time,
     map_hemisphere,
     parse_str_into_float,
@@ -386,21 +386,12 @@ class SharePointClient:
         """Maps anaesthesic type, duration, level for Injection"""
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
         anaesthetic_type = "isoflurane"
-        first = True
-        if first:
-            duration = list_item.get_property(
-                list_fields.FIRST_INJECTION_ISO_DURATION.value
-            )
-            level = list_item.get_property(
-                list_fields.ROUND1_INJ_ISOLEVEL.value
-            )
-        else:
-            duration = list_item.get_property(
-                list_fields.SECOND_INJECTION_ISO_DURATION.value
-            )
-            level = list_item.get_property(
-                list_fields.ROUND2_INJ_ISOLEVEL.value
-            )
+        duration = list_item.get_property(
+            list_fields.FIRST_INJECTION_ISO_DURATION.value
+        )
+        level = list_item.get_property(
+            list_fields.ROUND1_INJ_ISOLEVEL.value
+        )
         anaesthetic = Anaesthetic.construct(
             type=anaesthetic_type,
             duration=duration,

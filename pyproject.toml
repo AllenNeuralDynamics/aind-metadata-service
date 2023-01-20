@@ -19,7 +19,7 @@ dynamic = ["version"]
 dependencies = [
     'pyodbc',
     'office365-rest-python-client',
-    'aind-data-schema==0.3.2',
+    'aind-data-schema==0.9.2',
     'fastapi',
     'uvicorn[standard]',
     'python-dateutil'
@@ -75,7 +75,7 @@ exclude_lines = [
     "import",
     "pragma: no cover"
 ]
-fail_under = 98
+fail_under = 100
 
 [tool.isort]
 line_length = 79
