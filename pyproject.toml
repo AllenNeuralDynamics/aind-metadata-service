@@ -19,9 +19,10 @@ dynamic = ["version"]
 dependencies = [
     'pyodbc',
     'office365-rest-python-client',
-    'aind-data-schema==0.3.2',
+    'aind-data-schema==0.9.2',
     'fastapi',
-    'uvicorn[standard]'
+    'uvicorn[standard]',
+    'python-dateutil'
 ]
 
 [project.optional-dependencies]
