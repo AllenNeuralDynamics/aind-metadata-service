@@ -10,8 +10,10 @@ def map_hemisphere(response_hemisphere) -> Optional[Side]:
     """Maps response string to Side object"""
     if response_hemisphere == Side.LEFT.value:
         return Side.LEFT
-    else:
+    elif response_hemisphere == Side.RIGHT.value:
         return Side.RIGHT
+    else:
+        return None
 
 
 def convert_str_to_time(time_string):

@@ -38,6 +38,12 @@ class Examples:
     with open(list_item2_filepath) as f:
         list_item2_json = json.load(f)
 
+    list_item3_filepath = (
+            Path("tests") / "sharepoint" / "resources" / "list_item3.json"
+    )
+    with open(list_item3_filepath) as f:
+        list_item3_json = json.load(f)
+
     described_by = (
         "https://raw.githubusercontent.com/AllenNeuralDynamics/"
         "aind-data-schema/main/src/aind_data_schema/procedures.py"
@@ -169,6 +175,67 @@ class Examples:
         ),
     )
 
+    expected_procedures3 = Procedures.construct(
+        describedBy=described_by,
+        schema_version="0.5.2",
+        subject_id="650102",
+        headframes=(
+            [
+                Headframe.construct(
+                    type=None,
+                    start_date="2022-12-05T08:00:00Z",
+                    end_date="2022-12-09T08:00:00Z",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol=None,
+                    animal_weight=None,
+                    notes=None,
+                    well_part_number=None,
+                    well_type=None,
+                )
+            ]
+        ),
+        injections=(
+            [
+                IontophoresisInjection.construct(
+                    type=None,
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol="2115",
+                    animal_weight=None,
+                    anaesthesia=expected_anaesthetic,
+                    notes=None,
+                    injection_materials=None,
+                    injection_duration=5,
+                    recovery_time=None,
+                    workstation_id="SWS 3",
+                    instrument_id="Select...",
+                    injection_hemisphere=None,
+                    injection_coordinate_ml=-3.3,
+                    injection_coordinate_ap=-1.6,
+                    injection_coordinate_depth=4.3,
+                    injection_angle=0.0,
+                    injection_type="Iontophoresis",
+                    injection_current="5uA",
+                    alternating_current="7/7",
+                )
+            ]
+        ),
+        fiber_implants=(
+            [
+                FiberImplant.construct(
+                    type=None,
+                    start_date="2022-12-05T08:00:00Z",
+                    end_date="2022-12-09T08:00:00Z",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol=None,
+                    animal_weight=None,
+                    notes=None,
+                )
+            ]
+        ),
+    )
+
 
 class TestSharepointClient(unittest.TestCase):
     """Class to test methods for SharePointClient."""
@@ -228,6 +295,15 @@ class TestSharepointClient(unittest.TestCase):
             list_item_collection2, subject_id=subject_id
         )
         expected_msg2 = Responses.model_response(Examples.expected_procedures2)
+
+        list_item_collection3 = ListItemCollection(context=blank_ctx)
+        list_item3 = ListItem(context=blank_ctx)
+        list_item3.get_property = lambda x: Examples.list_item3_json[x]
+        list_item_collection3.add_child(list_item3)
+        msg3 = self.client._handle_response_from_sharepoint(
+            list_item_collection3, subject_id=subject_id
+        )
+        expected_msg3 = Responses.model_response(Examples.expected_procedures3)
         self.assertEqual(empty_response.status_code, empty_msg.status_code)
         self.assertEqual(empty_response.body, empty_msg.body)
         self.assertEqual(expected_msg.status_code, msg.status_code)
@@ -235,6 +311,7 @@ class TestSharepointClient(unittest.TestCase):
         self.assertEqual(expected_msg1.status_code, msg1.status_code)
         self.assertEqual(expected_msg1.body, msg1.body)
         self.assertEqual(expected_msg2.body, msg2.body)
+        self.assertEqual(expected_msg3.body, msg3.body)
 
     def test_get_procedure_info(self):
         """Basic test on the main interface."""
