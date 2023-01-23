@@ -1,14 +1,18 @@
 """Module to create client to connect to sharepoint database"""
 
 from enum import Enum
+from typing import Optional
 
 from aind_data_schema.procedures import (
+    Anaesthetic,
     FiberImplant,
     Headframe,
-    Injection,
+    IontophoresisInjection,
+    NanojectInjection,
     Procedures,
     Craniotomy,
 )
+from dateutil import parser
 from fastapi.responses import JSONResponse
 from office365.runtime.auth.client_credential import ClientCredential
 from office365.runtime.client_object import ClientObject
@@ -16,6 +20,11 @@ from office365.sharepoint.client_context import ClientContext
 from office365.sharepoint.listitems.collection import ListItemCollection
 
 from aind_metadata_service.response_handler import Responses
+from aind_metadata_service.sharepoint.utils import (
+    convert_str_to_time,
+    map_hemisphere,
+    parse_str_into_float,
+)
 
 
 class NeurosurgeryAndBehaviorList2019:
@@ -32,10 +41,18 @@ class NeurosurgeryAndBehaviorList2019:
         """Enum class for SharePoint's Procedure Type"""
 
         HEAD_PLANT = "HP"
+        STEREOTAXIC_INJECTION = "Stereotaxic Injection (Coordinate)"
         INJECTION = "Injection"
+        INJ = "INJ"
         OPTIC_FIBER_IMPLANT = "Optic Fiber Implant"
         HP_TRANSCRANIAL = "HP Transcranial (for ISI)"
         WHC_NP = "WHC NP"
+
+    class InjectionType(Enum):
+        """Enum class for Injection Types"""
+
+        IONTO = "Iontophoresis"
+        NANOJECT = "Nanoject (Pressure)"
 
     class ListField(Enum):
         """Enum class for fields in List Item object response"""
@@ -341,7 +358,11 @@ class SharePointClient:
                         head_frames.append(
                             self._map_list_item_to_head_frame(list_item)
                         )
-                    if procedure_type == nsb_proc_types.INJECTION.value:
+                    if procedure_type in {
+                        nsb_proc_types.STEREOTAXIC_INJECTION.value,
+                        nsb_proc_types.INJECTION.value,
+                        nsb_proc_types.INJ.value,
+                    }:
                         injections.append(
                             self._map_list_item_to_injection(list_item)
                         )
@@ -370,19 +391,129 @@ class SharePointClient:
         return response
 
     @staticmethod
-    def _map_list_item_to_injection(list_item: ClientObject) -> Injection:
+    def _map_injection_anaesthesia(list_item) -> Optional[Anaesthetic]:
+        """Maps anaesthesic type, duration, level for Injection"""
+        list_fields = NeurosurgeryAndBehaviorList2019.ListField
+        anaesthetic_type = "isoflurane"
+        duration = list_item.get_property(
+            list_fields.FIRST_INJECTION_ISO_DURATION.value
+        )
+        level = list_item.get_property(list_fields.ROUND1_INJ_ISOLEVEL.value)
+        anaesthetic = Anaesthetic.construct(
+            type=anaesthetic_type,
+            duration=duration,
+            level=level,
+        )
+        return anaesthetic
+
+    def _map_list_item_to_injection(self, list_item: ClientObject):
         """Maps a SharePoint ClientObject to an Injection model"""
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
-        start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
-        end_date = list_item.get_property(list_fields.DATE_RANGE_END.value)
+        start_date = parser.isoparse(
+            list_item.get_property(list_fields.DATE1ST_INJECTION.value)
+        ).date()
+        end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
         )
-        injection = Injection.construct(
-            start_date=start_date,
-            end_date=end_date,
-            experimenter_full_name=experimenter_full_name,
+        iacuc_protocol = list_item.get_property(
+            list_fields.IACUC_PROTOCOL.value
         )
+        animal_weight = list_item.get_property(
+            list_fields.WEIGHT_BEFORE_SURGER.value
+        )
+        # TODO: all fields after this have diff field names for 2nd inj
+        anaesthesia = self._map_injection_anaesthesia(list_item)
+        injection_duration = convert_str_to_time(
+            list_item.get_property(list_fields.INJ1_LENGHTOF_TIME.value)
+        )
+        recovery_time = list_item.get_property(
+            list_fields.FIRST_INJ_RECOVERY.value
+        )
+        workstation_id = list_item.get_property(
+            list_fields.WORK_STATION1ST_INJECTION.value
+        )
+        injection_type = list_item.get_property(list_fields.INJ1_TYPE.value)
+        injection_hemisphere = map_hemisphere(
+            list_item.get_property(list_fields.VIRUS_HEMISPHERE.value)
+        )
+        injection_coordinate_ml = parse_str_into_float(
+            list_item.get_property(list_fields.VIRUS_M_L.value)
+        )
+        # TODO: handle direction for coordinate ap
+        injection_coordinate_ap = parse_str_into_float(
+            list_item.get_property(list_fields.VIRUS_A_P.value)
+        )
+        # TODO: handle 2 values for depth (for now using 1st value)
+        injection_coordinate_depth = parse_str_into_float(
+            list_item.get_property(list_fields.VIRUS_D_V.value)
+        )
+        injection_angle = parse_str_into_float(
+            list_item.get_property(list_fields.INJ1ANGLE0.value)
+        )
+        notes = list_item.get_property(
+            list_fields.ST_ROUND_INJECTION_COMMENTS.value
+        )
+        if (
+            injection_type
+            == NeurosurgeryAndBehaviorList2019.InjectionType.IONTO.value
+        ):
+            instrument_id = list_item.get_property(
+                list_fields.IONTO_NUMBER_INJ1.value
+            )
+            injection_current = list_item.get_property(
+                list_fields.INJ1_CURRENT.value
+            )
+            alternating_current = list_item.get_property(
+                list_fields.INJ1_ALTERNATING_TIME.value
+            )
+            injection = IontophoresisInjection.construct(
+                start_date=start_date,
+                end_date=end_date,
+                experimenter_full_name=experimenter_full_name,
+                iacuc_protocol=iacuc_protocol,
+                animal_weight=animal_weight,
+                anaesthesia=anaesthesia,
+                injection_duration=injection_duration,
+                recovery_time=recovery_time,
+                workstation_id=workstation_id,
+                instrument_id=instrument_id,
+                injection_hemisphere=injection_hemisphere,
+                injection_coordinate_ml=injection_coordinate_ml,
+                injection_coordinate_ap=injection_coordinate_ap,
+                injection_coordinate_depth=injection_coordinate_depth,
+                injection_angle=injection_angle,
+                injection_type=injection_type,
+                injection_current=injection_current,
+                alternating_current=alternating_current,
+            )
+        else:
+            instrument_id = list_item.get_property(
+                list_fields.NANOJECT_NUMBER_INJ10.value
+            )
+            injection_volume = list_item.get_property(
+                list_fields.INJ1_VOL.value
+            )
+            injection = NanojectInjection.construct(
+                start_date=start_date,
+                end_date=end_date,
+                experimenter_full_name=experimenter_full_name,
+                iacuc_protocol=iacuc_protocol,
+                animal_weight=animal_weight,
+                anaesthesia=anaesthesia,
+                injection_duration=injection_duration,
+                recovery_time=recovery_time,
+                workstation_id=workstation_id,
+                instrument_id=instrument_id,
+                injection_hemisphere=injection_hemisphere,
+                injection_coordinate_ml=injection_coordinate_ml,
+                injection_coordinate_ap=injection_coordinate_ap,
+                injection_coordinate_depth=injection_coordinate_depth,
+                injection_angle=injection_angle,
+                injection_type=injection_type,
+                injection_volume=injection_volume,
+                notes=notes,
+            )
         return injection
 
     @staticmethod
