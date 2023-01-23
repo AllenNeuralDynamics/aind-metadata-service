@@ -1,6 +1,7 @@
 """Module to test SharePoint Client methods"""
 
 import json
+import os
 import unittest
 from pathlib import Path
 
@@ -26,21 +27,21 @@ from aind_metadata_service.sharepoint.client import (
 class Examples:
     """Class to hold some examples to compare against"""
 
-    list_item1_filepath = (
-        Path("tests") / "sharepoint" / "resources" / "list_item1.json"
-    )
+    TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__)))
+    RESOURCES_DIR = TEST_DIR / "resources"
+
+    list_item1_filepath = RESOURCES_DIR/"list_item1.json"
+
     with open(list_item1_filepath) as f:
         list_item1_json = json.load(f)
 
-    list_item2_filepath = (
-        Path("tests") / "sharepoint" / "resources" / "list_item2.json"
-    )
+    list_item2_filepath = RESOURCES_DIR/"list_item2.json"
+
     with open(list_item2_filepath) as f:
         list_item2_json = json.load(f)
 
-    list_item3_filepath = (
-            Path("tests") / "sharepoint" / "resources" / "list_item3.json"
-    )
+    list_item3_filepath = RESOURCES_DIR/"list_item3.json"
+
     with open(list_item3_filepath) as f:
         list_item3_json = json.load(f)
 
