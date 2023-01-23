@@ -564,16 +564,9 @@ class SharePointClient:
         )
         iacuc_protocol = list_item.get_property(list_fields.IACUC_PROTOCOL.value)
         animal_weight = list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER.value)
-        anaesthesia = self._map_hp_anaesthesia(list_item, list_fields)  # 2 ?
-        craniotomy_type = list_item.get_property(list_fields.CRANIOTOMY_TYPE.value)
-        # TODO: add enum for craniotomy type
-        # if craniotomy_type is "WHC NP" or "WHC 2P":
-        #     # what are the coords and size ?
-        # elif craniotomy_type is "Frontal Window 3mm":
-        #     # what are the coords?
-        #     # size = 3 mm
-        # else:
-        #     # default is visual cortex 5 mm
+        anaesthesia = self._map_hp_anaesthesia(list_item, list_fields)
+        # craniotomy_type = list_item.get_property(list_fields.CRANIOTOMY_TYPE.value)
+        # TODO: handle size and coords by craniotomy_type ?
         craniotomy_hemisphere = list_item.get_property(list_fields.HP_LOC.value)
         craniotomy_coordinates_ml = list_item.get_property(list_fields.HP_M_L.value)
         craniotomy_coordinates_ap = list_item.get_property(list_fields.HP_A_P.value)
@@ -582,6 +575,7 @@ class SharePointClient:
         dura_removed = list_item.get_property(list_fields.HP_DUROTOMY.value)
         # TODO: protective_material
         workstation_id = list_item.get_property(list_fields.HP_WORK_STATION.value)
+        notes = list_item.get_property(list_fields.LONG_SURGEON_COMMENTS.value)
         craniotomy = Craniotomy.construct(
             start_date=start_date,
             end_date=end_date,
@@ -595,6 +589,8 @@ class SharePointClient:
             craniotomy_size=craniotomy_size,
             dura_removed=dura_removed,
             workstation_id=workstation_id,
+            notes=notes,
+
         )
         return craniotomy
 
