@@ -47,6 +47,9 @@ class NeurosurgeryAndBehaviorList2019:
         OPTIC_FIBER_IMPLANT = "Optic Fiber Implant"
         HP_TRANSCRANIAL = "HP Transcranial (for ISI)"
         WHC_NP = "WHC NP"
+        C_CAM = "C CAM"
+        C_MULTISCOPE = "C Multiscope"
+        C = "C"
 
     class InjectionType(Enum):
         """Enum class for Injection Types"""
@@ -373,7 +376,12 @@ class SharePointClient:
                         fiber_implants.append(
                             self._map_list_item_to_fiber_implant(list_item)
                         )
-                    if procedure_type == nsb_proc_types.HP_TRANSCRANIAL.value:
+                    if procedure_type in {
+                        nsb_proc_types.WHC_NP.value,
+                        nsb_proc_types.C_MULTISCOPE.value,
+                        nsb_proc_types.C_CAM.value,
+                        nsb_proc_types.C.value,
+                    }:
                         craniotomies.append(
                             self._map_list_item_to_craniotomy(list_item)
                         )
@@ -538,7 +546,7 @@ class SharePointClient:
     def _map_hp_anaesthesia(list_item, list_fields) -> Optional[Anaesthetic]:
         """Maps anaesthesic type, duration, level for HP/craniotomy"""
         anaesthetic_type = "isoflurane"
-        # TODO: map duration
+        # TODO: duration
         level = list_item.get_property(list_fields.HP_ISO_LEVEL.value)
         anaesthetic = Anaesthetic.construct(
             type=anaesthetic_type,
@@ -559,16 +567,17 @@ class SharePointClient:
         anaesthesia = self._map_hp_anaesthesia(list_item, list_fields)  # 2 ?
         craniotomy_type = list_item.get_property(list_fields.CRANIOTOMY_TYPE.value)
         # TODO: add enum for craniotomy type
-        if craniotomy_type is "WHC NP" or "WHC 2P":
-            # what are the coords and size ?
-        elif craniotomy_type is "Frontal Window 3mm":
-            # what are the coords?
-            # size = 3 mm
-        else:
-            # default is visual cortex 5 mm
-            craniotomy_coordinates_ml = list_item.get_property(list_fields.HP_M_L.value)
-            craniotomy_coordinates_ap = list_item.get_property(list_fields.HP_A_P.value)
-            craniotomy_size = list_item.get_property(list_fields.HP_DIAMETER.value)
+        # if craniotomy_type is "WHC NP" or "WHC 2P":
+        #     # what are the coords and size ?
+        # elif craniotomy_type is "Frontal Window 3mm":
+        #     # what are the coords?
+        #     # size = 3 mm
+        # else:
+        #     # default is visual cortex 5 mm
+        craniotomy_hemisphere = list_item.get_property(list_fields.HP_LOC.value)
+        craniotomy_coordinates_ml = list_item.get_property(list_fields.HP_M_L.value)
+        craniotomy_coordinates_ap = list_item.get_property(list_fields.HP_A_P.value)
+        craniotomy_size = list_item.get_property(list_fields.HP_DIAMETER.value)
         # TODO: implant_part_number (IMPLANT_ID_COVERSLIP_TYPE)
         dura_removed = list_item.get_property(list_fields.HP_DUROTOMY.value)
         # TODO: protective_material
@@ -580,6 +589,7 @@ class SharePointClient:
             iacuc_protocol=iacuc_protocol,
             animal_weight=animal_weight,
             anaesthesia=anaesthesia,
+            craniotomy_hemisphere=craniotomy_hemisphere,
             craniotomy_coordinates_ml=craniotomy_coordinates_ml,
             craniotomy_coordinates_ap=craniotomy_coordinates_ap,
             craniotomy_size=craniotomy_size,
