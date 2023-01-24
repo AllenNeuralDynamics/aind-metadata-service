@@ -24,6 +24,8 @@ from aind_metadata_service.sharepoint.utils import (
     convert_str_to_time,
     map_hemisphere,
     parse_str_into_float,
+    clean_notes,
+    convert_str_to_bool,
 )
 
 
@@ -459,9 +461,9 @@ class SharePointClient:
         injection_angle = parse_str_into_float(
             list_item.get_property(list_fields.INJ1ANGLE0.value)
         )
-        notes = list_item.get_property(
+        notes = clean_notes(list_item.get_property(
             list_fields.ST_ROUND_INJECTION_COMMENTS.value
-        )
+        ))
         if (
             injection_type
             == NeurosurgeryAndBehaviorList2019.InjectionType.IONTO.value
@@ -556,27 +558,27 @@ class SharePointClient:
 
     def _map_list_item_to_craniotomy(self, list_item: ClientObject) -> Craniotomy:
         """Maps a SharePoint ListItem to a Craniotomy model"""
+        # TODO: missing fields (implant_part_number, protective_material)
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
-        start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
-        end_date = list_item.get_property(list_fields.DATE_RANGE_END.value)
+        start_date = parser.isoparse(list_item.get_property(list_fields.DATE_OF_SURGERY.value)).date()
+        end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
         )
         iacuc_protocol = list_item.get_property(list_fields.IACUC_PROTOCOL.value)
         animal_weight = list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER.value)
         anaesthesia = self._map_hp_anaesthesia(list_item, list_fields)
-        # craniotomy_type = list_item.get_property(list_fields.CRANIOTOMY_TYPE.value)
+        craniotomy_type = list_item.get_property(list_fields.CRANIOTOMY_TYPE.value)
         # TODO: handle size and coords by craniotomy_type ?
         craniotomy_hemisphere = list_item.get_property(list_fields.HP_LOC.value)
-        craniotomy_coordinates_ml = list_item.get_property(list_fields.HP_M_L.value)
-        craniotomy_coordinates_ap = list_item.get_property(list_fields.HP_A_P.value)
-        craniotomy_size = list_item.get_property(list_fields.HP_DIAMETER.value)
-        # TODO: implant_part_number (IMPLANT_ID_COVERSLIP_TYPE)
-        dura_removed = list_item.get_property(list_fields.HP_DUROTOMY.value)
-        # TODO: protective_material
+        craniotomy_coordinates_ml = parse_str_into_float(list_item.get_property(list_fields.HP_M_L.value))
+        craniotomy_coordinates_ap = parse_str_into_float(list_item.get_property(list_fields.HP_A_P.value))
+        craniotomy_size = parse_str_into_float(list_item.get_property(list_fields.HP_DIAMETER.value))
+        dura_removed = convert_str_to_bool(list_item.get_property(list_fields.HP_DUROTOMY.value))
         workstation_id = list_item.get_property(list_fields.HP_WORK_STATION.value)
-        notes = list_item.get_property(list_fields.LONG_SURGEON_COMMENTS.value)
+        notes = clean_notes(list_item.get_property(list_fields.LONG_SURGEON_COMMENTS.value))
         craniotomy = Craniotomy.construct(
+            type = craniotomy_type,
             start_date=start_date,
             end_date=end_date,
             experimenter_full_name=experimenter_full_name,

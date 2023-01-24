@@ -5,6 +5,17 @@ from typing import Optional
 
 from aind_data_schema.procedures import Side
 
+CLEANR = re.compile('<.*?>')
+
+
+def clean_notes(raw_text):
+    """Removes <html> tags, newline delimiters, and leading/trailing white spaces"""
+    if raw_text:
+        clean_text = re.sub(CLEANR, '', raw_text)
+        clean_text = re.sub(r'\r\n', '', clean_text)
+        return clean_text.strip()
+    return raw_text
+
 
 def map_hemisphere(response_hemisphere) -> Optional[Side]:
     """Maps response string to Side object"""
@@ -26,3 +37,14 @@ def parse_str_into_float(input_string):
     if "," in input_string:
         input_string = input_string.split(",")[0]
     return float(input_string.strip(string.ascii_letters))
+
+
+def convert_str_to_bool(input_string):
+    """converts yes/no"""
+    if input_string == "Yes":
+        return True
+    elif input_string == "No":
+        return False
+    else:
+        return None
+
