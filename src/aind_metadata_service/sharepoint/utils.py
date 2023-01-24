@@ -2,7 +2,15 @@
 import re
 import string
 from typing import Optional
+
 from aind_data_schema.procedures import Side
+
+
+def map_choice(response):
+    """Maps choice response when it wasn't selected"""
+    if response == "Select...":
+        return None
+    return response
 
 
 def map_hemisphere(response_hemisphere) -> Optional[Side]:
@@ -35,4 +43,3 @@ def convert_str_to_bool(input_string):
         return False
     else:
         return None
-

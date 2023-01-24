@@ -5,12 +5,12 @@ from typing import Optional
 
 from aind_data_schema.procedures import (
     Anaesthetic,
+    Craniotomy,
     FiberImplant,
     Headframe,
     IontophoresisInjection,
     NanojectInjection,
     Procedures,
-    Craniotomy,
 )
 from dateutil import parser
 from fastapi.responses import JSONResponse
@@ -21,10 +21,11 @@ from office365.sharepoint.listitems.collection import ListItemCollection
 
 from aind_metadata_service.response_handler import Responses
 from aind_metadata_service.sharepoint.utils import (
+    convert_str_to_bool,
     convert_str_to_time,
+    map_choice,
     map_hemisphere,
     parse_str_into_float,
-    convert_str_to_bool,
 )
 
 
@@ -551,28 +552,50 @@ class SharePointClient:
         )
         return anaesthetic
 
-    def _map_list_item_to_craniotomy(self, list_item: ClientObject) -> Craniotomy:
+    def _map_list_item_to_craniotomy(
+        self, list_item: ClientObject
+    ) -> Craniotomy:
         """Maps a SharePoint ListItem to a Craniotomy model"""
         # TODO: missing fields (implant_part_number, protective_material)
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
-        start_date = parser.isoparse(list_item.get_property(list_fields.DATE_OF_SURGERY.value)).date()
+        start_date = parser.isoparse(
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
+        ).date()
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
         )
-        iacuc_protocol = list_item.get_property(list_fields.IACUC_PROTOCOL.value)
-        animal_weight = list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER.value)
+        iacuc_protocol = list_item.get_property(
+            list_fields.IACUC_PROTOCOL.value
+        )
+        animal_weight = list_item.get_property(
+            list_fields.WEIGHT_BEFORE_SURGER.value
+        )
         anaesthesia = self._map_hp_anaesthesia(list_item, list_fields)
-        craniotomy_type = list_item.get_property(list_fields.CRANIOTOMY_TYPE.value)
+        craniotomy_type = list_item.get_property(
+            list_fields.CRANIOTOMY_TYPE.value
+        )
         # TODO: handle size and coords by craniotomy_type ?
-        craniotomy_hemisphere = list_item.get_property(list_fields.HP_LOC.value)
-        craniotomy_coordinates_ml = parse_str_into_float(list_item.get_property(list_fields.HP_M_L.value))
-        craniotomy_coordinates_ap = parse_str_into_float(list_item.get_property(list_fields.HP_A_P.value))
-        craniotomy_size = parse_str_into_float(list_item.get_property(list_fields.HP_DIAMETER.value))
-        dura_removed = convert_str_to_bool(list_item.get_property(list_fields.HP_DUROTOMY.value))
-        workstation_id = list_item.get_property(list_fields.HP_WORK_STATION.value)
+        craniotomy_hemisphere = map_choice(
+            list_item.get_property(list_fields.HP_LOC.value)
+        )
+        craniotomy_coordinates_ml = parse_str_into_float(
+            list_item.get_property(list_fields.HP_M_L.value)
+        )
+        craniotomy_coordinates_ap = parse_str_into_float(
+            list_item.get_property(list_fields.HP_A_P.value)
+        )
+        craniotomy_size = parse_str_into_float(
+            list_item.get_property(list_fields.HP_DIAMETER.value)
+        )
+        dura_removed = convert_str_to_bool(
+            list_item.get_property(list_fields.HP_DUROTOMY.value)
+        )
+        workstation_id = list_item.get_property(
+            list_fields.HP_WORK_STATION.value
+        )
         craniotomy = Craniotomy.construct(
-            type = craniotomy_type,
+            type=craniotomy_type,
             start_date=start_date,
             end_date=end_date,
             experimenter_full_name=experimenter_full_name,
