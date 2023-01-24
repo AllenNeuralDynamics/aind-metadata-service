@@ -24,7 +24,6 @@ from aind_metadata_service.sharepoint.utils import (
     convert_str_to_time,
     map_hemisphere,
     parse_str_into_float,
-    clean_notes,
     convert_str_to_bool,
 )
 
@@ -461,9 +460,6 @@ class SharePointClient:
         injection_angle = parse_str_into_float(
             list_item.get_property(list_fields.INJ1ANGLE0.value)
         )
-        notes = clean_notes(list_item.get_property(
-            list_fields.ST_ROUND_INJECTION_COMMENTS.value
-        ))
         if (
             injection_type
             == NeurosurgeryAndBehaviorList2019.InjectionType.IONTO.value
@@ -522,7 +518,6 @@ class SharePointClient:
                 injection_angle=injection_angle,
                 injection_type=injection_type,
                 injection_volume=injection_volume,
-                notes=notes,
             )
         return injection
 
@@ -576,7 +571,6 @@ class SharePointClient:
         craniotomy_size = parse_str_into_float(list_item.get_property(list_fields.HP_DIAMETER.value))
         dura_removed = convert_str_to_bool(list_item.get_property(list_fields.HP_DUROTOMY.value))
         workstation_id = list_item.get_property(list_fields.HP_WORK_STATION.value)
-        notes = clean_notes(list_item.get_property(list_fields.LONG_SURGEON_COMMENTS.value))
         craniotomy = Craniotomy.construct(
             type = craniotomy_type,
             start_date=start_date,
@@ -591,8 +585,6 @@ class SharePointClient:
             craniotomy_size=craniotomy_size,
             dura_removed=dura_removed,
             workstation_id=workstation_id,
-            notes=notes,
-
         )
         return craniotomy
 

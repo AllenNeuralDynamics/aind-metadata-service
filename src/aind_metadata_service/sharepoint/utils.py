@@ -2,19 +2,7 @@
 import re
 import string
 from typing import Optional
-
 from aind_data_schema.procedures import Side
-
-CLEANR = re.compile('<.*?>')
-
-
-def clean_notes(raw_text):
-    """Removes <html> tags, newline delimiters, and leading/trailing white spaces"""
-    if raw_text:
-        clean_text = re.sub(CLEANR, '', raw_text)
-        clean_text = re.sub(r'\r\n', '', clean_text)
-        return clean_text.strip()
-    return raw_text
 
 
 def map_hemisphere(response_hemisphere) -> Optional[Side]:
