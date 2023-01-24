@@ -1,6 +1,5 @@
 """Helper methods to map sharepoint fields to schema format"""
 import re
-import string
 from typing import Optional
 
 from aind_data_schema.procedures import Side
@@ -30,9 +29,13 @@ def convert_str_to_time(time_string):
 
 def parse_str_into_float(input_string):
     """Parses int from string and converts to float"""
-    if "," in input_string:
-        input_string = input_string.split(",")[0]
-    return float(input_string.strip(string.ascii_letters))
+    if input_string:
+        if "," in input_string:
+            input_string = input_string.split(",")[0]
+        stripped_response = re.sub(r"[^0-9.-]", "", input_string)
+        if re.search("[0-9]", stripped_response):
+            return float(stripped_response)
+    return None
 
 
 def convert_str_to_bool(input_string):

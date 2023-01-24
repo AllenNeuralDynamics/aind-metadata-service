@@ -218,7 +218,7 @@ class Examples:
                     injection_hemisphere=None,
                     injection_coordinate_ml=-3.3,
                     injection_coordinate_ap=-1.6,
-                    injection_coordinate_depth=4.3,
+                    injection_coordinate_depth=None,
                     injection_angle=0.0,
                     injection_type="Iontophoresis",
                     injection_current="5uA",
