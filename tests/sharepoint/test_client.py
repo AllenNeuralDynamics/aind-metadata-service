@@ -13,6 +13,7 @@ from aind_data_schema.procedures import (
     IontophoresisInjection,
     NanojectInjection,
     Procedures,
+    OphysProbe,
 )
 from office365.sharepoint.client_context import ClientContext
 from office365.sharepoint.listitems.collection import ListItemCollection
@@ -56,10 +57,20 @@ class Examples:
         duration=None,
         level="Select...",
     )
+
     expected_hp_anaesthetic = Anaesthetic.construct(
         type="isoflurane",
         level="Select...",
     )
+
+    expected_probe1 = OphysProbe.construct(
+        stereotactic_coordinate_ml=-3.3,
+        stereotactic_coordinate_ap=-1.6,
+        stereotactic_coordinate_dv=4.2,
+        angle=0.0,
+    )
+    expected_probes = [expected_probe1]
+
     expected_procedures1 = Procedures.construct(
         describedBy=described_by,
         schema_version="0.5.2",
@@ -122,6 +133,7 @@ class Examples:
                     dura_removed=True,
                     workstation_id="SWS 3",
                     notes=None,
+                    probes=expected_probes,
                 )
             ]
         ),

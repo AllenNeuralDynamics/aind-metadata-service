@@ -143,7 +143,7 @@
   "ImplantIDCoverslipType": null,
   "Inj1Angle_v2": "0",
   "Inj2Angle_v2": "0",
-  "FiberImplant1": false,
+  "FiberImplant1": true,
   "FiberImplant1DV": "4.2",
   "FiberImplant2": false,
   "FiberImplant2DV": "4.2",

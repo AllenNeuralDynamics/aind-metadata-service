@@ -1,11 +1,7 @@
 """Module to create client to connect to sharepoint database"""
 
 from enum import Enum
-<<<<<<< HEAD
-from dateutil import parser
-=======
 from typing import Optional
->>>>>>> main
 
 from aind_data_schema.procedures import (
     Anaesthetic,
@@ -16,6 +12,7 @@ from aind_data_schema.procedures import (
     NanojectInjection,
     Procedures,
     OphysProbe,
+    ProbeName,
 )
 from dateutil import parser
 from fastapi.responses import JSONResponse
@@ -53,7 +50,7 @@ class NeurosurgeryAndBehaviorList2019:
         INJ = "INJ"
         OPTIC_FIBER_IMPLANT = "Optic Fiber Implant"
         HP_TRANSCRANIAL = "HP Transcranial (for ISI)"
-        WHOLE_HEMISPHERE_CRANIOTOMY_NP = "WHC NP"
+        WHC_NP = "WHC NP"
         C_CAM = "C CAM"
         C_MULTISCOPE = "C Multiscope"
         C = "C"
@@ -384,7 +381,7 @@ class SharePointClient:
                             self._map_list_item_to_fiber_implant(list_item)
                         )
                     if procedure_type in {
-                        nsb_proc_types.WHOLE_HEMISPHERE_CRANIOTOMY_NP.value,
+                        nsb_proc_types.WHC_NP.value,
                         nsb_proc_types.C_MULTISCOPE.value,
                         nsb_proc_types.C_CAM.value,
                         nsb_proc_types.C.value,
@@ -406,9 +403,8 @@ class SharePointClient:
         return response
 
     @staticmethod
-    def _map_injection_anaesthesia(list_item) -> Optional[Anaesthetic]:
+    def _map_injection_anaesthesia(list_item, list_fields) -> Optional[Anaesthetic]:
         """Maps anaesthesic type, duration, level for Injection"""
-        list_fields = NeurosurgeryAndBehaviorList2019.ListField
         anaesthetic_type = "isoflurane"
         duration = list_item.get_property(
             list_fields.FIRST_INJECTION_ISO_DURATION.value
@@ -531,20 +527,16 @@ class SharePointClient:
     def _map_list_item_to_ophys_probe(list_item: ClientObject, list_fields) -> OphysProbe:
         """Maps a Sharepoint ListItem to a OphysProbe model"""
         ophys_probes = []
-        #  name
-        # manufacturer
-        # part_number
-        # core_diameter
-        # numerical_aperture
-        # ferrule_material
-        # notes
+        # TODO: missing fields manufacturer, part_number, core_diameter, numerical_aperature, ferrule_material
         fiber_implant1 = list_item.get_property(list_fields.FIBER_IMPLANT1.value)
         if fiber_implant1:
-            stereotactic_coordinate_ml = list_item.get_property(list_fields.VIRUS_M_L.value)
-            stereotactic_coordinate_ap = list_item.get_property(list_fields.VIRUS_A_P.value)
-            stereotactic_coordinate_dv = list_item.get_property(list_fields.FIBER_IMPLANT1_DV.value)
-            angle = list_item.get_property(list_fields.INJ1_ANGLE_V2.value)
+            name = ProbeName.PROBE_A.value
+            stereotactic_coordinate_ml = parse_str_into_float(list_item.get_property(list_fields.VIRUS_M_L.value))
+            stereotactic_coordinate_ap = parse_str_into_float(list_item.get_property(list_fields.VIRUS_A_P.value))
+            stereotactic_coordinate_dv = parse_str_into_float(list_item.get_property(list_fields.FIBER_IMPLANT1_DV.value))
+            angle = parse_str_into_float(list_item.get_property(list_fields.INJ1_ANGLE_V2.value))
             ophys_probe1 = OphysProbe.construct(
+                name=name,
                 stereotactic_coordinate_ml=stereotactic_coordinate_ml,
                 stereotactic_coordinate_ap=stereotactic_coordinate_ap,
                 stereotactic_coordinate_dv=stereotactic_coordinate_dv,
@@ -553,11 +545,13 @@ class SharePointClient:
             ophys_probes.append(ophys_probe1)
         fiber_implant2 = list_item.get_property(list_fields.FIBER_IMPLANT2.value)
         if fiber_implant2:
-            stereotactic_coordinate_ml = list_item.get_property(list_fields.ML2ND_INJ.value)
-            stereotactic_coordinate_ap = list_item.get_property(list_fields.AP2ND_INJ.value)
-            stereotactic_coordinate_dv = list_item.get_property(list_fields.FIBER_IMPLANT2_DV.value)
-            angle = list_item.get_property(list_fields.INJ2_ANGLE_V2.value)
+            name = ProbeName.PROBE_B.value
+            stereotactic_coordinate_ml = parse_str_into_float(list_item.get_property(list_fields.ML2ND_INJ.value))
+            stereotactic_coordinate_ap = parse_str_into_float(list_item.get_property(list_fields.AP2ND_INJ.value))
+            stereotactic_coordinate_dv = parse_str_into_float(list_item.get_property(list_fields.FIBER_IMPLANT2_DV.value))
+            angle = parse_str_into_float(list_item.get_property(list_fields.INJ2_ANGLE_V2.value))
             ophys_probe1 = OphysProbe.construct(
+                name=name,
                 stereotactic_coordinate_ml=stereotactic_coordinate_ml,
                 stereotactic_coordinate_ap=stereotactic_coordinate_ap,
                 stereotactic_coordinate_dv=stereotactic_coordinate_dv,
@@ -579,7 +573,6 @@ class SharePointClient:
         )
         iacuc_protocol = list_item.get_property(list_fields.IACUC_PROTOCOL.value)
         animal_weight = list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER.value)
-        # TODO: probes is a list, figure out how probes correlates with list item obj
         probes = self._map_list_item_to_ophys_probe(list_item, list_fields)
         fiber_implant = FiberImplant.construct(
             start_date=start_date,
@@ -662,18 +655,26 @@ class SharePointClient:
         )
         return craniotomy
 
-    @staticmethod
-    def _map_list_item_to_head_frame(list_item: ClientObject) -> Headframe:
+    def _map_list_item_to_head_frame(self, list_item: ClientObject) -> Headframe:
         """Maps a SharePoint ListItem to a HeadFrame model"""
+        # TODO: map missing fields (headframe_part_number, headframe_material, well_part_number, well_type)
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
-        start_date = list_item.get_property(list_fields.DATE_RANGE_START.value)
-        end_date = list_item.get_property(list_fields.DATE_RANGE_END.value)
+        start_date = parser.isoparse(list_item.get_property(list_fields.DATE_OF_SURGERY.value))
+        end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
         )
+        iacuc_protocol = list_item.get_property(list_fields.IACUC_PROTOCOL.value)
+        animal_weight = list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER.value)
+        anaesthesia = self._map_hp_anaesthesia(list_item, list_fields)
+        headpost_type = list_item.get_property(list_fields.HEADPOST_TYPE.value)
         head_frame = Headframe.construct(
             start_date=start_date,
             end_date=end_date,
             experimenter_full_name=experimenter_full_name,
+            iacuc_protocol=iacuc_protocol,
+            animal_weight=animal_weight,
+            anaesthesia=anaesthesia,
+            headframe_type=headframe_type,
         )
         return head_frame
