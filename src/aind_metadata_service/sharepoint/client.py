@@ -48,7 +48,7 @@ class NeurosurgeryAndBehaviorList2019:
         INJ = "INJ"
         OPTIC_FIBER_IMPLANT = "Optic Fiber Implant"
         HP_TRANSCRANIAL = "HP Transcranial (for ISI)"
-        WHOLE_HEMISPHERE_CRANIOTOMY_NEUROPIXEL = "WHC NP"
+        WHOLE_HEMISPHERE_CRANIOTOMY_NP = "WHC NP"
         C_CAM = "C CAM"
         C_MULTISCOPE = "C Multiscope"
         C = "C"
@@ -379,8 +379,7 @@ class SharePointClient:
                             self._map_list_item_to_fiber_implant(list_item)
                         )
                     if procedure_type in {
-                        nsb_proc_types.
-                        WHOLE_HEMISPHERE_CRANIOTOMY_NEUROPIXEL.value,
+                        nsb_proc_types.WHOLE_HEMISPHERE_CRANIOTOMY_NP.value,
                         nsb_proc_types.C_MULTISCOPE.value,
                         nsb_proc_types.C_CAM.value,
                         nsb_proc_types.C.value,
