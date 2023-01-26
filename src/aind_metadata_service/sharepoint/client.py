@@ -5,6 +5,7 @@ from typing import Optional
 
 from aind_data_schema.procedures import (
     Anaesthetic,
+    Craniotomy,
     FiberImplant,
     Headframe,
     IontophoresisInjection,
@@ -20,7 +21,9 @@ from office365.sharepoint.listitems.collection import ListItemCollection
 
 from aind_metadata_service.response_handler import Responses
 from aind_metadata_service.sharepoint.utils import (
+    convert_str_to_bool,
     convert_str_to_time,
+    map_choice,
     map_hemisphere,
     parse_str_into_float,
 )
@@ -44,6 +47,11 @@ class NeurosurgeryAndBehaviorList2019:
         INJECTION = "Injection"
         INJ = "INJ"
         OPTIC_FIBER_IMPLANT = "Optic Fiber Implant"
+        HP_TRANSCRANIAL = "HP Transcranial (for ISI)"
+        WHOLE_HEMISPHERE_CRANIOTOMY_NP = "WHC NP"
+        C_CAM = "C CAM"
+        C_MULTISCOPE = "C Multiscope"
+        C = "C"
 
     class InjectionType(Enum):
         """Enum class for Injection Types"""
@@ -342,6 +350,7 @@ class SharePointClient:
             head_frames = []
             injections = []
             fiber_implants = []
+            craniotomies = []
             for list_item in list_items:
                 if list_item.get_property(list_fields.PROCEDURE.value):
                     procedure_types = list_item.get_property(
@@ -369,12 +378,23 @@ class SharePointClient:
                         fiber_implants.append(
                             self._map_list_item_to_fiber_implant(list_item)
                         )
+                    if procedure_type in {
+                        nsb_proc_types.WHOLE_HEMISPHERE_CRANIOTOMY_NP.value,
+                        nsb_proc_types.C_MULTISCOPE.value,
+                        nsb_proc_types.C_CAM.value,
+                        nsb_proc_types.C.value,
+                    }:
+                        craniotomies.append(
+                            self._map_list_item_to_craniotomy(list_item)
+                        )
                 if head_frames:
                     procedures.headframes = head_frames
                 if injections:
                     procedures.injections = injections
                 if fiber_implants:
                     procedures.fiber_implants = fiber_implants
+                if craniotomies:
+                    procedures.craniotomies = craniotomies
             response = Responses.model_response(procedures)
         else:
             response = Responses.no_data_found_response()
@@ -441,9 +461,6 @@ class SharePointClient:
         injection_angle = parse_str_into_float(
             list_item.get_property(list_fields.INJ1ANGLE0.value)
         )
-        notes = list_item.get_property(
-            list_fields.ST_ROUND_INJECTION_COMMENTS.value
-        )
         if (
             injection_type
             == NeurosurgeryAndBehaviorList2019.InjectionType.IONTO.value
@@ -502,7 +519,6 @@ class SharePointClient:
                 injection_angle=injection_angle,
                 injection_type=injection_type,
                 injection_volume=injection_volume,
-                notes=notes,
             )
         return injection
 
@@ -523,6 +539,77 @@ class SharePointClient:
             experimenter_full_name=experimenter_full_name,
         )
         return fiber_implant
+
+    @staticmethod
+    def _map_hp_anaesthesia(list_item, list_fields) -> Optional[Anaesthetic]:
+        """Maps anaesthesic type, duration, level for HP/craniotomy"""
+        anaesthetic_type = "isoflurane"
+        # TODO: duration
+        level = list_item.get_property(list_fields.HP_ISO_LEVEL.value)
+        anaesthetic = Anaesthetic.construct(
+            type=anaesthetic_type,
+            level=level,
+        )
+        return anaesthetic
+
+    def _map_list_item_to_craniotomy(
+        self, list_item: ClientObject
+    ) -> Craniotomy:
+        """Maps a SharePoint ListItem to a Craniotomy model"""
+        # TODO: missing fields (implant_part_number, protective_material)
+        list_fields = NeurosurgeryAndBehaviorList2019.ListField
+        start_date = parser.isoparse(
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
+        ).date()
+        end_date = start_date
+        experimenter_full_name = list_item.get_property(
+            list_fields.LAB_TRACKS_REQUESTOR.value
+        )
+        iacuc_protocol = list_item.get_property(
+            list_fields.IACUC_PROTOCOL.value
+        )
+        animal_weight = list_item.get_property(
+            list_fields.WEIGHT_BEFORE_SURGER.value
+        )
+        anaesthesia = self._map_hp_anaesthesia(list_item, list_fields)
+        craniotomy_type = list_item.get_property(
+            list_fields.CRANIOTOMY_TYPE.value
+        )
+        # TODO: handle size and coords by craniotomy_type ?
+        craniotomy_hemisphere = map_choice(
+            list_item.get_property(list_fields.HP_LOC.value)
+        )
+        craniotomy_coordinates_ml = parse_str_into_float(
+            list_item.get_property(list_fields.HP_M_L.value)
+        )
+        craniotomy_coordinates_ap = parse_str_into_float(
+            list_item.get_property(list_fields.HP_A_P.value)
+        )
+        craniotomy_size = parse_str_into_float(
+            list_item.get_property(list_fields.HP_DIAMETER.value)
+        )
+        dura_removed = convert_str_to_bool(
+            list_item.get_property(list_fields.HP_DUROTOMY.value)
+        )
+        workstation_id = list_item.get_property(
+            list_fields.HP_WORK_STATION.value
+        )
+        craniotomy = Craniotomy.construct(
+            type=craniotomy_type,
+            start_date=start_date,
+            end_date=end_date,
+            experimenter_full_name=experimenter_full_name,
+            iacuc_protocol=iacuc_protocol,
+            animal_weight=animal_weight,
+            anaesthesia=anaesthesia,
+            craniotomy_hemisphere=craniotomy_hemisphere,
+            craniotomy_coordinates_ml=craniotomy_coordinates_ml,
+            craniotomy_coordinates_ap=craniotomy_coordinates_ap,
+            craniotomy_size=craniotomy_size,
+            dura_removed=dura_removed,
+            workstation_id=workstation_id,
+        )
+        return craniotomy
 
     @staticmethod
     def _map_list_item_to_head_frame(list_item: ClientObject) -> Headframe:

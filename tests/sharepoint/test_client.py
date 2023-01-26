@@ -7,6 +7,7 @@ from pathlib import Path
 
 from aind_data_schema.procedures import (
     Anaesthetic,
+    Craniotomy,
     FiberImplant,
     Headframe,
     IontophoresisInjection,
@@ -30,17 +31,17 @@ class Examples:
     TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__)))
     RESOURCES_DIR = TEST_DIR / "resources"
 
-    list_item1_filepath = RESOURCES_DIR/"list_item1.json"
+    list_item1_filepath = RESOURCES_DIR / "list_item1.json"
 
     with open(list_item1_filepath) as f:
         list_item1_json = json.load(f)
 
-    list_item2_filepath = RESOURCES_DIR/"list_item2.json"
+    list_item2_filepath = RESOURCES_DIR / "list_item2.json"
 
     with open(list_item2_filepath) as f:
         list_item2_json = json.load(f)
 
-    list_item3_filepath = RESOURCES_DIR/"list_item3.json"
+    list_item3_filepath = RESOURCES_DIR / "list_item3.json"
 
     with open(list_item3_filepath) as f:
         list_item3_json = json.load(f)
@@ -50,9 +51,13 @@ class Examples:
         "aind-data-schema/main/src/aind_data_schema/procedures.py"
     )
 
-    expected_anaesthetic = Anaesthetic.construct(
+    expected_inj_anaesthetic = Anaesthetic.construct(
         type="isoflurane",
         duration=None,
+        level="Select...",
+    )
+    expected_hp_anaesthetic = Anaesthetic.construct(
+        type="isoflurane",
         level="Select...",
     )
     expected_procedures1 = Procedures.construct(
@@ -83,7 +88,7 @@ class Examples:
                     experimenter_full_name="Mary Smith",
                     iacuc_protocol="2115",
                     animal_weight=None,
-                    anaesthesia=expected_anaesthetic,
+                    anaesthesia=expected_inj_anaesthetic,
                     notes=None,
                     injection_materials=None,
                     injection_duration=5,
@@ -100,15 +105,22 @@ class Examples:
                 )
             ]
         ),
-        fiber_implants=(
+        craniotomies=(
             [
-                FiberImplant.construct(
+                Craniotomy.construct(
                     type=None,
-                    start_date="2022-12-05T08:00:00Z",
-                    end_date="2022-12-09T08:00:00Z",
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
                     experimenter_full_name="Mary Smith",
-                    iacuc_protocol=None,
+                    iacuc_protocol="2115",
                     animal_weight=None,
+                    anaesthesia=expected_hp_anaesthetic,
+                    craniotomy_hemisphere="Right",
+                    craniotomy_coordinates_ml=2.8,
+                    craniotomy_coordinates_ap=1.3,
+                    craniotomy_size=5.0,
+                    dura_removed=True,
+                    workstation_id="SWS 3",
                     notes=None,
                 )
             ]
@@ -119,21 +131,6 @@ class Examples:
         describedBy=described_by,
         schema_version="0.5.2",
         subject_id="650102",
-        headframes=(
-            [
-                Headframe.construct(
-                    type=None,
-                    start_date="2022-12-05T08:00:00Z",
-                    end_date="2022-12-09T08:00:00Z",
-                    experimenter_full_name="Mary Smith",
-                    iacuc_protocol=None,
-                    animal_weight=None,
-                    notes=None,
-                    well_part_number=None,
-                    well_type=None,
-                )
-            ]
-        ),
         injections=(
             [
                 IontophoresisInjection.construct(
@@ -143,7 +140,7 @@ class Examples:
                     experimenter_full_name="Mary Smith",
                     iacuc_protocol="2115",
                     animal_weight=None,
-                    anaesthesia=expected_anaesthetic,
+                    anaesthesia=expected_inj_anaesthetic,
                     notes=None,
                     injection_materials=None,
                     injection_duration=5,
@@ -161,15 +158,22 @@ class Examples:
                 )
             ]
         ),
-        fiber_implants=(
+        craniotomies=(
             [
-                FiberImplant.construct(
+                Craniotomy.construct(
                     type=None,
-                    start_date="2022-12-05T08:00:00Z",
-                    end_date="2022-12-09T08:00:00Z",
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
                     experimenter_full_name="Mary Smith",
-                    iacuc_protocol=None,
+                    iacuc_protocol="2115",
                     animal_weight=None,
+                    anaesthesia=expected_hp_anaesthetic,
+                    craniotomy_hemisphere="Center",
+                    craniotomy_coordinates_ml=2.8,
+                    craniotomy_coordinates_ap=1.3,
+                    craniotomy_size=5.0,
+                    dura_removed=False,
+                    workstation_id="SWS 3",
                     notes=None,
                 )
             ]
@@ -204,7 +208,7 @@ class Examples:
                     experimenter_full_name="Mary Smith",
                     iacuc_protocol="2115",
                     animal_weight=None,
-                    anaesthesia=expected_anaesthetic,
+                    anaesthesia=expected_inj_anaesthetic,
                     notes=None,
                     injection_materials=None,
                     injection_duration=5,
@@ -214,7 +218,7 @@ class Examples:
                     injection_hemisphere=None,
                     injection_coordinate_ml=-3.3,
                     injection_coordinate_ap=-1.6,
-                    injection_coordinate_depth=4.3,
+                    injection_coordinate_depth=None,
                     injection_angle=0.0,
                     injection_type="Iontophoresis",
                     injection_current="5uA",
@@ -231,6 +235,26 @@ class Examples:
                     experimenter_full_name="Mary Smith",
                     iacuc_protocol=None,
                     animal_weight=None,
+                    notes=None,
+                )
+            ]
+        ),
+        craniotomies=(
+            [
+                Craniotomy.construct(
+                    type=None,
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol="2115",
+                    animal_weight=None,
+                    anaesthesia=expected_hp_anaesthetic,
+                    craniotomy_hemisphere=None,
+                    craniotomy_coordinates_ml=2.8,
+                    craniotomy_coordinates_ap=1.3,
+                    craniotomy_size=5.0,
+                    dura_removed=None,
+                    workstation_id="SWS 3",
                     notes=None,
                 )
             ]
