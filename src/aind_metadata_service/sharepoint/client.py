@@ -6,14 +6,14 @@ from typing import Optional
 from aind_data_schema.procedures import (
     Anaesthetic,
     Craniotomy,
+    CraniotomyType,
     FiberImplant,
     Headframe,
     IontophoresisInjection,
     NanojectInjection,
-    Procedures,
     OphysProbe,
     ProbeName,
-    CraniotomyType,
+    Procedures,
 )
 from dateutil import parser
 from fastapi.responses import JSONResponse
@@ -51,7 +51,7 @@ class NeurosurgeryAndBehaviorList2019:
         INJ = "INJ"
         OPTIC_FIBER_IMPLANT = "Optic Fiber Implant"
         HP_TRANSCRANIAL = "HP Transcranial (for ISI)"
-        WHC_NP = "WHC NP"
+        WHOLE_HEMISPHERE_CRANIOTOMY_NP = "WHC NP"
         C_CAM = "C CAM"
         C_MULTISCOPE = "C Multiscope"
         C = "C"
@@ -64,6 +64,7 @@ class NeurosurgeryAndBehaviorList2019:
 
     class CraniotomyType(Enum):
         """Enum class for Craniotomy Types"""
+
         VISUAL_CORTEX = "Visual Cortex 5mm"
         FRONTAL_WINDOW = "Frontal Window 3mm"
         WHC_NP = "WHC NP"
@@ -71,10 +72,14 @@ class NeurosurgeryAndBehaviorList2019:
 
     class HeadPostType(Enum):
         """Enum class for HeadPost Types"""
+
         CAM = "CAM-style headframe (0160-100-10 Rev A)"
         NEUROPIXEL = "Neuropixel-style headframe (0160-100-10/0160-200-36)"
-        MESO_NGC = "Mesoscope-style well with NGC-style headframe (0160-200-20/0160-100-10)"
-        WHC_NEUROPIXEL = "WHC #42 with Neuropixel well and well cap"
+        MESO_NGC = (
+            "Mesoscope-style well with NGC-style headframe"
+            " (0160-200-20/0160-100-10)"
+        )
+        WHC_NP = "WHC #42 with Neuropixel well and well cap"
         NGC = "NGC-style headframe, no well (0160-100-10)"
         AI_HEADBAR = "AI Straight Headbar"
 
@@ -398,7 +403,7 @@ class SharePointClient:
                             self._map_list_item_to_fiber_implant(list_item)
                         )
                     if procedure_type in {
-                        nsb_proc_types.WHC_NP.value,
+                        nsb_proc_types.WHOLE_HEMISPHERE_CRANIOTOMY_NP.value,
                         nsb_proc_types.C_MULTISCOPE.value,
                         nsb_proc_types.C_CAM.value,
                         nsb_proc_types.C.value,
@@ -420,7 +425,9 @@ class SharePointClient:
         return response
 
     @staticmethod
-    def _map_injection_anaesthesia(list_item, list_fields) -> Optional[Anaesthetic]:
+    def _map_injection_anaesthesia(
+        list_item, list_fields
+    ) -> Optional[Anaesthetic]:
         """Maps anaesthesic type, duration, level for Injection"""
         anaesthetic_type = "isoflurane"
         duration = list_item.get_property(
@@ -454,7 +461,7 @@ class SharePointClient:
             list_fields.WEIGHT_AFTER_SURGERY.value
         )
         # TODO: all fields after this have diff field names for 2nd inj
-        anaesthesia = self._map_injection_anaesthesia(list_item,list_fields)
+        anaesthesia = self._map_injection_anaesthesia(list_item, list_fields)
         injection_duration = convert_str_to_time(
             list_item.get_property(list_fields.INJ1_LENGHTOF_TIME.value)
         )
@@ -489,8 +496,8 @@ class SharePointClient:
             instrument_id = list_item.get_property(
                 list_fields.IONTO_NUMBER_INJ1.value
             )
-            injection_current = list_item.get_property(
-                list_fields.INJ1_CURRENT.value
+            injection_current = parse_str_into_float(
+                list_item.get_property(list_fields.INJ1_CURRENT.value)
             )
             alternating_current = list_item.get_property(
                 list_fields.INJ1_ALTERNATING_TIME.value
@@ -520,8 +527,8 @@ class SharePointClient:
             instrument_id = list_item.get_property(
                 list_fields.NANOJECT_NUMBER_INJ10.value
             )
-            injection_volume = list_item.get_property(
-                list_fields.INJ1_VOL.value
+            injection_volume = parse_str_into_float(
+                list_item.get_property(list_fields.INJ1_VOL.value)
             )
             injection = NanojectInjection.construct(
                 start_date=start_date,
@@ -549,14 +556,25 @@ class SharePointClient:
     def _map_list_item_to_ophys_probe(list_item: ClientObject, list_fields):
         """Maps a Sharepoint ListItem to a OphysProbe model"""
         ophys_probes = []
-        # TODO: missing fields manufacturer, part_number, core_diameter, numerical_aperature, ferrule_material
-        fiber_implant1 = list_item.get_property(list_fields.FIBER_IMPLANT1.value)
+        # TODO: missing fields manufacturer, part_number, core_diameter
+        #  numerical_aperature, ferrule_material
+        fiber_implant1 = list_item.get_property(
+            list_fields.FIBER_IMPLANT1.value
+        )
         if fiber_implant1:
             name = ProbeName.PROBE_A.value
-            stereotactic_coordinate_ml = parse_str_into_float(list_item.get_property(list_fields.VIRUS_M_L.value))
-            stereotactic_coordinate_ap = parse_str_into_float(list_item.get_property(list_fields.VIRUS_A_P.value))
-            stereotactic_coordinate_dv = parse_str_into_float(list_item.get_property(list_fields.FIBER_IMPLANT1_DV.value))
-            angle = parse_str_into_float(list_item.get_property(list_fields.INJ1_ANGLE_V2.value))
+            stereotactic_coordinate_ml = parse_str_into_float(
+                list_item.get_property(list_fields.VIRUS_M_L.value)
+            )
+            stereotactic_coordinate_ap = parse_str_into_float(
+                list_item.get_property(list_fields.VIRUS_A_P.value)
+            )
+            stereotactic_coordinate_dv = parse_str_into_float(
+                list_item.get_property(list_fields.FIBER_IMPLANT1_DV.value)
+            )
+            angle = parse_str_into_float(
+                list_item.get_property(list_fields.INJ1_ANGLE_V2.value)
+            )
             ophys_probe1 = OphysProbe.construct(
                 name=name,
                 stereotactic_coordinate_ml=stereotactic_coordinate_ml,
@@ -565,13 +583,23 @@ class SharePointClient:
                 angle=angle,
             )
             ophys_probes.append(ophys_probe1)
-        fiber_implant2 = list_item.get_property(list_fields.FIBER_IMPLANT2.value)
+        fiber_implant2 = list_item.get_property(
+            list_fields.FIBER_IMPLANT2.value
+        )
         if fiber_implant2:
             name = ProbeName.PROBE_B.value
-            stereotactic_coordinate_ml = parse_str_into_float(list_item.get_property(list_fields.ML2ND_INJ.value))
-            stereotactic_coordinate_ap = parse_str_into_float(list_item.get_property(list_fields.AP2ND_INJ.value))
-            stereotactic_coordinate_dv = parse_str_into_float(list_item.get_property(list_fields.FIBER_IMPLANT2_DV.value))
-            angle = parse_str_into_float(list_item.get_property(list_fields.INJ2_ANGLE_V2.value))
+            stereotactic_coordinate_ml = parse_str_into_float(
+                list_item.get_property(list_fields.ML2ND_INJ.value)
+            )
+            stereotactic_coordinate_ap = parse_str_into_float(
+                list_item.get_property(list_fields.AP2ND_INJ.value)
+            )
+            stereotactic_coordinate_dv = parse_str_into_float(
+                list_item.get_property(list_fields.FIBER_IMPLANT2_DV.value)
+            )
+            angle = parse_str_into_float(
+                list_item.get_property(list_fields.INJ2_ANGLE_V2.value)
+            )
             ophys_probe1 = OphysProbe.construct(
                 name=name,
                 stereotactic_coordinate_ml=stereotactic_coordinate_ml,
@@ -583,17 +611,21 @@ class SharePointClient:
         return ophys_probes
 
     def _map_list_item_to_fiber_implant(
-            self,
-            list_item: ClientObject,
+        self,
+        list_item: ClientObject,
     ) -> FiberImplant:
         """Maps a SharePoint ListItem to a FiberImplant model"""
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
-        start_date = parser.isoparse(list_item.get_property(list_fields.DATE_OF_SURGERY.value)).date()
+        start_date = parser.isoparse(
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
+        ).date()
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
         )
-        iacuc_protocol = list_item.get_property(list_fields.IACUC_PROTOCOL.value)
+        iacuc_protocol = list_item.get_property(
+            list_fields.IACUC_PROTOCOL.value
+        )
         animal_weight_prior = list_item.get_property(
             list_fields.WEIGHT_BEFORE_SURGER.value
         )
@@ -627,15 +659,20 @@ class SharePointClient:
     @staticmethod
     def _map_craniotomy_type(sp_craniotomy_type) -> Optional[CraniotomyType]:
         """Maps craniotomy type"""
-        if sp_craniotomy_type == NeurosurgeryAndBehaviorList2019.CraniotomyType.VISUAL_CORTEX.value:
-            return CraniotomyType.VISCTX
-        elif sp_craniotomy_type == NeurosurgeryAndBehaviorList2019.CraniotomyType.FRONTAL_WINDOW.value:
-            return CraniotomyType.THREE_MM
-        elif sp_craniotomy_type in {NeurosurgeryAndBehaviorList2019.CraniotomyType.WHC_NP.value,
-                                    NeurosurgeryAndBehaviorList2019.CraniotomyType.WHC_2P.value}:
-            return CraniotomyType.WHC
-        else:
-            return None
+        CT = NeurosurgeryAndBehaviorList2019.CraniotomyType
+        if sp_craniotomy_type:
+            if sp_craniotomy_type == CT.VISUAL_CORTEX.value:
+                return CraniotomyType.VISCTX
+            elif sp_craniotomy_type == CT.FRONTAL_WINDOW.value:
+                return CraniotomyType.THREE_MM
+            elif sp_craniotomy_type in {
+                CT.WHC_NP.value,
+                CT.WHC_2P.value,
+            }:
+                return CraniotomyType.WHC
+            else:
+                return CraniotomyType.OTHER
+        return None
 
     def _map_list_item_to_craniotomy(
         self, list_item: ClientObject
@@ -660,9 +697,9 @@ class SharePointClient:
             list_fields.WEIGHT_AFTER_SURGERY.value
         )
         anaesthesia = self._map_hp_anaesthesia(list_item, list_fields)
-        craniotomy_type = self._map_craniotomy_type(list_item.get_property(
-            list_fields.CRANIOTOMY_TYPE.value
-        ))
+        craniotomy_type = self._map_craniotomy_type(
+            list_item.get_property(list_fields.CRANIOTOMY_TYPE.value)
+        )
         # TODO: handle size and coords by craniotomy_type ?
         craniotomy_hemisphere = map_choice(
             list_item.get_property(list_fields.HP_LOC.value)
@@ -701,60 +738,93 @@ class SharePointClient:
         return craniotomy
 
     def _map_headpost_type(self, headpost_type: str):
-        """Maps Sharepoint response's HeadPostType to fields in HeadFrame model"""
-        if headpost_type:
-            if headpost_type == NeurosurgeryAndBehaviorList2019.HeadPostType.CAM.value:
-                headframe_type = "CAM-style"
-                headframe_part_number = "0160-100-10 Rev A"
-                well_type = "CAM-style"
-                well_part_number = None
-            elif headpost_type == NeurosurgeryAndBehaviorList2019.HeadPostType.NEUROPIXEL.value:
-                headframe_type = "Neuropixel-style"
-                headframe_part_number = "0160-100-10"
-                well_type = "Neuropixel-style"
-                well_part_number = "0160-200-36"
-            elif headpost_type == NeurosurgeryAndBehaviorList2019.HeadPostType.MESO_NGC.value:
-                headframe_type = "NGC-style"
-                headframe_part_number = "0160-100-10"
-                well_type = "Mesoscope-style"
-                well_part_number = "0160-200-20"
-            elif headpost_type == NeurosurgeryAndBehaviorList2019.HeadPostType.WHC_NEUROPIXEL.value:
-                headframe_type = "WHC #42"
-                headframe_part_number = "42"
-                well_type = "Neuropixel-style"
-                well_part_number = "0160-200-36"
-            elif headpost_type == NeurosurgeryAndBehaviorList2019.HeadPostType.NGC.value:
-                headframe_type = "NGC-style"
-                headframe_part_number = "0160-100-10"
-                well_type = None
-                well_part_number = None
-            else:
-                headframe_type = "AI Straight Headbar"
-                headframe_part_number = None
-                well_type = None
-                well_part_number = None
-            return headframe_type, headframe_part_number, well_type, well_part_number
+        """Maps Sharepoint HeadPostType to fields in HeadFrame model"""
+        if (
+            headpost_type
+            == NeurosurgeryAndBehaviorList2019.HeadPostType.CAM.value
+        ):
+            headframe_type = "CAM-style"
+            headframe_part_number = "0160-100-10 Rev A"
+            well_type = "CAM-style"
+            well_part_number = None
+        elif (
+            headpost_type
+            == NeurosurgeryAndBehaviorList2019.HeadPostType.NEUROPIXEL.value
+        ):
+            headframe_type = "Neuropixel-style"
+            headframe_part_number = "0160-100-10"
+            well_type = "Neuropixel-style"
+            well_part_number = "0160-200-36"
+        elif (
+            headpost_type
+            == NeurosurgeryAndBehaviorList2019.HeadPostType.MESO_NGC.value
+        ):
+            headframe_type = "NGC-style"
+            headframe_part_number = "0160-100-10"
+            well_type = "Mesoscope-style"
+            well_part_number = "0160-200-20"
+        elif (
+            headpost_type
+            == NeurosurgeryAndBehaviorList2019.HeadPostType.WHC_NP.value
+        ):
+            headframe_type = "WHC #42"
+            headframe_part_number = "42"
+            well_type = "Neuropixel-style"
+            well_part_number = "0160-200-36"
+        elif (
+            headpost_type
+            == NeurosurgeryAndBehaviorList2019.HeadPostType.NGC.value
+        ):
+            headframe_type = "NGC-style"
+            headframe_part_number = "0160-100-10"
+            well_type = None
+            well_part_number = None
+        elif (
+            headpost_type
+            == NeurosurgeryAndBehaviorList2019.HeadPostType.AI_HEADBAR.value
+        ):
+            headframe_type = "AI Straight Headbar"
+            headframe_part_number = None
+            well_type = None
+            well_part_number = None
         else:
-            return None
+            return None, None, None, None
+        return (
+            headframe_type,
+            headframe_part_number,
+            well_type,
+            well_part_number,
+        )
 
-    def _map_list_item_to_head_frame(self, list_item: ClientObject) -> Headframe:
+    def _map_list_item_to_head_frame(
+        self, list_item: ClientObject
+    ) -> Headframe:
         """Maps a SharePoint ListItem to a HeadFrame model"""
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
-        start_date = parser.isoparse(list_item.get_property(list_fields.DATE_OF_SURGERY.value)).date()
+        start_date = parser.isoparse(
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
+        ).date()
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
         )
-        iacuc_protocol = list_item.get_property(list_fields.IACUC_PROTOCOL.value)
-        animal_weight_prior = parse_str_into_float(list_item.get_property(
-            list_fields.WEIGHT_BEFORE_SURGER.value
-        ))
-        animal_weight_post = parse_str_into_float(list_item.get_property(
-            list_fields.WEIGHT_AFTER_SURGERY.value
-        ))
+        iacuc_protocol = list_item.get_property(
+            list_fields.IACUC_PROTOCOL.value
+        )
+        animal_weight_prior = parse_str_into_float(
+            list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER.value)
+        )
+        animal_weight_post = parse_str_into_float(
+            list_item.get_property(list_fields.WEIGHT_AFTER_SURGERY.value)
+        )
         anaesthesia = self._map_hp_anaesthesia(list_item, list_fields)
         headpost_type = list_item.get_property(list_fields.HEADPOST_TYPE.value)
-        headframe_type, headframe_part_number, well_type, well_part_number = self._map_headpost_type(headpost_type)
+        (
+            headframe_type,
+            headframe_part_number,
+            well_type,
+            well_part_number,
+        ) = self._map_headpost_type(headpost_type)
         head_frame = Headframe.construct(
             start_date=start_date,
             end_date=end_date,
