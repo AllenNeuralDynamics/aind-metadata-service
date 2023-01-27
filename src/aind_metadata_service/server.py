@@ -9,7 +9,7 @@ from aind_metadata_service.labtracks.client import LabTracksClient
 from aind_metadata_service.sharepoint.client import SharePointClient
 
 app = FastAPI()
-favicon_path = 'https://alleninstitute.org/static/images/favicons/alleninstitute/favicon.png'
+favicon_path = "https://alleninstitute.org/static/images/favicons/alleninstitute/favicon.png"
 
 # TODO: Handle configs better?
 
@@ -57,7 +57,13 @@ async def retrieve_procedures(subject_id):
 
     return response
 
-@app.get("/favicon.ico", include_in_schema=False, response_class=RedirectResponse, status_code=200)
+
+@app.get(
+    "/favicon.ico",
+    include_in_schema=False,
+    response_class=RedirectResponse,
+    status_code=200,
+)
 async def favicon():
     """
     Returns the favicon
