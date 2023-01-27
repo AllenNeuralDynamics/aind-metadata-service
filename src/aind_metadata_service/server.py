@@ -57,9 +57,9 @@ async def retrieve_procedures(subject_id):
 
     return response
 
-@app.get("/favicon.ico", include_in_schema=False)
+@app.get("/favicon.ico", include_in_schema=False, response_class=RedirectResponse, status_code=200)
 async def favicon():
     """
     Returns the favicon
     """
-    return RedirectResponse(favicon_path)
+    return favicon_path
