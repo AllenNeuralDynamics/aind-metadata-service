@@ -64,12 +64,20 @@ class Examples:
     )
 
     expected_probe1 = OphysProbe.construct(
+        name="Probe A",
         stereotactic_coordinate_ml=-3.3,
         stereotactic_coordinate_ap=-1.6,
         stereotactic_coordinate_dv=4.2,
         angle=0.0,
     )
-    expected_probes = [expected_probe1]
+
+    expected_probe2 = OphysProbe.construct(
+        name="Probe B",
+        stereotactic_coordinate_ml=-0.6,
+        stereotactic_coordinate_ap=-3.05,
+        stereotactic_coordinate_dv=4.2,
+        angle=0.0,
+    )
 
     expected_procedures1 = Procedures.construct(
         describedBy=described_by,
@@ -79,12 +87,15 @@ class Examples:
             [
                 Headframe.construct(
                     type=None,
-                    start_date="2022-12-05T08:00:00Z",
-                    end_date="2022-12-09T08:00:00Z",
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
                     experimenter_full_name="Mary Smith",
-                    iacuc_protocol=None,
+                    iacuc_protocol="2115",
                     animal_weight=None,
                     notes=None,
+                    anaesthesia=expected_hp_anaesthetic,
+                    headframe_type="AI Straight Headbar",
+                    headframe_part_number=None,
                     well_part_number=None,
                     well_type=None,
                 )
@@ -133,7 +144,6 @@ class Examples:
                     dura_removed=True,
                     workstation_id="SWS 3",
                     notes=None,
-                    probes=expected_probes,
                 )
             ]
         ),
@@ -200,14 +210,17 @@ class Examples:
             [
                 Headframe.construct(
                     type=None,
-                    start_date="2022-12-05T08:00:00Z",
-                    end_date="2022-12-09T08:00:00Z",
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
                     experimenter_full_name="Mary Smith",
-                    iacuc_protocol=None,
+                    iacuc_protocol="2115",
                     animal_weight=None,
                     notes=None,
-                    well_part_number=None,
-                    well_type=None,
+                    anaesthesia=expected_hp_anaesthetic,
+                    headframe_type="NGC-style",
+                    headframe_part_number="0160-100-10",
+                    well_part_number="0160-200-20",
+                    well_type="Mesoscope-style",
                 )
             ]
         ),
@@ -242,12 +255,13 @@ class Examples:
             [
                 FiberImplant.construct(
                     type=None,
-                    start_date="2022-12-05T08:00:00Z",
-                    end_date="2022-12-09T08:00:00Z",
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
                     experimenter_full_name="Mary Smith",
-                    iacuc_protocol=None,
+                    iacuc_protocol="2115",
                     animal_weight=None,
                     notes=None,
+                    probes=[expected_probe1, expected_probe2],
                 )
             ]
         ),

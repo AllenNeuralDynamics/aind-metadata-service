@@ -61,6 +61,15 @@ class NeurosurgeryAndBehaviorList2019:
         IONTO = "Iontophoresis"
         NANOJECT = "Nanoject (Pressure)"
 
+    class HeadPostType(Enum):
+        """Enum class for HeadPost Types"""
+        CAM = "CAM-style headframe (0160-100-10 Rev A)"
+        NEUROPIXEL = "Neuropixel-style headframe (0160-100-10/0160-200-36)"
+        MESO_NGC = "Mesoscope-style well with NGC-style headframe (0160-200-20/0160-100-10)"
+        WHC_NEUROPIXEL = "WHC #42 with Neuropixel well and well cap"
+        NGC = "NGC-style headframe, no well (0160-100-10)"
+        AI_HEADBAR = "AI Straight Headbar"
+
     class ListField(Enum):
         """Enum class for fields in List Item object response"""
 
@@ -434,7 +443,7 @@ class SharePointClient:
             list_fields.WEIGHT_BEFORE_SURGER.value
         )
         # TODO: all fields after this have diff field names for 2nd inj
-        anaesthesia = self._map_injection_anaesthesia(list_item)
+        anaesthesia = self._map_injection_anaesthesia(list_item,list_fields)
         injection_duration = convert_str_to_time(
             list_item.get_property(list_fields.INJ1_LENGHTOF_TIME.value)
         )
@@ -655,11 +664,47 @@ class SharePointClient:
         )
         return craniotomy
 
+    def _map_headpost_type(self, headpost_type: str):
+        """Maps Sharepoint response's HeadPostType to fields in HeadFrame model"""
+        if headpost_type:
+            if headpost_type == "CAM-style headframe (0160-100-10 Rev A)":
+                headframe_type = "CAM-style"
+                headframe_part_number = "0160-100-10 Rev A"
+                well_type = "CAM-style"
+                well_part_number = None
+            elif headpost_type == "Neuropixel-style headframe (0160-100-10/0160-200-36)":
+                headframe_type = "Neuropixel-style"
+                headframe_part_number = "0160-100-10"
+                well_type = "Neuropixel-style"
+                well_part_number = "0160-200-36"
+            elif headpost_type == "Mesoscope-style well with NGC-style headframe (0160-200-20/0160-100-10)":
+                headframe_type = "NGC-style"
+                headframe_part_number = "0160-100-10"
+                well_type = "Mesoscope-style"
+                well_part_number = "0160-200-20"
+            elif headpost_type == "WHC #42 with Neuropixel well and well cap":
+                headframe_type = "WHC #42"
+                headframe_part_number = "42"
+                well_type = "Neuropixel-style"
+                well_part_number = "0160-200-36"
+            elif headpost_type == "NGC-style headframe, no well (0160-100-10)":
+                headframe_type = "NGC-style"
+                headframe_part_number = "0160-100-10"
+                well_type = None
+                well_part_number = None
+            else:
+                headframe_type = "AI Straight Headbar"
+                headframe_part_number = None
+                well_type = None
+                well_part_number = None
+            return headframe_type, headframe_part_number, well_type, well_part_number
+        else:
+            return None
+
     def _map_list_item_to_head_frame(self, list_item: ClientObject) -> Headframe:
         """Maps a SharePoint ListItem to a HeadFrame model"""
-        # TODO: map missing fields (headframe_part_number, headframe_material, well_part_number, well_type)
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
-        start_date = parser.isoparse(list_item.get_property(list_fields.DATE_OF_SURGERY.value))
+        start_date = parser.isoparse(list_item.get_property(list_fields.DATE_OF_SURGERY.value)).date()
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
@@ -668,6 +713,7 @@ class SharePointClient:
         animal_weight = list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER.value)
         anaesthesia = self._map_hp_anaesthesia(list_item, list_fields)
         headpost_type = list_item.get_property(list_fields.HEADPOST_TYPE.value)
+        headframe_type, headframe_part_number, well_type, well_part_number = self._map_headpost_type(headpost_type)
         head_frame = Headframe.construct(
             start_date=start_date,
             end_date=end_date,
@@ -676,5 +722,8 @@ class SharePointClient:
             animal_weight=animal_weight,
             anaesthesia=anaesthesia,
             headframe_type=headframe_type,
+            headframe_part_number=headframe_part_number,
+            well_type=well_type,
+            well_part_number=well_part_number,
         )
         return head_frame
