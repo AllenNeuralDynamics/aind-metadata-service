@@ -3,7 +3,7 @@
 import os
 
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
+from fastapi.responses import RedirectResponse
 
 from aind_metadata_service.labtracks.client import LabTracksClient
 from aind_metadata_service.sharepoint.client import SharePointClient
@@ -62,4 +62,4 @@ async def favicon():
     """
     Returns the favicon
     """
-    return FileResponse(favicon_path)
+    return RedirectResponse(favicon_path)
