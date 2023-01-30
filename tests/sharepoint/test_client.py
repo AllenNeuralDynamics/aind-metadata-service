@@ -182,21 +182,19 @@ class Examples:
 
     described_by = (
         "https://raw.githubusercontent.com/AllenNeuralDynamics/"
-        "aind-data-schema/main/site-packages/aind_data_schema/procedures.py"
+        "aind-data-schema/main/src/aind_data_schema/procedures.py"
     )
     expected_procedures1 = Procedures.construct(
         describedBy=described_by,
-        schema_version="0.4.4",
+        schema_version="0.5.4",
         subject_id="650102",
         headframes=(
             [
                 Headframe.construct(
-                    type=None,
                     start_date="2022-12-05T08:00:00Z",
                     end_date="2022-12-09T08:00:00Z",
                     experimenter_full_name="Mary Smith",
                     iacuc_protocol=None,
-                    animal_weight=None,
                     notes=None,
                     well_part_number=None,
                     well_type=None,
@@ -206,12 +204,10 @@ class Examples:
         injections=(
             [
                 Injection.construct(
-                    type=None,
                     start_date="2022-12-05T08:00:00Z",
                     end_date="2022-12-09T08:00:00Z",
                     experimenter_full_name="Mary Smith",
                     iacuc_protocol=None,
-                    animal_weight=None,
                     notes=None,
                     injection_materials=None,
                 )
@@ -220,12 +216,10 @@ class Examples:
         fiber_implants=(
             [
                 FiberImplant.construct(
-                    type=None,
                     start_date="2022-12-05T08:00:00Z",
                     end_date="2022-12-09T08:00:00Z",
                     experimenter_full_name="Mary Smith",
                     iacuc_protocol=None,
-                    animal_weight=None,
                     notes=None,
                 )
             ]
