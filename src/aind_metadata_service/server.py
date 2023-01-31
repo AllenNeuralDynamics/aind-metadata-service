@@ -3,6 +3,7 @@
 import os
 
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 
 from aind_metadata_service.labtracks.client import LabTracksClient
 from aind_metadata_service.sharepoint.client import SharePointClient
@@ -10,6 +11,7 @@ from aind_metadata_service.sharepoint.client import SharePointClient
 app = FastAPI()
 
 # TODO: Handle configs better?
+favicon_path = os.getenv("FAVICON_PATH")
 
 labtracks_driver = os.getenv("ODBC_DRIVER")
 labtracks_server = os.getenv("LABTRACKS_SERVER")
@@ -54,3 +56,16 @@ async def retrieve_procedures(subject_id):
     response = sharepoint_client.get_procedure_info(subject_id=subject_id)
 
     return response
+
+
+@app.get(
+    "/favicon.ico",
+    include_in_schema=False,
+    response_class=RedirectResponse,
+    status_code=200,
+)
+async def favicon():
+    """
+    Returns the favicon
+    """
+    return favicon_path
