@@ -1,11 +1,18 @@
 """Module to test SharePoint Client methods"""
 
+import json
+import os
 import unittest
+from pathlib import Path
 
 from aind_data_schema.procedures import (
+    Anaesthetic,
+    Craniotomy,
     FiberImplant,
     Headframe,
-    Injection,
+    IontophoresisInjection,
+    NanojectInjection,
+    OphysProbe,
     Procedures,
 )
 from office365.sharepoint.client_context import ClientContext
@@ -22,182 +29,93 @@ from aind_metadata_service.sharepoint.client import (
 class Examples:
     """Class to hold some examples to compare against"""
 
-    lims_link = "<a href='http://lims2/specimens?search650102'>Search</a>"
-    project_id = "122-01-001-10 Neural Dynamics Scientific Activities"
-    # TODO: Move this to JSON file in resources
-    list_item_json = {
-        "FileSystemObjectType": 0,
-        "Id": 5554,
-        "ServerRedirectedEmbedUri": None,
-        "ServerRedirectedEmbedUrl": "",
-        "ContentTypeId": "0x0100D7F25D3C051CD548B3304044B3DA2E96",
-        "Title": "650102HP+Injection+Optic Fiber Implant",
-        "PIId": 5313,
-        "PIStringId": "5313",
-        "LabTracks_x0020_Requestor": "Mary Smith",
-        "Project_x0020_ID_x0020__x0028_te": project_id,
-        "IACUC_x0020_Protocol_x0020__x002": "2115",
-        "Procedure": "HP+Injection+Optic Fiber Implant",
-        "Light_x0020_Cycle": "Reverse (9pm to 9am)",
-        "LIMs_x0020_Required": "No",
-        "LabTracks_x0020_Group": "Slc6a3-Cre",
-        "LabTracks_x0020_ID": "650102",
-        "Date_x0020_of_x0020_Surgery": "2022-12-06T08:00:00Z",
-        "Lims_x0020_Project_x0020_Code": "Select...",
-        "Virus_x0020_M_x002f_L": "-3.3",
-        "Virus_x0020_A_x002f_P": "-1.6",
-        "Virus_x0020_D_x002f_V": "4.3",
-        "Virus_x0020_Hemisphere": "Left",
-        "HP_x0020_M_x002f_L": None,
-        "HP_x0020_A_x002f_P": None,
-        "HP_x0020_Diameter": "5mm",
-        "Iso_x0020_On": None,
-        "Cage": None,
-        "Sex": "Select...",
-        "Date_x0020_of_x0020_Birth": None,
-        "Weight_x0020_before_x0020_Surger": None,
-        "Weight_x0020_after_x0020_Surgery": None,
-        "PedigreeName": "Slc6a3-Cre-650102",
-        "Breg2Lamb": None,
-        "HeadpostType": "AI Straight Headbar",
-        "DateRangeStart": "2022-12-05T08:00:00Z",
-        "DateRangeEnd": "2022-12-09T08:00:00Z",
-        "HpLoc": "Select...",
-        "HpPerf": "Select if applicable...",
-        "HPDurotomy": "Select...",
-        "HpPrevInject": "Select...",
-        "ML2ndInj": "-0.6",
-        "AP2ndInj": "-3.05",
-        "DV2ndInj": "4.3",
-        "Hemisphere2ndInj": "Left",
-        "HpWorkStation": "SWS 3",
-        "SurgeryStatus": "New",
-        "ComDurotomy": "Select...",
-        "ComSwelling": "Select...",
-        "ComSinusbleed": "Select...",
-        "ComDuring1stInj": "Select...",
-        "ComDuring2ndInj": "Select...",
-        "ComDamage": "Select...",
-        "ComWindow": "Select...",
-        "ComCoplanar": "Select...",
-        "ComAfter1stInj": "Select...",
-        "ComAfter2ndInj": "Select...",
-        "WorkStation1stInjection": "SWS 3",
-        "WorkStation2ndInjection": "Select...",
-        "Date1stInjection": "2022-12-06T08:00:00Z",
-        "Date2ndInjection": None,
-        "Inj1StorageLocation": "A Box",
-        "Inj2StorageLocation": "A Box",
-        "Inj1Type": "Nanoject (Pressure)",
-        "Inj2Type": "Nanoject (Pressure)",
-        "Inj1Vol": "400",
-        "Inj2Vol": "400",
-        "Inj1LenghtofTime": None,
-        "Inj2LenghtofTime": None,
-        "Inj1Current": None,
-        "Inj2Current": None,
-        "Inj1AlternatingTime": None,
-        "Inj2AlternatingTime": None,
-        "FirstInjectionWeightBefor": None,
-        "FirstInjectionWeightAfter": None,
-        "FirstInjectionIsoDuration": None,
-        "SecondInjectionWeightBefore": None,
-        "SecondInjectionWeightAfter": None,
-        "SecondInjectionIsoDuration": None,
-        "Inj1Round": "1st",
-        "Inj2Round": "1st",
-        "HPIsoLevel": "Select...",
-        "Round1InjIsolevel": "Select...",
-        "Round2InjIsolevel": "Select...",
-        "Test1Id": 2916,
-        "Test1StringId": "2916",
-        "TEST_x0020_2nd_x0020_Round_x0020Id": None,
-        "TEST_x0020_2nd_x0020_Round_x0020StringId": None,
-        "TEST_x0020_1st_x0020_Round_x0020Id": 2916,
-        "TEST_x0020_1st_x0020_Round_x0020StringId": "2916",
-        "OData__x0031_HP_x0020_Requestor_x0020_": None,
-        "Issue": "Select...",
-        "Touch_x0020_Up_x0020_Status": "Select...",
-        "Touch_x0020_Up_x0020_SurgeonId": None,
-        "Touch_x0020_Up_x0020_SurgeonStringId": None,
-        "Touch_x0020_Up_x0020__x0020_Comp": None,
-        "Exudate_x0020_Severity": "Select...",
-        "Scabbing": "Select...",
-        "Eye_x0020_Issue": "Select...",
-        "Eye_x0020_Affected": "Select...",
-        "Touch_x0020_Up_x0020_Weight_x002": None,
-        "LIMS_x0020_link": lims_link,
-        "HP_x0020__x0026__x0020_Inj": "Yes",
-        "field30": "23",
-        "field50": "23",
-        "LIMStaskflow1": None,
-        "ComplianceAssetId": None,
-        "Created": "2022-12-02T17:04:37Z",
-        "AuthorId": 187,
-        "EditorId": 2916,
-        "Modified": "2022-12-02T18:15:36Z",
-        "HPRequestorCommentsPlaintext": None,
-        "NanojectNumberInj2": "Select...",
-        "NanojectNumberInj10": "Select...",
-        "IontoNumberInj1": "Select...",
-        "IontoNumberInj2": "Select...",
-        "IontoNumberHPINJ": None,
-        "inj1volperdepth": None,
-        "inj2volperdepth": None,
-        "Inj1angle0": "Select...",
-        "Inj2angle0": "Select...",
-        "Contusion": "Select...",
-        "HPSurgeonComments": None,
-        "stRoundInjectionComments": None,
-        "ndRoungInjectionComments": None,
-        "FirstRoundIontoIssue": "Select...",
-        "HPRecovery": None,
-        "FirstInjRecovery": None,
-        "SecondInjRecover": None,
-        "SecondRoundIontoIssue": "Select...",
-        "LongSurgeonComments": None,
-        "Long1stRoundInjCmts": None,
-        "Long2ndRndInjCmts": None,
-        "LongRequestorComments": None,
-        "Inj1VirusStrain_rt": "Premixied &quot;\u200bdL+Cre&quot;",
-        "Inj2VirusStrain_rt": "DIO-ChrimsonR",
-        "retSetting0": "Off",
-        "retSetting1": "Off",
-        "Start_x0020_Of_x0020_Week": "2022-12-05T08:00:00Z",
-        "End_x0020_of_x0020_Week": "2022-12-09T08:00:00Z",
-        "Age_x0020_at_x0020_Injection": "44901.0000000000",
-        "CraniotomyType": None,
-        "ImplantIDCoverslipType": None,
-        "Inj1Angle_v2": "0",
-        "Inj2Angle_v2": "0",
-        "FiberImplant1": False,
-        "FiberImplant1DV": "4.2",
-        "FiberImplant2": False,
-        "FiberImplant2DV": "4.2",
-        "ID": 5554,
-        "OData__UIVersionString": "4.0",
-        "Attachments": False,
-        "GUID": "00c3c333-c4a0-42aa-adab-88183c324201",
-    }
+    TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__)))
+    RESOURCES_DIR = TEST_DIR / "resources"
+
+    list_item1_filepath = RESOURCES_DIR / "list_item1.json"
+
+    with open(list_item1_filepath) as f:
+        list_item1_json = json.load(f)
+
+    list_item2_filepath = RESOURCES_DIR / "list_item2.json"
+
+    with open(list_item2_filepath) as f:
+        list_item2_json = json.load(f)
+
+    list_item3_filepath = RESOURCES_DIR / "list_item3.json"
+
+    with open(list_item3_filepath) as f:
+        list_item3_json = json.load(f)
+
+    list_item4_filepath = RESOURCES_DIR / "list_item4.json"
+
+    with open(list_item4_filepath) as f:
+        list_item4_json = json.load(f)
+
+    list_item5_filepath = RESOURCES_DIR / "list_item5.json"
+
+    with open(list_item5_filepath) as f:
+        list_item5_json = json.load(f)
+
+    list_item6_filepath = RESOURCES_DIR / "list_item6.json"
+
+    with open(list_item6_filepath) as f:
+        list_item6_json = json.load(f)
+
+    list_item7_filepath = RESOURCES_DIR / "list_item7.json"
+
+    with open(list_item7_filepath) as f:
+        list_item7_json = json.load(f)
 
     described_by = (
         "https://raw.githubusercontent.com/AllenNeuralDynamics/"
-        "aind-data-schema/main/site-packages/aind_data_schema/procedures.py"
+        "aind-data-schema/main/src/aind_data_schema/procedures.py"
     )
+
+    expected_inj_anaesthetic = Anaesthetic.construct(
+        type="isoflurane",
+        duration=None,
+        level="Select...",
+    )
+
+    expected_hp_anaesthetic = Anaesthetic.construct(
+        type="isoflurane",
+        level="Select...",
+    )
+
+    expected_probe1 = OphysProbe.construct(
+        name="Probe A",
+        stereotactic_coordinate_ml=-3.3,
+        stereotactic_coordinate_ap=-1.6,
+        stereotactic_coordinate_dv=4.2,
+        angle=0.0,
+    )
+
+    expected_probe2 = OphysProbe.construct(
+        name="Probe B",
+        stereotactic_coordinate_ml=-0.6,
+        stereotactic_coordinate_ap=-3.05,
+        stereotactic_coordinate_dv=4.2,
+        angle=0.0,
+    )
+
     expected_procedures1 = Procedures.construct(
         describedBy=described_by,
-        schema_version="0.4.4",
+        schema_version="0.5.4",
         subject_id="650102",
         headframes=(
             [
                 Headframe.construct(
-                    type=None,
-                    start_date="2022-12-05T08:00:00Z",
-                    end_date="2022-12-09T08:00:00Z",
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
                     experimenter_full_name="Mary Smith",
-                    iacuc_protocol=None,
-                    animal_weight=None,
+                    iacuc_protocol="2115",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
                     notes=None,
+                    anaesthesia=expected_hp_anaesthetic,
+                    headframe_type="AI Straight Headbar",
+                    headframe_part_number=None,
                     well_part_number=None,
                     well_type=None,
                 )
@@ -205,27 +123,409 @@ class Examples:
         ),
         injections=(
             [
-                Injection.construct(
-                    type=None,
-                    start_date="2022-12-05T08:00:00Z",
-                    end_date="2022-12-09T08:00:00Z",
+                NanojectInjection.construct(
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
                     experimenter_full_name="Mary Smith",
-                    iacuc_protocol=None,
-                    animal_weight=None,
+                    iacuc_protocol="2115",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
+                    anaesthesia=expected_inj_anaesthetic,
                     notes=None,
                     injection_materials=None,
+                    injection_duration=5,
+                    recovery_time=None,
+                    workstation_id="SWS 3",
+                    instrument_id="Select...",
+                    injection_hemisphere="Left",
+                    injection_coordinate_ml=-3.3,
+                    injection_coordinate_ap=-1.6,
+                    injection_coordinate_depth=4.3,
+                    injection_angle=0.0,
+                    injection_type="Nanoject (Pressure)",
+                    injection_volume=400.0,
+                )
+            ]
+        ),
+        craniotomies=(
+            [
+                Craniotomy.construct(
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol="2115",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
+                    anaesthesia=expected_hp_anaesthetic,
+                    craniotomy_type="Visual Cortex",
+                    craniotomy_hemisphere="Right",
+                    craniotomy_coordinates_ml=2.8,
+                    craniotomy_coordinates_ap=1.3,
+                    craniotomy_size=5.0,
+                    dura_removed=True,
+                    workstation_id="SWS 3",
+                    notes=None,
+                )
+            ]
+        ),
+    )
+
+    expected_procedures2 = Procedures.construct(
+        describedBy=described_by,
+        schema_version="0.5.4",
+        subject_id="650102",
+        headframes=(
+            [
+                Headframe.construct(
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol="2115",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
+                    notes=None,
+                    anaesthesia=expected_hp_anaesthetic,
+                    headframe_type="CAM-style",
+                    headframe_part_number="0160-100-10 Rev A",
+                    well_part_number=None,
+                    well_type="CAM-style",
+                )
+            ]
+        ),
+        injections=(
+            [
+                IontophoresisInjection.construct(
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol="2115",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
+                    anaesthesia=expected_inj_anaesthetic,
+                    notes=None,
+                    injection_materials=None,
+                    injection_duration=5,
+                    recovery_time=None,
+                    workstation_id="SWS 3",
+                    instrument_id="Select...",
+                    injection_hemisphere="Right",
+                    injection_coordinate_ml=-3.3,
+                    injection_coordinate_ap=-1.6,
+                    injection_coordinate_depth=4.3,
+                    injection_angle=0.0,
+                    injection_type="Iontophoresis",
+                    injection_current=5.0,
+                    alternating_current="7/7",
+                )
+            ]
+        ),
+        craniotomies=(
+            [
+                Craniotomy.construct(
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol="2115",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
+                    anaesthesia=expected_hp_anaesthetic,
+                    craniotomy_type="Whole hemisphere craniotomy",
+                    craniotomy_hemisphere="Center",
+                    craniotomy_coordinates_ml=2.8,
+                    craniotomy_coordinates_ap=1.3,
+                    craniotomy_size=5.0,
+                    dura_removed=False,
+                    workstation_id="SWS 3",
+                    notes=None,
+                )
+            ]
+        ),
+    )
+
+    expected_procedures3 = Procedures.construct(
+        describedBy=described_by,
+        schema_version="0.5.4",
+        subject_id="650102",
+        headframes=(
+            [
+                Headframe.construct(
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol="2115",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
+                    notes=None,
+                    anaesthesia=expected_hp_anaesthetic,
+                    headframe_type="NGC-style",
+                    headframe_part_number="0160-100-10",
+                    well_part_number="0160-200-20",
+                    well_type="Mesoscope-style",
+                )
+            ]
+        ),
+        injections=(
+            [
+                IontophoresisInjection.construct(
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol="2115",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
+                    anaesthesia=expected_inj_anaesthetic,
+                    notes=None,
+                    injection_materials=None,
+                    injection_duration=5,
+                    recovery_time=None,
+                    workstation_id="SWS 3",
+                    instrument_id="Select...",
+                    injection_hemisphere=None,
+                    injection_coordinate_ml=-3.3,
+                    injection_coordinate_ap=-1.6,
+                    injection_coordinate_depth=None,
+                    injection_angle=0.0,
+                    injection_type="Iontophoresis",
+                    injection_current=5.0,
+                    alternating_current="7/7",
                 )
             ]
         ),
         fiber_implants=(
             [
                 FiberImplant.construct(
-                    type=None,
-                    start_date="2022-12-05T08:00:00Z",
-                    end_date="2022-12-09T08:00:00Z",
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
                     experimenter_full_name="Mary Smith",
-                    iacuc_protocol=None,
-                    animal_weight=None,
+                    iacuc_protocol="2115",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
+                    notes=None,
+                    probes=[expected_probe1, expected_probe2],
+                )
+            ]
+        ),
+        craniotomies=(
+            [
+                Craniotomy.construct(
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol="2115",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
+                    anaesthesia=expected_hp_anaesthetic,
+                    craniotomy_type="3 mm",
+                    craniotomy_hemisphere=None,
+                    craniotomy_coordinates_ml=2.8,
+                    craniotomy_coordinates_ap=1.3,
+                    craniotomy_size=3.0,
+                    dura_removed=None,
+                    workstation_id="SWS 3",
+                    notes=None,
+                )
+            ]
+        ),
+    )
+
+    expected_procedures4 = Procedures.construct(
+        describedBy=described_by,
+        schema_version="0.5.4",
+        subject_id="650102",
+        headframes=(
+            [
+                Headframe.construct(
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol="2115",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
+                    notes=None,
+                    anaesthesia=expected_hp_anaesthetic,
+                    headframe_type="Neuropixel-style",
+                    headframe_part_number="0160-100-10",
+                    well_part_number="0160-200-36",
+                    well_type="Neuropixel-style",
+                )
+            ]
+        ),
+        injections=(
+            [
+                IontophoresisInjection.construct(
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol="2115",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
+                    anaesthesia=expected_inj_anaesthetic,
+                    notes=None,
+                    injection_materials=None,
+                    injection_duration=5,
+                    recovery_time=None,
+                    workstation_id="SWS 3",
+                    instrument_id="Select...",
+                    injection_hemisphere=None,
+                    injection_coordinate_ml=-3.3,
+                    injection_coordinate_ap=-1.6,
+                    injection_coordinate_depth=None,
+                    injection_angle=0.0,
+                    injection_type="Iontophoresis",
+                    injection_current=5.0,
+                    alternating_current="7/7",
+                )
+            ]
+        ),
+        fiber_implants=(
+            [
+                FiberImplant.construct(
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol="2115",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
+                    notes=None,
+                    probes=[expected_probe1, expected_probe2],
+                )
+            ]
+        ),
+        craniotomies=(
+            [
+                Craniotomy.construct(
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol="2115",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
+                    anaesthesia=expected_hp_anaesthetic,
+                    craniotomy_type="Other",
+                    craniotomy_hemisphere=None,
+                    craniotomy_coordinates_ml=2.8,
+                    craniotomy_coordinates_ap=1.3,
+                    craniotomy_size=3.0,
+                    dura_removed=None,
+                    workstation_id="SWS 3",
+                    notes=None,
+                )
+            ]
+        ),
+    )
+    expected_procedures5 = Procedures.construct(
+        describedBy=described_by,
+        schema_version="0.5.4",
+        subject_id="650102",
+        headframes=(
+            [
+                Headframe.construct(
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol="2115",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
+                    notes=None,
+                    anaesthesia=expected_hp_anaesthetic,
+                    headframe_type="WHC #42",
+                    headframe_part_number="42",
+                    well_part_number="0160-200-36",
+                    well_type="Neuropixel-style",
+                )
+            ]
+        ),
+    )
+    expected_procedures6 = Procedures.construct(
+        describedBy=described_by,
+        schema_version="0.5.4",
+        subject_id="650102",
+        headframes=(
+            [
+                Headframe.construct(
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol="2115",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
+                    notes=None,
+                    anaesthesia=expected_hp_anaesthetic,
+                    headframe_type="NGC-style",
+                    headframe_part_number="0160-100-10",
+                    well_part_number=None,
+                    well_type=None,
+                )
+            ]
+        ),
+    )
+
+    expected_procedures7 = Procedures.construct(
+        describedBy=described_by,
+        schema_version="0.5.4",
+        subject_id="650102",
+        headframes=(
+            [
+                Headframe.construct(
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol="2115",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
+                    notes=None,
+                    anaesthesia=expected_hp_anaesthetic,
+                    headframe_type=None,
+                    headframe_part_number=None,
+                    well_part_number=None,
+                    well_type=None,
+                )
+            ]
+        ),
+        injections=(
+            [
+                IontophoresisInjection.construct(
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol="2115",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
+                    anaesthesia=expected_inj_anaesthetic,
+                    notes=None,
+                    injection_materials=None,
+                    injection_duration=5,
+                    recovery_time=None,
+                    workstation_id="SWS 3",
+                    instrument_id="Select...",
+                    injection_hemisphere="Right",
+                    injection_coordinate_ml=-3.3,
+                    injection_coordinate_ap=-1.6,
+                    injection_coordinate_depth=4.3,
+                    injection_angle=0.0,
+                    injection_type="Iontophoresis",
+                    injection_current=5.0,
+                    alternating_current="7/7",
+                )
+            ]
+        ),
+        craniotomies=(
+            [
+                Craniotomy.construct(
+                    start_date="2022-12-06",
+                    end_date="2022-12-06",
+                    experimenter_full_name="Mary Smith",
+                    iacuc_protocol="2115",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
+                    anaesthesia=expected_hp_anaesthetic,
+                    craniotomy_type=None,
+                    craniotomy_hemisphere="Center",
+                    craniotomy_coordinates_ml=2.8,
+                    craniotomy_coordinates_ap=1.3,
+                    craniotomy_size=5.0,
+                    dura_removed=False,
+                    workstation_id="SWS 3",
                     notes=None,
                 )
             ]
@@ -274,27 +574,88 @@ class TestSharepointClient(unittest.TestCase):
 
         # Add a list item with contents
         list_item_collection = ListItemCollection(context=blank_ctx)
-        list_item2 = ListItem(context=blank_ctx)
-        list_item2.get_property = lambda x: Examples.list_item_json[x]
-        list_item_collection.add_child(list_item2)
+        list_item1 = ListItem(context=blank_ctx)
+        list_item1.get_property = lambda x: Examples.list_item1_json[x]
+        list_item_collection.add_child(list_item1)
         msg1 = self.client._handle_response_from_sharepoint(
             list_item_collection, subject_id=subject_id
         )
         expected_msg1 = Responses.model_response(Examples.expected_procedures1)
         empty_response = Responses.no_data_found_response()
+
+        list_item_collection2 = ListItemCollection(context=blank_ctx)
+        list_item2 = ListItem(context=blank_ctx)
+        list_item2.get_property = lambda x: Examples.list_item2_json[x]
+        list_item_collection2.add_child(list_item2)
+        msg2 = self.client._handle_response_from_sharepoint(
+            list_item_collection2, subject_id=subject_id
+        )
+        expected_msg2 = Responses.model_response(Examples.expected_procedures2)
+
+        list_item_collection3 = ListItemCollection(context=blank_ctx)
+        list_item3 = ListItem(context=blank_ctx)
+        list_item3.get_property = lambda x: Examples.list_item3_json[x]
+        list_item_collection3.add_child(list_item3)
+        msg3 = self.client._handle_response_from_sharepoint(
+            list_item_collection3, subject_id=subject_id
+        )
+        expected_msg3 = Responses.model_response(Examples.expected_procedures3)
+
+        list_item_collection4 = ListItemCollection(context=blank_ctx)
+        list_item4 = ListItem(context=blank_ctx)
+        list_item4.get_property = lambda x: Examples.list_item4_json[x]
+        list_item_collection4.add_child(list_item4)
+        msg4 = self.client._handle_response_from_sharepoint(
+            list_item_collection4, subject_id=subject_id
+        )
+        expected_msg4 = Responses.model_response(Examples.expected_procedures4)
+
+        list_item_collection5 = ListItemCollection(context=blank_ctx)
+        list_item5 = ListItem(context=blank_ctx)
+        list_item5.get_property = lambda x: Examples.list_item5_json[x]
+        list_item_collection5.add_child(list_item5)
+        msg5 = self.client._handle_response_from_sharepoint(
+            list_item_collection5, subject_id=subject_id
+        )
+        expected_msg5 = Responses.model_response(Examples.expected_procedures5)
+
+        list_item_collection6 = ListItemCollection(context=blank_ctx)
+        list_item6 = ListItem(context=blank_ctx)
+        list_item6.get_property = lambda x: Examples.list_item6_json[x]
+        list_item_collection6.add_child(list_item6)
+        msg6 = self.client._handle_response_from_sharepoint(
+            list_item_collection6, subject_id=subject_id
+        )
+        expected_msg6 = Responses.model_response(Examples.expected_procedures6)
+
+        list_item_collection7 = ListItemCollection(context=blank_ctx)
+        list_item7 = ListItem(context=blank_ctx)
+        list_item7.get_property = lambda x: Examples.list_item7_json[x]
+        list_item_collection7.add_child(list_item7)
+        msg7 = self.client._handle_response_from_sharepoint(
+            list_item_collection7, subject_id=subject_id
+        )
+        expected_msg7 = Responses.model_response(Examples.expected_procedures7)
+
         self.assertEqual(empty_response.status_code, empty_msg.status_code)
         self.assertEqual(empty_response.body, empty_msg.body)
         self.assertEqual(expected_msg.status_code, msg.status_code)
         self.assertEqual(expected_msg.body, msg.body)
         self.assertEqual(expected_msg1.status_code, msg1.status_code)
         self.assertEqual(expected_msg1.body, msg1.body)
+        self.assertEqual(expected_msg2.body, msg2.body)
+        self.assertEqual(expected_msg3.body, msg3.body)
+        self.assertEqual(expected_msg4.body, msg4.body)
+        self.assertEqual(expected_msg5.body, msg5.body)
+        self.assertEqual(expected_msg6.body, msg6.body)
+        self.assertEqual(expected_msg7.body, msg7.body)
 
     def test_get_procedure_info(self):
         """Basic test on the main interface."""
         blank_ctx = ClientContext(base_url=self.client.site_url)
         list_item_collection = ListItemCollection(context=blank_ctx)
         list_item = ListItem(context=blank_ctx)
-        list_item.to_json = lambda: Examples.list_item_json
+        list_item.to_json = lambda: Examples.list_item1_json
         list_item_collection.add_child(list_item)
         self.client.client_context.execute_query = lambda: list_item_collection
         response = self.client.get_procedure_info("0000")
