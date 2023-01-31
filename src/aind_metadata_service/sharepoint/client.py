@@ -42,12 +42,22 @@ class NeurosurgeryAndBehaviorList2023:
         SELECT_STR = "Select..."
         PROCEDURE_TYPE_SPLITTER = "+"
 
-    class ProcedureType(Enum):
-        """Enum class for SharePoint's Procedure Type"""
+    class ProcedureCategory(Enum):
+        """Enum class for 2023 SharePoint's Procedure Category"""
 
-        HEAD_PLANT = "HP"
+        HEADPOST_ONLY = "Headpost Only"
         INJECTION = "Injection"
-        OPTIC_FIBER_IMPLANT = "Optic Fiber Implant"
+        FIBER_OPTIC_IMPLANT = "Fiber Optic Implant"
+        CRANIAL_WINDOW = "Cranial Window"
+
+    class ProcedureType(Enum):
+        """Enum class for 2023 SharePoint's Specific Procedure Type"""
+        INJECTION = "Injection"
+        INJ = "INJ"
+        WITH_HEADPOST = "with Headpost"
+        FIBER_OPTIC_IMPLANT = "Fiber Optic Implant"
+        CTX = "Ctx"
+        WHC_NP = "WHC NP"
 
     class ListField(Enum):
         """Enum class for fields in List Item object response"""
@@ -95,7 +105,7 @@ class NeurosurgeryAndBehaviorList2023:
         LONG_REQUESTOR_COMMENTS = "LongRequestorComments"
         PROCEDURE_SLOTS = "Procedure_x0020_Slots"
         PROCEDURE_FAMILY = "Procedure_x0020_Family"
-        PROCEDURE_T2 = "Procedure_x0020_Family"
+        PROCEDURE_T2 = "Procedure_x0020_T2"
         PROCEDURE = "Procedure"
         HEADPOST = "Headpost"
         HEADPOST_TYPE = "HeadpostType"
@@ -500,7 +510,7 @@ class SharePointClient:
 
         """
         # TODO: Add try to handle internal server error response.
-        # default response?
+        # default response
         for version in ListVersions:
             filter_string = self._get_filter_string(version, subject_id)
             ctx = self.client_context
@@ -509,16 +519,94 @@ class SharePointClient:
             ).views.get_by_title(version.value["view_title"])
             ctx.load(list_view)
             ctx.execute_query()
-            # list_items append
             list_items = list_view.get_items().filter(filter_string)
             ctx.load(list_items)
             ctx.execute_query()
             response = self._handle_response_from_sharepoint(
-                list_items, subject_id=subject_id
+                list_items, subject_id=subject_id, version=version
             )
         return response
 
     # TODO: Refactor to make less complex?
+    def _handle_response_2019(self, list_items: ListItemCollection,
+                              head_frames, injections, fiber_implants, craniotomies):
+        """Handles sharepoint response when 2019 version"""
+        list_fields = NeurosurgeryAndBehaviorList2019.ListField
+        str_helpers = NeurosurgeryAndBehaviorList2019.StringParserHelper
+        nsb_proc_types = NeurosurgeryAndBehaviorList2019.ProcedureType
+        for list_item in list_items:
+            if list_item.get_property(list_fields.PROCEDURE.value):
+                procedure_types = list_item.get_property(
+                    list_fields.PROCEDURE.value
+                ).split(str_helpers.PROCEDURE_TYPE_SPLITTER.value)
+            else:
+                procedure_types = []
+            for procedure_type in procedure_types:
+                if procedure_type == nsb_proc_types.HEAD_PLANT.value:
+                    head_frames.append(
+                        self._map_list_item_to_head_frame(list_item)
+                    )
+                if procedure_type in {
+                    nsb_proc_types.STEREOTAXIC_INJECTION.value,
+                    nsb_proc_types.INJECTION.value,
+                    nsb_proc_types.INJ.value,
+                }:
+                    injections.append(
+                        self._map_list_item_to_injection(list_item)
+                    )
+                if (
+                        procedure_type
+                        == nsb_proc_types.OPTIC_FIBER_IMPLANT.value
+                ):
+                    fiber_implants.append(
+                        self._map_list_item_to_fiber_implant(list_item)
+                    )
+                if procedure_type in {
+                    nsb_proc_types.WHOLE_HEMISPHERE_CRANIOTOMY_NP.value,
+                    nsb_proc_types.C_MULTISCOPE.value,
+                    nsb_proc_types.C_CAM.value,
+                    nsb_proc_types.C.value,
+                }:
+                    craniotomies.append(
+                        self._map_list_item_to_craniotomy(list_item)
+                    )
+        return head_frames, injections, fiber_implants, craniotomies
+
+    def _handle_response_2023(self, list_items: ListItemCollection,
+                              head_frames, injections, fiber_implants, craniotomies):
+        """Handles sharepoint response when 2019 version"""
+        list_fields = NeurosurgeryAndBehaviorList2023.ListField
+        nsb_proc_categories = NeurosurgeryAndBehaviorList2023.ProcedureCategory
+        # str_helpers = NeurosurgeryAndBehaviorList2023.StringParserHelper
+        # nsb_proc_types = NeurosurgeryAndBehaviorList2023.ProcedureType
+        for list_item in list_items:
+            if list_item.get_property(list_fields.PROCEDURE.value):
+                procedure_category = list_item.get_property(list_fields.PROCEDURE_FAMILY.value)
+                # procedure_types = list_item.get_property(
+                #     list_fields.PROCEDURE.value
+                # ).split(str_helpers.PROCEDURE_TYPE_SPLITTER.value)
+            else:
+                procedure_category = None
+                # procedure_types = []
+            if procedure_category == nsb_proc_categories.HEADPOST_ONLY.value:
+                    head_frames.append(
+                        self._map_list_item_to_head_frame(list_item)
+                    )
+            if procedure_category == nsb_proc_categories.CRANIAL_WINDOW.value:
+                craniotomies.append(
+                    self._map_list_item_to_craniotomy(list_item)
+                )
+            if procedure_category == nsb_proc_categories.INJECTION.value:
+                injections.append(
+                    self._map_list_item_to_injection(list_item)
+                )
+            if procedure_category == nsb_proc_categories.FIBER_OPTIC_IMPLANT.value:
+                fiber_implants.append(
+                    self._map_list_item_to_fiber_implant(list_item)
+                )
+            # TODO: map based on specific procedure types
+        return head_frames, injections, fiber_implants, craniotomies
+
     def _handle_response_from_sharepoint(  # noqa: C901
         self, list_items: ListItemCollection, subject_id: str, version: ListVersions
     ) -> JSONResponse:
@@ -540,64 +628,27 @@ class SharePointClient:
 
         """
         if list_items:
-            # TODO: default version? for now 2019
-            if version == ListVersions.VERSION_2023:
-                list_fields = NeurosurgeryAndBehaviorList2023.ListField
-                str_helpers = NeurosurgeryAndBehaviorList2023.StringParserHelper
-                nsb_proc_types = NeurosurgeryAndBehaviorList2023.ProcedureType
-            else:
-                list_fields = NeurosurgeryAndBehaviorList2019.ListField
-                str_helpers = NeurosurgeryAndBehaviorList2019.StringParserHelper
-                nsb_proc_types = NeurosurgeryAndBehaviorList2019.ProcedureType
-            procedures = Procedures.construct(subject_id=subject_id)
             head_frames = []
             injections = []
             fiber_implants = []
             craniotomies = []
-            for list_item in list_items:
-                if list_item.get_property(list_fields.PROCEDURE.value):
-                    procedure_types = list_item.get_property(
-                        list_fields.PROCEDURE.value
-                    ).split(str_helpers.PROCEDURE_TYPE_SPLITTER.value)
-                else:
-                    procedure_types = []
-                for procedure_type in procedure_types:
-                    if procedure_type == nsb_proc_types.HEAD_PLANT.value:
-                        head_frames.append(
-                            self._map_list_item_to_head_frame(list_item)
-                        )
-                    if procedure_type in {
-                        nsb_proc_types.STEREOTAXIC_INJECTION.value,
-                        nsb_proc_types.INJECTION.value,
-                        nsb_proc_types.INJ.value,
-                    }:
-                        injections.append(
-                            self._map_list_item_to_injection(list_item)
-                        )
-                    if (
-                        procedure_type
-                        == nsb_proc_types.OPTIC_FIBER_IMPLANT.value
-                    ):
-                        fiber_implants.append(
-                            self._map_list_item_to_fiber_implant(list_item)
-                        )
-                    if procedure_type in {
-                        nsb_proc_types.WHOLE_HEMISPHERE_CRANIOTOMY_NP.value,
-                        nsb_proc_types.C_MULTISCOPE.value,
-                        nsb_proc_types.C_CAM.value,
-                        nsb_proc_types.C.value,
-                    }:
-                        craniotomies.append(
-                            self._map_list_item_to_craniotomy(list_item)
-                        )
-                if head_frames:
-                    procedures.headframes = head_frames
-                if injections:
-                    procedures.injections = injections
-                if fiber_implants:
-                    procedures.fiber_implants = fiber_implants
-                if craniotomies:
-                    procedures.craniotomies = craniotomies
+            if version == ListVersions.VERSION_2023:
+                head_frames, injections, fiber_implants, craniotomies = self._handle_response_2019(
+                    list_items, head_frames, injections, fiber_implants, craniotomies)
+            else:
+                head_frames, injections, fiber_implants, craniotomies = self._handle_response_2019(
+                    list_items, head_frames, injections, fiber_implants, craniotomies
+                )
+            procedures = Procedures.construct(subject_id=subject_id)
+            # before this was in loop for each list_item, is there a specific reason why?
+            if head_frames:
+                procedures.headframes = head_frames
+            if injections:
+                procedures.injections = injections
+            if fiber_implants:
+                procedures.fiber_implants = fiber_implants
+            if craniotomies:
+                procedures.craniotomies = craniotomies
             response = Responses.model_response(procedures)
         else:
             response = Responses.no_data_found_response()
