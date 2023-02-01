@@ -6,6 +6,11 @@
 REST service to retrieve metadata from databases.
 
 ## Installation
+
+### Server Installation
+
+Can be pip installed using `pip install aind_metadata_service[server]`.
+
 Installing `pyodbc`.
 - You may need to install `unixodbc-dev`. You can follow this [https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver16](link) for instructions depending on your os.
 
@@ -16,12 +21,13 @@ Installing `pyodbc`.
 
 ```
 
-To use the software, in the root directory, run
-```
-pip install -e .
-```
+### Client Installation
 
-To develop the code, run
+Can be pip installed with `pip install aind_metadata_service[client]`
+
+### For Development
+
+In the root directory, run
 ```
 pip install -e .[dev]
 ```

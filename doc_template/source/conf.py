@@ -5,20 +5,19 @@
 
 # -- Path Setup --------------------------------------------------------------
 import os
-import pathlib
 import sys
 
-from pygit2 import Repository
+import aind_metadata_service
 
 sys.path.insert(0, os.path.abspath("../../src"))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
-head = Repository(pathlib.Path.cwd())
+# head = Repository(pathlib.Path.cwd())
 
-project = str(head).split("/")[-3]
+project = aind_metadata_service.__name__
 copyright = "2022, Allen Institute of Neural Dynamics"
 author = "Allen Institute of Neural Dynamics"
-release = "0.1"
+release = aind_metadata_service.__version__
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
