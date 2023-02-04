@@ -20,6 +20,6 @@ Driver = /usr/lib/x86_64-linux-gnu/odbc/libtdsodbc.so\n\
 Setup = /usr/lib/x86_64-linux-gnu/odbc/libtdsS.so" >> /etc/odbcinst.ini
 
 # Pip command
-RUN pip install .
+RUN pip install .[server]
 
 CMD ["uvicorn", "aind_metadata_service.server:app", "--host", "0.0.0.0", "--port", "5000"]
