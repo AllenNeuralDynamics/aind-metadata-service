@@ -17,23 +17,31 @@ readme = "README.md"
 dynamic = ["version"]
 
 dependencies = [
-    'pyodbc',
-    'office365-rest-python-client',
-    'aind-data-schema==0.10.1',
-    'fastapi',
-    'uvicorn[standard]',
-    'python-dateutil'
+    'aind-data-schema==0.10.1'
 ]
 
 [project.optional-dependencies]
 dev = [
+    'aind-metadata-service[server]',
+    'aind-metadata-service[client]',
     'black',
     'coverage',
     'flake8',
     'interrogate',
     'isort',
-    'Sphinx',
-    'pygit2'
+    'Sphinx'
+]
+
+server = [
+    'pyodbc',
+    'office365-rest-python-client',
+    'fastapi',
+    'uvicorn[standard]',
+    'python-dateutil'
+]
+
+client = [
+    'requests'
 ]
 
 [tool.setuptools.packages.find]
