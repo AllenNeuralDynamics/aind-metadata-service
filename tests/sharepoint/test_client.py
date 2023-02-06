@@ -23,6 +23,7 @@ from aind_metadata_service.response_handler import Responses
 from aind_metadata_service.sharepoint.client import (
     ListVersions,
     SharePointClient,
+    SharePointResponseHandler,
 )
 
 
@@ -539,18 +540,20 @@ class TestSharepointClient(unittest.TestCase):
     client = SharePointClient(
         site_url="a_url", client_id="an_id", client_secret="a_secret"
     )
+    response_handler = SharePointResponseHandler()
 
     def test_get_filter_string(self):
         """Tests that the filter string is constructed correctly."""
         version_2019 = self.client._get_filter_string(
             version=ListVersions.VERSION_2019, subject_id="652464"
         )
-        default = self.client._get_filter_string(
-            version=ListVersions.DEFAULT, subject_id="652464"
+        version_2023 = self.client._get_filter_string(
+            version=ListVersions.VERSION_2023, subject_id="652464"
         )
-        expected_string = "substringof('652464', LabTracks_x0020_ID)"
-        self.assertEqual(version_2019, expected_string)
-        self.assertEqual(default, expected_string)
+        expected_string_1 = "substringof('652464', LabTracks_x0020_ID)"
+        expected_string_2 = "substringof('652464', LabTracks_x0020_ID1)"
+        self.assertEqual(version_2019, expected_string_1)
+        self.assertEqual(version_2023, expected_string_2)
 
     def test_handle_response(self):
         """Tests that the responses returned are what's expected."""
@@ -558,7 +561,7 @@ class TestSharepointClient(unittest.TestCase):
         blank_ctx = ClientContext(base_url=self.client.site_url)
         list_item_collection = ListItemCollection(context=blank_ctx)
         # A completely empty list_item_collection
-        empty_msg = self.client._handle_response_from_sharepoint(
+        empty_msg = self.response_handler.handle_response_from_sharepoint(
             list_item_collection, subject_id=subject_id
         )
 
