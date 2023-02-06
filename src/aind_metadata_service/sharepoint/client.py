@@ -520,12 +520,7 @@ class SharePointClient:
             list_items = list_view.get_items().filter(filter_string)
             ctx.load(list_items)
             ctx.execute_query()
-            if list_items:
-                response_bool = True
-                if version == ListVersions.VERSION_2023:
-                    sprh.map_2023_response(list_items)
-                elif version == ListVersions.VERSION_2019:
-                    sprh.map_2019_response(list_items)
+            response_bool = sprh.map_response(list_items, version, response_bool)
         response = sprh.handle_response_from_sharepoint(
             response_bool, subject_id=subject_id
         )
@@ -538,6 +533,29 @@ class SharePointResponseHandler:
         self.craniotomies = []
         self.injections = []
         self.fiber_implants = []
+
+    def map_response(self, list_items, version, response_bool):
+        """
+        Maps the response from SharePoint based on version
+        Parameters
+        ----------
+        list_items : ListItemCollection
+            SharePoint returns a ListItemCollection given a query.
+        version
+            Sharepoint list version.
+        response_bool : bool
+            Tracks whether procedure info was found in at least one Sharepoint db.
+        Returns
+        -------
+        Boolean
+        """
+        if list_items:
+            response_bool = True
+            if version == ListVersions.VERSION_2023:
+                self._map_2023_response(list_items)
+            elif version == ListVersions.VERSION_2019:
+                self._map_2019_response(list_items)
+        return response_bool
 
     def handle_response_from_sharepoint(  # noqa: C901
         self, response_bool, subject_id: str
@@ -574,7 +592,7 @@ class SharePointResponseHandler:
             response = Responses.no_data_found_response()
         return response
 
-    def map_2023_response(self, list_items: ListItemCollection):
+    def _map_2023_response(self, list_items: ListItemCollection):
         """Maps sharepoint response when 2023 version"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         nsb_proc_categories = NeurosurgeryAndBehaviorList2023.ProcedureCategory
@@ -601,7 +619,7 @@ class SharePointResponseHandler:
                 )
             # TODO: map based on specific procedure types
 
-    def map_2019_response(self, list_items: ListItemCollection):
+    def _map_2019_response(self, list_items: ListItemCollection):
         """Maps sharepoint response when 2019 version"""
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
         str_helpers = NeurosurgeryAndBehaviorList2019.StringParserHelper
