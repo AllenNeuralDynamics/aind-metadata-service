@@ -507,8 +507,10 @@ class SharePointClient:
 
         """
         # TODO: Add try to handle internal server error response.
-        sprh = SharePointResponseHandler()
-        response_bool = False
+        all_head_frames = []
+        all_craniotomies = []
+        all_fiber_implants = []
+        all_injections = []
         for version in ListVersions:
             filter_string = self._get_filter_string(version, subject_id)
             ctx = self.client_context
@@ -520,53 +522,34 @@ class SharePointClient:
             list_items = list_view.get_items().filter(filter_string)
             ctx.load(list_items)
             ctx.execute_query()
-            response_bool = sprh.map_response(list_items, version, response_bool)
-        response = sprh.handle_response_from_sharepoint(
-            response_bool, subject_id=subject_id
+            if list_items:
+                head_frames, craniotomies, fiber_implants, injections = self._map_response(version, list_items)
+                all_head_frames.extend(head_frames)
+                all_craniotomies.extend(craniotomies)
+                all_fiber_implants.extend(fiber_implants)
+                all_injections.extend(injections)
+        response = self._handle_response_from_sharepoint(
+            subject_id=subject_id,
+            head_frames=all_head_frames, craniotomies=all_craniotomies,
+            fiber_implants=all_fiber_implants, injections=all_injections
         )
         return response
 
+    def _map_response(self, version, list_items: ListItemCollection,):
+        if version == ListVersions.VERSION_2023:
+            head_frames, craniotomies, fiber_implants, injections = self._map_2023_response(list_items)
+        else:
+            head_frames, craniotomies, fiber_implants, injections = self._map_2019_response(list_items)
+        return head_frames, craniotomies, fiber_implants, injections
 
-class SharePointResponseHandler:
-    def __init__(self):
-        self.head_frames = []
-        self.craniotomies = []
-        self.injections = []
-        self.fiber_implants = []
-
-    def map_response(self, list_items, version, response_bool):
-        """
-        Maps the response from SharePoint based on version
-        Parameters
-        ----------
-        list_items : ListItemCollection
-            SharePoint returns a ListItemCollection given a query.
-        version
-            Sharepoint list version.
-        response_bool : bool
-            Tracks whether procedure info was found in at least one Sharepoint db.
-        Returns
-        -------
-        Boolean
-        """
-        if list_items:
-            response_bool = True
-            if version == ListVersions.VERSION_2023:
-                self._map_2023_response(list_items)
-            elif version == ListVersions.VERSION_2019:
-                self._map_2019_response(list_items)
-        return response_bool
-
-    def handle_response_from_sharepoint(  # noqa: C901
-        self, response_bool, subject_id: str
+    @staticmethod
+    def _handle_response_from_sharepoint(  # noqa: C901
+        subject_id: str, head_frames=None, craniotomies=None, fiber_implants=None, injections=None
     ) -> JSONResponse:
         """
         Maps the response from SharePoint into a Procedures model
         Parameters
         ----------
-        response_bool : bool
-            Tracks whether procedure info was found in at least one SWR list.
-            Otherwise, maps to no data found response.
         subject_id : str
           ID of the subject being queried for.
 
@@ -576,17 +559,16 @@ class SharePointResponseHandler:
           Either a Procedures model or an error response
 
         """
-        if response_bool:
+        if head_frames or injections or fiber_implants or craniotomies:
             procedures = Procedures.construct(subject_id=subject_id)
-            # before this was in loop for each list_item, is there a specific reason why?
-            if self.head_frames:
-                procedures.headframes = self.head_frames
-            if self.injections:
-                procedures.injections = self.injections
-            if self.fiber_implants:
-                procedures.fiber_implants = self.fiber_implants
-            if self.craniotomies:
-                procedures.craniotomies = self.craniotomies
+            if head_frames:
+                procedures.headframes = head_frames
+            if injections:
+                procedures.injections = injections
+            if fiber_implants:
+                procedures.fiber_implants = fiber_implants
+            if craniotomies:
+                procedures.craniotomies = craniotomies
             response = Responses.model_response(procedures)
         else:
             response = Responses.no_data_found_response()
@@ -596,34 +578,43 @@ class SharePointResponseHandler:
         """Maps sharepoint response when 2023 version"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         nsb_proc_categories = NeurosurgeryAndBehaviorList2023.ProcedureCategory
+        head_frames = []
+        craniotomies = []
+        fiber_implants = []
+        injections = []
         for list_item in list_items:
             if list_item.get_property(list_fields.PROCEDURE_FAMILY.value):
                 procedure_category = list_item.get_property(list_fields.PROCEDURE_FAMILY.value)
             else:
                 procedure_category = None
             if procedure_category == nsb_proc_categories.HEADPOST_ONLY.value:
-                self.head_frames.append(
+                head_frames.append(
                     self._map_list_item_to_head_frame_2023(list_item)
                 )
             if procedure_category == nsb_proc_categories.CRANIAL_WINDOW.value:
-                self.craniotomies.append(
+                craniotomies.append(
                     self._map_list_item_to_craniotomy_2023(list_item)
                 )
             if procedure_category == nsb_proc_categories.INJECTION.value:
-                self.injections.append(
+                injections.append(
                     self._map_list_item_to_injection_2023(list_item)
                 )
             if procedure_category == nsb_proc_categories.FIBER_OPTIC_IMPLANT.value:
-                self.fiber_implants.append(
+                fiber_implants.append(
                     self._map_list_item_to_fiber_implant_2023(list_item)
                 )
             # TODO: map based on specific procedure types
+        return head_frames, craniotomies, fiber_implants, injections
 
     def _map_2019_response(self, list_items: ListItemCollection):
         """Maps sharepoint response when 2019 version"""
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
         str_helpers = NeurosurgeryAndBehaviorList2019.StringParserHelper
         nsb_proc_types = NeurosurgeryAndBehaviorList2019.ProcedureType
+        head_frames = []
+        craniotomies = []
+        fiber_implants = []
+        injections = []
         for list_item in list_items:
             if list_item.get_property(list_fields.PROCEDURE.value):
                 procedure_types = list_item.get_property(
@@ -633,7 +624,7 @@ class SharePointResponseHandler:
                 procedure_types = []
             for procedure_type in procedure_types:
                 if procedure_type == nsb_proc_types.HEAD_PLANT.value:
-                    self.head_frames.append(
+                    head_frames.append(
                         self._map_list_item_to_head_frame(list_item)
                     )
                 if procedure_type in {
@@ -641,14 +632,14 @@ class SharePointResponseHandler:
                     nsb_proc_types.INJECTION.value,
                     nsb_proc_types.INJ.value,
                 }:
-                    self.injections.append(
+                    injections.append(
                         self._map_list_item_to_injection(list_item)
                     )
                 if (
                         procedure_type
                         == nsb_proc_types.OPTIC_FIBER_IMPLANT.value
                 ):
-                    self.fiber_implants.append(
+                    fiber_implants.append(
                         self._map_list_item_to_fiber_implant(list_item)
                     )
                 if procedure_type in {
@@ -657,9 +648,10 @@ class SharePointResponseHandler:
                     nsb_proc_types.C_CAM.value,
                     nsb_proc_types.C.value,
                 }:
-                    self.craniotomies.append(
+                    craniotomies.append(
                         self._map_list_item_to_craniotomy(list_item)
                     )
+        return head_frames, craniotomies, fiber_implants, injections
 
     @staticmethod
     def _map_injection_anaesthesia(
