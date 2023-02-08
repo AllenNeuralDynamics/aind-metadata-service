@@ -1,10 +1,10 @@
 """Module to test SharePoint Client methods"""
 
+import datetime
 import json
 import os
 import unittest
 from pathlib import Path
-import datetime
 
 from aind_data_schema.procedures import (
     Anaesthetic,
@@ -12,11 +12,11 @@ from aind_data_schema.procedures import (
     CraniotomyType,
     FiberImplant,
     Headframe,
-    Side,
     IontophoresisInjection,
     NanojectInjection,
     OphysProbe,
     Procedures,
+    Side,
 )
 from office365.sharepoint.client_context import ClientContext
 from office365.sharepoint.listitems.collection import ListItemCollection
@@ -233,7 +233,7 @@ class Examples:
             headframe_part_number=None,
             well_part_number=None,
             well_type=None,
-        )
+        ),
     ]
 
     expected_injections1 = [
@@ -305,7 +305,6 @@ class Examples:
             injection_current=5.0,
             alternating_current="7/7",
         ),
-
     ]
 
     expected_craniotomies1 = [
@@ -393,7 +392,7 @@ class Examples:
             dura_removed=False,
             workstation_id="SWS 3",
             notes=None,
-        )
+        ),
     ]
 
     expected_fiber_implants1 = [
@@ -532,7 +531,8 @@ class TestSharepointClient(unittest.TestCase):
         list_item_collection_2019.add_child(list_item12)
 
         h1, c1, f1, i1 = self.client._map_response(
-            version=version_2019, list_items=list_item_collection_2019,
+            version=version_2019,
+            list_items=list_item_collection_2019,
         )
 
         list_item_collection_2023 = ListItemCollection(context=blank_ctx)
@@ -558,7 +558,8 @@ class TestSharepointClient(unittest.TestCase):
         list_item_collection_2023.add_child(list_item13)
 
         h2, c2, f2, i2 = self.client._map_response(
-            version=version_2023, list_items=list_item_collection_2023,
+            version=version_2023,
+            list_items=list_item_collection_2023,
         )
 
         self.assertEqual(Examples.expected_headframes1, h1)
@@ -577,8 +578,11 @@ class TestSharepointClient(unittest.TestCase):
         empty_response = Responses.no_data_found_response()
         msg1 = self.client._handle_response_from_sharepoint(
             subject_id,
-            Examples.expected_headframes1, Examples.expected_craniotomies1,
-            Examples.expected_fiber_implants1, Examples.expected_injections1)
+            Examples.expected_headframes1,
+            Examples.expected_craniotomies1,
+            Examples.expected_fiber_implants1,
+            Examples.expected_injections1,
+        )
         expected_msg1 = Responses.model_response(Examples.expected_procedures1)
 
         self.assertEqual(empty_response.status_code, empty_msg.status_code)
@@ -602,4 +606,3 @@ class TestSharepointClient(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

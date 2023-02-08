@@ -15,7 +15,6 @@ from aind_data_schema.procedures import (
     ProbeName,
     Procedures,
 )
-
 from dateutil import parser
 from fastapi.responses import JSONResponse
 from office365.runtime.auth.client_credential import ClientCredential
@@ -23,6 +22,7 @@ from office365.runtime.client_object import ClientObject
 from office365.sharepoint.client_context import ClientContext
 from office365.sharepoint.listitems.collection import ListItemCollection
 
+from aind_metadata_service.response_handler import Responses
 from aind_metadata_service.sharepoint.utils import (
     convert_str_to_bool,
     convert_str_to_time,
@@ -30,8 +30,6 @@ from aind_metadata_service.sharepoint.utils import (
     map_hemisphere,
     parse_str_into_float,
 )
-
-from aind_metadata_service.response_handler import Responses
 
 
 class NeurosurgeryAndBehaviorList2023:
@@ -54,6 +52,7 @@ class NeurosurgeryAndBehaviorList2023:
 
     class ProcedureType(Enum):
         """Enum class for 2023 SharePoint's Specific Procedure Type"""
+
         INJECTION = "Injection"
         INJ = "INJ"
         WITH_HEADPOST = "with Headpost"
@@ -459,7 +458,7 @@ class SharePointClient:
         Parameters
         ----------
         version : ListVersions
-          Which version of the backend is being queried
+          Version of the SharePoint List being queried against
         subject_id : str
           ID of the subject being queried for
 
@@ -522,28 +521,68 @@ class SharePointClient:
             list_items = list_view.get_items().filter(filter_string)
             ctx.load(list_items)
             ctx.execute_query()
-            head_frames, craniotomies, fiber_implants, injections = self._map_response(version, list_items)
+            (
+                head_frames,
+                craniotomies,
+                fiber_implants,
+                injections,
+            ) = self._map_response(version, list_items)
             all_head_frames.extend(head_frames)
             all_craniotomies.extend(craniotomies)
             all_fiber_implants.extend(fiber_implants)
             all_injections.extend(injections)
         response = self._handle_response_from_sharepoint(
             subject_id=subject_id,
-            head_frames=all_head_frames, craniotomies=all_craniotomies,
-            fiber_implants=all_fiber_implants, injections=all_injections
+            head_frames=all_head_frames,
+            craniotomies=all_craniotomies,
+            fiber_implants=all_fiber_implants,
+            injections=all_injections,
         )
         return response
 
     def _map_response(self, version, list_items: ListItemCollection):
+        """
+        Maps sharepoint response to lists of procedures
+        Parameters
+        ----------
+        version : ListVersions
+            Version of the SharePoint List being queried against
+        list_items : ListItemCollection
+            SharePoint returns a ListItemCollection given a query
+        Returns
+        -------
+        head_frames : list
+            Empty list or list of Headframe models
+        craniotomies : list
+            Empty list or list of Craniotomy models
+        fiber_implants : list
+            Empty list or list of FiberImplant models
+        injections : list
+            Empty list or list of BrainInjection models
+        """
         if version == ListVersions.VERSION_2023:
-            head_frames, craniotomies, fiber_implants, injections = self._map_2023_response(list_items)
+            (
+                head_frames,
+                craniotomies,
+                fiber_implants,
+                injections,
+            ) = self._map_2023_response(list_items)
         else:
-            head_frames, craniotomies, fiber_implants, injections = self._map_2019_response(list_items)
+            (
+                head_frames,
+                craniotomies,
+                fiber_implants,
+                injections,
+            ) = self._map_2019_response(list_items)
         return head_frames, craniotomies, fiber_implants, injections
 
     @staticmethod
     def _handle_response_from_sharepoint(  # noqa: C901
-        subject_id: str, head_frames=None, craniotomies=None, fiber_implants=None, injections=None
+        subject_id: str,
+        head_frames=None,
+        craniotomies=None,
+        fiber_implants=None,
+        injections=None,
     ) -> JSONResponse:
         """
         Maps the response from SharePoint into a Procedures model
@@ -583,7 +622,9 @@ class SharePointClient:
         injections = []
         for list_item in list_items:
             if list_item.get_property(list_fields.PROCEDURE_FAMILY.value):
-                procedure_category = list_item.get_property(list_fields.PROCEDURE_FAMILY.value)
+                procedure_category = list_item.get_property(
+                    list_fields.PROCEDURE_FAMILY.value
+                )
             else:
                 procedure_category = None
             if procedure_category == nsb_proc_categories.HEADPOST_ONLY.value:
@@ -598,7 +639,10 @@ class SharePointClient:
                 injections.append(
                     self._map_list_item_to_injection_2023(list_item)
                 )
-            if procedure_category == nsb_proc_categories.FIBER_OPTIC_IMPLANT.value:
+            if (
+                procedure_category
+                == nsb_proc_categories.FIBER_OPTIC_IMPLANT.value
+            ):
                 fiber_implants.append(
                     self._map_list_item_to_fiber_implant_2023(list_item)
                 )
@@ -634,10 +678,7 @@ class SharePointClient:
                     injections.append(
                         self._map_list_item_to_injection(list_item)
                     )
-                if (
-                        procedure_type
-                        == nsb_proc_types.OPTIC_FIBER_IMPLANT.value
-                ):
+                if procedure_type == nsb_proc_types.OPTIC_FIBER_IMPLANT.value:
                     fiber_implants.append(
                         self._map_list_item_to_fiber_implant(list_item)
                     )
@@ -654,7 +695,7 @@ class SharePointClient:
 
     @staticmethod
     def _map_injection_anaesthesia(
-            list_item, list_fields
+        list_item, list_fields
     ) -> Optional[Anaesthetic]:
         """Maps anaesthesic type, duration, level for Injection"""
         anaesthetic_type = "isoflurane"
@@ -718,8 +759,8 @@ class SharePointClient:
             list_item.get_property(list_fields.INJ1ANGLE0.value)
         )
         if (
-                injection_type
-                == NeurosurgeryAndBehaviorList2019.InjectionType.IONTO.value
+            injection_type
+            == NeurosurgeryAndBehaviorList2019.InjectionType.IONTO.value
         ):
             instrument_id = list_item.get_property(
                 list_fields.IONTO_NUMBER_INJ1.value
@@ -839,8 +880,8 @@ class SharePointClient:
         return ophys_probes
 
     def _map_list_item_to_fiber_implant(
-            self,
-            list_item: ClientObject,
+        self,
+        list_item: ClientObject,
     ) -> FiberImplant:
         """Maps a SharePoint ListItem to a FiberImplant model"""
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
@@ -903,7 +944,7 @@ class SharePointClient:
         return None
 
     def _map_list_item_to_craniotomy(
-            self, list_item: ClientObject
+        self, list_item: ClientObject
     ) -> Craniotomy:
         """Maps a SharePoint ListItem to a Craniotomy model"""
         # TODO: missing fields (implant_part_number, protective_material)
@@ -969,48 +1010,48 @@ class SharePointClient:
     def _map_headpost_type(headpost_type: str):
         """Maps Sharepoint HeadPostType to fields in HeadFrame model"""
         if (
-                headpost_type
-                == NeurosurgeryAndBehaviorList2019.HeadPostType.CAM.value
+            headpost_type
+            == NeurosurgeryAndBehaviorList2019.HeadPostType.CAM.value
         ):
             headframe_type = "CAM-style"
             headframe_part_number = "0160-100-10 Rev A"
             well_type = "CAM-style"
             well_part_number = None
         elif (
-                headpost_type
-                == NeurosurgeryAndBehaviorList2019.HeadPostType.NEUROPIXEL.value
+            headpost_type
+            == NeurosurgeryAndBehaviorList2019.HeadPostType.NEUROPIXEL.value
         ):
             headframe_type = "Neuropixel-style"
             headframe_part_number = "0160-100-10"
             well_type = "Neuropixel-style"
             well_part_number = "0160-200-36"
         elif (
-                headpost_type
-                == NeurosurgeryAndBehaviorList2019.HeadPostType.MESO_NGC.value
+            headpost_type
+            == NeurosurgeryAndBehaviorList2019.HeadPostType.MESO_NGC.value
         ):
             headframe_type = "NGC-style"
             headframe_part_number = "0160-100-10"
             well_type = "Mesoscope-style"
             well_part_number = "0160-200-20"
         elif (
-                headpost_type
-                == NeurosurgeryAndBehaviorList2019.HeadPostType.WHC_NP.value
+            headpost_type
+            == NeurosurgeryAndBehaviorList2019.HeadPostType.WHC_NP.value
         ):
             headframe_type = "WHC #42"
             headframe_part_number = "42"
             well_type = "Neuropixel-style"
             well_part_number = "0160-200-36"
         elif (
-                headpost_type
-                == NeurosurgeryAndBehaviorList2019.HeadPostType.NGC.value
+            headpost_type
+            == NeurosurgeryAndBehaviorList2019.HeadPostType.NGC.value
         ):
             headframe_type = "NGC-style"
             headframe_part_number = "0160-100-10"
             well_type = None
             well_part_number = None
         elif (
-                headpost_type
-                == NeurosurgeryAndBehaviorList2019.HeadPostType.AI_HEADBAR.value
+            headpost_type
+            == NeurosurgeryAndBehaviorList2019.HeadPostType.AI_HEADBAR.value
         ):
             headframe_type = "AI Straight Headbar"
             headframe_part_number = None
@@ -1026,7 +1067,7 @@ class SharePointClient:
         )
 
     def _map_list_item_to_head_frame(
-            self, list_item: ClientObject
+        self, list_item: ClientObject
     ) -> Headframe:
         """Maps a SharePoint ListItem to a HeadFrame model"""
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
@@ -1089,7 +1130,7 @@ class SharePointClient:
 
     @staticmethod
     def _map_list_item_to_fiber_implant_2023(
-            list_item: ClientObject,
+        list_item: ClientObject,
     ) -> FiberImplant:
         """Maps a SharePoint ListItem to a FiberImplant model"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
@@ -1109,7 +1150,7 @@ class SharePointClient:
 
     @staticmethod
     def _map_list_item_to_craniotomy_2023(
-            list_item: ClientObject
+        list_item: ClientObject,
     ) -> Craniotomy:
         """Maps a SharePoint ListItem to a Craniotomy model"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
@@ -1129,7 +1170,7 @@ class SharePointClient:
 
     @staticmethod
     def _map_list_item_to_head_frame_2023(
-            list_item: ClientObject
+        list_item: ClientObject,
     ) -> Headframe:
         """Maps a SharePoint ListItem to a HeadFrame model"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
