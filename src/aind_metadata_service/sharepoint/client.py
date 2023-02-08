@@ -511,9 +511,9 @@ class SharePointClient:
         all_craniotomies = []
         all_fiber_implants = []
         all_injections = []
+        ctx = self.client_context
         for version in ListVersions:
             filter_string = self._get_filter_string(version, subject_id)
-            ctx = self.client_context
             list_view = ctx.web.lists.get_by_title(
                 version.value["list_title"]
             ).views.get_by_title(version.value["view_title"])
@@ -522,12 +522,11 @@ class SharePointClient:
             list_items = list_view.get_items().filter(filter_string)
             ctx.load(list_items)
             ctx.execute_query()
-            if list_items:
-                head_frames, craniotomies, fiber_implants, injections = self._map_response(version, list_items)
-                all_head_frames.extend(head_frames)
-                all_craniotomies.extend(craniotomies)
-                all_fiber_implants.extend(fiber_implants)
-                all_injections.extend(injections)
+            head_frames, craniotomies, fiber_implants, injections = self._map_response(version, list_items)
+            all_head_frames.extend(head_frames)
+            all_craniotomies.extend(craniotomies)
+            all_fiber_implants.extend(fiber_implants)
+            all_injections.extend(injections)
         response = self._handle_response_from_sharepoint(
             subject_id=subject_id,
             head_frames=all_head_frames, craniotomies=all_craniotomies,
