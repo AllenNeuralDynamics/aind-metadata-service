@@ -535,7 +535,7 @@ class SharePointClient:
         )
         return response
 
-    def _map_response(self, version, list_items: ListItemCollection,):
+    def _map_response(self, version, list_items: ListItemCollection):
         if version == ListVersions.VERSION_2023:
             head_frames, craniotomies, fiber_implants, injections = self._map_2023_response(list_items)
         else:
