@@ -1,7 +1,7 @@
 """Module to create client to connect to sharepoint database"""
 
 from enum import Enum
-from typing import Optional
+from typing import Optional, Tuple
 
 from aind_data_schema.procedures import (
     Anaesthetic,
@@ -468,7 +468,6 @@ class SharePointClient:
           A string to pass into a query filter
 
         """
-        default = ""
         version_2019 = (
             f"substringof("
             f"'{subject_id}', "
@@ -481,10 +480,9 @@ class SharePointClient:
             f"{NeurosurgeryAndBehaviorList2023.ListField.LAB_TRACKS_ID.value}"
             f")"
         )
-        filter_string = default
         if version == ListVersions.VERSION_2019:
             filter_string = version_2019
-        elif version == ListVersions.VERSION_2023:
+        else:
             filter_string = version_2023
         return filter_string
 
@@ -540,7 +538,9 @@ class SharePointClient:
         )
         return response
 
-    def _map_response(self, version, list_items: ListItemCollection):
+    def _map_response(
+        self, version, list_items: ListItemCollection
+    ) -> Tuple[list, list, list, list]:
         """
         Maps sharepoint response to lists of procedures
         Parameters
@@ -577,7 +577,7 @@ class SharePointClient:
         return head_frames, craniotomies, fiber_implants, injections
 
     @staticmethod
-    def _handle_response_from_sharepoint(  # noqa: C901
+    def _handle_response_from_sharepoint(
         subject_id: str,
         head_frames=None,
         craniotomies=None,
@@ -612,7 +612,9 @@ class SharePointClient:
             response = Responses.no_data_found_response()
         return response
 
-    def _map_2023_response(self, list_items: ListItemCollection):
+    def _map_2023_response(
+        self, list_items: ListItemCollection
+    ) -> Tuple[list, list, list, list]:
         """Maps sharepoint response when 2023 version"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         nsb_proc_categories = NeurosurgeryAndBehaviorList2023.ProcedureCategory
@@ -649,7 +651,9 @@ class SharePointClient:
             # TODO: map based on specific procedure types
         return head_frames, craniotomies, fiber_implants, injections
 
-    def _map_2019_response(self, list_items: ListItemCollection):
+    def _map_2019_response(
+        self, list_items: ListItemCollection
+    ) -> Tuple[list, list, list, list]:
         """Maps sharepoint response when 2019 version"""
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
         str_helpers = NeurosurgeryAndBehaviorList2019.StringParserHelper
