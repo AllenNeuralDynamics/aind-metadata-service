@@ -1,7 +1,7 @@
 """Module to create client to connect to sharepoint database"""
 
 from enum import Enum
-from typing import Optional
+from typing import Optional, Tuple
 
 from aind_data_schema.procedures import (
     Anaesthetic,
@@ -30,6 +30,179 @@ from aind_metadata_service.sharepoint.utils import (
     map_hemisphere,
     parse_str_into_float,
 )
+
+
+class NeurosurgeryAndBehaviorList2023:
+    """Class to contain helpful info to parse the 2023 SharePoint List"""
+
+    class StringParserHelper(Enum):
+        """Enum class for SharePoint's response strings"""
+
+        # Not really why, but some response fields return 'Select...'
+        SELECT_STR = "Select..."
+        PROCEDURE_TYPE_SPLITTER = "+"
+
+    class ProcedureCategory(Enum):
+        """Enum class for 2023 SharePoint's Procedure Category"""
+
+        HEADPOST_ONLY = "Headpost Only"
+        INJECTION = "Injection"
+        FIBER_OPTIC_IMPLANT = "Fiber Optic Implant"
+        CRANIAL_WINDOW = "Cranial Window"
+
+    class ProcedureType(Enum):
+        """Enum class for 2023 SharePoint's Specific Procedure Type"""
+
+        INJECTION = "Injection"
+        INJ = "INJ"
+        WITH_HEADPOST = "with Headpost"
+        FIBER_OPTIC_IMPLANT = "Fiber Optic Implant"
+        CTX = "Ctx"
+        WHC_NP = "WHC NP"
+
+    class ListField(Enum):
+        """Enum class for fields in List Item object response"""
+
+        FILE_SYSTEM_OBJECT_TYPE = "FileSystemObjectType"
+        ID = "Id"
+        SERVER_REDIRECTED_EMBED_URI = "ServerRedirectedEmbedUri"
+        SERVER_REDIRECTED_EMBED_URL = "ServerRedirectedEmbedUrl"
+        TITLE = "Title"
+        PI_ID = "PIId"
+        PI_STRING_ID = "PIStringId"
+        LAB_TRACKS_REQUESTOR = "LabTracks_x0020_Requestor"
+        PROJECT_ID_TE = "Project_x0020_ID_x0020__x0028_te"
+        IACUC_PROTOCOL = "IACUC_x0020_Protocol_x0020__x002"
+        DATE_RANGE_START = "DateRangeStart"
+        LIGHT_CYCLE = "Light_x0020_Cycle"
+        LIMS_REQUIRED = "LIMs_x0020_Required"
+        LIMS_PROJECT_CODE = "Lims_x0020_Project_x0020_Code"
+        LIM_STASKFLOW1 = "LIMStaskflow1"
+        TEST_ID = "Test1Id"
+        TEST_STRING_ID = "Test1StringId"
+        DATE_OF_SURGERY = "Date_x0020_of_x0020_Surgery"
+        HP_WORK_STATION = "HpWorkStation"
+        TEST_1ST_ROUND_ID = "TEST_x0020_1st_x0020_Round_x0020Id"
+        TEST_1ST_ROUND_STRING_ID = "TEST_x0020_1st_x0020_Round_x0020StringId"
+        DATE1ST_INJECTION = "Date1stInjection"
+        WORK_STATION1ST_INJECTION = "WorkStation1stInjection"
+        LAB_TRACKS_GROUP = "LabTracks_x0020_Group"
+        LAB_TRACKS_ID = "LabTracks_x0020_ID1"
+        PEDIGREE_NAME = "PedigreeName"
+        SEX = "Sex"
+        DATE_OF_BIRTH = "Date_x0020_of_x0020_Birth"
+        WEIGHT_BEFORE_SURGER = "Weight_x0020_before_x0020_Surger"
+        WEIGHT_AFTER_SURGERY = "Weight_x0020_after_x0020_Surgery"
+        ISO_ON = "Iso_x0020_On"
+        HP_ISO_LEVEL = "HPIsoLevel"
+        HP_RECOVERY = "HPRecovery"
+        FIRST_INJECTION_WEIGHT_BEFOR = "FirstInjectionWeightBefor"
+        FIRST_INJECTION_WEIGHT_AFTER = "FirstInjectionWeightAfter"
+        FIRST_INJECTION_ISO_DURATION = "FirstInjectionIsoDuration"
+        ROUND1_INJ_ISOLEVEL = "Round1InjIsolevel"
+        FIRST_INJ_RECOVERY = "FirstInjRecovery"
+        BREG2_LAMB = "Breg2Lamb"
+        SURGERY_STATUS = "SurgeryStatus"
+        LONG_REQUESTOR_COMMENTS = "LongRequestorComments"
+        PROCEDURE_SLOTS = "Procedure_x0020_Slots"
+        PROCEDURE_FAMILY = "Procedure_x0020_Family"
+        PROCEDURE_T2 = "Procedure_x0020_T2"
+        PROCEDURE = "Procedure"
+        HEADPOST = "Headpost"
+        HEADPOST_TYPE = "HeadpostType"
+        CRANIOTOMY_TYPE = "CraniotomyType"
+        IMPLANT_ID_COVERSLIP_TYPE = "ImplantIDCoverslipType"
+        BURR_HOLE_1 = "Burr_x0020_hole_x0020_1"
+        INJ1_VIRUS_STRAIN_RT = "Inj1VirusStrain_rt"
+        BURR1_VIRUS_BIOSAFTE = "Burr1_x0020_Virus_x0020_Biosafte"
+        INJ1_STORAGE_LOCATION = "Inj1StorageLocation"
+        INJ1_TYPE = "Inj1Type"
+        VIRUS_HEMISPHERE = "Virus_x0020_Hemisphere"
+        INJ1_ANGLE_V2 = "Inj1Angle_v2"
+        INJ1VOLPERDEPTH = "inj1volperdepth"
+        INJ1_CURRENT = "Inj1Current"
+        INJ1_ALTERNATING_TIME = "Inj1AlternatingTime"
+        RET_SETTING0 = "retSetting0"
+        INJ1_IONTO_TIME = "Inj1IontoTime"
+        VIRUS_M_L = "Virus_x0020_M_x002f_L"
+        VIRUS_A_P = "Virus_x0020_A_x002f_P"
+        VIRUS_D_V = "Virus_x0020_D_x002f_V"
+        FIBER_IMPLANT1_LENGT = "Fiber_x0020_Implant1_x0020_Lengt"
+        FIBER_IMPLANT1_DV = "FiberImplant1DV"
+        BURR_HOLE_2 = "Burr_x0020_hole_x0020_2"
+        INJ2_VIRUS_STRAIN_RT = "Inj2VirusStrain_rt"
+        BURR2_VIRUS_BIOSAFTE = "Burr2_x0020_Virus_x0020_Biosafte"
+        INJ2_STORAGE_LOCATION = "Inj2StorageLocation"
+        INJ2_TYPE = "Inj2Type"
+        HEMISPHERE2ND_INJ = "Hemisphere2ndInj"
+        INJ2_ANGLE_V2 = "Inj2Angle_v2"
+        INJ2VOLPERDEPTH = "inj2volperdepth"
+        INJ2_CURRENT = "Inj2Current"
+        INJ2_ALTERNATING_TIME = "Inj2AlternatingTime"
+        RET_SETTING1 = "retSetting1"
+        INJ2_IONTO_TIME = "Inj2IontoTime"
+        ML2ND_INJ = "ML2ndInj"
+        AP2ND_INJ = "AP2ndInj"
+        DV2ND_INJ = "DV2ndInj"
+        FIBER_IMPLANT2_LENGT = "Fiber_x0020_Implant2_x0020_Lengt"
+        FIBER_IMPLANT2_DV = "FiberImplant2DV"
+        BURR_HOLE_3 = "Burr_x0020_hole_x0020_3"
+        INJ_VIRUS_STRAIN_RT = "InjVirusStrain_rt"
+        BURR3_VIRUS_BIOSAFTE = "Burr3_x0020_Virus_x0020_Biosafet"
+        INJ3_STORAGE_LOCATION = "Inj3StorageLocation"
+        INJ3_TYPE = "Inj3Type"
+        BURR3_HEMISPHERE = "Burr_x0020_3_x0020_Hemisphere"
+        BURR3_ANGLE = "Burr_x0020_3_x0020_Angle"
+        BURR3_AP = "Burr3_x0020_A_x002f_P"
+        BURR3_ML = "Burr3_x0020_M_x002f_L"
+        BURR3_DV = "Burr3_x0020_D_x002f_V"
+        INJ3VOLPERDEPTH = "inj3volperdepth"
+        INJ3_CURRENT = "Inj3Current"
+        INJ3_ALTERNATING_TIME = "Inj3AlternatingTime"
+        INJ3_RET_SETTING = "Inj3retSetting"
+        INJ3_IONTO_TIME = "Inj3IontoTime"
+        FIBER_IMPLANT3_LENGT = "Fiber_x0020_Implant3_x0020_Lengt"
+        FIBER_IMPLANT3_D = "Fiber_x0020_Implant3_x0020_D_x00"
+        BURR_HOLE_4 = "Burr_x0020_hole_x0020_4"
+        INJ4_VIRUS_STRAIN_RT = "Inj4VirusStrain_rt"
+        BURR4_VIRUS_BIOSAFTE = "Burr4_x0020_Virus_x0020_Biosafte"
+        INJ4_STORAGE_LOCATION = "Inj4StorageLocation"
+        INJ4_TYPE = "Inj4Type"
+        BURR4_HEMISPHERE = "Burr_x0020_4_x0020_Hemisphere"
+        BURR4_ANGLE = "Burr_x0020_4_x0020_Angle"
+        INJ4VOLPERDEPTH = "Inj4volperdepth"
+        INJ4_CURRENT = "Inj4Current"
+        INJ4_ALTERNATING_TIME = "Inj4AlternatingTime"
+        INJ4_RET_SETTING = "Inj4retSetting"
+        INJ4_IONTO_TIME = "Inj4IontoTime"
+        BURR4_AP = "Burr4_x0020_A_x002f_P"
+        BURR4_ML = "Burr4_x0020_M_x002f_L"
+        BURR4_DV = "Burr4_x0020_D_x002f_V"
+        FIBER_IMPLANT4_LENGT = "Fiber_x0020_Implant4_x0020_Lengt"
+        FIBER_IMPLANT4_D = "Fiber_x0020_Implant4_x0020_D_x00"
+        COM_DUROTOMY = "ComDurotomy"
+        COM_SWELLING = "ComSwelling"
+        COM_SINUSBLEED = "ComSinusbleed"
+        COM_DAMAGE = "ComDamage"
+        COM_WINDOW = "ComWindow"
+        COM_COPLANAR = "ComCoplanar"
+        CONTUSION = "Contusion"
+        IONTO_NUMBER_INJ1 = "IontoNumberInj1"
+        NANOJECT_NUMBER_INJ10 = "NanojectNumberInj10"
+        IONTO_NUMBER_INJ2 = "IontoNumberInj2"
+        NANOJECT_NUMBER_INJ2 = "NanojectNumberInj2"
+        HP_SURGEON_COMMENTS = "HPSurgeonComments"
+        AGE_AT_INJECTION = "Age_x0020_at_x0020_Injection"
+        CONTENT_TYPE_ID = "ContentTypeId"
+        COMPLIANCE_ASSET_ID = "ComplianceAssetId"
+        CREATED = "Created"
+        ID2 = "ID"
+        MODIFIED = "Modified"
+        AUTHOR_ID = "AuthorId"
+        EDITOR_ID = "EditorId"
+        ODATA_UI_VERSION_STRING = "OData__UIVersionString"
+        ATTACHMENTS = "Attachments"
+        GUID = "GUID"
 
 
 class NeurosurgeryAndBehaviorList2019:
@@ -243,11 +416,14 @@ class NeurosurgeryAndBehaviorList2019:
 class ListVersions(Enum):
     """Enum class to handle different SharePoint list versions."""
 
+    VERSION_2023 = {
+        "list_title": "SWR 2023-Present",
+        "view_title": "New Request",
+    }
     VERSION_2019 = {
         "list_title": "SWR 2019-Present",
         "view_title": "New Request",
     }
-    DEFAULT = {"list_title": "SWR 2019-Present", "view_title": "New Request"}
 
 
 class SharePointClient:
@@ -282,7 +458,7 @@ class SharePointClient:
         Parameters
         ----------
         version : ListVersions
-          Which version of the backend is being queried
+          Version of the SharePoint List being queried against
         subject_id : str
           ID of the subject being queried for
 
@@ -292,28 +468,27 @@ class SharePointClient:
           A string to pass into a query filter
 
         """
-        default = (
-            f"substringof("
-            f"'{subject_id}', "
-            f"{NeurosurgeryAndBehaviorList2019.ListField.LAB_TRACKS_ID.value}"
-            f")"
-        )
         version_2019 = (
             f"substringof("
             f"'{subject_id}', "
             f"{NeurosurgeryAndBehaviorList2019.ListField.LAB_TRACKS_ID.value}"
             f")"
         )
-        # TODO: Handle other versions
-        filter_string = default
+        version_2023 = (
+            f"substringof("
+            f"'{subject_id}', "
+            f"{NeurosurgeryAndBehaviorList2023.ListField.LAB_TRACKS_ID.value}"
+            f")"
+        )
         if version == ListVersions.VERSION_2019:
             filter_string = version_2019
+        else:
+            filter_string = version_2023
         return filter_string
 
     def get_procedure_info(
         self,
         subject_id: str,
-        version: ListVersions = ListVersions.VERSION_2019,
     ) -> JSONResponse:
         """
         Primary interface. Maps a subject_id to a response.
@@ -321,8 +496,6 @@ class SharePointClient:
         ----------
         subject_id : str
           ID of the subject being queried for.
-        version : ListVersions
-          Version of the SharePoint List being queried against
 
         Returns
         -------
@@ -331,32 +504,90 @@ class SharePointClient:
 
         """
         # TODO: Add try to handle internal server error response.
-        filter_string = self._get_filter_string(version, subject_id)
+        all_head_frames = []
+        all_craniotomies = []
+        all_fiber_implants = []
+        all_injections = []
         ctx = self.client_context
-        list_view = ctx.web.lists.get_by_title(
-            version.value["list_title"]
-        ).views.get_by_title(version.value["view_title"])
-        ctx.load(list_view)
-        ctx.execute_query()
-        list_items = list_view.get_items().filter(filter_string)
-        ctx.load(list_items)
-        ctx.execute_query()
+        for version in ListVersions:
+            filter_string = self._get_filter_string(version, subject_id)
+            list_view = ctx.web.lists.get_by_title(
+                version.value["list_title"]
+            ).views.get_by_title(version.value["view_title"])
+            ctx.load(list_view)
+            ctx.execute_query()
+            list_items = list_view.get_items().filter(filter_string)
+            ctx.load(list_items)
+            ctx.execute_query()
+            (
+                head_frames,
+                craniotomies,
+                fiber_implants,
+                injections,
+            ) = self._map_response(version, list_items)
+            all_head_frames.extend(head_frames)
+            all_craniotomies.extend(craniotomies)
+            all_fiber_implants.extend(fiber_implants)
+            all_injections.extend(injections)
         response = self._handle_response_from_sharepoint(
-            list_items, subject_id=subject_id
+            subject_id=subject_id,
+            head_frames=all_head_frames,
+            craniotomies=all_craniotomies,
+            fiber_implants=all_fiber_implants,
+            injections=all_injections,
         )
-
         return response
 
-    # TODO: Refactor to make less complex?
-    def _handle_response_from_sharepoint(  # noqa: C901
-        self, list_items: ListItemCollection, subject_id: str
+    def _map_response(
+        self, version, list_items: ListItemCollection
+    ) -> Tuple[list, list, list, list]:
+        """
+        Maps sharepoint response to lists of procedures
+        Parameters
+        ----------
+        version : ListVersions
+            Version of the SharePoint List being queried against
+        list_items : ListItemCollection
+            SharePoint returns a ListItemCollection given a query
+        Returns
+        -------
+        head_frames : list
+            Empty list or list of Headframe models
+        craniotomies : list
+            Empty list or list of Craniotomy models
+        fiber_implants : list
+            Empty list or list of FiberImplant models
+        injections : list
+            Empty list or list of BrainInjection models
+        """
+        if version == ListVersions.VERSION_2023:
+            (
+                head_frames,
+                craniotomies,
+                fiber_implants,
+                injections,
+            ) = self._map_2023_response(list_items)
+        else:
+            (
+                head_frames,
+                craniotomies,
+                fiber_implants,
+                injections,
+            ) = self._map_2019_response(list_items)
+        return head_frames, craniotomies, fiber_implants, injections
+
+    @staticmethod
+    def _handle_response_from_sharepoint(
+        subject_id: str,
+        head_frames=None,
+        craniotomies=None,
+        fiber_implants=None,
+        injections=None,
     ) -> JSONResponse:
         """
         Maps the response from SharePoint into a Procedures model
         Parameters
         ----------
-        list_items : ListItemCollection
-          SharePoint returns a ListItemCollection given a query
         subject_id : str
           ID of the subject being queried for.
 
@@ -366,63 +597,105 @@ class SharePointClient:
           Either a Procedures model or an error response
 
         """
-        if list_items:
-            list_fields = NeurosurgeryAndBehaviorList2019.ListField
-            str_helpers = NeurosurgeryAndBehaviorList2019.StringParserHelper
-            nsb_proc_types = NeurosurgeryAndBehaviorList2019.ProcedureType
+        if head_frames or injections or fiber_implants or craniotomies:
             procedures = Procedures.construct(subject_id=subject_id)
-            head_frames = []
-            injections = []
-            fiber_implants = []
-            craniotomies = []
-            for list_item in list_items:
-                if list_item.get_property(list_fields.PROCEDURE.value):
-                    procedure_types = list_item.get_property(
-                        list_fields.PROCEDURE.value
-                    ).split(str_helpers.PROCEDURE_TYPE_SPLITTER.value)
-                else:
-                    procedure_types = []
-                for procedure_type in procedure_types:
-                    if procedure_type == nsb_proc_types.HEAD_PLANT.value:
-                        head_frames.append(
-                            self._map_list_item_to_head_frame(list_item)
-                        )
-                    if procedure_type in {
-                        nsb_proc_types.STEREOTAXIC_INJECTION.value,
-                        nsb_proc_types.INJECTION.value,
-                        nsb_proc_types.INJ.value,
-                    }:
-                        injections.append(
-                            self._map_list_item_to_injection(list_item)
-                        )
-                    if (
-                        procedure_type
-                        == nsb_proc_types.OPTIC_FIBER_IMPLANT.value
-                    ):
-                        fiber_implants.append(
-                            self._map_list_item_to_fiber_implant(list_item)
-                        )
-                    if procedure_type in {
-                        nsb_proc_types.WHOLE_HEMISPHERE_CRANIOTOMY_NP.value,
-                        nsb_proc_types.C_MULTISCOPE.value,
-                        nsb_proc_types.C_CAM.value,
-                        nsb_proc_types.C.value,
-                    }:
-                        craniotomies.append(
-                            self._map_list_item_to_craniotomy(list_item)
-                        )
-                if head_frames:
-                    procedures.headframes = head_frames
-                if injections:
-                    procedures.injections = injections
-                if fiber_implants:
-                    procedures.fiber_implants = fiber_implants
-                if craniotomies:
-                    procedures.craniotomies = craniotomies
+            if head_frames:
+                procedures.headframes = head_frames
+            if injections:
+                procedures.injections = injections
+            if fiber_implants:
+                procedures.fiber_implants = fiber_implants
+            if craniotomies:
+                procedures.craniotomies = craniotomies
             response = Responses.model_response(procedures)
         else:
             response = Responses.no_data_found_response()
         return response
+
+    def _map_2023_response(
+        self, list_items: ListItemCollection
+    ) -> Tuple[list, list, list, list]:
+        """Maps sharepoint response when 2023 version"""
+        list_fields = NeurosurgeryAndBehaviorList2023.ListField
+        nsb_proc_categories = NeurosurgeryAndBehaviorList2023.ProcedureCategory
+        head_frames = []
+        craniotomies = []
+        fiber_implants = []
+        injections = []
+        for list_item in list_items:
+            if list_item.get_property(list_fields.PROCEDURE_FAMILY.value):
+                procedure_category = list_item.get_property(
+                    list_fields.PROCEDURE_FAMILY.value
+                )
+            else:
+                procedure_category = None
+            if procedure_category == nsb_proc_categories.HEADPOST_ONLY.value:
+                head_frames.append(
+                    self._map_list_item_to_head_frame_2023(list_item)
+                )
+            if procedure_category == nsb_proc_categories.CRANIAL_WINDOW.value:
+                craniotomies.append(
+                    self._map_list_item_to_craniotomy_2023(list_item)
+                )
+            if procedure_category == nsb_proc_categories.INJECTION.value:
+                injections.append(
+                    self._map_list_item_to_injection_2023(list_item)
+                )
+            if (
+                procedure_category
+                == nsb_proc_categories.FIBER_OPTIC_IMPLANT.value
+            ):
+                fiber_implants.append(
+                    self._map_list_item_to_fiber_implant_2023(list_item)
+                )
+            # TODO: map based on specific procedure types
+        return head_frames, craniotomies, fiber_implants, injections
+
+    def _map_2019_response(
+        self, list_items: ListItemCollection
+    ) -> Tuple[list, list, list, list]:
+        """Maps sharepoint response when 2019 version"""
+        list_fields = NeurosurgeryAndBehaviorList2019.ListField
+        str_helpers = NeurosurgeryAndBehaviorList2019.StringParserHelper
+        nsb_proc_types = NeurosurgeryAndBehaviorList2019.ProcedureType
+        head_frames = []
+        craniotomies = []
+        fiber_implants = []
+        injections = []
+        for list_item in list_items:
+            if list_item.get_property(list_fields.PROCEDURE.value):
+                procedure_types = list_item.get_property(
+                    list_fields.PROCEDURE.value
+                ).split(str_helpers.PROCEDURE_TYPE_SPLITTER.value)
+            else:
+                procedure_types = []
+            for procedure_type in procedure_types:
+                if procedure_type == nsb_proc_types.HEAD_PLANT.value:
+                    head_frames.append(
+                        self._map_list_item_to_head_frame(list_item)
+                    )
+                if procedure_type in {
+                    nsb_proc_types.STEREOTAXIC_INJECTION.value,
+                    nsb_proc_types.INJECTION.value,
+                    nsb_proc_types.INJ.value,
+                }:
+                    injections.append(
+                        self._map_list_item_to_injection(list_item)
+                    )
+                if procedure_type == nsb_proc_types.OPTIC_FIBER_IMPLANT.value:
+                    fiber_implants.append(
+                        self._map_list_item_to_fiber_implant(list_item)
+                    )
+                if procedure_type in {
+                    nsb_proc_types.WHOLE_HEMISPHERE_CRANIOTOMY_NP.value,
+                    nsb_proc_types.C_MULTISCOPE.value,
+                    nsb_proc_types.C_CAM.value,
+                    nsb_proc_types.C.value,
+                }:
+                    craniotomies.append(
+                        self._map_list_item_to_craniotomy(list_item)
+                    )
+        return head_frames, craniotomies, fiber_implants, injections
 
     @staticmethod
     def _map_injection_anaesthesia(
@@ -737,7 +1010,8 @@ class SharePointClient:
         )
         return craniotomy
 
-    def _map_headpost_type(self, headpost_type: str):
+    @staticmethod
+    def _map_headpost_type(headpost_type: str):
         """Maps Sharepoint HeadPostType to fields in HeadFrame model"""
         if (
             headpost_type
@@ -837,5 +1111,83 @@ class SharePointClient:
             headframe_part_number=headframe_part_number,
             well_type=well_type,
             well_part_number=well_part_number,
+        )
+        return head_frame
+
+    @staticmethod
+    def _map_list_item_to_injection_2023(list_item: ClientObject):
+        """Maps a SharePoint ClientObject to an Injection model"""
+        list_fields = NeurosurgeryAndBehaviorList2023.ListField
+        start_date = parser.isoparse(
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
+        ).date()
+        end_date = start_date
+        experimenter_full_name = list_item.get_property(
+            list_fields.LAB_TRACKS_REQUESTOR.value
+        )
+        injection = IontophoresisInjection.construct(
+            start_date=start_date,
+            end_date=end_date,
+            experimenter_full_name=experimenter_full_name,
+        )
+        return injection
+
+    @staticmethod
+    def _map_list_item_to_fiber_implant_2023(
+        list_item: ClientObject,
+    ) -> FiberImplant:
+        """Maps a SharePoint ListItem to a FiberImplant model"""
+        list_fields = NeurosurgeryAndBehaviorList2023.ListField
+        start_date = parser.isoparse(
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
+        ).date()
+        end_date = start_date
+        experimenter_full_name = list_item.get_property(
+            list_fields.LAB_TRACKS_REQUESTOR.value
+        )
+        fiber_implant = FiberImplant.construct(
+            start_date=start_date,
+            end_date=end_date,
+            experimenter_full_name=experimenter_full_name,
+        )
+        return fiber_implant
+
+    @staticmethod
+    def _map_list_item_to_craniotomy_2023(
+        list_item: ClientObject,
+    ) -> Craniotomy:
+        """Maps a SharePoint ListItem to a Craniotomy model"""
+        list_fields = NeurosurgeryAndBehaviorList2023.ListField
+        start_date = parser.isoparse(
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
+        ).date()
+        end_date = start_date
+        experimenter_full_name = list_item.get_property(
+            list_fields.LAB_TRACKS_REQUESTOR.value
+        )
+        craniotomy = Craniotomy.construct(
+            start_date=start_date,
+            end_date=end_date,
+            experimenter_full_name=experimenter_full_name,
+        )
+        return craniotomy
+
+    @staticmethod
+    def _map_list_item_to_head_frame_2023(
+        list_item: ClientObject,
+    ) -> Headframe:
+        """Maps a SharePoint ListItem to a HeadFrame model"""
+        list_fields = NeurosurgeryAndBehaviorList2023.ListField
+        start_date = parser.isoparse(
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
+        ).date()
+        end_date = start_date
+        experimenter_full_name = list_item.get_property(
+            list_fields.LAB_TRACKS_REQUESTOR.value
+        )
+        head_frame = Headframe.construct(
+            start_date=start_date,
+            end_date=end_date,
+            experimenter_full_name=experimenter_full_name,
         )
         return head_frame
