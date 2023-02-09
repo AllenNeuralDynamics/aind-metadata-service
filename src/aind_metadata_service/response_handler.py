@@ -1,6 +1,6 @@
 """Module to handle responses"""
-from typing import List
 from enum import Enum
+from typing import List
 
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -9,6 +9,7 @@ from pydantic import BaseModel, validate_model
 
 class StatusCodes(Enum):
     """Enum class of status codes"""
+
     connection_error = 503
     internal_server_error = 500
     multiple_responses = 300
@@ -19,12 +20,18 @@ class StatusCodes(Enum):
 
 class Responses:
     """This class contains methods to map responses from server."""
+
     @staticmethod
     def connection_error_response() -> JSONResponse:
         """Map to a connection error"""
         response = JSONResponse(
             status_code=StatusCodes.connection_error.value,
-            content=({"message": "Error Connecting to Internal Server.", "data": None}),
+            content=(
+                {
+                    "message": "Error Connecting to Internal Server.",
+                    "data": None,
+                }
+            ),
         )
         return response
 

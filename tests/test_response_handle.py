@@ -62,7 +62,12 @@ class TestResponseHandler(unittest.TestCase):
         response = Responses.connection_error_response()
         expected_response = JSONResponse(
             status_code=503,
-            content=({"message": "Error Connecting to Internal Server.", "data": None}),
+            content=(
+                {
+                    "message": "Error Connecting to Internal Server.",
+                    "data": None,
+                }
+            ),
         )
         self.assertEqual(expected_response.status_code, response.status_code)
         self.assertEqual(expected_response.body, response.body)
