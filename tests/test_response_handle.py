@@ -45,7 +45,7 @@ class TestResponseHandler(unittest.TestCase):
         *_, validation_error = validate_model(model.__class__, model.__dict__)
         model_json = jsonable_encoder(model)
         expected_response = JSONResponse(
-            status_code=418,
+            status_code=406,
             content=(
                 {
                     "message": f"Validation Errors: {validation_error}",
@@ -54,6 +54,16 @@ class TestResponseHandler(unittest.TestCase):
             ),
         )
 
+        self.assertEqual(expected_response.status_code, response.status_code)
+        self.assertEqual(expected_response.body, response.body)
+
+    def test_connection_error(self):
+        """Test connection error response"""
+        response = Responses.connection_error_response()
+        expected_response = JSONResponse(
+            status_code=503,
+            content=({"message": "Error Connecting to Internal Server.", "data": None}),
+        )
         self.assertEqual(expected_response.status_code, response.status_code)
         self.assertEqual(expected_response.body, response.body)
 
