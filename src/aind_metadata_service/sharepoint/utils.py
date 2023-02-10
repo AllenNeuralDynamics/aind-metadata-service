@@ -1,15 +1,15 @@
 """Helper methods to map sharepoint fields to schema format"""
+import datetime
 import re
 from typing import Optional
-import datetime
-from dateutil import parser
 
 from aind_data_schema.procedures import Side
+from dateutil import parser
 
 
 def map_choice(response):
     """Maps choice response when it wasn't selected"""
-    if response == "Select...":
+    if response == "Select..." or response == "N/A":
         return None
     return response
 
@@ -24,9 +24,12 @@ def map_hemisphere(response_hemisphere) -> Optional[Side]:
         return None
 
 
-def convert_str_to_time(time_string) -> int:
+def convert_str_to_time(time_string) -> Optional[int]:
     """converts duration"""
-    return int(re.search(r"\d+", time_string).group())
+    if time_string:
+        return int(re.search(r"\d+", time_string).group())
+    else:
+        return None
 
 
 def parse_str_into_float(input_string) -> Optional[float]:

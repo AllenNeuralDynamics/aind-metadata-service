@@ -1,7 +1,7 @@
 """Module to create client to connect to sharepoint database"""
 
 from enum import Enum
-from typing import Optional, Tuple, Union, List
+from typing import List, Optional, Tuple, Union
 
 from aind_data_schema.procedures import (
     Anaesthetic,
@@ -26,9 +26,9 @@ from aind_metadata_service.sharepoint.utils import (
     convert_str_to_bool,
     convert_str_to_time,
     map_choice,
+    map_date_to_datetime,
     map_hemisphere,
     parse_str_into_float,
-    map_date_to_datetime,
 )
 
 
@@ -714,11 +714,13 @@ class SharePointClient:
         )
         return anaesthetic
 
-    def _map_1st_injection(self, list_item: ClientObject, list_fields) -> \
-            Union[NanojectInjection, IontophoresisInjection]:
+    def _map_1st_injection(
+        self, list_item: ClientObject, list_fields
+    ) -> Union[NanojectInjection, IontophoresisInjection]:
         """Maps a SharePoint ClientObject to an Injection model"""
         start_date = map_date_to_datetime(
-            list_item.get_property(list_fields.DATE1ST_INJECTION.value))
+            list_item.get_property(list_fields.DATE1ST_INJECTION.value)
+        )
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
@@ -727,12 +729,14 @@ class SharePointClient:
             list_fields.IACUC_PROTOCOL.value
         )
         animal_weight_prior = list_item.get_property(
-            list_fields.WEIGHT_BEFORE_SURGER.value
+            list_fields.FIRST_INJECTION_WEIGHT_BEFOR.value
         )
         animal_weight_post = list_item.get_property(
-            list_fields.WEIGHT_AFTER_SURGERY.value
+            list_fields.FIRST_INJECTION_WEIGHT_AFTER.value
         )
-        anaesthesia = self._map_1st_injection_anaesthesia(list_item, list_fields)
+        anaesthesia = self._map_1st_injection_anaesthesia(
+            list_item, list_fields
+        )
         injection_duration = convert_str_to_time(
             list_item.get_property(list_fields.INJ1_LENGHTOF_TIME.value)
         )
@@ -825,7 +829,7 @@ class SharePointClient:
 
     @staticmethod
     def _map_2nd_injection_anaesthesia(
-            list_item: ClientObject, list_fields
+        list_item: ClientObject, list_fields
     ) -> Optional[Anaesthetic]:
         """Maps anaesthesic type, duration, level for Injection"""
         anaesthetic_type = "isoflurane"
@@ -840,10 +844,13 @@ class SharePointClient:
         )
         return anaesthetic
 
-    def _map_2nd_injection(self, list_item: ClientObject, list_fields) -> \
-            Union[NanojectInjection, IontophoresisInjection]:
+    def _map_2nd_injection(
+        self, list_item: ClientObject, list_fields
+    ) -> Union[NanojectInjection, IontophoresisInjection]:
         """Maps Sharepoint ListItem to a 2nd Injection model"""
-        start_date = map_date_to_datetime(list_item.get_property(list_fields.DATE2ND_INJECTION.value))
+        start_date = map_date_to_datetime(
+            list_item.get_property(list_fields.DATE2ND_INJECTION.value)
+        )
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
@@ -857,7 +864,9 @@ class SharePointClient:
         animal_weight_post = list_item.get_property(
             list_fields.SECOND_INJECTION_WEIGHT_AFTER.value
         )
-        anaesthesia = self._map_2nd_injection_anaesthesia(list_item, list_fields)
+        anaesthesia = self._map_2nd_injection_anaesthesia(
+            list_item, list_fields
+        )
         injection_duration = convert_str_to_time(
             list_item.get_property(list_fields.INJ2_LENGHTOF_TIME.value)
         )
@@ -948,8 +957,9 @@ class SharePointClient:
             )
         return injection
 
-    def _map_list_item_to_injections(self, list_item: ClientObject) -> List[
-            Union[NanojectInjection, IontophoresisInjection]]:
+    def _map_list_item_to_injections(
+        self, list_item: ClientObject
+    ) -> List[Union[NanojectInjection, IontophoresisInjection]]:
         """Maps a Sharepoint ListItem to a list of Injection models"""
         injections = []
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
@@ -963,7 +973,9 @@ class SharePointClient:
         return injections
 
     @staticmethod
-    def _map_list_item_to_ophys_probe(list_item: ClientObject, list_fields) -> List[OphysProbe]:
+    def _map_list_item_to_ophys_probe(
+        list_item: ClientObject, list_fields
+    ) -> List[OphysProbe]:
         """Maps a Sharepoint ListItem to list of OphysProbe models"""
         ophys_probes = []
         # TODO: missing fields manufacturer, part_number, core_diameter
@@ -1027,7 +1039,8 @@ class SharePointClient:
         """Maps a SharePoint ListItem to a FiberImplant model"""
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
         start_date = map_date_to_datetime(
-            list_item.get_property(list_fields.DATE_OF_SURGERY.value))
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
+        )
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
@@ -1090,7 +1103,8 @@ class SharePointClient:
         # TODO: missing fields (implant_part_number, protective_material)
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
         start_date = map_date_to_datetime(
-            list_item.get_property(list_fields.DATE_OF_SURGERY.value))
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
+        )
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
@@ -1211,7 +1225,8 @@ class SharePointClient:
         """Maps a SharePoint ListItem to a HeadFrame model"""
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
         start_date = map_date_to_datetime(
-            list_item.get_property(list_fields.DATE_OF_SURGERY.value))
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
+        )
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
@@ -1253,7 +1268,8 @@ class SharePointClient:
         """Maps a SharePoint ClientObject to an Injection model"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         start_date = map_date_to_datetime(
-            list_item.get_property(list_fields.DATE_OF_SURGERY.value))
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
+        )
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
@@ -1272,7 +1288,8 @@ class SharePointClient:
         """Maps a SharePoint ListItem to a FiberImplant model"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         start_date = map_date_to_datetime(
-            list_item.get_property(list_fields.DATE_OF_SURGERY.value))
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
+        )
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
@@ -1291,7 +1308,8 @@ class SharePointClient:
         """Maps a SharePoint ListItem to a Craniotomy model"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         start_date = map_date_to_datetime(
-            list_item.get_property(list_fields.DATE_OF_SURGERY.value))
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
+        )
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
@@ -1310,7 +1328,8 @@ class SharePointClient:
         """Maps a SharePoint ListItem to a HeadFrame model"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         start_date = map_date_to_datetime(
-            list_item.get_property(list_fields.DATE_OF_SURGERY.value))
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
+        )
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
