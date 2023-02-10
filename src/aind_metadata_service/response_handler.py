@@ -10,12 +10,12 @@ from pydantic import BaseModel, validate_model
 class StatusCodes(Enum):
     """Enum class of status codes"""
 
-    connection_error = 503
-    internal_server_error = 500
-    multiple_responses = 300
-    valid_data = 200
-    invalid_data = 406
-    no_data = 404
+    CONNECTION_ERROR = 503
+    INTERNAL_SERVER_ERROR = 500
+    MULTIPLE_RESPONSES = 300
+    VALID_DATA = 200
+    INVALID_DATA = 406
+    NO_DATA_FOUND = 404
 
 
 class Responses:
@@ -25,7 +25,7 @@ class Responses:
     def connection_error_response() -> JSONResponse:
         """Map to a connection error"""
         response = JSONResponse(
-            status_code=StatusCodes.connection_error.value,
+            status_code=StatusCodes.CONNECTION_ERROR.value,
             content=(
                 {
                     "message": "Error Connecting to Internal Server.",
@@ -39,7 +39,7 @@ class Responses:
     def internal_server_error_response() -> JSONResponse:
         """Map to an internal server error"""
         response = JSONResponse(
-            status_code=StatusCodes.internal_server_error.value,
+            status_code=StatusCodes.INTERNAL_SERVER_ERROR.value,
             content=({"message": "Internal Server Error.", "data": None}),
         )
         return response
@@ -48,7 +48,7 @@ class Responses:
     def no_data_found_response() -> JSONResponse:
         """Map to a 404 error."""
         response = JSONResponse(
-            status_code=StatusCodes.no_data.value,
+            status_code=StatusCodes.NO_DATA_FOUND.value,
             content=({"message": "No Data Found.", "data": None}),
         )
         return response
@@ -58,7 +58,7 @@ class Responses:
         """Map to a multiple choices error."""
         models_json = [jsonable_encoder(model) for model in models]
         response = JSONResponse(
-            status_code=StatusCodes.multiple_responses.value,
+            status_code=StatusCodes.MULTIPLE_RESPONSES.value,
             content=(
                 {"message": "Multiple Items Found.", "data": models_json}
             ),
@@ -79,7 +79,7 @@ class Responses:
         model_json = jsonable_encoder(model)
         if validation_error:
             response = JSONResponse(
-                status_code=StatusCodes.invalid_data.value,
+                status_code=StatusCodes.INVALID_DATA.value,
                 content=(
                     {
                         "message": f"Validation Errors: {validation_error}",
@@ -89,7 +89,7 @@ class Responses:
             )
         else:
             response = JSONResponse(
-                status_code=StatusCodes.valid_data.value,
+                status_code=StatusCodes.VALID_DATA.value,
                 content=(
                     {
                         "message": "Valid Model.",
