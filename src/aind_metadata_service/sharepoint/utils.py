@@ -26,9 +26,11 @@ def map_hemisphere(response_hemisphere) -> Optional[Side]:
 
 def convert_str_to_time(time_string) -> Optional[int]:
     """converts duration"""
-    if time_string:
+    try:
         return int(re.search(r"\d+", time_string).group())
-    else:
+    except AttributeError:
+        return None
+    except TypeError:
         return None
 
 

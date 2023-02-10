@@ -65,7 +65,7 @@
   "Inj2Type": "Iontophoresis",
   "Inj1Vol": "400",
   "Inj2Vol": "400",
-  "Inj1LenghtofTime": "5min",
+  "Inj1LenghtofTime": "slow",
   "Inj2LenghtofTime": null,
   "Inj1Current": "5uA",
   "Inj2Current": "5uA",

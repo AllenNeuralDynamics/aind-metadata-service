@@ -337,7 +337,7 @@ class Examples:
             anaesthesia=expected_inj_anaesthetic,
             notes=None,
             injection_materials=None,
-            injection_duration=5,
+            injection_duration=None,
             recovery_time=None,
             workstation_id="SWS 3",
             instrument_id="Select...",

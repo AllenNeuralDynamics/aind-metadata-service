@@ -219,7 +219,8 @@ class NeurosurgeryAndBehaviorList2019:
         """Enum class for SharePoint's Procedure Type"""
 
         HEAD_PLANT = "HP"
-        STEREOTAXIC_INJECTION = "Stereotaxic Injection (Coordinate)"
+        STEREOTAXIC_INJECTION_COORDINATE = "Stereotaxic Injection (Coordinate)"
+        STEREOTAXIC_INJECTION = "Stereotaxic Injection"
         INJECTION = "Injection"
         INJ = "INJ"
         OPTIC_FIBER_IMPLANT = "Optic Fiber Implant"
@@ -675,6 +676,7 @@ class SharePointClient:
                         self._map_list_item_to_head_frame(list_item)
                     )
                 if procedure_type in {
+                    nsb_proc_types.STEREOTAXIC_INJECTION_COORDINATE.value,
                     nsb_proc_types.STEREOTAXIC_INJECTION.value,
                     nsb_proc_types.INJECTION.value,
                     nsb_proc_types.INJ.value,
