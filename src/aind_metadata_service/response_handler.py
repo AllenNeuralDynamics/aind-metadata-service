@@ -1,4 +1,5 @@
 """Module to handle responses"""
+from enum import Enum
 from typing import List
 
 from fastapi.encoders import jsonable_encoder
@@ -6,14 +7,39 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, validate_model
 
 
+class StatusCodes(Enum):
+    """Enum class of status codes"""
+
+    CONNECTION_ERROR = 503
+    INTERNAL_SERVER_ERROR = 500
+    MULTIPLE_RESPONSES = 300
+    VALID_DATA = 200
+    INVALID_DATA = 406
+    NO_DATA_FOUND = 404
+
+
 class Responses:
     """This class contains methods to map responses from server."""
+
+    @staticmethod
+    def connection_error_response() -> JSONResponse:
+        """Map to a connection error"""
+        response = JSONResponse(
+            status_code=StatusCodes.CONNECTION_ERROR.value,
+            content=(
+                {
+                    "message": "Error Connecting to Internal Server.",
+                    "data": None,
+                }
+            ),
+        )
+        return response
 
     @staticmethod
     def internal_server_error_response() -> JSONResponse:
         """Map to an internal server error"""
         response = JSONResponse(
-            status_code=500,
+            status_code=StatusCodes.INTERNAL_SERVER_ERROR.value,
             content=({"message": "Internal Server Error.", "data": None}),
         )
         return response
@@ -22,17 +48,17 @@ class Responses:
     def no_data_found_response() -> JSONResponse:
         """Map to a 404 error."""
         response = JSONResponse(
-            status_code=404,
+            status_code=StatusCodes.NO_DATA_FOUND.value,
             content=({"message": "No Data Found.", "data": None}),
         )
         return response
 
     @staticmethod
     def multiple_items_found_response(models: List[BaseModel]) -> JSONResponse:
-        """Map to a 418 error."""
+        """Map to a multiple choices error."""
         models_json = [jsonable_encoder(model) for model in models]
         response = JSONResponse(
-            status_code=418,
+            status_code=StatusCodes.MULTIPLE_RESPONSES.value,
             content=(
                 {"message": "Multiple Items Found.", "data": models_json}
             ),
@@ -53,7 +79,7 @@ class Responses:
         model_json = jsonable_encoder(model)
         if validation_error:
             response = JSONResponse(
-                status_code=418,
+                status_code=StatusCodes.INVALID_DATA.value,
                 content=(
                     {
                         "message": f"Validation Errors: {validation_error}",
@@ -63,7 +89,7 @@ class Responses:
             )
         else:
             response = JSONResponse(
-                status_code=200,
+                status_code=StatusCodes.VALID_DATA.value,
                 content=(
                     {
                         "message": "Valid Model.",

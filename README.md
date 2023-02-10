@@ -93,3 +93,13 @@ Then to create the documentation html files, run
 sphinx-build -b html doc_template/source/ doc_template/build/html
 ```
 More info on sphinx installation can be found here: https://www.sphinx-doc.org/en/master/usage/installation.html
+
+### Responses
+There are 6 possible status code responses for aind-metadata-service:
+- **200**: successfully retrieved valid data without any problems. 
+- **406**: successfully retrieved some data, but failed to validate against pydantic models.
+- **404**: found no data that matches query.
+- **300**: queried the server, but more items were returned than expected.
+- **503**: failed to connect to labtracks/sharepoint servers.
+- **500**: successfully connected to labtracks/sharepoint, but some other server error occurred.
+These status codes are defined in StatusCodes enum in response_handler.py
