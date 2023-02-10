@@ -15,7 +15,6 @@ from aind_data_schema.procedures import (
     ProbeName,
     Procedures,
 )
-from dateutil import parser
 from fastapi.responses import JSONResponse
 from office365.runtime.auth.client_credential import ClientCredential
 from office365.runtime.client_object import ClientObject
@@ -29,6 +28,7 @@ from aind_metadata_service.sharepoint.utils import (
     map_choice,
     map_hemisphere,
     parse_str_into_float,
+    map_date_to_datetime,
 )
 
 
@@ -717,9 +717,8 @@ class SharePointClient:
     def _map_1st_injection(self, list_item: ClientObject, list_fields) -> \
             Union[NanojectInjection, IontophoresisInjection]:
         """Maps a SharePoint ClientObject to an Injection model"""
-        start_date = parser.isoparse(
-            list_item.get_property(list_fields.DATE1ST_INJECTION.value)
-        ).date()
+        start_date = map_date_to_datetime(
+            list_item.get_property(list_fields.DATE1ST_INJECTION.value))
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
@@ -844,9 +843,7 @@ class SharePointClient:
     def _map_2nd_injection(self, list_item: ClientObject, list_fields) -> \
             Union[NanojectInjection, IontophoresisInjection]:
         """Maps Sharepoint ListItem to a 2nd Injection model"""
-        start_date = parser.isoparse(
-            list_item.get_property(list_fields.DATE2ND_INJECTION.value)
-        ).date()
+        start_date = map_date_to_datetime(list_item.get_property(list_fields.DATE2ND_INJECTION.value))
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
@@ -960,7 +957,7 @@ class SharePointClient:
         injections.append(injection_1)
         # check if there's a 2nd injection in list item
         inj2round = list_item.get_property(list_fields.INJ2_ROUND.value)
-        if inj2round == "2nd":
+        if map_choice(inj2round):
             injection_2 = self._map_2nd_injection(list_item, list_fields)
             injections.append(injection_2)
         return injections
@@ -1029,9 +1026,8 @@ class SharePointClient:
     ) -> FiberImplant:
         """Maps a SharePoint ListItem to a FiberImplant model"""
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
-        start_date = parser.isoparse(
-            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
-        ).date()
+        start_date = map_date_to_datetime(
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value))
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
@@ -1093,9 +1089,8 @@ class SharePointClient:
         """Maps a SharePoint ListItem to a Craniotomy model"""
         # TODO: missing fields (implant_part_number, protective_material)
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
-        start_date = parser.isoparse(
-            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
-        ).date()
+        start_date = map_date_to_datetime(
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value))
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
@@ -1215,9 +1210,8 @@ class SharePointClient:
     ) -> Headframe:
         """Maps a SharePoint ListItem to a HeadFrame model"""
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
-        start_date = parser.isoparse(
-            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
-        ).date()
+        start_date = map_date_to_datetime(
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value))
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
@@ -1258,9 +1252,8 @@ class SharePointClient:
     def _map_list_item_to_injection_2023(list_item: ClientObject):
         """Maps a SharePoint ClientObject to an Injection model"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
-        start_date = parser.isoparse(
-            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
-        ).date()
+        start_date = map_date_to_datetime(
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value))
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
@@ -1278,9 +1271,8 @@ class SharePointClient:
     ) -> FiberImplant:
         """Maps a SharePoint ListItem to a FiberImplant model"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
-        start_date = parser.isoparse(
-            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
-        ).date()
+        start_date = map_date_to_datetime(
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value))
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
@@ -1298,9 +1290,8 @@ class SharePointClient:
     ) -> Craniotomy:
         """Maps a SharePoint ListItem to a Craniotomy model"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
-        start_date = parser.isoparse(
-            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
-        ).date()
+        start_date = map_date_to_datetime(
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value))
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
@@ -1318,9 +1309,8 @@ class SharePointClient:
     ) -> Headframe:
         """Maps a SharePoint ListItem to a HeadFrame model"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
-        start_date = parser.isoparse(
-            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
-        ).date()
+        start_date = map_date_to_datetime(
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value))
         end_date = start_date
         experimenter_full_name = list_item.get_property(
             list_fields.LAB_TRACKS_REQUESTOR.value
