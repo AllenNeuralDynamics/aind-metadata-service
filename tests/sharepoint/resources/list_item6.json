@@ -78,7 +78,7 @@
   "SecondInjectionWeightAfter": null,
   "SecondInjectionIsoDuration": null,
   "Inj1Round": "1st",
-  "Inj2Round": "1st",
+  "Inj2Round": null,
   "HPIsoLevel": "Select...",
   "Round1InjIsolevel": "Select...",
   "Round2InjIsolevel": "Select...",
