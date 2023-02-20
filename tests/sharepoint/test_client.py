@@ -139,7 +139,7 @@ class Examples:
         Headframe.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
             iacuc_protocol="2115",
             animal_weight_prior=None,
             animal_weight_post=None,
@@ -153,7 +153,7 @@ class Examples:
         Headframe.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
             iacuc_protocol="2115",
             animal_weight_prior=None,
             animal_weight_post=None,
@@ -167,7 +167,7 @@ class Examples:
         Headframe.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
             iacuc_protocol="2115",
             animal_weight_prior=None,
             animal_weight_post=None,
@@ -181,7 +181,7 @@ class Examples:
         Headframe.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
             iacuc_protocol="2115",
             animal_weight_prior=None,
             animal_weight_post=None,
@@ -195,7 +195,7 @@ class Examples:
         Headframe.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
             iacuc_protocol="2115",
             animal_weight_prior=None,
             animal_weight_post=None,
@@ -209,7 +209,7 @@ class Examples:
         Headframe.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
             iacuc_protocol="2115",
             animal_weight_prior=None,
             animal_weight_post=None,
@@ -223,7 +223,7 @@ class Examples:
         Headframe.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB",
             iacuc_protocol="2115",
             animal_weight_prior=None,
             animal_weight_post=None,
@@ -240,7 +240,7 @@ class Examples:
         NanojectInjection.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
             iacuc_protocol="2115",
             animal_weight_prior=19.1,
             animal_weight_post=19.2,
@@ -262,7 +262,7 @@ class Examples:
         IontophoresisInjection.construct(
             start_date=None,
             end_date=None,
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
             iacuc_protocol="2115",
             animal_weight_prior=19.6,
             animal_weight_post=19.6,
@@ -285,7 +285,7 @@ class Examples:
         IontophoresisInjection.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
             iacuc_protocol="2115",
             animal_weight_prior=None,
             animal_weight_post=None,
@@ -308,7 +308,7 @@ class Examples:
         NanojectInjection.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
             iacuc_protocol="2115",
             animal_weight_prior=None,
             animal_weight_post=None,
@@ -330,7 +330,7 @@ class Examples:
         IontophoresisInjection.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
             iacuc_protocol="2115",
             animal_weight_prior=None,
             animal_weight_post=None,
@@ -356,7 +356,7 @@ class Examples:
         Craniotomy.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
             iacuc_protocol="2115",
             animal_weight_prior=None,
             animal_weight_post=None,
@@ -373,7 +373,7 @@ class Examples:
         Craniotomy.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
             iacuc_protocol="2115",
             animal_weight_prior=None,
             animal_weight_post=None,
@@ -390,7 +390,7 @@ class Examples:
         Craniotomy.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
             iacuc_protocol="2115",
             animal_weight_prior=None,
             animal_weight_post=None,
@@ -407,7 +407,7 @@ class Examples:
         Craniotomy.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
             iacuc_protocol="2115",
             animal_weight_prior=None,
             animal_weight_post=None,
@@ -424,7 +424,7 @@ class Examples:
         Craniotomy.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB",
             iacuc_protocol="2115",
             animal_weight_prior=None,
             animal_weight_post=None,
@@ -444,7 +444,7 @@ class Examples:
         FiberImplant.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
             iacuc_protocol="2115",
             animal_weight_prior=None,
             animal_weight_post=None,
@@ -454,7 +454,7 @@ class Examples:
         FiberImplant.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
             iacuc_protocol="2115",
             animal_weight_prior=None,
             animal_weight_post=None,
@@ -477,7 +477,7 @@ class Examples:
         Headframe.construct(
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
         )
     ]
 
@@ -485,7 +485,7 @@ class Examples:
         IontophoresisInjection.construct(
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
         )
     ]
 
@@ -493,7 +493,7 @@ class Examples:
         Craniotomy.construct(
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
         )
     ]
 
@@ -501,7 +501,7 @@ class Examples:
         FiberImplant.construct(
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
-            experimenter_full_name="Mary Smith",
+            experimenter_full_name="NSB-187",
         )
     ]
 
