@@ -700,6 +700,15 @@ class SharePointClient:
         return head_frames, craniotomies, fiber_implants, injections
 
     @staticmethod
+    def _map_experimenter_name(list_item: ClientObject, list_fields) -> str:
+        """Maps Experimenter name as "NSB" + ID"""
+        author_id = list_item.get_property(list_fields.AUTHOR_ID.value)
+        if author_id:
+            return "NSB-" + str(author_id)
+        else:
+            return "NSB"
+
+    @staticmethod
     def _map_1st_injection_anaesthesia(
         list_item: ClientObject, list_fields
     ) -> Optional[Anaesthetic]:
@@ -724,8 +733,8 @@ class SharePointClient:
             list_item.get_property(list_fields.DATE1ST_INJECTION.value)
         )
         end_date = start_date
-        experimenter_full_name = list_item.get_property(
-            list_fields.LAB_TRACKS_REQUESTOR.value
+        experimenter_full_name = self._map_experimenter_name(
+            list_item, list_fields
         )
         iacuc_protocol = list_item.get_property(
             list_fields.IACUC_PROTOCOL.value
@@ -854,8 +863,8 @@ class SharePointClient:
             list_item.get_property(list_fields.DATE2ND_INJECTION.value)
         )
         end_date = start_date
-        experimenter_full_name = list_item.get_property(
-            list_fields.LAB_TRACKS_REQUESTOR.value
+        experimenter_full_name = self._map_experimenter_name(
+            list_item, list_fields
         )
         iacuc_protocol = list_item.get_property(
             list_fields.IACUC_PROTOCOL.value
@@ -1044,8 +1053,8 @@ class SharePointClient:
             list_item.get_property(list_fields.DATE_OF_SURGERY.value)
         )
         end_date = start_date
-        experimenter_full_name = list_item.get_property(
-            list_fields.LAB_TRACKS_REQUESTOR.value
+        experimenter_full_name = self._map_experimenter_name(
+            list_item, list_fields
         )
         iacuc_protocol = list_item.get_property(
             list_fields.IACUC_PROTOCOL.value
@@ -1108,8 +1117,8 @@ class SharePointClient:
             list_item.get_property(list_fields.DATE_OF_SURGERY.value)
         )
         end_date = start_date
-        experimenter_full_name = list_item.get_property(
-            list_fields.LAB_TRACKS_REQUESTOR.value
+        experimenter_full_name = self._map_experimenter_name(
+            list_item, list_fields
         )
         iacuc_protocol = list_item.get_property(
             list_fields.IACUC_PROTOCOL.value
@@ -1230,8 +1239,8 @@ class SharePointClient:
             list_item.get_property(list_fields.DATE_OF_SURGERY.value)
         )
         end_date = start_date
-        experimenter_full_name = list_item.get_property(
-            list_fields.LAB_TRACKS_REQUESTOR.value
+        experimenter_full_name = self._map_experimenter_name(
+            list_item, list_fields
         )
         iacuc_protocol = list_item.get_property(
             list_fields.IACUC_PROTOCOL.value
@@ -1265,16 +1274,15 @@ class SharePointClient:
         )
         return head_frame
 
-    @staticmethod
-    def _map_list_item_to_injection_2023(list_item: ClientObject):
+    def _map_list_item_to_injection_2023(self, list_item: ClientObject):
         """Maps a SharePoint ClientObject to an Injection model"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         start_date = map_date_to_datetime(
             list_item.get_property(list_fields.DATE_OF_SURGERY.value)
         )
         end_date = start_date
-        experimenter_full_name = list_item.get_property(
-            list_fields.LAB_TRACKS_REQUESTOR.value
+        experimenter_full_name = self._map_experimenter_name(
+            list_item, list_fields
         )
         injection = IontophoresisInjection.construct(
             start_date=start_date,
@@ -1283,8 +1291,8 @@ class SharePointClient:
         )
         return injection
 
-    @staticmethod
     def _map_list_item_to_fiber_implant_2023(
+        self,
         list_item: ClientObject,
     ) -> FiberImplant:
         """Maps a SharePoint ListItem to a FiberImplant model"""
@@ -1293,8 +1301,8 @@ class SharePointClient:
             list_item.get_property(list_fields.DATE_OF_SURGERY.value)
         )
         end_date = start_date
-        experimenter_full_name = list_item.get_property(
-            list_fields.LAB_TRACKS_REQUESTOR.value
+        experimenter_full_name = self._map_experimenter_name(
+            list_item, list_fields
         )
         fiber_implant = FiberImplant.construct(
             start_date=start_date,
@@ -1303,8 +1311,8 @@ class SharePointClient:
         )
         return fiber_implant
 
-    @staticmethod
     def _map_list_item_to_craniotomy_2023(
+        self,
         list_item: ClientObject,
     ) -> Craniotomy:
         """Maps a SharePoint ListItem to a Craniotomy model"""
@@ -1313,8 +1321,8 @@ class SharePointClient:
             list_item.get_property(list_fields.DATE_OF_SURGERY.value)
         )
         end_date = start_date
-        experimenter_full_name = list_item.get_property(
-            list_fields.LAB_TRACKS_REQUESTOR.value
+        experimenter_full_name = self._map_experimenter_name(
+            list_item, list_fields
         )
         craniotomy = Craniotomy.construct(
             start_date=start_date,
@@ -1323,8 +1331,8 @@ class SharePointClient:
         )
         return craniotomy
 
-    @staticmethod
     def _map_list_item_to_head_frame_2023(
+        self,
         list_item: ClientObject,
     ) -> Headframe:
         """Maps a SharePoint ListItem to a HeadFrame model"""
@@ -1333,8 +1341,8 @@ class SharePointClient:
             list_item.get_property(list_fields.DATE_OF_SURGERY.value)
         )
         end_date = start_date
-        experimenter_full_name = list_item.get_property(
-            list_fields.LAB_TRACKS_REQUESTOR.value
+        experimenter_full_name = self._map_experimenter_name(
+            list_item, list_fields
         )
         head_frame = Headframe.construct(
             start_date=start_date,
