@@ -41,15 +41,7 @@ class NeurosurgeryAndBehaviorList2023:
         # Not really why, but some response fields return 'Select...'
         SELECT_STR = "Select..."
         PROCEDURE_TYPE_SPLITTER = "+"
-        WITH_HEADPOST = "(with Headpost)"
-
-    class ProcedureCategory(Enum):
-        """Enum class for 2023 SharePoint's Procedure Category"""
-
-        HEADPOST_ONLY = "Headpost Only"
-        INJECTION = "Injection"
-        FIBER_OPTIC_IMPLANT = "Fiber Optic Implant"
-        CRANIAL_WINDOW = "Cranial Window"
+        WITH_HEADPOST = " (with Headpost)"
 
     class ProcedureType(Enum):
         """Enum class for 2023 SharePoint's Specific Procedure Type"""
@@ -590,13 +582,13 @@ class SharePointClient:
                     list_fields.PROCEDURE.value
                 ).split(str_helpers.PROCEDURE_TYPE_SPLITTER.value)
                 # splits "WITH HEADPOST" to its own procedure
-                for i in range(procedure_types):
+                for i in range(len(procedure_types)):
                     procedure_type = procedure_types[i]
                     if str_helpers.WITH_HEADPOST.value in procedure_type:
-                        procedure_types[i] = procedure_type.split(str_helpers.WITH_HEADPOST.value)
+                        procedure_types[i] = procedure_type.split(str_helpers.WITH_HEADPOST.value)[0]
                         procedure_types.append(nsb_proc_types.WITH_HEADPOST.value)
             else:
-                procedure_types = None
+                procedure_types = []
             for procedure_type in procedure_types:
                 if procedure_type in {
                     nsb_proc_types.WITH_HEADPOST.value,
