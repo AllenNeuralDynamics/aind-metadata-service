@@ -41,6 +41,7 @@ class NeurosurgeryAndBehaviorList2023:
         # Not really why, but some response fields return 'Select...'
         SELECT_STR = "Select..."
         PROCEDURE_TYPE_SPLITTER = "+"
+        WITH_HEADPOST = "(with Headpost)"
 
     class ProcedureCategory(Enum):
         """Enum class for 2023 SharePoint's Procedure Category"""
@@ -53,12 +54,19 @@ class NeurosurgeryAndBehaviorList2023:
     class ProcedureType(Enum):
         """Enum class for 2023 SharePoint's Specific Procedure Type"""
 
+        STEREOTAXIC_INJECTION = "Stereotaxic Injection"
+        ISI_INJECTION = "ISI-guided Injection"
+        FIBER_OPTIC_IMPLANT = "Fiber Optic Implant"
         INJECTION = "Injection"
         INJ = "INJ"
         WITH_HEADPOST = "with Headpost"
-        FIBER_OPTIC_IMPLANT = "Fiber Optic Implant"
-        CTX = "Ctx"
         WHC_NP = "WHC NP"
+        HP_ONLY = "HP Only"
+        HP_TRANSCRANIAL = "HP Transcranial"
+        VISUAL_CTX_2P = "Visual Ctx 2P"
+        FRONTAL_CTX_2P = "Frontal Ctx 2P"
+        MOTOR_CTX = "Motor Ctx"
+        VISUAL_CTX_NP = "Visual Ctx NP"
 
     class ListField(Enum):
         """Enum class for fields in List Item object response"""
@@ -219,12 +227,13 @@ class NeurosurgeryAndBehaviorList2019:
         """Enum class for SharePoint's Procedure Type"""
 
         HEAD_PLANT = "HP"
+        HP_ONLY = "HP Only"
+        HP_TRANSCRANIAL = "HP Transcranial (for ISI)"
         STEREOTAXIC_INJECTION_COORDINATE = "Stereotaxic Injection (Coordinate)"
         STEREOTAXIC_INJECTION = "Stereotaxic Injection"
         INJECTION = "Injection"
         INJ = "INJ"
         OPTIC_FIBER_IMPLANT = "Optic Fiber Implant"
-        HP_TRANSCRANIAL = "HP Transcranial (for ISI)"
         WHOLE_HEMISPHERE_CRANIOTOMY_NP = "WHC NP"
         C_CAM = "C CAM"
         C_MULTISCOPE = "C Multiscope"
@@ -572,35 +581,54 @@ class SharePointClient:
     def _map_2023_response(self, list_items: ListItemCollection) -> list:
         """Maps sharepoint response when 2023 version"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
-        nsb_proc_categories = NeurosurgeryAndBehaviorList2023.ProcedureCategory
         subject_procedures = []
+        str_helpers = NeurosurgeryAndBehaviorList2023.StringParserHelper
+        nsb_proc_types = NeurosurgeryAndBehaviorList2023.ProcedureType
         for list_item in list_items:
-            if list_item.get_property(list_fields.PROCEDURE_FAMILY.value):
-                procedure_category = list_item.get_property(
-                    list_fields.PROCEDURE_FAMILY.value
-                )
+            if list_item.get_property(list_fields.PROCEDURE.value):
+                procedure_types = list_item.get_property(
+                    list_fields.PROCEDURE.value
+                ).split(str_helpers.PROCEDURE_TYPE_SPLITTER.value)
+                # splits "WITH HEADPOST" to its own procedure
+                for i in range(procedure_types):
+                    procedure_type = procedure_types[i]
+                    if str_helpers.WITH_HEADPOST.value in procedure_type:
+                        procedure_types[i] = procedure_type.split(str_helpers.WITH_HEADPOST.value)
+                        procedure_types.append(nsb_proc_types.WITH_HEADPOST.value)
             else:
-                procedure_category = None
-            if procedure_category == nsb_proc_categories.HEADPOST_ONLY.value:
-                subject_procedures.append(
-                    self._map_list_item_to_head_frame_2023(list_item)
-                )
-            if procedure_category == nsb_proc_categories.CRANIAL_WINDOW.value:
-                subject_procedures.append(
-                    self._map_list_item_to_craniotomy_2023(list_item)
-                )
-            if procedure_category == nsb_proc_categories.INJECTION.value:
-                subject_procedures.append(
-                    self._map_list_item_to_injection_2023(list_item)
-                )
-            if (
-                procedure_category
-                == nsb_proc_categories.FIBER_OPTIC_IMPLANT.value
-            ):
-                subject_procedures.append(
-                    self._map_list_item_to_fiber_implant_2023(list_item)
-                )
-            # TODO: map based on specific procedure types
+                procedure_types = None
+            for procedure_type in procedure_types:
+                if procedure_type in {
+                    nsb_proc_types.WITH_HEADPOST.value,
+                    nsb_proc_types.HP_ONLY.value,
+                    nsb_proc_types.HP_TRANSCRANIAL.value,
+                }:
+                    subject_procedures.append(
+                        self._map_list_item_to_head_frame_2023(list_item)
+                    )
+                if procedure_type in {
+                    nsb_proc_types.STEREOTAXIC_INJECTION.value,
+                    nsb_proc_types.INJ.value,
+                    nsb_proc_types.INJECTION.value,
+                    nsb_proc_types.ISI_INJECTION.value,
+                }:
+                    subject_procedures.append(
+                        self._map_list_item_to_injection_2023(list_item)
+                    )
+                if procedure_type == nsb_proc_types.FIBER_OPTIC_IMPLANT.value:
+                    subject_procedures.append(
+                        self._map_list_item_to_fiber_implant_2023(list_item)
+                    )
+                if procedure_type in {
+                    nsb_proc_types.VISUAL_CTX_NP.value,
+                    nsb_proc_types.VISUAL_CTX_2P.value,
+                    nsb_proc_types.FRONTAL_CTX_2P.value,
+                    nsb_proc_types.MOTOR_CTX.value,
+                    nsb_proc_types.WHC_NP.value,
+                }:
+                    subject_procedures.append(
+                        self._map_list_item_to_craniotomy_2023(list_item)
+                    )
         return subject_procedures
 
     def _map_2019_response(self, list_items: ListItemCollection) -> list:
@@ -617,7 +645,11 @@ class SharePointClient:
             else:
                 procedure_types = []
             for procedure_type in procedure_types:
-                if procedure_type == nsb_proc_types.HEAD_PLANT.value:
+                if procedure_type in {
+                    nsb_proc_types.HEAD_PLANT.value,
+                    nsb_proc_types.HP_ONLY.value,
+                    nsb_proc_types.HP_TRANSCRANIAL.value,
+                }:
                     subject_procedures.append(
                         self._map_list_item_to_head_frame(list_item)
                     )
