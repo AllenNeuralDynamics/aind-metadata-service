@@ -585,9 +585,9 @@ class SharePointClient:
                 for i in range(len(procedure_types)):
                     procedure_type = procedure_types[i]
                     if str_helpers.WITH_HEADPOST.value in procedure_type:
-                        procedure_types[i] = procedure_type.split(
-                            str_helpers.WITH_HEADPOST.value
-                        )[0]
+                        procedure_types[i] = procedure_type.replace(
+                            str_helpers.WITH_HEADPOST.value, ""
+                        )
                         procedure_types.append(
                             nsb_proc_types.WITH_HEADPOST.value
                         )
