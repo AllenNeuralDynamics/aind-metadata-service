@@ -463,14 +463,16 @@ class Examples:
         ),
     ]
 
+    all_procedures1 = []
+    all_procedures1.extend(expected_headframes1)
+    all_procedures1.extend(expected_craniotomies1)
+    all_procedures1.extend(expected_fiber_implants1)
+    all_procedures1.extend(expected_injections1)
     expected_procedures1 = Procedures.construct(
         describedBy=described_by,
-        schema_version="0.5.4",
+        schema_version="0.6.1",
         subject_id="650102",
-        headframes=expected_headframes1,
-        injections=expected_injections1,
-        craniotomies=expected_craniotomies1,
-        fiber_implants=expected_fiber_implants1,
+        subject_procedures=all_procedures1,
     )
 
     expected_headframes2 = [

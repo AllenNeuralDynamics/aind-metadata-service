@@ -600,14 +600,15 @@ class SharePointClient:
         """
         if head_frames or injections or fiber_implants or craniotomies:
             procedures = Procedures.construct(subject_id=subject_id)
+            procedures.subject_procedures = []
             if head_frames:
-                procedures.headframes = head_frames
-            if injections:
-                procedures.injections = injections
-            if fiber_implants:
-                procedures.fiber_implants = fiber_implants
+                procedures.subject_procedures.extend(head_frames)
             if craniotomies:
-                procedures.craniotomies = craniotomies
+                procedures.subject_procedures.extend(craniotomies)
+            if fiber_implants:
+                procedures.subject_procedures.extend(fiber_implants)
+            if injections:
+                procedures.subject_procedures.extend(injections)
             response = Responses.model_response(procedures)
         else:
             response = Responses.no_data_found_response()
