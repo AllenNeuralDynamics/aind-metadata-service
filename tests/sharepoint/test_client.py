@@ -507,6 +507,15 @@ class Examples:
             end_date=datetime.date(2022, 1, 3),
             experimenter_full_name="NSB-187",
         ),
+        SubjectProcedure.construct(
+            start_date=datetime.date(2022, 1, 3),
+            end_date=datetime.date(2022, 1, 3),
+            experimenter_full_name="NSB-187",
+            iacuc_protocol="2103",
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
+            notes=None,
+        ),
     ]
 
     expected_procedures_2023_1 = Procedures.construct(
