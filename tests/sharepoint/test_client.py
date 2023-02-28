@@ -487,11 +487,6 @@ class Examples:
             end_date=datetime.date(2022, 1, 3),
             experimenter_full_name="NSB-187",
         ),
-        IontophoresisInjection.construct(
-            start_date=datetime.date(2022, 1, 3),
-            end_date=datetime.date(2022, 1, 3),
-            experimenter_full_name="NSB-187",
-        ),
         Craniotomy.construct(
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
