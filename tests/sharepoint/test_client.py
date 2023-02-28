@@ -135,7 +135,7 @@ class Examples:
         angle=0.0,
     )
 
-    expected_headframes1 = [
+    expected_subject_procedures1 = [
         Headframe.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
@@ -234,9 +234,6 @@ class Examples:
             well_part_number=None,
             well_type=None,
         ),
-    ]
-
-    expected_injections1 = [
         NanojectInjection.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
@@ -350,9 +347,6 @@ class Examples:
             injection_current=5.0,
             alternating_current="7/7",
         ),
-    ]
-
-    expected_craniotomies1 = [
         Craniotomy.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
@@ -438,9 +432,6 @@ class Examples:
             workstation_id="SWS 3",
             notes=None,
         ),
-    ]
-
-    expected_fiber_implants1 = [
         FiberImplant.construct(
             start_date=datetime.date(2022, 12, 6),
             end_date=datetime.date(2022, 12, 6),
@@ -463,58 +454,41 @@ class Examples:
         ),
     ]
 
-    all_procedures1 = []
-    all_procedures1.extend(expected_headframes1)
-    all_procedures1.extend(expected_craniotomies1)
-    all_procedures1.extend(expected_fiber_implants1)
-    all_procedures1.extend(expected_injections1)
     expected_procedures1 = Procedures.construct(
         describedBy=described_by,
         schema_version="0.6.1",
         subject_id="650102",
-        subject_procedures=all_procedures1,
+        subject_procedures=expected_subject_procedures1,
     )
 
-    expected_headframes2 = [
+    expected_subject_procedures2 = [
         Headframe.construct(
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
             experimenter_full_name="NSB-187",
-        )
-    ]
-
-    expected_injections2 = [
+        ),
         IontophoresisInjection.construct(
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
             experimenter_full_name="NSB-187",
-        )
-    ]
-
-    expected_craniotomies2 = [
+        ),
         Craniotomy.construct(
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
             experimenter_full_name="NSB-187",
-        )
-    ]
-
-    expected_fiber_implants2 = [
+        ),
         FiberImplant.construct(
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
             experimenter_full_name="NSB-187",
-        )
+        ),
     ]
 
     expected_procedures_2023_1 = Procedures.construct(
         describedBy=described_by,
         schema_version="0.5.4",
         subject_id="650102",
-        headframes=expected_headframes2,
-        injections=expected_injections2,
-        craniotomies=expected_craniotomies2,
-        fiber_implants=expected_fiber_implants2,
+        subject_procedures=expected_subject_procedures2,
     )
 
 
@@ -577,7 +551,7 @@ class TestSharepointClient(unittest.TestCase):
         list_item12.get_property = lambda x: Examples.list_item12_json[x]
         list_item_collection_2019.add_child(list_item12)
 
-        h1, c1, f1, i1 = self.client._map_response(
+        procedures2019 = self.client._map_response(
             version=version_2019,
             list_items=list_item_collection_2019,
         )
@@ -604,19 +578,16 @@ class TestSharepointClient(unittest.TestCase):
         list_item13.get_property = lambda x: Examples.list_item13_json[x]
         list_item_collection_2023.add_child(list_item13)
 
-        h2, c2, f2, i2 = self.client._map_response(
+        procedures2023 = self.client._map_response(
             version=version_2023,
             list_items=list_item_collection_2023,
         )
-
-        self.assertEqual(Examples.expected_headframes1, h1)
-        self.assertEqual(Examples.expected_craniotomies1, c1)
-        self.assertEqual(Examples.expected_fiber_implants1, f1)
-        self.assertEqual(Examples.expected_injections1, i1)
-        self.assertEqual(Examples.expected_headframes2, h2)
-        self.assertEqual(Examples.expected_injections2, i2)
-        self.assertEqual(Examples.expected_fiber_implants2, f2)
-        self.assertEqual(Examples.expected_craniotomies2, c2)
+        self.assertCountEqual(
+            Examples.expected_subject_procedures1, procedures2019
+        )
+        self.assertCountEqual(
+            Examples.expected_subject_procedures2, procedures2023
+        )
 
     def test_handle_response(self):
         """Tests that the responses returned are what's expected."""
@@ -624,11 +595,7 @@ class TestSharepointClient(unittest.TestCase):
         empty_msg = self.client._handle_response_from_sharepoint(subject_id)
         empty_response = Responses.no_data_found_response()
         msg1 = self.client._handle_response_from_sharepoint(
-            subject_id,
-            Examples.expected_headframes1,
-            Examples.expected_craniotomies1,
-            Examples.expected_fiber_implants1,
-            Examples.expected_injections1,
+            subject_id, Examples.expected_subject_procedures1
         )
         expected_msg1 = Responses.model_response(Examples.expected_procedures1)
 
