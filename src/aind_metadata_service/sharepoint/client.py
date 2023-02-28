@@ -422,7 +422,7 @@ class ListVersions(Enum):
         "view_title": "New Request",
     }
     VERSION_2019 = {
-        "list_title": "SWR 2019-Present",
+        "list_title": "SWR 2019-2022",
         "view_title": "New Request",
     }
 
