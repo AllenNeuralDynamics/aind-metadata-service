@@ -17,6 +17,7 @@ from aind_data_schema.procedures import (
     OphysProbe,
     Procedures,
     Side,
+    SubjectProcedure,
 )
 from office365.sharepoint.client_context import ClientContext
 from office365.sharepoint.listitems.collection import ListItemCollection
@@ -452,6 +453,15 @@ class Examples:
             notes=None,
             probes=[expected_probe1, expected_probe2],
         ),
+        SubjectProcedure.construct(
+            start_date=datetime.date(2022, 12, 6),
+            end_date=datetime.date(2022, 12, 6),
+            experimenter_full_name="NSB-187",
+            iacuc_protocol="2115",
+            animal_weight_prior=None,
+            animal_weight_post=None,
+            notes=None,
+        ),
     ]
 
     expected_procedures1 = Procedures.construct(
@@ -496,6 +506,15 @@ class Examples:
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
             experimenter_full_name="NSB-187",
+        ),
+        SubjectProcedure.construct(
+            start_date=datetime.date(2022, 1, 3),
+            end_date=datetime.date(2022, 1, 3),
+            experimenter_full_name="NSB-187",
+            iacuc_protocol="2103",
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
+            notes=None,
         ),
     ]
 

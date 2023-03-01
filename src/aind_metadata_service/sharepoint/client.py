@@ -14,6 +14,7 @@ from aind_data_schema.procedures import (
     OphysProbe,
     ProbeName,
     Procedures,
+    SubjectProcedure,
 )
 from fastapi.responses import JSONResponse
 from office365.runtime.auth.client_credential import ClientCredential
@@ -593,6 +594,9 @@ class SharePointClient:
                         )
             else:
                 procedure_types = []
+                subject_procedures.append(
+                    self._map_list_item_to_subject_procedure(list_item)
+                )
             for procedure_type in procedure_types:
                 if procedure_type in {
                     nsb_proc_types.WITH_HEADPOST.value,
@@ -640,6 +644,9 @@ class SharePointClient:
                 ).split(str_helpers.PROCEDURE_TYPE_SPLITTER.value)
             else:
                 procedure_types = []
+                subject_procedures.append(
+                    self._map_list_item_to_subject_procedure(list_item)
+                )
             for procedure_type in procedure_types:
                 if procedure_type in {
                     nsb_proc_types.HEAD_PLANT.value,
@@ -672,6 +679,38 @@ class SharePointClient:
                         self._map_list_item_to_craniotomy(list_item)
                     )
         return subject_procedures
+
+    def _map_list_item_to_subject_procedure(
+        self, list_item: ClientObject
+    ) -> SubjectProcedure:
+        """Maps a Sharepoint ClientObject to generic SubjectProcedure model"""
+        list_fields = NeurosurgeryAndBehaviorList2019.ListField
+        start_date = map_date_to_datetime(
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
+        )
+        end_date = start_date
+        experimenter_full_name = self._map_experimenter_name(
+            list_item, list_fields
+        )
+        iacuc_protocol = list_item.get_property(
+            list_fields.IACUC_PROTOCOL.value
+        )
+        animal_weight_prior = parse_str_into_float(
+            list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER.value)
+        )
+        animal_weight_post = parse_str_into_float(
+            list_item.get_property(list_fields.WEIGHT_AFTER_SURGERY.value)
+        )
+        # TODO: map anaesthesia ?
+        subject_procedure = SubjectProcedure.construct(
+            start_date=start_date,
+            end_date=end_date,
+            experimenter_full_name=experimenter_full_name,
+            iacuc_protocol=iacuc_protocol,
+            animal_weight_prior=animal_weight_prior,
+            animal_weight_post=animal_weight_post,
+        )
+        return subject_procedure
 
     @staticmethod
     def _map_experimenter_name(list_item: ClientObject, list_fields) -> str:
@@ -713,11 +752,15 @@ class SharePointClient:
         iacuc_protocol = list_item.get_property(
             list_fields.IACUC_PROTOCOL.value
         )
-        animal_weight_prior = list_item.get_property(
-            list_fields.FIRST_INJECTION_WEIGHT_BEFOR.value
+        animal_weight_prior = parse_str_into_float(
+            list_item.get_property(
+                list_fields.FIRST_INJECTION_WEIGHT_BEFOR.value
+            )
         )
-        animal_weight_post = list_item.get_property(
-            list_fields.FIRST_INJECTION_WEIGHT_AFTER.value
+        animal_weight_post = parse_str_into_float(
+            list_item.get_property(
+                list_fields.FIRST_INJECTION_WEIGHT_AFTER.value
+            )
         )
         anaesthesia = self._map_1st_injection_anaesthesia(
             list_item, list_fields
@@ -843,11 +886,15 @@ class SharePointClient:
         iacuc_protocol = list_item.get_property(
             list_fields.IACUC_PROTOCOL.value
         )
-        animal_weight_prior = list_item.get_property(
-            list_fields.SECOND_INJECTION_WEIGHT_BEFORE.value
+        animal_weight_prior = parse_str_into_float(
+            list_item.get_property(
+                list_fields.SECOND_INJECTION_WEIGHT_BEFORE.value
+            )
         )
-        animal_weight_post = list_item.get_property(
-            list_fields.SECOND_INJECTION_WEIGHT_AFTER.value
+        animal_weight_post = parse_str_into_float(
+            list_item.get_property(
+                list_fields.SECOND_INJECTION_WEIGHT_AFTER.value
+            )
         )
         anaesthesia = self._map_2nd_injection_anaesthesia(
             list_item, list_fields
@@ -1033,11 +1080,11 @@ class SharePointClient:
         iacuc_protocol = list_item.get_property(
             list_fields.IACUC_PROTOCOL.value
         )
-        animal_weight_prior = list_item.get_property(
-            list_fields.WEIGHT_BEFORE_SURGER.value
+        animal_weight_prior = parse_str_into_float(
+            list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER.value)
         )
-        animal_weight_post = list_item.get_property(
-            list_fields.WEIGHT_AFTER_SURGERY.value
+        animal_weight_post = parse_str_into_float(
+            list_item.get_property(list_fields.WEIGHT_AFTER_SURGERY.value)
         )
         probes = self._map_list_item_to_ophys_probe(list_item, list_fields)
         fiber_implant = FiberImplant.construct(
@@ -1097,11 +1144,11 @@ class SharePointClient:
         iacuc_protocol = list_item.get_property(
             list_fields.IACUC_PROTOCOL.value
         )
-        animal_weight_prior = list_item.get_property(
-            list_fields.WEIGHT_BEFORE_SURGER.value
+        animal_weight_prior = parse_str_into_float(
+            list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER.value)
         )
-        animal_weight_post = list_item.get_property(
-            list_fields.WEIGHT_AFTER_SURGERY.value
+        animal_weight_post = parse_str_into_float(
+            list_item.get_property(list_fields.WEIGHT_AFTER_SURGERY.value)
         )
         anaesthesia = self._map_hp_anaesthesia(list_item, list_fields)
         craniotomy_type = self._map_craniotomy_type(
