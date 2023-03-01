@@ -680,7 +680,9 @@ class SharePointClient:
                     )
         return subject_procedures
 
-    def _map_list_item_to_subject_procedure(self, list_item: ClientObject) -> SubjectProcedure:
+    def _map_list_item_to_subject_procedure(
+        self, list_item: ClientObject
+    ) -> SubjectProcedure:
         """Maps a Sharepoint ClientObject to generic SubjectProcedure model"""
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
         start_date = map_date_to_datetime(
@@ -751,10 +753,14 @@ class SharePointClient:
             list_fields.IACUC_PROTOCOL.value
         )
         animal_weight_prior = parse_str_into_float(
-            list_item.get_property(list_fields.FIRST_INJECTION_WEIGHT_BEFOR.value)
+            list_item.get_property(
+                list_fields.FIRST_INJECTION_WEIGHT_BEFOR.value
+            )
         )
         animal_weight_post = parse_str_into_float(
-            list_item.get_property(list_fields.FIRST_INJECTION_WEIGHT_AFTER.value)
+            list_item.get_property(
+                list_fields.FIRST_INJECTION_WEIGHT_AFTER.value
+            )
         )
         anaesthesia = self._map_1st_injection_anaesthesia(
             list_item, list_fields
@@ -881,10 +887,14 @@ class SharePointClient:
             list_fields.IACUC_PROTOCOL.value
         )
         animal_weight_prior = parse_str_into_float(
-            list_item.get_property(list_fields.SECOND_INJECTION_WEIGHT_BEFORE.value)
+            list_item.get_property(
+                list_fields.SECOND_INJECTION_WEIGHT_BEFORE.value
+            )
         )
         animal_weight_post = parse_str_into_float(
-            list_item.get_property(list_fields.SECOND_INJECTION_WEIGHT_AFTER.value)
+            list_item.get_property(
+                list_fields.SECOND_INJECTION_WEIGHT_AFTER.value
+            )
         )
         anaesthesia = self._map_2nd_injection_anaesthesia(
             list_item, list_fields

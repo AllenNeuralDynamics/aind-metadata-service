@@ -461,7 +461,7 @@ class Examples:
             animal_weight_prior=None,
             animal_weight_post=None,
             notes=None,
-        )
+        ),
     ]
 
     expected_procedures1 = Procedures.construct(
