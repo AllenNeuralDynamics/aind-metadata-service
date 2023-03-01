@@ -70,6 +70,7 @@
   "Inj1Current": "5uA",
   "Inj2Current": "5uA",
   "Inj1AlternatingTime": "7/7",
+  "Inj1AlternatingTime": "7/7",
   "Inj2AlternatingTime": null,
   "FirstInjectionWeightBefor": null,
   "FirstInjectionWeightAfter": null,
