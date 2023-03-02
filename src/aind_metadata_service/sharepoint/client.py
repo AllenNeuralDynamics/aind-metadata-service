@@ -1329,6 +1329,7 @@ class SharePointClient:
             list_item.get_property(list_fields.BURR_HOLE_4.value)
         ]
         burr_procedures = []
+        # TODO: instead of loop, individually check each burr hole and go thru
         for burr_hole in range(len(burr_holes)):
             if burr_hole == nsb_burr_types.INJECTION:
                 burr_procedures.append(self._map_list_item_to_injection_2023(list_item))
