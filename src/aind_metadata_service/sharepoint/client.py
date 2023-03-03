@@ -618,7 +618,7 @@ class SharePointClient:
                         self._map_list_item_to_head_frame_2023(list_item)
                     )
                 if procedure_type in {
-                    nsb_proc_types.STEREOTAXIC_INJECTION.value,
+                    # nsb_proc_types.STEREOTAXIC_INJECTION.value,
                     nsb_proc_types.INJ.value,
                     # nsb_proc_types.INJECTION.value,
                     nsb_proc_types.ISI_INJECTION.value,
@@ -640,8 +640,6 @@ class SharePointClient:
                     subject_procedures.append(
                         self._map_list_item_to_craniotomy_2023(list_item)
                     )
-                # TODO: map by burr holes for fiber implants and stereotaxic injection
-                # might need to create a procedure for "Fiber Implant + Injection" rather than splitting it
                 if procedure_type in {
                     nsb_proc_types.INJECTION.value,
                     nsb_proc_types.STEREOTAXIC_INJECTION.value,
@@ -1377,7 +1375,7 @@ class SharePointClient:
             list_item.get_property(list_fields.INJ1_ANGLE_V2.value)
         )
         for procedure in procedure_types:
-            if procedure == nsb_burr_types.INJECTION:
+            if procedure == nsb_burr_types.INJECTION.value:
                 # TODO: missing fields (anaesthesia, injection duration, recovery time)
                 workstation_id = list_item.get_property(
                     list_fields.WORK_STATION1ST_INJECTION.value
@@ -1436,7 +1434,7 @@ class SharePointClient:
                         injection_volume=injection_volume,
                     )
                 burr_1_procedures.append(injection)
-            elif procedure == nsb_burr_types.FIBER_IMPLANT:
+            elif procedure == nsb_burr_types.FIBER_IMPLANT.value:
                 # TODO: map each burr hole as a fiber implant, or map each burr hole as a probe?
                 name = ProbeName.PROBE_A.value
                 fiber_implant_depth = list_item.get_property(list_fields.FIBER_IMPLANT1_DV.value)
