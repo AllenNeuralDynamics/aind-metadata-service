@@ -104,6 +104,11 @@ class Examples:
     with open(list_item13_filepath) as f:
         list_item13_json = json.load(f)
 
+    list_item14_filepath = RESOURCES_DIR / "list_item14.json"
+
+    with open(list_item14_filepath) as f:
+        list_item14_json = json.load(f)
+
     described_by = (
         "https://raw.githubusercontent.com/AllenNeuralDynamics/"
         "aind-data-schema/main/src/aind_data_schema/procedures.py"

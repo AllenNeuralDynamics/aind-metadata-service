@@ -43,6 +43,7 @@ class NeurosurgeryAndBehaviorList2023:
         SELECT_STR = "Select..."
         PROCEDURE_TYPE_SPLITTER = "+"
         WITH_HEADPOST = " (with Headpost)"
+        BURR_TYPE_SPLITTER = "&"
 
     class ProcedureType(Enum):
         """Enum class for 2023 SharePoint's Specific Procedure Type"""
@@ -60,6 +61,7 @@ class NeurosurgeryAndBehaviorList2023:
         FRONTAL_CTX_2P = "Frontal Ctx 2P"
         MOTOR_CTX = "Motor Ctx"
         VISUAL_CTX_NP = "Visual Ctx NP"
+        INJECTION_FIBER_IMPLANT = "Injection+Fiber Optic Implant"
 
     class BurrHoleType(Enum):
         """Enum class for 2023 SharePoint's BurrHole Procedures"""
@@ -590,19 +592,17 @@ class SharePointClient:
         nsb_proc_types = NeurosurgeryAndBehaviorList2023.ProcedureType
         for list_item in list_items:
             if list_item.get_property(list_fields.PROCEDURE.value):
-                procedure_types = list_item.get_property(
-                    list_fields.PROCEDURE.value
-                ).split(str_helpers.PROCEDURE_TYPE_SPLITTER.value)
-                # splits "WITH HEADPOST" to its own procedure
-                for i in range(len(procedure_types)):
-                    procedure_type = procedure_types[i]
-                    if str_helpers.WITH_HEADPOST.value in procedure_type:
-                        procedure_types[i] = procedure_type.replace(
-                            str_helpers.WITH_HEADPOST.value, ""
-                        )
-                        procedure_types.append(
-                            nsb_proc_types.WITH_HEADPOST.value
-                        )
+                procedure = list_item.get_property(list_fields.PROCEDURE.value)
+                procedure_types = []
+                if str_helpers.WITH_HEADPOST.value in procedure:
+                    procedure = procedure.replace(str_helpers.WITH_HEADPOST.value, "")
+                    procedure_types.append(
+                        nsb_proc_types.WITH_HEADPOST.value
+                    )
+                if procedure != nsb_proc_types.INJECTION_FIBER_IMPLANT.value:
+                    procedure_types.extend(procedure.split(str_helpers.PROCEDURE_TYPE_SPLITTER.value))
+                else:
+                    procedure_types.append(procedure)
             else:
                 procedure_types = []
                 subject_procedures.append(
@@ -618,19 +618,6 @@ class SharePointClient:
                         self._map_list_item_to_head_frame_2023(list_item)
                     )
                 if procedure_type in {
-                    # nsb_proc_types.STEREOTAXIC_INJECTION.value,
-                    nsb_proc_types.INJ.value,
-                    # nsb_proc_types.INJECTION.value,
-                    nsb_proc_types.ISI_INJECTION.value,
-                }:
-                    subject_procedures.append(
-                        self._map_list_item_to_injection_2023(list_item)
-                    )
-                # if procedure_type == nsb_proc_types.FIBER_OPTIC_IMPLANT.value:
-                #     subject_procedures.append(
-                #         self._map_list_item_to_fiber_implant_2023(list_item)
-                #     )
-                if procedure_type in {
                     nsb_proc_types.VISUAL_CTX_NP.value,
                     nsb_proc_types.VISUAL_CTX_2P.value,
                     nsb_proc_types.FRONTAL_CTX_2P.value,
@@ -643,7 +630,10 @@ class SharePointClient:
                 if procedure_type in {
                     nsb_proc_types.INJECTION.value,
                     nsb_proc_types.STEREOTAXIC_INJECTION.value,
-                    nsb_proc_types.FIBER_OPTIC_IMPLANT.value
+                    nsb_proc_types.INJ.value,
+                    nsb_proc_types.ISI_INJECTION.value,
+                    nsb_proc_types.FIBER_OPTIC_IMPLANT.value,
+                    nsb_proc_types.INJECTION_FIBER_IMPLANT.value,
                 }:
                     subject_procedures.extend(
                         self._map_burr_holes(list_item)
@@ -1342,7 +1332,7 @@ class SharePointClient:
         burr_1_procedures = []
         if list_item.get_property(list_fields.BURR_HOLE_1.value):
             procedure_types = list_item.get_property(
-                list_fields.PROCEDURE.value).split(str_helpers.PROCEDURE_TYPE_SPLITTER.value)
+                list_fields.BURR_HOLE_1.value).split(str_helpers.BURR_TYPE_SPLITTER.value)
         else:
             procedure_types = []
         # map burr hole fields
@@ -1375,7 +1365,7 @@ class SharePointClient:
             list_item.get_property(list_fields.INJ1_ANGLE_V2.value)
         )
         for procedure in procedure_types:
-            if procedure == nsb_burr_types.INJECTION.value:
+            if procedure.strip() == nsb_burr_types.INJECTION.value:
                 # TODO: missing fields (anaesthesia, injection duration, recovery time)
                 workstation_id = list_item.get_property(
                     list_fields.WORK_STATION1ST_INJECTION.value
@@ -1384,7 +1374,7 @@ class SharePointClient:
                 burr_coordinate_depth = parse_str_into_float(
                     list_item.get_property(list_fields.VIRUS_D_V.value)
                 )
-                if injection_type == NeurosurgeryAndBehaviorList2023.InjectionType.IONTO.value:
+                if injection_type.strip() == NeurosurgeryAndBehaviorList2023.InjectionType.IONTO.value:
                     # TODO: instrument id
                     injection_current = parse_str_into_float(
                         list_item.get_property(list_fields.INJ1_CURRENT.value)
@@ -1434,7 +1424,7 @@ class SharePointClient:
                         injection_volume=injection_volume,
                     )
                 burr_1_procedures.append(injection)
-            elif procedure == nsb_burr_types.FIBER_IMPLANT.value:
+            elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
                 # TODO: map each burr hole as a fiber implant, or map each burr hole as a probe?
                 name = ProbeName.PROBE_A.value
                 fiber_implant_depth = list_item.get_property(list_fields.FIBER_IMPLANT1_DV.value)
