@@ -1165,7 +1165,7 @@ class SharePointClient:
             list_item.get_property(list_fields.HP_A_P.value)
         )
         craniotomy_size = parse_str_into_float(
-            list_item.get_property(list_fields.HP_DIAMETER.value)
+            list_item.get_property(list_fields.IMPLANT_ID_COVERSLIP_TYPE.value)
         )
         dura_removed = convert_str_to_bool(
             list_item.get_property(list_fields.HP_DUROTOMY.value)
