@@ -1365,9 +1365,21 @@ class SharePointClient:
         experimenter_full_name = self._map_experimenter_name(
             list_item, list_fields
         )
+        iacuc_protocol = list_item.get_property(
+            list_fields.IACUC_PROTOCOL.value
+        )
+        animal_weight_prior = parse_str_into_float(
+            list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER.value)
+        )
+        animal_weight_post = parse_str_into_float(
+            list_item.get_property(list_fields.WEIGHT_AFTER_SURGERY.value)
+        )
         head_frame = Headframe.construct(
             start_date=start_date,
             end_date=end_date,
             experimenter_full_name=experimenter_full_name,
+            iacuc_protocol=iacuc_protocol,
+            animal_weight_prior=animal_weight_prior,
+            animal_weight_post=animal_weight_post,
         )
         return head_frame
