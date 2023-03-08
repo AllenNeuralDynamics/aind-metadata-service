@@ -274,7 +274,7 @@ class Examples:
             injection_materials=None,
             injection_duration=4,
             recovery_time=None,
-            workstation_id="Select...",
+            workstation_id=None,
             instrument_id="Select...",
             injection_hemisphere=Side.LEFT,
             injection_coordinate_ml=-0.6,
@@ -320,7 +320,7 @@ class Examples:
             injection_materials=None,
             injection_duration=None,
             recovery_time=None,
-            workstation_id="Select...",
+            workstation_id=None,
             instrument_id="NJ#4",
             injection_hemisphere=Side.RIGHT,
             injection_coordinate_ml=-0.6,
@@ -476,8 +476,108 @@ class Examples:
         subject_procedures=expected_subject_procedures1,
     )
 
-    # list item 14 (burr holes)
     expected_subject_procedures2 = [
+        # from list item 8
+        IontophoresisInjection.construct(
+            start_date=datetime.date(2022, 1, 3),
+            end_date=datetime.date(2022, 1, 3),
+            experimenter_full_name='NSB-187',
+            iacuc_protocol='2103',
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
+            anaesthesia=Anaesthetic.construct(
+                type='isoflurane',
+                duration=None,
+                level=None
+            ),
+            injection_coordinate_ml=-2.3,
+            injection_coordinate_ap=4.72,
+            injection_coordinate_depth=None,
+            injection_angle=0.0,
+            injection_hemisphere=Side.RIGHT,
+            procedure_type='Iontophoresis',
+            injection_current=5.0,
+            alternating_current="7/7"
+        ),
+        # from list item 9
+        Headframe.construct(
+            start_date=datetime.date(2022, 1, 3),
+            end_date=datetime.date(2022, 1, 3),
+            experimenter_full_name='NSB-187',
+            iacuc_protocol=None,
+            animal_weight_prior=None,
+            animal_weight_post=None,
+            procedure_type = 'Headframe'
+        ),
+        # from list item 10
+        Craniotomy.construct(
+            start_date=datetime.date(2022, 1, 3),
+            end_date=datetime.date(2022, 1, 3),
+            experimenter_full_name='NSB-187',
+            iacuc_protocol=None,
+            animal_weight_prior=None,
+            animal_weight_post=None,
+            procedure_type='Craniotomy',
+            craniotomy_hemisphere=None,
+            craniotomy_coordinates_ml=None,
+            craniotomy_coordinates_ap=None,
+        ),
+        # from list item 11
+        Headframe.construct(
+            start_date=datetime.date(2022, 1, 3),
+            end_date=datetime.date(2022, 1, 3),
+            experimenter_full_name='NSB-187',
+            iacuc_protocol=None,
+            animal_weight_prior=None,
+            animal_weight_post=None,
+            procedure_type = 'Headframe',
+        ),
+        NanojectInjection.construct(
+            start_date=datetime.date(2022, 1, 3),
+            end_date=datetime.date(2022, 1, 3),
+            experimenter_full_name='NSB-187',
+            iacuc_protocol='2103',
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
+            anaesthesia = expected_inj_anaesthetic,
+            injection_coordinate_ml = 3.0,
+            injection_coordinate_ap = -2.45,
+            injection_coordinate_depth = None,
+            injection_angle = None,
+            procedure_type = 'Nanoject (Pressure)',
+            injection_volume = 500.0,
+        ),
+        NanojectInjection.construct(
+            start_date=datetime.date(2022, 1, 3),
+            end_date=datetime.date(2022, 1, 3),
+            experimenter_full_name='NSB-187',
+            iacuc_protocol='2103',
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
+            anaesthesia=expected_inj_anaesthetic,
+            injection_coordinate_ml=3.0,
+            injection_coordinate_ap=-2.45,
+            injection_coordinate_depth=None,
+            injection_angle=None,
+            procedure_type='Nanoject (Pressure)',
+            injection_volume=600.0,
+        ),
+        NanojectInjection.construct(
+            start_date=datetime.date(2022, 1, 3),
+            end_date=datetime.date(2022, 1, 3),
+            experimenter_full_name='NSB-187',
+            iacuc_protocol='2103',
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
+            anaesthesia=expected_inj_anaesthetic,
+            procedure_type='Nanoject (Pressure)',
+            injection_coordinate_ml=None,
+            injection_coordinate_ap=None,
+            injection_coordinate_depth=None,
+            injection_angle=None,
+            injection_volume=600.0,
+        ),
+        # from list item 14
         Headframe.construct(
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
@@ -497,7 +597,7 @@ class Examples:
             injection_angle=0.0,
             injection_hemisphere=Side.LEFT,
             procedure_type="Nanoject (Pressure)",
-            injection_volume=600,
+            injection_volume=600.0,
             notes=None,
         ),
         FiberImplant.construct(
@@ -517,6 +617,24 @@ class Examples:
                 angle=0.0,
             ),
         ),
+        IontophoresisInjection.construct(
+            start_date=datetime.date(2022, 1, 3),
+            end_date=datetime.date(2022, 1, 3),
+            experimenter_full_name='NSB-187',
+            iacuc_protocol='2103',
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
+            notes=None,
+            procedure_type='Iontophoresis',
+            injection_hemisphere=Side.LEFT,
+            anaesthesia=expected_inj_anaesthetic,
+            injection_coordinate_ml=-0.5,
+            injection_coordinate_ap=2.0,
+            injection_coordinate_depth=5.0,
+            injection_angle=0.0,
+            injection_current=None,
+            alternating_current="7/7",
+        ),
         FiberImplant.construct(
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
@@ -534,6 +652,23 @@ class Examples:
                 angle=0.0,
             ),
         ),
+        IontophoresisInjection.construct(
+            start_date=datetime.date(2022, 1, 3),
+            end_date=datetime.date(2022, 1, 3),
+            experimenter_full_name='NSB-187',
+            iacuc_protocol='2103',
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
+            anaesthesia=expected_inj_anaesthetic,
+            injection_coordinate_ml=-2.2,
+            injection_coordinate_ap=-6.1,
+            injection_coordinate_depth=3.1,
+            injection_angle=0.0,
+            injection_hemisphere=Side.LEFT,
+            procedure_type='Iontophoresis',
+            injection_current=5.0,
+            alternating_current='7/7'
+        ),
         FiberImplant.construct(
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
@@ -550,36 +685,40 @@ class Examples:
                 angle=0.0,
             )
         ),
-        # Headframe.construct(
-        #     start_date=datetime.date(2022, 1, 3),
-        #     end_date=datetime.date(2022, 1, 3),
-        #     experimenter_full_name="NSB-187",
-        # ),
-        # IontophoresisInjection.construct(
-        #     start_date=datetime.date(2022, 1, 3),
-        #     end_date=datetime.date(2022, 1, 3),
-        #     experimenter_full_name="NSB-187",
-        # ),
-        # IontophoresisInjection.construct(
-        #     start_date=datetime.date(2022, 1, 3),
-        #     end_date=datetime.date(2022, 1, 3),
-        #     experimenter_full_name="NSB-187",
-        # ),
-        # IontophoresisInjection.construct(
-        #     start_date=datetime.date(2022, 1, 3),
-        #     end_date=datetime.date(2022, 1, 3),
-        #     experimenter_full_name="NSB-187",
-        # ),
-        # Craniotomy.construct(
-        #     start_date=datetime.date(2022, 1, 3),
-        #     end_date=datetime.date(2022, 1, 3),
-        #     experimenter_full_name="NSB-187",
-        # ),
-        # FiberImplant.construct(
-        #     start_date=datetime.date(2022, 1, 3),
-        #     end_date=datetime.date(2022, 1, 3),
-        #     experimenter_full_name="NSB-187",
-        # ),
+        IontophoresisInjection.construct(
+            start_date=datetime.date(2022, 1, 3),
+            end_date=datetime.date(2022, 1, 3),
+            experimenter_full_name='NSB-187',
+            iacuc_protocol='2103',
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
+            anaesthesia = expected_inj_anaesthetic,
+            injection_coordinate_ml = -2.5,
+            injection_coordinate_ap = 1.0,
+            injection_coordinate_depth = 3.0,
+            injection_angle = 0.0,
+            injection_hemisphere = Side.RIGHT,
+            procedure_type = 'Iontophoresis',
+            injection_current = 5.0,
+            alternating_current = '7/7'
+        ),
+        FiberImplant.construct(
+            start_date=datetime.date(2022, 1, 3),
+            end_date=datetime.date(2022, 1, 3),
+            experimenter_full_name='NSB-187',
+            iacuc_protocol='2103',
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
+            procedure_type='Fiber implant',
+            probes=OphysProbe.construct(
+                name='Probe A',
+                stereotactic_coordinate_ap=1.0,
+                stereotactic_coordinate_ml=-2.5,
+                stereotactic_coordinate_dv=-1.8,
+                angle=0.0,
+            )
+        ),
+        # from list item 13
         SubjectProcedure.construct(
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
@@ -664,21 +803,21 @@ class TestSharepointClient(unittest.TestCase):
         )
 
         list_item_collection_2023 = ListItemCollection(context=blank_ctx)
-        # list_item8 = ListItem(context=blank_ctx)
-        # list_item8.get_property = lambda x: Examples.list_item8_json[x]
-        # list_item_collection_2023.add_child(list_item8)
-        #
-        # list_item9 = ListItem(context=blank_ctx)
-        # list_item9.get_property = lambda x: Examples.list_item9_json[x]
-        # list_item_collection_2023.add_child(list_item9)
-        #
-        # list_item10 = ListItem(context=blank_ctx)
-        # list_item10.get_property = lambda x: Examples.list_item10_json[x]
-        # list_item_collection_2023.add_child(list_item10)
-        #
-        # list_item11 = ListItem(context=blank_ctx)
-        # list_item11.get_property = lambda x: Examples.list_item11_json[x]
-        # list_item_collection_2023.add_child(list_item11)
+        list_item8 = ListItem(context=blank_ctx)
+        list_item8.get_property = lambda x: Examples.list_item8_json[x]
+        list_item_collection_2023.add_child(list_item8)
+
+        list_item9 = ListItem(context=blank_ctx)
+        list_item9.get_property = lambda x: Examples.list_item9_json[x]
+        list_item_collection_2023.add_child(list_item9)
+
+        list_item10 = ListItem(context=blank_ctx)
+        list_item10.get_property = lambda x: Examples.list_item10_json[x]
+        list_item_collection_2023.add_child(list_item10)
+
+        list_item11 = ListItem(context=blank_ctx)
+        list_item11.get_property = lambda x: Examples.list_item11_json[x]
+        list_item_collection_2023.add_child(list_item11)
 
         # add list item with no procedure
         list_item13 = ListItem(context=blank_ctx)
@@ -696,6 +835,7 @@ class TestSharepointClient(unittest.TestCase):
         self.assertCountEqual(
             Examples.expected_subject_procedures1, procedures2019
         )
+
         self.assertCountEqual(
             Examples.expected_subject_procedures2, procedures2023
         )

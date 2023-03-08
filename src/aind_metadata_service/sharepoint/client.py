@@ -780,9 +780,9 @@ class SharePointClient:
         recovery_time = list_item.get_property(
             list_fields.FIRST_INJ_RECOVERY.value
         )
-        workstation_id = list_item.get_property(
+        workstation_id = map_choice(list_item.get_property(
             list_fields.WORK_STATION1ST_INJECTION.value
-        )
+        ))
         injection_type = list_item.get_property(list_fields.INJ1_TYPE.value)
         injection_hemisphere = map_hemisphere(
             list_item.get_property(list_fields.VIRUS_HEMISPHERE.value)
@@ -914,9 +914,9 @@ class SharePointClient:
         recovery_time = list_item.get_property(
             list_fields.SECOND_INJ_RECOVER.value
         )
-        workstation_id = list_item.get_property(
+        workstation_id = map_choice(list_item.get_property(
             list_fields.WORK_STATION2ND_INJECTION.value
-        )
+        ))
         injection_type = list_item.get_property(list_fields.INJ2_TYPE.value)
         injection_hemisphere = map_hemisphere(
             list_item.get_property(list_fields.HEMISPHERE2ND_INJ.value)
@@ -1179,9 +1179,9 @@ class SharePointClient:
         dura_removed = convert_str_to_bool(
             list_item.get_property(list_fields.HP_DUROTOMY.value)
         )
-        workstation_id = list_item.get_property(
+        workstation_id = map_choice(list_item.get_property(
             list_fields.HP_WORK_STATION.value
-        )
+        ))
         craniotomy = Craniotomy.construct(
             start_date=start_date,
             end_date=end_date,
@@ -1311,13 +1311,13 @@ class SharePointClient:
         """Maps Burr Holes in a 2023 SharePoint ListItem to list of FiberImplants and Injections"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         burr_procedures = []
-        if list_item.get_property(list_fields.BURR_HOLE_1.value):
+        if map_choice(list_item.get_property(list_fields.BURR_HOLE_1.value)):
             burr_procedures.extend(self._map_burr_hole_1(list_item))
-        if list_item.get_property(list_fields.BURR_HOLE_2.value):
+        if map_choice(list_item.get_property(list_fields.BURR_HOLE_2.value)):
             burr_procedures.extend(self._map_burr_hole_2(list_item))
-        if list_item.get_property(list_fields.BURR_HOLE_3.value):
+        if map_choice(list_item.get_property(list_fields.BURR_HOLE_3.value)):
             burr_procedures.extend(self._map_burr_hole_3(list_item))
-        if list_item.get_property(list_fields.BURR_HOLE_4.value):
+        if map_choice(list_item.get_property(list_fields.BURR_HOLE_4.value)):
             burr_procedures.extend(self._map_burr_hole_4(list_item))
         return burr_procedures
 
@@ -1330,11 +1330,10 @@ class SharePointClient:
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         str_helpers = NeurosurgeryAndBehaviorList2023.StringParserHelper
         burr_1_procedures = []
+        procedure_types = []
         if list_item.get_property(list_fields.BURR_HOLE_1.value):
-            procedure_types = list_item.get_property(
-                list_fields.BURR_HOLE_1.value).split(str_helpers.BURR_TYPE_SPLITTER.value)
-        else:
-            procedure_types = []
+            procedure_types.extend(list_item.get_property(
+                list_fields.BURR_HOLE_1.value).split(str_helpers.BURR_TYPE_SPLITTER.value))
         # map generic burr hole fields
         start_date = map_date_to_datetime(
             list_item.get_property(list_fields.DATE_OF_SURGERY.value)
@@ -1371,9 +1370,9 @@ class SharePointClient:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
                 # TODO: missing fields (injection duration, instrument id)
                 # TODO: check fields (workstation id, anaesthesia duration, level)
-                workstation_id = list_item.get_property(
+                workstation_id = map_choice(list_item.get_property(
                     list_fields.WORK_STATION1ST_INJECTION.value
-                )
+                ))
                 injection_type = list_item.get_property(list_fields.INJ1_TYPE.value)
                 burr_coordinate_depth = parse_str_into_float(
                     list_item.get_property(list_fields.VIRUS_D_V.value)
@@ -1465,11 +1464,10 @@ class SharePointClient:
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         str_helpers = NeurosurgeryAndBehaviorList2023.StringParserHelper
         burr_2_procedures = []
+        procedure_types = []
         if list_item.get_property(list_fields.BURR_HOLE_2.value):
-            procedure_types = list_item.get_property(
-                list_fields.BURR_HOLE_2.value).split(str_helpers.BURR_TYPE_SPLITTER.value)
-        else:
-            procedure_types = []
+            procedure_types.extend(list_item.get_property(
+                list_fields.BURR_HOLE_2.value).split(str_helpers.BURR_TYPE_SPLITTER.value))
         start_date = map_date_to_datetime(
             list_item.get_property(list_fields.DATE_OF_SURGERY.value)
         )
@@ -1505,9 +1503,9 @@ class SharePointClient:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
                 # TODO: missing fields (injection duration, instrument id)
                 # TODO: check fields (workstation id, anaesthesia duration, level)
-                workstation_id = list_item.get_property(
+                workstation_id = map_choice(list_item.get_property(
                     list_fields.WORK_STATION1ST_INJECTION.value
-                )
+                ))
                 injection_type = list_item.get_property(list_fields.INJ2_TYPE.value)
                 burr_coordinate_depth = parse_str_into_float(
                     list_item.get_property(list_fields.DV2ND_INJ.value)
@@ -1599,11 +1597,10 @@ class SharePointClient:
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         str_helpers = NeurosurgeryAndBehaviorList2023.StringParserHelper
         burr_3_procedures = []
+        procedure_types = []
         if list_item.get_property(list_fields.BURR_HOLE_3.value):
-            procedure_types = list_item.get_property(
-                list_fields.BURR_HOLE_3.value).split(str_helpers.BURR_TYPE_SPLITTER.value)
-        else:
-            procedure_types = []
+            procedure_types.extend(list_item.get_property(
+                list_fields.BURR_HOLE_3.value).split(str_helpers.BURR_TYPE_SPLITTER.value))
         start_date = map_date_to_datetime(
             list_item.get_property(list_fields.DATE_OF_SURGERY.value)
         )
@@ -1639,9 +1636,9 @@ class SharePointClient:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
                 # TODO: missing fields (injection duration, instrument id)
                 # TODO: check fields (workstation id, anaesthesia duration, level)
-                workstation_id = list_item.get_property(
+                workstation_id = map_choice(list_item.get_property(
                     list_fields.WORK_STATION1ST_INJECTION.value
-                )
+                ))
                 injection_type = list_item.get_property(list_fields.INJ3_TYPE.value)
                 burr_coordinate_depth = parse_str_into_float(
                     list_item.get_property(list_fields.BURR3_DV.value)
@@ -1733,11 +1730,10 @@ class SharePointClient:
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         str_helpers = NeurosurgeryAndBehaviorList2023.StringParserHelper
         burr_4_procedures = []
+        procedure_types = []
         if list_item.get_property(list_fields.BURR_HOLE_4.value):
-            procedure_types = list_item.get_property(
-                list_fields.BURR_HOLE_4.value).split(str_helpers.BURR_TYPE_SPLITTER.value)
-        else:
-            procedure_types = []
+            procedure_types.extend(list_item.get_property(
+                list_fields.BURR_HOLE_4.value).split(str_helpers.BURR_TYPE_SPLITTER.value))
         start_date = map_date_to_datetime(
             list_item.get_property(list_fields.DATE_OF_SURGERY.value)
         )
@@ -1773,10 +1769,10 @@ class SharePointClient:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
                 # TODO: missing fields (injection duration, instrument id)
                 # TODO: check fields (workstation id, anaesthesia duration, level)
-                workstation_id = list_item.get_property(
+                workstation_id = map_choice(list_item.get_property(
                     list_fields.WORK_STATION1ST_INJECTION.value
-                )
-                injection_type = list_item.get_property(list_fields.INJ3_TYPE.value)
+                ))
+                injection_type = list_item.get_property(list_fields.INJ4_TYPE.value)
                 burr_coordinate_depth = parse_str_into_float(
                     list_item.get_property(list_fields.BURR4_DV.value)
                 )
