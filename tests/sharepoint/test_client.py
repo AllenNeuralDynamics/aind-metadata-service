@@ -485,9 +485,6 @@ class Examples:
             iacuc_protocol="2103",
             animal_weight_prior=25.2,
             animal_weight_post=28.2,
-            anaesthesia=Anaesthetic.construct(
-                type="isoflurane", duration=None, level=None
-            ),
             injection_coordinate_ml=-2.3,
             injection_coordinate_ap=4.72,
             injection_coordinate_depth=None,
@@ -537,7 +534,6 @@ class Examples:
             iacuc_protocol="2103",
             animal_weight_prior=25.2,
             animal_weight_post=28.2,
-            anaesthesia=expected_inj_anaesthetic,
             injection_coordinate_ml=3.0,
             injection_coordinate_ap=-2.45,
             injection_coordinate_depth=None,
@@ -552,7 +548,6 @@ class Examples:
             iacuc_protocol="2103",
             animal_weight_prior=25.2,
             animal_weight_post=28.2,
-            anaesthesia=expected_inj_anaesthetic,
             injection_coordinate_ml=3.0,
             injection_coordinate_ap=-2.45,
             injection_coordinate_depth=None,
@@ -567,7 +562,6 @@ class Examples:
             iacuc_protocol="2103",
             animal_weight_prior=25.2,
             animal_weight_post=28.2,
-            anaesthesia=expected_inj_anaesthetic,
             procedure_type="Nanoject (Pressure)",
             injection_coordinate_ml=None,
             injection_coordinate_ap=None,
@@ -588,7 +582,6 @@ class Examples:
             iacuc_protocol="2103",
             animal_weight_prior=25.2,
             animal_weight_post=28.2,
-            anaesthesia=expected_inj_anaesthetic,
             injection_coordinate_ml=-5.2,
             injection_coordinate_ap=-0.85,
             injection_coordinate_depth=-3.1,
@@ -614,7 +607,6 @@ class Examples:
                 stereotactic_coordinate_dv=-2.95,
                 angle=0.0,
             ),
-            anaesthesia=expected_inj_anaesthetic,
         ),
         IontophoresisInjection.construct(
             start_date=datetime.date(2022, 1, 3),
@@ -626,7 +618,6 @@ class Examples:
             notes=None,
             procedure_type="Iontophoresis",
             injection_hemisphere=Side.LEFT,
-            anaesthesia=expected_inj_anaesthetic,
             injection_coordinate_ml=-0.5,
             injection_coordinate_ap=2.0,
             injection_coordinate_depth=5.0,
@@ -650,7 +641,6 @@ class Examples:
                 stereotactic_coordinate_dv=-1.05,
                 angle=0.0,
             ),
-            anaesthesia=expected_inj_anaesthetic,
         ),
         IontophoresisInjection.construct(
             start_date=datetime.date(2022, 1, 3),
@@ -659,7 +649,6 @@ class Examples:
             iacuc_protocol="2103",
             animal_weight_prior=25.2,
             animal_weight_post=28.2,
-            anaesthesia=expected_inj_anaesthetic,
             injection_coordinate_ml=-2.2,
             injection_coordinate_ap=-6.1,
             injection_coordinate_depth=3.1,
@@ -684,7 +673,6 @@ class Examples:
                 stereotactic_coordinate_dv=-1.85,
                 angle=0.0,
             ),
-            anaesthesia=expected_inj_anaesthetic,
         ),
         IontophoresisInjection.construct(
             start_date=datetime.date(2022, 1, 3),
@@ -693,7 +681,6 @@ class Examples:
             iacuc_protocol="2103",
             animal_weight_prior=25.2,
             animal_weight_post=28.2,
-            anaesthesia=expected_inj_anaesthetic,
             injection_coordinate_ml=-2.5,
             injection_coordinate_ap=1.0,
             injection_coordinate_depth=3.0,
@@ -718,7 +705,6 @@ class Examples:
                 stereotactic_coordinate_dv=-1.8,
                 angle=0.0,
             ),
-            anaesthesia=expected_inj_anaesthetic,
         ),
         # from list item 13
         SubjectProcedure.construct(

@@ -1371,12 +1371,9 @@ class SharePointClient:
         burr_angle = parse_str_into_float(
             list_item.get_property(list_fields.INJ1_ANGLE_V2.value)
         )
-        anaesthesia = self._map_1st_injection_anaesthesia(
-            list_item, list_fields
-        )
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
-                # TODO: missing fields (injection duration, instrument id)
+                # TODO: missing fields (instrument id, anaesthesia, recovery time)
                 workstation_id = map_choice(
                     list_item.get_property(
                         list_fields.WORK_STATION1ST_INJECTION.value
@@ -1387,9 +1384,6 @@ class SharePointClient:
                 )
                 burr_coordinate_depth = parse_str_into_float(
                     list_item.get_property(list_fields.VIRUS_D_V.value)
-                )
-                recovery_time = list_item.get_property(
-                    list_fields.FIRST_INJ_RECOVERY.value
                 )
                 if injection_type.strip() == injection_types.IONTO.value:
                     injection_current = parse_str_into_float(
@@ -1415,11 +1409,9 @@ class SharePointClient:
                         injection_coordinate_ap=burr_coordinate_ap,
                         injection_coordinate_depth=burr_coordinate_depth,
                         injection_angle=burr_angle,
-                        anaesthesia=anaesthesia,
                         injection_current=injection_current,
                         injection_duration=injection_duration,
                         alternating_current=alternating_current,
-                        recovery_time=recovery_time,
                     )
                 else:
                     injection_volume = parse_str_into_float(
@@ -1441,9 +1433,7 @@ class SharePointClient:
                         injection_coordinate_ap=burr_coordinate_ap,
                         injection_coordinate_depth=burr_coordinate_depth,
                         injection_angle=burr_angle,
-                        anaesthesia=anaesthesia,
                         injection_volume=injection_volume,
-                        recovery_time=recovery_time,
                     )
                 burr_1_procedures.append(injection)
             elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
@@ -1466,7 +1456,6 @@ class SharePointClient:
                     animal_weight_prior=animal_weight_prior,
                     animal_weight_post=animal_weight_post,
                     probes=ophys_probe,
-                    anaesthesia=anaesthesia,
                 )
                 burr_1_procedures.append(fiber_implant)
         return burr_1_procedures
@@ -1516,12 +1505,9 @@ class SharePointClient:
         burr_angle = parse_str_into_float(
             list_item.get_property(list_fields.INJ2_ANGLE_V2.value)
         )
-        anaesthesia = self._map_1st_injection_anaesthesia(
-            list_item, list_fields
-        )
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
-                # TODO: missing fields (injection duration, instrument id)
+                # TODO: missing fields (instrument id, anaesthesia, recovery time)
                 workstation_id = map_choice(
                     list_item.get_property(
                         list_fields.WORK_STATION1ST_INJECTION.value
@@ -1532,9 +1518,6 @@ class SharePointClient:
                 )
                 burr_coordinate_depth = parse_str_into_float(
                     list_item.get_property(list_fields.DV2ND_INJ.value)
-                )
-                recovery_time = list_item.get_property(
-                    list_fields.FIRST_INJ_RECOVERY.value
                 )
                 if injection_type.strip() == injection_types.IONTO.value:
                     injection_current = parse_str_into_float(
@@ -1560,11 +1543,9 @@ class SharePointClient:
                         injection_coordinate_ap=burr_coordinate_ap,
                         injection_coordinate_depth=burr_coordinate_depth,
                         injection_angle=burr_angle,
-                        anaesthesia=anaesthesia,
                         injection_current=injection_current,
                         injection_duration=injection_duration,
                         alternating_current=alternating_current,
-                        recovery_time=recovery_time,
                     )
                 else:
                     injection_volume = parse_str_into_float(
@@ -1586,9 +1567,7 @@ class SharePointClient:
                         injection_coordinate_ap=burr_coordinate_ap,
                         injection_coordinate_depth=burr_coordinate_depth,
                         injection_angle=burr_angle,
-                        anaesthesia=anaesthesia,
                         injection_volume=injection_volume,
-                        recovery_time=recovery_time,
                     )
                 burr_2_procedures.append(injection)
             elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
@@ -1611,7 +1590,6 @@ class SharePointClient:
                     animal_weight_prior=animal_weight_prior,
                     animal_weight_post=animal_weight_post,
                     probes=ophys_probe,
-                    anaesthesia=anaesthesia,
                 )
                 burr_2_procedures.append(fiber_implant)
         return burr_2_procedures
@@ -1661,12 +1639,9 @@ class SharePointClient:
         burr_angle = parse_str_into_float(
             list_item.get_property(list_fields.BURR3_ANGLE.value)
         )
-        anaesthesia = self._map_1st_injection_anaesthesia(
-            list_item, list_fields
-        )
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
-                # TODO: missing fields (injection duration, instrument id)
+                # TODO: missing fields (instrument id, anaesthesia, recovery time)
                 workstation_id = map_choice(
                     list_item.get_property(
                         list_fields.WORK_STATION1ST_INJECTION.value
@@ -1677,9 +1652,6 @@ class SharePointClient:
                 )
                 burr_coordinate_depth = parse_str_into_float(
                     list_item.get_property(list_fields.BURR3_DV.value)
-                )
-                recovery_time = list_item.get_property(
-                    list_fields.FIRST_INJ_RECOVERY.value
                 )
                 if injection_type.strip() == injection_types.IONTO.value:
                     injection_current = parse_str_into_float(
@@ -1705,11 +1677,9 @@ class SharePointClient:
                         injection_coordinate_ap=burr_coordinate_ap,
                         injection_coordinate_depth=burr_coordinate_depth,
                         injection_angle=burr_angle,
-                        anaesthesia=anaesthesia,
                         injection_current=injection_current,
                         injection_duration=injection_duration,
                         alternating_current=alternating_current,
-                        recovery_time=recovery_time,
                     )
                 else:
                     injection_volume = parse_str_into_float(
@@ -1731,9 +1701,7 @@ class SharePointClient:
                         injection_coordinate_ap=burr_coordinate_ap,
                         injection_coordinate_depth=burr_coordinate_depth,
                         injection_angle=burr_angle,
-                        anaesthesia=anaesthesia,
                         injection_volume=injection_volume,
-                        recovery_time=recovery_time,
                     )
                 burr_3_procedures.append(injection)
             elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
@@ -1756,7 +1724,6 @@ class SharePointClient:
                     animal_weight_prior=animal_weight_prior,
                     animal_weight_post=animal_weight_post,
                     probes=ophys_probe,
-                    anaesthesia=anaesthesia,
                 )
                 burr_3_procedures.append(fiber_implant)
         return burr_3_procedures
@@ -1806,12 +1773,9 @@ class SharePointClient:
         burr_angle = parse_str_into_float(
             list_item.get_property(list_fields.BURR4_ANGLE.value)
         )
-        anaesthesia = self._map_1st_injection_anaesthesia(
-            list_item, list_fields
-        )
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
-                # TODO: missing fields (injection duration, instrument id)
+                # TODO: missing fields (instrument id, anaesthesia, recovery time)
                 workstation_id = map_choice(
                     list_item.get_property(
                         list_fields.WORK_STATION1ST_INJECTION.value
@@ -1822,9 +1786,6 @@ class SharePointClient:
                 )
                 burr_coordinate_depth = parse_str_into_float(
                     list_item.get_property(list_fields.BURR4_DV.value)
-                )
-                recovery_time = list_item.get_property(
-                    list_fields.FIRST_INJ_RECOVERY.value
                 )
                 if injection_type.strip() == injection_types.IONTO.value:
                     injection_current = parse_str_into_float(
@@ -1850,11 +1811,9 @@ class SharePointClient:
                         injection_coordinate_ap=burr_coordinate_ap,
                         injection_coordinate_depth=burr_coordinate_depth,
                         injection_angle=burr_angle,
-                        anaesthesia=anaesthesia,
                         injection_current=injection_current,
                         injection_duration=injection_duration,
                         alternating_current=alternating_current,
-                        recovery_time=recovery_time,
                     )
                 else:
                     injection_volume = parse_str_into_float(
@@ -1876,9 +1835,7 @@ class SharePointClient:
                         injection_coordinate_ap=burr_coordinate_ap,
                         injection_coordinate_depth=burr_coordinate_depth,
                         injection_angle=burr_angle,
-                        anaesthesia=anaesthesia,
                         injection_volume=injection_volume,
-                        recovery_time=recovery_time,
                     )
                 burr_4_procedures.append(injection)
             elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
@@ -1902,7 +1859,6 @@ class SharePointClient:
                     animal_weight_prior=animal_weight_prior,
                     animal_weight_post=animal_weight_post,
                     probes=ophys_probe,
-                    anaesthesia=anaesthesia,
                 )
                 burr_4_procedures.append(fiber_implant)
         return burr_4_procedures
