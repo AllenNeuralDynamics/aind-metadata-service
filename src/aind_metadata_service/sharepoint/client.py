@@ -1451,6 +1451,7 @@ class SharePointClient:
                     animal_weight_prior=animal_weight_prior,
                     animal_weight_post=animal_weight_post,
                     probes=ophys_probe,
+                    anaesthesia=anaesthesia,
                 )
                 burr_1_procedures.append(fiber_implant)
         return burr_1_procedures
@@ -1584,6 +1585,7 @@ class SharePointClient:
                     animal_weight_prior=animal_weight_prior,
                     animal_weight_post=animal_weight_post,
                     probes=ophys_probe,
+                    anaesthesia=anaesthesia,
                 )
                 burr_2_procedures.append(fiber_implant)
         return burr_2_procedures
@@ -1717,6 +1719,7 @@ class SharePointClient:
                     animal_weight_prior=animal_weight_prior,
                     animal_weight_post=animal_weight_post,
                     probes=ophys_probe,
+                    anaesthesia=anaesthesia,
                 )
                 burr_3_procedures.append(fiber_implant)
         return burr_3_procedures
@@ -1851,6 +1854,7 @@ class SharePointClient:
                     animal_weight_prior=animal_weight_prior,
                     animal_weight_post=animal_weight_post,
                     probes=ophys_probe,
+                    anaesthesia=anaesthesia,
                 )
                 burr_4_procedures.append(fiber_implant)
         return burr_4_procedures
