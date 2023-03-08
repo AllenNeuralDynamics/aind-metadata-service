@@ -1839,8 +1839,7 @@ class SharePointClient:
                     )
                 burr_4_procedures.append(injection)
             elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
-                # TODO: map to "Probe D" from aind-data-schema 0.12.13
-                name = "Probe D"
+                name = ProbeName.PROBE_D.value
                 fiber_implant_depth = parse_str_into_float(
                     list_item.get_property(list_fields.FIBER_IMPLANT4_D.value)
                 )

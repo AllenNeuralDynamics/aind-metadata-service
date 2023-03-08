@@ -471,7 +471,7 @@ class Examples:
 
     expected_procedures1 = Procedures.construct(
         describedBy=described_by,
-        schema_version="0.6.1",
+        schema_version="0.6.2",
         subject_id="650102",
         subject_procedures=expected_subject_procedures1,
     )
