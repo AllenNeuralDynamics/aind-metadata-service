@@ -476,42 +476,110 @@ class Examples:
         subject_procedures=expected_subject_procedures1,
     )
 
+    # list item 14 (burr holes)
     expected_subject_procedures2 = [
         Headframe.construct(
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
             experimenter_full_name="NSB-187",
         ),
-        Headframe.construct(
+        NanojectInjection.construct(
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
             experimenter_full_name="NSB-187",
-        ),
-        IontophoresisInjection.construct(
-            start_date=datetime.date(2022, 1, 3),
-            end_date=datetime.date(2022, 1, 3),
-            experimenter_full_name="NSB-187",
-        ),
-        IontophoresisInjection.construct(
-            start_date=datetime.date(2022, 1, 3),
-            end_date=datetime.date(2022, 1, 3),
-            experimenter_full_name="NSB-187",
-        ),
-        IontophoresisInjection.construct(
-            start_date=datetime.date(2022, 1, 3),
-            end_date=datetime.date(2022, 1, 3),
-            experimenter_full_name="NSB-187",
-        ),
-        Craniotomy.construct(
-            start_date=datetime.date(2022, 1, 3),
-            end_date=datetime.date(2022, 1, 3),
-            experimenter_full_name="NSB-187",
+            iacuc_protocol="2103",
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
+            anaesthesia=expected_inj_anaesthetic,
+            injection_coordinate_ml=-5.2,
+            injection_coordinate_ap=-0.85,
+            injection_coordinate_depth=-3.1,
+            injection_angle=0.0,
+            injection_hemisphere=Side.LEFT,
+            procedure_type="Nanoject (Pressure)",
+            injection_volume=600,
+            notes=None,
         ),
         FiberImplant.construct(
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
             experimenter_full_name="NSB-187",
+            iacuc_protocol="2103",
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
+            notes=None,
+            procedure_type="Fiber implant",
+            probes=OphysProbe.construct(
+                name="Probe A",
+                stereotactic_coordinate_ap=-0.85,
+                stereotactic_coordinate_ml=-5.2,
+                stereotactic_coordinate_dv=-2.95,
+                angle=0.0,
+            ),
         ),
+        FiberImplant.construct(
+            start_date=datetime.date(2022, 1, 3),
+            end_date=datetime.date(2022, 1, 3),
+            experimenter_full_name='NSB-187',
+            iacuc_protocol='2103',
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
+            notes=None,
+            procedure_type='Fiber implant',
+            probes=OphysProbe.construct(
+                name='Probe B',
+                stereotactic_coordinate_ap=2.0,
+                stereotactic_coordinate_ml=-0.5,
+                stereotactic_coordinate_dv=-1.05,
+                angle=0.0,
+            ),
+        ),
+        FiberImplant.construct(
+            start_date=datetime.date(2022, 1, 3),
+            end_date=datetime.date(2022, 1, 3),
+            experimenter_full_name='NSB-187',
+            iacuc_protocol='2103',
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
+            procedure_type='Fiber implant',
+            probes=OphysProbe.construct(
+                name='Probe C',
+                stereotactic_coordinate_ap=-6.1,
+                stereotactic_coordinate_ml=-2.2,
+                stereotactic_coordinate_dv=-1.85,
+                angle=0.0,
+            )
+        ),
+        # Headframe.construct(
+        #     start_date=datetime.date(2022, 1, 3),
+        #     end_date=datetime.date(2022, 1, 3),
+        #     experimenter_full_name="NSB-187",
+        # ),
+        # IontophoresisInjection.construct(
+        #     start_date=datetime.date(2022, 1, 3),
+        #     end_date=datetime.date(2022, 1, 3),
+        #     experimenter_full_name="NSB-187",
+        # ),
+        # IontophoresisInjection.construct(
+        #     start_date=datetime.date(2022, 1, 3),
+        #     end_date=datetime.date(2022, 1, 3),
+        #     experimenter_full_name="NSB-187",
+        # ),
+        # IontophoresisInjection.construct(
+        #     start_date=datetime.date(2022, 1, 3),
+        #     end_date=datetime.date(2022, 1, 3),
+        #     experimenter_full_name="NSB-187",
+        # ),
+        # Craniotomy.construct(
+        #     start_date=datetime.date(2022, 1, 3),
+        #     end_date=datetime.date(2022, 1, 3),
+        #     experimenter_full_name="NSB-187",
+        # ),
+        # FiberImplant.construct(
+        #     start_date=datetime.date(2022, 1, 3),
+        #     end_date=datetime.date(2022, 1, 3),
+        #     experimenter_full_name="NSB-187",
+        # ),
         SubjectProcedure.construct(
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
@@ -596,26 +664,30 @@ class TestSharepointClient(unittest.TestCase):
         )
 
         list_item_collection_2023 = ListItemCollection(context=blank_ctx)
-        list_item8 = ListItem(context=blank_ctx)
-        list_item8.get_property = lambda x: Examples.list_item8_json[x]
-        list_item_collection_2023.add_child(list_item8)
-
-        list_item9 = ListItem(context=blank_ctx)
-        list_item9.get_property = lambda x: Examples.list_item9_json[x]
-        list_item_collection_2023.add_child(list_item9)
-
-        list_item10 = ListItem(context=blank_ctx)
-        list_item10.get_property = lambda x: Examples.list_item10_json[x]
-        list_item_collection_2023.add_child(list_item10)
-
-        list_item11 = ListItem(context=blank_ctx)
-        list_item11.get_property = lambda x: Examples.list_item11_json[x]
-        list_item_collection_2023.add_child(list_item11)
+        # list_item8 = ListItem(context=blank_ctx)
+        # list_item8.get_property = lambda x: Examples.list_item8_json[x]
+        # list_item_collection_2023.add_child(list_item8)
+        #
+        # list_item9 = ListItem(context=blank_ctx)
+        # list_item9.get_property = lambda x: Examples.list_item9_json[x]
+        # list_item_collection_2023.add_child(list_item9)
+        #
+        # list_item10 = ListItem(context=blank_ctx)
+        # list_item10.get_property = lambda x: Examples.list_item10_json[x]
+        # list_item_collection_2023.add_child(list_item10)
+        #
+        # list_item11 = ListItem(context=blank_ctx)
+        # list_item11.get_property = lambda x: Examples.list_item11_json[x]
+        # list_item_collection_2023.add_child(list_item11)
 
         # add list item with no procedure
         list_item13 = ListItem(context=blank_ctx)
         list_item13.get_property = lambda x: Examples.list_item13_json[x]
         list_item_collection_2023.add_child(list_item13)
+
+        list_item14 = ListItem(context=blank_ctx)
+        list_item14.get_property = lambda x: Examples.list_item14_json[x]
+        list_item_collection_2023.add_child(list_item14)
 
         procedures2023 = self.client._map_response(
             version=version_2023,

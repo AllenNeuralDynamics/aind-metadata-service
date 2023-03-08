@@ -1308,24 +1308,24 @@ class SharePointClient:
             self,
             list_item: ClientObject,
     ) -> List[Union[FiberImplant, IontophoresisInjection, NanojectInjection]]:
-        """Maps Burr Holes in a SharePoint ListItem to list of FiberImplants and Injections"""
+        """Maps Burr Holes in a 2023 SharePoint ListItem to list of FiberImplants and Injections"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         burr_procedures = []
         if list_item.get_property(list_fields.BURR_HOLE_1.value):
             burr_procedures.extend(self._map_burr_hole_1(list_item))
-        # if list_item.get_property(list_fields.BURR_HOLE_2.value):
-        #     burr_procedures.append(self._map_burr_hole_2(list_item))
-        # if list_item.get_property(list_fields.BURR_HOLE_3.value):
-        #     burr_procedures.append(self._map_burr_hole_3(list_item))
-        # if list_item.get_property(list_fields.BURR_HOLE_4.value):
-        #     burr_procedures.append(self._map_burr_hole_4(list_item))
+        if list_item.get_property(list_fields.BURR_HOLE_2.value):
+            burr_procedures.extend(self._map_burr_hole_2(list_item))
+        if list_item.get_property(list_fields.BURR_HOLE_3.value):
+            burr_procedures.extend(self._map_burr_hole_3(list_item))
+        if list_item.get_property(list_fields.BURR_HOLE_4.value):
+            burr_procedures.extend(self._map_burr_hole_4(list_item))
         return burr_procedures
 
     def _map_burr_hole_1(
             self,
             list_item: ClientObject,
     ) -> List[Union[IontophoresisInjection, NanojectInjection, FiberImplant]]:
-        """Maps 1st burr hole"""
+        """Maps 1st burr hole to Injections and/or FiberImplants"""
         nsb_burr_types = NeurosurgeryAndBehaviorList2023.BurrHoleType
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         str_helpers = NeurosurgeryAndBehaviorList2023.StringParserHelper
@@ -1335,7 +1335,7 @@ class SharePointClient:
                 list_fields.BURR_HOLE_1.value).split(str_helpers.BURR_TYPE_SPLITTER.value)
         else:
             procedure_types = []
-        # map burr hole fields
+        # map generic burr hole fields
         start_date = map_date_to_datetime(
             list_item.get_property(list_fields.DATE_OF_SURGERY.value)
         )
@@ -1364,9 +1364,13 @@ class SharePointClient:
         burr_angle = parse_str_into_float(
             list_item.get_property(list_fields.INJ1_ANGLE_V2.value)
         )
+        anaesthesia = self._map_1st_injection_anaesthesia(
+            list_item, list_fields
+        )
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
-                # TODO: missing fields (anaesthesia, injection duration, recovery time)
+                # TODO: missing fields (injection duration, instrument id)
+                # TODO: check fields (workstation id, anaesthesia duration, level)
                 workstation_id = list_item.get_property(
                     list_fields.WORK_STATION1ST_INJECTION.value
                 )
@@ -1374,8 +1378,10 @@ class SharePointClient:
                 burr_coordinate_depth = parse_str_into_float(
                     list_item.get_property(list_fields.VIRUS_D_V.value)
                 )
+                recovery_time = list_item.get_property(
+                    list_fields.FIRST_INJ_RECOVERY.value
+                )
                 if injection_type.strip() == NeurosurgeryAndBehaviorList2023.InjectionType.IONTO.value:
-                    # TODO: instrument id
                     injection_current = parse_str_into_float(
                         list_item.get_property(list_fields.INJ1_CURRENT.value)
                     )
@@ -1399,14 +1405,16 @@ class SharePointClient:
                         injection_coordinate_ap=burr_coordinate_ap,
                         injection_coordinate_depth=burr_coordinate_depth,
                         injection_angle=burr_angle,
+                        anaesthesia=anaesthesia,
                         injection_current=injection_current,
                         injection_duration=injection_duration,
                         alternating_current=alternating_current,
+                        recovery_time=recovery_time,
                     )
                 else:
-                    injection_volume = list_item.get_property(
+                    injection_volume = parse_str_into_float(list_item.get_property(
                         list_fields.INJ1VOLPERDEPTH.value
-                    )
+                    ))
                     injection = NanojectInjection.construct(
                         start_date=start_date,
                         end_date=end_date,
@@ -1421,13 +1429,14 @@ class SharePointClient:
                         injection_coordinate_ap=burr_coordinate_ap,
                         injection_coordinate_depth=burr_coordinate_depth,
                         injection_angle=burr_angle,
+                        anaesthesia=anaesthesia,
                         injection_volume=injection_volume,
+                        recovery_time=recovery_time,
                     )
                 burr_1_procedures.append(injection)
             elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
-                # TODO: map each burr hole as a fiber implant, or map each burr hole as a probe?
                 name = ProbeName.PROBE_A.value
-                fiber_implant_depth = list_item.get_property(list_fields.FIBER_IMPLANT1_DV.value)
+                fiber_implant_depth = parse_str_into_float(list_item.get_property(list_fields.FIBER_IMPLANT1_DV.value))
                 ophys_probe = OphysProbe.construct(
                     name=name,
                     stereotactic_coordinate_ml=burr_coordinate_ml,
@@ -1447,9 +1456,20 @@ class SharePointClient:
                 burr_1_procedures.append(fiber_implant)
         return burr_1_procedures
 
-    def _map_list_item_to_injection_2023(self, list_item: ClientObject):
-        """Maps a SharePoint ClientObject to an Injection model"""
+    def _map_burr_hole_2(
+            self,
+            list_item: ClientObject,
+    ) -> List[Union[IontophoresisInjection, NanojectInjection, FiberImplant]]:
+        """Maps 2nd burr hole to Injections and/or FiberImplants"""
+        nsb_burr_types = NeurosurgeryAndBehaviorList2023.BurrHoleType
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
+        str_helpers = NeurosurgeryAndBehaviorList2023.StringParserHelper
+        burr_2_procedures = []
+        if list_item.get_property(list_fields.BURR_HOLE_2.value):
+            procedure_types = list_item.get_property(
+                list_fields.BURR_HOLE_2.value).split(str_helpers.BURR_TYPE_SPLITTER.value)
+        else:
+            procedure_types = []
         start_date = map_date_to_datetime(
             list_item.get_property(list_fields.DATE_OF_SURGERY.value)
         )
@@ -1457,19 +1477,133 @@ class SharePointClient:
         experimenter_full_name = self._map_experimenter_name(
             list_item, list_fields
         )
-        injection = IontophoresisInjection.construct(
-            start_date=start_date,
-            end_date=end_date,
-            experimenter_full_name=experimenter_full_name,
+        iacuc_protocol = list_item.get_property(
+            list_fields.IACUC_PROTOCOL.value
         )
-        return injection
+        animal_weight_prior = parse_str_into_float(
+            list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER.value)
+        )
+        animal_weight_post = parse_str_into_float(
+            list_item.get_property(list_fields.WEIGHT_AFTER_SURGERY.value)
+        )
+        burr_hemisphere = map_hemisphere(
+            list_item.get_property(list_fields.HEMISPHERE2ND_INJ.value)
+        )
+        burr_coordinate_ml = parse_str_into_float(
+            list_item.get_property(list_fields.ML2ND_INJ.value)
+        )
+        burr_coordinate_ap = parse_str_into_float(
+            list_item.get_property(list_fields.AP2ND_INJ.value)
+        )
+        burr_angle = parse_str_into_float(
+            list_item.get_property(list_fields.INJ2_ANGLE_V2.value)
+        )
+        anaesthesia = self._map_1st_injection_anaesthesia(
+            list_item, list_fields
+        )
+        for procedure in procedure_types:
+            if procedure.strip() == nsb_burr_types.INJECTION.value:
+                # TODO: missing fields (injection duration, instrument id)
+                # TODO: check fields (workstation id, anaesthesia duration, level)
+                workstation_id = list_item.get_property(
+                    list_fields.WORK_STATION1ST_INJECTION.value
+                )
+                injection_type = list_item.get_property(list_fields.INJ2_TYPE.value)
+                burr_coordinate_depth = parse_str_into_float(
+                    list_item.get_property(list_fields.DV2ND_INJ.value)
+                )
+                recovery_time = list_item.get_property(
+                    list_fields.FIRST_INJ_RECOVERY.value
+                )
+                if injection_type.strip() == NeurosurgeryAndBehaviorList2023.InjectionType.IONTO.value:
+                    injection_current = parse_str_into_float(
+                        list_item.get_property(list_fields.INJ2_CURRENT.value)
+                    )
+                    alternating_current = list_item.get_property(
+                        list_fields.INJ2_ALTERNATING_TIME.value
+                    )
+                    injection_duration = list_item.get_property(
+                        list_fields.INJ2_IONTO_TIME.value
+                    )
+                    injection = IontophoresisInjection.construct(
+                        start_date=start_date,
+                        end_date=end_date,
+                        experimenter_full_name=experimenter_full_name,
+                        iacuc_protocol=iacuc_protocol,
+                        animal_weight_prior=animal_weight_prior,
+                        animal_weight_post=animal_weight_post,
+                        procedure_type=injection_type,
+                        workstation_id=workstation_id,
+                        injection_hemisphere=burr_hemisphere,
+                        injection_coordinate_ml=burr_coordinate_ml,
+                        injection_coordinate_ap=burr_coordinate_ap,
+                        injection_coordinate_depth=burr_coordinate_depth,
+                        injection_angle=burr_angle,
+                        anaesthesia=anaesthesia,
+                        injection_current=injection_current,
+                        injection_duration=injection_duration,
+                        alternating_current=alternating_current,
+                        recovery_time=recovery_time,
+                    )
+                else:
+                    injection_volume = parse_str_into_float(list_item.get_property(
+                        list_fields.INJ2VOLPERDEPTH.value
+                    ))
+                    injection = NanojectInjection.construct(
+                        start_date=start_date,
+                        end_date=end_date,
+                        experimenter_full_name=experimenter_full_name,
+                        iacuc_protocol=iacuc_protocol,
+                        animal_weight_prior=animal_weight_prior,
+                        animal_weight_post=animal_weight_post,
+                        procedure_type=injection_type,
+                        workstation_id=workstation_id,
+                        injection_hemisphere=burr_hemisphere,
+                        injection_coordinate_ml=burr_coordinate_ml,
+                        injection_coordinate_ap=burr_coordinate_ap,
+                        injection_coordinate_depth=burr_coordinate_depth,
+                        injection_angle=burr_angle,
+                        anaesthesia=anaesthesia,
+                        injection_volume=injection_volume,
+                        recovery_time=recovery_time,
+                    )
+                burr_2_procedures.append(injection)
+            elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
+                name = ProbeName.PROBE_B.value
+                fiber_implant_depth = parse_str_into_float(list_item.get_property(list_fields.FIBER_IMPLANT2_DV.value))
+                ophys_probe = OphysProbe.construct(
+                    name=name,
+                    stereotactic_coordinate_ml=burr_coordinate_ml,
+                    stereotactic_coordinate_ap=burr_coordinate_ap,
+                    stereotactic_coordinate_dv=fiber_implant_depth,
+                    angle=burr_angle,
+                )
+                fiber_implant = FiberImplant.construct(
+                    start_date=start_date,
+                    end_date=end_date,
+                    experimenter_full_name=experimenter_full_name,
+                    iacuc_protocol=iacuc_protocol,
+                    animal_weight_prior=animal_weight_prior,
+                    animal_weight_post=animal_weight_post,
+                    probes=ophys_probe,
+                )
+                burr_2_procedures.append(fiber_implant)
+        return burr_2_procedures
 
-    def _map_list_item_to_fiber_implant_2023(
-        self,
-        list_item: ClientObject,
-    ) -> FiberImplant:
-        """Maps a SharePoint ListItem to a FiberImplant model"""
+    def _map_burr_hole_3(
+            self,
+            list_item: ClientObject,
+    ) -> List[Union[IontophoresisInjection, NanojectInjection, FiberImplant]]:
+        """Maps 3rd burr hole to Injections and/or FiberImplants"""
+        nsb_burr_types = NeurosurgeryAndBehaviorList2023.BurrHoleType
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
+        str_helpers = NeurosurgeryAndBehaviorList2023.StringParserHelper
+        burr_3_procedures = []
+        if list_item.get_property(list_fields.BURR_HOLE_3.value):
+            procedure_types = list_item.get_property(
+                list_fields.BURR_HOLE_3.value).split(str_helpers.BURR_TYPE_SPLITTER.value)
+        else:
+            procedure_types = []
         start_date = map_date_to_datetime(
             list_item.get_property(list_fields.DATE_OF_SURGERY.value)
         )
@@ -1477,12 +1611,253 @@ class SharePointClient:
         experimenter_full_name = self._map_experimenter_name(
             list_item, list_fields
         )
-        fiber_implant = FiberImplant.construct(
-            start_date=start_date,
-            end_date=end_date,
-            experimenter_full_name=experimenter_full_name,
+        iacuc_protocol = list_item.get_property(
+            list_fields.IACUC_PROTOCOL.value
         )
-        return fiber_implant
+        animal_weight_prior = parse_str_into_float(
+            list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER.value)
+        )
+        animal_weight_post = parse_str_into_float(
+            list_item.get_property(list_fields.WEIGHT_AFTER_SURGERY.value)
+        )
+        burr_hemisphere = map_hemisphere(
+            list_item.get_property(list_fields.BURR3_HEMISPHERE.value)
+        )
+        burr_coordinate_ml = parse_str_into_float(
+            list_item.get_property(list_fields.BURR3_ML.value)
+        )
+        burr_coordinate_ap = parse_str_into_float(
+            list_item.get_property(list_fields.BURR3_AP.value)
+        )
+        burr_angle = parse_str_into_float(
+            list_item.get_property(list_fields.BURR3_ANGLE.value)
+        )
+        anaesthesia = self._map_1st_injection_anaesthesia(
+            list_item, list_fields
+        )
+        for procedure in procedure_types:
+            if procedure.strip() == nsb_burr_types.INJECTION.value:
+                # TODO: missing fields (injection duration, instrument id)
+                # TODO: check fields (workstation id, anaesthesia duration, level)
+                workstation_id = list_item.get_property(
+                    list_fields.WORK_STATION1ST_INJECTION.value
+                )
+                injection_type = list_item.get_property(list_fields.INJ3_TYPE.value)
+                burr_coordinate_depth = parse_str_into_float(
+                    list_item.get_property(list_fields.BURR3_DV.value)
+                )
+                recovery_time = list_item.get_property(
+                    list_fields.FIRST_INJ_RECOVERY.value
+                )
+                if injection_type.strip() == NeurosurgeryAndBehaviorList2023.InjectionType.IONTO.value:
+                    injection_current = parse_str_into_float(
+                        list_item.get_property(list_fields.INJ3_CURRENT.value)
+                    )
+                    alternating_current = list_item.get_property(
+                        list_fields.INJ3_ALTERNATING_TIME.value
+                    )
+                    injection_duration = list_item.get_property(
+                        list_fields.INJ3_IONTO_TIME.value
+                    )
+                    injection = IontophoresisInjection.construct(
+                        start_date=start_date,
+                        end_date=end_date,
+                        experimenter_full_name=experimenter_full_name,
+                        iacuc_protocol=iacuc_protocol,
+                        animal_weight_prior=animal_weight_prior,
+                        animal_weight_post=animal_weight_post,
+                        procedure_type=injection_type,
+                        workstation_id=workstation_id,
+                        injection_hemisphere=burr_hemisphere,
+                        injection_coordinate_ml=burr_coordinate_ml,
+                        injection_coordinate_ap=burr_coordinate_ap,
+                        injection_coordinate_depth=burr_coordinate_depth,
+                        injection_angle=burr_angle,
+                        anaesthesia=anaesthesia,
+                        injection_current=injection_current,
+                        injection_duration=injection_duration,
+                        alternating_current=alternating_current,
+                        recovery_time=recovery_time,
+                    )
+                else:
+                    injection_volume = parse_str_into_float(list_item.get_property(
+                        list_fields.INJ3VOLPERDEPTH.value
+                    ))
+                    injection = NanojectInjection.construct(
+                        start_date=start_date,
+                        end_date=end_date,
+                        experimenter_full_name=experimenter_full_name,
+                        iacuc_protocol=iacuc_protocol,
+                        animal_weight_prior=animal_weight_prior,
+                        animal_weight_post=animal_weight_post,
+                        procedure_type=injection_type,
+                        workstation_id=workstation_id,
+                        injection_hemisphere=burr_hemisphere,
+                        injection_coordinate_ml=burr_coordinate_ml,
+                        injection_coordinate_ap=burr_coordinate_ap,
+                        injection_coordinate_depth=burr_coordinate_depth,
+                        injection_angle=burr_angle,
+                        anaesthesia=anaesthesia,
+                        injection_volume=injection_volume,
+                        recovery_time=recovery_time,
+                    )
+                burr_3_procedures.append(injection)
+            elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
+                name = ProbeName.PROBE_C.value
+                fiber_implant_depth = parse_str_into_float(list_item.get_property(list_fields.FIBER_IMPLANT3_D.value))
+                ophys_probe = OphysProbe.construct(
+                    name=name,
+                    stereotactic_coordinate_ml=burr_coordinate_ml,
+                    stereotactic_coordinate_ap=burr_coordinate_ap,
+                    stereotactic_coordinate_dv=fiber_implant_depth,
+                    angle=burr_angle,
+                )
+                fiber_implant = FiberImplant.construct(
+                    start_date=start_date,
+                    end_date=end_date,
+                    experimenter_full_name=experimenter_full_name,
+                    iacuc_protocol=iacuc_protocol,
+                    animal_weight_prior=animal_weight_prior,
+                    animal_weight_post=animal_weight_post,
+                    probes=ophys_probe,
+                )
+                burr_3_procedures.append(fiber_implant)
+        return burr_3_procedures
+
+    def _map_burr_hole_4(
+            self,
+            list_item: ClientObject,
+    ) -> List[Union[IontophoresisInjection, NanojectInjection, FiberImplant]]:
+        """Maps 4th burr hole to Injections and/or FiberImplants"""
+        nsb_burr_types = NeurosurgeryAndBehaviorList2023.BurrHoleType
+        list_fields = NeurosurgeryAndBehaviorList2023.ListField
+        str_helpers = NeurosurgeryAndBehaviorList2023.StringParserHelper
+        burr_4_procedures = []
+        if list_item.get_property(list_fields.BURR_HOLE_4.value):
+            procedure_types = list_item.get_property(
+                list_fields.BURR_HOLE_4.value).split(str_helpers.BURR_TYPE_SPLITTER.value)
+        else:
+            procedure_types = []
+        start_date = map_date_to_datetime(
+            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
+        )
+        end_date = start_date
+        experimenter_full_name = self._map_experimenter_name(
+            list_item, list_fields
+        )
+        iacuc_protocol = list_item.get_property(
+            list_fields.IACUC_PROTOCOL.value
+        )
+        animal_weight_prior = parse_str_into_float(
+            list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER.value)
+        )
+        animal_weight_post = parse_str_into_float(
+            list_item.get_property(list_fields.WEIGHT_AFTER_SURGERY.value)
+        )
+        burr_hemisphere = map_hemisphere(
+            list_item.get_property(list_fields.BURR4_HEMISPHERE.value)
+        )
+        burr_coordinate_ml = parse_str_into_float(
+            list_item.get_property(list_fields.BURR4_ML.value)
+        )
+        burr_coordinate_ap = parse_str_into_float(
+            list_item.get_property(list_fields.BURR4_AP.value)
+        )
+        burr_angle = parse_str_into_float(
+            list_item.get_property(list_fields.BURR4_ANGLE.value)
+        )
+        anaesthesia = self._map_1st_injection_anaesthesia(
+            list_item, list_fields
+        )
+        for procedure in procedure_types:
+            if procedure.strip() == nsb_burr_types.INJECTION.value:
+                # TODO: missing fields (injection duration, instrument id)
+                # TODO: check fields (workstation id, anaesthesia duration, level)
+                workstation_id = list_item.get_property(
+                    list_fields.WORK_STATION1ST_INJECTION.value
+                )
+                injection_type = list_item.get_property(list_fields.INJ3_TYPE.value)
+                burr_coordinate_depth = parse_str_into_float(
+                    list_item.get_property(list_fields.BURR4_DV.value)
+                )
+                recovery_time = list_item.get_property(
+                    list_fields.FIRST_INJ_RECOVERY.value
+                )
+                if injection_type.strip() == NeurosurgeryAndBehaviorList2023.InjectionType.IONTO.value:
+                    injection_current = parse_str_into_float(
+                        list_item.get_property(list_fields.INJ4_CURRENT.value)
+                    )
+                    alternating_current = list_item.get_property(
+                        list_fields.INJ4_ALTERNATING_TIME.value
+                    )
+                    injection_duration = list_item.get_property(
+                        list_fields.INJ4_IONTO_TIME.value
+                    )
+                    injection = IontophoresisInjection.construct(
+                        start_date=start_date,
+                        end_date=end_date,
+                        experimenter_full_name=experimenter_full_name,
+                        iacuc_protocol=iacuc_protocol,
+                        animal_weight_prior=animal_weight_prior,
+                        animal_weight_post=animal_weight_post,
+                        procedure_type=injection_type,
+                        workstation_id=workstation_id,
+                        injection_hemisphere=burr_hemisphere,
+                        injection_coordinate_ml=burr_coordinate_ml,
+                        injection_coordinate_ap=burr_coordinate_ap,
+                        injection_coordinate_depth=burr_coordinate_depth,
+                        injection_angle=burr_angle,
+                        anaesthesia=anaesthesia,
+                        injection_current=injection_current,
+                        injection_duration=injection_duration,
+                        alternating_current=alternating_current,
+                        recovery_time=recovery_time,
+                    )
+                else:
+                    injection_volume = parse_str_into_float(list_item.get_property(
+                        list_fields.INJ4VOLPERDEPTH.value
+                    ))
+                    injection = NanojectInjection.construct(
+                        start_date=start_date,
+                        end_date=end_date,
+                        experimenter_full_name=experimenter_full_name,
+                        iacuc_protocol=iacuc_protocol,
+                        animal_weight_prior=animal_weight_prior,
+                        animal_weight_post=animal_weight_post,
+                        procedure_type=injection_type,
+                        workstation_id=workstation_id,
+                        injection_hemisphere=burr_hemisphere,
+                        injection_coordinate_ml=burr_coordinate_ml,
+                        injection_coordinate_ap=burr_coordinate_ap,
+                        injection_coordinate_depth=burr_coordinate_depth,
+                        injection_angle=burr_angle,
+                        anaesthesia=anaesthesia,
+                        injection_volume=injection_volume,
+                        recovery_time=recovery_time,
+                    )
+                burr_4_procedures.append(injection)
+            elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
+                # TODO: map to "Probe D"
+                name = ProbeName.PROBE_A.value
+                fiber_implant_depth = parse_str_into_float(list_item.get_property(list_fields.FIBER_IMPLANT4_D.value))
+                ophys_probe = OphysProbe.construct(
+                    name=name,
+                    stereotactic_coordinate_ml=burr_coordinate_ml,
+                    stereotactic_coordinate_ap=burr_coordinate_ap,
+                    stereotactic_coordinate_dv=fiber_implant_depth,
+                    angle=burr_angle,
+                )
+                fiber_implant = FiberImplant.construct(
+                    start_date=start_date,
+                    end_date=end_date,
+                    experimenter_full_name=experimenter_full_name,
+                    iacuc_protocol=iacuc_protocol,
+                    animal_weight_prior=animal_weight_prior,
+                    animal_weight_post=animal_weight_post,
+                    probes=ophys_probe,
+                )
+                burr_4_procedures.append(fiber_implant)
+        return burr_4_procedures
 
     def _map_list_item_to_craniotomy_2023(
         self,
