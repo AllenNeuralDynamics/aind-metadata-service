@@ -1373,7 +1373,7 @@ class SharePointClient:
         )
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
-                # TODO: missing fields (instrument id, anaesthesia, recovery time)
+                # TODO: instrument id, anaesthesia, recovery
                 workstation_id = map_choice(
                     list_item.get_property(
                         list_fields.WORK_STATION1ST_INJECTION.value
@@ -1507,7 +1507,7 @@ class SharePointClient:
         )
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
-                # TODO: missing fields (instrument id, anaesthesia, recovery time)
+                # TODO: instrument id, anaesthesia, recovery time
                 workstation_id = map_choice(
                     list_item.get_property(
                         list_fields.WORK_STATION1ST_INJECTION.value
@@ -1641,7 +1641,7 @@ class SharePointClient:
         )
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
-                # TODO: missing fields (instrument id, anaesthesia, recovery time)
+                # TODO: instrument id, anaesthesia, recovery time
                 workstation_id = map_choice(
                     list_item.get_property(
                         list_fields.WORK_STATION1ST_INJECTION.value
@@ -1775,7 +1775,7 @@ class SharePointClient:
         )
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
-                # TODO: missing fields (instrument id, anaesthesia, recovery time)
+                # TODO: instrument id, anaesthesia, recovery time
                 workstation_id = map_choice(
                     list_item.get_property(
                         list_fields.WORK_STATION1ST_INJECTION.value
