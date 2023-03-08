@@ -65,12 +65,14 @@ class NeurosurgeryAndBehaviorList2023:
 
     class BurrHoleType(Enum):
         """Enum class for 2023 SharePoint's BurrHole Procedures"""
+
         INJECTION = "Injection"
         FIBER_IMPLANT = "Fiber Implant"
         INJECTION_FIBER_IMPLANT = "Injection & Fiber Implant"
 
     class InjectionType(Enum):
         """Enum class of Injection Types"""
+
         IONTO = "Iontophoresis"
         NANOJECT = "Nanoject (Pressure)"
 
@@ -595,12 +597,16 @@ class SharePointClient:
                 procedure = list_item.get_property(list_fields.PROCEDURE.value)
                 procedure_types = []
                 if str_helpers.WITH_HEADPOST.value in procedure:
-                    procedure = procedure.replace(str_helpers.WITH_HEADPOST.value, "")
-                    procedure_types.append(
-                        nsb_proc_types.WITH_HEADPOST.value
+                    procedure = procedure.replace(
+                        str_helpers.WITH_HEADPOST.value, ""
                     )
+                    procedure_types.append(nsb_proc_types.WITH_HEADPOST.value)
                 if procedure != nsb_proc_types.INJECTION_FIBER_IMPLANT.value:
-                    procedure_types.extend(procedure.split(str_helpers.PROCEDURE_TYPE_SPLITTER.value))
+                    procedure_types.extend(
+                        procedure.split(
+                            str_helpers.PROCEDURE_TYPE_SPLITTER.value
+                        )
+                    )
                 else:
                     procedure_types.append(procedure)
             else:
@@ -635,9 +641,7 @@ class SharePointClient:
                     nsb_proc_types.FIBER_OPTIC_IMPLANT.value,
                     nsb_proc_types.INJECTION_FIBER_IMPLANT.value,
                 }:
-                    subject_procedures.extend(
-                        self._map_burr_holes(list_item)
-                    )
+                    subject_procedures.extend(self._map_burr_holes(list_item))
         return subject_procedures
 
     def _map_2019_response(self, list_items: ListItemCollection) -> list:
@@ -780,9 +784,9 @@ class SharePointClient:
         recovery_time = list_item.get_property(
             list_fields.FIRST_INJ_RECOVERY.value
         )
-        workstation_id = map_choice(list_item.get_property(
-            list_fields.WORK_STATION1ST_INJECTION.value
-        ))
+        workstation_id = map_choice(
+            list_item.get_property(list_fields.WORK_STATION1ST_INJECTION.value)
+        )
         injection_type = list_item.get_property(list_fields.INJ1_TYPE.value)
         injection_hemisphere = map_hemisphere(
             list_item.get_property(list_fields.VIRUS_HEMISPHERE.value)
@@ -914,9 +918,9 @@ class SharePointClient:
         recovery_time = list_item.get_property(
             list_fields.SECOND_INJ_RECOVER.value
         )
-        workstation_id = map_choice(list_item.get_property(
-            list_fields.WORK_STATION2ND_INJECTION.value
-        ))
+        workstation_id = map_choice(
+            list_item.get_property(list_fields.WORK_STATION2ND_INJECTION.value)
+        )
         injection_type = list_item.get_property(list_fields.INJ2_TYPE.value)
         injection_hemisphere = map_hemisphere(
             list_item.get_property(list_fields.HEMISPHERE2ND_INJ.value)
@@ -1179,9 +1183,9 @@ class SharePointClient:
         dura_removed = convert_str_to_bool(
             list_item.get_property(list_fields.HP_DUROTOMY.value)
         )
-        workstation_id = map_choice(list_item.get_property(
-            list_fields.HP_WORK_STATION.value
-        ))
+        workstation_id = map_choice(
+            list_item.get_property(list_fields.HP_WORK_STATION.value)
+        )
         craniotomy = Craniotomy.construct(
             start_date=start_date,
             end_date=end_date,
@@ -1305,10 +1309,10 @@ class SharePointClient:
         return head_frame
 
     def _map_burr_holes(
-            self,
-            list_item: ClientObject,
+        self,
+        list_item: ClientObject,
     ) -> List[Union[FiberImplant, IontophoresisInjection, NanojectInjection]]:
-        """Maps Burr Holes in a 2023 SharePoint ListItem to list of FiberImplants and Injections"""
+        """Maps SharePoint ListItem to list of FiberImplants/Injections"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         burr_procedures = []
         if map_choice(list_item.get_property(list_fields.BURR_HOLE_1.value)):
@@ -1322,18 +1326,22 @@ class SharePointClient:
         return burr_procedures
 
     def _map_burr_hole_1(
-            self,
-            list_item: ClientObject,
+        self,
+        list_item: ClientObject,
     ) -> List[Union[IontophoresisInjection, NanojectInjection, FiberImplant]]:
         """Maps 1st burr hole to Injections and/or FiberImplants"""
         nsb_burr_types = NeurosurgeryAndBehaviorList2023.BurrHoleType
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         str_helpers = NeurosurgeryAndBehaviorList2023.StringParserHelper
+        injection_types = NeurosurgeryAndBehaviorList2023.InjectionType
         burr_1_procedures = []
         procedure_types = []
         if list_item.get_property(list_fields.BURR_HOLE_1.value):
-            procedure_types.extend(list_item.get_property(
-                list_fields.BURR_HOLE_1.value).split(str_helpers.BURR_TYPE_SPLITTER.value))
+            procedure_types.extend(
+                list_item.get_property(list_fields.BURR_HOLE_1.value).split(
+                    str_helpers.BURR_TYPE_SPLITTER.value
+                )
+            )
         # map generic burr hole fields
         start_date = map_date_to_datetime(
             list_item.get_property(list_fields.DATE_OF_SURGERY.value)
@@ -1369,18 +1377,21 @@ class SharePointClient:
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
                 # TODO: missing fields (injection duration, instrument id)
-                # TODO: check fields (workstation id, anaesthesia duration, level)
-                workstation_id = map_choice(list_item.get_property(
-                    list_fields.WORK_STATION1ST_INJECTION.value
-                ))
-                injection_type = list_item.get_property(list_fields.INJ1_TYPE.value)
+                workstation_id = map_choice(
+                    list_item.get_property(
+                        list_fields.WORK_STATION1ST_INJECTION.value
+                    )
+                )
+                injection_type = list_item.get_property(
+                    list_fields.INJ1_TYPE.value
+                )
                 burr_coordinate_depth = parse_str_into_float(
                     list_item.get_property(list_fields.VIRUS_D_V.value)
                 )
                 recovery_time = list_item.get_property(
                     list_fields.FIRST_INJ_RECOVERY.value
                 )
-                if injection_type.strip() == NeurosurgeryAndBehaviorList2023.InjectionType.IONTO.value:
+                if injection_type.strip() == injection_types.IONTO.value:
                     injection_current = parse_str_into_float(
                         list_item.get_property(list_fields.INJ1_CURRENT.value)
                     )
@@ -1411,9 +1422,11 @@ class SharePointClient:
                         recovery_time=recovery_time,
                     )
                 else:
-                    injection_volume = parse_str_into_float(list_item.get_property(
-                        list_fields.INJ1VOLPERDEPTH.value
-                    ))
+                    injection_volume = parse_str_into_float(
+                        list_item.get_property(
+                            list_fields.INJ1VOLPERDEPTH.value
+                        )
+                    )
                     injection = NanojectInjection.construct(
                         start_date=start_date,
                         end_date=end_date,
@@ -1435,7 +1448,9 @@ class SharePointClient:
                 burr_1_procedures.append(injection)
             elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
                 name = ProbeName.PROBE_A.value
-                fiber_implant_depth = parse_str_into_float(list_item.get_property(list_fields.FIBER_IMPLANT1_DV.value))
+                fiber_implant_depth = parse_str_into_float(
+                    list_item.get_property(list_fields.FIBER_IMPLANT1_DV.value)
+                )
                 ophys_probe = OphysProbe.construct(
                     name=name,
                     stereotactic_coordinate_ml=burr_coordinate_ml,
@@ -1457,18 +1472,22 @@ class SharePointClient:
         return burr_1_procedures
 
     def _map_burr_hole_2(
-            self,
-            list_item: ClientObject,
+        self,
+        list_item: ClientObject,
     ) -> List[Union[IontophoresisInjection, NanojectInjection, FiberImplant]]:
         """Maps 2nd burr hole to Injections and/or FiberImplants"""
         nsb_burr_types = NeurosurgeryAndBehaviorList2023.BurrHoleType
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         str_helpers = NeurosurgeryAndBehaviorList2023.StringParserHelper
+        injection_types = NeurosurgeryAndBehaviorList2023.InjectionType
         burr_2_procedures = []
         procedure_types = []
         if list_item.get_property(list_fields.BURR_HOLE_2.value):
-            procedure_types.extend(list_item.get_property(
-                list_fields.BURR_HOLE_2.value).split(str_helpers.BURR_TYPE_SPLITTER.value))
+            procedure_types.extend(
+                list_item.get_property(list_fields.BURR_HOLE_2.value).split(
+                    str_helpers.BURR_TYPE_SPLITTER.value
+                )
+            )
         start_date = map_date_to_datetime(
             list_item.get_property(list_fields.DATE_OF_SURGERY.value)
         )
@@ -1503,18 +1522,21 @@ class SharePointClient:
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
                 # TODO: missing fields (injection duration, instrument id)
-                # TODO: check fields (workstation id, anaesthesia duration, level)
-                workstation_id = map_choice(list_item.get_property(
-                    list_fields.WORK_STATION1ST_INJECTION.value
-                ))
-                injection_type = list_item.get_property(list_fields.INJ2_TYPE.value)
+                workstation_id = map_choice(
+                    list_item.get_property(
+                        list_fields.WORK_STATION1ST_INJECTION.value
+                    )
+                )
+                injection_type = list_item.get_property(
+                    list_fields.INJ2_TYPE.value
+                )
                 burr_coordinate_depth = parse_str_into_float(
                     list_item.get_property(list_fields.DV2ND_INJ.value)
                 )
                 recovery_time = list_item.get_property(
                     list_fields.FIRST_INJ_RECOVERY.value
                 )
-                if injection_type.strip() == NeurosurgeryAndBehaviorList2023.InjectionType.IONTO.value:
+                if injection_type.strip() == injection_types.IONTO.value:
                     injection_current = parse_str_into_float(
                         list_item.get_property(list_fields.INJ2_CURRENT.value)
                     )
@@ -1545,9 +1567,11 @@ class SharePointClient:
                         recovery_time=recovery_time,
                     )
                 else:
-                    injection_volume = parse_str_into_float(list_item.get_property(
-                        list_fields.INJ2VOLPERDEPTH.value
-                    ))
+                    injection_volume = parse_str_into_float(
+                        list_item.get_property(
+                            list_fields.INJ2VOLPERDEPTH.value
+                        )
+                    )
                     injection = NanojectInjection.construct(
                         start_date=start_date,
                         end_date=end_date,
@@ -1569,7 +1593,9 @@ class SharePointClient:
                 burr_2_procedures.append(injection)
             elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
                 name = ProbeName.PROBE_B.value
-                fiber_implant_depth = parse_str_into_float(list_item.get_property(list_fields.FIBER_IMPLANT2_DV.value))
+                fiber_implant_depth = parse_str_into_float(
+                    list_item.get_property(list_fields.FIBER_IMPLANT2_DV.value)
+                )
                 ophys_probe = OphysProbe.construct(
                     name=name,
                     stereotactic_coordinate_ml=burr_coordinate_ml,
@@ -1591,18 +1617,22 @@ class SharePointClient:
         return burr_2_procedures
 
     def _map_burr_hole_3(
-            self,
-            list_item: ClientObject,
+        self,
+        list_item: ClientObject,
     ) -> List[Union[IontophoresisInjection, NanojectInjection, FiberImplant]]:
         """Maps 3rd burr hole to Injections and/or FiberImplants"""
         nsb_burr_types = NeurosurgeryAndBehaviorList2023.BurrHoleType
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         str_helpers = NeurosurgeryAndBehaviorList2023.StringParserHelper
+        injection_types = NeurosurgeryAndBehaviorList2023.InjectionType
         burr_3_procedures = []
         procedure_types = []
         if list_item.get_property(list_fields.BURR_HOLE_3.value):
-            procedure_types.extend(list_item.get_property(
-                list_fields.BURR_HOLE_3.value).split(str_helpers.BURR_TYPE_SPLITTER.value))
+            procedure_types.extend(
+                list_item.get_property(list_fields.BURR_HOLE_3.value).split(
+                    str_helpers.BURR_TYPE_SPLITTER.value
+                )
+            )
         start_date = map_date_to_datetime(
             list_item.get_property(list_fields.DATE_OF_SURGERY.value)
         )
@@ -1637,18 +1667,21 @@ class SharePointClient:
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
                 # TODO: missing fields (injection duration, instrument id)
-                # TODO: check fields (workstation id, anaesthesia duration, level)
-                workstation_id = map_choice(list_item.get_property(
-                    list_fields.WORK_STATION1ST_INJECTION.value
-                ))
-                injection_type = list_item.get_property(list_fields.INJ3_TYPE.value)
+                workstation_id = map_choice(
+                    list_item.get_property(
+                        list_fields.WORK_STATION1ST_INJECTION.value
+                    )
+                )
+                injection_type = list_item.get_property(
+                    list_fields.INJ3_TYPE.value
+                )
                 burr_coordinate_depth = parse_str_into_float(
                     list_item.get_property(list_fields.BURR3_DV.value)
                 )
                 recovery_time = list_item.get_property(
                     list_fields.FIRST_INJ_RECOVERY.value
                 )
-                if injection_type.strip() == NeurosurgeryAndBehaviorList2023.InjectionType.IONTO.value:
+                if injection_type.strip() == injection_types.IONTO.value:
                     injection_current = parse_str_into_float(
                         list_item.get_property(list_fields.INJ3_CURRENT.value)
                     )
@@ -1679,9 +1712,11 @@ class SharePointClient:
                         recovery_time=recovery_time,
                     )
                 else:
-                    injection_volume = parse_str_into_float(list_item.get_property(
-                        list_fields.INJ3VOLPERDEPTH.value
-                    ))
+                    injection_volume = parse_str_into_float(
+                        list_item.get_property(
+                            list_fields.INJ3VOLPERDEPTH.value
+                        )
+                    )
                     injection = NanojectInjection.construct(
                         start_date=start_date,
                         end_date=end_date,
@@ -1703,7 +1738,9 @@ class SharePointClient:
                 burr_3_procedures.append(injection)
             elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
                 name = ProbeName.PROBE_C.value
-                fiber_implant_depth = parse_str_into_float(list_item.get_property(list_fields.FIBER_IMPLANT3_D.value))
+                fiber_implant_depth = parse_str_into_float(
+                    list_item.get_property(list_fields.FIBER_IMPLANT3_D.value)
+                )
                 ophys_probe = OphysProbe.construct(
                     name=name,
                     stereotactic_coordinate_ml=burr_coordinate_ml,
@@ -1725,18 +1762,22 @@ class SharePointClient:
         return burr_3_procedures
 
     def _map_burr_hole_4(
-            self,
-            list_item: ClientObject,
+        self,
+        list_item: ClientObject,
     ) -> List[Union[IontophoresisInjection, NanojectInjection, FiberImplant]]:
         """Maps 4th burr hole to Injections and/or FiberImplants"""
         nsb_burr_types = NeurosurgeryAndBehaviorList2023.BurrHoleType
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         str_helpers = NeurosurgeryAndBehaviorList2023.StringParserHelper
+        injection_types = NeurosurgeryAndBehaviorList2023.InjectionType
         burr_4_procedures = []
         procedure_types = []
         if list_item.get_property(list_fields.BURR_HOLE_4.value):
-            procedure_types.extend(list_item.get_property(
-                list_fields.BURR_HOLE_4.value).split(str_helpers.BURR_TYPE_SPLITTER.value))
+            procedure_types.extend(
+                list_item.get_property(list_fields.BURR_HOLE_4.value).split(
+                    str_helpers.BURR_TYPE_SPLITTER.value
+                )
+            )
         start_date = map_date_to_datetime(
             list_item.get_property(list_fields.DATE_OF_SURGERY.value)
         )
@@ -1771,18 +1812,21 @@ class SharePointClient:
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
                 # TODO: missing fields (injection duration, instrument id)
-                # TODO: check fields (workstation id, anaesthesia duration, level)
-                workstation_id = map_choice(list_item.get_property(
-                    list_fields.WORK_STATION1ST_INJECTION.value
-                ))
-                injection_type = list_item.get_property(list_fields.INJ4_TYPE.value)
+                workstation_id = map_choice(
+                    list_item.get_property(
+                        list_fields.WORK_STATION1ST_INJECTION.value
+                    )
+                )
+                injection_type = list_item.get_property(
+                    list_fields.INJ4_TYPE.value
+                )
                 burr_coordinate_depth = parse_str_into_float(
                     list_item.get_property(list_fields.BURR4_DV.value)
                 )
                 recovery_time = list_item.get_property(
                     list_fields.FIRST_INJ_RECOVERY.value
                 )
-                if injection_type.strip() == NeurosurgeryAndBehaviorList2023.InjectionType.IONTO.value:
+                if injection_type.strip() == injection_types.IONTO.value:
                     injection_current = parse_str_into_float(
                         list_item.get_property(list_fields.INJ4_CURRENT.value)
                     )
@@ -1813,9 +1857,11 @@ class SharePointClient:
                         recovery_time=recovery_time,
                     )
                 else:
-                    injection_volume = parse_str_into_float(list_item.get_property(
-                        list_fields.INJ4VOLPERDEPTH.value
-                    ))
+                    injection_volume = parse_str_into_float(
+                        list_item.get_property(
+                            list_fields.INJ4VOLPERDEPTH.value
+                        )
+                    )
                     injection = NanojectInjection.construct(
                         start_date=start_date,
                         end_date=end_date,
@@ -1838,7 +1884,9 @@ class SharePointClient:
             elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
                 # TODO: map to "Probe D"
                 name = ProbeName.PROBE_A.value
-                fiber_implant_depth = parse_str_into_float(list_item.get_property(list_fields.FIBER_IMPLANT4_D.value))
+                fiber_implant_depth = parse_str_into_float(
+                    list_item.get_property(list_fields.FIBER_IMPLANT4_D.value)
+                )
                 ophys_probe = OphysProbe.construct(
                     name=name,
                     stereotactic_coordinate_ml=burr_coordinate_ml,
