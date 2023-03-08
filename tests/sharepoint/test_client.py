@@ -712,7 +712,7 @@ class Examples:
             animal_weight_post=28.2,
             procedure_type="Fiber implant",
             probes=OphysProbe.construct(
-                name="Probe A",
+                name="Probe D",
                 stereotactic_coordinate_ap=1.0,
                 stereotactic_coordinate_ml=-2.5,
                 stereotactic_coordinate_dv=-1.8,
