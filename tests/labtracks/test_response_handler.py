@@ -63,7 +63,7 @@ class TestResponseExamples:
 
     expected_subject = Subject.parse_obj(
         {
-            "schema_version": "0.2.2",
+            "schema_version": "0.3.0",
             "species": "Mus musculus",
             "subject_id": "115977",
             "sex": "Male",
