@@ -140,7 +140,7 @@
   "End_x0020_of_x0020_Week": "2022-12-09T08:00:00Z",
   "Age_x0020_at_x0020_Injection": "44901.0000000000",
   "CraniotomyType": "Other",
-  "ImplantIDCoverslipType": null,
+  "ImplantIDCoverslipType": "3mm",
   "Inj1Angle_v2": "0",
   "Inj2Angle_v2": "0",
   "FiberImplant1": true,
