@@ -1917,6 +1917,8 @@ class SharePointClient:
             return "0160-100-46"
         elif headframe_type == headframe_types.MOTOR_CTX.value:
             return "0160-100-51"
+        elif headframe_type == headframe_types.WHC_2P.value:
+            return "0160-100-45"
         else:
             return None
 
@@ -1932,6 +1934,8 @@ class SharePointClient:
             return "0160-200-36"
         elif well_type == well_types.WHC_NP.value:
             return "0160-055-08"
+        elif well_type == well_types.WHC_2P.value:
+            return "0160-200-62"
         else:
             return None
 

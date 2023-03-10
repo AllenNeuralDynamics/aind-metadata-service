@@ -119,6 +119,11 @@ class Examples:
     with open(list_item16_filepath) as f:
         list_item16_json = json.load(f)
 
+    list_item17_filepath = RESOURCES_DIR / "list_item17.json"
+
+    with open(list_item17_filepath) as f:
+        list_item17_json = json.load(f)
+
     described_by = (
         "https://raw.githubusercontent.com/AllenNeuralDynamics/"
         "aind-data-schema/main/src/aind_data_schema/procedures.py"
@@ -760,6 +765,20 @@ class Examples:
             well_type="No Well",
             well_part_number=None,
         ),
+        # from list item 17
+        Headframe.construct(
+            start_date=datetime.date(2022, 1, 3),
+            end_date=datetime.date(2022, 1, 3),
+            experimenter_full_name="NSB-187",
+            iacuc_protocol="2103",
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
+            procedure_type="Headframe",
+            headframe_type="WHC 2P",
+            headframe_part_number="0160-100-45",
+            well_type="WHC 2P",
+            well_part_number="0160-200-62",
+        ),
         # from list item 13
         SubjectProcedure.construct(
             start_date=datetime.date(2022, 1, 3),
@@ -877,6 +896,10 @@ class TestSharepointClient(unittest.TestCase):
         list_item16 = ListItem(context=blank_ctx)
         list_item16.get_property = lambda x: Examples.list_item16_json[x]
         list_item_collection_2023.add_child(list_item16)
+
+        list_item17 = ListItem(context=blank_ctx)
+        list_item17.get_property = lambda x: Examples.list_item17_json[x]
+        list_item_collection_2023.add_child(list_item17)
 
         procedures2023 = self.client._map_response(
             version=version_2023,
