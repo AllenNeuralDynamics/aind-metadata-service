@@ -1908,6 +1908,13 @@ class SharePointClient:
         headframe_types = NeurosurgeryAndBehaviorList2023.HeadFrameType
         if headframe_type == headframe_types.VISUAL_CTX.value:
             return "0160-100-10"
+        elif headframe_type == headframe_types.WHC_NP.value:
+            return "0160-100-42"
+        # TODO: check these part numbers
+        elif headframe_type == headframe_types.FRONTAL_CTX.value:
+            return "0160-100-46"
+        elif headframe_type == headframe_types.MOTOR_CTX.value:
+            return "0160-100-51"
         else:
             return None
 
@@ -1921,6 +1928,8 @@ class SharePointClient:
             return "0160-200-20"
         elif well_type == well_types.NEUROPIXEL.value:
             return "0160-200-36"
+        elif well_type == well_types.WHC_NP.value:
+            return "0160-055-08"
         else:
             return None
 
