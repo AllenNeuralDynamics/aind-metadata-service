@@ -78,6 +78,7 @@ class NeurosurgeryAndBehaviorList2023:
 
     class HeadFrameType(Enum):
         """Enum class for Headframe Types"""
+
         VISUAL_CTX = "Visual Ctx"
         FRONTAL_CTX = "Frontal Ctx"
         MOTOR_CTX = "Motor Ctx"
@@ -88,9 +89,10 @@ class NeurosurgeryAndBehaviorList2023:
 
     class WellType(Enum):
         """Enum class for Well Types"""
+
         NO_WELL = "No Well"
         CAM = "Scientifica (CAM)"
-        MESOSCOPE = "Mescoscope"
+        MESOSCOPE = "Mesoscope"
         NEUROPIXEL = "Neuropixel"
         WHC_2P = "WHC 2P"
         WHC_NP = "WHC NP"
@@ -1903,7 +1905,7 @@ class SharePointClient:
         return craniotomy
 
     @staticmethod
-    def _map_hp_part_number(headframe_type:str):
+    def _map_hp_part_number(headframe_type: str):
         """maps headframe_part_number from headframe_type"""
         headframe_types = NeurosurgeryAndBehaviorList2023.HeadFrameType
         if headframe_type == headframe_types.VISUAL_CTX.value:

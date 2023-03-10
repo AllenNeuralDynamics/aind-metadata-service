@@ -109,6 +109,16 @@ class Examples:
     with open(list_item14_filepath) as f:
         list_item14_json = json.load(f)
 
+    list_item15_filepath = RESOURCES_DIR / "list_item15.json"
+
+    with open(list_item15_filepath) as f:
+        list_item15_json = json.load(f)
+
+    list_item16_filepath = RESOURCES_DIR / "list_item16.json"
+
+    with open(list_item16_filepath) as f:
+        list_item16_json = json.load(f)
+
     described_by = (
         "https://raw.githubusercontent.com/AllenNeuralDynamics/"
         "aind-data-schema/main/src/aind_data_schema/procedures.py"
@@ -499,10 +509,14 @@ class Examples:
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
             experimenter_full_name="NSB-187",
-            iacuc_protocol=None,
-            animal_weight_prior=None,
-            animal_weight_post=None,
+            iacuc_protocol="2103",
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
             procedure_type="Headframe",
+            headframe_type="Visual Ctx",
+            headframe_part_number="0160-100-10",
+            well_type="Mesoscope",
+            well_part_number="0160-200-20",
         ),
         # from list item 10
         Craniotomy.construct(
@@ -522,10 +536,14 @@ class Examples:
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
             experimenter_full_name="NSB-187",
-            iacuc_protocol=None,
-            animal_weight_prior=None,
-            animal_weight_post=None,
+            iacuc_protocol="2103",
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
             procedure_type="Headframe",
+            headframe_type="WHC NP",
+            headframe_part_number="0160-100-42",
+            well_type="Neuropixel",
+            well_part_number="0160-200-36",
         ),
         NanojectInjection.construct(
             start_date=datetime.date(2022, 1, 3),
@@ -574,6 +592,14 @@ class Examples:
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
             experimenter_full_name="NSB-187",
+            iacuc_protocol="2103",
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
+            procedure_type="Headframe",
+            headframe_type="Frontal Ctx",
+            headframe_part_number="0160-100-46",
+            well_type="WHC NP",
+            well_part_number="0160-055-08",
         ),
         NanojectInjection.construct(
             start_date=datetime.date(2022, 1, 3),
@@ -706,6 +732,34 @@ class Examples:
                 angle=0.0,
             ),
         ),
+        # from list item 15
+        Headframe.construct(
+            start_date=datetime.date(2022, 1, 3),
+            end_date=datetime.date(2022, 1, 3),
+            experimenter_full_name="NSB-187",
+            iacuc_protocol="2103",
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
+            procedure_type="Headframe",
+            headframe_type="Motor Ctx",
+            headframe_part_number="0160-100-51",
+            well_type="Scientifica (CAM)",
+            well_part_number="Rev A",
+        ),
+        # from list item 16
+        Headframe.construct(
+            start_date=datetime.date(2022, 1, 3),
+            end_date=datetime.date(2022, 1, 3),
+            experimenter_full_name="NSB-187",
+            iacuc_protocol="2103",
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
+            procedure_type="Headframe",
+            headframe_type="AI Straight Bar",
+            headframe_part_number=None,
+            well_type="No Well",
+            well_part_number=None,
+        ),
         # from list item 13
         SubjectProcedure.construct(
             start_date=datetime.date(2022, 1, 3),
@@ -815,6 +869,14 @@ class TestSharepointClient(unittest.TestCase):
         list_item14 = ListItem(context=blank_ctx)
         list_item14.get_property = lambda x: Examples.list_item14_json[x]
         list_item_collection_2023.add_child(list_item14)
+
+        list_item15 = ListItem(context=blank_ctx)
+        list_item15.get_property = lambda x: Examples.list_item15_json[x]
+        list_item_collection_2023.add_child(list_item15)
+
+        list_item16 = ListItem(context=blank_ctx)
+        list_item16.get_property = lambda x: Examples.list_item16_json[x]
+        list_item_collection_2023.add_child(list_item16)
 
         procedures2023 = self.client._map_response(
             version=version_2023,
