@@ -76,6 +76,28 @@ class NeurosurgeryAndBehaviorList2023:
         IONTO = "Iontophoresis"
         NANOJECT = "Nanoject (Pressure)"
 
+    class HeadFrameType(Enum):
+        """Enum class for Headframe Types"""
+
+        VISUAL_CTX = "Visual Ctx"
+        FRONTAL_CTX = "Frontal Ctx"
+        MOTOR_CTX = "Motor Ctx"
+        WHC_2P = "WHC 2P"
+        WHC_NP = "WHC NP"
+        AI_STRAIGHT_BAR = "AI Straight bar"
+        OTHER = "Other"
+
+    class WellType(Enum):
+        """Enum class for Well Types"""
+
+        NO_WELL = "No Well"
+        CAM = "Scientifica (CAM)"
+        MESOSCOPE = "Mesoscope"
+        NEUROPIXEL = "Neuropixel"
+        WHC_2P = "WHC 2P"
+        WHC_NP = "WHC NP"
+        OTHER = "Other"
+
     class ListField(Enum):
         """Enum class for fields in List Item object response"""
 
@@ -1882,6 +1904,41 @@ class SharePointClient:
         )
         return craniotomy
 
+    @staticmethod
+    def _map_hp_part_number(headframe_type: str):
+        """maps headframe_part_number from headframe_type"""
+        headframe_types = NeurosurgeryAndBehaviorList2023.HeadFrameType
+        if headframe_type == headframe_types.VISUAL_CTX.value:
+            return "0160-100-10"
+        elif headframe_type == headframe_types.WHC_NP.value:
+            return "0160-100-42"
+        # TODO: check these part numbers
+        elif headframe_type == headframe_types.FRONTAL_CTX.value:
+            return "0160-100-46"
+        elif headframe_type == headframe_types.MOTOR_CTX.value:
+            return "0160-100-51"
+        elif headframe_type == headframe_types.WHC_2P.value:
+            return "0160-100-45"
+        else:
+            return None
+
+    @staticmethod
+    def _map_well_part_number(well_type: str):
+        """maps well_part_number from well_type"""
+        well_types = NeurosurgeryAndBehaviorList2023.WellType
+        if well_type == well_types.CAM.value:
+            return "Rev A"
+        elif well_type == well_types.MESOSCOPE.value:
+            return "0160-200-20"
+        elif well_type == well_types.NEUROPIXEL.value:
+            return "0160-200-36"
+        elif well_type == well_types.WHC_NP.value:
+            return "0160-055-08"
+        elif well_type == well_types.WHC_2P.value:
+            return "0160-200-62"
+        else:
+            return None
+
     def _map_list_item_to_head_frame_2023(
         self,
         list_item: ClientObject,
@@ -1895,9 +1952,29 @@ class SharePointClient:
         experimenter_full_name = self._map_experimenter_name(
             list_item, list_fields
         )
+        iacuc_protocol = list_item.get_property(
+            list_fields.IACUC_PROTOCOL.value
+        )
+        animal_weight_prior = parse_str_into_float(
+            list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER.value)
+        )
+        animal_weight_post = parse_str_into_float(
+            list_item.get_property(list_fields.WEIGHT_AFTER_SURGERY.value)
+        )
+        headframe_type = list_item.get_property(list_fields.HEADPOST.value)
+        headframe_part_number = self._map_hp_part_number(headframe_type)
+        well_type = list_item.get_property(list_fields.HEADPOST_TYPE.value)
+        well_part_number = self._map_well_part_number(well_type)
         head_frame = Headframe.construct(
             start_date=start_date,
             end_date=end_date,
             experimenter_full_name=experimenter_full_name,
+            iacuc_protocol=iacuc_protocol,
+            animal_weight_prior=animal_weight_prior,
+            animal_weight_post=animal_weight_post,
+            headframe_type=headframe_type,
+            headframe_part_number=headframe_part_number,
+            well_type=well_type,
+            well_part_number=well_part_number,
         )
         return head_frame
