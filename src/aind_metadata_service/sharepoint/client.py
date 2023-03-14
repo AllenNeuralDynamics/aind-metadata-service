@@ -1889,6 +1889,7 @@ class SharePointClient:
         list_item: ClientObject,
     ) -> Craniotomy:
         """Maps a SharePoint ListItem to a Craniotomy model"""
+        # TODO: missing fields (craniotomy coords,hemisphere)
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
         start_date = map_date_to_datetime(
             list_item.get_property(list_fields.DATE_OF_SURGERY.value)
@@ -1906,7 +1907,9 @@ class SharePointClient:
         animal_weight_post = parse_str_into_float(
             list_item.get_property(list_fields.WEIGHT_AFTER_SURGERY.value)
         )
-        craniotomy_type = list_item.get_property(list_fields.CRANIOTOMY_TYPE.value)
+        craniotomy_type = list_item.get_property(
+            list_fields.CRANIOTOMY_TYPE.value
+        )
         craniotomy_size = parse_str_into_float(craniotomy_type)
         craniotomy = Craniotomy.construct(
             start_date=start_date,
