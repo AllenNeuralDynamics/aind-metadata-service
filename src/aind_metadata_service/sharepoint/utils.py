@@ -2,7 +2,6 @@
 import datetime
 import re
 from typing import Optional
-
 from aind_data_schema.procedures import Side
 from dateutil import parser
 
@@ -61,3 +60,5 @@ def map_date_to_datetime(date) -> Optional[datetime.date]:
         return parser.isoparse(date).date()
     else:
         return None
+
+
