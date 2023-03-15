@@ -64,3 +64,25 @@ def map_date_to_datetime(date) -> Optional[datetime.date]:
         return None
 
 
+def convert_hour_to_datetime(hours) -> Optional[datetime.time]:
+    """maps hour to datetime.time object"""
+    if hours:
+        hours = float(hours)
+        mins = (hours % 1) * 60
+        hours = hours / 1
+        secs = (mins % 1) * 60
+        mins = mins / 1
+        return datetime.time(int(hours), int(mins), int(secs))
+    return None
+
+
+def convert_min_to_datetime(mins) -> Optional[datetime.time]:
+    """maps mins to datetime.time object"""
+    if mins:
+        mins = parse_str_into_float(mins)
+        return datetime.time(0, int(mins), 0)
+    return None
+
+
+
+

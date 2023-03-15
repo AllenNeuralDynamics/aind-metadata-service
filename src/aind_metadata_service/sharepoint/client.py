@@ -30,6 +30,8 @@ from aind_metadata_service.sharepoint.utils import (
     map_date_to_datetime,
     map_hemisphere,
     parse_str_into_float,
+    convert_hour_to_datetime,
+    convert_min_to_datetime,
 )
 
 
@@ -1341,12 +1343,12 @@ class SharePointClient:
         """Maps anaesthesic type, duration, level based on surgery order"""
         anaesthetic_type = "isoflurane"
         if surgery_during == "Follow up Surgery":
-            duration = list_item.get_property(list_fields.FIRST_INJECTION_ISO_DURATION.value)
-            level = list_item.get_property(list_fields.ROUND1_INJ_ISOLEVEL.value)
+            duration = convert_hour_to_datetime(list_item.get_property(list_fields.FIRST_INJECTION_ISO_DURATION.value))
+            level = parse_str_into_float(list_item.get_property(list_fields.ROUND1_INJ_ISOLEVEL.value))
         else:
             # default is Initial Surgery
-            duration = list_item.get_property(list_fields.ISO_ON.value)
-            level = list_item.get_property(list_fields.HP_ISO_LEVEL.value)
+            duration = convert_hour_to_datetime(list_item.get_property(list_fields.ISO_ON.value))
+            level = parse_str_into_float(list_item.get_property(list_fields.HP_ISO_LEVEL.value))
         anaesthetic = Anaesthetic.construct(
             type=anaesthetic_type,
             duration=duration,
@@ -1355,26 +1357,39 @@ class SharePointClient:
         return anaesthetic
 
     @staticmethod
+    def _map_initial_followup_date(list_item, list_fields, surgery_during):
+        """Maps date of procedure based on surgery order"""
+        if surgery_during == "Follow up Surgery":
+            start_date = map_date_to_datetime(
+                list_item.get_property(list_fields.DATE1ST_INJECTION.value)
+            )
+        else:
+            start_date = map_date_to_datetime(
+                list_item.get_property(list_fields.DATE_OF_SURGERY.value)
+            )
+        return start_date
+
+    @staticmethod
     def _map_initial_followup_injection(list_item, list_fields, injection_type, surgery_during):
         """Maps workstation_id, recovery_time, and instrument_id based on surgery order"""
         injection_types = NeurosurgeryAndBehaviorList2023.InjectionType
         if surgery_during == "Follow up Surgery":
             workstation_id = map_choice(list_item.get_property(list_fields.WORK_STATION1ST_INJECTION.value))
-            recovery_time = list_item.get_property(list_fields.FIRST_INJ_RECOVERY.value)
+            recovery_time = convert_min_to_datetime(list_item.get_property(list_fields.FIRST_INJ_RECOVERY.value))
             if injection_type.strip() == injection_types.IONTO.value:
-                instrument_id = list_item.get_property(list_fields.IONTO_NUMBER_INJ2.value)
+                instrument_id = map_choice(list_item.get_property(list_fields.IONTO_NUMBER_INJ2.value))
             elif injection_type.strip() == injection_types.NANOJECT.value:
-                instrument_id = list_item.get_property(list_fields.NANOJECT_NUMBER_INJ2.value)
+                instrument_id = map_choice(list_item.get_property(list_fields.NANOJECT_NUMBER_INJ2.value))
             else:
                 instrument_id = None
         else:
             # default is Initial Surgery
             workstation_id = map_choice(list_item.get_property(list_fields.WORK_STATION1ST_INJECTION.value))
-            recovery_time = list_item.get_property(list_fields.FIRST_INJ_RECOVERY.value)
+            recovery_time = convert_min_to_datetime(list_item.get_property(list_fields.HP_RECOVERY.value))
             if injection_type.strip() == injection_types.IONTO.value:
-                instrument_id = list_item.get_property(list_fields.IONTO_NUMBER_INJ2.value)
+                instrument_id = map_choice(list_item.get_property(list_fields.IONTO_NUMBER_INJ1.value))
             elif injection_type.strip() == injection_types.NANOJECT.value:
-                instrument_id = list_item.get_property(list_fields.NANOJECT_NUMBER_INJ2.value)
+                instrument_id = map_choice(list_item.get_property(list_fields.NANOJECT_NUMBER_INJ10.value))
             else:
                 instrument_id = None
         return workstation_id, recovery_time, instrument_id
@@ -1384,11 +1399,11 @@ class SharePointClient:
         """Maps workstation_id, recovery_time, and instrument_id based on surgery order"""
         if surgery_during == "Follow up Surgery":
             workstation_id = map_choice(list_item.get_property(list_fields.WORK_STATION1ST_INJECTION.value))
-            recovery_time = list_item.get_property(list_fields.FIRST_INJ_RECOVERY.value)
+            recovery_time = convert_min_to_datetime(list_item.get_property(list_fields.FIRST_INJ_RECOVERY.value))
         else:
             # default is Initial Surgery
             workstation_id = map_choice(list_item.get_property(list_fields.WORK_STATION1ST_INJECTION.value))
-            recovery_time = list_item.get_property(list_fields.FIRST_INJ_RECOVERY.value)
+            recovery_time = convert_min_to_datetime(list_item.get_property(list_fields.HP_RECOVERY.value))
         return workstation_id, recovery_time
 
     @staticmethod
@@ -1445,10 +1460,6 @@ class SharePointClient:
                 )
             )
         # map generic burr hole fields
-        start_date = map_date_to_datetime(
-            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
-        )
-        end_date = start_date
         experimenter_full_name = self._map_experimenter_name(
             list_item, list_fields
         )
@@ -1467,8 +1478,11 @@ class SharePointClient:
         burr_angle = parse_str_into_float(
             list_item.get_property(list_fields.INJ1_ANGLE_V2.value)
         )
+        # map fields dependent on surgery order (initial or follow up)
         burr_during = map_choice(list_item.get_property(list_fields.BURR1_DURING.value))
         anaesthesia = self._map_2023_anaesthesia(list_item, list_fields, burr_during)
+        start_date = self._map_initial_followup_date(list_item, list_fields, burr_during)
+        end_date = start_date
         animal_weight_prior, animal_weight_post = self._map_initial_followup_weight(list_item, list_fields, burr_during)
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
@@ -1580,10 +1594,6 @@ class SharePointClient:
                     str_helpers.BURR_TYPE_SPLITTER.value
                 )
             )
-        start_date = map_date_to_datetime(
-            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
-        )
-        end_date = start_date
         experimenter_full_name = self._map_experimenter_name(
             list_item, list_fields
         )
@@ -1604,6 +1614,8 @@ class SharePointClient:
         )
         burr_during = map_choice(list_item.get_property(list_fields.BURR2_DURING.value))
         anaesthesia = self._map_2023_anaesthesia(list_item, list_fields, burr_during)
+        start_date = self._map_initial_followup_date(list_item, list_fields, burr_during)
+        end_date = start_date
         animal_weight_prior, animal_weight_post = self._map_initial_followup_weight(list_item, list_fields, burr_during)
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
@@ -1715,10 +1727,6 @@ class SharePointClient:
                     str_helpers.BURR_TYPE_SPLITTER.value
                 )
             )
-        start_date = map_date_to_datetime(
-            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
-        )
-        end_date = start_date
         experimenter_full_name = self._map_experimenter_name(
             list_item, list_fields
         )
@@ -1739,6 +1747,8 @@ class SharePointClient:
         )
         burr_during = map_choice(list_item.get_property(list_fields.BURR3_DURING.value))
         anaesthesia = self._map_2023_anaesthesia(list_item, list_fields, burr_during)
+        start_date = self._map_initial_followup_date(list_item, list_fields, burr_during)
+        end_date = start_date
         animal_weight_prior, animal_weight_post = self._map_initial_followup_weight(list_item, list_fields, burr_during)
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
@@ -1850,10 +1860,6 @@ class SharePointClient:
                     str_helpers.BURR_TYPE_SPLITTER.value
                 )
             )
-        start_date = map_date_to_datetime(
-            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
-        )
-        end_date = start_date
         experimenter_full_name = self._map_experimenter_name(
             list_item, list_fields
         )
@@ -1874,6 +1880,8 @@ class SharePointClient:
         )
         burr_during = map_choice(list_item.get_property(list_fields.BURR4_DURING.value))
         anaesthesia = self._map_2023_anaesthesia(list_item, list_fields, burr_during)
+        start_date = self._map_initial_followup_date(list_item, list_fields, burr_during)
+        end_date = start_date
         animal_weight_prior, animal_weight_post = self._map_initial_followup_weight(list_item, list_fields, burr_during)
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
@@ -1975,10 +1983,6 @@ class SharePointClient:
         """Maps a SharePoint ListItem to a Craniotomy model"""
         # TODO: missing fields (craniotomy coords,hemisphere)
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
-        start_date = map_date_to_datetime(
-            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
-        )
-        end_date = start_date
         experimenter_full_name = self._map_experimenter_name(
             list_item, list_fields
         )
@@ -1991,6 +1995,8 @@ class SharePointClient:
         craniotomy_size = parse_str_into_float(craniotomy_type)
         craniotomy_during = map_choice(list_item.get_property(list_fields.CRANIOTOMY_DURING.value))
         anaesthesia = self._map_2023_anaesthesia(list_item, list_fields, craniotomy_during)
+        start_date = self._map_initial_followup_date(list_item, list_fields, craniotomy_during)
+        end_date = start_date
         workstation_id, recovery_time = self._map_initial_followup_craniotomy(
             list_item, list_fields, craniotomy_during
         )
@@ -2052,10 +2058,6 @@ class SharePointClient:
     ) -> Headframe:
         """Maps a SharePoint ListItem to a HeadFrame model"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
-        start_date = map_date_to_datetime(
-            list_item.get_property(list_fields.DATE_OF_SURGERY.value)
-        )
-        end_date = start_date
         experimenter_full_name = self._map_experimenter_name(
             list_item, list_fields
         )
@@ -2068,6 +2070,8 @@ class SharePointClient:
         well_part_number = self._map_well_part_number(well_type)
         hp_during = map_choice(list_item.get_property(list_fields.HEADPOST_DURING.value))
         anaesthesia = self._map_2023_anaesthesia(list_item, list_fields, hp_during)
+        start_date = self._map_initial_followup_date(list_item, list_fields, hp_during)
+        end_date = start_date
         animal_weight_prior, animal_weight_post = self._map_initial_followup_weight(
             list_item, list_fields, hp_during
         )

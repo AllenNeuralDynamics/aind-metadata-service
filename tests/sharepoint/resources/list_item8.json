@@ -123,7 +123,7 @@
   "ComWindow": "None",
   "ComCoplanar": "None",
   "Contusion": "Central",
-  "IontoNumberInj1": "Select...",
+  "IontoNumberInj1": "Ionto #1",
   "NanojectNumberInj10": "Select...",
   "IontoNumberInj2": "Select...",
   "NanojectNumberInj2": "Select...",
@@ -138,5 +138,11 @@
   "EditorId": "2846",
   "OData__UIVersionString": "1",
   "Attachments": false,
-  "GUID": "cda0b241-be4f-4a14-a7ef-75a01939036a"
+  "GUID": "cda0b241-be4f-4a14-a7ef-75a01939036a",
+  "Burr1_x0020_Perform_x0020_During": "Initial Surgery",
+  "Burr2_x0020_Perform_x0020_During": null,
+  "Burr3_x0020_Perform_x0020_During": null,
+  "Burr4_x0020_Perform_x0020_During": null,
+  "Headpost_x0020_Perform_x0020_Dur": null,
+  "Craniotomy_x0020_Perform_x0020_D": null
 }

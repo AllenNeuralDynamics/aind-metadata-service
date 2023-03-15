@@ -41,7 +41,7 @@
   "SurgeryStatus": "Ready for Feedback",
   "LongRequestorComments": null,
   "Procedure_x0020_Slots": "Single surgical session",
-  "Procedure_x0020_Family": "Fiber Optic Implant",
+  "Procedure_x0020_Family": "Headpost Only",
   "Procedure_x0020_T2": "Select...",
   "Procedure": "HP Only",
   "Headpost": "Motor Ctx",
@@ -138,7 +138,13 @@
   "EditorId": "2846",
   "OData__UIVersionString": "1",
   "Attachments": false,
-  "GUID": "cda0b241-be4f-4a14-a7ef-75a01939036a"
+  "GUID": "cda0b241-be4f-4a14-a7ef-75a01939036a",
+  "Burr1_x0020_Perform_x0020_During": "Initial Surgery",
+  "Burr2_x0020_Perform_x0020_During": "Initial Surgery",
+  "Burr3_x0020_Perform_x0020_During": "Initial Surgery",
+  "Burr4_x0020_Perform_x0020_During": "Initial Surgery",
+  "Headpost_x0020_Perform_x0020_Dur": "Initial Surgery",
+  "Craniotomy_x0020_Perform_x0020_D": "Initial Surgery"
 }
 
 
