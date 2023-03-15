@@ -33,8 +33,10 @@ def convert_str_to_time(time_string) -> Optional[int]:
         return None
 
 
-def parse_str_into_float(input_string) -> Optional[float]:
+def parse_str_into_float(input_string: str) -> Optional[float]:
     """Parses int from string and converts to float"""
+    if isinstance(input_string, float):
+        return input_string
     if input_string:
         if "," in input_string:
             input_string = input_string.split(",")[0]
