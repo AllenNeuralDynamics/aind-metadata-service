@@ -102,6 +102,7 @@ class NeurosurgeryAndBehaviorList2023:
 
     class SurgeryOrder(Enum):
         """Enum class for Initial/FollowUp classifiers"""
+
         INITIAL = "Initial Surgery"
         FOLLOW_UP = "Follow up Surgery"
 
