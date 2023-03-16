@@ -508,9 +508,11 @@ class Examples:
             procedure_type="Iontophoresis",
             injection_current=5.0,
             alternating_current="7/7",
-            anaesthesia=Anaesthetic(type='isoflurane', duration=datetime.time(1, 30), level=2.0),
+            anaesthesia=Anaesthetic(
+                type="isoflurane", duration=datetime.time(1, 30), level=2.0
+            ),
             instrument_id="Ionto #1",
-            recovery_time=datetime.time(0, 25),
+            recovery_time=None,
         ),
         # from list item 9
         Headframe.construct(
@@ -525,7 +527,28 @@ class Examples:
             headframe_part_number="0160-100-10",
             well_type="Mesoscope",
             well_part_number="0160-200-20",
-            anaesthesia=Anaesthetic(type='isoflurane', duration=datetime.time(1, 30), level=2.0),
+            anaesthesia=Anaesthetic(
+                type="isoflurane", duration=datetime.time(1, 30), level=2.0
+            ),
+        ),
+        Craniotomy.construct(
+            start_date=datetime.date(2022, 1, 3),
+            end_date=datetime.date(2022, 1, 3),
+            experimenter_full_name="NSB-187",
+            iacuc_protocol="2103",
+            animal_weight_prior=25.2,
+            animal_weight_post=28.2,
+            procedure_type="Craniotomy",
+            craniotomy_type="5mm",
+            craniotomy_size=5.0,
+            craniotomy_hemisphere=None,
+            craniotomy_coordinates_ml=None,
+            craniotomy_coordinates_ap=None,
+            anaesthesia=Anaesthetic(
+                type="isoflurane", duration=datetime.time(1, 30), level=2.0
+            ),
+            recovery_time=datetime.time(0, 30),
+            workstation_id="SWS 5",
         ),
         # from list item 10
         Craniotomy.construct(
@@ -541,7 +564,9 @@ class Examples:
             craniotomy_hemisphere=None,
             craniotomy_coordinates_ml=None,
             craniotomy_coordinates_ap=None,
-            anaesthesia=Anaesthetic(type='isoflurane', duration=datetime.time(1, 30), level=2.0),
+            anaesthesia=Anaesthetic(
+                type="isoflurane", duration=datetime.time(1, 30), level=2.0
+            ),
             recovery_time=datetime.time(0, 25),
         ),
         # from list item 11
@@ -557,7 +582,9 @@ class Examples:
             headframe_part_number="0160-100-42",
             well_type="Neuropixel",
             well_part_number="0160-200-36",
-            anaesthesia=Anaesthetic(type='isoflurane', duration=datetime.time(1, 30), level=2.0),
+            anaesthesia=Anaesthetic(
+                type="isoflurane", duration=datetime.time(1, 30), level=2.0
+            ),
         ),
         NanojectInjection.construct(
             start_date=datetime.date(2022, 1, 3),
@@ -572,7 +599,9 @@ class Examples:
             injection_angle=None,
             procedure_type="Nanoject (Pressure)",
             injection_volume=500.0,
-            anaesthesia=Anaesthetic(type='isoflurane', duration=datetime.time(1, 30), level=2.0),
+            anaesthesia=Anaesthetic(
+                type="isoflurane", duration=datetime.time(1, 30), level=2.0
+            ),
             recovery_time=datetime.time(0, 25),
         ),
         NanojectInjection.construct(
@@ -588,7 +617,9 @@ class Examples:
             injection_angle=None,
             procedure_type="Nanoject (Pressure)",
             injection_volume=600.0,
-            anaesthesia=Anaesthetic(type='isoflurane', duration=datetime.time(2, 0), level=2.5),
+            anaesthesia=Anaesthetic(
+                type="isoflurane", duration=datetime.time(2, 0), level=2.5
+            ),
             recovery_time=datetime.time(0, 30),
         ),
         NanojectInjection.construct(
@@ -604,7 +635,9 @@ class Examples:
             injection_coordinate_depth=None,
             injection_angle=None,
             injection_volume=600.0,
-            anaesthesia=Anaesthetic(type='isoflurane', duration=datetime.time(1, 30), level=2.0),
+            anaesthesia=Anaesthetic(
+                type="isoflurane", duration=datetime.time(1, 30), level=2.0
+            ),
             recovery_time=datetime.time(0, 25),
         ),
         # from list item 14
@@ -620,7 +653,9 @@ class Examples:
             headframe_part_number="0160-100-46",
             well_type="WHC NP",
             well_part_number="0160-055-08",
-            anaesthesia=Anaesthetic(type='isoflurane', duration=datetime.time(1, 30), level=2.0),
+            anaesthesia=Anaesthetic(
+                type="isoflurane", duration=datetime.time(1, 30), level=2.0
+            ),
         ),
         NanojectInjection.construct(
             start_date=datetime.date(2022, 1, 3),
@@ -637,7 +672,9 @@ class Examples:
             procedure_type="Nanoject (Pressure)",
             injection_volume=600.0,
             notes=None,
-            anaesthesia=Anaesthetic(type='isoflurane', duration=datetime.time(1, 30), level=2.0),
+            anaesthesia=Anaesthetic(
+                type="isoflurane", duration=datetime.time(1, 30), level=2.0
+            ),
             recovery_time=datetime.time(0, 25),
         ),
         FiberImplant.construct(
@@ -656,7 +693,9 @@ class Examples:
                 stereotactic_coordinate_dv=-2.95,
                 angle=0.0,
             ),
-            anaesthesia=Anaesthetic(type='isoflurane', duration=datetime.time(1, 30), level=2.0),
+            anaesthesia=Anaesthetic(
+                type="isoflurane", duration=datetime.time(1, 30), level=2.0
+            ),
         ),
         IontophoresisInjection.construct(
             start_date=datetime.date(2022, 1, 3),
@@ -674,7 +713,9 @@ class Examples:
             injection_angle=0.0,
             injection_current=None,
             alternating_current="7/7",
-            anaesthesia=Anaesthetic(type='isoflurane', duration=datetime.time(1, 30), level=2.0),
+            anaesthesia=Anaesthetic(
+                type="isoflurane", duration=datetime.time(1, 30), level=2.0
+            ),
             recovery_time=datetime.time(0, 25),
         ),
         FiberImplant.construct(
@@ -693,7 +734,9 @@ class Examples:
                 stereotactic_coordinate_dv=-1.05,
                 angle=0.0,
             ),
-            anaesthesia=Anaesthetic(type='isoflurane', duration=datetime.time(1, 30), level=2.0),
+            anaesthesia=Anaesthetic(
+                type="isoflurane", duration=datetime.time(1, 30), level=2.0
+            ),
         ),
         IontophoresisInjection.construct(
             start_date=datetime.date(2022, 1, 3),
@@ -710,7 +753,9 @@ class Examples:
             procedure_type="Iontophoresis",
             injection_current=5.0,
             alternating_current="7/7",
-            anaesthesia=Anaesthetic(type='isoflurane', duration=datetime.time(1, 30), level=2.0),
+            anaesthesia=Anaesthetic(
+                type="isoflurane", duration=datetime.time(1, 30), level=2.0
+            ),
             recovery_time=datetime.time(0, 25),
         ),
         FiberImplant.construct(
@@ -728,7 +773,9 @@ class Examples:
                 stereotactic_coordinate_dv=-1.85,
                 angle=0.0,
             ),
-            anaesthesia=Anaesthetic(type='isoflurane', duration=datetime.time(1, 30), level=2.0),
+            anaesthesia=Anaesthetic(
+                type="isoflurane", duration=datetime.time(1, 30), level=2.0
+            ),
         ),
         IontophoresisInjection.construct(
             start_date=datetime.date(2022, 1, 3),
@@ -745,7 +792,9 @@ class Examples:
             procedure_type="Iontophoresis",
             injection_current=5.0,
             alternating_current="7/7",
-            anaesthesia=Anaesthetic(type='isoflurane', duration=datetime.time(1, 30), level=2.0),
+            anaesthesia=Anaesthetic(
+                type="isoflurane", duration=datetime.time(1, 30), level=2.0
+            ),
             recovery_time=datetime.time(0, 25),
         ),
         FiberImplant.construct(
@@ -763,7 +812,9 @@ class Examples:
                 stereotactic_coordinate_dv=-1.8,
                 angle=0.0,
             ),
-            anaesthesia=Anaesthetic(type='isoflurane', duration=datetime.time(1, 30), level=2.0),
+            anaesthesia=Anaesthetic(
+                type="isoflurane", duration=datetime.time(1, 30), level=2.0
+            ),
         ),
         # from list item 15
         Headframe.construct(
@@ -778,7 +829,9 @@ class Examples:
             headframe_part_number="0160-100-51",
             well_type="Scientifica (CAM)",
             well_part_number="Rev A",
-            anaesthesia=Anaesthetic(type='isoflurane', duration=datetime.time(1, 30), level=2.0),
+            anaesthesia=Anaesthetic(
+                type="isoflurane", duration=datetime.time(1, 30), level=2.0
+            ),
         ),
         # from list item 16
         Headframe.construct(
@@ -793,7 +846,9 @@ class Examples:
             headframe_part_number=None,
             well_type="No Well",
             well_part_number=None,
-            anaesthesia=Anaesthetic(type='isoflurane', duration=datetime.time(1, 30), level=2.0),
+            anaesthesia=Anaesthetic(
+                type="isoflurane", duration=datetime.time(1, 30), level=2.0
+            ),
         ),
         # from list item 17
         Headframe.construct(
@@ -808,7 +863,9 @@ class Examples:
             headframe_part_number="0160-100-45",
             well_type="WHC 2P",
             well_part_number="0160-200-62",
-            anaesthesia=Anaesthetic(type='isoflurane', duration=datetime.time(1, 30), level=2.0),
+            anaesthesia=Anaesthetic(
+                type="isoflurane", duration=datetime.time(1, 30), level=2.0
+            ),
         ),
         # # from list item 13
         SubjectProcedure.construct(
