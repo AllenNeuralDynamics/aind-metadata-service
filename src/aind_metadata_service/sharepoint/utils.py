@@ -35,7 +35,7 @@ def convert_str_to_time(time_string) -> Optional[int]:
 
 def parse_str_into_float(input_string: str) -> Optional[float]:
     """Parses int from string and converts to float"""
-    if isinstance(input_string, float):
+    if isinstance(input_string, float) or isinstance(input_string, int):
         return input_string
     if input_string:
         if "," in input_string:
@@ -66,12 +66,13 @@ def map_date_to_datetime(date) -> Optional[datetime.date]:
 
 def convert_hour_to_datetime(hours) -> Optional[datetime.time]:
     """maps hour to datetime.time object"""
-    hours = float(hours)
-    mins = (hours % 1) * 60
-    hours = hours / 1
-    secs = (mins % 1) * 60
-    mins = mins / 1
-    return datetime.time(int(hours), int(mins), int(secs))
+    if hours:
+        hours = float(hours)
+        mins = (hours % 1) * 60
+        hours = hours / 1
+        secs = (mins % 1) * 60
+        mins = mins / 1
+        return datetime.time(int(hours), int(mins), int(secs))
 
 
 def convert_min_to_datetime(mins) -> Optional[datetime.time]:
