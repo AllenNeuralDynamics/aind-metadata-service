@@ -32,7 +32,7 @@ dev = [
 ]
 
 server = [
-    'aind-data-schema==0.12.13',
+    'aind-data-schema==0.12.20',
     'pyodbc',
     'office365-rest-python-client',
     'fastapi',

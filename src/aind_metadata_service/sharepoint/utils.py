@@ -4,6 +4,7 @@ import re
 from typing import Optional
 from aind_data_schema.procedures import Side
 from dateutil import parser
+from datetime import timedelta
 
 
 def map_choice(response):
@@ -20,16 +21,6 @@ def map_hemisphere(response_hemisphere) -> Optional[Side]:
     elif response_hemisphere == Side.RIGHT.value:
         return Side.RIGHT
     else:
-        return None
-
-
-def convert_str_to_time(time_string) -> Optional[int]:
-    """converts duration"""
-    try:
-        return int(re.search(r"\d+", time_string).group())
-    except AttributeError:
-        return None
-    except TypeError:
         return None
 
 
@@ -64,20 +55,8 @@ def map_date_to_datetime(date) -> Optional[datetime.date]:
         return None
 
 
-def convert_hour_to_datetime(hours) -> Optional[datetime.time]:
-    """maps hour to datetime.time object"""
-    if hours:
-        hours = float(hours)
-        mins = (hours % 1) * 60
-        hours = hours / 1
-        secs = (mins % 1) * 60
-        mins = mins / 1
-        return datetime.time(int(hours), int(mins), int(secs))
+def convert_hour_to_mins(hours) -> Optional[float]:
+    """maps durations so that hours are converted to minutes (float)"""
+    return timedelta(hours=parse_str_into_float(hours)).total_seconds() / 60
 
 
-def convert_min_to_datetime(mins) -> Optional[datetime.time]:
-    """maps mins to datetime.time object"""
-    if mins:
-        mins = parse_str_into_float(mins)
-        return datetime.time(0, int(mins), 0)
-    return None
