@@ -1,10 +1,11 @@
 """Helper methods to map sharepoint fields to schema format"""
 import datetime
 import re
+from datetime import timedelta
 from typing import Optional
+
 from aind_data_schema.procedures import Side
 from dateutil import parser
-from datetime import timedelta
 
 
 def map_choice(response):
@@ -57,6 +58,7 @@ def map_date_to_datetime(date) -> Optional[datetime.date]:
 
 def convert_hour_to_mins(hours) -> Optional[float]:
     """maps durations so that hours are converted to minutes (float)"""
-    return timedelta(hours=parse_str_into_float(hours)).total_seconds() / 60
-
-
+    if hours:
+        return (
+            timedelta(hours=parse_str_into_float(hours)).total_seconds() / 60
+        )

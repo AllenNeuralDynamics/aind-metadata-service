@@ -24,12 +24,12 @@ from office365.sharepoint.listitems.collection import ListItemCollection
 
 from aind_metadata_service.response_handler import Responses
 from aind_metadata_service.sharepoint.utils import (
+    convert_hour_to_mins,
     convert_str_to_bool,
     map_choice,
     map_date_to_datetime,
     map_hemisphere,
     parse_str_into_float,
-    convert_hour_to_mins,
 )
 
 
@@ -482,7 +482,7 @@ class SharePointClient:
     """This class contains the api to connect to SharePoint db."""
 
     def __init__(
-            self, site_url: str, client_id: str, client_secret: str
+        self, site_url: str, client_id: str, client_secret: str
     ) -> None:
         """
         Initialize a client
@@ -539,8 +539,8 @@ class SharePointClient:
         return filter_string
 
     def get_procedure_info(
-            self,
-            subject_id: str,
+        self,
+        subject_id: str,
     ) -> JSONResponse:
         """
         Primary interface. Maps a subject_id to a response.
@@ -596,7 +596,7 @@ class SharePointClient:
 
     @staticmethod
     def _handle_response_from_sharepoint(
-            subject_id: str, subject_procedures=None
+        subject_id: str, subject_procedures=None
     ) -> JSONResponse:
         """
         Maps the response from SharePoint into a Procedures model
@@ -728,7 +728,7 @@ class SharePointClient:
         return subject_procedures
 
     def _map_list_item_to_subject_procedure(
-            self, list_item: ClientObject
+        self, list_item: ClientObject
     ) -> SubjectProcedure:
         """Maps a Sharepoint ClientObject to generic SubjectProcedure model"""
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
@@ -770,7 +770,7 @@ class SharePointClient:
 
     @staticmethod
     def _map_1st_injection_anaesthesia(
-            list_item: ClientObject, list_fields
+        list_item: ClientObject, list_fields
     ) -> Optional[Anaesthetic]:
         """Maps anaesthesic type, duration, level for Injection"""
         anaesthetic_type = "isoflurane"
@@ -786,7 +786,7 @@ class SharePointClient:
         return anaesthetic
 
     def _map_1st_injection(
-            self, list_item: ClientObject, list_fields
+        self, list_item: ClientObject, list_fields
     ) -> Union[NanojectInjection, IontophoresisInjection]:
         """Maps a SharePoint ClientObject to an Injection model"""
         start_date = map_date_to_datetime(
@@ -840,8 +840,8 @@ class SharePointClient:
             list_item.get_property(list_fields.INJ1ANGLE0.value)
         )
         if (
-                injection_type
-                == NeurosurgeryAndBehaviorList2019.InjectionType.IONTO.value
+            injection_type
+            == NeurosurgeryAndBehaviorList2019.InjectionType.IONTO.value
         ):
             instrument_id = list_item.get_property(
                 list_fields.IONTO_NUMBER_INJ1.value
@@ -904,7 +904,7 @@ class SharePointClient:
 
     @staticmethod
     def _map_2nd_injection_anaesthesia(
-            list_item: ClientObject, list_fields
+        list_item: ClientObject, list_fields
     ) -> Optional[Anaesthetic]:
         """Maps anaesthesic type, duration, level for Injection"""
         anaesthetic_type = "isoflurane"
@@ -920,7 +920,7 @@ class SharePointClient:
         return anaesthetic
 
     def _map_2nd_injection(
-            self, list_item: ClientObject, list_fields
+        self, list_item: ClientObject, list_fields
     ) -> Union[NanojectInjection, IontophoresisInjection]:
         """Maps Sharepoint ListItem to a 2nd Injection model"""
         start_date = map_date_to_datetime(
@@ -974,8 +974,8 @@ class SharePointClient:
             list_item.get_property(list_fields.INJ2ANGLE0.value)
         )
         if (
-                injection_type
-                == NeurosurgeryAndBehaviorList2019.InjectionType.IONTO.value
+            injection_type
+            == NeurosurgeryAndBehaviorList2019.InjectionType.IONTO.value
         ):
             instrument_id = list_item.get_property(
                 list_fields.IONTO_NUMBER_INJ2.value
@@ -1037,7 +1037,7 @@ class SharePointClient:
         return injection
 
     def _map_list_item_to_injections(
-            self, list_item: ClientObject
+        self, list_item: ClientObject
     ) -> List[Union[NanojectInjection, IontophoresisInjection]]:
         """Maps a Sharepoint ListItem to a list of Injection models"""
         injections = []
@@ -1053,7 +1053,7 @@ class SharePointClient:
 
     @staticmethod
     def _map_list_item_to_ophys_probe(
-            list_item: ClientObject, list_fields
+        list_item: ClientObject, list_fields
     ) -> List[OphysProbe]:
         """Maps a Sharepoint ListItem to list of OphysProbe models"""
         ophys_probes = []
@@ -1112,8 +1112,8 @@ class SharePointClient:
         return ophys_probes
 
     def _map_list_item_to_fiber_implant(
-            self,
-            list_item: ClientObject,
+        self,
+        list_item: ClientObject,
     ) -> FiberImplant:
         """Maps a SharePoint ListItem to a FiberImplant model"""
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
@@ -1176,7 +1176,7 @@ class SharePointClient:
         return None
 
     def _map_list_item_to_craniotomy(
-            self, list_item: ClientObject
+        self, list_item: ClientObject
     ) -> Craniotomy:
         """Maps a SharePoint ListItem to a Craniotomy model"""
         # TODO: missing fields (implant_part_number, protective_material)
@@ -1242,48 +1242,48 @@ class SharePointClient:
     def _map_headpost_type(headpost_type: str):
         """Maps Sharepoint HeadPostType to fields in HeadFrame model"""
         if (
-                headpost_type
-                == NeurosurgeryAndBehaviorList2019.HeadPostType.CAM.value
+            headpost_type
+            == NeurosurgeryAndBehaviorList2019.HeadPostType.CAM.value
         ):
             headframe_type = "CAM-style"
             headframe_part_number = "0160-100-10 Rev A"
             well_type = "CAM-style"
             well_part_number = None
         elif (
-                headpost_type
-                == NeurosurgeryAndBehaviorList2019.HeadPostType.NEUROPIXEL.value
+            headpost_type
+            == NeurosurgeryAndBehaviorList2019.HeadPostType.NEUROPIXEL.value
         ):
             headframe_type = "Neuropixel-style"
             headframe_part_number = "0160-100-10"
             well_type = "Neuropixel-style"
             well_part_number = "0160-200-36"
         elif (
-                headpost_type
-                == NeurosurgeryAndBehaviorList2019.HeadPostType.MESO_NGC.value
+            headpost_type
+            == NeurosurgeryAndBehaviorList2019.HeadPostType.MESO_NGC.value
         ):
             headframe_type = "NGC-style"
             headframe_part_number = "0160-100-10"
             well_type = "Mesoscope-style"
             well_part_number = "0160-200-20"
         elif (
-                headpost_type
-                == NeurosurgeryAndBehaviorList2019.HeadPostType.WHC_NP.value
+            headpost_type
+            == NeurosurgeryAndBehaviorList2019.HeadPostType.WHC_NP.value
         ):
             headframe_type = "WHC #42"
             headframe_part_number = "42"
             well_type = "Neuropixel-style"
             well_part_number = "0160-200-36"
         elif (
-                headpost_type
-                == NeurosurgeryAndBehaviorList2019.HeadPostType.NGC.value
+            headpost_type
+            == NeurosurgeryAndBehaviorList2019.HeadPostType.NGC.value
         ):
             headframe_type = "NGC-style"
             headframe_part_number = "0160-100-10"
             well_type = None
             well_part_number = None
         elif (
-                headpost_type
-                == NeurosurgeryAndBehaviorList2019.HeadPostType.AI_HEADBAR.value
+            headpost_type
+            == NeurosurgeryAndBehaviorList2019.HeadPostType.AI_HEADBAR.value
         ):
             headframe_type = "AI Straight Headbar"
             headframe_part_number = None
@@ -1299,7 +1299,7 @@ class SharePointClient:
         )
 
     def _map_list_item_to_head_frame(
-            self, list_item: ClientObject
+        self, list_item: ClientObject
     ) -> Headframe:
         """Maps a SharePoint ListItem to a HeadFrame model"""
         list_fields = NeurosurgeryAndBehaviorList2019.ListField
@@ -1344,19 +1344,25 @@ class SharePointClient:
 
     @staticmethod
     def _map_2023_anaesthesia(
-            list_item, list_fields, surgery_during
+        list_item, list_fields, surgery_during
     ) -> Optional[Anaesthetic]:
         """Maps anaesthesic type, duration, level based on surgery order"""
         surgery_order = NeurosurgeryAndBehaviorList2023.SurgeryOrder
         anaesthetic_type = "isoflurane"
         if surgery_during == surgery_order.SECOND.value:
-            duration = convert_hour_to_mins(list_item.get_property(list_fields.FIRST_INJECTION_ISO_DURATION.value))
+            duration = convert_hour_to_mins(
+                list_item.get_property(
+                    list_fields.FIRST_INJECTION_ISO_DURATION.value
+                )
+            )
             level = parse_str_into_float(
                 list_item.get_property(list_fields.ROUND1_INJ_ISOLEVEL.value)
             )
         else:
             # default is Initial Surgery
-            duration = convert_hour_to_mins(list_item.get_property(list_fields.ISO_ON.value))
+            duration = convert_hour_to_mins(
+                list_item.get_property(list_fields.ISO_ON.value)
+            )
             level = parse_str_into_float(
                 list_item.get_property(list_fields.HP_ISO_LEVEL.value)
             )
@@ -1383,7 +1389,7 @@ class SharePointClient:
 
     @staticmethod
     def _map_initial_followup_injection(
-            list_item, list_fields, injection_type, surgery_during
+        list_item, list_fields, injection_type, surgery_during
     ):
         """
         Maps injection workstation_id, recovery_time, and instrument_id
@@ -1397,7 +1403,9 @@ class SharePointClient:
                     list_fields.WORK_STATION1ST_INJECTION.value
                 )
             )
-            recovery_time = parse_str_into_float(list_item.get_property(list_fields.FIRST_INJ_RECOVERY.value))
+            recovery_time = parse_str_into_float(
+                list_item.get_property(list_fields.FIRST_INJ_RECOVERY.value)
+            )
             if injection_type.strip() == injection_types.IONTO.value:
                 instrument_id = map_choice(
                     list_item.get_property(list_fields.IONTO_NUMBER_INJ2.value)
@@ -1415,7 +1423,9 @@ class SharePointClient:
                     list_fields.WORK_STATION1ST_INJECTION.value
                 )
             )
-            recovery_time = parse_str_into_float(list_item.get_property(list_fields.HP_RECOVERY.value))
+            recovery_time = parse_str_into_float(
+                list_item.get_property(list_fields.HP_RECOVERY.value)
+            )
             if injection_type.strip() == injection_types.IONTO.value:
                 instrument_id = map_choice(
                     list_item.get_property(list_fields.IONTO_NUMBER_INJ1.value)
@@ -1430,7 +1440,7 @@ class SharePointClient:
 
     @staticmethod
     def _map_initial_followup_craniotomy(
-            list_item, list_fields, surgery_during
+        list_item, list_fields, surgery_during
     ):
         """
         Maps craniotomy workstation_id and recovery_time based on
@@ -1443,7 +1453,9 @@ class SharePointClient:
                     list_fields.WORK_STATION1ST_INJECTION.value
                 )
             )
-            recovery_time = parse_str_into_float(list_item.get_property(list_fields.FIRST_INJ_RECOVERY.value))
+            recovery_time = parse_str_into_float(
+                list_item.get_property(list_fields.FIRST_INJ_RECOVERY.value)
+            )
         else:
             # default is Initial Surgery
             workstation_id = map_choice(
@@ -1451,7 +1463,9 @@ class SharePointClient:
                     list_fields.WORK_STATION1ST_INJECTION.value
                 )
             )
-            recovery_time = parse_str_into_float(list_item.get_property(list_fields.HP_RECOVERY.value))
+            recovery_time = parse_str_into_float(
+                list_item.get_property(list_fields.HP_RECOVERY.value)
+            )
         return workstation_id, recovery_time
 
     @staticmethod
@@ -1479,8 +1493,8 @@ class SharePointClient:
         return animal_weight_prior, animal_weight_post
 
     def _map_burr_holes(
-            self,
-            list_item: ClientObject,
+        self,
+        list_item: ClientObject,
     ) -> List[Union[FiberImplant, IontophoresisInjection, NanojectInjection]]:
         """Maps SharePoint ListItem to list of FiberImplants/Injections"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
@@ -1496,8 +1510,8 @@ class SharePointClient:
         return burr_procedures
 
     def _map_burr_hole_1(
-            self,
-            list_item: ClientObject,
+        self,
+        list_item: ClientObject,
     ) -> List[Union[IontophoresisInjection, NanojectInjection, FiberImplant]]:
         """Maps 1st burr hole to Injections and/or FiberImplants"""
         nsb_burr_types = NeurosurgeryAndBehaviorList2023.BurrHoleType
@@ -1646,8 +1660,8 @@ class SharePointClient:
         return burr_1_procedures
 
     def _map_burr_hole_2(
-            self,
-            list_item: ClientObject,
+        self,
+        list_item: ClientObject,
     ) -> List[Union[IontophoresisInjection, NanojectInjection, FiberImplant]]:
         """Maps 2nd burr hole to Injections and/or FiberImplants"""
         nsb_burr_types = NeurosurgeryAndBehaviorList2023.BurrHoleType
@@ -1794,8 +1808,8 @@ class SharePointClient:
         return burr_2_procedures
 
     def _map_burr_hole_3(
-            self,
-            list_item: ClientObject,
+        self,
+        list_item: ClientObject,
     ) -> List[Union[IontophoresisInjection, NanojectInjection, FiberImplant]]:
         """Maps 3rd burr hole to Injections and/or FiberImplants"""
         nsb_burr_types = NeurosurgeryAndBehaviorList2023.BurrHoleType
@@ -1942,8 +1956,8 @@ class SharePointClient:
         return burr_3_procedures
 
     def _map_burr_hole_4(
-            self,
-            list_item: ClientObject,
+        self,
+        list_item: ClientObject,
     ) -> List[Union[IontophoresisInjection, NanojectInjection, FiberImplant]]:
         """Maps 4th burr hole to Injections and/or FiberImplants"""
         nsb_burr_types = NeurosurgeryAndBehaviorList2023.BurrHoleType
@@ -2090,8 +2104,8 @@ class SharePointClient:
         return burr_4_procedures
 
     def _map_list_item_to_craniotomy_2023(
-            self,
-            list_item: ClientObject,
+        self,
+        list_item: ClientObject,
     ) -> Craniotomy:
         """Maps a SharePoint ListItem to a Craniotomy model"""
         # TODO: missing fields (craniotomy coords,hemisphere)
@@ -2175,8 +2189,8 @@ class SharePointClient:
             return None
 
     def _map_list_item_to_head_frame_2023(
-            self,
-            list_item: ClientObject,
+        self,
+        list_item: ClientObject,
     ) -> Headframe:
         """Maps a SharePoint ListItem to a HeadFrame model"""
         list_fields = NeurosurgeryAndBehaviorList2023.ListField
