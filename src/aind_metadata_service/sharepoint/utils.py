@@ -1,6 +1,7 @@
 """Helper methods to map sharepoint fields to schema format"""
 import datetime
 import re
+from datetime import timedelta
 from typing import Optional
 
 from aind_data_schema.procedures import Side
@@ -24,18 +25,10 @@ def map_hemisphere(response_hemisphere) -> Optional[Side]:
         return None
 
 
-def convert_str_to_time(time_string) -> Optional[int]:
-    """converts duration"""
-    try:
-        return int(re.search(r"\d+", time_string).group())
-    except AttributeError:
-        return None
-    except TypeError:
-        return None
-
-
-def parse_str_into_float(input_string) -> Optional[float]:
+def parse_str_into_float(input_string: str) -> Optional[float]:
     """Parses int from string and converts to float"""
+    if isinstance(input_string, float) or isinstance(input_string, int):
+        return input_string
     if input_string:
         if "," in input_string:
             input_string = input_string.split(",")[0]
@@ -61,3 +54,11 @@ def map_date_to_datetime(date) -> Optional[datetime.date]:
         return parser.isoparse(date).date()
     else:
         return None
+
+
+def convert_hour_to_mins(hours) -> Optional[float]:
+    """maps durations so that hours are converted to minutes (float)"""
+    if hours:
+        return (
+            timedelta(hours=parse_str_into_float(hours)).total_seconds() / 60
+        )
