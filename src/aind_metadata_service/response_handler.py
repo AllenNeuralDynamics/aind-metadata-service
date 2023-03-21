@@ -1,21 +1,10 @@
 """Module to handle responses"""
-from enum import Enum
 from typing import List
 
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, validate_model
-
-
-class StatusCodes(Enum):
-    """Enum class of status codes"""
-
-    CONNECTION_ERROR = 503
-    INTERNAL_SERVER_ERROR = 500
-    MULTIPLE_RESPONSES = 300
-    VALID_DATA = 200
-    INVALID_DATA = 406
-    NO_DATA_FOUND = 404
+from aind_metadata_service.client import StatusCodes
 
 
 class Responses:
