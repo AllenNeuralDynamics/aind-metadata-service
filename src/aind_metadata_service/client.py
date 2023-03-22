@@ -1,5 +1,17 @@
 """Module for client library."""
 import requests
+from enum import Enum
+
+
+class StatusCodes(Enum):
+    """Enum class of status codes"""
+
+    CONNECTION_ERROR = 503
+    INTERNAL_SERVER_ERROR = 500
+    MULTIPLE_RESPONSES = 300
+    VALID_DATA = 200
+    INVALID_DATA = 406
+    NO_DATA_FOUND = 404
 
 
 class AindMetadataServiceClient:
