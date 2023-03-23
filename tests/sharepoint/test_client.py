@@ -12,13 +12,13 @@ from aind_data_schema.procedures import (
     CraniotomyType,
     FiberImplant,
     Headframe,
+    InjectionMaterial,
     IontophoresisInjection,
     NanojectInjection,
     OphysProbe,
     Procedures,
     Side,
     SubjectProcedure,
-    InjectionMaterial,
 )
 from office365.sharepoint.client_context import ClientContext
 from office365.sharepoint.listitems.collection import ListItemCollection
@@ -527,6 +527,7 @@ class Examples:
             anaesthesia=Anaesthetic(type="isoflurane", duration=90, level=2.0),
             instrument_id="Ionto #1",
             recovery_time=None,
+            injection_materials=expected_inj_materials_1,
         ),
         # from list item 9
         Headframe.construct(
@@ -642,7 +643,7 @@ class Examples:
             anaesthesia=Anaesthetic(type="isoflurane", duration=90, level=2.0),
             recovery_time=25,
         ),
-        # from list item 14
+        # # from list item 14
         Headframe.construct(
             start_date=datetime.date(2022, 1, 3),
             end_date=datetime.date(2022, 1, 3),
@@ -975,9 +976,9 @@ class TestSharepointClient(unittest.TestCase):
             Examples.expected_subject_procedures1, procedures2019
         )
 
-        # self.assertCountEqual(
-        #     Examples.expected_subject_procedures2, procedures2023
-        # )
+        self.assertCountEqual(
+            Examples.expected_subject_procedures2, procedures2023
+        )
 
     def test_handle_response(self):
         """Tests that the responses returned are what's expected."""
