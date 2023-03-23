@@ -839,6 +839,9 @@ class SharePointClient:
         injection_angle = parse_str_into_float(
             list_item.get_property(list_fields.INJ1ANGLE0.value)
         )
+        bregma_to_lambda_distance = parse_str_into_float(
+            list_item.get_property(list_fields.BREG2_LAMB.value)
+        )
         if (
             injection_type
             == NeurosurgeryAndBehaviorList2019.InjectionType.IONTO.value
@@ -872,6 +875,7 @@ class SharePointClient:
                 injection_type=injection_type,
                 injection_current=injection_current,
                 alternating_current=alternating_current,
+                bregma_to_lambda_distance=bregma_to_lambda_distance,
             )
         else:
             instrument_id = list_item.get_property(
@@ -899,6 +903,7 @@ class SharePointClient:
                 injection_angle=injection_angle,
                 injection_type=injection_type,
                 injection_volume=injection_volume,
+                bregma_to_lambda_distance=bregma_to_lambda_distance,
             )
         return injection
 
@@ -973,6 +978,9 @@ class SharePointClient:
         injection_angle = parse_str_into_float(
             list_item.get_property(list_fields.INJ2ANGLE0.value)
         )
+        bregma_to_lambda_distance = parse_str_into_float(
+            list_item.get_property(list_fields.BREG2_LAMB.value)
+        )
         if (
             injection_type
             == NeurosurgeryAndBehaviorList2019.InjectionType.IONTO.value
@@ -1006,6 +1014,7 @@ class SharePointClient:
                 injection_type=injection_type,
                 injection_current=injection_current,
                 alternating_current=alternating_current,
+                bregma_to_lambda_distance=bregma_to_lambda_distance,
             )
         else:
             instrument_id = list_item.get_property(
@@ -1033,6 +1042,7 @@ class SharePointClient:
                 injection_angle=injection_angle,
                 injection_type=injection_type,
                 injection_volume=injection_volume,
+                bregma_to_lambda_distance=bregma_to_lambda_distance,
             )
         return injection
 
@@ -1220,6 +1230,9 @@ class SharePointClient:
         workstation_id = map_choice(
             list_item.get_property(list_fields.HP_WORK_STATION.value)
         )
+        bregma_to_lambda_distance = parse_str_into_float(
+            list_item.get_property(list_fields.BREG2_LAMB.value)
+        )
         craniotomy = Craniotomy.construct(
             start_date=start_date,
             end_date=end_date,
@@ -1235,6 +1248,7 @@ class SharePointClient:
             craniotomy_size=craniotomy_size,
             dura_removed=dura_removed,
             workstation_id=workstation_id,
+            bregma_to_lambda_distance=bregma_to_lambda_distance,
         )
         return craniotomy
 
@@ -1577,6 +1591,9 @@ class SharePointClient:
                 ) = self._map_initial_followup_injection(
                     list_item, list_fields, injection_type, burr_during
                 )
+                bregma_to_lambda_distance = parse_str_into_float(
+                    list_item.get_property(list_fields.BREG2_LAMB.value)
+                )
                 if injection_type.strip() == injection_types.IONTO.value:
                     injection_current = parse_str_into_float(
                         list_item.get_property(list_fields.INJ1_CURRENT.value)
@@ -1607,6 +1624,7 @@ class SharePointClient:
                         anaesthesia=anaesthesia,
                         recovery_time=recovery_time,
                         instrument_id=instrument_id,
+                        bregma_to_lambda_distance=bregma_to_lambda_distance,
                     )
                 else:
                     injection_volume = parse_str_into_float(
@@ -1632,6 +1650,7 @@ class SharePointClient:
                         anaesthesia=anaesthesia,
                         recovery_time=recovery_time,
                         instrument_id=instrument_id,
+                        bregma_to_lambda_distance=bregma_to_lambda_distance,
                     )
                 burr_1_procedures.append(injection)
             elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
@@ -1725,6 +1744,9 @@ class SharePointClient:
                 ) = self._map_initial_followup_injection(
                     list_item, list_fields, injection_type, burr_during
                 )
+                bregma_to_lambda_distance = parse_str_into_float(
+                    list_item.get_property(list_fields.BREG2_LAMB.value)
+                )
                 if injection_type.strip() == injection_types.IONTO.value:
                     injection_current = parse_str_into_float(
                         list_item.get_property(list_fields.INJ2_CURRENT.value)
@@ -1755,6 +1777,7 @@ class SharePointClient:
                         recovery_time=recovery_time,
                         instrument_id=instrument_id,
                         anaesthesia=anaesthesia,
+                        bregma_to_lambda_distance=bregma_to_lambda_distance,
                     )
                 else:
                     injection_volume = parse_str_into_float(
@@ -1780,6 +1803,7 @@ class SharePointClient:
                         recovery_time=recovery_time,
                         instrument_id=instrument_id,
                         anaesthesia=anaesthesia,
+                        bregma_to_lambda_distance=bregma_to_lambda_distance,
                     )
                 burr_2_procedures.append(injection)
             elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
@@ -1873,6 +1897,9 @@ class SharePointClient:
                 ) = self._map_initial_followup_injection(
                     list_item, list_fields, injection_type, burr_during
                 )
+                bregma_to_lambda_distance = parse_str_into_float(
+                    list_item.get_property(list_fields.BREG2_LAMB.value)
+                )
                 if injection_type.strip() == injection_types.IONTO.value:
                     injection_current = parse_str_into_float(
                         list_item.get_property(list_fields.INJ3_CURRENT.value)
@@ -1903,6 +1930,7 @@ class SharePointClient:
                         recovery_time=recovery_time,
                         instrument_id=instrument_id,
                         anaesthesia=anaesthesia,
+                        bregma_to_lambda_distance=bregma_to_lambda_distance,
                     )
                 else:
                     injection_volume = parse_str_into_float(
@@ -1928,6 +1956,7 @@ class SharePointClient:
                         recovery_time=recovery_time,
                         instrument_id=instrument_id,
                         anaesthesia=anaesthesia,
+                        bregma_to_lambda_distance=bregma_to_lambda_distance,
                     )
                 burr_3_procedures.append(injection)
             elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
@@ -2021,6 +2050,9 @@ class SharePointClient:
                 ) = self._map_initial_followup_injection(
                     list_item, list_fields, injection_type, burr_during
                 )
+                bregma_to_lambda_distance = parse_str_into_float(
+                    list_item.get_property(list_fields.BREG2_LAMB.value)
+                )
                 if injection_type.strip() == injection_types.IONTO.value:
                     injection_current = parse_str_into_float(
                         list_item.get_property(list_fields.INJ4_CURRENT.value)
@@ -2051,6 +2083,7 @@ class SharePointClient:
                         recovery_time=recovery_time,
                         instrument_id=instrument_id,
                         anaesthesia=anaesthesia,
+                        bregma_to_lambda_distance=bregma_to_lambda_distance,
                     )
                 else:
                     injection_volume = parse_str_into_float(
@@ -2076,6 +2109,7 @@ class SharePointClient:
                         recovery_time=recovery_time,
                         instrument_id=instrument_id,
                         anaesthesia=anaesthesia,
+                        bregma_to_lambda_distance=bregma_to_lambda_distance,
                     )
                 burr_4_procedures.append(injection)
             elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
@@ -2139,6 +2173,9 @@ class SharePointClient:
         ) = self._map_initial_followup_weight(
             list_item, list_fields, craniotomy_during
         )
+        bregma_to_lambda_distance = parse_str_into_float(
+            list_item.get_property(list_fields.BREG2_LAMB.value)
+        )
         craniotomy = Craniotomy.construct(
             start_date=start_date,
             end_date=end_date,
@@ -2151,6 +2188,7 @@ class SharePointClient:
             anaesthesia=anaesthesia,
             workstation_id=workstation_id,
             recovery_time=recovery_time,
+            bregma_to_lambda_distance=bregma_to_lambda_distance,
         )
         return craniotomy
 
