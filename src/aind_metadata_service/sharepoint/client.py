@@ -9,6 +9,7 @@ from aind_data_schema.procedures import (
     CraniotomyType,
     FiberImplant,
     Headframe,
+    InjectionMaterial,
     IontophoresisInjection,
     NanojectInjection,
     OphysProbe,
@@ -748,7 +749,6 @@ class SharePointClient:
         animal_weight_post = parse_str_into_float(
             list_item.get_property(list_fields.WEIGHT_AFTER_SURGERY.value)
         )
-        # TODO: map anaesthesia ?
         subject_procedure = SubjectProcedure.construct(
             start_date=start_date,
             end_date=end_date,
@@ -784,6 +784,17 @@ class SharePointClient:
             level=level,
         )
         return anaesthetic
+
+    @staticmethod
+    def _map_injection_materials(full_genome_name):
+        """Maps injection materials"""
+        if full_genome_name:
+            injection_materials = InjectionMaterial.construct(
+                full_genome_name=full_genome_name
+            )
+        else:
+            injection_materials = None
+        return injection_materials
 
     def _map_1st_injection(
         self, list_item: ClientObject, list_fields
@@ -839,6 +850,10 @@ class SharePointClient:
         injection_angle = parse_str_into_float(
             list_item.get_property(list_fields.INJ1ANGLE0.value)
         )
+        full_genome_name = list_item.get_property(
+            list_fields.INJ1_VIRUS_STRAIN_RT.value
+        )
+        injection_materials = self._map_injection_materials(full_genome_name)
         if (
             injection_type
             == NeurosurgeryAndBehaviorList2019.InjectionType.IONTO.value
@@ -872,6 +887,7 @@ class SharePointClient:
                 injection_type=injection_type,
                 injection_current=injection_current,
                 alternating_current=alternating_current,
+                injection_materials=injection_materials,
             )
         else:
             instrument_id = list_item.get_property(
@@ -899,6 +915,7 @@ class SharePointClient:
                 injection_angle=injection_angle,
                 injection_type=injection_type,
                 injection_volume=injection_volume,
+                injection_materials=injection_materials,
             )
         return injection
 
@@ -973,6 +990,10 @@ class SharePointClient:
         injection_angle = parse_str_into_float(
             list_item.get_property(list_fields.INJ2ANGLE0.value)
         )
+        full_genome_name = list_item.get_property(
+            list_fields.INJ2_VIRUS_STRAIN_RT.value
+        )
+        injection_materials = self._map_injection_materials(full_genome_name)
         if (
             injection_type
             == NeurosurgeryAndBehaviorList2019.InjectionType.IONTO.value
@@ -1006,6 +1027,7 @@ class SharePointClient:
                 injection_type=injection_type,
                 injection_current=injection_current,
                 alternating_current=alternating_current,
+                injection_materials=injection_materials,
             )
         else:
             instrument_id = list_item.get_property(
@@ -1033,6 +1055,7 @@ class SharePointClient:
                 injection_angle=injection_angle,
                 injection_type=injection_type,
                 injection_volume=injection_volume,
+                injection_materials=injection_materials,
             )
         return injection
 
@@ -1577,6 +1600,12 @@ class SharePointClient:
                 ) = self._map_initial_followup_injection(
                     list_item, list_fields, injection_type, burr_during
                 )
+                full_genome_name = list_item.get_property(
+                    list_fields.INJ1_VIRUS_STRAIN_RT.value
+                )
+                injection_materials = self._map_injection_materials(
+                    full_genome_name
+                )
                 if injection_type.strip() == injection_types.IONTO.value:
                     injection_current = parse_str_into_float(
                         list_item.get_property(list_fields.INJ1_CURRENT.value)
@@ -1607,6 +1636,7 @@ class SharePointClient:
                         anaesthesia=anaesthesia,
                         recovery_time=recovery_time,
                         instrument_id=instrument_id,
+                        injection_materials=injection_materials,
                     )
                 else:
                     injection_volume = parse_str_into_float(
@@ -1632,6 +1662,7 @@ class SharePointClient:
                         anaesthesia=anaesthesia,
                         recovery_time=recovery_time,
                         instrument_id=instrument_id,
+                        injection_materials=injection_materials,
                     )
                 burr_1_procedures.append(injection)
             elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
@@ -1725,6 +1756,12 @@ class SharePointClient:
                 ) = self._map_initial_followup_injection(
                     list_item, list_fields, injection_type, burr_during
                 )
+                full_genome_name = list_item.get_property(
+                    list_fields.INJ2_VIRUS_STRAIN_RT.value
+                )
+                injection_materials = self._map_injection_materials(
+                    full_genome_name
+                )
                 if injection_type.strip() == injection_types.IONTO.value:
                     injection_current = parse_str_into_float(
                         list_item.get_property(list_fields.INJ2_CURRENT.value)
@@ -1755,6 +1792,7 @@ class SharePointClient:
                         recovery_time=recovery_time,
                         instrument_id=instrument_id,
                         anaesthesia=anaesthesia,
+                        injection_materials=injection_materials,
                     )
                 else:
                     injection_volume = parse_str_into_float(
@@ -1780,6 +1818,7 @@ class SharePointClient:
                         recovery_time=recovery_time,
                         instrument_id=instrument_id,
                         anaesthesia=anaesthesia,
+                        injection_materials=injection_materials,
                     )
                 burr_2_procedures.append(injection)
             elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
@@ -1873,6 +1912,12 @@ class SharePointClient:
                 ) = self._map_initial_followup_injection(
                     list_item, list_fields, injection_type, burr_during
                 )
+                full_genome_name = list_item.get_property(
+                    list_fields.INJ_VIRUS_STRAIN_RT.value
+                )
+                injection_materials = self._map_injection_materials(
+                    full_genome_name
+                )
                 if injection_type.strip() == injection_types.IONTO.value:
                     injection_current = parse_str_into_float(
                         list_item.get_property(list_fields.INJ3_CURRENT.value)
@@ -1903,6 +1948,7 @@ class SharePointClient:
                         recovery_time=recovery_time,
                         instrument_id=instrument_id,
                         anaesthesia=anaesthesia,
+                        injection_materials=injection_materials,
                     )
                 else:
                     injection_volume = parse_str_into_float(
@@ -1928,6 +1974,7 @@ class SharePointClient:
                         recovery_time=recovery_time,
                         instrument_id=instrument_id,
                         anaesthesia=anaesthesia,
+                        injection_materials=injection_materials,
                     )
                 burr_3_procedures.append(injection)
             elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
@@ -2021,6 +2068,12 @@ class SharePointClient:
                 ) = self._map_initial_followup_injection(
                     list_item, list_fields, injection_type, burr_during
                 )
+                full_genome_name = list_item.get_property(
+                    list_fields.INJ4_VIRUS_STRAIN_RT.value
+                )
+                injection_materials = self._map_injection_materials(
+                    full_genome_name
+                )
                 if injection_type.strip() == injection_types.IONTO.value:
                     injection_current = parse_str_into_float(
                         list_item.get_property(list_fields.INJ4_CURRENT.value)
@@ -2051,6 +2104,7 @@ class SharePointClient:
                         recovery_time=recovery_time,
                         instrument_id=instrument_id,
                         anaesthesia=anaesthesia,
+                        injection_materials=injection_materials,
                     )
                 else:
                     injection_volume = parse_str_into_float(
@@ -2076,6 +2130,7 @@ class SharePointClient:
                         recovery_time=recovery_time,
                         instrument_id=instrument_id,
                         anaesthesia=anaesthesia,
+                        injection_materials=injection_materials,
                     )
                 burr_4_procedures.append(injection)
             elif procedure.strip() == nsb_burr_types.FIBER_IMPLANT.value:
