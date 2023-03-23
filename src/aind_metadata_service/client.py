@@ -1,6 +1,7 @@
 """Module for client library."""
-import requests
 from enum import Enum
+
+import requests
 
 
 class StatusCodes(Enum):
