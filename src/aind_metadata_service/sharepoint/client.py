@@ -798,7 +798,9 @@ class SharePointClient:
         return injection_materials
 
     @staticmethod
-    def _map_inj_coordinate_reference(ap) -> Optional[CoordinateReferenceLocation]:
+    def _map_inj_coordinate_reference(
+        ap,
+    ) -> Optional[CoordinateReferenceLocation]:
         """Maps coordinate reference location"""
         coordinate_reference = CoordinateReferenceLocation.BREGMA
         if "rostral" in ap:
@@ -1122,8 +1124,10 @@ class SharePointClient:
             stereotactic_coordinate_ap = parse_str_into_float(
                 list_item.get_property(list_fields.VIRUS_A_P.value)
             )
-            stereotactic_coordinate_reference = self._map_inj_coordinate_reference(
-                list_item.get_property(list_fields.VIRUS_A_P.value)
+            stereotactic_coordinate_reference = (
+                self._map_inj_coordinate_reference(
+                    list_item.get_property(list_fields.VIRUS_A_P.value)
+                )
             )
             stereotactic_coordinate_dv = parse_str_into_float(
                 list_item.get_property(list_fields.FIBER_IMPLANT1_DV.value)
@@ -1152,8 +1156,10 @@ class SharePointClient:
             stereotactic_coordinate_ap = parse_str_into_float(
                 list_item.get_property(list_fields.AP2ND_INJ.value)
             )
-            stereotactic_coordinate_reference = self._map_inj_coordinate_reference(
-                list_item.get_property(list_fields.AP2ND_INJ.value)
+            stereotactic_coordinate_reference = (
+                self._map_inj_coordinate_reference(
+                    list_item.get_property(list_fields.AP2ND_INJ.value)
+                )
             )
             stereotactic_coordinate_dv = parse_str_into_float(
                 list_item.get_property(list_fields.FIBER_IMPLANT2_DV.value)
@@ -1264,7 +1270,9 @@ class SharePointClient:
             list_item.get_property(list_fields.CRANIOTOMY_TYPE.value)
         )
         if craniotomy_type == CraniotomyType.VISCTX:
-            craniotomy_coordinates_reference = CoordinateReferenceLocation.LAMBDA
+            craniotomy_coordinates_reference = (
+                CoordinateReferenceLocation.LAMBDA
+            )
         else:
             craniotomy_coordinates_reference = None
         craniotomy_hemisphere = map_choice(
@@ -2064,7 +2072,7 @@ class SharePointClient:
                     stereotactic_coordinate_dv=fiber_implant_depth,
                     angle=burr_angle,
                     bregma_to_lambda_distance=bregma_to_lambda_distance,
-                    stereotactic_coordiante_reference=burr_coordinate_reference,
+                    stereotactic_coordinate_reference=burr_coordinate_reference,
                 )
                 fiber_implant = FiberImplant.construct(
                     start_date=start_date,
@@ -2285,7 +2293,9 @@ class SharePointClient:
             list_item.get_property(list_fields.BREG2_LAMB.value)
         )
         if craniotomy_type == CraniotomyType.FIVE_MM.value.replace(" ", ""):
-            craniotomy_coordinates_reference = CoordinateReferenceLocation.LAMBDA
+            craniotomy_coordinates_reference = (
+                CoordinateReferenceLocation.LAMBDA
+            )
         else:
             craniotomy_coordinates_reference = None
         craniotomy = Craniotomy.construct(

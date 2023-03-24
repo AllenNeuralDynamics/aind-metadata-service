@@ -37,7 +37,7 @@
   "FirstInjectionIsoDuration": null,
   "Round1InjIsolevel": null,
   "FirstInjRecovery": null,
-  "Breg2Lamb": null,
+  "Breg2Lamb": "6.1",
   "SurgeryStatus": "Ready for Feedback",
   "LongRequestorComments": null,
   "Procedure_x0020_Slots": "Single surgical session",
