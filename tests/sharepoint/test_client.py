@@ -8,6 +8,7 @@ from pathlib import Path
 
 from aind_data_schema.procedures import (
     Anaesthetic,
+    CoordinateReferenceLocation,
     Craniotomy,
     CraniotomyType,
     FiberImplant,
@@ -19,7 +20,6 @@ from aind_data_schema.procedures import (
     Procedures,
     Side,
     SubjectProcedure,
-    CoordinateReferenceLocation,
 )
 from office365.sharepoint.client_context import ClientContext
 from office365.sharepoint.listitems.collection import ListItemCollection
@@ -142,13 +142,16 @@ class Examples:
         level="Select...",
     )
 
+    bregma_reference = CoordinateReferenceLocation.BREGMA
+    lambda_reference = CoordinateReferenceLocation.LAMBDA
+
     expected_probe1 = OphysProbe.construct(
         name="Probe A",
         stereotactic_coordinate_ml=-3.3,
         stereotactic_coordinate_ap=-1.6,
         stereotactic_coordinate_dv=4.2,
         angle=0.0,
-        stereotactic_coordinate_reference=CoordinateReferenceLocation.BREGMA,
+        stereotactic_coordinate_reference=bregma_reference,
         bregma_to_lambda_distance=4.0,
     )
 
@@ -159,7 +162,7 @@ class Examples:
         stereotactic_coordinate_dv=4.2,
         angle=0.0,
         bregma_to_lambda_distance=4.0,
-        stereotactic_coordinate_reference=CoordinateReferenceLocation.BREGMA,
+        stereotactic_coordinate_reference=bregma_reference,
     )
 
     expected_inj_materials_1 = InjectionMaterial.construct(
@@ -192,7 +195,7 @@ class Examples:
             injection_type="Nanoject (Pressure)",
             injection_volume=400.0,
             injection_materials=expected_inj_materials_1,
-            injection_coordinate_reference=CoordinateReferenceLocation.BREGMA,
+            injection_coordinate_reference=bregma_reference,
             bregma_to_lambda_distance=4.0,
         ),
         IontophoresisInjection.construct(
@@ -218,7 +221,7 @@ class Examples:
             injection_current=None,
             alternating_current="7/7",
             bregma_to_lambda_distance=4.0,
-            injection_coordinate_reference=CoordinateReferenceLocation.BREGMA,
+            injection_coordinate_reference=bregma_reference,
         ),
         Headframe.construct(
             start_date=datetime.date(2022, 12, 6),
@@ -251,7 +254,7 @@ class Examples:
             workstation_id="SWS 3",
             notes=None,
             bregma_to_lambda_distance=4.0,
-            craniotomy_coordinates_reference=CoordinateReferenceLocation.LAMBDA,
+            craniotomy_coordinates_reference=lambda_reference,
         ),
         FiberImplant.construct(
             start_date=datetime.date(2022, 12, 6),
@@ -286,7 +289,7 @@ class Examples:
             injection_type="Iontophoresis",
             injection_current=5.0,
             alternating_current="7/7",
-            injection_coordinate_reference=CoordinateReferenceLocation.LAMBDA,
+            injection_coordinate_reference=lambda_reference,
         ),
         NanojectInjection.construct(
             start_date=datetime.date(2022, 12, 6),
@@ -309,7 +312,7 @@ class Examples:
             injection_angle=None,
             injection_type="Nanoject (Pressure)",
             injection_volume=400.0,
-            injection_coordinate_reference=CoordinateReferenceLocation.BREGMA,
+            injection_coordinate_reference=bregma_reference,
         ),
         Craniotomy.construct(
             start_date=datetime.date(2022, 12, 6),
@@ -379,7 +382,7 @@ class Examples:
             injection_type="Iontophoresis",
             injection_current=5.0,
             alternating_current="7/7",
-            injection_coordinate_reference=CoordinateReferenceLocation.BREGMA,
+            injection_coordinate_reference=bregma_reference,
             bregma_to_lambda_distance=4.0,
         ),
         FiberImplant.construct(
@@ -544,7 +547,7 @@ class Examples:
             instrument_id="Ionto #1",
             recovery_time=None,
             injection_materials=expected_inj_materials_1,
-            injection_coordinate_reference=CoordinateReferenceLocation.BREGMA,
+            injection_coordinate_reference=bregma_reference,
             bregma_to_lambda_distance=6.1,
         ),
         # from list item 9
@@ -578,7 +581,7 @@ class Examples:
             anaesthesia=Anaesthetic(type="isoflurane", duration=90, level=2.0),
             recovery_time=30,
             workstation_id="SWS 5",
-            craniotomy_coordinates_reference=CoordinateReferenceLocation.LAMBDA,
+            craniotomy_coordinates_reference=lambda_reference,
         ),
         # from list item 10
         Craniotomy.construct(
@@ -627,7 +630,7 @@ class Examples:
             injection_volume=500.0,
             anaesthesia=Anaesthetic(type="isoflurane", duration=90, level=2.0),
             recovery_time=25,
-            injection_coordinate_reference=CoordinateReferenceLocation.BREGMA,
+            injection_coordinate_reference=bregma_reference,
         ),
         NanojectInjection.construct(
             start_date=None,
@@ -646,7 +649,7 @@ class Examples:
                 type="isoflurane", duration=120, level=2.5
             ),
             recovery_time=30,
-            injection_coordinate_reference=CoordinateReferenceLocation.BREGMA,
+            injection_coordinate_reference=bregma_reference,
         ),
         NanojectInjection.construct(
             start_date=datetime.date(2022, 1, 3),
@@ -663,7 +666,7 @@ class Examples:
             injection_volume=600.0,
             anaesthesia=Anaesthetic(type="isoflurane", duration=90, level=2.0),
             recovery_time=25,
-            injection_coordinate_reference=CoordinateReferenceLocation.BREGMA,
+            injection_coordinate_reference=bregma_reference,
         ),
         # from list item 14
         Headframe.construct(
@@ -697,7 +700,7 @@ class Examples:
             notes=None,
             anaesthesia=Anaesthetic(type="isoflurane", duration=90, level=2.0),
             recovery_time=25,
-            injection_coordinate_reference=CoordinateReferenceLocation.BREGMA,
+            injection_coordinate_reference=bregma_reference,
         ),
         FiberImplant.construct(
             start_date=datetime.date(2022, 1, 3),
@@ -714,7 +717,7 @@ class Examples:
                 stereotactic_coordinate_ml=-5.2,
                 stereotactic_coordinate_dv=-2.95,
                 angle=0.0,
-                stereotactic_coordinate_reference=CoordinateReferenceLocation.BREGMA,
+                stereotactic_coordinate_reference=bregma_reference,
             ),
             anaesthesia=Anaesthetic(type="isoflurane", duration=90, level=2.0),
         ),
@@ -736,7 +739,7 @@ class Examples:
             alternating_current="7/7",
             anaesthesia=Anaesthetic(type="isoflurane", duration=90, level=2.0),
             recovery_time=25,
-            injection_coordinate_reference=CoordinateReferenceLocation.BREGMA,
+            injection_coordinate_reference=bregma_reference,
         ),
         FiberImplant.construct(
             start_date=datetime.date(2022, 1, 3),
@@ -753,7 +756,7 @@ class Examples:
                 stereotactic_coordinate_ml=-0.5,
                 stereotactic_coordinate_dv=-1.05,
                 angle=0.0,
-                stereotactic_coordinate_reference=CoordinateReferenceLocation.BREGMA,
+                stereotactic_coordinate_reference=bregma_reference,
             ),
             anaesthesia=Anaesthetic(type="isoflurane", duration=90, level=2.0),
         ),
@@ -774,7 +777,7 @@ class Examples:
             alternating_current="7/7",
             anaesthesia=Anaesthetic(type="isoflurane", duration=90, level=2.0),
             recovery_time=25,
-            injection_coordinate_reference=CoordinateReferenceLocation.BREGMA,
+            injection_coordinate_reference=bregma_reference,
         ),
         FiberImplant.construct(
             start_date=datetime.date(2022, 1, 3),
@@ -790,7 +793,7 @@ class Examples:
                 stereotactic_coordinate_ml=-2.2,
                 stereotactic_coordinate_dv=-1.85,
                 angle=0.0,
-                stereotactic_coordinate_reference=CoordinateReferenceLocation.BREGMA,
+                stereotactic_coordinate_reference=bregma_reference,
             ),
             anaesthesia=Anaesthetic(type="isoflurane", duration=90, level=2.0),
         ),
@@ -811,7 +814,7 @@ class Examples:
             alternating_current="7/7",
             anaesthesia=Anaesthetic(type="isoflurane", duration=90, level=2.0),
             recovery_time=25,
-            injection_coordinate_reference=CoordinateReferenceLocation.BREGMA,
+            injection_coordinate_reference=bregma_reference,
         ),
         FiberImplant.construct(
             start_date=datetime.date(2022, 1, 3),
@@ -827,7 +830,7 @@ class Examples:
                 stereotactic_coordinate_ml=-2.5,
                 stereotactic_coordinate_dv=-1.8,
                 angle=0.0,
-                stereotactic_coordinate_reference=CoordinateReferenceLocation.BREGMA,
+                stereotactic_coordinate_reference=bregma_reference,
             ),
             anaesthesia=Anaesthetic(type="isoflurane", duration=90, level=2.0),
         ),

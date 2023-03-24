@@ -5,6 +5,7 @@ from typing import List, Optional, Union
 
 from aind_data_schema.procedures import (
     Anaesthetic,
+    CoordinateReferenceLocation,
     Craniotomy,
     CraniotomyType,
     FiberImplant,
@@ -16,7 +17,6 @@ from aind_data_schema.procedures import (
     ProbeName,
     Procedures,
     SubjectProcedure,
-    CoordinateReferenceLocation,
 )
 from fastapi.responses import JSONResponse
 from office365.runtime.auth.client_credential import ClientCredential
@@ -1124,10 +1124,8 @@ class SharePointClient:
             stereotactic_coordinate_ap = parse_str_into_float(
                 list_item.get_property(list_fields.VIRUS_A_P.value)
             )
-            stereotactic_coordinate_reference = (
-                self._map_inj_coordinate_reference(
-                    list_item.get_property(list_fields.VIRUS_A_P.value)
-                )
+            coordinate_reference = self._map_inj_coordinate_reference(
+                list_item.get_property(list_fields.VIRUS_A_P.value)
             )
             stereotactic_coordinate_dv = parse_str_into_float(
                 list_item.get_property(list_fields.FIBER_IMPLANT1_DV.value)
@@ -1142,7 +1140,7 @@ class SharePointClient:
                 stereotactic_coordinate_dv=stereotactic_coordinate_dv,
                 angle=angle,
                 bregma_to_lambda_distance=bregma_to_lambda_distance,
-                stereotactic_coordinate_reference=stereotactic_coordinate_reference,
+                stereotactic_coordinate_reference=coordinate_reference,
             )
             ophys_probes.append(ophys_probe1)
         fiber_implant2 = list_item.get_property(
@@ -1156,10 +1154,8 @@ class SharePointClient:
             stereotactic_coordinate_ap = parse_str_into_float(
                 list_item.get_property(list_fields.AP2ND_INJ.value)
             )
-            stereotactic_coordinate_reference = (
-                self._map_inj_coordinate_reference(
-                    list_item.get_property(list_fields.AP2ND_INJ.value)
-                )
+            coordinate_reference = self._map_inj_coordinate_reference(
+                list_item.get_property(list_fields.AP2ND_INJ.value)
             )
             stereotactic_coordinate_dv = parse_str_into_float(
                 list_item.get_property(list_fields.FIBER_IMPLANT2_DV.value)
@@ -1174,7 +1170,7 @@ class SharePointClient:
                 stereotactic_coordinate_dv=stereotactic_coordinate_dv,
                 angle=angle,
                 bregma_to_lambda_distance=bregma_to_lambda_distance,
-                stereotactic_coordinate_reference=stereotactic_coordinate_reference,
+                stereotactic_coordinate_reference=coordinate_reference,
             )
             ophys_probes.append(ophys_probe2)
         return ophys_probes
@@ -1643,7 +1639,7 @@ class SharePointClient:
         bregma_to_lambda_distance = parse_str_into_float(
             list_item.get_property(list_fields.BREG2_LAMB.value)
         )
-        burr_coordinate_reference = CoordinateReferenceLocation.BREGMA
+        coordinate_reference = CoordinateReferenceLocation.BREGMA
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
                 injection_type = list_item.get_property(
@@ -1696,7 +1692,7 @@ class SharePointClient:
                         recovery_time=recovery_time,
                         instrument_id=instrument_id,
                         bregma_to_lambda_distance=bregma_to_lambda_distance,
-                        injection_coordinate_reference=burr_coordinate_reference,
+                        injection_coordinate_reference=coordinate_reference,
                         injection_materials=injection_materials,
                     )
                 else:
@@ -1724,7 +1720,7 @@ class SharePointClient:
                         recovery_time=recovery_time,
                         instrument_id=instrument_id,
                         bregma_to_lambda_distance=bregma_to_lambda_distance,
-                        injection_coordinate_reference=burr_coordinate_reference,
+                        injection_coordinate_reference=coordinate_reference,
                         injection_materials=injection_materials,
                     )
                 burr_1_procedures.append(injection)
@@ -1740,7 +1736,7 @@ class SharePointClient:
                     stereotactic_coordinate_dv=fiber_implant_depth,
                     angle=burr_angle,
                     bregma_to_lambda_distance=bregma_to_lambda_distance,
-                    stereotactic_coordinate_reference=burr_coordinate_reference,
+                    stereotactic_coordinate_reference=coordinate_reference,
                 )
                 fiber_implant = FiberImplant.construct(
                     start_date=start_date,
@@ -1809,7 +1805,7 @@ class SharePointClient:
         bregma_to_lambda_distance = parse_str_into_float(
             list_item.get_property(list_fields.BREG2_LAMB.value)
         )
-        burr_coordinate_reference = CoordinateReferenceLocation.BREGMA
+        coordinate_reference = CoordinateReferenceLocation.BREGMA
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
                 injection_type = list_item.get_property(
@@ -1862,7 +1858,7 @@ class SharePointClient:
                         instrument_id=instrument_id,
                         anaesthesia=anaesthesia,
                         bregma_to_lambda_distance=bregma_to_lambda_distance,
-                        injection_coordinate_reference=burr_coordinate_reference,
+                        injection_coordinate_reference=coordinate_reference,
                         injection_materials=injection_materials,
                     )
                 else:
@@ -1890,7 +1886,7 @@ class SharePointClient:
                         instrument_id=instrument_id,
                         anaesthesia=anaesthesia,
                         bregma_to_lambda_distance=bregma_to_lambda_distance,
-                        injection_coordinate_reference=burr_coordinate_reference,
+                        injection_coordinate_reference=coordinate_reference,
                         injection_materials=injection_materials,
                     )
                 burr_2_procedures.append(injection)
@@ -1906,7 +1902,7 @@ class SharePointClient:
                     stereotactic_coordinate_dv=fiber_implant_depth,
                     angle=burr_angle,
                     bregma_to_lambda_distance=bregma_to_lambda_distance,
-                    stereotactic_coordinate_reference=burr_coordinate_reference,
+                    stereotactic_coordinate_reference=coordinate_reference,
                 )
                 fiber_implant = FiberImplant.construct(
                     start_date=start_date,
@@ -1975,7 +1971,7 @@ class SharePointClient:
         bregma_to_lambda_distance = parse_str_into_float(
             list_item.get_property(list_fields.BREG2_LAMB.value)
         )
-        burr_coordinate_reference = CoordinateReferenceLocation.BREGMA
+        coordinate_reference = CoordinateReferenceLocation.BREGMA
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
                 injection_type = list_item.get_property(
@@ -2028,7 +2024,7 @@ class SharePointClient:
                         instrument_id=instrument_id,
                         anaesthesia=anaesthesia,
                         bregma_to_lambda_distance=bregma_to_lambda_distance,
-                        injection_coordinate_reference=burr_coordinate_reference,
+                        injection_coordinate_reference=coordinate_reference,
                         injection_materials=injection_materials,
                     )
                 else:
@@ -2056,7 +2052,7 @@ class SharePointClient:
                         instrument_id=instrument_id,
                         anaesthesia=anaesthesia,
                         bregma_to_lambda_distance=bregma_to_lambda_distance,
-                        injection_coordinate_reference=burr_coordinate_reference,
+                        injection_coordinate_reference=coordinate_reference,
                         injection_materials=injection_materials,
                     )
                 burr_3_procedures.append(injection)
@@ -2072,7 +2068,7 @@ class SharePointClient:
                     stereotactic_coordinate_dv=fiber_implant_depth,
                     angle=burr_angle,
                     bregma_to_lambda_distance=bregma_to_lambda_distance,
-                    stereotactic_coordinate_reference=burr_coordinate_reference,
+                    stereotactic_coordinate_reference=coordinate_reference,
                 )
                 fiber_implant = FiberImplant.construct(
                     start_date=start_date,
@@ -2141,7 +2137,7 @@ class SharePointClient:
         bregma_to_lambda_distance = parse_str_into_float(
             list_item.get_property(list_fields.BREG2_LAMB.value)
         )
-        burr_coordinate_reference = CoordinateReferenceLocation.BREGMA
+        coordinate_reference = CoordinateReferenceLocation.BREGMA
         for procedure in procedure_types:
             if procedure.strip() == nsb_burr_types.INJECTION.value:
                 injection_type = list_item.get_property(
@@ -2194,7 +2190,7 @@ class SharePointClient:
                         instrument_id=instrument_id,
                         anaesthesia=anaesthesia,
                         bregma_to_lambda_distance=bregma_to_lambda_distance,
-                        injection_coordinate_reference=burr_coordinate_reference,
+                        injection_coordinate_reference=coordinate_reference,
                         injection_materials=injection_materials,
                     )
                 else:
@@ -2222,7 +2218,7 @@ class SharePointClient:
                         instrument_id=instrument_id,
                         anaesthesia=anaesthesia,
                         bregma_to_lambda_distance=bregma_to_lambda_distance,
-                        injection_coordinate_reference=burr_coordinate_reference,
+                        injection_coordinate_reference=coordinate_reference,
                         injection_materials=injection_materials,
                     )
                 burr_4_procedures.append(injection)
@@ -2238,7 +2234,7 @@ class SharePointClient:
                     stereotactic_coordinate_dv=fiber_implant_depth,
                     angle=burr_angle,
                     bregma_to_lambda_distance=bregma_to_lambda_distance,
-                    stereotactic_coordinate_reference=burr_coordinate_reference,
+                    stereotactic_coordinate_reference=coordinate_reference,
                 )
                 fiber_implant = FiberImplant.construct(
                     start_date=start_date,
