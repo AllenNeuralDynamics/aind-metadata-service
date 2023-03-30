@@ -31,7 +31,7 @@
   "Weight_x0020_before_x0020_Surger": null,
   "Weight_x0020_after_x0020_Surgery": null,
   "PedigreeName": "Slc6a3-Cre-650102",
-  "Breg2Lamb": null,
+  "Breg2Lamb": "4.0",
   "HeadpostType": "Mesoscope-style well with NGC-style headframe (0160-200-20/0160-100-10)",
   "DateRangeStart": "2022-12-05T08:00:00Z",
   "DateRangeEnd": "2022-12-09T08:00:00Z",
