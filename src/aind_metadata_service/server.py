@@ -20,9 +20,15 @@ labtracks_db = os.getenv("LABTRACKS_DATABASE")
 labtracks_user = os.getenv("LABTRACKS_USER")
 labtracks_password = os.getenv("LABTRACKS_PASSWORD")
 
-sharepoint_url = os.getenv("SHAREPOINT_URL")
-sharepoint_user = os.getenv("SHAREPOINT_USER")
-sharepoint_password = os.getenv("SHAREPOINT_PASSWORD")
+nsb_sharepoint_url = os.getenv("NSB_SHAREPOINT_URL")
+nsb_sharepoint_list_names = os.getenv(
+    "NSB_SHAREPOINT_LIST_NAMES",
+    default=(
+        """'{"version_2019": "SWR 2019-2022", 
+        "version_2023":"SWR 2023-Present"}'""")
+)
+nsb_sharepoint_user = os.getenv("NSB_SHAREPOINT_USER")
+nsb_sharepoint_password = os.getenv("NSB_SHAREPOINT_PASSWORD")
 
 
 @app.get("/subject/{subject_id}")
@@ -48,9 +54,9 @@ async def retrieve_procedures(subject_id):
     Retrieves procedure info from SharePoint
     """
     sharepoint_client = SharePointClient(
-        site_url=sharepoint_url,
-        client_id=sharepoint_user,
-        client_secret=sharepoint_password,
+        site_url=nsb_sharepoint_url,
+        client_id=nsb_sharepoint_user,
+        client_secret=nsb_sharepoint_password,
     )
 
     response = sharepoint_client.get_procedure_info(subject_id=subject_id)
