@@ -27,39 +27,34 @@ class ListClient:
         subject_procedures = []
         filter_string = (
             f"substringof('{self.subject_id}', "
-            f"{NSBList2019.ListField.LAB_TRACKS_ID})"
+            f"{NSBList2019.__fields__.get('labtracks_id').alias})"
         )
         list_view = self.client_context.web.lists.get_by_title(
             self.list_title
-        ).views.get_by_title(NSBList2019.VIEW_TITLE)
+        ).views.get_by_title(getattr(NSBList2019, "_view_title"))
         self.client_context.load(list_view)
         self.client_context.execute_query()
         list_items = list_view.get_items().filter(filter_string)
         self.client_context.load(list_items)
         self.client_context.execute_query()
         for list_item in list_items:
-            self._map_list_item(list_item.to_json())
+            parsed_nsb_model = NSBList2019.parse_obj(list_item.to_json())
+            self._map_nsb_model(parsed_nsb_model)
         return list_items
 
-    def _map_list_item(self, list_item: dict):
+    def _map_nsb_model(self, nsb_model: NSBList2019):
         procedures = []
         subject_id = self.subject_id
-        lf = NSBList2019.ListField
-        start_date = self._map_iso_date_to_date(
-            list_item.get(lf.DATE_OF_SURGERY)
-        )
+        # lf = NSBList2019.ListField
+        start_date = nsb_model.date_of_surgery
         end_date = start_date
         experimenter_full_name = self._map_auth_id_to_exp_name(
-            list_item.get(lf.AUTHOR_ID)
+            nsb_model.author_id
         )
-        iacuc_protocol = list_item.get(lf.IACUC_PROTOCOL)
-        animal_weight_prior = self._map_float_str_to_float(
-            list_item.get(lf.WEIGHT_BEFORE_SURGER)
-        )
-        animal_weight_post = self._map_float_str_to_float(
-            list_item.get(lf.WEIGHT_AFTER_SURGERY)
-        )
-        procedure_types = list_item.get(lf.PROCEDURE)
+        iacuc_protocol = nsb_model.iacuc_protocol
+        animal_weight_prior = nsb_model.weight_before_surgery
+        animal_weight_post = nsb_model.weight_after_surgery
+        procedure_types = nsb_model.procedure
         procedure_types = (
             []
             if procedure_types is None
@@ -82,7 +77,7 @@ class ListClient:
                 "animal_weight_prior": animal_weight_prior,
                 "animal_weight_post": animal_weight_post
             })
-            headpost_type = list_item.get(lf.HEADPOST_TYPE)
+            headpost_type = nsb_model.get(lf.HEADPOST_TYPE)
             headpost_info = HeadPostInfo.from_headpost_type(
                 headpost_type=headpost_type
             )
@@ -92,7 +87,7 @@ class ListClient:
             )
             hf_kwargs["well_type"] = headpost_info.well_type
             hf_kwargs["well_part_number"] = headpost_info.well_part_number
-            hp_iso_level = list_item.get(lf.HP_ISO_LEVEL)
+            hp_iso_level = nsb_model.get(lf.HP_ISO_LEVEL)
             anaesthetic_type = "isoflurane"
             anaesthetic = Anaesthetic.construct(
                 type=anaesthetic_type,
@@ -114,26 +109,26 @@ class ListClient:
             # There could be one or two injections in the sharepoint listitem
             inj1_kwargs = {}
             inj1_start_date = self._map_iso_date_to_date(
-                list_item.get(lf.DATE1ST_INJECTION)
+                nsb_model.get(lf.DATE1ST_INJECTION)
             )
             inj1_kwargs["start_date"] = inj1_start_date
             inj1_kwargs["end_date"] = inj1_start_date
             inj1_kwargs["animal_weight_prior"] = self._map_float_str_to_float(
-                list_item.get(lf.FIRST_INJECTION_WEIGHT_BEFOR)
+                nsb_model.get(lf.FIRST_INJECTION_WEIGHT_BEFOR)
             )
             inj1_kwargs["animal_weight_post"] = self._map_float_str_to_float(
-                list_item.get(lf.FIRST_INJECTION_WEIGHT_AFTER)
+                nsb_model.get(lf.FIRST_INJECTION_WEIGHT_AFTER)
             )
             inj1_kwargs["injection_duration"] = self._map_float_str_to_float(
-                list_item.get(lf.INJ1_LENGHTOF_TIME)
+                nsb_model.get(lf.INJ1_LENGHTOF_TIME)
             )
             # First injection anaesthetic
             inj1_anaesthetic_type = "isoflurane"
             inj1_anaesthetic_duration = self._map_float_str_to_float(
-                    list_item.get(lf.FIRST_INJECTION_ISO_DURATION)
+                    nsb_model.get(lf.FIRST_INJECTION_ISO_DURATION)
             )
             inj1_anaesthetic_level = self._map_float_str_to_float(
-                list_item.get(lf.ROUND1_INJ_ISOLEVEL)
+                nsb_model.get(lf.ROUND1_INJ_ISOLEVEL)
             )
             inj1_kwargs["anaesthesia"] = Anaesthetic.construct(
                 type=inj1_anaesthetic_type,
@@ -141,37 +136,42 @@ class ListClient:
                 level=inj1_anaesthetic_level,
             )
             inj1_kwargs["recovery_time"] = self._map_float_str_to_float(
-                list_item.get(lf.FIRST_INJ_RECOVERY)
+                nsb_model.get(lf.FIRST_INJ_RECOVERY)
             )
             inj1_kwargs["workstation_id"] = self._filter_select_string(
-                list_item.get(lf.WORK_STATION1ST_INJECTION)
+                nsb_model.get(lf.WORK_STATION1ST_INJECTION)
             )
-            inj1_type = list_item.get(lf.INJ1_TYPE)
+            inj1_type = nsb_model.get(lf.INJ1_TYPE)
             inj1_kwargs["injection_type"] = inj1_type
             inj1_kwargs["injection_hemisphere"] = self._map_hemisphere(
-                list_item.get(lf.VIRUS_HEMISPHERE)
+                nsb_model.get(lf.VIRUS_HEMISPHERE)
             )
             inj1_kwargs["injection_coordinate_ml"] = self._parse_inj_virus_info(
-                list_item.get(lf.VIRUS_M_L)
+                nsb_model.get(lf.VIRUS_M_L)
             )
             inj1_kwargs["injection_coordinate_ap"] = self._parse_inj_virus_info(
-                list_item.get(lf.VIRUS_A_P)
+                nsb_model.get(lf.VIRUS_A_P)
             )
             inj1_kwargs["injection_coordinate_reference"] = self._map_ap_info_to_coord_reference(
-                list_item.get(lf.VIRUS_A_P)
+                nsb_model.get(lf.VIRUS_A_P)
             )
             inj1_kwargs["injection_coordinate_depth"] = self._parse_inj_virus_info(
-                list_item.get(lf.VIRUS_D_V)
+                nsb_model.get(lf.VIRUS_D_V)
             )
-            inj1_kwargs["injection_angle"] = self._parse_angle_str(list_item.get(lf.INJ1ANGLE0))
+            inj1_kwargs["injection_angle"] = self._parse_angle_str(nsb_model.get(lf.INJ1ANGLE0))
             inj1_kwargs["bregma_to_lambda_distance"] = self._map_float_str_to_float(
-                list_item.get(lf.BREG2_LAMB)
+                nsb_model.get(lf.BREG2_LAMB)
             )
-            inj1_virus_strain = list_item.get(lf.INJ1_VIRUS_STRAIN_RT)
+            inj1_virus_strain = nsb_model.get(lf.INJ1_VIRUS_STRAIN_RT)
             inj1_kwargs["injection_materials"] = None if inj1_virus_strain is None else InjectionMaterial.construct(
                 full_genome_name=inj1_virus_strain
             )
+            # If injection type is of
             if inj1_type is not None and inj1_type == NSBList2019.InjectionType.IONTO:
+                inj1_instrument_id = nsb_model.get(lf.IONTO_NUMBER_INJ1)
+            #     inj1_injection_current = parse_str_into_float(
+            #     list_item.get_property(list_fields.INJ1_CURRENT)
+            # )
                 pass
 
 
@@ -267,3 +267,10 @@ class ListClient:
             return CoordinateReferenceLocation.LAMBDA
         else:
             return CoordinateReferenceLocation.BREGMA
+
+    @staticmethod
+    def _parse_string_to_float(input_str: Optional[str], regex_pattern: str) -> Optional[float]:
+        if input_str is None:
+            return None
+        else:
+            return None

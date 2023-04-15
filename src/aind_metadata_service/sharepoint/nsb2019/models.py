@@ -1,260 +1,578 @@
-from dataclasses import dataclass
-from typing import Optional
-from enum import Enum
+from typing import Optional, Union, Tuple
+from pydantic import BaseModel, Extra, Field, validator
+from datetime import datetime
+import re
 
 
-class NSBList2019:
-    """Class to contain helpful info to parse the 2019 SharePoint List"""
+class NSBList2019(BaseModel, extra=Extra.allow):
 
-    VIEW_TITLE = "New Request"
+    _view_title = "New Request"
 
-    class StringParserHelper:
-        """Enum class for SharePoint's response strings"""
+    ap_2nd_inj: Optional[Tuple[float, Optional[str]]] = Field(
+        default=None, alias="AP2ndInj"
+    )
+    age_at_injection: Optional[float] = Field(
+        default=None, alias="Age_x0020_at_x0020_Injection"
+    )
+    attachments: Optional[bool] = Field(default=None, alias="Attachments")
+    author_id: Optional[int] = Field(default=None, alias="AuthorId")
+    breg_2_lamb: Optional[float] = Field(default=None, alias="Breg2Lamb")
+    cage: Optional[str] = Field(default=None, alias="Cage")
+    com_after_1st_inj: Optional[str] = Field(
+        default=None, alias="ComAfter1stInj"
+    )
+    com_after_2nd_inj: Optional[str] = Field(
+        default=None, alias="ComAfter2ndInj"
+    )
+    com_coplanar: Optional[str] = Field(default=None, alias="ComCoplanar")
+    com_damage: Optional[str] = Field(default=None, alias="ComDamage")
+    com_during_1st_inj: Optional[str] = Field(
+        default=None, alias="ComDuring1stInj"
+    )
+    com_during_2nd_inj: Optional[str] = Field(
+        default=None, alias="ComDuring2ndInj"
+    )
+    com_durotomy: Optional[str] = Field(default=None, alias="ComDurotomy")
+    com_sinusbleed: Optional[str] = Field(default=None, alias="ComSinusbleed")
+    com_swelling: Optional[str] = Field(default=None, alias="ComSwelling")
+    com_window: Optional[str] = Field(default=None, alias="ComWindow")
+    compliance_asset_id: Optional[str] = Field(
+        default=None, alias="ComplianceAssetId"
+    )
+    content_type_id: Optional[str] = Field(default=None, alias="ContentTypeId")
+    contusion: Optional[str] = Field(default=None, alias="Contusion")
+    craniotomy_type: Optional[Tuple[str, float]] = Field(
+        default=None, alias="CraniotomyType"
+    )
+    created: Optional[datetime] = Field(default=None, alias="Created")
+    dv_2nd_inj: Optional[float] = Field(default=None, alias="DV2ndInj")
+    date_1st_injection: Optional[datetime] = Field(
+        default=None, alias="Date1stInjection"
+    )
+    date_2nd_injection: Optional[datetime] = Field(
+        default=None, alias="Date2ndInjection"
+    )
+    date_range_end: Optional[datetime] = Field(
+        default=None, alias="DateRangeEnd"
+    )
+    date_range_start: Optional[datetime] = Field(
+        default=None, alias="DateRangeStart"
+    )
+    date_of_birth: Optional[datetime] = Field(
+        default=None, alias="Date_x0020_of_x0020_Birth"
+    )
+    date_of_surgery: Optional[datetime] = Field(
+        default=None, alias="Date_x0020_of_x0020_Surgery"
+    )
+    editor_id: Optional[int] = Field(default=None, alias="EditorId")
+    end_of_week: Optional[datetime] = Field(
+        default=None, alias="End_x0020_of_x0020_Week"
+    )
+    exudate_severity: Optional[str] = Field(
+        default=None, alias="Exudate_x0020_Severity"
+    )
+    eye_affected: Optional[str] = Field(
+        default=None, alias="Eye_x0020_Affected"
+    )
+    eye_issue: Optional[str] = Field(default=None, alias="Eye_x0020_Issue")
+    fiber_implant1: Optional[str] = Field(default=None, alias="FiberImplant1")
+    fiber_implant1_dv: Optional[str] = Field(
+        default=None, alias="FiberImplant1DV"
+    )
+    fiber_implant2: Optional[str] = Field(default=None, alias="FiberImplant2")
+    fiber_implant2_dv: Optional[str] = Field(
+        default=None, alias="FiberImplant2DV"
+    )
+    file_system_object_type: Optional[int] = Field(
+        default=None, alias="FileSystemObjectType"
+    )
+    first_inj_recovery: Optional[int] = Field(
+        default=None, alias="FirstInjRecovery"
+    )
+    first_injection_iso_duration: Optional[float] = Field(
+        default=None, alias="FirstInjectionIsoDuration"
+    )
+    first_injection_weight_after: Optional[float] = Field(
+        default=None, alias="FirstInjectionWeightAfter"
+    )
+    first_injection_weight_before: Optional[float] = Field(
+        default=None, alias="FirstInjectionWeightBefor"
+    )
+    first_round_ionto_issue: Optional[str] = Field(
+        default=None, alias="FirstRoundIontoIssue"
+    )
+    guid: Optional[str] = Field(default=None, alias="GUID")
+    hp_durotomy: Optional[str] = Field(default=None, alias="HPDurotomy")
+    hp_iso_level: Optional[float] = Field(default=None, alias="HPIsoLevel")
+    hp_recovery: Optional[float] = Field(default=None, alias="HPRecovery")
+    hp_requestor_comments_plaintext: Optional[str] = Field(
+        default=None, alias="HPRequestorCommentsPlaintext"
+    )
+    hp_surgeon_comments: Optional[str] = Field(
+        default=None, alias="HPSurgeonComments"
+    )
+    hp_ap: Optional[float] = Field(default=None, alias="HP_x0020_A_x002f_P")
+    hp_diameter: Optional[float] = Field(
+        default=None, alias="HP_x0020_Diameter"
+    )
+    hp_ml: Optional[float] = Field(default=None, alias="HP_x0020_M_x002f_L")
+    hp_inj: Optional[str] = Field(
+        default=None, alias="HP_x0020__x0026__x0020_Inj"
+    )
+    headpost_type: Optional[str] = Field(default=None, alias="HeadpostType")
+    hemisphere_2nd_inj: Optional[str] = Field(
+        default=None, alias="Hemisphere2ndInj"
+    )
+    hp_loc: Optional[str] = Field(default=None, alias="HpLoc")
+    hp_perf: Optional[str] = Field(default=None, alias="HpPerf")
+    hp_prev_inject: Optional[str] = Field(default=None, alias="HpPrevInject")
+    hp_work_station: Optional[str] = Field(default=None, alias="HpWorkStation")
+    iacuc_protocol: Optional[str] = Field(
+        default=None, alias="IACUC_x0020_Protocol_x0020__x002"
+    )
+    id1: Optional[int] = Field(default=None, alias="ID")
+    id2: Optional[int] = Field(default=None, alias="Id")
+    implant_id_coverslip_type: Optional[Tuple[float, Optional[str]]] = Field(
+        default=None, alias="ImplantIDCoverslipType"
+    )
+    inj1_alternating_time: Optional[str] = Field(
+        default=None, alias="Inj1AlternatingTime"
+    )
+    inj1_angle_v2: Optional[float] = Field(default=None, alias="Inj1Angle_v2")
+    inj1_current: Optional[float] = Field(default=None, alias="Inj1Current")
+    inj1_length_of_time: Optional[float] = Field(
+        default=None, alias="Inj1LenghtofTime"
+    )
+    inj1_round: Optional[str] = Field(default=None, alias="Inj1Round")
+    inj1_storage_location: Optional[str] = Field(
+        default=None, alias="Inj1StorageLocation"
+    )
+    inj1_type: Optional[str] = Field(default=None, alias="Inj1Type")
+    inj1_virus_strain_rt: Optional[str] = Field(
+        default=None, alias="Inj1VirusStrain_rt"
+    )
+    inj1_vol: Optional[float] = Field(default=None, alias="Inj1Vol")
+    inj1_angle0: Optional[float] = Field(default=None, alias="Inj1angle0")
+    inj2_alternating_time: Optional[str] = Field(
+        default=None, alias="Inj2AlternatingTime"
+    )
+    inj2_angle_v2: Optional[float] = Field(default=None, alias="Inj2Angle_v2")
+    inj2_current: Optional[float] = Field(default=None, alias="Inj2Current")
+    inj2_length_of_time: Optional[float] = Field(
+        default=None, alias="Inj2LenghtofTime"
+    )
+    inj2_round: Optional[str] = Field(default=None, alias="Inj2Round")
+    inj2_storage_location: Optional[str] = Field(
+        default=None, alias="Inj2StorageLocation"
+    )
+    inj2_type: Optional[str] = Field(default=None, alias="Inj2Type")
+    inj2_virus_strain_rt: Optional[str] = Field(
+        default=None, alias="Inj2VirusStrain_rt"
+    )
+    inj2_vol: Optional[float] = Field(default=None, alias="Inj2Vol")
+    inj2_angle0: Optional[float] = Field(default=None, alias="Inj2angle0")
+    ionto_number_hpinj: Optional[str] = Field(
+        default=None, alias="IontoNumberHPINJ"
+    )
+    ionto_number_inj1: Optional[str] = Field(
+        default=None, alias="IontoNumberHPINJ"
+    )
+    ionto_number_inj2: Optional[str] = Field(
+        default=None, alias="IontoNumberHPINJ"
+    )
+    iso_on: Optional[float] = Field(default=None, alias="Iso_x0020_On")
+    issue: Optional[str] = Field(default=None, alias="Issue")
+    lims_link: Optional[str] = Field(default=None, alias="LIMS_x0020_link")
+    lims_task_flow1: Optional[str] = Field(default=None, alias="LIMStaskflow1")
+    lims_required: Optional[str] = Field(
+        default=None, alias="LIMs_x0020_Required"
+    )
+    labtracks_group: Optional[str] = Field(
+        default=None, alias="LabTracks_x0020_Group"
+    )
+    labtracks_id: Optional[str] = Field(
+        default=None, alias="LabTracks_x0020_ID"
+    )
+    labtracks_requestor: Optional[str] = Field(
+        default=None, alias="LabTracks_x0020_Requestor"
+    )
+    light_cycle: Optional[str] = Field(default=None, alias="Light_x0020_Cycle")
+    lims_project_code: Optional[str] = Field(
+        default=None, alias="Lims_x0020_Project_x0020_Code"
+    )
+    long_1st_round_inj_cmts: Optional[str] = Field(
+        default=None, alias="Long1stRoundInjCmts"
+    )
+    long_2nd_rnd_inj_cmts: Optional[str] = Field(
+        default=None, alias="Long2ndRndInjCmts"
+    )
+    long_requestor_comments: Optional[str] = Field(
+        default=None, alias="LongRequestorComments"
+    )
+    long_surgeon_comments: Optional[str] = Field(
+        default=None, alias="LongSurgeonComments"
+    )
+    ml_2nd_inj: Optional[float] = Field(default=None, alias="ML2ndInj")
+    modified: Optional[datetime] = Field(default=None, alias="Modified")
+    nanoject_number_inj10: Optional[str] = Field(
+        default=None, alias="NanojectNumberInj10"
+    )
+    nanoject_number_inj2: Optional[str] = Field(
+        default=None, alias="NanojectNumberInj2"
+    )
+    odata_ui_version_string: Optional[str] = Field(
+        default=None, alias="OData__UIVersionString"
+    )
+    odata_hp_requestor: Optional[str] = Field(
+        default=None, alias="OData__x0031_HP_x0020_Requestor_x0020_"
+    )
+    piid: Optional[int] = Field(default=None, alias="PIId")
+    pi_string_id: Optional[str] = Field(default=None, alias="PIStringId")
+    pedigree_name: Optional[str] = Field(default=None, alias="PedigreeName")
+    procedure: Optional[str] = Field(default=None, alias="Procedure")
+    project_id_te: Optional[str] = Field(
+        default=None, alias="Project_x0020_ID_x0020__x0028_te"
+    )
+    round1_inj_iso_level: Optional[float] = Field(
+        default=None, alias="Round1InjIsolevel"
+    )
+    round2_inj_iso_level: Optional[float] = Field(
+        default=None, alias="Round2InjIsolevel"
+    )
+    scabbing: Optional[str] = Field(default=None, alias="Scabbing")
+    second_inj_recovery: Optional[int] = Field(
+        default=None, alias="SecondInjRecover"
+    )
+    second_injection_iso_duration: Optional[float] = Field(
+        default=None, alias="SecondInjectionIsoDuration"
+    )
+    second_injection_weight_after: Optional[float] = Field(
+        default=None, alias="SecondInjectionWeightAfter"
+    )
+    second_injection_weight_before: Optional[float] = Field(
+        default=None, alias="SecondInjectionWeightBefore"
+    )
+    second_round_ionto_issue: Optional[str] = Field(
+        default=None, alias="SecondRoundIontoIssue"
+    )
+    server_redirected_embed_uri: Optional[str] = Field(
+        default=None, alias="ServerRedirectedEmbedUri"
+    )
+    server_redirected_embed_url: Optional[str] = Field(
+        default=None, alias="ServerRedirectedEmbedUrl"
+    )
+    start_of_week: Optional[datetime] = Field(
+        default=None, alias="Start_x0020_Of_x0020_Week"
+    )
+    surgery_status: Optional[str] = Field(default=None, alias="SurgeryStatus")
+    test_1st_round_id: Optional[int] = Field(
+        default=None, alias="TEST_x0020_1st_x0020_Round_x0020Id"
+    )
+    test_1st_round_string_id: Optional[str] = Field(
+        default=None, alias="TEST_x0020_1st_x0020_Round_x0020StringId"
+    )
+    test_2nd_round_id: Optional[int] = Field(
+        default=None, alias="TEST_x0020_2nd_x0020_Round_x0020Id"
+    )
+    test_2nd_round_string_id: Optional[str] = Field(
+        default=None, alias="TEST_x0020_2nd_x0020_Round_x0020StringId"
+    )
+    test1_id: Optional[int] = Field(default=None, alias="Test1Id")
+    test1_string_id: Optional[str] = Field(default=None, alias="Test1StringId")
+    title: Optional[str] = Field(default=None, alias="Title")
+    touch_up_status: Optional[str] = Field(
+        default=None, alias="Touch_x0020_Up_x0020_Status"
+    )
+    touch_up_surgeon_id: Optional[int] = Field(
+        default=None, alias="Touch_x0020_Up_x0020_SurgeonId"
+    )
+    touch_up_surgeon_string_id: Optional[str] = Field(
+        default=None, alias="Touch_x0020_Up_x0020_SurgeonStringId"
+    )
+    touch_up_weight: Optional[float] = Field(
+        default=None, alias="Touch_x0020_Up_x0020_Weight_x002"
+    )
+    touch_up_comp: Optional[str] = Field(
+        default=None, alias="Touch_x0020_Up_x0020__x0020_Comp"
+    )
+    virus_ap: Optional[Tuple[float, Optional[str]]] = Field(
+        default=None, alias="Virus_x0020_A_x002f_P"
+    )
+    virus_dv: Optional[Tuple[float, Optional[str]]] = Field(
+        default=None, alias="Virus_x0020_D_x002f_V"
+    )
+    virus_hemisphere: Optional[str] = Field(
+        default=None, alias="Virus_x0020_Hemisphere"
+    )
+    virus_ml: Optional[Tuple[float, Optional[str]]] = Field(
+        default=None, alias="Virus_x0020_M_x002f_L"
+    )
+    weight_after_surgery: Optional[float] = Field(
+        default=None, alias="Weight_x0020_after_x0020_Surgery"
+    )
+    weight_before_surgery: Optional[float] = Field(
+        default=None, alias="Weight_x0020_before_x0020_Surger"
+    )
+    workstation_1st_injection: Optional[str] = Field(
+        default=None, alias="WorkStation1stInjection"
+    )
+    workstation_2nd_injection: Optional[str] = Field(
+        default=None, alias="WorkStation2ndInjection"
+    )
+    # The rest of these fields seem like legacy mistakes
+    field30: Optional[float] = Field(default=None, alias="field30")
+    field50: Optional[float] = Field(default=None, alias="field50")
+    inj1_vol_per_depth: Optional[float] = Field(
+        default=None, alias="inj1volperdepth"
+    )
+    inj2_vol_per_depth: Optional[float] = Field(
+        default=None, alias="inj2volperdepth"
+    )
+    nd_round_injection_comments: Optional[str] = Field(
+        default=None, alias="ndRoungInjectionComments"
+    )
+    ret_setting0: Optional[str] = Field(default=None, alias="retSetting0")
+    ret_setting1: Optional[str] = Field(default=None, alias="retSetting1")
+    st_round_injection_comments: Optional[str] = Field(
+        default=None, alias="stRoundInjectionComments"
+    )
 
-        # Not really why, but some response fields return 'Select...'
-        SELECT_STR = "Select..."
-        PROCEDURE_TYPE_SPLITTER = "+"
-
-    class InjStringParserHelper:
-        """Some injections have this to indicate rostal info"""
-
-        ROSTAL_TO_LAMBDA = "rostal to lambda"
-
-    class ProcedureType:
-        """Enum class for SharePoint's Procedure Type"""
-
-        HEAD_PLANT = "HP"
-        HP_ONLY = "HP Only"
-        HP_TRANSCRANIAL = "HP Transcranial (for ISI)"
-        STEREOTAXIC_INJECTION_COORDINATE = "Stereotaxic Injection (Coordinate)"
-        STEREOTAXIC_INJECTION = "Stereotaxic Injection"
-        INJECTION = "Injection"
-        INJ = "INJ"
-        OPTIC_FIBER_IMPLANT = "Optic Fiber Implant"
-        WHOLE_HEMISPHERE_CRANIOTOMY_NP = "WHC NP"
-        C_CAM = "C CAM"
-        C_MULTISCOPE = "C Multiscope"
-        C = "C"
-
-    class InjectionType:
-        """Enum class for Injection Types"""
-
-        IONTO = "Iontophoresis"
-        NANOJECT = "Nanoject (Pressure)"
-
-    class CraniotomyType:
-        """Enum class for Craniotomy Types"""
-
-        VISUAL_CORTEX = "Visual Cortex 5mm"
-        FRONTAL_WINDOW = "Frontal Window 3mm"
-        WHC_NP = "WHC NP"
-        WHC_2P = "WHC 2P"
-
-    class HeadPostType(Enum):
-        """Enum class for HeadPost Types"""
-
-        CAM = "CAM-style headframe (0160-100-10 Rev A)"
-        NEUROPIXEL = "Neuropixel-style headframe (0160-100-10/0160-200-36)"
-        MESO_NGC = (
-            "Mesoscope-style well with NGC-style headframe"
-            " (0160-200-20/0160-100-10)"
-        )
-        WHC_NP = "WHC #42 with Neuropixel well and well cap"
-        NGC = "NGC-style headframe, no well (0160-100-10)"
-        AI_HEADBAR = "AI Straight Headbar"
-
-    class ListField:
-        """Enum class for fields in List Item object response"""
-
-        FILE_SYSTEM_OBJECT_TYPE = "FileSystemObjectType"
-        ID = "Id"
-        SERVER_REDIRECTED_EMBED_URI = "ServerRedirectedEmbedUri"
-        SERVER_REDIRECTED_EMBED_URL = "ServerRedirectedEmbedUrl"
-        CONTENT_TYPE_ID = "ContentTypeId"
-        TITLE = "Title"
-        PI_ID = "PIId"
-        PI_STRING_ID = "PIStringId"
-        LAB_TRACKS_REQUESTOR = "LabTracks_x0020_Requestor"
-        PROJECT_ID_TE = "Project_x0020_ID_x0020__x0028_te"
-        IACUC_PROTOCOL = "IACUC_x0020_Protocol_x0020__x002"
-        PROCEDURE = "Procedure"
-        LIGHT_CYCLE = "Light_x0020_Cycle"
-        LI_MS_REQUIRED = "LIMs_x0020_Required"
-        LAB_TRACKS_GROUP = "LabTracks_x0020_Group"
-        LAB_TRACKS_ID = "LabTracks_x0020_ID"
-        DATE_OF_SURGERY = "Date_x0020_of_x0020_Surgery"
-        LIMS_PROJECT_CODE = "Lims_x0020_Project_x0020_Code"
-        VIRUS_M_L = "Virus_x0020_M_x002f_L"
-        VIRUS_A_P = "Virus_x0020_A_x002f_P"
-        VIRUS_D_V = "Virus_x0020_D_x002f_V"
-        VIRUS_HEMISPHERE = "Virus_x0020_Hemisphere"
-        HP_M_L = "HP_x0020_M_x002f_L"
-        HP_A_P = "HP_x0020_A_x002f_P"
-        HP_DIAMETER = "HP_x0020_Diameter"
-        ISO_ON = "Iso_x0020_On"
-        CAGE = "Cage"
-        SEX = "Sex"
-        DATE_OF_BIRTH = "Date_x0020_of_x0020_Birth"
-        WEIGHT_BEFORE_SURGER = "Weight_x0020_before_x0020_Surger"
-        WEIGHT_AFTER_SURGERY = "Weight_x0020_after_x0020_Surgery"
-        PEDIGREE_NAME = "PedigreeName"
-        BREG2_LAMB = "Breg2Lamb"
-        HEADPOST_TYPE = "HeadpostType"
-        DATE_RANGE_START = "DateRangeStart"
-        DATE_RANGE_END = "DateRangeEnd"
-        HP_LOC = "HpLoc"
-        HP_PERF = "HpPerf"
-        HP_DUROTOMY = "HPDurotomy"
-        HP_PREV_INJECT = "HpPrevInject"
-        ML2ND_INJ = "ML2ndInj"
-        AP2ND_INJ = "AP2ndInj"
-        DV2ND_INJ = "DV2ndInj"
-        HEMISPHERE2ND_INJ = "Hemisphere2ndInj"
-        HP_WORK_STATION = "HpWorkStation"
-        SURGERY_STATUS = "SurgeryStatus"
-        COM_DUROTOMY = "ComDurotomy"
-        COM_SWELLING = "ComSwelling"
-        COM_SINUSBLEED = "ComSinusbleed"
-        COM_DURING1ST_INJ = "ComDuring1stInj"
-        COM_DURING2ND_INJ = "ComDuring2ndInj"
-        COM_DAMAGE = "ComDamage"
-        COM_WINDOW = "ComWindow"
-        COM_COPLANAR = "ComCoplanar"
-        COM_AFTER1ST_INJ = "ComAfter1stInj"
-        COM_AFTER2ND_INJ = "ComAfter2ndInj"
-        WORK_STATION1ST_INJECTION = "WorkStation1stInjection"
-        WORK_STATION2ND_INJECTION = "WorkStation2ndInjection"
-        DATE1ST_INJECTION = "Date1stInjection"
-        DATE2ND_INJECTION = "Date2ndInjection"
-        INJ1_STORAGE_LOCATION = "Inj1StorageLocation"
-        INJ2_STORAGE_LOCATION = "Inj2StorageLocation"
-        INJ1_TYPE = "Inj1Type"
-        INJ2_TYPE = "Inj2Type"
-        INJ1_VOL = "Inj1Vol"
-        INJ2_VOL = "Inj2Vol"
-        INJ1_LENGHTOF_TIME = "Inj1LenghtofTime"
-        INJ2_LENGHTOF_TIME = "Inj2LenghtofTime"
-        INJ1_CURRENT = "Inj1Current"
-        INJ2_CURRENT = "Inj2Current"
-        INJ1_ALTERNATING_TIME = "Inj1AlternatingTime"
-        INJ2_ALTERNATING_TIME = "Inj2AlternatingTime"
-        FIRST_INJECTION_WEIGHT_BEFOR = "FirstInjectionWeightBefor"
-        FIRST_INJECTION_WEIGHT_AFTER = "FirstInjectionWeightAfter"
-        FIRST_INJECTION_ISO_DURATION = "FirstInjectionIsoDuration"
-        SECOND_INJECTION_WEIGHT_BEFORE = "SecondInjectionWeightBefore"
-        SECOND_INJECTION_WEIGHT_AFTER = "SecondInjectionWeightAfter"
-        SECOND_INJECTION_ISO_DURATION = "SecondInjectionIsoDuration"
-        INJ1_ROUND = "Inj1Round"
-        INJ2_ROUND = "Inj2Round"
-        HP_ISO_LEVEL = "HPIsoLevel"
-        ROUND1_INJ_ISOLEVEL = "Round1InjIsolevel"
-        ROUND2_INJ_ISOLEVEL = "Round2InjIsolevel"
-        TEST1_ID = "Test1Id"
-        TEST1_STRING_ID = "Test1StringId"
-        TEST_2ND_ROUND_ID = "TEST_x0020_2nd_x0020_Round_x0020Id"
-        TEST_2ND_ROUND_STRING_ID = "TEST_x0020_2nd_x0020_Round_x0020StringId"
-        TEST_1ST_ROUND_ID = "TEST_x0020_1st_x0020_Round_x0020Id"
-        TEST_1ST_ROUND_STRING_ID = "TEST_x0020_1st_x0020_Round_x0020StringId"
-        ODATA_HP_REQUESTOR = "OData__x0031_HP_x0020_Requestor_x0020_"
-        ISSUE = "Issue"
-        TOUCH_UP_STATUS = "Touch_x0020_Up_x0020_Status"
-        TOUCH_UP_SURGEON_ID = "Touch_x0020_Up_x0020_SurgeonId"
-        TOUCH_UP_SURGEON_STRING_ID = "Touch_x0020_Up_x0020_SurgeonStringId"
-        TOUCH_UP_COMP = "Touch_x0020_Up_x0020__x0020_Comp"
-        EXUDATE_SEVERITY = "Exudate_x0020_Severity"
-        SCABBING = "Scabbing"
-        EYE_ISSUE = "Eye_x0020_Issue"
-        EYE_AFFECTED = "Eye_x0020_Affected"
-        TOUCH_UP_WEIGHT = "Touch_x0020_Up_x0020_Weight_x002"
-        LIMS_LINK = "LIMS_x0020_link"
-        HP_INJ = "HP_x0020__x0026__x0020_Inj"
-        FIELD30 = "field30"
-        FIELD50 = "field50"
-        LIM_STASKFLOW1 = "LIMStaskflow1"
-        COMPLIANCE_ASSET_ID = "ComplianceAssetId"
-        CREATED = "Created"
-        AUTHOR_ID = "AuthorId"
-        EDITOR_ID = "EditorId"
-        MODIFIED = "Modified"
-        HP_REQUESTOR_COMMENTS_PLAINTEXT = "HPRequestorCommentsPlaintext"
-        NANOJECT_NUMBER_INJ2 = "NanojectNumberInj2"
-        NANOJECT_NUMBER_INJ10 = "NanojectNumberInj10"
-        IONTO_NUMBER_INJ1 = "IontoNumberInj1"
-        IONTO_NUMBER_INJ2 = "IontoNumberInj2"
-        IONTO_NUMBER_HPINJ = "IontoNumberHPINJ"
-        INJ1VOLPERDEPTH = "inj1volperdepth"
-        INJ2VOLPERDEPTH = "inj2volperdepth"
-        INJ1ANGLE0 = "Inj1angle0"
-        INJ2ANGLE0 = "Inj2angle0"
-        CONTUSION = "Contusion"
-        HP_SURGEON_COMMENTS = "HPSurgeonComments"
-        ST_ROUND_INJECTION_COMMENTS = "stRoundInjectionComments"
-        ND_ROUNG_INJECTION_COMMENTS = "ndRoungInjectionComments"
-        FIRST_ROUND_IONTO_ISSUE = "FirstRoundIontoIssue"
-        HP_RECOVERY = "HPRecovery"
-        FIRST_INJ_RECOVERY = "FirstInjRecovery"
-        SECOND_INJ_RECOVER = "SecondInjRecover"
-        SECOND_ROUND_IONTO_ISSUE = "SecondRoundIontoIssue"
-        LONG_SURGEON_COMMENTS = "LongSurgeonComments"
-        LONG1ST_ROUND_INJ_CMTS = "Long1stRoundInjCmts"
-        LONG2ND_RND_INJ_CMTS = "Long2ndRndInjCmts"
-        LONG_REQUESTOR_COMMENTS = "LongRequestorComments"
-        INJ1_VIRUS_STRAIN_RT = "Inj1VirusStrain_rt"
-        INJ2_VIRUS_STRAIN_RT = "Inj2VirusStrain_rt"
-        RET_SETTING0 = "retSetting0"
-        RET_SETTING1 = "retSetting1"
-        START_OF_WEEK = "Start_x0020_Of_x0020_Week"
-        END_OF_WEEK = "End_x0020_of_x0020_Week"
-        AGE_AT_INJECTION = "Age_x0020_at_x0020_Injection"
-        CRANIOTOMY_TYPE = "CraniotomyType"
-        IMPLANT_ID_COVERSLIP_TYPE = "ImplantIDCoverslipType"
-        INJ1_ANGLE_V2 = "Inj1Angle_v2"
-        INJ2_ANGLE_V2 = "Inj2Angle_v2"
-        FIBER_IMPLANT1 = "FiberImplant1"
-        FIBER_IMPLANT1_DV = "FiberImplant1DV"
-        FIBER_IMPLANT2 = "FiberImplant2"
-        FIBER_IMPLANT2_DV = "FiberImplant2DV"
-        ID2 = "ID"  # For some reason ID and Id are present in response
-        ODATA_UI_VERSION_STRING = "OData__UIVersionString"
-        ATTACHMENTS = "Attachments"
-        GUID = "GUID"
-
-
-@dataclass
-class HeadPostInfo:
-    headframe_type: Optional[str] = None
-    headframe_part_number: Optional[str] = None
-    well_type: Optional[str] = None
-    well_part_number: Optional[str] = None
-
-    @classmethod
-    def from_headpost_type(cls, headpost_type: Optional[
-        NSBList2019.ListField.HEADPOST_TYPE]):
-        if headpost_type is None or headpost_type not in NSBList2019.HeadPostType.__members__.values():
-            return cls()
-        elif headpost_type == NSBList2019.HeadPostType.CAM:
-            return cls(headframe_type="CAM-style",
-                       headframe_part_number="0160-100-10 Rev A",
-                       well_type="CAM-style")
-        elif headpost_type == NSBList2019.HeadPostType.NEUROPIXEL:
-            return cls(headframe_type="Neuropixel-style",
-                       headframe_part_number="0160-100-10",
-                       well_type="Neuropixel-style",
-                       well_part_number="0160-200-36")
-        elif headpost_type == NSBList2019.HeadPostType.MESO_NGC:
-            return cls(headframe_type="NGC-style",
-                       headframe_part_number="0160-100-10",
-                       well_type="Mesoscope-style",
-                       well_part_number="0160-200-20")
-        elif headpost_type == NSBList2019.HeadPostType.WHC_NP:
-            return cls(headframe_type="WHC #42",
-                       headframe_part_number="42",
-                       well_type="Neuropixel-style",
-                       well_part_number="0160-200-36")
-        elif headpost_type == NSBList2019.HeadPostType.NGC:
-            return cls(headframe_type="NGC-style",
-                       headframe_part_number="0160-100-10")
-        elif headpost_type == NSBList2019.HeadPostType.AI_HEADBAR:
-            return cls(headframe_type="AI Straight Headbar")
+    @validator(
+        "age_at_injection",
+        "breg_2_lamb",
+        "dv_2nd_inj",
+        "first_injection_iso_duration",
+        "first_injection_weight_after",
+        "first_injection_weight_before",
+        "hp_iso_level",
+        "hp_recovery",
+        "hp_ap",
+        "hp_diameter",
+        "hp_ml",
+        "inj1_vol",
+        "inj2_vol",
+        "ml_2nd_inj",
+        "round1_inj_iso_level",
+        "round2_inj_iso_level",
+        "second_injection_iso_duration",
+        "second_injection_weight_after",
+        "second_injection_weight_before",
+        "touch_up_weight",
+        "weight_after_surgery",
+        "weight_before_surgery",
+        "field30",
+        "field50",
+        "inj1_vol_per_depth",
+        "inj2_vol_per_depth",
+        pre=True,
+    )
+    def parse_basic_num_str_to_float(
+        cls, v: Union[str, int, float, None]
+    ) -> Optional[float]:
+        pattern = r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))"
+        if type(v) is str and re.match(pattern, v):
+            return re.match(pattern, v).group(1)
+        elif type(v) is int or type(v) is float:
+            return v
         else:
-            return cls()
+            return None
+
+    @validator(
+        "cage",
+        "com_after_1st_inj",
+        "com_after_2nd_inj",
+        "com_coplanar",
+        "com_damage",
+        "com_during_1st_inj",
+        "com_during_2nd_inj",
+        "com_durotomy",
+        "com_sinusbleed",
+        "com_swelling",
+        "com_window",
+        "compliance_asset_id",
+        "content_type_id",
+        "contusion",
+        "exudate_severity",
+        "eye_affected",
+        "eye_issue",
+        "fiber_implant1",
+        "fiber_implant1_dv",
+        "fiber_implant2",
+        "fiber_implant2_dv",
+        "first_round_ionto_issue",
+        "guid",
+        "hp_durotomy",
+        "hp_requestor_comments_plaintext",
+        "hp_surgeon_comments",
+        "hp_inj",
+        "headpost_type",
+        "hemisphere_2nd_inj",
+        "hp_loc",
+        "hp_perf",
+        "hp_prev_inject",
+        "hp_work_station",
+        "iacuc_protocol",
+        "inj1_alternating_time",
+        "inj1_round",
+        "inj1_storage_location",
+        "inj1_type",
+        "inj1_virus_strain_rt",
+        "inj2_alternating_time",
+        "inj2_round",
+        "inj2_storage_location",
+        "inj2_type",
+        "inj2_virus_strain_rt",
+        "ionto_number_hpinj",
+        "ionto_number_inj1",
+        "ionto_number_inj2",
+        "issue",
+        "lims_link",
+        "lims_task_flow1",
+        "lims_required",
+        "labtracks_group",
+        "labtracks_id",
+        "labtracks_requestor",
+        "light_cycle",
+        "lims_project_code",
+        "long_1st_round_inj_cmts",
+        "long_2nd_rnd_inj_cmts",
+        "long_requestor_comments",
+        "long_surgeon_comments",
+        "nanoject_number_inj10",
+        "nanoject_number_inj2",
+        "odata_ui_version_string",
+        "odata_hp_requestor",
+        "pi_string_id",
+        "pedigree_name",
+        "procedure",
+        "project_id_te",
+        "scabbing",
+        "second_round_ionto_issue",
+        "surgery_status",
+        "touch_up_status",
+        "touch_up_surgeon_string_id",
+        "virus_hemisphere",
+        "workstation_1st_injection",
+        "workstation_2nd_injection",
+        pre=True,
+    )
+    def filter_select_str(cls, v: Optional[str]) -> Optional[str]:
+        """Filter out strings that contain 'Select', etc."""
+        strings_to_filter = [
+            "Select...",
+            "N/A",
+            "NA",
+            "None",
+            "Select if applicable...",
+        ]
+        if type(v) is str and v in strings_to_filter:
+            return None
+        else:
+            return v
+
+    @validator(
+        "ap_2nd_inj",
+        "implant_id_coverslip_type",
+        "virus_ap",
+        "virus_dv",
+        "virus_ml",
+        pre=True,
+    )
+    def parse_numeric_with_notes(
+        cls, v: Union[str, None]
+    ) -> Optional[Tuple[float, Optional[str]]]:
+        """Match like '0.25' or '-4.72, rostral to lambda' or
+        '5mm stacked coverslip' or '30 degrees'"""
+        pattern1 = r"^([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))$"
+        pattern2 = r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))([,\w].*)"
+        if type(v) is str and re.match(pattern1, v):
+            return re.match(pattern1, v).group(1), None
+        elif type(v) is str and re.match(pattern2, v):
+            return (
+                re.match(pattern2, v).group(1),
+                re.match(pattern2, v).group(2),
+            )
+        else:
+            return None
+
+    @validator("craniotomy_type", pre=True)
+    def parse_string_with_numeric(
+        cls, v: Optional[str]
+    ) -> Optional[Tuple[str, float]]:
+        """Match like 'Visual Cortex 5mm'"""
+        pattern = r"(.*)\s+(\d+)mm$"
+        if type(v) is str and re.match(pattern, v):
+            return re.match(pattern, v).group(1), re.match(pattern, v).group(2)
+        else:
+            return None
+
+    @validator(
+        "inj1_angle_v2",
+        "inj1_angle0",
+        "inj2_angle_v2",
+        "inj2_angle0",
+        pre=True,
+    )
+    def parse_angle_str_float(
+        cls, v: Union[str, int, float, None]
+    ) -> Optional[float]:
+        pattern = (
+            r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))\s*"
+            r"(?:deg|degs|degree|degrees){0,1}\s*$"
+        )
+        if type(v) is str and re.match(pattern, v):
+            return re.match(pattern, v).group(1)
+        elif type(v) is int or type(v) is float:
+            return v
+        else:
+            return None
+
+    @validator("inj1_current", "inj2_current", pre=True)
+    def parse_current_str_float(
+        cls, v: Union[str, int, float, None]
+    ) -> Optional[float]:
+        pattern = (
+            r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))(\s*uA\s*)*$"
+        )
+        if type(v) is str and re.match(pattern, v):
+            return re.match(pattern, v).group(1)
+        elif type(v) is int or type(v) is float:
+            return v
+        else:
+            return None
+
+    @validator("inj1_length_of_time", "inj2_length_of_time", pre=True)
+    def parse_time_length_str_float(
+        cls, v: Union[str, int, float, None]
+    ) -> Optional[float]:
+        pattern1 = (
+            r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))\s*"
+            r"(?:min|mins|minute|minutes){0,1}\s*$"
+        )
+        pattern2 = (
+            r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))\s*"
+            r"(?:min|mins|minute|minutes){1}\s*(\d+)"
+            r"(?:sec|secs|second|seconds)(?:/depth|/location)*$"
+        )
+        if type(v) is str and re.match(pattern1, v):
+            return re.match(pattern1, v).group(1)
+        elif type(v) is str and re.match(pattern2, v):
+            minutes = re.match(pattern2, v).group(1)
+            seconds = re.match(pattern2, v).group(2)
+            total_time = (
+                float(minutes) + (float(seconds) / 60)
+                if float(minutes) > 0
+                else float(minutes) - (float(seconds) / 60)
+            )
+            return total_time
+        elif type(v) is int or type(v) is float:
+            return v
+        else:
+            return None
+
+    def has_hp_procedure(self):
+        return "HP" in self.procedure
+
+    def has_inj_procedure(self):
+        return "INJ" in self.procedure or "Injection" in self.procedure
+
