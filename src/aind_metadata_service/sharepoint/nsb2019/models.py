@@ -3,14 +3,6 @@ from typing import Optional
 from enum import Enum
 
 
-@dataclass
-class HeadPostInfo:
-    nsb_name: str
-    headframe_type: Optional[str] = None
-    headframe_part_number: Optional[str]  = None
-    well_type: Optional[str] = None
-    well_part_number: Optional[str] = None
-
 class NSBList2019:
     """Class to contain helpful info to parse the 2019 SharePoint List"""
 
@@ -22,6 +14,11 @@ class NSBList2019:
         # Not really why, but some response fields return 'Select...'
         SELECT_STR = "Select..."
         PROCEDURE_TYPE_SPLITTER = "+"
+
+    class InjStringParserHelper:
+        """Some injections have this to indicate rostal info"""
+
+        ROSTAL_TO_LAMBDA = "rostal to lambda"
 
     class ProcedureType:
         """Enum class for SharePoint's Procedure Type"""
@@ -53,7 +50,7 @@ class NSBList2019:
         WHC_NP = "WHC NP"
         WHC_2P = "WHC 2P"
 
-    class HeadPostType:
+    class HeadPostType(Enum):
         """Enum class for HeadPost Types"""
 
         CAM = "CAM-style headframe (0160-100-10 Rev A)"
@@ -221,3 +218,43 @@ class NSBList2019:
         ODATA_UI_VERSION_STRING = "OData__UIVersionString"
         ATTACHMENTS = "Attachments"
         GUID = "GUID"
+
+
+@dataclass
+class HeadPostInfo:
+    headframe_type: Optional[str] = None
+    headframe_part_number: Optional[str] = None
+    well_type: Optional[str] = None
+    well_part_number: Optional[str] = None
+
+    @classmethod
+    def from_headpost_type(cls, headpost_type: Optional[
+        NSBList2019.ListField.HEADPOST_TYPE]):
+        if headpost_type is None or headpost_type not in NSBList2019.HeadPostType.__members__.values():
+            return cls()
+        elif headpost_type == NSBList2019.HeadPostType.CAM:
+            return cls(headframe_type="CAM-style",
+                       headframe_part_number="0160-100-10 Rev A",
+                       well_type="CAM-style")
+        elif headpost_type == NSBList2019.HeadPostType.NEUROPIXEL:
+            return cls(headframe_type="Neuropixel-style",
+                       headframe_part_number="0160-100-10",
+                       well_type="Neuropixel-style",
+                       well_part_number="0160-200-36")
+        elif headpost_type == NSBList2019.HeadPostType.MESO_NGC:
+            return cls(headframe_type="NGC-style",
+                       headframe_part_number="0160-100-10",
+                       well_type="Mesoscope-style",
+                       well_part_number="0160-200-20")
+        elif headpost_type == NSBList2019.HeadPostType.WHC_NP:
+            return cls(headframe_type="WHC #42",
+                       headframe_part_number="42",
+                       well_type="Neuropixel-style",
+                       well_part_number="0160-200-36")
+        elif headpost_type == NSBList2019.HeadPostType.NGC:
+            return cls(headframe_type="NGC-style",
+                       headframe_part_number="0160-100-10")
+        elif headpost_type == NSBList2019.HeadPostType.AI_HEADBAR:
+            return cls(headframe_type="AI Straight Headbar")
+        else:
+            return cls()

@@ -1,4 +1,8 @@
-from aind_metadata_service.sharepoint.nsb2019.models import NSBList2019
+from aind_metadata_service.sharepoint.nsb2019.models import (
+    NSBList2019,
+    HeadPostInfo,
+)
+from aind_data_schema.procedures import Headframe, Anaesthetic, Side, CoordinateReferenceLocation, InjectionMaterial
 from office365.runtime.auth.client_credential import ClientCredential
 from office365.runtime.client_object import ClientObject
 from office365.sharepoint.client_context import ClientContext
@@ -6,19 +10,9 @@ from office365.sharepoint.listitems.collection import ListItemCollection
 from dateutil import parser
 from typing import Optional
 from datetime import date
+import re
 from dataclasses import dataclass
 from enum import Enum
-
-
-@dataclass
-class HeadPostInfo:
-    headframe_type: Optional[str] = None
-    headframe_part_number: Optional[str]  = None
-    well_type: Optional[str] = None
-    well_part_number: Optional[str] = None
-
-class NSBHeadPostType(Enum):
-
 
 
 class ListClient:
@@ -48,80 +42,228 @@ class ListClient:
         return list_items
 
     def _map_list_item(self, list_item: dict):
+        procedures = []
         subject_id = self.subject_id
         lf = NSBList2019.ListField
-        start_date = (
-            self._map_date_of_surg_to_start_date(
-                list_item.get(lf.DATE_OF_SURGERY)
-            )
+        start_date = self._map_iso_date_to_date(
+            list_item.get(lf.DATE_OF_SURGERY)
         )
         end_date = start_date
-        experimenter_full_name = (
-            self._map_auth_id_to_exp_name(list_item.get(lf.AUTHOR_ID))
+        experimenter_full_name = self._map_auth_id_to_exp_name(
+            list_item.get(lf.AUTHOR_ID)
         )
-        iaucuc_protocol = list_item.get(lf.IACUC_PROTOCOL)
-        animal_weight_prior = self._map_float_str_to_float(list_item.get(lf.WEIGHT_BEFORE_SURGER))
-        animal_weight_post = self._map_float_str_to_float(list_item.get(lf.WEIGHT_AFTER_SURGERY))
-        hp_iso_level = list_item.get(lf.HP_ISO_LEVEL)
-        # anaesthesia=
+        iacuc_protocol = list_item.get(lf.IACUC_PROTOCOL)
+        animal_weight_prior = self._map_float_str_to_float(
+            list_item.get(lf.WEIGHT_BEFORE_SURGER)
+        )
+        animal_weight_post = self._map_float_str_to_float(
+            list_item.get(lf.WEIGHT_AFTER_SURGERY)
+        )
+        procedure_types = list_item.get(lf.PROCEDURE)
+        procedure_types = (
+            []
+            if procedure_types is None
+            else procedure_types.split(
+                NSBList2019.StringParserHelper.PROCEDURE_TYPE_SPLITTER
+            )
+        )
+
+        # Check if headframe type procedure in list of procedures
+        if (
+            NSBList2019.ProcedureType.HP_ONLY in procedure_types
+            or NSBList2019.ProcedureType.HP_TRANSCRANIAL in procedure_types
+            or NSBList2019.ProcedureType.HEAD_PLANT in procedure_types
+        ):
+            hf_kwargs = ({
+                "start_date": start_date,
+                "end_date": end_date,
+                "experimenter_full_name": experimenter_full_name,
+                "iacuc_protocol": iacuc_protocol,
+                "animal_weight_prior": animal_weight_prior,
+                "animal_weight_post": animal_weight_post
+            })
+            headpost_type = list_item.get(lf.HEADPOST_TYPE)
+            headpost_info = HeadPostInfo.from_headpost_type(
+                headpost_type=headpost_type
+            )
+            hf_kwargs["headframe_type"] = headpost_type.headframe_type
+            hf_kwargs["headframe_part_number"] = (
+                headpost_info.headframe_part_number
+            )
+            hf_kwargs["well_type"] = headpost_info.well_type
+            hf_kwargs["well_part_number"] = headpost_info.well_part_number
+            hp_iso_level = list_item.get(lf.HP_ISO_LEVEL)
+            anaesthetic_type = "isoflurane"
+            anaesthetic = Anaesthetic.construct(
+                type=anaesthetic_type,
+                level=hp_iso_level,
+            )
+            hf_kwargs["anaesthesia"] = anaesthetic
+            headframe_proc = Headframe.construct(**hf_kwargs)
+            procedures.append(headframe_proc)
+
+        # Check if injection type procedure in procedure_types
+        if (
+            NSBList2019.ProcedureType.STEREOTAXIC_INJECTION_COORDINATE
+            in procedure_types
+            or NSBList2019.ProcedureType.STEREOTAXIC_INJECTION
+            in procedure_types
+            or NSBList2019.ProcedureType.INJECTION in procedure_types
+            or NSBList2019.ProcedureType.INJ in procedure_types
+        ):
+            # There could be one or two injections in the sharepoint listitem
+            inj1_kwargs = {}
+            inj1_start_date = self._map_iso_date_to_date(
+                list_item.get(lf.DATE1ST_INJECTION)
+            )
+            inj1_kwargs["start_date"] = inj1_start_date
+            inj1_kwargs["end_date"] = inj1_start_date
+            inj1_kwargs["animal_weight_prior"] = self._map_float_str_to_float(
+                list_item.get(lf.FIRST_INJECTION_WEIGHT_BEFOR)
+            )
+            inj1_kwargs["animal_weight_post"] = self._map_float_str_to_float(
+                list_item.get(lf.FIRST_INJECTION_WEIGHT_AFTER)
+            )
+            inj1_kwargs["injection_duration"] = self._map_float_str_to_float(
+                list_item.get(lf.INJ1_LENGHTOF_TIME)
+            )
+            # First injection anaesthetic
+            inj1_anaesthetic_type = "isoflurane"
+            inj1_anaesthetic_duration = self._map_float_str_to_float(
+                    list_item.get(lf.FIRST_INJECTION_ISO_DURATION)
+            )
+            inj1_anaesthetic_level = self._map_float_str_to_float(
+                list_item.get(lf.ROUND1_INJ_ISOLEVEL)
+            )
+            inj1_kwargs["anaesthesia"] = Anaesthetic.construct(
+                type=inj1_anaesthetic_type,
+                duration=inj1_anaesthetic_duration,
+                level=inj1_anaesthetic_level,
+            )
+            inj1_kwargs["recovery_time"] = self._map_float_str_to_float(
+                list_item.get(lf.FIRST_INJ_RECOVERY)
+            )
+            inj1_kwargs["workstation_id"] = self._filter_select_string(
+                list_item.get(lf.WORK_STATION1ST_INJECTION)
+            )
+            inj1_type = list_item.get(lf.INJ1_TYPE)
+            inj1_kwargs["injection_type"] = inj1_type
+            inj1_kwargs["injection_hemisphere"] = self._map_hemisphere(
+                list_item.get(lf.VIRUS_HEMISPHERE)
+            )
+            inj1_kwargs["injection_coordinate_ml"] = self._parse_inj_virus_info(
+                list_item.get(lf.VIRUS_M_L)
+            )
+            inj1_kwargs["injection_coordinate_ap"] = self._parse_inj_virus_info(
+                list_item.get(lf.VIRUS_A_P)
+            )
+            inj1_kwargs["injection_coordinate_reference"] = self._map_ap_info_to_coord_reference(
+                list_item.get(lf.VIRUS_A_P)
+            )
+            inj1_kwargs["injection_coordinate_depth"] = self._parse_inj_virus_info(
+                list_item.get(lf.VIRUS_D_V)
+            )
+            inj1_kwargs["injection_angle"] = self._parse_angle_str(list_item.get(lf.INJ1ANGLE0))
+            inj1_kwargs["bregma_to_lambda_distance"] = self._map_float_str_to_float(
+                list_item.get(lf.BREG2_LAMB)
+            )
+            inj1_virus_strain = list_item.get(lf.INJ1_VIRUS_STRAIN_RT)
+            inj1_kwargs["injection_materials"] = None if inj1_virus_strain is None else InjectionMaterial.construct(
+                full_genome_name=inj1_virus_strain
+            )
+            if inj1_type is not None and inj1_type == NSBList2019.InjectionType.IONTO:
+                pass
+
+
         return None
 
     @staticmethod
-    def _map_auth_id_to_exp_name(nsb_author_id: Optional[str]) -> Optional[str]:
+    def _map_auth_id_to_exp_name(
+        nsb_author_id: Optional[str],
+    ) -> Optional[str]:
         """Maps NSB Author ID to Experimenter name as "NSB" + ID"""
         return "NSB" if nsb_author_id is None else f"NSB-{nsb_author_id}"
 
     @staticmethod
-    def _map_date_of_surg_to_start_date(nsb_date_of_surg: Optional[str]) -> Optional[date]:
+    def _map_iso_date_to_date(
+        nsb_iso_date_str: Optional[str],
+    ) -> Optional[date]:
         """Maps NSB date of surgery field to start date"""
-        return None if nsb_date_of_surg is None else parser.isoparse(nsb_date_of_surg)
+        return (
+            None
+            if nsb_iso_date_str is None
+            else parser.isoparse(nsb_iso_date_str)
+        )
 
     @staticmethod
-    def _map_float_str_to_float(float_str: Optional[str]) -> Optional[float]:
+    def _filter_select_string(input: Optional[str]) -> Optional[str]:
+        if input is None:
+            return None
+        elif input in ["Select...", "N/A", "NA"]:
+            return None
+        else:
+            return input
+
+    def _map_float_str_to_float(self, float_str: Optional[str]) -> Optional[float]:
         """This will coerce Optional[str] to Optional[float]"""
-        return None if float_str is None else float(float_str)
+        filtered_str = self._filter_select_string(float_str)
+        if filtered_str is None:
+            return None
+        try:
+            return float(float_str)
+        except ValueError:
+            return None
 
+    @staticmethod
+    def _map_hemisphere(nsb_hemisphere: Optional[str]) -> Optional[Side]:
+        if nsb_hemisphere is None:
+            return None
+        elif nsb_hemisphere.upper() == Side.LEFT.value.upper():
+            return Side.LEFT
+        elif nsb_hemisphere.upper() == Side.RIGHT.value.upper():
+            return Side.RIGHT
+        else:
+            return None
 
-    def _map_list_item_to_head_frame(
-        self, list_item: ClientObject
-    ) -> Headframe:
-        """Maps a SharePoint ListItem to a HeadFrame model"""
-        list_fields = NSBList2019.ListField
-        start_date = map_date_to_datetime(
-            list_item.get_property(list_fields.DATE_OF_SURGERY)
-        )
-        end_date = start_date
-        experimenter_full_name = self._map_experimenter_name(
-            list_item, list_fields
-        )
-        iacuc_protocol = list_item.get_property(
-            list_fields.IACUC_PROTOCOL
-        )
-        animal_weight_prior = parse_str_into_float(
-            list_item.get_property(list_fields.WEIGHT_BEFORE_SURGER)
-        )
-        animal_weight_post = parse_str_into_float(
-            list_item.get_property(list_fields.WEIGHT_AFTER_SURGERY)
-        )
-        anaesthesia = self._map_hp_anaesthesia(list_item, list_fields)
-        headpost_type = list_item.get_property(list_fields.HEADPOST_TYPE)
-        (
-            headframe_type,
-            headframe_part_number,
-            well_type,
-            well_part_number,
-        ) = self._map_headpost_type(headpost_type)
-        head_frame = Headframe.construct(
-            start_date=start_date,
-            end_date=end_date,
-            experimenter_full_name=experimenter_full_name,
-            iacuc_protocol=iacuc_protocol,
-            animal_weight_prior=animal_weight_prior,
-            animal_weight_post=animal_weight_post,
-            anaesthesia=anaesthesia,
-            headframe_type=headframe_type,
-            headframe_part_number=headframe_part_number,
-            well_type=well_type,
-            well_part_number=well_part_number,
-        )
-        return head_frame
+    def _parse_inj_virus_info(self, virus_info: Optional[str]) -> Optional[float]:
+        """Some fields look like '-3.5, notes' or '3.5, 4.6' """
+        filtered_str = self._filter_select_string(virus_info)
+        if filtered_str is None:
+            return None
+        else:
+            split_str = filtered_str.split(",")
+            return self._map_float_str_to_float(split_str[0])
+
+    @staticmethod
+    def _parse_angle_str(angle_info: Optional[str]) -> Optional[float]:
+        """Angles look like '30 degrees'"""
+        pattern1 = r"^(\d+)\s*(?:degrees)*"
+        if angle_info is None or not re.match(pattern1, angle_info):
+            return None
+        else:
+            return float(re.match(pattern1, angle_info).group(1))
+
+    @staticmethod
+    def _map_injection_length_of_time(inj_len_of_time_str: Optional[str]) -> Optional[float]:
+        """NSB2019 has entries that look like '5' or '3min10sec' etc."""
+        pattern1 = r"^(\d)+\s*(?:min)*$"
+        pattern2 = r"^(\d+)\s*min\s*(\d+)\s*(?:sec)*"
+        if inj_len_of_time_str is None:
+            return None
+        elif re.match(pattern1, inj_len_of_time_str):
+            return float(re.match(pattern1, inj_len_of_time_str).group(1))
+        elif re.match(pattern2, inj_len_of_time_str):
+            minutes = re.match(pattern2, inj_len_of_time_str).group(1)
+            seconds = re.match(pattern2, inj_len_of_time_str).group(2)
+            return float(minutes) + float(seconds)/60
+        else:
+            return None
+
+    @staticmethod
+    def _map_ap_info_to_coord_reference(nsb_virus_ap: Optional[str]) -> Optional[CoordinateReferenceLocation]:
+        if nsb_virus_ap is None:
+            return None
+        elif NSBList2019.InjStringParserHelper.ROSTAL_TO_LAMBDA in nsb_virus_ap:
+            return CoordinateReferenceLocation.LAMBDA
+        else:
+            return CoordinateReferenceLocation.BREGMA
