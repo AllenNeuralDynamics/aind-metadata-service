@@ -1,14 +1,111 @@
-from typing import Optional, Union, Tuple
+from typing import Optional, Union
 from pydantic import BaseModel, Extra, Field, validator
 from datetime import datetime
 import re
+from dataclasses import dataclass
+from enum import Enum
+
+
+class HeadPostType(Enum):
+    """Enum class for HeadPost Types"""
+
+    CAM = "CAM-style headframe (0160-100-10 Rev A)"
+    NEUROPIXEL = "Neuropixel-style headframe (0160-100-10/0160-200-36)"
+    MESO_NGC = (
+        "Mesoscope-style well with NGC-style headframe"
+        " (0160-200-20/0160-100-10)"
+    )
+    WHC_NP = "WHC #42 with Neuropixel well and well cap"
+    NGC = "NGC-style headframe, no well (0160-100-10)"
+    AI_HEADBAR = "AI Straight Headbar"
+
+
+class CraniotomyType(Enum):
+    """Enum class for Craniotomy Types"""
+
+    VISUAL_CORTEX = "Visual Cortex 5mm"
+    FRONTAL_WINDOW = "Frontal Window 3mm"
+    WHC_NP = "WHC NP"
+    WHC_2P = "WHC 2P"
+
+
+class InjectionType(Enum):
+    NANOJECT = "Nanoject (Pressure)"
+    IONTOPHORESIS = "Iontophoresis"
+
+
+class SexType(Enum):
+    """Enum class for HeadPost Types"""
+
+    MALE = "Male"
+    FEMALE = "Female"
+
+
+class HemisphereType(Enum):
+    """Enum class for HeadPost Types"""
+
+    RIGHT = "Right"
+    LEFT = "Left"
+
+
+@dataclass
+class HeadPostInfo:
+    headframe_type: Optional[str] = None
+    headframe_part_number: Optional[str] = None
+    well_type: Optional[str] = None
+    well_part_number: Optional[str] = None
+
+    @classmethod
+    def from_headpost_type(cls, headpost_type: Optional[HeadPostType]):
+        if headpost_type is None:
+            return cls()
+        elif headpost_type == HeadPostType.CAM:
+            return cls(
+                headframe_type="CAM-style",
+                headframe_part_number="0160-100-10 Rev A",
+                well_type="CAM-style",
+            )
+        elif headpost_type == HeadPostType.NEUROPIXEL:
+            return cls(
+                headframe_type="Neuropixel-style",
+                headframe_part_number="0160-100-10",
+                well_type="Neuropixel-style",
+                well_part_number="0160-200-36",
+            )
+        elif headpost_type == HeadPostType.MESO_NGC:
+            return cls(
+                headframe_type="NGC-style",
+                headframe_part_number="0160-100-10",
+                well_type="Mesoscope-style",
+                well_part_number="0160-200-20",
+            )
+        elif headpost_type == HeadPostType.WHC_NP:
+            return cls(
+                headframe_type="WHC #42",
+                headframe_part_number="42",
+                well_type="Neuropixel-style",
+                well_part_number="0160-200-36",
+            )
+        elif headpost_type == HeadPostType.NGC:
+            return cls(
+                headframe_type="NGC-style", headframe_part_number="0160-100-10"
+            )
+        elif headpost_type == HeadPostType.AI_HEADBAR:
+            return cls(headframe_type="AI Straight Headbar")
+        else:
+            return cls()
+
+
+@dataclass
+class NumberWithNotes:
+    number: Optional[float] = None
+    notes: Optional[str] = None
 
 
 class NSBList2019(BaseModel, extra=Extra.allow):
-
     _view_title = "New Request"
 
-    ap_2nd_inj: Optional[Tuple[float, Optional[str]]] = Field(
+    ap_2nd_inj: Optional[NumberWithNotes] = Field(
         default=None, alias="AP2ndInj"
     )
     age_at_injection: Optional[float] = Field(
@@ -41,11 +138,13 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     )
     content_type_id: Optional[str] = Field(default=None, alias="ContentTypeId")
     contusion: Optional[str] = Field(default=None, alias="Contusion")
-    craniotomy_type: Optional[Tuple[str, float]] = Field(
+    craniotomy_type: Optional[CraniotomyType] = Field(
         default=None, alias="CraniotomyType"
     )
     created: Optional[datetime] = Field(default=None, alias="Created")
-    dv_2nd_inj: Optional[float] = Field(default=None, alias="DV2ndInj")
+    dv_2nd_inj: Optional[NumberWithNotes] = Field(
+        default=None, alias="DV2ndInj"
+    )
     date_1st_injection: Optional[datetime] = Field(
         default=None, alias="Date1stInjection"
     )
@@ -102,7 +201,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
         default=None, alias="FirstRoundIontoIssue"
     )
     guid: Optional[str] = Field(default=None, alias="GUID")
-    hp_durotomy: Optional[str] = Field(default=None, alias="HPDurotomy")
+    hp_durotomy: Optional[bool] = Field(default=None, alias="HPDurotomy")
     hp_iso_level: Optional[float] = Field(default=None, alias="HPIsoLevel")
     hp_recovery: Optional[float] = Field(default=None, alias="HPRecovery")
     hp_requestor_comments_plaintext: Optional[str] = Field(
@@ -119,11 +218,13 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     hp_inj: Optional[str] = Field(
         default=None, alias="HP_x0020__x0026__x0020_Inj"
     )
-    headpost_type: Optional[str] = Field(default=None, alias="HeadpostType")
+    headpost_type: Optional[HeadPostType] = Field(
+        default=None, alias="HeadpostType"
+    )
     hemisphere_2nd_inj: Optional[str] = Field(
         default=None, alias="Hemisphere2ndInj"
     )
-    hp_loc: Optional[str] = Field(default=None, alias="HpLoc")
+    hp_loc: Optional[HemisphereType] = Field(default=None, alias="HpLoc")
     hp_perf: Optional[str] = Field(default=None, alias="HpPerf")
     hp_prev_inject: Optional[str] = Field(default=None, alias="HpPrevInject")
     hp_work_station: Optional[str] = Field(default=None, alias="HpWorkStation")
@@ -132,7 +233,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     )
     id1: Optional[int] = Field(default=None, alias="ID")
     id2: Optional[int] = Field(default=None, alias="Id")
-    implant_id_coverslip_type: Optional[Tuple[float, Optional[str]]] = Field(
+    implant_id_coverslip_type: Optional[NumberWithNotes] = Field(
         default=None, alias="ImplantIDCoverslipType"
     )
     inj1_alternating_time: Optional[str] = Field(
@@ -147,7 +248,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     inj1_storage_location: Optional[str] = Field(
         default=None, alias="Inj1StorageLocation"
     )
-    inj1_type: Optional[str] = Field(default=None, alias="Inj1Type")
+    inj1_type: Optional[InjectionType] = Field(default=None, alias="Inj1Type")
     inj1_virus_strain_rt: Optional[str] = Field(
         default=None, alias="Inj1VirusStrain_rt"
     )
@@ -165,7 +266,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     inj2_storage_location: Optional[str] = Field(
         default=None, alias="Inj2StorageLocation"
     )
-    inj2_type: Optional[str] = Field(default=None, alias="Inj2Type")
+    inj2_type: Optional[InjectionType] = Field(default=None, alias="Inj2Type")
     inj2_virus_strain_rt: Optional[str] = Field(
         default=None, alias="Inj2VirusStrain_rt"
     )
@@ -212,7 +313,9 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     long_surgeon_comments: Optional[str] = Field(
         default=None, alias="LongSurgeonComments"
     )
-    ml_2nd_inj: Optional[float] = Field(default=None, alias="ML2ndInj")
+    ml_2nd_inj: Optional[NumberWithNotes] = Field(
+        default=None, alias="ML2ndInj"
+    )
     modified: Optional[datetime] = Field(default=None, alias="Modified")
     nanoject_number_inj10: Optional[str] = Field(
         default=None, alias="NanojectNumberInj10"
@@ -261,6 +364,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     server_redirected_embed_url: Optional[str] = Field(
         default=None, alias="ServerRedirectedEmbedUrl"
     )
+    sex: Optional[SexType] = Field(default=None, alias="Sex")
     start_of_week: Optional[datetime] = Field(
         default=None, alias="Start_x0020_Of_x0020_Week"
     )
@@ -295,16 +399,16 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     touch_up_comp: Optional[str] = Field(
         default=None, alias="Touch_x0020_Up_x0020__x0020_Comp"
     )
-    virus_ap: Optional[Tuple[float, Optional[str]]] = Field(
+    virus_ap: Optional[NumberWithNotes] = Field(
         default=None, alias="Virus_x0020_A_x002f_P"
     )
-    virus_dv: Optional[Tuple[float, Optional[str]]] = Field(
+    virus_dv: Optional[NumberWithNotes] = Field(
         default=None, alias="Virus_x0020_D_x002f_V"
     )
-    virus_hemisphere: Optional[str] = Field(
+    virus_hemisphere: Optional[HemisphereType] = Field(
         default=None, alias="Virus_x0020_Hemisphere"
     )
-    virus_ml: Optional[Tuple[float, Optional[str]]] = Field(
+    virus_ml: Optional[NumberWithNotes] = Field(
         default=None, alias="Virus_x0020_M_x002f_L"
     )
     weight_after_surgery: Optional[float] = Field(
@@ -340,7 +444,6 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     @validator(
         "age_at_injection",
         "breg_2_lamb",
-        "dv_2nd_inj",
         "first_injection_iso_duration",
         "first_injection_weight_after",
         "first_injection_weight_before",
@@ -351,7 +454,6 @@ class NSBList2019(BaseModel, extra=Extra.allow):
         "hp_ml",
         "inj1_vol",
         "inj2_vol",
-        "ml_2nd_inj",
         "round1_inj_iso_level",
         "round2_inj_iso_level",
         "second_injection_iso_duration",
@@ -401,13 +503,9 @@ class NSBList2019(BaseModel, extra=Extra.allow):
         "fiber_implant2_dv",
         "first_round_ionto_issue",
         "guid",
-        "hp_durotomy",
         "hp_requestor_comments_plaintext",
         "hp_surgeon_comments",
         "hp_inj",
-        "headpost_type",
-        "hemisphere_2nd_inj",
-        "hp_loc",
         "hp_perf",
         "hp_prev_inject",
         "hp_work_station",
@@ -415,12 +513,10 @@ class NSBList2019(BaseModel, extra=Extra.allow):
         "inj1_alternating_time",
         "inj1_round",
         "inj1_storage_location",
-        "inj1_type",
         "inj1_virus_strain_rt",
         "inj2_alternating_time",
         "inj2_round",
         "inj2_storage_location",
-        "inj2_type",
         "inj2_virus_strain_rt",
         "ionto_number_hpinj",
         "ionto_number_inj1",
@@ -451,7 +547,6 @@ class NSBList2019(BaseModel, extra=Extra.allow):
         "surgery_status",
         "touch_up_status",
         "touch_up_surgeon_string_id",
-        "virus_hemisphere",
         "workstation_1st_injection",
         "workstation_2nd_injection",
         pre=True,
@@ -472,7 +567,9 @@ class NSBList2019(BaseModel, extra=Extra.allow):
 
     @validator(
         "ap_2nd_inj",
+        "dv_2nd_inj",
         "implant_id_coverslip_type",
+        "ml_2nd_inj",
         "virus_ap",
         "virus_dv",
         "virus_ml",
@@ -480,17 +577,17 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     )
     def parse_numeric_with_notes(
         cls, v: Union[str, None]
-    ) -> Optional[Tuple[float, Optional[str]]]:
+    ) -> Optional[NumberWithNotes]:
         """Match like '0.25' or '-4.72, rostral to lambda' or
         '5mm stacked coverslip' or '30 degrees'"""
         pattern1 = r"^([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))$"
         pattern2 = r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))([,\w].*)"
         if type(v) is str and re.match(pattern1, v):
-            return re.match(pattern1, v).group(1), None
+            return NumberWithNotes(number=re.match(pattern1, v).group(1))
         elif type(v) is str and re.match(pattern2, v):
-            return (
-                re.match(pattern2, v).group(1),
-                re.match(pattern2, v).group(2),
+            return NumberWithNotes(
+                number=re.match(pattern2, v).group(1),
+                notes=re.match(pattern2, v).group(2),
             )
         else:
             return None
@@ -498,11 +595,10 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     @validator("craniotomy_type", pre=True)
     def parse_string_with_numeric(
         cls, v: Optional[str]
-    ) -> Optional[Tuple[str, float]]:
+    ) -> Optional[CraniotomyType]:
         """Match like 'Visual Cortex 5mm'"""
-        pattern = r"(.*)\s+(\d+)mm$"
-        if type(v) is str and re.match(pattern, v):
-            return re.match(pattern, v).group(1), re.match(pattern, v).group(2)
+        if type(v) is str and v in [e.value for e in CraniotomyType]:
+            return CraniotomyType(v)
         else:
             return None
 
@@ -541,6 +637,36 @@ class NSBList2019(BaseModel, extra=Extra.allow):
         else:
             return None
 
+    @validator("headpost_type", pre=True)
+    def parse_headpost_type(cls, v: Optional[str]) -> Optional[HeadPostType]:
+        if type(v) is str and v in [e.value for e in HeadPostType]:
+            return HeadPostType(v)
+        else:
+            return None
+
+    @validator("sex", pre=True)
+    def parse_sex_type(cls, v: Optional[str]) -> Optional[SexType]:
+        if type(v) is str and v in [e.value for e in SexType]:
+            return SexType(v)
+        else:
+            return None
+
+    @validator("hemisphere_2nd_inj", "hp_loc", "virus_hemisphere", pre=True)
+    def parse_hemisphere_type(
+        cls, v: Optional[str]
+    ) -> Optional[HemisphereType]:
+        if type(v) is str and v in [e.value for e in HemisphereType]:
+            return HemisphereType(v)
+        else:
+            return None
+
+    @validator("inj1_type", "inj2_type", pre=True)
+    def parse_injection_type(cls, v: Optional[str]) -> Optional[InjectionType]:
+        if type(v) is str and v in [e.value for e in InjectionType]:
+            return InjectionType(v)
+        else:
+            return None
+
     @validator("inj1_length_of_time", "inj2_length_of_time", pre=True)
     def parse_time_length_str_float(
         cls, v: Union[str, int, float, None]
@@ -570,9 +696,58 @@ class NSBList2019(BaseModel, extra=Extra.allow):
         else:
             return None
 
-    def has_hp_procedure(self):
-        return "HP" in self.procedure
+    @validator("hp_durotomy", pre=True)
+    def parse_str_to_bool(cls, v: Optional[str]) -> Optional[bool]:
+        if v is None:
+            return None
+        elif v in (
+            [
+                "Yes",
+                "yes",
+                "YES",
+                "y",
+                "Y",
+                "1",
+                "T",
+                "t",
+                "true",
+                "True",
+                "TRUE",
+            ]
+        ):
+            return True
+        elif v in (
+            [
+                "No",
+                "no",
+                "NO",
+                "n",
+                "N",
+                "0",
+                "F",
+                "f",
+                "false",
+                "False",
+                "FALSE",
+            ]
+        ):
+            return False
+        else:
+            return None
 
-    def has_inj_procedure(self):
-        return "INJ" in self.procedure or "Injection" in self.procedure
+    def has_hp_procedure(self) -> bool:
+        return self.procedure is not None and "HP" in self.procedure
 
+    def has_inj_procedure(self) -> bool:
+        return self.procedure is not None and (
+            "INJ" in self.procedure or "Injection" in self.procedure
+        )
+
+    def has_2nd_inj_procedure(self) -> bool:
+        return self.has_inj_procedure() and self.inj2_round is not None
+
+    def has_cran_procedure(self) -> bool:
+        return self.procedure is not None and "HP+C" in self.procedure
+
+    def has_lambda_note(self) -> bool:
+        return self.virus_ap is not None and "lambda" in self.virus_ap.notes
