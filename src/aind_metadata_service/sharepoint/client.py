@@ -1,8 +1,6 @@
 """Module to create client to connect to sharepoint database"""
 
-from aind_data_schema.procedures import (
-    Procedures,
-)
+from aind_data_schema.procedures import Procedures
 from fastapi.responses import JSONResponse
 from office365.runtime.auth.client_credential import ClientCredential
 from office365.sharepoint.client_context import ClientContext
@@ -15,7 +13,11 @@ class SharePointClient:
     """This class contains the api to connect to SharePoint db."""
 
     def __init__(
-        self, nsb_site_url: str, client_id: str, client_secret: str, nsb_2019_list_title: str
+        self,
+        nsb_site_url: str,
+        client_id: str,
+        client_secret: str,
+        nsb_2019_list_title: str,
     ) -> None:
         """
         Initialize a client
@@ -32,9 +34,9 @@ class SharePointClient:
         self.client_id = client_id
         self.client_secret = client_secret
         self.credentials = ClientCredential(self.client_id, self.client_secret)
-        self.nsb_client_context = (
-            ClientContext(self.nsb_site_url).with_credentials(self.credentials)
-        )
+        self.nsb_client_context = ClientContext(
+            self.nsb_site_url
+        ).with_credentials(self.credentials)
         self.nsb_2019_list_title = nsb_2019_list_title
 
     def get_procedure_info(
@@ -57,7 +59,11 @@ class SharePointClient:
         # TODO: Add try to handle internal server error response.
         subject_procedures = []
         nsb_ctx = self.nsb_client_context
-        nsb2019_list_client = ListClient(subject_id=subject_id, client_context=nsb_ctx, list_title=self.nsb_2019_list_title)
+        nsb2019_list_client = ListClient(
+            subject_id=subject_id,
+            client_context=nsb_ctx,
+            list_title=self.nsb_2019_list_title,
+        )
         procedures2019 = nsb2019_list_client.get_list_of_procedures()
         subject_procedures.extend(procedures2019)
         response = self._handle_response_from_sharepoint(

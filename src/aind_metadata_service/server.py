@@ -25,7 +25,8 @@ nsb_sharepoint_list_names = os.getenv(
     "NSB_SHAREPOINT_LIST_NAMES",
     default=(
         """'{"version_2019": "SWR 2019-2022", 
-        "version_2023":"SWR 2023-Present"}'""")
+        "version_2023":"SWR 2023-Present"}'"""
+    ),
 )
 nsb_sharepoint_user = os.getenv("NSB_SHAREPOINT_USER")
 nsb_sharepoint_password = os.getenv("NSB_SHAREPOINT_PASSWORD")

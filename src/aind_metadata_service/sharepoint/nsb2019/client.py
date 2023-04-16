@@ -1,26 +1,30 @@
-from aind_metadata_service.sharepoint.nsb2019.models import (
-    NSBList2019,
-    HeadPostInfo,
-    HemisphereType,
-    NumberWithNotes,
-    InjectionType,
-    CraniotomyType as NSBCraniotomyType,
-)
+from typing import List, Optional
+
 from aind_data_schema.procedures import (
-    Headframe,
     Anaesthetic,
-    Craniotomy,
-    Side,
-    CraniotomyType,
+    BrainInjection,
     CoordinateReferenceLocation,
+    Craniotomy,
+    CraniotomyType,
+    Headframe,
+    InjectionMaterial,
     IontophoresisInjection,
     NanojectInjection,
-    BrainInjection,
+    Side,
     SubjectProcedure,
-    InjectionMaterial,
 )
 from office365.sharepoint.client_context import ClientContext
-from typing import Optional, List
+
+from aind_metadata_service.sharepoint.nsb2019.models import (
+    CraniotomyType as NSBCraniotomyType,
+)
+from aind_metadata_service.sharepoint.nsb2019.models import (
+    HeadPostInfo,
+    HemisphereType,
+    InjectionType,
+    NSBList2019,
+    NumberWithNotes,
+)
 
 
 class ListClient:

@@ -1,9 +1,10 @@
-from typing import Optional, Union
-from pydantic import BaseModel, Extra, Field, validator
-from datetime import datetime
 import re
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
+from typing import Optional, Union
+
+from pydantic import BaseModel, Extra, Field, validator
 
 
 class HeadPostType(Enum):
@@ -102,6 +103,7 @@ class NumberWithNotes:
     notes: Optional[str] = None
 
 
+# noinspection PyMethodParameters
 class NSBList2019(BaseModel, extra=Extra.allow):
     _view_title = "New Request"
 
@@ -221,7 +223,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     headpost_type: Optional[HeadPostType] = Field(
         default=None, alias="HeadpostType"
     )
-    hemisphere_2nd_inj: Optional[str] = Field(
+    hemisphere_2nd_inj: Optional[HemisphereType] = Field(
         default=None, alias="Hemisphere2ndInj"
     )
     hp_loc: Optional[HemisphereType] = Field(default=None, alias="HpLoc")
@@ -677,7 +679,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
         )
         pattern2 = (
             r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))\s*"
-            r"(?:min|mins|minute|minutes){1}\s*(\d+)"
+            r"(?:min|mins|minute|minutes){1}\s*(\d+)\s*"
             r"(?:sec|secs|second|seconds)(?:/depth|/location)*$"
         )
         if type(v) is str and re.match(pattern1, v):
@@ -750,4 +752,6 @@ class NSBList2019(BaseModel, extra=Extra.allow):
         return self.procedure is not None and "HP+C" in self.procedure
 
     def has_lambda_note(self) -> bool:
-        return self.virus_ap is not None and "lambda" in self.virus_ap.notes
+        return (
+            self.virus_ap.notes is not None and "lambda" in self.virus_ap.notes
+        )
