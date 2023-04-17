@@ -48,12 +48,14 @@ class ListClient:
         list_items = list_view.get_items().filter(filter_string)
         self.client_context.load(list_items)
         self.client_context.execute_query()
+        list_of_procedures = []
         for list_item in list_items:
             parsed_nsb_model = NSBList2019.parse_obj(list_item.to_json())
-            self._map_nsb_model(parsed_nsb_model)
-        return list_items
+            procedures = self._map_nsb_model(parsed_nsb_model)
+            list_of_procedures.extend(procedures)
+        return list_of_procedures
 
-    def _map_nsb_model(self, nsb_model: NSBList2019):
+    def _map_nsb_model(self, nsb_model: NSBList2019) -> List[SubjectProcedure]:
         procedures = []
         start_date = nsb_model.date_of_surgery
         end_date = start_date
@@ -272,7 +274,7 @@ class ListClient:
                 "animal_weight_prior": animal_weight_prior,
                 "animal_weight_post": animal_weight_post,
             }
-            subject_procedure = SubjectProcedure.construct(basic_kwargs)
+            subject_procedure = SubjectProcedure.construct(**basic_kwargs)
             procedures.append(subject_procedure)
 
         return procedures
@@ -319,7 +321,7 @@ class ListClient:
     def _map_ap_info_to_coord_reference(
         nsb_virus_ap: Optional[NumberWithNotes],
     ) -> Optional[CoordinateReferenceLocation]:
-        if nsb_virus_ap is None:
+        if nsb_virus_ap.notes is None:
             return None
         elif "lambda" in nsb_virus_ap.notes:
             return CoordinateReferenceLocation.LAMBDA

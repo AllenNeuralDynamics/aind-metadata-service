@@ -3,8 +3,7 @@ import logging
 import os
 from pathlib import Path
 from typing import List
-from unittest import TestCase
-from unittest import main as unittest_main
+from unittest import TestCase, main as unittest_main
 
 from aind_metadata_service.sharepoint.nsb2019.models import (
     NSBList2019,
