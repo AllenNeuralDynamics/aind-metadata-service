@@ -86,7 +86,9 @@ class TestNSB2019Parsers(TestCase):
         mapped_procedure1 = mapper._map_nsb_model(nsb_model1)
         mapped_procedure1.sort(key=lambda x: str(x))
         cran_proc1 = mapped_procedure1[0]
-        self.assertEqual(CraniotomyType.WHC, getattr(cran_proc1, "craniotomy_type"))
+        self.assertEqual(
+            CraniotomyType.WHC, getattr(cran_proc1, "craniotomy_type")
+        )
 
         # Check OTHER type
         raw_data["CraniotomyType"] = "Other"
@@ -94,8 +96,9 @@ class TestNSB2019Parsers(TestCase):
         mapped_procedure2 = mapper._map_nsb_model(nsb_model2)
         mapped_procedure2.sort(key=lambda x: str(x))
         cran_proc2 = mapped_procedure2[0]
-        self.assertEqual(CraniotomyType.OTHER,
-                         getattr(cran_proc2, "craniotomy_type"))
+        self.assertEqual(
+            CraniotomyType.OTHER, getattr(cran_proc2, "craniotomy_type")
+        )
 
 
 if __name__ == "__main__":

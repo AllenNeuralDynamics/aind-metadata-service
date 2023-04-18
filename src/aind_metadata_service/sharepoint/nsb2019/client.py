@@ -20,7 +20,7 @@ from aind_metadata_service.sharepoint.nsb2019.models import (
 )
 from aind_metadata_service.sharepoint.nsb2019.models import (
     HeadPostInfo,
-    HemisphereType,
+    Hemisphere,
     InjectionType,
     NSBList2019,
     NumberWithNotes,
@@ -288,7 +288,7 @@ class ListClient:
 
     @staticmethod
     def _map_hemisphere(
-        nsb_hemisphere: Optional[HemisphereType],
+        nsb_hemisphere: Optional[Hemisphere],
     ) -> Optional[Side]:
         if nsb_hemisphere is None:
             return None

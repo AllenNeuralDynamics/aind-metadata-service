@@ -23,7 +23,7 @@ from aind_metadata_service.sharepoint.nsb2019.models import (
 )
 from aind_metadata_service.sharepoint.nsb2019.models import (
     HeadPostInfo,
-    HemisphereType,
+    Hemisphere,
     InjectionType,
     NSBList2019,
     NumberWithNotes,
@@ -324,11 +324,11 @@ class NSB2019Mapping:
 
     @staticmethod
     def _map_hemisphere(
-        nsb_hemisphere: Optional[HemisphereType],
+        nsb_hemisphere: Optional[Hemisphere],
     ) -> Optional[Side]:
-        if nsb_hemisphere == HemisphereType.LEFT:
+        if nsb_hemisphere == Hemisphere.LEFT:
             return Side.LEFT
-        elif nsb_hemisphere == HemisphereType.RIGHT:
+        elif nsb_hemisphere == Hemisphere.RIGHT:
             return Side.RIGHT
         else:
             return None

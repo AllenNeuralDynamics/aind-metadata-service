@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional, Union
 
-from pydantic import BaseModel, Extra, Field, validator
+from pydantic import BaseModel, Extra, Field, validator, SecretStr
 
 
 class HeadPostType(Enum):
@@ -35,14 +35,14 @@ class InjectionType(Enum):
     IONTOPHORESIS = "Iontophoresis"
 
 
-class SexType(Enum):
+class Sex(Enum):
     """Enum class for HeadPost Types"""
 
     MALE = "Male"
     FEMALE = "Female"
 
 
-class HemisphereType(Enum):
+class Hemisphere(Enum):
     """Enum class for HeadPost Types"""
 
     RIGHT = "Right"
@@ -99,6 +99,7 @@ class HeadPostInfo:
 
 @dataclass
 class NumberWithNotes:
+    raw_input: Optional[str] = None
     number: Optional[float] = None
     notes: Optional[str] = None
 
@@ -223,10 +224,10 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     headpost_type: Optional[HeadPostType] = Field(
         default=None, alias="HeadpostType"
     )
-    hemisphere_2nd_inj: Optional[HemisphereType] = Field(
+    hemisphere_2nd_inj: Optional[Hemisphere] = Field(
         default=None, alias="Hemisphere2ndInj"
     )
-    hp_loc: Optional[HemisphereType] = Field(default=None, alias="HpLoc")
+    hp_loc: Optional[Hemisphere] = Field(default=None, alias="HpLoc")
     hp_perf: Optional[str] = Field(default=None, alias="HpPerf")
     hp_prev_inject: Optional[str] = Field(default=None, alias="HpPrevInject")
     hp_work_station: Optional[str] = Field(default=None, alias="HpWorkStation")
@@ -296,7 +297,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     labtracks_id: Optional[str] = Field(
         default=None, alias="LabTracks_x0020_ID"
     )
-    labtracks_requestor: Optional[str] = Field(
+    labtracks_requestor: Optional[SecretStr] = Field(
         default=None, alias="LabTracks_x0020_Requestor"
     )
     light_cycle: Optional[str] = Field(default=None, alias="Light_x0020_Cycle")
@@ -331,7 +332,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     odata_hp_requestor: Optional[str] = Field(
         default=None, alias="OData__x0031_HP_x0020_Requestor_x0020_"
     )
-    piid: Optional[int] = Field(default=None, alias="PIId")
+    pi_id: Optional[int] = Field(default=None, alias="PIId")
     pi_string_id: Optional[str] = Field(default=None, alias="PIStringId")
     pedigree_name: Optional[str] = Field(default=None, alias="PedigreeName")
     procedure: Optional[str] = Field(default=None, alias="Procedure")
@@ -366,7 +367,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     server_redirected_embed_url: Optional[str] = Field(
         default=None, alias="ServerRedirectedEmbedUrl"
     )
-    sex: Optional[SexType] = Field(default=None, alias="Sex")
+    sex: Optional[Sex] = Field(default=None, alias="Sex")
     start_of_week: Optional[datetime] = Field(
         default=None, alias="Start_x0020_Of_x0020_Week"
     )
@@ -407,7 +408,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     virus_dv: Optional[NumberWithNotes] = Field(
         default=None, alias="Virus_x0020_D_x002f_V"
     )
-    virus_hemisphere: Optional[HemisphereType] = Field(
+    virus_hemisphere: Optional[Hemisphere] = Field(
         default=None, alias="Virus_x0020_Hemisphere"
     )
     virus_ml: Optional[NumberWithNotes] = Field(
@@ -577,25 +578,26 @@ class NSBList2019(BaseModel, extra=Extra.allow):
         "virus_ml",
         pre=True,
     )
-    def parse_numeric_with_notes(
-        cls, v: Union[str, None]
-    ) -> NumberWithNotes:
+    def parse_numeric_with_notes(cls, v: Union[str, None]) -> NumberWithNotes:
         """Match like '0.25' or '-4.72, rostral to lambda' or
         '5mm stacked coverslip' or '30 degrees'"""
         pattern1 = r"^([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))$"
         pattern2 = r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))([,\w].*)"
         if type(v) is str and re.match(pattern1, v):
-            return NumberWithNotes(number=re.match(pattern1, v).group(1))
+            return NumberWithNotes(
+                raw_input=v, number=re.match(pattern1, v).group(1)
+            )
         elif type(v) is str and re.match(pattern2, v):
             return NumberWithNotes(
+                raw_input=v,
                 number=re.match(pattern2, v).group(1),
                 notes=re.match(pattern2, v).group(2),
             )
         else:
-            return NumberWithNotes()
+            return NumberWithNotes(raw_input=v)
 
     @validator("craniotomy_type", pre=True)
-    def parse_string_with_numeric(
+    def parse_craniotomy_type(
         cls, v: Optional[str]
     ) -> Optional[CraniotomyType]:
         """Match like 'Visual Cortex 5mm'"""
@@ -647,18 +649,18 @@ class NSBList2019(BaseModel, extra=Extra.allow):
             return None
 
     @validator("sex", pre=True)
-    def parse_sex_type(cls, v: Optional[str]) -> Optional[SexType]:
-        if type(v) is str and v in [e.value for e in SexType]:
-            return SexType(v)
+    def parse_sex_type(cls, v: Optional[str]) -> Optional[Sex]:
+        if type(v) is str and v in [e.value for e in Sex]:
+            return Sex(v)
         else:
             return None
 
     @validator("hemisphere_2nd_inj", "hp_loc", "virus_hemisphere", pre=True)
     def parse_hemisphere_type(
         cls, v: Optional[str]
-    ) -> Optional[HemisphereType]:
-        if type(v) is str and v in [e.value for e in HemisphereType]:
-            return HemisphereType(v)
+    ) -> Optional[Hemisphere]:
+        if type(v) is str and v in [e.value for e in Hemisphere]:
+            return Hemisphere(v)
         else:
             return None
 

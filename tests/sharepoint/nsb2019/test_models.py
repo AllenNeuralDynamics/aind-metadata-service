@@ -8,7 +8,7 @@ from unittest import main as unittest_main
 
 from aind_metadata_service.sharepoint.nsb2019.models import (
     NSBList2019,
-    SexType,
+    Sex,
 )
 
 if os.getenv("LOG_LEVEL"):  # pragma: no cover
@@ -64,7 +64,7 @@ class TestNSB2019Models(TestCase):
         self.assertIsNone(nsb_model.hp_durotomy)
         self.assertEqual(5.5, nsb_model.inj1_length_of_time)
         self.assertEqual(5, nsb_model.inj2_length_of_time)
-        self.assertEqual(SexType.FEMALE, nsb_model.sex)
+        self.assertEqual(Sex.FEMALE, nsb_model.sex)
 
     def test_boolean_properties(self):
         list_item = self.list_items[0]
