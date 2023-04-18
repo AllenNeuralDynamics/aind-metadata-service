@@ -177,11 +177,11 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     )
     eye_issue: Optional[str] = Field(default=None, alias="Eye_x0020_Issue")
     fiber_implant1: Optional[str] = Field(default=None, alias="FiberImplant1")
-    fiber_implant1_dv: Optional[str] = Field(
+    fiber_implant1_dv: Optional[float] = Field(
         default=None, alias="FiberImplant1DV"
     )
     fiber_implant2: Optional[str] = Field(default=None, alias="FiberImplant2")
-    fiber_implant2_dv: Optional[str] = Field(
+    fiber_implant2_dv: Optional[float] = Field(
         default=None, alias="FiberImplant2DV"
     )
     file_system_object_type: Optional[int] = Field(
@@ -446,6 +446,8 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     @validator(
         "age_at_injection",
         "breg_2_lamb",
+        "fiber_implant1_dv",
+        "fiber_implant2_dv",
         "first_injection_iso_duration",
         "first_injection_weight_after",
         "first_injection_weight_before",
@@ -500,9 +502,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
         "eye_affected",
         "eye_issue",
         "fiber_implant1",
-        "fiber_implant1_dv",
         "fiber_implant2",
-        "fiber_implant2_dv",
         "first_round_ionto_issue",
         "guid",
         "hp_requestor_comments_plaintext",
@@ -579,7 +579,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     )
     def parse_numeric_with_notes(
         cls, v: Union[str, None]
-    ) -> Optional[NumberWithNotes]:
+    ) -> NumberWithNotes:
         """Match like '0.25' or '-4.72, rostral to lambda' or
         '5mm stacked coverslip' or '30 degrees'"""
         pattern1 = r"^([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))$"
@@ -592,7 +592,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
                 notes=re.match(pattern2, v).group(2),
             )
         else:
-            return None
+            return NumberWithNotes()
 
     @validator("craniotomy_type", pre=True)
     def parse_string_with_numeric(
@@ -750,6 +750,9 @@ class NSBList2019(BaseModel, extra=Extra.allow):
 
     def has_cran_procedure(self) -> bool:
         return self.procedure is not None and "HP+C" in self.procedure
+
+    def has_fiber_implant_procedure(self) -> bool:
+        return self.procedure is not None and "Fiber Implant" in self.procedure
 
     def has_lambda_note(self) -> bool:
         return (

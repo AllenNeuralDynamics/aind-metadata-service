@@ -3,7 +3,8 @@ import logging
 import os
 from pathlib import Path
 from typing import List
-from unittest import TestCase, main as unittest_main
+from unittest import TestCase
+from unittest import main as unittest_main
 
 from aind_metadata_service.sharepoint.nsb2019.models import (
     NSBList2019,
@@ -14,7 +15,7 @@ if os.getenv("LOG_LEVEL"):  # pragma: no cover
     logging.basicConfig(level=os.getenv("LOG_LEVEL"))
 
 TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / ".." / ".."
-SHAREPOINT_DIR = TEST_DIR / "resources" / "sharepoint" / "nsb2019"
+SHAREPOINT_DIR = TEST_DIR / "resources" / "sharepoint" / "nsb2019" / "raw"
 LIST_ITEM_FILE_NAMES = os.listdir(SHAREPOINT_DIR)
 LIST_ITEM_FILE_PATHS = [SHAREPOINT_DIR / str(f) for f in LIST_ITEM_FILE_NAMES]
 
@@ -52,6 +53,7 @@ class TestNSB2019Models(TestCase):
         list_item["Inj1Type"] = "Select..."
         list_item["HPDurotomy"] = None
         list_item["Inj1LenghtofTime"] = "5 min 30 sec"
+        list_item["Inj2LenghtofTime"] = 5
         # Check that the sex types are being mapped correctly
         list_item["Sex"] = "Female"
         nsb_model = NSBList2019.parse_obj(list_item)
@@ -61,6 +63,7 @@ class TestNSB2019Models(TestCase):
         self.assertIsNone(nsb_model.inj1_type)
         self.assertIsNone(nsb_model.hp_durotomy)
         self.assertEqual(5.5, nsb_model.inj1_length_of_time)
+        self.assertEqual(5, nsb_model.inj2_length_of_time)
         self.assertEqual(SexType.FEMALE, nsb_model.sex)
 
     def test_boolean_properties(self):
@@ -70,6 +73,7 @@ class TestNSB2019Models(TestCase):
         self.assertTrue(nsb_model.has_hp_procedure())
         self.assertTrue(nsb_model.has_inj_procedure())
         self.assertTrue(nsb_model.has_2nd_inj_procedure())
+        self.assertTrue(nsb_model.has_fiber_implant_procedure())
         self.assertFalse(nsb_model.has_lambda_note())
 
 
