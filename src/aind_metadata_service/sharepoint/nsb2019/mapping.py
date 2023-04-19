@@ -31,7 +31,7 @@ from aind_metadata_service.sharepoint.nsb2019.models import (
 
 
 class NSB2019Mapping:
-    def _map_nsb_model(self, nsb_model: NSBList2019) -> List[SubjectProcedure]:
+    def map_nsb_model(self, nsb_model: NSBList2019) -> List[SubjectProcedure]:
         procedures = []
         start_date = self._map_datetime_to_date(nsb_model.date_of_surgery)
         end_date = start_date

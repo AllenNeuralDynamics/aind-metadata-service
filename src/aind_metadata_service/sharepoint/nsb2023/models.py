@@ -1,11 +1,17 @@
 import re
-from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
-from typing import Optional, Union
-from aind_metadata_service.sharepoint.nsb2019.models import NumberWithNotes, Hemisphere, InjectionType, Sex
+from typing import Optional, Union, List
 
-from pydantic import BaseModel, Extra, Field, validator, SecretStr
+from pydantic import BaseModel, Extra, Field, SecretStr, validator
+
+from aind_metadata_service.sharepoint.nsb2019.models import (
+    Hemisphere,
+    InjectionType,
+    NumberWithNotes,
+    Sex,
+    HeadPostInfo,
+)
 
 
 class CraniotomyType(Enum):
@@ -17,26 +23,76 @@ class CraniotomyType(Enum):
 
 
 class HeadPost(Enum):
-    AI_HEADBAR = "AI Straight bar",
-    OTHER = "Other (add details in requestor comments)",
-    WHC_NP = "WHC NP",
+    AI_HEADBAR = "AI Straight bar"
+    OTHER = "Other (add details in requestor comments)"
+    WHC_NP = "WHC NP"
     VISUAL_CTX = "Visual Ctx"
+    FRONTAL_CTX = "Frontal Ctx"
+    MOTOR_CTX = "Motor Ctx"
 
 
 class HeadPostType(Enum):
-    NEUROPIXEL = "Neuropixel",
-    MESOSCOPE = "Mesoscope",
-    NO_WELL = "No Well",
-    OTHER = "Other (See requestor comments)",
-    CAM = "Scientifica (CAM)",
+    NEUROPIXEL = "Neuropixel"
+    MESOSCOPE = "Mesoscope"
+    NO_WELL = "No Well"
+    OTHER = "Other (See requestor comments)"
+    CAM = "Scientifica (CAM)"
     WHC_NP = "WHC NP"
 
 
-class NSBList2023(BaseModel, extra=Extra.allow):
+class BurrHoleProcedure(Enum):
+    INJECTION = "Injection"
+    FIBER_IMPLANT = "Fiber Implant"
 
+
+class During(Enum):
+    """Enum class for Initial/FollowUp classifiers"""
+
+    INITIAL_SURGERY = "Initial Surgery"
+    FOLLOW_UP_SURGERY = "Follow up Surgery"
+
+
+class HeadPostInfo2023(HeadPostInfo):
+    @classmethod
+    def from_hp_and_hp_type(
+        cls, hp: Optional[HeadPost], hp_type: Optional[HeadPostType]
+    ):
+        headframe_type = hp
+        well_type = hp_type
+        if hp == HeadPost.VISUAL_CTX:
+            headframe_part_number = "0160-100-10"
+        elif hp == HeadPost.WHC_NP:
+            headframe_part_number = "0160-100-42"
+        elif hp == HeadPost.FRONTAL_CTX:
+            headframe_part_number = "0160-100-46"
+        elif hp == HeadPost.MOTOR_CTX:
+            headframe_part_number = "0160-100-51"
+        else:
+            headframe_part_number = None
+        if hp_type == HeadPostType.CAM:
+            well_part_number = "Rev A"
+        elif hp_type == HeadPostType.MESOSCOPE:
+            well_part_number = "0160-200-20"
+        elif hp_type == HeadPostType.NEUROPIXEL:
+            well_part_number = "0160-200-36"
+        elif hp_type == HeadPostType.WHC_NP:
+            well_part_number = "0160-055-08"
+        else:
+            well_part_number = None
+        return cls(
+            headframe_type=headframe_type,
+            headframe_part_number=headframe_part_number,
+            well_type=well_type,
+            well_part_number=well_part_number,
+        )
+
+
+class NSBList2023(BaseModel, extra=Extra.allow):
     _view_title = "New Request"
 
-    ap_2nd_inj: Optional[NumberWithNotes] = Field(default=None, alias="AP2ndInj")
+    ap_2nd_inj: Optional[NumberWithNotes] = Field(
+        default=None, alias="AP2ndInj"
+    )
     age_at_injection: Optional[float] = Field(
         default=None, alias="Age_x0020_at_x0020_Injection"
     )
@@ -46,7 +102,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     burr1_injection_devi: Optional[str] = Field(
         default=None, alias="Burr1_x0020_Injection_x0020_Devi"
     )
-    burr1_perform_during: Optional[str] = Field(
+    burr1_perform_during: Optional[During] = Field(
         default=None, alias="Burr1_x0020_Perform_x0020_During"
     )
     burr1_virus_biosafte: Optional[str] = Field(
@@ -55,7 +111,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     burr2_injection_devi: Optional[str] = Field(
         default=None, alias="Burr2_x0020_Injection_x0020_Devi"
     )
-    burr2_perform_during: Optional[str] = Field(
+    burr2_perform_during: Optional[During] = Field(
         default=None, alias="Burr2_x0020_Perform_x0020_During"
     )
     burr2_status: Optional[str] = Field(
@@ -76,7 +132,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     burr3_ml: Optional[float] = Field(
         default=None, alias="Burr3_x0020_M_x002f_L"
     )
-    burr3_perform_during: Optional[str] = Field(
+    burr3_perform_during: Optional[During] = Field(
         default=None, alias="Burr3_x0020_Perform_x0020_During"
     )
     burr3_status: Optional[str] = Field(
@@ -97,7 +153,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     burr4_ml: Optional[float] = Field(
         default=None, alias="Burr4_x0020_M_x002f_L"
     )
-    burr4_perform_during: Optional[str] = Field(
+    burr4_perform_during: Optional[During] = Field(
         default=None, alias="Burr4_x0020_Perform_x0020_During"
     )
     burr4_status: Optional[str] = Field(
@@ -121,16 +177,16 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     burr_hole_1_st: Optional[str] = Field(
         default=None, alias="Burr_x0020_Hole_x0020_1_x0020_st"
     )
-    burr_hole_1: Optional[str] = Field(
+    burr_hole_1: Optional[List[BurrHoleProcedure]] = Field(
         default=None, alias="Burr_x0020_hole_x0020_1"
     )
-    burr_hole_2: Optional[str] = Field(
+    burr_hole_2: Optional[List[BurrHoleProcedure]] = Field(
         default=None, alias="Burr_x0020_hole_x0020_2"
     )
-    burr_hole_3: Optional[str] = Field(
+    burr_hole_3: Optional[List[BurrHoleProcedure]] = Field(
         default=None, alias="Burr_x0020_hole_x0020_3"
     )
-    burr_hole_4: Optional[str] = Field(
+    burr_hole_4: Optional[List[BurrHoleProcedure]] = Field(
         default=None, alias="Burr_x0020_hole_x0020_4"
     )
     com_coplanar: Optional[str] = Field(default=None, alias="ComCoplanar")
@@ -147,11 +203,13 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     craniotomy_type: Optional[CraniotomyType] = Field(
         default=None, alias="CraniotomyType"
     )
-    craniotomy_perform_during: Optional[str] = Field(
+    craniotomy_perform_during: Optional[During] = Field(
         default=None, alias="Craniotomy_x0020_Perform_x0020_D"
     )
     created: Optional[datetime] = Field(default=None, alias="Created")
-    dv_2nd_inj: Optional[NumberWithNotes] = Field(default=None, alias="DV2ndInj")
+    dv_2nd_inj: Optional[NumberWithNotes] = Field(
+        default=None, alias="DV2ndInj"
+    )
     date_1st_injection: Optional[datetime] = Field(
         default=None, alias="Date1stInjection"
     )
@@ -195,7 +253,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     first_inj_recovery: Optional[int] = Field(
         default=None, alias="FirstInjRecovery"
     )
-    first_injection_iso_duration: Optional[float] = Field(
+    first_injection_iso_duration: Optional[timedelta] = Field(
         default=None, alias="FirstInjectionIsoDuration"
     )
     first_injection_weight_after: Optional[float] = Field(
@@ -211,8 +269,10 @@ class NSBList2023(BaseModel, extra=Extra.allow):
         default=None, alias="HPSurgeonComments"
     )
     headpost: Optional[HeadPost] = Field(default=None, alias="Headpost")
-    headpost_type: Optional[HeadPostType] = Field(default=None, alias="HeadpostType")
-    headpost_perform_during: Optional[str] = Field(
+    headpost_type: Optional[HeadPostType] = Field(
+        default=None, alias="HeadpostType"
+    )
+    headpost_perform_during: Optional[During] = Field(
         default=None, alias="Headpost_x0020_Perform_x0020_Dur"
     )
     hemisphere_2nd_inj: Optional[Hemisphere] = Field(
@@ -232,7 +292,9 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     )
     inj1_angle_v2: Optional[float] = Field(default=None, alias="Inj1Angle_v2")
     inj1_current: Optional[float] = Field(default=None, alias="Inj1Current")
-    inj1_ionto_time: Optional[float] = Field(default=None, alias="Inj1IontoTime")
+    inj1_ionto_time: Optional[timedelta] = Field(
+        default=None, alias="Inj1IontoTime"
+    )
     inj1_storage_location: Optional[str] = Field(
         default=None, alias="Inj1StorageLocation"
     )
@@ -245,7 +307,9 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     )
     inj2_angle_v2: Optional[float] = Field(default=None, alias="Inj2Angle_v2")
     inj2_current: Optional[float] = Field(default=None, alias="Inj2Current")
-    inj2_ionto_time: Optional[float] = Field(default=None, alias="Inj2IontoTime")
+    inj2_ionto_time: Optional[timedelta] = Field(
+        default=None, alias="Inj2IontoTime"
+    )
     inj2_storage_location: Optional[str] = Field(
         default=None, alias="Inj2StorageLocation"
     )
@@ -257,7 +321,9 @@ class NSBList2023(BaseModel, extra=Extra.allow):
         default=None, alias="Inj3AlternatingTime"
     )
     inj3_current: Optional[float] = Field(default=None, alias="Inj3Current")
-    inj3_ionto_time: Optional[float] = Field(default=None, alias="Inj3IontoTime")
+    inj3_ionto_time: Optional[timedelta] = Field(
+        default=None, alias="Inj3IontoTime"
+    )
     inj3_storage_location: Optional[str] = Field(
         default=None, alias="Inj3StorageLocation"
     )
@@ -272,7 +338,9 @@ class NSBList2023(BaseModel, extra=Extra.allow):
         default=None, alias="Inj4AlternatingTime"
     )
     inj4_current: Optional[float] = Field(default=None, alias="Inj4Current")
-    inj4_ionto_time: Optional[float] = Field(default=None, alias="Inj4IontoTime")
+    inj4_ionto_time: Optional[timedelta] = Field(
+        default=None, alias="Inj4IontoTime"
+    )
     inj4_storage_location: Optional[str] = Field(
         default=None, alias="Inj4StorageLocation"
     )
@@ -295,7 +363,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     ionto_number_inj2: Optional[str] = Field(
         default=None, alias="IontoNumberInj2"
     )
-    iso_on: Optional[float] = Field(default=None, alias="Iso_x0020_On")
+    iso_on: Optional[timedelta] = Field(default=None, alias="Iso_x0020_On")
     lims_project: Optional[str] = Field(default=None, alias="LIMSProject")
     lims_taskflow: Optional[str] = Field(default=None, alias="LIMSTaskflow")
     lims_required: Optional[str] = Field(
@@ -314,7 +382,9 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     long_requestor_comments: Optional[str] = Field(
         default=None, alias="LongRequestorComments"
     )
-    ml_2nd_inj: Optional[NumberWithNotes] = Field(default=None, alias="ML2ndInj")
+    ml_2nd_inj: Optional[NumberWithNotes] = Field(
+        default=None, alias="ML2ndInj"
+    )
     modified: Optional[datetime] = Field(default=None, alias="Modified")
     nanoject_number_inj10: Optional[str] = Field(
         default=None, alias="NanojectNumberInj10"
@@ -392,35 +462,34 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     ret_setting0: Optional[str] = Field(default=None, alias="retSetting0")
     ret_setting1: Optional[str] = Field(default=None, alias="retSetting1")
 
-
     @validator(
-        'age_at_injection',
-        'breg_2_lamb',
-        'burr3_ap',
-        'burr3_dv',
-        'burr3_ml',
-        'burr4_ap',
-        'burr4_dv',
-        'burr4_ml',
-        'fiber_implant1_dv',
-        'fiber_implant2_dv',
-        'fiber_implant3_d',
-        'fiber_implant4_d',
-        'first_injection_iso_duration',
-        'first_injection_weight_after',
-        'first_injection_weight_before',
-        'hp_iso_level',
-        'hp_recovery',
-        'iso_on',
-        'round1_inj_iso_level',
-        'weight_after_surgery',
-        'weight_before_surgery',
-        'inj1_vol_per_depth',
-        'inj2_vol_per_depth',
+        "age_at_injection",
+        "breg_2_lamb",
+        "burr3_ap",
+        "burr3_dv",
+        "burr3_ml",
+        "burr4_ap",
+        "burr4_dv",
+        "burr4_ml",
+        "fiber_implant1_dv",
+        "fiber_implant2_dv",
+        "fiber_implant3_d",
+        "fiber_implant4_d",
+        "first_injection_iso_duration",
+        "first_injection_weight_after",
+        "first_injection_weight_before",
+        "hp_iso_level",
+        "hp_recovery",
+        "iso_on",
+        "round1_inj_iso_level",
+        "weight_after_surgery",
+        "weight_before_surgery",
+        "inj1_vol_per_depth",
+        "inj2_vol_per_depth",
         pre=True,
     )
     def parse_basic_num_str_to_float(
-            cls, v: Union[str, int, float, None]
+        cls, v: Union[str, int, float, None]
     ) -> Optional[float]:
         pattern = r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))"
         if type(v) is str and re.match(pattern, v):
@@ -431,85 +500,75 @@ class NSBList2023(BaseModel, extra=Extra.allow):
             return None
 
     @validator(
-        'burr1_injection_devi',
-        'burr1_perform_during',
-        'burr1_virus_biosafte',
-        'burr2_injection_devi',
-        'burr2_perform_during',
-        'burr2_status',
-        'burr2_virus_biosafte',
-        'burr3_injection_devi',
-        'burr3_perform_during',
-        'burr3_status',
-        'burr3_virus_biosafet',
-        'burr4_injection_devi',
-        'burr4_perform_during',
-        'burr4_status',
-        'burr4_virus_biosafte',
-        'burr_hole_1_st',
-        'burr_hole_1',
-        'burr_hole_2',
-        'burr_hole_3',
-        'burr_hole_4',
-        'com_coplanar',
-        'com_damage',
-        'com_durotomy',
-        'com_sinusbleed',
-        'com_swelling',
-        'com_window',
-        'compliance_asset_id',
-        'content_type_id',
-        'contusion',
-        'craniotomy_perform_during',
-        'guid',
-        'hp_surgeon_comments',
-        'headpost_perform_during',
-        'hp_work_station',
-        'iacuc_protocol',
-        'inj1_alternating_time',
-        'inj1_storage_location',
-        'inj1_virus_strain_rt',
-        'inj2_alternating_time',
-        'inj2_storage_location',
-        'inj2_virus_strain_rt',
-        'inj3_alternating_time',
-        'inj3_storage_location',
-        'inj3_ret_setting',
-        'inj4_alternating_time',
-        'inj4_storage_location',
-        'inj4_virus_strain_rt',
-        'inj4_ret_setting',
-        'inj_virus_strain_rt',
-        'ionto_number_inj1',
-        'ionto_number_inj2',
-        'lims_project',
-        'lims_taskflow',
-        'lims_required',
-        'labtracks_group',
-        'labtracks_id1',
-        'light_cycle',
-        'long_requestor_comments',
-        'nanoject_number_inj10',
-        'nanoject_number_inj2',
-        'odata_ui_version_string',
-        'odata_of_burr',
-        'pi_string_id',
-        'pedigree_name',
-        'procedure',
-        'procedure_family',
-        'procedure_slots',
-        'procedure_t2',
-        'project_id',
-        'server_redirected_embed_uri',
-        'server_redirected_embed_url',
-        'surgery_status',
-        'test_1st_round_id',
-        'test_1st_round_string_id',
-        'test1_string_id',
-        'title',
-        'work_station_1st_injection',
-        'ret_setting0',
-        'ret_setting1',
+        "burr1_injection_devi",
+        "burr1_virus_biosafte",
+        "burr2_injection_devi",
+        "burr2_status",
+        "burr2_virus_biosafte",
+        "burr3_injection_devi",
+        "burr3_status",
+        "burr3_virus_biosafet",
+        "burr4_injection_devi",
+        "burr4_status",
+        "burr4_virus_biosafte",
+        "burr_hole_1_st",
+        "com_coplanar",
+        "com_damage",
+        "com_durotomy",
+        "com_sinusbleed",
+        "com_swelling",
+        "com_window",
+        "compliance_asset_id",
+        "content_type_id",
+        "contusion",
+        "guid",
+        "hp_surgeon_comments",
+        "hp_work_station",
+        "iacuc_protocol",
+        "inj1_alternating_time",
+        "inj1_storage_location",
+        "inj1_virus_strain_rt",
+        "inj2_alternating_time",
+        "inj2_storage_location",
+        "inj2_virus_strain_rt",
+        "inj3_alternating_time",
+        "inj3_storage_location",
+        "inj3_ret_setting",
+        "inj4_alternating_time",
+        "inj4_storage_location",
+        "inj4_virus_strain_rt",
+        "inj4_ret_setting",
+        "inj_virus_strain_rt",
+        "ionto_number_inj1",
+        "ionto_number_inj2",
+        "lims_project",
+        "lims_taskflow",
+        "lims_required",
+        "labtracks_group",
+        "labtracks_id1",
+        "light_cycle",
+        "long_requestor_comments",
+        "nanoject_number_inj10",
+        "nanoject_number_inj2",
+        "odata_ui_version_string",
+        "odata_of_burr",
+        "pi_string_id",
+        "pedigree_name",
+        "procedure",
+        "procedure_family",
+        "procedure_slots",
+        "procedure_t2",
+        "project_id",
+        "server_redirected_embed_uri",
+        "server_redirected_embed_url",
+        "surgery_status",
+        "test_1st_round_id",
+        "test_1st_round_string_id",
+        "test1_string_id",
+        "title",
+        "work_station_1st_injection",
+        "ret_setting0",
+        "ret_setting1",
         pre=True,
     )
     def filter_select_str(cls, v: Optional[str]) -> Optional[str]:
@@ -527,19 +586,19 @@ class NSBList2023(BaseModel, extra=Extra.allow):
             return v
 
     @validator(
-        'ap_2nd_inj',
-        'dv_2nd_inj',
-        'fiber_implant1_length',
-        'fiber_implant2_length',
-        'fiber_implant3_length',
-        'fiber_implant4_length',
-        'implant_id_coverslip_type',
-        'inj3_vol_per_depth',
-        'inj4_vol_per_depth',
-        'ml_2nd_inj',
-        'virus_ap',
-        'virus_dv',
-        'virus_ml',
+        "ap_2nd_inj",
+        "dv_2nd_inj",
+        "fiber_implant1_length",
+        "fiber_implant2_length",
+        "fiber_implant3_length",
+        "fiber_implant4_length",
+        "implant_id_coverslip_type",
+        "inj3_vol_per_depth",
+        "inj4_vol_per_depth",
+        "ml_2nd_inj",
+        "virus_ap",
+        "virus_dv",
+        "virus_ml",
         pre=True,
     )
     def parse_numeric_with_notes(cls, v: Union[str, None]) -> NumberWithNotes:
@@ -582,10 +641,14 @@ class NSBList2023(BaseModel, extra=Extra.allow):
             return None
 
     @validator(
-        "inj1_current", "inj2_current", "inj3_current", "inj4_current", pre=True
+        "inj1_current",
+        "inj2_current",
+        "inj3_current",
+        "inj4_current",
+        pre=True,
     )
     def parse_current_str_float(
-            cls, v: Union[str, int, float, None]
+        cls, v: Union[str, int, float, None]
     ) -> Optional[float]:
         pattern = (
             r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))(\s*uA\s*)*$"
@@ -597,9 +660,24 @@ class NSBList2023(BaseModel, extra=Extra.allow):
         else:
             return None
 
+    @validator(
+        "burr1_perform_during",
+        "burr2_perform_during",
+        "burr3_perform_during",
+        "burr4_perform_during",
+        "craniotomy_perform_during",
+        "headpost_perform_during",
+        pre=True,
+    )
+    def parse_during_type(cls, v: Optional[str]) -> Optional[During]:
+        if type(v) is str and v in [e.value for e in During]:
+            return During(v)
+        else:
+            return None
+
     @validator("craniotomy_type", pre=True)
     def parse_craniotomy_type(
-            cls, v: Optional[str]
+        cls, v: Optional[str]
     ) -> Optional[CraniotomyType]:
         """Match like 'Visual Cortex 5mm'"""
         if type(v) is str and v in [e.value for e in CraniotomyType]:
@@ -628,35 +706,36 @@ class NSBList2023(BaseModel, extra=Extra.allow):
         else:
             return None
 
-    @validator('burr_3_hemisphere',
-               'burr_4_hemisphere',
-               'hemisphere_2nd_inj',
-               'virus_hemisphere', pre=True)
-    def parse_hemisphere_type(
-            cls, v: Optional[str]
-    ) -> Optional[Hemisphere]:
+    @validator(
+        "burr_3_hemisphere",
+        "burr_4_hemisphere",
+        "hemisphere_2nd_inj",
+        "virus_hemisphere",
+        pre=True,
+    )
+    def parse_hemisphere_type(cls, v: Optional[str]) -> Optional[Hemisphere]:
         if type(v) is str and v in [e.value for e in Hemisphere]:
             return Hemisphere(v)
         else:
             return None
 
-    @validator('inj1_type',
-               'inj2_type',
-               'inj3_type',
-               'inj4_type', pre=True)
+    @validator("inj1_type", "inj2_type", "inj3_type", "inj4_type", pre=True)
     def parse_injection_type(cls, v: Optional[str]) -> Optional[InjectionType]:
         if type(v) is str and v in [e.value for e in InjectionType]:
             return InjectionType(v)
         else:
             return None
 
-    @validator('inj1_ionto_time',
-        'inj2_ionto_time',
-        'inj3_ionto_time',
-        'inj4_ionto_time', pre=True)
-    def parse_time_length_str_float(
+    @validator(
+        "inj1_ionto_time",
+        "inj2_ionto_time",
+        "inj3_ionto_time",
+        "inj4_ionto_time",
+        pre=True,
+    )
+    def parse_time_length(
         cls, v: Union[str, int, float, None]
-    ) -> Optional[float]:
+    ) -> Optional[timedelta]:
         pattern1 = (
             r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))\s*"
             r"(?:min|mins|minute|minutes){0,1}\s*$"
@@ -667,28 +746,77 @@ class NSBList2023(BaseModel, extra=Extra.allow):
             r"(?:sec|secs|second|seconds)(?:/depth|/location)*$"
         )
         if type(v) is str and re.match(pattern1, v):
-            return re.match(pattern1, v).group(1)
+            minutes = float(re.match(pattern1, v).group(1))
+            return timedelta(minutes=minutes)
         elif type(v) is str and re.match(pattern2, v):
-            minutes = re.match(pattern2, v).group(1)
-            seconds = re.match(pattern2, v).group(2)
-            total_time = (
-                float(minutes) + (float(seconds) / 60)
-                if float(minutes) > 0
-                else float(minutes) - (float(seconds) / 60)
-            )
-            return total_time
+            minutes = float(re.match(pattern2, v).group(1))
+            seconds = float(re.match(pattern2, v).group(2))
+            return timedelta(minutes=minutes, seconds=seconds)
         elif type(v) is int or type(v) is float:
-            return v
+            return timedelta(minutes=v)
         else:
             return None
 
-    # def has_hp_procedure(self) -> bool:
-    #     return self.procedure is not None and "HP" in self.procedure
-    #
+    @validator("first_injection_iso_duration", "iso_on", pre=True)
+    def parse_hours_to_timedelta(
+        cls, v: Union[float, str, None]
+    ) -> Optional[timedelta]:
+        if v is None:
+            return None
+        else:
+            return timedelta(hours=float(v))
+
+    @validator(
+        "burr_hole_1", "burr_hole_2", "burr_hole_3", "burr_hole_4", pre=True
+    )
+    def parse_burr_hole(
+        cls, v: Optional[str]
+    ) -> Optional[List[BurrHoleProcedure]]:
+        if v is None:
+            return None
+        else:
+            burr_hole_procedures = []
+            if BurrHoleProcedure.INJECTION.value in v:
+                burr_hole_procedures.append(BurrHoleProcedure.INJECTION)
+            if BurrHoleProcedure.FIBER_IMPLANT.value in v:
+                burr_hole_procedures.append(BurrHoleProcedure.FIBER_IMPLANT)
+            return burr_hole_procedures
+
+    def has_hp_procedure(self) -> bool:
+        if self.procedure is None:
+            return False
+        elif (
+            "Headpost" in self.procedure
+            or "HP Only" in self.procedure
+            or "HP Transcranial" in self.procedure
+        ):
+            return True
+        else:
+            return False
+
+    def has_burr_hole_procedure(
+        self, burr_hole_num: int, burr_hole_procedure: BurrHoleProcedure
+    ) -> bool:
+        burr_hole_procedures = getattr(self, f"burr_hole_{burr_hole_num}")
+        if burr_hole_procedures is None:
+            return False
+        elif burr_hole_procedure in burr_hole_procedures:
+            return True
+        else:
+            return False
+
     # def has_inj_procedure(self, inj_number: Optional[int] = None) -> bool:
     #     return self.procedure is not None and (
     #         "INJ" in self.procedure or "Injection" in self.procedure
     #     )
     #
-    # def has_cran_procedure(self) -> bool:
-    #     return self.procedure is not None and "HP+C" in self.procedure
+    def has_cran_procedure(self) -> bool:
+        if self.procedure is not None and (
+            "Visual Ctx" in self.procedure
+            or "Motor Ctx" in self.procedure
+            or "Frontal Ctx" in self.procedure
+            or "WHC NP" in self.procedure
+        ):
+            return True
+        else:
+            return False

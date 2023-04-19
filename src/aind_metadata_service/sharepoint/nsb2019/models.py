@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional, Union
 
-from pydantic import BaseModel, Extra, Field, validator, SecretStr
+from pydantic import BaseModel, Extra, Field, SecretStr, validator
 
 
 class HeadPostType(Enum):
@@ -656,9 +656,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
             return None
 
     @validator("hemisphere_2nd_inj", "hp_loc", "virus_hemisphere", pre=True)
-    def parse_hemisphere_type(
-        cls, v: Optional[str]
-    ) -> Optional[Hemisphere]:
+    def parse_hemisphere_type(cls, v: Optional[str]) -> Optional[Hemisphere]:
         if type(v) is str and v in [e.value for e in Hemisphere]:
             return Hemisphere(v)
         else:

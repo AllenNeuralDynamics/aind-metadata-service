@@ -1,15 +1,16 @@
 import json
 import logging
 import os
+from copy import deepcopy
 from pathlib import Path
 from typing import List, Tuple
 from unittest import TestCase
 from unittest import main as unittest_main
-from copy import deepcopy
+
+from aind_data_schema.procedures import BrainInjection, CraniotomyType
 
 from aind_metadata_service.sharepoint.nsb2019.mapping import NSB2019Mapping
 from aind_metadata_service.sharepoint.nsb2019.models import NSBList2019
-from aind_data_schema.procedures import BrainInjection, CraniotomyType
 
 if os.getenv("LOG_LEVEL"):  # pragma: no cover
     logging.basicConfig(level=os.getenv("LOG_LEVEL"))
@@ -54,7 +55,7 @@ class TestNSB2019Parsers(TestCase):
             logging.debug(f"Processing file: {raw_file_name}")
             nsb_model = NSBList2019.parse_obj(raw_data)
             mapper = NSB2019Mapping()
-            mapped_procedure = mapper._map_nsb_model(nsb_model)
+            mapped_procedure = mapper.map_nsb_model(nsb_model)
             self.assertTrue(expected_mapped_data, mapped_procedure)
 
     def test_inj_mapping_edge_cases(self):
@@ -69,7 +70,7 @@ class TestNSB2019Parsers(TestCase):
         raw_data["Virus_x0020_A_x002f_P"] = "Select..."
         nsb_model = NSBList2019.parse_obj(raw_data)
         mapper = NSB2019Mapping()
-        mapped_procedure = mapper._map_nsb_model(nsb_model)
+        mapped_procedure = mapper.map_nsb_model(nsb_model)
         self.assertTrue(isinstance(mapped_procedure[0], BrainInjection))
         self.assertTrue(isinstance(mapped_procedure[1], BrainInjection))
 
@@ -83,7 +84,7 @@ class TestNSB2019Parsers(TestCase):
         raw_data["CraniotomyType"] = "WHC NP"
         nsb_model1 = NSBList2019.parse_obj(raw_data)
         mapper = NSB2019Mapping()
-        mapped_procedure1 = mapper._map_nsb_model(nsb_model1)
+        mapped_procedure1 = mapper.map_nsb_model(nsb_model1)
         mapped_procedure1.sort(key=lambda x: str(x))
         cran_proc1 = mapped_procedure1[0]
         self.assertEqual(
@@ -93,7 +94,7 @@ class TestNSB2019Parsers(TestCase):
         # Check OTHER type
         raw_data["CraniotomyType"] = "Other"
         nsb_model2 = NSBList2019.parse_obj(raw_data)
-        mapped_procedure2 = mapper._map_nsb_model(nsb_model2)
+        mapped_procedure2 = mapper.map_nsb_model(nsb_model2)
         mapped_procedure2.sort(key=lambda x: str(x))
         cran_proc2 = mapped_procedure2[0]
         self.assertEqual(
