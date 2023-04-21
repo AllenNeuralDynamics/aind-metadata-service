@@ -77,6 +77,7 @@ class NSB2019Mapping:
             list_of_procedures.extend(procedures)
         return list_of_procedures
 
+    # flake8: noqa: C901
     def map_nsb_model(self, nsb_model: NSBList2019) -> List[SubjectProcedure]:
         """Maps an individual list item model into List[SubjectProcedures]"""
         procedures = []

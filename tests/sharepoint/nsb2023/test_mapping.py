@@ -9,7 +9,7 @@ from typing import List, Tuple
 from unittest import TestCase
 from unittest import main as unittest_main
 
-from aind_data_schema.procedures import BrainInjection, CraniotomyType
+from aind_data_schema.procedures import CraniotomyType
 
 from aind_metadata_service.sharepoint.nsb2023.mapping import NSB2023Mapping
 from aind_metadata_service.sharepoint.nsb2023.models import NSBList2023

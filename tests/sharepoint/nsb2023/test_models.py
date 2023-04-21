@@ -1,4 +1,5 @@
-import datetime
+"""Tests NSB 2023 data models are created correctly"""
+
 import json
 import logging
 import os
@@ -13,7 +14,6 @@ from aind_metadata_service.sharepoint.nsb2023.models import (
     BurrHoleProcedure,
     During,
     HeadPostInfo2023,
-    HeadPostType,
     InjectionType,
     NSBList2023,
 )
@@ -25,15 +25,20 @@ TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / ".." / ".."
 SHAREPOINT_DIR = TEST_DIR / "resources" / "sharepoint" / "nsb2023" / "raw"
 LIST_ITEM_FILE_NAMES = os.listdir(SHAREPOINT_DIR)
 LIST_ITEM_FILE_PATHS = [SHAREPOINT_DIR / str(f) for f in LIST_ITEM_FILE_NAMES]
+LIST_ITEM_FILE_PATHS.sort()
 
 
 class TestNSB2023Models(TestCase):
+    """Tests methods in NSBList2023 class"""
+
     @classmethod
     def setUpClass(cls):
+        """Load json files before running tests."""
         cls.list_items = cls._load_json_files()
 
     @staticmethod
     def _load_json_files() -> List[dict]:
+        """Reads test data into json"""
         list_items = []
         for file_path in LIST_ITEM_FILE_PATHS:
             with open(file_path) as f:
@@ -87,11 +92,12 @@ class TestNSB2023Models(TestCase):
         self.assertEqual(None, nsb_model.craniotomy_type)
 
     def test_booleans(self):
+        """Tests boolean methods"""
         list_item = deepcopy(self.list_items[0])
         nsb_model = NSBList2023.parse_obj(list_item)
         self.assertFalse(nsb_model.has_hp_procedure())
-        self.assertFalse(nsb_model.has_cran_procedure())
-        self.assertTrue(
+        self.assertTrue(nsb_model.has_cran_procedure())
+        self.assertFalse(
             nsb_model.has_burr_hole_procedure(1, BurrHoleProcedure.INJECTION)
         )
         self.assertFalse(
@@ -140,6 +146,7 @@ class TestNSB2023Models(TestCase):
         self.assertFalse(nsb_model.has_cran_procedure())
 
     def test_parse_info(self):
+        """Tests data containers created correctly"""
         list_item = deepcopy(self.list_items[0])
         nsb_model = NSBList2023.parse_obj(list_item)
         burr_hole0_info = nsb_model.burr_hole_info(0)
@@ -167,7 +174,7 @@ class TestNSB2023Models(TestCase):
             During.FOLLOW_UP_SURGERY, inj_type=InjectionType.NANOJECT
         )
         self.assertIsNone(burr_hole0_info.during)
-        self.assertEqual(During.INITIAL_SURGERY, burr_hole1_info.during)
+        self.assertEqual(None, burr_hole1_info.during)
         self.assertIsNone(burr_hole2_info.during)
         self.assertIsNone(burr_hole3_info.during)
         self.assertIsNone(burr_hole4_info.during)
