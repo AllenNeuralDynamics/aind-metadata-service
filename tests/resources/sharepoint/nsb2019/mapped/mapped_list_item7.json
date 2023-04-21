@@ -35,7 +35,7 @@
       },
       "notes": null,
       "procedure_type": "Craniotomy",
-      "craniotomy_type": null,
+      "craniotomy_type": "Other",
       "craniotomy_hemisphere": null,
       "craniotomy_coordinates_ml": 2.8,
       "craniotomy_coordinates_ap": 1.3,

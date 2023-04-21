@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import List, Optional
 
 from aind_data_schema.procedures import (
@@ -375,3 +375,7 @@ class NSB2019Mapping:
             return None
         else:
             return dt.date()
+
+    @staticmethod
+    def _duration_to_minutes(duration: Optional[timedelta]):
+        return None if duration is None else duration.total_seconds() / 60

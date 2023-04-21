@@ -80,7 +80,7 @@
       "injection_coordinate_ap": -3.05,
       "injection_coordinate_depth": 4.3,
       "injection_coordinate_unit": "millimeter",
-      "injection_coordinate_reference": null,
+      "injection_coordinate_reference": "Bregma",
       "bregma_to_lambda_distance": null,
       "bregma_to_lambda_unit": "millimeter",
       "injection_angle": null,

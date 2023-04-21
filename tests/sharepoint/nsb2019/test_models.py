@@ -1,11 +1,11 @@
 import json
 import logging
 import os
+from copy import deepcopy
 from pathlib import Path
 from typing import List
 from unittest import TestCase
 from unittest import main as unittest_main
-from copy import deepcopy
 
 from aind_metadata_service.sharepoint.nsb2019.models import NSBList2019, Sex
 

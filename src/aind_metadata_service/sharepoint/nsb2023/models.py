@@ -1,16 +1,17 @@
 import re
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 
 from pydantic import BaseModel, Extra, Field, SecretStr, validator
 
 from aind_metadata_service.sharepoint.nsb2019.models import (
+    HeadPostInfo,
     Hemisphere,
     InjectionType,
     NumberWithNotes,
     Sex,
-    HeadPostInfo,
 )
 
 
@@ -87,8 +88,37 @@ class HeadPostInfo2023(HeadPostInfo):
         )
 
 
+@dataclass
+class BurrHoleInfo:
+    hemisphere: Optional[Hemisphere] = None
+    coordinate_ml: Optional[float] = None
+    coordinate_ap: Optional[float] = None
+    coordinate_depth: Optional[float] = None
+    angle: Optional[float] = None
+    during: Optional[During] = None
+    inj_type: Optional[InjectionType] = None
+    virus_strain: Optional[str] = None
+    inj_current: Optional[float] = None
+    alternating_current: Optional[str] = None
+    inj_duration: Optional[timedelta] = None
+    inj_volume: Optional[float] = None
+    fiber_implant_depth: Optional[float] = None
+
+
+@dataclass
+class SurgeryDuringInfo:
+    anaesthetic_duration_in_minutes: Optional[int] = None
+    anaesthetic_level: Optional[float] = None
+    start_date: Optional[datetime] = None
+    workstation_id: Optional[str] = None
+    recovery_time: Optional[float] = None
+    weight_prior: Optional[float] = None
+    weight_post: Optional[float] = None
+    instrument_id: Optional[str] = None
+
+
 class NSBList2023(BaseModel, extra=Extra.allow):
-    _view_title = "New Request"
+    # _view_title = "New Request"
 
     ap_2nd_inj: Optional[NumberWithNotes] = Field(
         default=None, alias="AP2ndInj"
@@ -805,11 +835,6 @@ class NSBList2023(BaseModel, extra=Extra.allow):
         else:
             return False
 
-    # def has_inj_procedure(self, inj_number: Optional[int] = None) -> bool:
-    #     return self.procedure is not None and (
-    #         "INJ" in self.procedure or "Injection" in self.procedure
-    #     )
-    #
     def has_cran_procedure(self) -> bool:
         if self.procedure is not None and (
             "Visual Ctx" in self.procedure
@@ -820,3 +845,115 @@ class NSBList2023(BaseModel, extra=Extra.allow):
             return True
         else:
             return False
+
+    def burr_hole_info(self, burr_hole_num: int) -> BurrHoleInfo:
+        if burr_hole_num == 1:
+            return BurrHoleInfo(
+                hemisphere=self.virus_hemisphere,
+                coordinate_ml=self.virus_ml.number,
+                coordinate_ap=self.virus_ap.number,
+                coordinate_depth=self.virus_dv.number,
+                angle=self.inj1_angle_v2,
+                during=self.burr1_perform_during,
+                inj_type=self.inj1_type,
+                virus_strain=self.inj1_virus_strain_rt,
+                inj_current=self.inj1_current,
+                alternating_current=self.inj1_alternating_time,
+                inj_duration=self.inj1_ionto_time,
+                inj_volume=self.inj1_vol_per_depth,
+                fiber_implant_depth=self.fiber_implant1_dv,
+            )
+        elif burr_hole_num == 2:
+            return BurrHoleInfo(
+                hemisphere=self.hemisphere_2nd_inj,
+                coordinate_ml=self.ml_2nd_inj.number,
+                coordinate_ap=self.ap_2nd_inj.number,
+                coordinate_depth=self.dv_2nd_inj.number,
+                angle=self.inj2_angle_v2,
+                during=self.burr2_perform_during,
+                inj_type=self.inj2_type,
+                virus_strain=self.inj2_virus_strain_rt,
+                inj_current=self.inj2_current,
+                alternating_current=self.inj2_alternating_time,
+                inj_duration=self.inj2_ionto_time,
+                inj_volume=self.inj2_vol_per_depth,
+                fiber_implant_depth=self.fiber_implant2_dv,
+            )
+        elif burr_hole_num == 3:
+            return BurrHoleInfo(
+                hemisphere=self.burr_3_hemisphere,
+                coordinate_ml=self.burr3_ml,
+                coordinate_ap=self.burr3_ap,
+                coordinate_depth=self.burr3_dv,
+                angle=self.burr_3_angle,
+                during=self.burr3_perform_during,
+                inj_type=self.inj3_type,
+                virus_strain=self.inj_virus_strain_rt,
+                inj_current=self.inj3_current,
+                alternating_current=self.inj3_alternating_time,
+                inj_duration=self.inj3_ionto_time,
+                inj_volume=self.inj3_vol_per_depth,
+                fiber_implant_depth=self.fiber_implant3_d,
+            )
+        elif burr_hole_num == 4:
+            return BurrHoleInfo(
+                hemisphere=self.burr_4_hemisphere,
+                coordinate_ml=self.burr4_ml,
+                coordinate_ap=self.burr4_ap,
+                coordinate_depth=self.burr4_dv,
+                angle=self.burr_4_angle,
+                during=self.burr4_perform_during,
+                inj_type=self.inj4_type,
+                virus_strain=self.inj4_virus_strain_rt,
+                inj_current=self.inj4_current,
+                alternating_current=self.inj4_alternating_time,
+                inj_duration=self.inj4_ionto_time,
+                inj_volume=self.inj4_vol_per_depth,
+                fiber_implant_depth=self.fiber_implant4_d,
+            )
+        else:
+            return BurrHoleInfo()
+
+    def surgery_during_info(
+        self, during: During, inj_type: Optional[InjectionType] = None
+    ) -> SurgeryDuringInfo:
+        if during == During.FOLLOW_UP_SURGERY:
+            if inj_type == InjectionType.NANOJECT:
+                instrument_id = self.nanoject_number_inj2
+            elif inj_type == InjectionType.IONTOPHORESIS:
+                instrument_id = self.ionto_number_inj2
+            else:
+                instrument_id = None
+            return SurgeryDuringInfo(
+                anaesthetic_duration_in_minutes=None
+                if self.first_injection_iso_duration is None
+                else self.first_injection_iso_duration.total_seconds() / 60,
+                anaesthetic_level=self.round1_inj_iso_level,
+                start_date=self.date_1st_injection,
+                workstation_id=self.work_station_1st_injection,
+                recovery_time=self.first_inj_recovery,
+                weight_prior=self.first_injection_weight_before,
+                weight_post=self.first_injection_weight_after,
+                instrument_id=instrument_id,
+            )
+        elif during == During.INITIAL_SURGERY:
+            if inj_type == InjectionType.NANOJECT:
+                instrument_id = self.nanoject_number_inj10
+            elif inj_type == InjectionType.IONTOPHORESIS:
+                instrument_id = self.ionto_number_inj1
+            else:
+                instrument_id = None
+            return SurgeryDuringInfo(
+                anaesthetic_duration_in_minutes=None
+                if self.iso_on is None
+                else self.iso_on.total_seconds() / 60,
+                anaesthetic_level=self.hp_iso_level,
+                start_date=self.date_of_surgery,
+                workstation_id=self.work_station_1st_injection,
+                recovery_time=self.hp_recovery,
+                weight_prior=self.weight_before_surgery,
+                weight_post=self.weight_after_surgery,
+                instrument_id=instrument_id,
+            )
+        else:
+            return SurgeryDuringInfo()
