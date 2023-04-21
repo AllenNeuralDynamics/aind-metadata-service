@@ -22,7 +22,9 @@ labtracks_password = os.getenv("LABTRACKS_PASSWORD")
 
 nsb_sharepoint_url = os.getenv("NSB_SHAREPOINT_URL")
 nsb_sharepoint_list_2019 = os.getenv("NSB_2019_LIST", default="SWR 2019-2022")
-nsb_sharepoint_list_2023 = os.getenv("NSB_2023_LIST", default="SWR 2023-Present")
+nsb_sharepoint_list_2023 = os.getenv(
+    "NSB_2023_LIST", default="SWR 2023-Present"
+)
 nsb_sharepoint_user = os.getenv("NSB_SHAREPOINT_USER")
 nsb_sharepoint_password = os.getenv("NSB_SHAREPOINT_PASSWORD")
 

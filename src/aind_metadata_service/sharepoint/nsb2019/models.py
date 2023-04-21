@@ -1,3 +1,5 @@
+"""Data Models for NSB 2019 Sharepoint ListItem"""
+
 import re
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -31,19 +33,21 @@ class CraniotomyType(Enum):
 
 
 class InjectionType(Enum):
+    """Enum class for Injection Types"""
+
     NANOJECT = "Nanoject (Pressure)"
     IONTOPHORESIS = "Iontophoresis"
 
 
 class Sex(Enum):
-    """Enum class for HeadPost Types"""
+    """Enum class for Sex Types"""
 
     MALE = "Male"
     FEMALE = "Female"
 
 
 class Hemisphere(Enum):
-    """Enum class for HeadPost Types"""
+    """Enum class for Hemisphere"""
 
     RIGHT = "Right"
     LEFT = "Left"
@@ -51,6 +55,8 @@ class Hemisphere(Enum):
 
 @dataclass
 class HeadPostInfo:
+    """Container for head post information"""
+
     headframe_type: Optional[str] = None
     headframe_part_number: Optional[str] = None
     well_type: Optional[str] = None
@@ -58,6 +64,7 @@ class HeadPostInfo:
 
     @classmethod
     def from_headpost_type(cls, headpost_type: Optional[HeadPostType]):
+        """Builds HeadPostInfo from HeadPostType"""
         if headpost_type is None:
             return cls()
         elif headpost_type == HeadPostType.CAM:
@@ -99,6 +106,8 @@ class HeadPostInfo:
 
 @dataclass
 class NumberWithNotes:
+    """Container to hold a parsed number from a string"""
+
     raw_input: Optional[str] = None
     number: Optional[float] = None
     notes: Optional[str] = None
@@ -106,6 +115,8 @@ class NumberWithNotes:
 
 # noinspection PyMethodParameters
 class NSBList2019(BaseModel, extra=Extra.allow):
+    """Data model for NSB 2019 ListItem"""
+
     _view_title = "New Request"
 
     ap_2nd_inj: Optional[NumberWithNotes] = Field(
@@ -244,7 +255,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     )
     inj1_angle_v2: Optional[float] = Field(default=None, alias="Inj1Angle_v2")
     inj1_current: Optional[float] = Field(default=None, alias="Inj1Current")
-    inj1_length_of_time: Optional[float] = Field(
+    inj1_length_of_time: Optional[timedelta] = Field(
         default=None, alias="Inj1LenghtofTime"
     )
     inj1_round: Optional[str] = Field(default=None, alias="Inj1Round")
@@ -262,7 +273,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     )
     inj2_angle_v2: Optional[float] = Field(default=None, alias="Inj2Angle_v2")
     inj2_current: Optional[float] = Field(default=None, alias="Inj2Current")
-    inj2_length_of_time: Optional[float] = Field(
+    inj2_length_of_time: Optional[timedelta] = Field(
         default=None, alias="Inj2LenghtofTime"
     )
     inj2_round: Optional[str] = Field(default=None, alias="Inj2Round")
@@ -476,6 +487,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     def parse_basic_num_str_to_float(
         cls, v: Union[str, int, float, None]
     ) -> Optional[float]:
+        """Parse a number from a string. Can be like -3.6mm, 2.5E5, etc."""
         pattern = r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))"
         if type(v) is str and re.match(pattern, v):
             return re.match(pattern, v).group(1)
@@ -616,6 +628,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     def parse_angle_str_float(
         cls, v: Union[str, int, float, None]
     ) -> Optional[float]:
+        """Parses string like '30 degrees' into a float"""
         pattern = (
             r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))\s*"
             r"(?:deg|degs|degree|degrees){0,1}\s*$"
@@ -631,6 +644,8 @@ class NSBList2019(BaseModel, extra=Extra.allow):
     def parse_current_str_float(
         cls, v: Union[str, int, float, None]
     ) -> Optional[float]:
+        """Parses strings like 3.5 or 3.5uA into 3.5. Will map strings like
+        3.5min to None"""
         pattern = (
             r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))(\s*uA\s*)*$"
         )
@@ -643,6 +658,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
 
     @validator("headpost_type", pre=True)
     def parse_headpost_type(cls, v: Optional[str]) -> Optional[HeadPostType]:
+        """Parses string into a HeadPostType"""
         if type(v) is str and v in [e.value for e in HeadPostType]:
             return HeadPostType(v)
         else:
@@ -650,6 +666,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
 
     @validator("sex", pre=True)
     def parse_sex_type(cls, v: Optional[str]) -> Optional[Sex]:
+        """Parses string into a Sex model"""
         if type(v) is str and v in [e.value for e in Sex]:
             return Sex(v)
         else:
@@ -657,6 +674,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
 
     @validator("hemisphere_2nd_inj", "hp_loc", "virus_hemisphere", pre=True)
     def parse_hemisphere_type(cls, v: Optional[str]) -> Optional[Hemisphere]:
+        """Parses string into Hemisphere model"""
         if type(v) is str and v in [e.value for e in Hemisphere]:
             return Hemisphere(v)
         else:
@@ -664,15 +682,17 @@ class NSBList2019(BaseModel, extra=Extra.allow):
 
     @validator("inj1_type", "inj2_type", pre=True)
     def parse_injection_type(cls, v: Optional[str]) -> Optional[InjectionType]:
+        """Parses string into InjectionType"""
         if type(v) is str and v in [e.value for e in InjectionType]:
             return InjectionType(v)
         else:
             return None
 
     @validator("inj1_length_of_time", "inj2_length_of_time", pre=True)
-    def parse_time_length_str_float(
+    def parse_time_length(
         cls, v: Union[str, int, float, None]
-    ) -> Optional[float]:
+    ) -> Optional[timedelta]:
+        """Parses time length string into timedelta"""
         pattern1 = (
             r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))\s*"
             r"(?:min|mins|minute|minutes){0,1}\s*$"
@@ -683,23 +703,20 @@ class NSBList2019(BaseModel, extra=Extra.allow):
             r"(?:sec|secs|second|seconds)(?:/depth|/location)*$"
         )
         if type(v) is str and re.match(pattern1, v):
-            return re.match(pattern1, v).group(1)
+            minutes = float(re.match(pattern1, v).group(1))
+            return timedelta(minutes=minutes)
         elif type(v) is str and re.match(pattern2, v):
-            minutes = re.match(pattern2, v).group(1)
-            seconds = re.match(pattern2, v).group(2)
-            total_time = (
-                float(minutes) + (float(seconds) / 60)
-                if float(minutes) > 0
-                else float(minutes) - (float(seconds) / 60)
-            )
-            return total_time
+            minutes = float(re.match(pattern2, v).group(1))
+            seconds = float(re.match(pattern2, v).group(2))
+            return timedelta(minutes=minutes, seconds=seconds)
         elif type(v) is int or type(v) is float:
-            return v
+            return timedelta(minutes=v)
         else:
             return None
 
     @validator("hp_durotomy", pre=True)
     def parse_str_to_bool(cls, v: Optional[str]) -> Optional[bool]:
+        """Parses string like 'Yes', 'No', etc. into a bool"""
         if v is None:
             return None
         elif v in (
@@ -738,23 +755,29 @@ class NSBList2019(BaseModel, extra=Extra.allow):
             return None
 
     def has_hp_procedure(self) -> bool:
+        """Is there a headpost procedure?"""
         return self.procedure is not None and "HP" in self.procedure
 
     def has_inj_procedure(self) -> bool:
+        """Is there an injection procedure?"""
         return self.procedure is not None and (
             "INJ" in self.procedure or "Injection" in self.procedure
         )
 
     def has_2nd_inj_procedure(self) -> bool:
+        """Is there a 2nd injection procedure?"""
         return self.has_inj_procedure() and self.inj2_round is not None
 
     def has_cran_procedure(self) -> bool:
+        """Is there a craniotomy procedure?"""
         return self.procedure is not None and "HP+C" in self.procedure
 
     def has_fiber_implant_procedure(self) -> bool:
+        """Is there a fiber implant procedure?"""
         return self.procedure is not None and "Fiber Implant" in self.procedure
 
     def has_lambda_note(self) -> bool:
+        """Does virus ap field contain a 'lambda' in the notes?"""
         return (
             self.virus_ap.notes is not None and "lambda" in self.virus_ap.notes
         )

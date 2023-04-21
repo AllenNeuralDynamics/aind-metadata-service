@@ -1,3 +1,5 @@
+"""Data Models for NSB 2023 Sharepoint ListItem"""
+
 import re
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -24,6 +26,8 @@ class CraniotomyType(Enum):
 
 
 class HeadPost(Enum):
+    """Enum class for HeadPost"""
+
     AI_HEADBAR = "AI Straight bar"
     OTHER = "Other (add details in requestor comments)"
     WHC_NP = "WHC NP"
@@ -33,6 +37,8 @@ class HeadPost(Enum):
 
 
 class HeadPostType(Enum):
+    """Enum class for HeadPostType"""
+
     NEUROPIXEL = "Neuropixel"
     MESOSCOPE = "Mesoscope"
     NO_WELL = "No Well"
@@ -42,6 +48,8 @@ class HeadPostType(Enum):
 
 
 class BurrHoleProcedure(Enum):
+    """Enum class for BurrHoleProcedure"""
+
     INJECTION = "Injection"
     FIBER_IMPLANT = "Fiber Implant"
 
@@ -54,10 +62,13 @@ class During(Enum):
 
 
 class HeadPostInfo2023(HeadPostInfo):
+    """Extends HeadPostInfo data container to include extra constructor"""
+
     @classmethod
     def from_hp_and_hp_type(
         cls, hp: Optional[HeadPost], hp_type: Optional[HeadPostType]
     ):
+        """Construct HeadPostInfo2023 from headpost and headpost_type"""
         headframe_type = hp
         well_type = hp_type
         if hp == HeadPost.VISUAL_CTX:
@@ -90,6 +101,8 @@ class HeadPostInfo2023(HeadPostInfo):
 
 @dataclass
 class BurrHoleInfo:
+    """Container for burr hole information"""
+
     hemisphere: Optional[Hemisphere] = None
     coordinate_ml: Optional[float] = None
     coordinate_ap: Optional[float] = None
@@ -107,6 +120,9 @@ class BurrHoleInfo:
 
 @dataclass
 class SurgeryDuringInfo:
+    """Container for information related to surgeries during initial or
+    follow-up sessions"""
+
     anaesthetic_duration_in_minutes: Optional[int] = None
     anaesthetic_level: Optional[float] = None
     start_date: Optional[datetime] = None
@@ -118,6 +134,8 @@ class SurgeryDuringInfo:
 
 
 class NSBList2023(BaseModel, extra=Extra.allow):
+    """Data model for NSB 2023 ListItem"""
+
     _view_title = "New Request"
 
     ap_2nd_inj: Optional[NumberWithNotes] = Field(
@@ -521,6 +539,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     def parse_basic_num_str_to_float(
         cls, v: Union[str, int, float, None]
     ) -> Optional[float]:
+        """Parse a number from a string. Can be like -3.6mm, 2.5E5, etc."""
         pattern = r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))"
         if type(v) is str and re.match(pattern, v):
             return re.match(pattern, v).group(1)
@@ -659,6 +678,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     def parse_angle_str_float(
         cls, v: Union[str, int, float, None]
     ) -> Optional[float]:
+        """Parses string like '30 degrees' into a float"""
         pattern = (
             r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))\s*"
             r"(?:deg|degs|degree|degrees){0,1}\s*$"
@@ -680,6 +700,8 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     def parse_current_str_float(
         cls, v: Union[str, int, float, None]
     ) -> Optional[float]:
+        """Parses strings like 3.5 or 3.5uA into 3.5. Will map strings like
+        3.5min to None"""
         pattern = (
             r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))(\s*uA\s*)*$"
         )
@@ -700,6 +722,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
         pre=True,
     )
     def parse_during_type(cls, v: Optional[str]) -> Optional[During]:
+        """Parses string into a During model"""
         if type(v) is str and v in [e.value for e in During]:
             return During(v)
         else:
@@ -717,6 +740,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
 
     @validator("headpost", pre=True)
     def parse_headpost(cls, v: Optional[str]) -> Optional[HeadPost]:
+        """Parses string into a HeadPost model"""
         if type(v) is str and v in [e.value for e in HeadPost]:
             return HeadPost(v)
         else:
@@ -724,6 +748,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
 
     @validator("headpost_type", pre=True)
     def parse_headpost_type(cls, v: Optional[str]) -> Optional[HeadPostType]:
+        """Parses string into a HeadPostType model"""
         if type(v) is str and v in [e.value for e in HeadPostType]:
             return HeadPostType(v)
         else:
@@ -731,6 +756,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
 
     @validator("sex", pre=True)
     def parse_sex_type(cls, v: Optional[str]) -> Optional[Sex]:
+        """Parses string into a Sex model"""
         if type(v) is str and v in [e.value for e in Sex]:
             return Sex(v)
         else:
@@ -744,6 +770,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
         pre=True,
     )
     def parse_hemisphere_type(cls, v: Optional[str]) -> Optional[Hemisphere]:
+        """Parses string into a Hemisphere model"""
         if type(v) is str and v in [e.value for e in Hemisphere]:
             return Hemisphere(v)
         else:
@@ -751,6 +778,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
 
     @validator("inj1_type", "inj2_type", "inj3_type", "inj4_type", pre=True)
     def parse_injection_type(cls, v: Optional[str]) -> Optional[InjectionType]:
+        """Parses string into a InjectionType model"""
         if type(v) is str and v in [e.value for e in InjectionType]:
             return InjectionType(v)
         else:
@@ -766,6 +794,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     def parse_time_length(
         cls, v: Union[str, int, float, None]
     ) -> Optional[timedelta]:
+        """Parses time length string into timedelta"""
         pattern1 = (
             r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))\s*"
             r"(?:min|mins|minute|minutes){0,1}\s*$"
@@ -791,6 +820,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     def parse_hours_to_timedelta(
         cls, v: Union[float, str, None]
     ) -> Optional[timedelta]:
+        """Parses hours string into timedelta"""
         if v is None:
             return None
         else:
@@ -802,6 +832,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     def parse_burr_hole(
         cls, v: Optional[str]
     ) -> Optional[List[BurrHoleProcedure]]:
+        """Parses string into a BurrHoleProcedure model"""
         if v is None:
             return None
         else:
@@ -813,6 +844,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
             return burr_hole_procedures
 
     def has_hp_procedure(self) -> bool:
+        """Is there a headpost procedure?"""
         if self.procedure is None:
             return False
         elif (
@@ -827,6 +859,20 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     def has_burr_hole_procedure(
         self, burr_hole_num: int, burr_hole_procedure: BurrHoleProcedure
     ) -> bool:
+        """
+        Is there a burr hole procedure?
+        Parameters
+        ----------
+        burr_hole_num : int
+          Burr Hole Number (1 through 4)
+        burr_hole_procedure : BurrHoleProcedure
+          Procedure Type (Fiber Implant or Injection)
+
+        Returns
+        -------
+        bool
+
+        """
         burr_hole_procedures = getattr(self, f"burr_hole_{burr_hole_num}")
         if burr_hole_procedures is None:
             return False
@@ -836,6 +882,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
             return False
 
     def has_cran_procedure(self) -> bool:
+        """Is there a craniotomy procedure?"""
         if self.procedure is not None and (
             "Visual Ctx" in self.procedure
             or "Motor Ctx" in self.procedure
@@ -847,6 +894,18 @@ class NSBList2023(BaseModel, extra=Extra.allow):
             return False
 
     def burr_hole_info(self, burr_hole_num: int) -> BurrHoleInfo:
+        """
+        Compiles burr hole information from NSB data
+        Parameters
+        ----------
+        burr_hole_num : int
+          Burr hole number
+
+        Returns
+        -------
+        BurrHoleInfo
+
+        """
         if burr_hole_num == 1:
             return BurrHoleInfo(
                 hemisphere=self.virus_hemisphere,
@@ -917,6 +976,20 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     def surgery_during_info(
         self, during: During, inj_type: Optional[InjectionType] = None
     ) -> SurgeryDuringInfo:
+        """
+        Compiles burr hole information from NSB data
+        Parameters
+        ----------
+        during : During
+          Initial or Follow up
+        inj_type : Optional[InjectionType]
+          Injection type during the surgery. Default is None.
+
+        Returns
+        -------
+        SurgeryDuringInfo
+
+        """
         if during == During.FOLLOW_UP_SURGERY:
             if inj_type == InjectionType.NANOJECT:
                 instrument_id = self.nanoject_number_inj2

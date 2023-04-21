@@ -1,3 +1,5 @@
+"""Maps client objects from NSB Sharepoint database to internal AIND models."""
+
 from typing import List, Optional
 
 from aind_data_schema.procedures import (
@@ -30,9 +32,29 @@ from aind_metadata_service.sharepoint.nsb2023.models import (
 
 
 class NSB2023Mapping(NSB2019Mapping):
+    """Provides methods to retrieve procedure information from sharepoint,
+    parses the response into an intermediate data model, and maps that model
+    into AIND internal Procedures model."""
+
     def get_procedures_from_sharepoint(
         self, subject_id: str, client_context: ClientContext, list_title: str
     ):
+        """
+        Get list of Procedures from NSB 2019 database.
+        Parameters
+        ----------
+        subject_id : str
+          ID of the subject to find procedure information for
+        client_context : ClientContext
+          NSB Sharepoint client
+        list_title : str
+          Title of the list where the 2019 procedure data is stored
+
+        Returns
+        -------
+        List[SubjectProcedure]
+
+        """
         filter_string = (
             f"substringof('{subject_id}', "
             f"{NSBList2023.__fields__.get('labtracks_id').alias})"
@@ -53,6 +75,7 @@ class NSB2023Mapping(NSB2019Mapping):
         return list_of_procedures
 
     def map_nsb_model(self, nsb_model: NSBList2023) -> List[SubjectProcedure]:
+        """Maps an individual list item model into List[SubjectProcedures]"""
         procedures = []
         experimenter_full_name = self._map_auth_id_to_exp_name(
             nsb_model.author_id
@@ -325,6 +348,7 @@ class NSB2023Mapping(NSB2019Mapping):
     def _map_craniotomy_type(
         nsb_craniotomy: Optional[NSBCraniotomyType],
     ) -> Optional[CraniotomyType]:
+        """Maps NSB CraniotomyType into AIND CraniotomyType"""
         if nsb_craniotomy == NSBCraniotomyType.FIVE_MM:
             return CraniotomyType.FIVE_MM
         elif nsb_craniotomy == NSBCraniotomyType.THREE_MM:
@@ -338,6 +362,7 @@ class NSB2023Mapping(NSB2019Mapping):
     def _map_burr_hole_number_to_probe(
         burr_hole_num: int,
     ) -> Optional[ProbeName]:
+        """Maps NSB Burr hole number into AIND ProbeName"""
         if burr_hole_num == 1:
             return ProbeName.PROBE_A
         elif burr_hole_num == 2:

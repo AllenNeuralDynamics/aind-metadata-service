@@ -4,6 +4,7 @@ import datetime
 import json
 import os
 import unittest
+from unittest.mock import patch, MagicMock
 from pathlib import Path
 
 from aind_data_schema.procedures import (
@@ -21,10 +22,35 @@ from aind_data_schema.procedures import (
     Side,
     SubjectProcedure,
 )
+from aind_metadata_service.sharepoint.client import SharePointClient
 
 
 class TestSharepointClient(unittest.TestCase):
     """Class to test methods for SharePointClient."""
+
+    @patch("aind_metadata_service.sharepoint.client.ClientContext")
+    def test_data_mapped(self, mock_sharepoint_client: MagicMock):
+
+        inner_mock = MagicMock()
+        mock_sharepoint_client.return_value.with_credentials.return_value = (
+            inner_mock
+        )
+        mock_list_views = MagicMock()
+        inner_mock.web.lists.get_by_title.return_value.views = mock_list_views
+        mock_list_items = MagicMock()
+        mock_list_views.get_by_title.return_value.get_items.return_value = (
+            mock_list_items
+        )
+        # mock_list_items.filter.return_value = ["a", "b"]
+
+        client = SharePointClient(nsb_site_url = "some_url",
+                                  nsb_list_title_2019 = "some_list_title2019",
+                                  nsb_list_title_2023 = "some_list_title2023",
+                                  client_id = "some_client_id",
+                                  client_secret = "some_client_secret")
+
+        response = client.get_procedure_info(subject_id="12345")
+
     #
     # client = SharePointClient(
     #     site_url="a_url", client_id="an_id", client_secret="a_secret"

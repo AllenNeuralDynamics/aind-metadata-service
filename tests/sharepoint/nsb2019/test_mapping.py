@@ -1,3 +1,5 @@
+"""Tests NSB 2019 data model is parsed correctly"""
+
 import json
 import logging
 import os
@@ -28,12 +30,16 @@ MAPPED_FILE_PATHS = [DIR_MAP / str(f) for f in MAPPED_ITEM_FILE_NAMES]
 
 
 class TestNSB2019Parsers(TestCase):
+    """Tests methods in NSB2019Mapping class"""
+
     @classmethod
     def setUpClass(cls):
+        """Load json files before running tests."""
         cls.list_items = cls._load_json_files()
 
     @staticmethod
     def _load_json_files() -> List[Tuple[dict, dict, str]]:
+        """Reads raw data and expected data into json"""
         list_items = []
         for file_path in LIST_ITEM_FILE_PATHS:
             mapped_file_path = (
@@ -46,10 +52,11 @@ class TestNSB2019Parsers(TestCase):
             with open(mapped_file_path) as f:
                 mapped_contents = json.load(f)
             list_items.append((contents, mapped_contents, file_path.name))
-            list_items.sort(key=lambda x: x[2])
+        list_items.sort(key=lambda x: x[2])
         return list_items
 
     def test_parser(self):
+        """Checks that raw data is parsed correctly"""
         for list_item in self.list_items:
             raw_data = list_item[0]
             expected_mapped_data = list(list_item[1])
@@ -109,6 +116,7 @@ class TestNSB2019Parsers(TestCase):
         )
 
     def test_map_duration_minutes(self):
+        """Tests that durations are mapped correctly"""
         duration1 = timedelta(minutes=5)
         mapper = NSB2019Mapping()
         minutes1 = mapper._duration_to_minutes(duration1)

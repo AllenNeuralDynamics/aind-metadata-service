@@ -1,9 +1,12 @@
+"""Tests NSB 2019 data models are created correctly"""
+
 import json
 import logging
 import os
 from copy import deepcopy
+from datetime import timedelta
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 from unittest import TestCase
 from unittest import main as unittest_main
 
@@ -19,30 +22,36 @@ LIST_ITEM_FILE_PATHS = [SHAREPOINT_DIR / str(f) for f in LIST_ITEM_FILE_NAMES]
 
 
 class TestNSB2019Models(TestCase):
+    """Tests methods in NSBList2019 class"""
+
     @classmethod
     def setUpClass(cls):
+        """Load json files before running tests."""
         cls.list_items = cls._load_json_files()
 
     @staticmethod
-    def _load_json_files() -> List[dict]:
+    def _load_json_files() -> List[Tuple[dict, str]]:
+        """Reads test data into json"""
         list_items = []
         for file_path in LIST_ITEM_FILE_PATHS:
             with open(file_path) as f:
                 contents = json.load(f)
-            list_items.append(contents)
+            list_items.append((contents, file_path.name))
+        list_items.sort(key=lambda x: x[1])
         return list_items
 
     def test_models_parsed(self):
         """Tests that the given list item files are parsed without error."""
         for index in range(len(self.list_items)):
-            list_item = self.list_items[index]
-            logging.debug(f"Processing file: {LIST_ITEM_FILE_NAMES[index]}")
+            list_item = self.list_items[index][0]
+            filename = self.list_items[index][1]
+            logging.debug(f"Processing file: {filename}")
             nsb_model = NSBList2019.parse_obj(list_item)
             self.assertEqual(nsb_model.author_id, list_item.get("AuthorId"))
 
     def test_aberrant_data_parsed(self):
         """Tests that certain edge cases get handled correctly"""
-        list_item = deepcopy(self.list_items[0])
+        list_item = deepcopy(self.list_items[0][0])
         # Test that numeric entries instead of strings will also get parsed
         list_item["Inj1angle0"] = 20
         list_item["Inj1Current"] = 21
@@ -60,12 +69,15 @@ class TestNSB2019Models(TestCase):
         self.assertEqual(22, nsb_model.age_at_injection)
         self.assertIsNone(nsb_model.inj1_type)
         self.assertIsNone(nsb_model.hp_durotomy)
-        self.assertEqual(5.5, nsb_model.inj1_length_of_time)
-        self.assertEqual(5, nsb_model.inj2_length_of_time)
+        self.assertEqual(
+            timedelta(minutes=5, seconds=30), nsb_model.inj1_length_of_time
+        )
+        self.assertEqual(timedelta(minutes=5), nsb_model.inj2_length_of_time)
         self.assertEqual(Sex.FEMALE, nsb_model.sex)
 
     def test_boolean_properties(self):
-        list_item = deepcopy(self.list_items[0])
+        """Tests the boolean methods are correct."""
+        list_item = deepcopy(self.list_items[0][0])
         nsb_model = NSBList2019.parse_obj(list_item)
         self.assertTrue(nsb_model.has_cran_procedure())
         self.assertTrue(nsb_model.has_hp_procedure())

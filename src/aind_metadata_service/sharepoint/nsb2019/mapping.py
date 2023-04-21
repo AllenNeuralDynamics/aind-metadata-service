@@ -1,3 +1,5 @@
+"""Maps client objects from NSB Sharepoint database to internal AIND models."""
+
 from datetime import date, datetime, timedelta
 from typing import List, Optional
 
@@ -32,9 +34,30 @@ from aind_metadata_service.sharepoint.nsb2019.models import (
 
 
 class NSB2019Mapping:
+    """Provides methods to retrieve procedure information from sharepoint,
+    parses the response into an intermediate data model, and maps that model
+    into AIND Procedures model."""
+
     def get_procedures_from_sharepoint(
         self, subject_id: str, client_context: ClientContext, list_title: str
-    ):
+    ) -> List[SubjectProcedure]:
+        """
+        Get list of Procedures from NSB 2019 database.
+        Parameters
+        ----------
+        subject_id : str
+          ID of the subject to find procedure information for
+        client_context : ClientContext
+          NSB Sharepoint client
+        list_title : str
+          Title of the list where the 2019 procedure data is stored
+
+        Returns
+        -------
+        List[SubjectProcedure]
+
+        """
+
         filter_string = (
             f"substringof('{subject_id}', "
             f"{NSBList2019.__fields__.get('labtracks_id').alias})"
@@ -55,6 +78,7 @@ class NSB2019Mapping:
         return list_of_procedures
 
     def map_nsb_model(self, nsb_model: NSBList2019) -> List[SubjectProcedure]:
+        """Maps an individual list item model into List[SubjectProcedures]"""
         procedures = []
         start_date = self._map_datetime_to_date(nsb_model.date_of_surgery)
         end_date = start_date
@@ -110,7 +134,9 @@ class NSB2019Mapping:
             inj1_kwargs[
                 "animal_weight_post"
             ] = nsb_model.first_injection_weight_after
-            inj1_kwargs["injection_duration"] = nsb_model.inj1_length_of_time
+            inj1_kwargs["injection_duration"] = self._duration_to_minutes(
+                nsb_model.inj1_length_of_time
+            )
             # First injection anaesthetic
             inj1_anaesthetic_type = "isoflurane"
             inj1_anaesthetic_duration = nsb_model.first_injection_iso_duration
@@ -170,7 +196,9 @@ class NSB2019Mapping:
             inj2_kwargs[
                 "animal_weight_post"
             ] = nsb_model.second_injection_weight_after
-            inj2_kwargs["injection_duration"] = nsb_model.inj2_length_of_time
+            inj2_kwargs["injection_duration"] = self._duration_to_minutes(
+                nsb_model.inj2_length_of_time
+            )
             # First injection anaesthetic
             inj2_anaesthetic_type = "isoflurane"
             inj2_anaesthetic_duration = nsb_model.second_injection_iso_duration
@@ -349,6 +377,7 @@ class NSB2019Mapping:
     def _map_hemisphere(
         nsb_hemisphere: Optional[Hemisphere],
     ) -> Optional[Side]:
+        """Maps NSB Hemisphere to AIND Side"""
         if nsb_hemisphere == Hemisphere.LEFT:
             return Side.LEFT
         elif nsb_hemisphere == Hemisphere.RIGHT:
@@ -360,6 +389,7 @@ class NSB2019Mapping:
     def _map_craniotomy_type(
         nsb_craniotomy: Optional[NSBCraniotomyType],
     ) -> Optional[CraniotomyType]:
+        """Maps NSB CraniotomyType into AIND CraniotomyType"""
         if nsb_craniotomy == NSBCraniotomyType.VISUAL_CORTEX:
             return CraniotomyType.VISCTX
         elif nsb_craniotomy == NSBCraniotomyType.FRONTAL_WINDOW:
@@ -376,6 +406,7 @@ class NSB2019Mapping:
     def _map_ap_info_to_coord_reference(
         nsb_virus_ap: Optional[NumberWithNotes],
     ) -> Optional[CoordinateReferenceLocation]:
+        """Maps NSB virus ap into AIND CoordinateReferenceLocation"""
         if nsb_virus_ap.number is None and nsb_virus_ap.notes is None:
             return None
         elif nsb_virus_ap.notes and "lambda" in nsb_virus_ap.notes:
@@ -387,6 +418,7 @@ class NSB2019Mapping:
     def _map_virus_strain_to_materials(
         virus_strain: Optional[str],
     ) -> Optional[InjectionMaterial]:
+        """Maps NASB virus strain into AIND InjectionMaterials"""
         if virus_strain is None:
             return None
         else:
@@ -394,11 +426,14 @@ class NSB2019Mapping:
 
     @staticmethod
     def _map_datetime_to_date(dt: datetime) -> Optional[date]:
+        """Maps datetime like '2020-10-10 00:00:00' into date like
+        '2020-10-10'"""
         if dt is None:
             return None
         else:
             return dt.date()
 
     @staticmethod
-    def _duration_to_minutes(duration: Optional[timedelta]):
+    def _duration_to_minutes(duration: Optional[timedelta]) -> Optional[float]:
+        """Converts Optional[timedelta] into an Optional[float]"""
         return None if duration is None else duration.total_seconds() / 60

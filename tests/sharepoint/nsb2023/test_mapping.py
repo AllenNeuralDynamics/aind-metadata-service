@@ -1,3 +1,5 @@
+"""Tests NSB 2023 data model is parsed correctly"""
+
 import json
 import logging
 import os
@@ -27,12 +29,16 @@ MAPPED_FILE_PATHS = [DIR_MAP / str(f) for f in MAPPED_ITEM_FILE_NAMES]
 
 
 class TestNSB2023Parsers(TestCase):
+    """Tests methods in NSB2023Mapping class"""
+
     @classmethod
     def setUpClass(cls):
+        """Load json files before running tests."""
         cls.list_items = cls._load_json_files()
 
     @staticmethod
     def _load_json_files() -> List[Tuple[dict, dict, str]]:
+        """Reads raw data and expected data into json"""
         list_items = []
         for file_path in LIST_ITEM_FILE_PATHS:
             mapped_file_path = (
@@ -49,6 +55,7 @@ class TestNSB2023Parsers(TestCase):
         return list_items
 
     def test_parser(self):
+        """Checks that raw data is parsed correctly"""
         for list_item in self.list_items:
             raw_data = list_item[0]
             expected_mapped_data = list(list_item[1])
@@ -63,22 +70,6 @@ class TestNSB2023Parsers(TestCase):
             ]
             mapped_procedure_json.sort(key=lambda x: str(x))
             self.assertEqual(expected_mapped_data, mapped_procedure_json)
-
-    # def test_inj_mapping_edge_cases(self):
-    #     """Tests the case where there is an INJ procedure, but the inj types
-    #     are malformed. It should create generic BrainInjection objects."""
-    #
-    #     list_item = self.list_items[0]
-    #     raw_data = deepcopy(list_item[0])
-    #     raw_data["Inj1Type"] = "Select..."
-    #     raw_data["Inj2Type"] = "Select..."
-    #     raw_data["Procedure"] = "INJ"
-    #     raw_data["Virus_x0020_A_x002f_P"] = "Select..."
-    #     nsb_model = NSBList2019.parse_obj(raw_data)
-    #     mapper = NSB2019Mapping()
-    #     mapped_procedure = mapper.map_nsb_model(nsb_model)
-    #     self.assertTrue(isinstance(mapped_procedure[0], BrainInjection))
-    #     self.assertTrue(isinstance(mapped_procedure[1], BrainInjection))
 
     def test_craniotomy_edge_case(self):
         """Tests other craniotomy cases"""
@@ -109,6 +100,8 @@ class TestNSB2023Parsers(TestCase):
         )
 
     def test_injection_edge_case(self):
+        """Tests the case where there is an INJ procedure, but the inj types
+        are malformed. It should create generic BrainInjection objects."""
         list_item = self.list_items[3]
         raw_data = deepcopy(list_item[0])
         raw_data["Inj1Type"] = "Select..."
@@ -118,6 +111,7 @@ class TestNSB2023Parsers(TestCase):
         self.assertIsNotNone(mapped_procedure)
 
     def test_burr_hole_to_probe_edge_case(self):
+        """Tests edge case where burr hole number is 5"""
         mapper = NSB2023Mapping()
         self.assertIsNone(mapper._map_burr_hole_number_to_probe(5))
 
