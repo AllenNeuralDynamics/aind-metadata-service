@@ -15,6 +15,7 @@ from aind_data_schema.procedures import (
     ProbeName,
     SubjectProcedure,
 )
+from office365.sharepoint.client_context import ClientContext
 
 from aind_metadata_service.sharepoint.nsb2019.mapping import NSB2019Mapping
 from aind_metadata_service.sharepoint.nsb2023.models import BurrHoleProcedure
@@ -29,6 +30,28 @@ from aind_metadata_service.sharepoint.nsb2023.models import (
 
 
 class NSB2023Mapping(NSB2019Mapping):
+    def get_procedures_from_sharepoint(
+        self, subject_id: str, client_context: ClientContext, list_title: str
+    ):
+        filter_string = (
+            f"substringof('{subject_id}', "
+            f"{NSBList2023.__fields__.get('labtracks_id').alias})"
+        )
+        list_view = client_context.web.lists.get_by_title(
+            list_title
+        ).views.get_by_title(getattr(NSBList2023, "_view_title"))
+        client_context.load(list_view)
+        client_context.execute_query()
+        list_items = list_view.get_items().filter(filter_string)
+        client_context.load(list_items)
+        client_context.execute_query()
+        list_of_procedures = []
+        for list_item in list_items:
+            parsed_nsb_model = NSBList2023.parse_obj(list_item.to_json())
+            procedures = self.map_nsb_model(parsed_nsb_model)
+            list_of_procedures.extend(procedures)
+        return list_of_procedures
+
     def map_nsb_model(self, nsb_model: NSBList2023) -> List[SubjectProcedure]:
         procedures = []
         experimenter_full_name = self._map_auth_id_to_exp_name(

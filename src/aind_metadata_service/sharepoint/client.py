@@ -6,7 +6,8 @@ from office365.runtime.auth.client_credential import ClientCredential
 from office365.sharepoint.client_context import ClientContext
 
 from aind_metadata_service.response_handler import Responses
-from aind_metadata_service.sharepoint.nsb2019.client import ListClient
+from aind_metadata_service.sharepoint.nsb2019.mapping import NSB2019Mapping
+from aind_metadata_service.sharepoint.nsb2023.mapping import NSB2023Mapping
 
 
 class SharePointClient:
@@ -15,9 +16,10 @@ class SharePointClient:
     def __init__(
         self,
         nsb_site_url: str,
+        nsb_list_title_2019: str,
+        nsb_list_title_2023: str,
         client_id: str,
         client_secret: str,
-        nsb_2019_list_title: str,
     ) -> None:
         """
         Initialize a client
@@ -31,13 +33,14 @@ class SharePointClient:
             password for principal account to access sharepoint
         """
         self.nsb_site_url = nsb_site_url
+        self.nsb_list_title_2019 = nsb_list_title_2019
+        self.nsb_list_title_2023 = nsb_list_title_2023
         self.client_id = client_id
         self.client_secret = client_secret
         self.credentials = ClientCredential(self.client_id, self.client_secret)
         self.nsb_client_context = ClientContext(
             self.nsb_site_url
         ).with_credentials(self.credentials)
-        self.nsb_2019_list_title = nsb_2019_list_title
 
     def get_procedure_info(
         self,
@@ -59,13 +62,20 @@ class SharePointClient:
         # TODO: Add try to handle internal server error response.
         subject_procedures = []
         nsb_ctx = self.nsb_client_context
-        nsb2019_list_client = ListClient(
+        nsb_2019_mapper = NSB2019Mapping()
+        nsb_2023_mapper = NSB2023Mapping()
+        procedures2019 = nsb_2019_mapper.get_procedures_from_sharepoint(
             subject_id=subject_id,
             client_context=nsb_ctx,
-            list_title=self.nsb_2019_list_title,
+            list_title=self.nsb_list_title_2019,
         )
-        procedures2019 = nsb2019_list_client.get_list_of_procedures()
+        procedures2023 = nsb_2023_mapper.get_procedures_from_sharepoint(
+            subject_id=subject_id,
+            client_context=nsb_ctx,
+            list_title=self.nsb_list_title_2023,
+        )
         subject_procedures.extend(procedures2019)
+        subject_procedures.extend(procedures2023)
         response = self._handle_response_from_sharepoint(
             subject_id=subject_id, subject_procedures=subject_procedures
         )

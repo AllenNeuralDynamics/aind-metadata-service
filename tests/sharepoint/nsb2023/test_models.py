@@ -3,19 +3,19 @@ import json
 import logging
 import os
 from copy import deepcopy
+from datetime import timedelta
 from pathlib import Path
 from typing import List
 from unittest import TestCase
 from unittest import main as unittest_main
-from datetime import timedelta
 
 from aind_metadata_service.sharepoint.nsb2023.models import (
-    NSBList2023,
-    HeadPostInfo2023,
-    HeadPostType,
     BurrHoleProcedure,
     During,
+    HeadPostInfo2023,
+    HeadPostType,
     InjectionType,
+    NSBList2023,
 )
 
 if os.getenv("LOG_LEVEL"):  # pragma: no cover

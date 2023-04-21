@@ -17,6 +17,7 @@ from aind_data_schema.procedures import (
     Side,
     SubjectProcedure,
 )
+from office365.sharepoint.client_context import ClientContext
 
 from aind_metadata_service.sharepoint.nsb2019.models import (
     CraniotomyType as NSBCraniotomyType,
@@ -31,6 +32,28 @@ from aind_metadata_service.sharepoint.nsb2019.models import (
 
 
 class NSB2019Mapping:
+    def get_procedures_from_sharepoint(
+        self, subject_id: str, client_context: ClientContext, list_title: str
+    ):
+        filter_string = (
+            f"substringof('{subject_id}', "
+            f"{NSBList2019.__fields__.get('labtracks_id').alias})"
+        )
+        list_view = client_context.web.lists.get_by_title(
+            list_title
+        ).views.get_by_title(getattr(NSBList2019, "_view_title"))
+        client_context.load(list_view)
+        client_context.execute_query()
+        list_items = list_view.get_items().filter(filter_string)
+        client_context.load(list_items)
+        client_context.execute_query()
+        list_of_procedures = []
+        for list_item in list_items:
+            parsed_nsb_model = NSBList2019.parse_obj(list_item.to_json())
+            procedures = self.map_nsb_model(parsed_nsb_model)
+            list_of_procedures.extend(procedures)
+        return list_of_procedures
+
     def map_nsb_model(self, nsb_model: NSBList2019) -> List[SubjectProcedure]:
         procedures = []
         start_date = self._map_datetime_to_date(nsb_model.date_of_surgery)

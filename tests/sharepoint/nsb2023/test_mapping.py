@@ -58,8 +58,9 @@ class TestNSB2023Parsers(TestCase):
             nsb_model = NSBList2023.parse_obj(raw_data)
             mapper = NSB2023Mapping()
             mapped_procedure = mapper.map_nsb_model(nsb_model)
-            mapped_procedure_json = [json.loads(p.json()) for p in
-                                     mapped_procedure]
+            mapped_procedure_json = [
+                json.loads(p.json()) for p in mapped_procedure
+            ]
             mapped_procedure_json.sort(key=lambda x: str(x))
             self.assertEqual(expected_mapped_data, mapped_procedure_json)
 

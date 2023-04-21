@@ -118,7 +118,7 @@ class SurgeryDuringInfo:
 
 
 class NSBList2023(BaseModel, extra=Extra.allow):
-    # _view_title = "New Request"
+    _view_title = "New Request"
 
     ap_2nd_inj: Optional[NumberWithNotes] = Field(
         default=None, alias="AP2ndInj"
@@ -402,7 +402,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     labtracks_group: Optional[str] = Field(
         default=None, alias="LabTracks_x0020_Group"
     )
-    labtracks_id1: Optional[str] = Field(
+    labtracks_id: Optional[str] = Field(
         default=None, alias="LabTracks_x0020_ID1"
     )
     labtracks_requestor: Optional[SecretStr] = Field(
@@ -575,7 +575,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
         "lims_taskflow",
         "lims_required",
         "labtracks_group",
-        "labtracks_id1",
+        "labtracks_id",
         "light_cycle",
         "long_requestor_comments",
         "nanoject_number_inj10",

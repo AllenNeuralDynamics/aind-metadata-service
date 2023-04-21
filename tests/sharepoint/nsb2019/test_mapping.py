@@ -2,11 +2,11 @@ import json
 import logging
 import os
 from copy import deepcopy
+from datetime import timedelta
 from pathlib import Path
 from typing import List, Tuple
 from unittest import TestCase
 from unittest import main as unittest_main
-from datetime import timedelta
 
 from aind_data_schema.procedures import BrainInjection, CraniotomyType
 
@@ -59,7 +59,9 @@ class TestNSB2019Parsers(TestCase):
             nsb_model = NSBList2019.parse_obj(raw_data)
             mapper = NSB2019Mapping()
             mapped_procedure = mapper.map_nsb_model(nsb_model)
-            mapped_procedure_json = [json.loads(p.json()) for p in mapped_procedure]
+            mapped_procedure_json = [
+                json.loads(p.json()) for p in mapped_procedure
+            ]
             mapped_procedure_json.sort(key=lambda x: str(x))
             self.assertEqual(expected_mapped_data, mapped_procedure_json)
 
@@ -107,7 +109,7 @@ class TestNSB2019Parsers(TestCase):
         )
 
     def test_map_duration_minutes(self):
-        duration1 = timedelta(minutes = 5)
+        duration1 = timedelta(minutes=5)
         mapper = NSB2019Mapping()
         minutes1 = mapper._duration_to_minutes(duration1)
         self.assertEqual(5, minutes1)
