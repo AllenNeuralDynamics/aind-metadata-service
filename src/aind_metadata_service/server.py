@@ -3,8 +3,8 @@
 import os
 
 from fastapi import FastAPI
-from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 from aind_metadata_service.labtracks.client import LabTracksClient
 from aind_metadata_service.sharepoint.client import SharePointClient
