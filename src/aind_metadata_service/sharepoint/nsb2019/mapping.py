@@ -58,15 +58,15 @@ class NSB2019Mapping:
 
         """
 
-        filter_string = (
-            f"({NSBList2019.__fields__.get('labtracks_id').alias} eq "
-            f"{subject_id})"
-        )
+        labtrack_alias = NSBList2019.__fields__.get('labtracks_id').alias
+        filter_string = f"{labtrack_alias} eq '{subject_id}'"
         list_view = client_context.web.lists.get_by_title(
             list_title
         ).views.get_by_title(getattr(NSBList2019, "_view_title"))
+        client_context.load(list_view)
         client_context.execute_query()
         list_items = list_view.get_items().filter(filter_string)
+        client_context.load(list_items)
         client_context.execute_query()
         list_of_procedures = []
         for list_item in list_items:
