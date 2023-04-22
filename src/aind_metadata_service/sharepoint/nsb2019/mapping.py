@@ -282,7 +282,9 @@ class NSB2019Mapping:
             cran_kwargs["craniotomy_coordinates_ap"] = nsb_model.hp_ap
             cran_kwargs[
                 "craniotomy_size"
-            ] = nsb_model.implant_id_coverslip_type.number
+            ] = self._map_nsb_craniotomy_type_to_size(
+                nsb_model.craniotomy_type
+            )
             cran_kwargs["dura_removed"] = nsb_model.hp_durotomy
             cran_kwargs["workstation_id"] = nsb_model.hp_work_station
             cran_kwargs["bregma_to_lambda_distance"] = nsb_model.breg_2_lamb
@@ -400,6 +402,18 @@ class NSB2019Mapping:
             return CraniotomyType.WHC
         else:
             return CraniotomyType.OTHER
+
+    @staticmethod
+    def _map_nsb_craniotomy_type_to_size(
+        cran_type: NSBCraniotomyType,
+    ) -> Optional[float]:
+        """Maps NSB CraniotomyType into size"""
+        if cran_type == NSBCraniotomyType.VISUAL_CORTEX:
+            return 5.0
+        elif cran_type == NSBCraniotomyType.FRONTAL_WINDOW:
+            return 3.0
+        else:
+            return None
 
     @staticmethod
     def _map_ap_info_to_coord_reference(
