@@ -30,19 +30,25 @@ class MolecularAnatomyMapping:
         return procedures
 
     @staticmethod
-    def _apply_filter(excel_sheets: dict, subject_id: str) -> List[ExcelSheetRow]:
+    def _apply_filter(
+        excel_sheets: dict, subject_id: str
+    ) -> List[ExcelSheetRow]:
         list_of_records = []
-        for sheet_name in excel_sheets:
+        for sheet_name in [
+            sn
+            for sn in excel_sheets
+            if not ExcelSheetRow.ignore_excel_sheet(
+                excel_sheet_name=sn, column_names=excel_sheets[sn].columns
+            )
+        ]:
             sheet_df = excel_sheets[sheet_name]
-            if 'Mouse ID' in sheet_df.columns:
-                filter_df = sheet_df[sheet_df['Mouse ID'] == int(subject_id)]
-                json_list = json.loads(filter_df.to_json(orient="records"))
-                list_of_records.extend([ExcelSheetRow.parse_obj(j) for j in json_list])
+            filter_df = sheet_df[sheet_df["Mouse ID"] == int(subject_id)]
+            json_list = json.loads(filter_df.to_json(orient="records"))
+            list_of_records.extend(
+                [ExcelSheetRow.parse_obj(j) for j in json_list]
+            )
         return list_of_records
 
     @staticmethod
     def map_model(sharepoint_model: ExcelSheetRow) -> List[SubjectProcedure]:
         return []
-
-
-
