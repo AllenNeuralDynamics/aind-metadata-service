@@ -719,34 +719,22 @@ class NSBList2019(BaseModel, extra=Extra.allow):
         """Parses string like 'Yes', 'No', etc. into a bool"""
         if v is None:
             return None
-        elif v in (
+        elif type(v) == str and v.upper() in (
             [
-                "Yes",
-                "yes",
                 "YES",
-                "y",
                 "Y",
                 "1",
                 "T",
-                "t",
-                "true",
-                "True",
                 "TRUE",
             ]
         ):
             return True
-        elif v in (
+        elif type(v) == str and v.upper() in (
             [
-                "No",
-                "no",
                 "NO",
-                "n",
                 "N",
                 "0",
                 "F",
-                "f",
-                "false",
-                "False",
                 "FALSE",
             ]
         ):
@@ -756,7 +744,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
 
     def has_hp_procedure(self) -> bool:
         """Is there a headpost procedure?"""
-        return self.procedure is not None and "HP" in self.procedure
+        return self.procedure is not None and ("HP" in self.procedure or "Headpost" in self.procedure)
 
     def has_inj_procedure(self) -> bool:
         """Is there an injection procedure?"""
@@ -770,7 +758,7 @@ class NSBList2019(BaseModel, extra=Extra.allow):
 
     def has_cran_procedure(self) -> bool:
         """Is there a craniotomy procedure?"""
-        return self.procedure is not None and "HP+C" in self.procedure
+        return self.procedure is not None and ("HP+C" in self.procedure or "WHC NP" in self.procedure or "C CAM" in self.procedure)
 
     def has_fiber_implant_procedure(self) -> bool:
         """Is there a fiber implant procedure?"""
