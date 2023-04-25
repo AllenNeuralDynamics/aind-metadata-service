@@ -31,6 +31,7 @@ class HeadPost(Enum):
     AI_HEADBAR = "AI Straight bar"
     OTHER = "Other (add details in requestor comments)"
     WHC_NP = "WHC NP"
+    WHC_2P = "WHC 2P"
     VISUAL_CTX = "Visual Ctx"
     FRONTAL_CTX = "Frontal Ctx"
     MOTOR_CTX = "Motor Ctx"
@@ -45,6 +46,7 @@ class HeadPostType(Enum):
     OTHER = "Other (See requestor comments)"
     CAM = "Scientifica (CAM)"
     WHC_NP = "WHC NP"
+    WHC_2P = "WHC 2P"
 
 
 class BurrHoleProcedure(Enum):
@@ -75,6 +77,8 @@ class HeadPostInfo2023(HeadPostInfo):
             headframe_part_number = "0160-100-10"
         elif hp == HeadPost.WHC_NP:
             headframe_part_number = "0160-100-42"
+        elif hp == HeadPost.WHC_2P:
+            headframe_part_number = "0160-100-45"
         elif hp == HeadPost.FRONTAL_CTX:
             headframe_part_number = "0160-100-46"
         elif hp == HeadPost.MOTOR_CTX:
@@ -89,6 +93,8 @@ class HeadPostInfo2023(HeadPostInfo):
             well_part_number = "0160-200-36"
         elif hp_type == HeadPostType.WHC_NP:
             well_part_number = "0160-055-08"
+        elif hp_type == HeadPostType.WHC_2P:
+            well_part_number = "0160-200-62"
         else:
             well_part_number = None
         return cls(

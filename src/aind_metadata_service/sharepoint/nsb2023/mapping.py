@@ -317,7 +317,7 @@ class NSB2023Mapping(NSB2019Mapping):
                     name=probe_name,
                     stereotactic_coordinate_ml=burr_hole_info.coordinate_ml,
                     stereotactic_coordinate_ap=burr_hole_info.coordinate_ap,
-                    stereotactic_coordinate_dv=burr_hole_info.coordinate_depth,
+                    stereotactic_coordinate_dv=burr_hole_info.fiber_implant_depth,
                     angle=burr_hole_info.angle,
                     bregma_to_lambda_distance=bregma_to_lambda_distance,
                     stereotactic_coordinate_reference=(
@@ -339,6 +339,8 @@ class NSB2023Mapping(NSB2019Mapping):
                     anaesthesia=anaesthetic,
                 )
                 procedures.append(fiber_implant_proc)
+
+        # Add if no procedure found...
 
         return procedures
 
