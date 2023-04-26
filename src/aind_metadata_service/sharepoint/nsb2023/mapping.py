@@ -72,6 +72,7 @@ class NSB2023Mapping(NSB2019Mapping):
             list_of_procedures.extend(procedures)
         return list_of_procedures
 
+    # flake8: noqa: C901
     def map_nsb_model(self, nsb_model: NSBList2023) -> List[SubjectProcedure]:
         """Maps an individual list item model into List[SubjectProcedures]"""
         procedures = []
@@ -342,7 +343,19 @@ class NSB2023Mapping(NSB2019Mapping):
                 )
                 procedures.append(fiber_implant_proc)
 
-        # Add if no procedure found...
+        # Create generic procedure model if no specific procedures found
+        if len(procedures) == 0:
+            subject_procedure = SubjectProcedure.construct(
+                start_date=self._map_datetime_to_date(
+                    nsb_model.date_of_surgery
+                ),
+                end_date=self._map_datetime_to_date(nsb_model.date_of_surgery),
+                experimenter_full_name=experimenter_full_name,
+                iacuc_protocol=iacuc_protocol,
+                animal_weight_prior=nsb_model.weight_before_surgery,
+                animal_weight_post=nsb_model.weight_after_surgery,
+            )
+            procedures.append(subject_procedure)
 
         return procedures
 
