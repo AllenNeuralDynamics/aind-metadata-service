@@ -1,0 +1,56 @@
+[
+   {
+      "start_date": "2022-01-03",
+      "end_date": "2022-01-03",
+      "experimenter_full_name": "NSB-187",
+      "iacuc_protocol": "2103",
+      "animal_weight_prior": 25.2,
+      "animal_weight_post": 28.2,
+      "weight_unit": "gram",
+      "anaesthesia": {
+         "type": "isoflurane",
+         "duration": 90.0,
+         "duration_unit": "minute",
+         "level": 2.0
+      },
+      "notes": null,
+      "procedure_type": "Headframe",
+      "headframe_type": "Visual Ctx",
+      "headframe_part_number": "0160-100-10",
+      "headframe_material": null,
+      "well_part_number": "0160-200-20",
+      "well_type": "Mesoscope"
+   },
+   {
+      "start_date": "2022-01-03",
+      "end_date": "2022-01-03",
+      "experimenter_full_name": "NSB-187",
+      "iacuc_protocol": "2103",
+      "animal_weight_prior": 25.2,
+      "animal_weight_post": 28.2,
+      "weight_unit": "gram",
+      "anaesthesia": {
+         "type": "isoflurane",
+         "duration": 90.0,
+         "duration_unit": "minute",
+         "level": 2.0
+      },
+      "notes": null,
+      "procedure_type": "Craniotomy",
+      "craniotomy_type": "5 mm",
+      "craniotomy_hemisphere": null,
+      "craniotomy_coordinates_ml": null,
+      "craniotomy_coordinates_ap": null,
+      "craniotomy_coordinates_unit": "millimeter",
+      "craniotomy_coordinates_reference": "Lambda",
+      "bregma_to_lambda_distance": null,
+      "bregma_to_lambda_unit": "millimeter",
+      "craniotomy_size": 5,
+      "craniotomy_size_unit": "millimeter",
+      "implant_part_number": null,
+      "dura_removed": null,
+      "protective_material": null,
+      "workstation_id": "SWS 5",
+      "recovery_time": 30
+   }
+]

@@ -1,0 +1,13 @@
+[
+   {
+      "anaesthesia": null,
+      "animal_weight_post": 28.2,
+      "animal_weight_prior": 25.2,
+      "end_date": "2022-01-03",
+      "experimenter_full_name": "NSB-187",
+      "iacuc_protocol": "2103",
+      "notes": null,
+      "start_date": "2022-01-03",
+      "weight_unit": "gram"
+   }
+]
