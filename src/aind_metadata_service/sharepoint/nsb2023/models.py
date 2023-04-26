@@ -66,8 +66,9 @@ class During(Enum):
 class HeadPostInfo2023(HeadPostInfo):
     """Extends HeadPostInfo data container to include extra constructor"""
 
+    # flake8: noqa: C901
     @classmethod
-    def from_hp_and_hp_type(  # noqa: C901
+    def from_hp_and_hp_type(
         cls, hp: Optional[HeadPost], hp_type: Optional[HeadPostType]
     ):
         """Construct HeadPostInfo2023 from headpost and headpost_type"""
