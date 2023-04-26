@@ -1,0 +1,39 @@
+[
+   {
+      "start_date": "2022-01-03",
+      "end_date": "2022-01-03",
+      "experimenter_full_name": "NSB-187",
+      "iacuc_protocol": "2103",
+      "animal_weight_prior": 25.2,
+      "animal_weight_post": 28.2,
+      "weight_unit": "gram",
+      "anaesthesia": {
+         "type": "isoflurane",
+         "duration": 90.0,
+         "duration_unit": "minute",
+         "level": 2.0
+      },
+      "notes": null,
+      "injection_materials": null,
+      "recovery_time": null,
+      "injection_duration": null,
+      "injection_duration_unit": "minute",
+      "workstation_id": null,
+      "instrument_id": "Ionto #1",
+      "injection_coordinate_ml": null,
+      "injection_coordinate_ap": null,
+      "injection_coordinate_depth": null,
+      "injection_coordinate_unit": "millimeter",
+      "injection_coordinate_reference": "Bregma",
+      "bregma_to_lambda_distance": 6.1,
+      "bregma_to_lambda_unit": "millimeter",
+      "injection_angle": null,
+      "injection_angle_unit": "degree",
+      "targeted_structure": null,
+      "injection_hemisphere": "Right",
+      "procedure_type": "Iontophoresis injection",
+      "injection_current": null,
+      "injection_current_unit": "microamps",
+      "alternating_current": null
+   }
+]

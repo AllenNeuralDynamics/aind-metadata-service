@@ -1,0 +1,54 @@
+[
+   {
+      "start_date": "2022-12-06",
+      "end_date": "2022-12-06",
+      "experimenter_full_name": "NSB-187",
+      "iacuc_protocol": "2115",
+      "animal_weight_prior": null,
+      "animal_weight_post": null,
+      "weight_unit": "gram",
+      "anaesthesia": {
+         "type": "isoflurane",
+         "duration_unit": "minute",
+         "level": null
+      },
+      "notes": null,
+      "procedure_type": "Headframe",
+      "headframe_type": "Neuropixel-style",
+      "headframe_part_number": "0160-100-10",
+      "headframe_material": null,
+      "well_part_number": "0160-200-36",
+      "well_type": "Neuropixel-style"
+   },
+   {
+      "start_date": "2022-12-06",
+      "end_date": "2022-12-06",
+      "experimenter_full_name": "NSB-187",
+      "iacuc_protocol": "2115",
+      "animal_weight_prior": null,
+      "animal_weight_post": null,
+      "weight_unit": "gram",
+      "anaesthesia": {
+         "type": "isoflurane",
+         "duration_unit": "minute",
+         "level": null
+      },
+      "notes": null,
+      "procedure_type": "Craniotomy",
+      "craniotomy_type": "Other",
+      "craniotomy_hemisphere": null,
+      "craniotomy_coordinates_ml": null,
+      "craniotomy_coordinates_ap": null,
+      "craniotomy_coordinates_unit": "millimeter",
+      "craniotomy_coordinates_reference": null,
+      "bregma_to_lambda_distance": null,
+      "bregma_to_lambda_unit": "millimeter",
+      "craniotomy_size": null,
+      "craniotomy_size_unit": "millimeter",
+      "implant_part_number": null,
+      "dura_removed": null,
+      "protective_material": null,
+      "workstation_id": "SWS 3",
+      "recovery_time": null
+   }
+]
