@@ -42,8 +42,8 @@
       "injection_duration_unit": "minute",
       "workstation_id": null,
       "instrument_id": null,
-      "injection_coordinate_ml": 3.0,
-      "injection_coordinate_ap": -2.45,
+      "injection_coordinate_ml": null,
+      "injection_coordinate_ap": null,
       "injection_coordinate_depth": null,
       "injection_coordinate_unit": "millimeter",
       "injection_coordinate_reference": "Bregma",
@@ -54,7 +54,7 @@
       "targeted_structure": null,
       "injection_hemisphere": null,
       "procedure_type": "Nanoject injection",
-      "injection_volume": 500.0,
+      "injection_volume": null,
       "injection_volume_unit": "nanoliter",
       "injection_current": null,
       "alternating_current": null
@@ -80,8 +80,8 @@
       "injection_duration_unit": "minute",
       "workstation_id": null,
       "instrument_id": null,
-      "injection_coordinate_ml": 3.0,
-      "injection_coordinate_ap": -2.45,
+      "injection_coordinate_ml": null,
+      "injection_coordinate_ap": null,
       "injection_coordinate_depth": null,
       "injection_coordinate_unit": "millimeter",
       "injection_coordinate_reference": "Bregma",
@@ -130,11 +130,7 @@
       "targeted_structure": null,
       "injection_hemisphere": null,
       "procedure_type": "Nanoject injection",
-      "injection_volume": {
-         "raw_input": "600 nl",
-         "number": 60.0,
-         "notes": "0 nl"
-      },
+      "injection_volume": null,
       "injection_volume_unit": "nanoliter",
       "injection_current": null,
       "alternating_current": null

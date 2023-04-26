@@ -55,7 +55,7 @@ class NSB2023Mapping(NSB2019Mapping):
         List[SubjectProcedure]
 
         """
-        labtrack_alias = NSBList2023.__fields__.get('labtracks_id').alias
+        labtrack_alias = NSBList2023.__fields__.get("labtracks_id").alias
         filter_string = f"{labtrack_alias} eq '{subject_id}'"
         list_view = client_context.web.lists.get_by_title(
             list_title
@@ -317,7 +317,9 @@ class NSB2023Mapping(NSB2019Mapping):
                     name=probe_name,
                     stereotactic_coordinate_ml=burr_hole_info.coordinate_ml,
                     stereotactic_coordinate_ap=burr_hole_info.coordinate_ap,
-                    stereotactic_coordinate_dv=burr_hole_info.fiber_implant_depth,
+                    stereotactic_coordinate_dv=(
+                        burr_hole_info.fiber_implant_depth
+                    ),
                     angle=burr_hole_info.angle,
                     bregma_to_lambda_distance=bregma_to_lambda_distance,
                     stereotactic_coordinate_reference=(

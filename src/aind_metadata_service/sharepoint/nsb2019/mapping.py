@@ -29,7 +29,6 @@ from aind_metadata_service.sharepoint.nsb2019.models import (
     Hemisphere,
     InjectionType,
     NSBList2019,
-    NumberWithNotes,
 )
 
 
@@ -58,7 +57,7 @@ class NSB2019Mapping:
 
         """
 
-        labtrack_alias = NSBList2019.__fields__.get('labtracks_id').alias
+        labtrack_alias = NSBList2019.__fields__.get("labtracks_id").alias
         filter_string = f"{labtrack_alias} eq '{subject_id}'"
         list_view = client_context.web.lists.get_by_title(
             list_title
@@ -150,14 +149,12 @@ class NSB2019Mapping:
             inj1_kwargs["injection_hemisphere"] = self._map_hemisphere(
                 nsb_model.virus_hemisphere
             )
-            inj1_kwargs["injection_coordinate_ml"] = nsb_model.virus_ml.number
-            inj1_kwargs["injection_coordinate_ap"] = nsb_model.virus_ap.number
+            inj1_kwargs["injection_coordinate_ml"] = nsb_model.virus_ml
+            inj1_kwargs["injection_coordinate_ap"] = nsb_model.virus_ap
             inj1_kwargs[
                 "injection_coordinate_reference"
             ] = self._map_ap_info_to_coord_reference(nsb_model.virus_ap)
-            inj1_kwargs[
-                "injection_coordinate_depth"
-            ] = nsb_model.virus_dv.number
+            inj1_kwargs["injection_coordinate_depth"] = nsb_model.virus_dv
             inj1_kwargs["injection_angle"] = nsb_model.inj1_angle0
             inj1_kwargs["bregma_to_lambda_distance"] = nsb_model.breg_2_lamb
             # inj1_virus_strain = nsb_model.inj1_virus_strain_rt
@@ -212,18 +209,12 @@ class NSB2019Mapping:
             inj2_kwargs["injection_hemisphere"] = self._map_hemisphere(
                 nsb_model.hemisphere_2nd_inj
             )
-            inj2_kwargs[
-                "injection_coordinate_ml"
-            ] = nsb_model.ml_2nd_inj.number
-            inj2_kwargs[
-                "injection_coordinate_ap"
-            ] = nsb_model.ap_2nd_inj.number
+            inj2_kwargs["injection_coordinate_ml"] = nsb_model.ml_2nd_inj
+            inj2_kwargs["injection_coordinate_ap"] = nsb_model.ap_2nd_inj
             inj2_kwargs[
                 "injection_coordinate_reference"
             ] = self._map_ap_info_to_coord_reference(nsb_model.ap_2nd_inj)
-            inj2_kwargs[
-                "injection_coordinate_depth"
-            ] = nsb_model.dv_2nd_inj.number
+            inj2_kwargs["injection_coordinate_depth"] = nsb_model.dv_2nd_inj
             inj2_kwargs["injection_angle"] = nsb_model.inj2_angle0
             # Is this the same for 1st and 2nd injections?
             inj2_kwargs["bregma_to_lambda_distance"] = nsb_model.breg_2_lamb
@@ -299,8 +290,8 @@ class NSB2019Mapping:
             bregma_to_lambda_distance = nsb_model.breg_2_lamb
             if fiber_implant1 is not None:
                 name = ProbeName.PROBE_A.value
-                stereotactic_coordinate_ml = nsb_model.virus_ml.number
-                stereotactic_coordinate_ap = nsb_model.virus_ap.number
+                stereotactic_coordinate_ml = nsb_model.virus_ml
+                stereotactic_coordinate_ap = nsb_model.virus_ap
                 coordinate_reference = self._map_ap_info_to_coord_reference(
                     nsb_model.virus_ap
                 )
@@ -318,8 +309,8 @@ class NSB2019Mapping:
                 ophys_probes.append(ophys_probe1)
             if fiber_implant2 is not None:
                 name = ProbeName.PROBE_B.value
-                stereotactic_coordinate_ml = nsb_model.ml_2nd_inj.number
-                stereotactic_coordinate_ap = nsb_model.ap_2nd_inj.number
+                stereotactic_coordinate_ml = nsb_model.ml_2nd_inj
+                stereotactic_coordinate_ap = nsb_model.ap_2nd_inj
                 coordinate_reference = self._map_ap_info_to_coord_reference(
                     nsb_model.ap_2nd_inj
                 )
@@ -417,15 +408,10 @@ class NSB2019Mapping:
 
     @staticmethod
     def _map_ap_info_to_coord_reference(
-        nsb_virus_ap: Optional[NumberWithNotes],
+        _: None,
     ) -> Optional[CoordinateReferenceLocation]:
         """Maps NSB virus ap into AIND CoordinateReferenceLocation"""
-        if nsb_virus_ap.number is None and nsb_virus_ap.notes is None:
-            return None
-        elif nsb_virus_ap.notes and "lambda" in nsb_virus_ap.notes:
-            return CoordinateReferenceLocation.LAMBDA
-        else:
-            return CoordinateReferenceLocation.BREGMA
+        return None
 
     @staticmethod
     def _map_virus_strain_to_materials(

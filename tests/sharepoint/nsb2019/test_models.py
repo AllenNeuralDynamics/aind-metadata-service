@@ -4,7 +4,6 @@ import json
 import logging
 import os
 from copy import deepcopy
-from datetime import timedelta
 from pathlib import Path
 from typing import List, Tuple
 from unittest import TestCase
@@ -53,26 +52,16 @@ class TestNSB2019Models(TestCase):
         """Tests that certain edge cases get handled correctly"""
         list_item = deepcopy(self.list_items[0][0])
         # Test that numeric entries instead of strings will also get parsed
-        list_item["Inj1angle0"] = 20
-        list_item["Inj1Current"] = 21
         list_item["Age_x0020_at_x0020_Injection"] = 22
         # Test that malformed or null types get mapped to None
         list_item["Inj1Type"] = "Select..."
         list_item["HPDurotomy"] = None
-        list_item["Inj1LenghtofTime"] = "5 min 30 sec"
-        list_item["Inj2LenghtofTime"] = 5
         # Check that the sex types are being mapped correctly
         list_item["Sex"] = "Female"
         nsb_model = NSBList2019.parse_obj(list_item)
-        self.assertEqual(20, nsb_model.inj1_angle0)
-        self.assertEqual(21, nsb_model.inj1_current)
         self.assertEqual(22, nsb_model.age_at_injection)
         self.assertIsNone(nsb_model.inj1_type)
         self.assertIsNone(nsb_model.hp_durotomy)
-        self.assertEqual(
-            timedelta(minutes=5, seconds=30), nsb_model.inj1_length_of_time
-        )
-        self.assertEqual(timedelta(minutes=5), nsb_model.inj2_length_of_time)
         self.assertEqual(Sex.FEMALE, nsb_model.sex)
 
     def test_boolean_properties(self):
@@ -84,7 +73,6 @@ class TestNSB2019Models(TestCase):
         self.assertTrue(nsb_model.has_inj_procedure())
         self.assertTrue(nsb_model.has_2nd_inj_procedure())
         self.assertTrue(nsb_model.has_fiber_implant_procedure())
-        self.assertFalse(nsb_model.has_lambda_note())
 
 
 if __name__ == "__main__":

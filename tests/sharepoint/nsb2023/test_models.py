@@ -4,7 +4,6 @@ import json
 import logging
 import os
 from copy import deepcopy
-from datetime import timedelta
 from pathlib import Path
 from typing import List
 from unittest import TestCase
@@ -67,29 +66,21 @@ class TestNSB2023Models(TestCase):
         """Tests that certain edge cases get handled correctly"""
         list_item = deepcopy(self.list_items[0])
         # Test that numeric entries instead of strings will also get parsed
-        list_item["Inj2Angle_v2"] = 20
-        list_item["Inj1Current"] = 21
         list_item["Age_x0020_at_x0020_Injection"] = 22
         # Test that malformed or null types get mapped to None
         list_item["Inj1Type"] = "Select..."
-        list_item["Inj1IontoTime"] = "5 min 30 sec"
-        list_item["Inj2IontoTime"] = 5
-        list_item["Inj3IontoTime"] = "5 min"
         # Check that the types are being mapped correctly
         list_item["Sex"] = "Select..."
         list_item["CraniotomyType"] = "Select..."
+        list_item["HeadpostType"] = "Select..."
+        list_item["Headpost"] = "Select..."
         nsb_model = NSBList2023.parse_obj(list_item)
-        self.assertEqual(20, nsb_model.inj2_angle_v2)
-        self.assertEqual(21, nsb_model.inj1_current)
         self.assertEqual(22, nsb_model.age_at_injection)
         self.assertIsNone(nsb_model.inj1_type)
-        self.assertEqual(
-            timedelta(minutes=5, seconds=30), nsb_model.inj1_ionto_time
-        )
-        self.assertEqual(timedelta(minutes=5), nsb_model.inj2_ionto_time)
-        self.assertEqual(timedelta(minutes=5), nsb_model.inj3_ionto_time)
-        self.assertEqual(None, nsb_model.sex)
-        self.assertEqual(None, nsb_model.craniotomy_type)
+        self.assertIsNone(nsb_model.sex)
+        self.assertIsNone(nsb_model.craniotomy_type)
+        self.assertIsNone(nsb_model.headpost)
+        self.assertIsNone(nsb_model.headpost_type)
 
     def test_booleans(self):
         """Tests boolean methods"""

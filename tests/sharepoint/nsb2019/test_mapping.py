@@ -10,7 +10,11 @@ from typing import List, Tuple
 from unittest import TestCase
 from unittest import main as unittest_main
 
-from aind_data_schema.procedures import BrainInjection, CraniotomyType
+from aind_data_schema.procedures import (
+    BrainInjection,
+    CraniotomyType,
+    InjectionMaterial,
+)
 
 from aind_metadata_service.sharepoint.nsb2019.mapping import NSB2019Mapping
 from aind_metadata_service.sharepoint.nsb2019.models import NSBList2019
@@ -82,6 +86,7 @@ class TestNSB2019Parsers(TestCase):
         raw_data["Inj2Type"] = "Select..."
         raw_data["Procedure"] = "INJ"
         raw_data["Virus_x0020_A_x002f_P"] = "Select..."
+        raw_data["ImplantIDCoverslipType"] = "3.5"
         nsb_model = NSBList2019.parse_obj(raw_data)
         mapper = NSB2019Mapping()
         mapped_procedure = mapper.map_nsb_model(nsb_model)
@@ -124,6 +129,15 @@ class TestNSB2019Parsers(TestCase):
         duration2 = None
         minutes2 = mapper._duration_to_minutes(duration2)
         self.assertIsNone(minutes2)
+
+    def test_virus_strain_mapping(self):
+        """Tests map_virus_strain_to_materials method."""
+        mapper = NSB2019Mapping()
+        inj_materials = mapper._map_virus_strain_to_materials("abc")
+        expected_inj_materials = InjectionMaterial.construct(
+            full_genome_name="abc"
+        )
+        self.assertEqual(expected_inj_materials, inj_materials)
 
 
 if __name__ == "__main__":

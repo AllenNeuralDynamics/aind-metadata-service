@@ -67,7 +67,7 @@ class HeadPostInfo2023(HeadPostInfo):
     """Extends HeadPostInfo data container to include extra constructor"""
 
     @classmethod
-    def from_hp_and_hp_type(
+    def from_hp_and_hp_type(  # noqa: C901
         cls, hp: Optional[HeadPost], hp_type: Optional[HeadPostType]
     ):
         """Construct HeadPostInfo2023 from headpost and headpost_type"""
@@ -144,9 +144,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
 
     _view_title = "New Request"
 
-    ap_2nd_inj: Optional[NumberWithNotes] = Field(
-        default=None, alias="AP2ndInj"
-    )
+    ap_2nd_inj: None = Field(default=None, alias="AP2ndInj")
     age_at_injection: Optional[float] = Field(
         default=None, alias="Age_x0020_at_x0020_Injection"
     )
@@ -174,18 +172,12 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     burr2_virus_biosafte: Optional[str] = Field(
         default=None, alias="Burr2_x0020_Virus_x0020_Biosafte"
     )
-    burr3_ap: Optional[float] = Field(
-        default=None, alias="Burr3_x0020_A_x002f_P"
-    )
-    burr3_dv: Optional[float] = Field(
-        default=None, alias="Burr3_x0020_D_x002f_V"
-    )
+    burr3_ap: None = Field(default=None, alias="Burr3_x0020_A_x002f_P")
+    burr3_dv: None = Field(default=None, alias="Burr3_x0020_D_x002f_V")
     burr3_injection_devi: Optional[str] = Field(
         default=None, alias="Burr3_x0020_Injection_x0020_Devi"
     )
-    burr3_ml: Optional[float] = Field(
-        default=None, alias="Burr3_x0020_M_x002f_L"
-    )
+    burr3_ml: None = Field(default=None, alias="Burr3_x0020_M_x002f_L")
     burr3_perform_during: Optional[During] = Field(
         default=None, alias="Burr3_x0020_Perform_x0020_During"
     )
@@ -195,18 +187,12 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     burr3_virus_biosafet: Optional[str] = Field(
         default=None, alias="Burr3_x0020_Virus_x0020_Biosafet"
     )
-    burr4_ap: Optional[float] = Field(
-        default=None, alias="Burr4_x0020_A_x002f_P"
-    )
-    burr4_dv: Optional[float] = Field(
-        default=None, alias="Burr4_x0020_D_x002f_V"
-    )
+    burr4_ap: None = Field(default=None, alias="Burr4_x0020_A_x002f_P")
+    burr4_dv: None = Field(default=None, alias="Burr4_x0020_D_x002f_V")
     burr4_injection_devi: Optional[str] = Field(
         default=None, alias="Burr4_x0020_Injection_x0020_Devi"
     )
-    burr4_ml: Optional[float] = Field(
-        default=None, alias="Burr4_x0020_M_x002f_L"
-    )
+    burr4_ml: None = Field(default=None, alias="Burr4_x0020_M_x002f_L")
     burr4_perform_during: Optional[During] = Field(
         default=None, alias="Burr4_x0020_Perform_x0020_During"
     )
@@ -216,15 +202,11 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     burr4_virus_biosafte: Optional[str] = Field(
         default=None, alias="Burr4_x0020_Virus_x0020_Biosafte"
     )
-    burr_3_angle: Optional[float] = Field(
-        default=None, alias="Burr_x0020_3_x0020_Angle"
-    )
+    burr_3_angle: None = Field(default=None, alias="Burr_x0020_3_x0020_Angle")
     burr_3_hemisphere: Optional[Hemisphere] = Field(
         default=None, alias="Burr_x0020_3_x0020_Hemisphere"
     )
-    burr_4_angle: Optional[float] = Field(
-        default=None, alias="Burr_x0020_4_x0020_Angle"
-    )
+    burr_4_angle: None = Field(default=None, alias="Burr_x0020_4_x0020_Angle")
     burr_4_hemisphere: Optional[Hemisphere] = Field(
         default=None, alias="Burr_x0020_4_x0020_Hemisphere"
     )
@@ -261,9 +243,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
         default=None, alias="Craniotomy_x0020_Perform_x0020_D"
     )
     created: Optional[datetime] = Field(default=None, alias="Created")
-    dv_2nd_inj: Optional[NumberWithNotes] = Field(
-        default=None, alias="DV2ndInj"
-    )
+    dv_2nd_inj: None = Field(default=None, alias="DV2ndInj")
     date_1st_injection: Optional[datetime] = Field(
         default=None, alias="Date1stInjection"
     )
@@ -341,43 +321,37 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     implant_id_coverslip_type: Optional[NumberWithNotes] = Field(
         default=None, alias="ImplantIDCoverslipType"
     )
-    inj1_alternating_time: Optional[str] = Field(
+    inj1_alternating_time: None = Field(
         default=None, alias="Inj1AlternatingTime"
     )
-    inj1_angle_v2: Optional[float] = Field(default=None, alias="Inj1Angle_v2")
-    inj1_current: Optional[float] = Field(default=None, alias="Inj1Current")
-    inj1_ionto_time: Optional[timedelta] = Field(
-        default=None, alias="Inj1IontoTime"
-    )
+    inj1_angle_v2: None = Field(default=None, alias="Inj1Angle_v2")
+    inj1_current: None = Field(default=None, alias="Inj1Current")
+    inj1_ionto_time: None = Field(default=None, alias="Inj1IontoTime")
     inj1_storage_location: Optional[str] = Field(
         default=None, alias="Inj1StorageLocation"
     )
     inj1_type: Optional[InjectionType] = Field(default=None, alias="Inj1Type")
-    inj1_virus_strain_rt: Optional[str] = Field(
+    inj1_virus_strain_rt: None = Field(
         default=None, alias="Inj1VirusStrain_rt"
     )
-    inj2_alternating_time: Optional[str] = Field(
+    inj2_alternating_time: None = Field(
         default=None, alias="Inj2AlternatingTime"
     )
-    inj2_angle_v2: Optional[float] = Field(default=None, alias="Inj2Angle_v2")
-    inj2_current: Optional[float] = Field(default=None, alias="Inj2Current")
-    inj2_ionto_time: Optional[timedelta] = Field(
-        default=None, alias="Inj2IontoTime"
-    )
+    inj2_angle_v2: None = Field(default=None, alias="Inj2Angle_v2")
+    inj2_current: None = Field(default=None, alias="Inj2Current")
+    inj2_ionto_time: None = Field(default=None, alias="Inj2IontoTime")
     inj2_storage_location: Optional[str] = Field(
         default=None, alias="Inj2StorageLocation"
     )
     inj2_type: Optional[InjectionType] = Field(default=None, alias="Inj2Type")
-    inj2_virus_strain_rt: Optional[str] = Field(
+    inj2_virus_strain_rt: None = Field(
         default=None, alias="Inj2VirusStrain_rt"
     )
-    inj3_alternating_time: Optional[str] = Field(
+    inj3_alternating_time: None = Field(
         default=None, alias="Inj3AlternatingTime"
     )
-    inj3_current: Optional[float] = Field(default=None, alias="Inj3Current")
-    inj3_ionto_time: Optional[timedelta] = Field(
-        default=None, alias="Inj3IontoTime"
-    )
+    inj3_current: None = Field(default=None, alias="Inj3Current")
+    inj3_ionto_time: None = Field(default=None, alias="Inj3IontoTime")
     inj3_storage_location: Optional[str] = Field(
         default=None, alias="Inj3StorageLocation"
     )
@@ -385,32 +359,24 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     inj3_ret_setting: Optional[str] = Field(
         default=None, alias="Inj3retSetting"
     )
-    inj3_vol_per_depth: Optional[NumberWithNotes] = Field(
-        default=None, alias="Inj3volperdepth"
-    )
-    inj4_alternating_time: Optional[str] = Field(
+    inj3_vol_per_depth: None = Field(default=None, alias="Inj3volperdepth")
+    inj4_alternating_time: None = Field(
         default=None, alias="Inj4AlternatingTime"
     )
-    inj4_current: Optional[float] = Field(default=None, alias="Inj4Current")
-    inj4_ionto_time: Optional[timedelta] = Field(
-        default=None, alias="Inj4IontoTime"
-    )
+    inj4_current: None = Field(default=None, alias="Inj4Current")
+    inj4_ionto_time: None = Field(default=None, alias="Inj4IontoTime")
     inj4_storage_location: Optional[str] = Field(
         default=None, alias="Inj4StorageLocation"
     )
     inj4_type: Optional[InjectionType] = Field(default=None, alias="Inj4Type")
-    inj4_virus_strain_rt: Optional[str] = Field(
+    inj4_virus_strain_rt: None = Field(
         default=None, alias="Inj4VirusStrain_rt"
     )
     inj4_ret_setting: Optional[str] = Field(
         default=None, alias="Inj4retSetting"
     )
-    inj4_vol_per_depth: Optional[NumberWithNotes] = Field(
-        default=None, alias="Inj4volperdepth"
-    )
-    inj_virus_strain_rt: Optional[str] = Field(
-        default=None, alias="InjVirusStrain_rt"
-    )
+    inj4_vol_per_depth: None = Field(default=None, alias="Inj4volperdepth")
+    inj_virus_strain_rt: None = Field(default=None, alias="InjVirusStrain_rt")
     ionto_number_inj1: Optional[str] = Field(
         default=None, alias="IontoNumberInj1"
     )
@@ -436,9 +402,7 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     long_requestor_comments: Optional[str] = Field(
         default=None, alias="LongRequestorComments"
     )
-    ml_2nd_inj: Optional[NumberWithNotes] = Field(
-        default=None, alias="ML2ndInj"
-    )
+    ml_2nd_inj: None = Field(default=None, alias="ML2ndInj")
     modified: Optional[datetime] = Field(default=None, alias="Modified")
     nanoject_number_inj10: Optional[str] = Field(
         default=None, alias="NanojectNumberInj10"
@@ -486,18 +450,12 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     test1_id: Optional[int] = Field(default=None, alias="Test1Id")
     test1_string_id: Optional[str] = Field(default=None, alias="Test1StringId")
     title: Optional[str] = Field(default=None, alias="Title")
-    virus_ap: Optional[NumberWithNotes] = Field(
-        default=None, alias="Virus_x0020_A_x002f_P"
-    )
-    virus_dv: Optional[NumberWithNotes] = Field(
-        default=None, alias="Virus_x0020_D_x002f_V"
-    )
+    virus_ap: None = Field(default=None, alias="Virus_x0020_A_x002f_P")
+    virus_dv: None = Field(default=None, alias="Virus_x0020_D_x002f_V")
     virus_hemisphere: Optional[Hemisphere] = Field(
         default=None, alias="Virus_x0020_Hemisphere"
     )
-    virus_ml: Optional[NumberWithNotes] = Field(
-        default=None, alias="Virus_x0020_M_x002f_L"
-    )
+    virus_ml: None = Field(default=None, alias="Virus_x0020_M_x002f_L")
     weight_after_surgery: Optional[float] = Field(
         default=None, alias="Weight_x0020_after_x0020_Surgery"
     )
@@ -507,24 +465,59 @@ class NSBList2023(BaseModel, extra=Extra.allow):
     work_station_1st_injection: Optional[str] = Field(
         default=None, alias="WorkStation1stInjection"
     )
-    inj1_vol_per_depth: Optional[float] = Field(
-        default=None, alias="inj1volperdepth"
-    )
-    inj2_vol_per_depth: Optional[float] = Field(
-        default=None, alias="inj2volperdepth"
-    )
+    inj1_vol_per_depth: None = Field(default=None, alias="inj1volperdepth")
+    inj2_vol_per_depth: None = Field(default=None, alias="inj2volperdepth")
     ret_setting0: Optional[str] = Field(default=None, alias="retSetting0")
     ret_setting1: Optional[str] = Field(default=None, alias="retSetting1")
 
+    # TODO: Add special parsing for following fields
     @validator(
-        "age_at_injection",
-        "breg_2_lamb",
+        "ap_2nd_inj",
         "burr3_ap",
         "burr3_dv",
         "burr3_ml",
         "burr4_ap",
         "burr4_dv",
         "burr4_ml",
+        "burr_3_angle",
+        "burr_4_angle",
+        "dv_2nd_inj",
+        "inj1_alternating_time",
+        "inj1_angle_v2",
+        "inj1_current",
+        "inj1_ionto_time",
+        "inj1_virus_strain_rt",
+        "inj2_alternating_time",
+        "inj2_angle_v2",
+        "inj2_current",
+        "inj2_ionto_time",
+        "inj2_virus_strain_rt",
+        "inj3_alternating_time",
+        "inj3_current",
+        "inj3_ionto_time",
+        "inj3_vol_per_depth",
+        "inj4_alternating_time",
+        "inj4_current",
+        "inj4_ionto_time",
+        "inj4_virus_strain_rt",
+        "inj4_vol_per_depth",
+        "inj_virus_strain_rt",
+        "ml_2nd_inj",
+        "virus_ap",
+        "virus_dv",
+        "virus_ml",
+        "inj1_vol_per_depth",
+        "inj2_vol_per_depth",
+        pre=True,
+    )
+    def parse_inconsistent_inputs(cls, _: Optional[str]) -> None:
+        """Placeholder method that maps strings to None. Will need to add
+        special handling of these fields down the road."""
+        return None
+
+    @validator(
+        "age_at_injection",
+        "breg_2_lamb",
         "fiber_implant1_dv",
         "fiber_implant2_dv",
         "fiber_implant3_d",
@@ -538,8 +531,6 @@ class NSBList2023(BaseModel, extra=Extra.allow):
         "round1_inj_iso_level",
         "weight_after_surgery",
         "weight_before_surgery",
-        "inj1_vol_per_depth",
-        "inj2_vol_per_depth",
         pre=True,
     )
     def parse_basic_num_str_to_float(
@@ -580,20 +571,12 @@ class NSBList2023(BaseModel, extra=Extra.allow):
         "hp_surgeon_comments",
         "hp_work_station",
         "iacuc_protocol",
-        "inj1_alternating_time",
         "inj1_storage_location",
-        "inj1_virus_strain_rt",
-        "inj2_alternating_time",
         "inj2_storage_location",
-        "inj2_virus_strain_rt",
-        "inj3_alternating_time",
         "inj3_storage_location",
         "inj3_ret_setting",
-        "inj4_alternating_time",
         "inj4_storage_location",
-        "inj4_virus_strain_rt",
         "inj4_ret_setting",
-        "inj_virus_strain_rt",
         "ionto_number_inj1",
         "ionto_number_inj2",
         "lims_project",
@@ -641,19 +624,11 @@ class NSBList2023(BaseModel, extra=Extra.allow):
             return v
 
     @validator(
-        "ap_2nd_inj",
-        "dv_2nd_inj",
         "fiber_implant1_length",
         "fiber_implant2_length",
         "fiber_implant3_length",
         "fiber_implant4_length",
         "implant_id_coverslip_type",
-        "inj3_vol_per_depth",
-        "inj4_vol_per_depth",
-        "ml_2nd_inj",
-        "virus_ap",
-        "virus_dv",
-        "virus_ml",
         pre=True,
     )
     def parse_numeric_with_notes(cls, v: Union[str, None]) -> NumberWithNotes:
@@ -673,50 +648,6 @@ class NSBList2023(BaseModel, extra=Extra.allow):
             )
         else:
             return NumberWithNotes(raw_input=v)
-
-    @validator(
-        "burr_3_angle",
-        "burr_4_angle",
-        "inj1_angle_v2",
-        "inj2_angle_v2",
-        pre=True,
-    )
-    def parse_angle_str_float(
-        cls, v: Union[str, int, float, None]
-    ) -> Optional[float]:
-        """Parses string like '30 degrees' into a float"""
-        pattern = (
-            r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))\s*"
-            r"(?:deg|degs|degree|degrees){0,1}\s*$"
-        )
-        if type(v) is str and re.match(pattern, v):
-            return re.match(pattern, v).group(1)
-        elif type(v) is int or type(v) is float:
-            return v
-        else:
-            return None
-
-    @validator(
-        "inj1_current",
-        "inj2_current",
-        "inj3_current",
-        "inj4_current",
-        pre=True,
-    )
-    def parse_current_str_float(
-        cls, v: Union[str, int, float, None]
-    ) -> Optional[float]:
-        """Parses strings like 3.5 or 3.5uA into 3.5. Will map strings like
-        3.5min to None"""
-        pattern = (
-            r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))(\s*uA\s*)*$"
-        )
-        if type(v) is str and re.match(pattern, v):
-            return re.match(pattern, v).group(1)
-        elif type(v) is int or type(v) is float:
-            return v
-        else:
-            return None
 
     @validator(
         "burr1_perform_during",
@@ -787,38 +718,6 @@ class NSBList2023(BaseModel, extra=Extra.allow):
         """Parses string into a InjectionType model"""
         if type(v) is str and v in [e.value for e in InjectionType]:
             return InjectionType(v)
-        else:
-            return None
-
-    @validator(
-        "inj1_ionto_time",
-        "inj2_ionto_time",
-        "inj3_ionto_time",
-        "inj4_ionto_time",
-        pre=True,
-    )
-    def parse_time_length(
-        cls, v: Union[str, int, float, None]
-    ) -> Optional[timedelta]:
-        """Parses time length string into timedelta"""
-        pattern1 = (
-            r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))\s*"
-            r"(?:min|mins|minute|minutes){0,1}\s*$"
-        )
-        pattern2 = (
-            r"([-+]?(?:[0-9]*[.]?[0-9]+(?:[eE][-+]?[0-9]+)?))\s*"
-            r"(?:min|mins|minute|minutes){1}\s*(\d+)\s*"
-            r"(?:sec|secs|second|seconds)(?:/depth|/location)*$"
-        )
-        if type(v) is str and re.match(pattern1, v):
-            minutes = float(re.match(pattern1, v).group(1))
-            return timedelta(minutes=minutes)
-        elif type(v) is str and re.match(pattern2, v):
-            minutes = float(re.match(pattern2, v).group(1))
-            seconds = float(re.match(pattern2, v).group(2))
-            return timedelta(minutes=minutes, seconds=seconds)
-        elif type(v) is int or type(v) is float:
-            return timedelta(minutes=v)
         else:
             return None
 
@@ -915,9 +814,9 @@ class NSBList2023(BaseModel, extra=Extra.allow):
         if burr_hole_num == 1:
             return BurrHoleInfo(
                 hemisphere=self.virus_hemisphere,
-                coordinate_ml=self.virus_ml.number,
-                coordinate_ap=self.virus_ap.number,
-                coordinate_depth=self.virus_dv.number,
+                coordinate_ml=self.virus_ml,
+                coordinate_ap=self.virus_ap,
+                coordinate_depth=self.virus_dv,
                 angle=self.inj1_angle_v2,
                 during=self.burr1_perform_during,
                 inj_type=self.inj1_type,
@@ -931,9 +830,9 @@ class NSBList2023(BaseModel, extra=Extra.allow):
         elif burr_hole_num == 2:
             return BurrHoleInfo(
                 hemisphere=self.hemisphere_2nd_inj,
-                coordinate_ml=self.ml_2nd_inj.number,
-                coordinate_ap=self.ap_2nd_inj.number,
-                coordinate_depth=self.dv_2nd_inj.number,
+                coordinate_ml=self.ml_2nd_inj,
+                coordinate_ap=self.ap_2nd_inj,
+                coordinate_depth=self.dv_2nd_inj,
                 angle=self.inj2_angle_v2,
                 during=self.burr2_perform_during,
                 inj_type=self.inj2_type,

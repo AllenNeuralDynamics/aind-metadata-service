@@ -105,6 +105,7 @@ class TestNSB2023Parsers(TestCase):
         list_item = self.list_items[3]
         raw_data = deepcopy(list_item[0])
         raw_data["Inj1Type"] = "Select..."
+        raw_data["ImplantIDCoverslipType"] = "3.5"
         nsb_model = NSBList2023.parse_obj(raw_data)
         mapper = NSB2023Mapping()
         mapped_procedure = mapper.map_nsb_model(nsb_model)
