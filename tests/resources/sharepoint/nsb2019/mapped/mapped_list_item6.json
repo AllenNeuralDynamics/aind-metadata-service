@@ -1,0 +1,23 @@
+[
+   {
+      "start_date": "2022-12-06",
+      "end_date": "2022-12-06",
+      "experimenter_full_name": "NSB-187",
+      "iacuc_protocol": "2115",
+      "animal_weight_prior": null,
+      "animal_weight_post": null,
+      "weight_unit": "gram",
+      "anaesthesia": {
+         "type": "isoflurane",
+         "duration_unit": "minute",
+         "level": null
+      },
+      "notes": null,
+      "procedure_type": "Headframe",
+      "headframe_type": "NGC-style",
+      "headframe_part_number": "0160-100-10",
+      "headframe_material": null,
+      "well_part_number": null,
+      "well_type": null
+   }
+]
