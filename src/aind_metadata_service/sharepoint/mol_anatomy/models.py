@@ -1,10 +1,13 @@
-from pydantic import BaseModel, Field, Extra, validator
-from typing import Optional, List, Union
-from datetime import datetime
+"""Model for Mol Anatomy tracking sheet"""
+
 import re
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
+from typing import List, Optional, Union
+
 import pytz
+from pydantic import BaseModel, Extra, Field, validator
 
 
 @dataclass
@@ -17,11 +20,15 @@ class NumberWithNotes:
 
 
 class Sex(Enum):
+    """Enum of Sex Types"""
+
     MALE = "M"
     FEMALE = "F"
 
 
 class ExcelSheetRow(BaseModel, extra=Extra.allow):
+    """Data model for a row in the excel sheet"""
+
     @staticmethod
     def ignore_excel_sheet(
         excel_sheet_name: str, column_names: List[str]
@@ -160,7 +167,7 @@ class ExcelSheetRow(BaseModel, extra=Extra.allow):
     @validator("ro_injection_date", pre=True)
     def parse_datetime(cls, v: Union[str, int, None]) -> Optional[datetime]:
         """Parses string or datetime to datetime. Removes dashes."""
-        if type(v) is str and v == '-':
+        if type(v) is str and v == "-":
             return None
         elif v is None:
             return None

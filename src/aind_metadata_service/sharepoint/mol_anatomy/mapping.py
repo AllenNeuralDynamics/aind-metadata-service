@@ -1,17 +1,23 @@
-from office365.sharepoint.client_context import ClientContext
-import pandas as pd
-from typing import List
-from aind_metadata_service.sharepoint.mol_anatomy.models import ExcelSheetRow
+"""Module to handle parsing information into aind-data-schema models"""
+
 import json
-from aind_data_schema.procedures import (
-    SubjectProcedure,
-)
+from typing import List
+
+import pandas as pd
+from aind_data_schema.procedures import RetroOrbitalInjection, SubjectProcedure
+from office365.sharepoint.client_context import ClientContext
+
+from aind_metadata_service.sharepoint.mol_anatomy.models import ExcelSheetRow
 
 
 class MolecularAnatomyMapping:
+    """Class that handles retrieving and parsing excel file into
+    aind-data-schema models"""
+
     def get_procedures_from_sharepoint(
         self, subject_id: str, client_context: ClientContext, list_title: str
     ) -> List[SubjectProcedure]:
+        """Gets procedures from excel file in Sharepoint"""
         file = (
             client_context.web.get_file_by_guest_url(list_title)
             .expand(["versions", "listItemAllFields"])
@@ -33,6 +39,8 @@ class MolecularAnatomyMapping:
     def _apply_filter(
         excel_sheets: dict, subject_id: str
     ) -> List[ExcelSheetRow]:
+        """Scan through the excel rows and take only the relevant rows with the
+        subject_id."""
         list_of_records = []
         for sheet_name in [
             sn
@@ -51,4 +59,15 @@ class MolecularAnatomyMapping:
 
     @staticmethod
     def map_model(sharepoint_model: ExcelSheetRow) -> List[SubjectProcedure]:
-        return []
+        """Maps a row in the excel sheet into a list of Procedures"""
+        # Check if retro orbital injection present:
+        if sharepoint_model.ro_injection_date is not None:
+            ro_procedures = [
+                RetroOrbitalInjection.construct(
+                    start_date=sharepoint_model.ro_injection_date,
+                    end_date=sharepoint_model.ro_injection_date,
+                )
+            ]
+        else:
+            ro_procedures = []
+        return ro_procedures
