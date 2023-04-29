@@ -9,48 +9,766 @@ from typing import Optional, Union
 from pydantic import BaseModel, Extra, Field, SecretStr, validator
 
 
-class HeadPostType(Enum):
-    """Enum class for HeadPost Types"""
+class After1StInjection(Enum):
+    BLEEDING = "Bleeding"
+    BLEEDINGFLUID_COMING_UP = "Bleeding/Fluid coming up"
+    FLUID_COMING_UP = "Fluid coming up"
+    NA = "N/A"
+    NO_ISSUES = "No Issues"
+    SELECT = "Select..."
+    SWELLING = "Swelling"
 
-    CAM = "CAM-style headframe (0160-100-10 Rev A)"
-    NEUROPIXEL = "Neuropixel-style headframe (0160-100-10/0160-200-36)"
-    MESO_NGC = (
-        "Mesoscope-style well with NGC-style headframe"
-        " (0160-200-20/0160-100-10)"
-    )
-    WHC_NP = "WHC #42 with Neuropixel well and well cap"
-    NGC = "NGC-style headframe, no well (0160-100-10)"
-    AI_HEADBAR = "AI Straight Headbar"
+
+class After2NdInjection(Enum):
+    BLEEDING = "Bleeding"
+    BLEEDINGFLUID_COMING_UP = "Bleeding/Fluid coming up"
+    FLUID_COMING_UP = "Fluid coming up"
+    NA = "N/A"
+    NO_ISSUES = "No Issues"
+    SELECT = "Select..."
+    SWELLING = "Swelling"
+
+
+class Contusion(Enum):
+    MILD = "Mild"
+    MODERATE = "Moderate"
+    NA = "N/A"
+    NONE = "None"
+    SELECT = "Select..."
+    SEVERE = "Severe"
 
 
 class CraniotomyType(Enum):
-    """Enum class for Craniotomy Types"""
-
-    VISUAL_CORTEX = "Visual Cortex 5mm"
-    FRONTAL_WINDOW = "Frontal Window 3mm"
-    WHC_NP = "WHC NP"
+    FRONTAL_WINDOW_3MM = "Frontal Window 3mm"
+    SELECT = "Select..."
+    VISUAL_CORTEX_5MM = "Visual Cortex 5mm"
     WHC_2P = "WHC 2P"
+    WHC_NP = "WHC NP"
 
 
-class InjectionType(Enum):
-    """Enum class for Injection Types"""
+class During1StInjection(Enum):
+    BLEEDING = "Bleeding"
+    BLEEDINGFLUID_COMING = "Bleeding/Fluid coming"
+    FLUID_COMING_UP = "Fluid coming up"
+    NA = "N/A"
+    NO_ISSUES = "No Issues"
+    PIPETTE_CLOGGEDBROKE_TIP = "Pipette clogged/broke tip"
+    SELECT = "Select..."
+    SWELLING = "Swelling"
 
-    NANOJECT = "Nanoject (Pressure)"
+
+class During2NdInjection(Enum):
+    BLEEDING = "Bleeding"
+    BLEEDINGFLUID_COMING_UP = "Bleeding/Fluid coming up"
+    FLUID_COMING_UP = "Fluid coming up"
+    NA = "N/A"
+    NO_ISSUES = "No Issues"
+    PIPETTE_CLOGGEDBROKE_TIP = "Pipette clogged/broke tip"
+    SELECT = "Select..."
+    SWELLING = "Swelling"
+
+
+class Durotomy(Enum):
+    COMPLETE = "Complete"
+    NA = "N/A"
+    NO = "No"
+    PARTIAL = "Partial"
+    SELECT = "Select..."
+    TORN__COMPLETE = "Torn & Complete"
+    UNINTENTIONAL = "Unintentional"
+
+
+class EdemaSwelling(Enum):
+    MILD = "Mild"
+    MODERATE = "Moderate"
+    NA = "N/A"
+    NONE = "None"
+    SELECT = "Select..."
+    SEVERE = "Severe"
+
+
+class ExudateSeverity(Enum):
+    MILD = "Mild"
+    MODERATE = "Moderate"
+    NONE = "None"
+    SELECT = "Select..."
+    SEVERE = "Severe"
+
+
+class EyeAffected(Enum):
+    BOTH = "Both"
+    LEFT = "Left"
+    NEITHER = "Neither"
+    RIGHT = "Right"
+    SELECT = "Select..."
+
+
+class EyeIssue(Enum):
+    CLOUDPOSSIBLY_BLIND = "Cloud/Possibly Blind"
+    NONE = "None"
+    OTHERSEE_COMMENTS = "Other...(See comments)"
+    PUFFYSWOLLEN = "Puffy/Swollen"
+    SELECT = "Select..."
+    SLIGHTLY_CLOSED = "Slightly Closed"
+    WEEPY = "Weepy"
+
+
+class FirstRoundInjIsoLevel(Enum):
+    N_025 = "0.25"
+    N_050 = "0.50"
+    N_075 = "0.75"
+    N_100 = "1.00"
+    N_125 = "1.25"
+    N_150 = "1.50"
+    N_175 = "1.75"
+    N_200 = "2.00"
+    N_225 = "2.25"
+    N_250 = "2.50"
+    N_275 = "2.75"
+    N_300 = "3.00+"
+    SELECT = "Select..."
+
+
+class FirstRoundInjWorkstation(Enum):
+    SELECT = "Select..."
+    SWS_1 = "SWS 1"
+    SWS_2 = "SWS 2"
+    SWS_3 = "SWS 3"
+    SWS_4 = "SWS 4"
+    SWS_5 = "SWS 5"
+    SWS_6 = "SWS 6"
+    SWS_7 = "SWS 7"
+    SWS_8 = "SWS 8"
+    SWS_9 = "SWS 9"
+
+
+class Firstroundiontoissue(Enum):
+    NA = "N/A"
+    NO = "No"
+    SELECT = "Select..."
+    YES = "Yes"
+
+
+class Firstroundiontonumber(Enum):
+    IONTO_1 = "Ionto #1"
+    IONTO_10 = "Ionto #10"
+    IONTO_2 = "Ionto #2"
+    IONTO_3 = "Ionto #3"
+    IONTO_4 = "Ionto #4"
+    IONTO_5 = "Ionto #5"
+    IONTO_6 = "Ionto #6"
+    IONTO_7 = "Ionto #7"
+    IONTO_8 = "Ionto #8"
+    IONTO_9 = "Ionto #9"
+    NA = "N/A"
+    SELECT = "Select..."
+
+
+class Firstroundnanojectnumber(Enum):
+    NA = "N/A"
+    NJ1 = "NJ#1"
+    NJ2 = "NJ#2"
+    NJ3 = "NJ#3"
+    NJ4 = "NJ#4"
+    NJ5 = "NJ#5"
+    NJ6 = "NJ#6"
+    NJ7 = "NJ#7"
+    NJ8 = "NJ#8"
+    SELECT = "Select..."
+
+
+class HeadpostType(Enum):
+    AI_STRAIGHT_HEADBAR = "AI Straight Headbar"
+    CAMSTYLE_HEADFRAME_016010010_REV_A = (
+        "CAM-style headframe (0160-100-10 Rev A)"
+    )
+    MESOSCOPESTYLE_WELL_WITH_NGCSTYLE_HEADFRAME_016020020016010010 = (
+        "Mesoscope-style well with NGC-style headframe "
+        "(0160-200-20/0160-100-10)"
+    )
+    NEUROPIXELSTYLE_HEADFRAME_016010010016020036 = (
+        "Neuropixel-style headframe (0160-100-10/0160-200-36)"
+    )
+    NGCSTYLE_HEADFRAME_NO_WELL_016010010 = (
+        "NGC-style headframe, no well (0160-100-10)"
+    )
+    SELECT = "Select..."
+    WHC_42_WITH_NEUROPIXEL_WELL_AND_WELL_CAP = (
+        "WHC #42 with Neuropixel well and well cap"
+    )
+
+
+class Hematoma(Enum):
+    MILD = "Mild"
+    MODERATE = "Moderate"
+    NA = "N/A"
+    NONE = "None"
+    SELECT = "Select..."
+    SEVERE = "Severe"
+
+
+class HpDurotomy(Enum):
+    NO = "No"
+    SELECT = "Select..."
+    YES = "Yes"
+
+
+class HpIsoLevel(Enum):
+    N_025 = "0.25"
+    N_050 = "0.50"
+    N_075 = "0.75"
+    N_100 = "1.00"
+    N_125 = "1.25"
+    N_15 = "1.5"
+    N_175 = "1.75"
+    N_200 = "2.00"
+    N_225 = "2.25"
+    N_250 = "2.50"
+    N_275 = "2.75"
+    N_300 = "3.00+"
+    SELECT = "Select..."
+
+
+class HpLocation(Enum):
+    CENTER = "Center"
+    LEFT = "Left"
+    RIGHT = "Right"
+    SELECT = "Select..."
+
+
+class HpPerferations(Enum):
+    LEFT = "Left"
+    NA = "NA"
+    RIGHT = "Right"
+    SELECT_IF_APPLICABLE = "Select if applicable..."
+
+
+class HpWorkStation(Enum):
+    SELECT = "Select..."
+    SWS_1 = "SWS 1"
+    SWS_2 = "SWS 2"
+    SWS_3 = "SWS 3"
+    SWS_4 = "SWS 4"
+    SWS_5 = "SWS 5"
+    SWS_6 = "SWS 6"
+    SWS_7 = "SWS 7"
+    SWS_8 = "SWS 8"
+    SWS_9 = "SWS 9"
+
+
+class IacucProtocol(Enum):
+    N_2001 = "2001"
+    N_2002 = "2002"
+    N_2003 = "2003"
+    N_2004 = "2004"
+    N_2005 = "2005"
+    N_2006 = "2006"
+    N_2011 = "2011"
+    N_2102 = "2102"
+    N_2103 = "2103"
+    N_2104 = "2104"
+    N_2105 = "2105"
+    N_2106 = "2106"
+    N_2107 = "2107"
+    N_2108 = "2108"
+    N_2109 = "2109"
+    N_2110 = "2110"
+    N_2113 = "2113"
+    N_2115 = "2115"
+    N_2117 = "2117"
+    N_2201 = "2201"
+    N_2202 = "2202"
+    N_2205 = "2205"
+    N_2212 = "2212"
+    SELECT = "Select..."
+
+
+class ImplantIdCoverslipType(Enum):
+    CUSTOM_IMPLANT_ADD_DETAILS_IN_COMMENTS_SECTION = (
+        "Custom Implant (add details in comments section)"
+    )
+    N_2001 = "2001"
+    N_2002 = "2002"
+    N_3001 = "3001"
+    N_5MM_STACKED_COVERSLIP = "5mm stacked coverslip"
+    N_5MM_STACKED_COVERSLIP_WITH_SILICONE_COATING_FOR_NEUROPIXEL = (
+        "5mm stacked coverslip (with silicone coating for Neuropixel)"
+    )
+    SELECT = "Select..."
+
+
+class Inj1Angle(Enum):
+    N_0_DEGREES = "0 degrees"
+    N_10_DEGREES = "10 degrees"
+    N_15_DEGREES = "15 degrees"
+    N_20_DEGREES = "20 degrees"
+    N_30_DEGREES = "30 degrees"
+    N_40_DEGREES = "40 degrees"
+    SELECT = "Select..."
+
+
+class Inj1Hemisphere(Enum):
+    LEFT = "Left"
+    RIGHT = "Right"
+    SELECT = "Select..."
+
+
+class Inj1Retsetting(Enum):
+    OFF = "Off"
+    ON = "On"
+
+
+class Inj1Round(Enum):
+    NA = "NA"
+    N_1ST = "1st"
+    N_2ND = "2nd"
+    SELECT = "Select..."
+
+
+class Inj1Type(Enum):
     IONTOPHORESIS = "Iontophoresis"
+    NANOJECT_PRESSURE = "Nanoject (Pressure)"
+    SELECT = "Select..."
+
+
+class Inj2Angle(Enum):
+    N_0_DEGREES = "0 degrees"
+    N_10_DEGREES = "10 degrees"
+    N_15_DEGREES = "15 degrees"
+    N_20_DEGREES = "20 degrees"
+    N_30_DEGREES = "30 degrees"
+    N_40_DEGREES = "40 degrees"
+    SELECT = "Select..."
+
+
+class Inj2Hemisphere(Enum):
+    LEFT = "Left"
+    RIGHT = "Right"
+    SELECT = "Select..."
+
+
+class Inj2Retsetting(Enum):
+    OFF = "Off"
+    ON = "On"
+
+
+class Inj2Round(Enum):
+    NA = "NA"
+    N_1ST = "1st"
+    N_2ND = "2nd"
+    SELECT = "Select..."
+
+
+class Inj2Type(Enum):
+    IONTOPHORESIS = "Iontophoresis"
+    NANOJECT_PRESSURE = "Nanoject (Pressure)"
+    SELECT = "Select..."
+
+
+class Iontonumberhpinj(Enum):
+    IONTO_1 = "Ionto #1"
+    IONTO_2 = "Ionto #2"
+    IONTO_3 = "Ionto #3"
+    IONTO_4 = "Ionto #4"
+    IONTO_5 = "Ionto #5"
+    IONTO_6 = "Ionto #6"
+    IONTO_7 = "Ionto #7"
+    IONTO_8 = "Ionto #8"
+    IONTO_9 = "Ionto #9"
+
+
+class Issue(Enum):
+    EXUDATE = "Exudate"
+    EYE_ISSUE = "Eye Issue"
+    METABOND = "Metabond"
+    MULTIPLE_ISSUES_NOTES_IN_COMMENTS = "Multiple Issues (Notes In comments)"
+    NONSURGICAL_ISSUE = "Non-Surgical Issue"
+    OTHERWRITE_IN_COMMENTS = "Other..(write in comments)"
+    REPLACEMENT_COVERSLIP = "Replacement: Coverslip"
+    REPLACEMENT_KWIKCAST = "Replacement: Kwikcast"
+    REPLACEMENT_ORING = "Replacement: O-ring"
+    SCABBING = "Scabbing"
+    SELECT = "Select..."
+    ZMOTION = "Z-Motion"
+
+
+class Laceration(Enum):
+    MILD = "Mild"
+    MODERATE = "Moderate"
+    NA = "N/A"
+    NONE = "None"
+    SELECT = "Select..."
+    SEVERE = "Severe"
+
+
+class LightCycle(Enum):
+    NORMAL_6AM_TO_8PM = "Normal (6am to 8pm)"
+    REVERSE_9PM_TO_9AM = "Reverse (9pm to 9am)"
+    SELECT = "Select..."
+
+
+class LimsProjectCode(Enum):
+    AINDDISCOVERY = "aind-discovery"
+    AINDEPHYS = "aind-ephys"
+    AINDMSMA = "aind-msma"
+    AINDOPHYS = "aind-ophys"
+    BRAINTVVIRALSTRATEGIES = "BraintvViralStrategies"
+    CELLTYPESTRANSGENICCHARACTERIZATIONGCAMP = (
+        "CelltypesTransgenicCharacterizationGCaMP"
+    )
+    CITRICACIDPILOT = "Citricacidpilot"
+    DYNAMICROUTINGBEHAVIORDEV = "DynamicRoutingBehaviorDev"
+    DYNAMICROUTINGSURGICALDEVELOPMENT = "DynamicRoutingSurgicalDevelopment"
+    DYNAMICROUTINGTASK1PRODUCTION = "DynamicRoutingTask1Production"
+    DYNAMICROUTINGULTRAOPTOTAGGINGBEHAVIOR = (
+        "DynamicRoutingUltraOptotaggingBehavior"
+    )
+    ISIX = "ISIx"
+    LEARNINGMFISHDEVELOPMENT = "LearningmFISHDevelopment"
+    LEARNINGMFISHTASK1A = "LearningmFISHTask1A"
+    MINDSCOPETRANSGENICCHARACTERIZATIONGCAMP = (
+        "MindscopeTransgenicCharacterizationGCaMP"
+    )
+    MIVSCCMET = "mIVSCC-MET"
+    MIVSCCMETX = "mIVSCC-METx"
+    MMPATCH = "mMPatch"
+    MMPATCHX = "mMPATCHx"
+    MOUSEBRAINCELLATLASTRANSSYNAPTIC = "MouseBrainCellAtlasTranssynaptic"
+    MOUSEGENETICTOOLSPROJECTIONMAPPING = "MouseGeneticToolsProjectionMapping"
+    OMFISHCOREGISTRATIONPILOT = "omFISHcoregistrationpilot"
+    OMFISHCUX2MESO = "omFISHCux2Meso"
+    OMFISHGAD2MESO = "omFISHGad2Meso"
+    OMFISHGAD2PILOT = "omFISHGad2Pilot"
+    OMFISHROBINJECTIONVIRUSPILOT = "omFISHROBinjectionviruspilot"
+    OMFISHRORBPILOT = "omFISHRorbPilot"
+    OPENSCOPEDENDRITECOUPLING = "OpenScopeDendriteCoupling"
+    OPENSCOPEDEVELOPMENT = "OpenscopeDevelopment"
+    OPENSCOPEGLOBALLOCALODDBALL = "OpenScopeGlobalLocalOddball"
+    OPENSCOPEILLUSION = "OpenScopeIllusion"
+    OPENSCOPEINJECTIONPILOT = "OpenScopeInjectionPilot"
+    SELECT = "Select..."
+    SURGERYX = "SurgeryX"
+    T301T = "T301t"
+    TASKTRAINEDNETWORKSMULTISCOPE = "TaskTrainedNetworksMultiscope"
+    TASKTRAINEDNETWORKSNEUROPIXEL = "TaskTrainedNetworksNeuropixel"
+    TINYBLUEDOTBEHAVIOR = "TinyBlueDotBehavior"
+    VARIABILITYAIM1 = "VariabilityAim1"
+    VARIABILITYAIM1PILOT = "VariabilityAim1Pilot"
+    VARIABILITYSPONTANEOUS = "VariabilitySpontaneous"
+    VIPAXONALV1PHASE1 = "VipAxonalV1Phase1"
+    VIPSOMATICV1MESO = "VIPSomaticV1Meso"
+    VIPSOMATICV1PHASE1 = "VipSomaticV1Phase1"
+    VIPSOMATICV1PHASE2 = "VipSomaticV1Phase2"
+
+
+class LimsRequired(Enum):
+    NO = "No"
+    SELECT = "Select..."
+    YES = "Yes"
+
+
+class Limstaskflow(Enum):
+    AIND_EPHYS_PASSIVE_BEHAVIOR = "AIND Ephys (Passive Behavior)"
+    AIND_EPHYS_SURGERY_ONLY = "AIND Ephys (Surgery only)"
+    AIND_U19_THALAMUS = "AIND U19 Thalamus"
+    BRAIN_LARGE_SCALE_RECORDING = "BRAIN Large Scale Recording"
+    BRAIN_MOUSE_BRAIN_CELL_ATLAS_TRANSSYNAPTIC = (
+        "BRAIN Mouse Brain Cell Atlas trans-synaptic"
+    )
+    BRAIN_OBSERVATORY_TRANSGENIC_CHARACTERIZATION = (
+        "Brain Observatory Transgenic Characterization"
+    )
+    BTV_BRAIN_VIRAL_STRATEGIES = "BTV BRAIN Viral Strategies"
+    CITRIC_ACID_PILOT = "Citric Acid Pilot"
+    EPHYS_TASK_DEV_DYNAMIC_ROUTING_NSB_BEH = (
+        "Ephys Task Dev Dynamic Routing (NSB Beh)"
+    )
+    EPHYS_TASK_DEV_DYNAMIC_ROUTING_SC_BEH = (
+        "Ephys Task Dev Dynamic Routing (S/C Beh)"
+    )
+    EPHYS_TAS_DEV_DYNAMIC_ROUTING_DOC_LEFT_EYE = (
+        "Ephys Tas Dev Dynamic Routing DOC Left Eye"
+    )
+    IVSCCM_INJECTION = "IVSCCm injection"
+    IVSCC_HVA_RETRO_PATCHSEQ = "IVSCC HVA Retro PatchSeq"
+    IVSPCM_INJECTION = "IVSPCm Injection"
+    MGT_ANTEROGRADE_PROJECTION_MAPPING = "MGT Anterograde Projection Mapping"
+    MGT_LAB = "MGT Lab"
+    MGT_TISSUECYTE = "MGT TissueCyte"
+    MSP_DYNAMIC_ROUTING_SURGICAL_DEVELOPMENT = (
+        "MSP Dynamic Routing Surgical Development"
+    )
+    MSP_DYNAMIC_ROUTING_TASK_1_PRODUCTION = (
+        "MSP Dynamic Routing Task 1 Production"
+    )
+    MSP_DYNAMIC_ROUTING_ULTRA_OPTOTAGGING_BEHAVIOR = (
+        "MSP Dynamic Routing Ultra Optotagging Behavior"
+    )
+    MSP_LEARNING__MFISH_DEVELOPMENT = "MSP Learning & mFISH Development"
+    MSP_LEARNING__MFISH_DEVELOPMENT_DOX = (
+        "MSP Learning & mFISH Development (Dox)"
+    )
+    MSP_LEARNING__MFISH_FRONTAL_WINDOW_DEV = (
+        "MSP Learning & mFISH Frontal Window Dev"
+    )
+    MSP_LEARNING__MFISH_VIRUS_TESTING = "MSP Learning & mFISH Virus Testing"
+    MSP_OMFISH_COREGISTRATION_PILOT = "MSP omFISH Co-Registration Pilot"
+    MSP_OMFISH_CUX2_PILOT = "MSP omFISH Cux2 Pilot"
+    MSP_OMFISH_GAD2_PILOT = "MSP omFISH Gad2 Pilot"
+    MSP_OMFISH_ROB_INJECTION_VIRUS_PILOT = (
+        "MSP omFISH ROB Injection Virus Pilot"
+    )
+    MSP_OMFISH_RORB_PILOT = "MSP omFISH Rorb Pilot"
+    MSP_OPENSCOPE_DENDRITE_COUPLING = "MSP OpenScope Dendrite Coupling"
+    MSP_OPENSCOPE_GLOBAL_LOCAL_ODDBALLS_COHORT_1 = (
+        "MSP OpenScope Global Local Oddballs (Cohort 1)"
+    )
+    MSP_OPENSCOPE_GLOBAL_LOCAL_ODDBALLS_COHORT_2 = (
+        "MSP OpenScope Global Local Oddballs (Cohort 2)"
+    )
+    MSP_OPENSCOPE_ILLUSION = "MSP OpenScope Illusion"
+    MSP_TASK_TRAINED_NETWORKS_MULTISCOPE = (
+        "MSP Task Trained Networks Multiscope"
+    )
+    MSP_TASK_TRAINED_NETWORKS_NEUROPIXEL = (
+        "MSP Task Trained Networks Neuropixel"
+    )
+    MSP_VARIABILITY_AIM_1 = "MSP Variability Aim 1"
+    MSP_VARIABILITY_AIM_1_PILOT = "MSP Variability Aim 1 Pilot"
+    MSP_VARIABILITY_SPONTANEOUS = "MSP Variability Spontaneous"
+    MSP_VIP_AXONAL_V1 = "MSP VIP Axonal V1"
+    MSP_VIP_SOMATIC_V1 = "MSP VIP Somatic V1"
+    NA = "N/A"
+    OPENSCOPE_VIRUS_VALIDATION = "Openscope Virus Validation"
+    TINY_BLUE_DOT_BEHAVIOR = "Tiny Blue Dot Behavior"
+    TRANSGENIC_CHARACTERIZATION_PASSIVE = (
+        "Transgenic Characterization (Passive)"
+    )
+    VGT_ENHANCERS_TRANSSYNAPTIC = "VGT Enhancers Transsynaptic"
+
+
+class PreviouslyInjected(Enum):
+    NO = "No"
+    SELECT = "Select..."
+    YES = "Yes"
+
+
+class Procedure(Enum):
+    CUSTOM = "Custom"
+    HPC_CAM = "HP+C CAM"
+    HPC_MULTISCOPE = "HP+C Multiscope"
+    HPC_NEUROPIXEL_STYLE = "HP+C Neuropixel style"
+    HPINJ = "HP+INJ"
+    HPINJECTIONOPTIC_FIBER_IMPLANT = "HP+Injection+Optic Fiber Implant"
+    HP_ONLY = "HP only"
+    HP_TRANSCRANIAL_FOR_ISI = "HP Transcranial (for ISI)"
+    INJHPC = "INJ+HP+C"
+    INJWHC_NP = "INJ+WHC NP"
+    SELECT = "Select..."
+    STEREOTAXIC_INJECTION = "Stereotaxic Injection"
+    TRAINING_SURGERY = "Training Surgery"
+    WHC_NP = "WHC NP"
+
+
+class ProjectId(Enum):
+    CAMC506 = "CAM-C506"
+    CONT503 = "CON-T503"
+    CTYT504 = "CTY-T504"
+    LOCC500 = "LOC-C500"
+    N_1020100910_CTYMORPHOLOGY = "102-01-009-10: CTY-Morphology"
+    N_1020101010_CTYSYNAPTIC_PHYS = "102-01-010-10: CTY-Synaptic Phys"
+    N_1020101410_CTY_GENTOOLS_MOUSE = "102-01-014-10: CTY GenTools Mouse"
+    N_1020102120_CTYBRAIN_MOUSE_BRAIN_CELL_ATLAS_SEG_1 = (
+        "102-01-021-20: CTY-BRAIN Mouse Brain Cell Atlas Seg 1"
+    )
+    N_1020102120_CTYBRAIN_MOUSE_BRAIN_CELL_ATLAS_SEG_2_ANATOMY = (
+        "102-01-021-20: CTY-BRAIN Mouse Brain Cell Atlas Seg 2 Anatomy"
+    )
+    N_1020103620_DISSEMINATION_OF_3PHOTON_IMAGING = (
+        "102-01-036-20 Dissemination of 3-photon Imaging"
+    )
+    N_1020104320_OPTICAL_INTERROGATION_OF_VENULAR_FUNCTION = (
+        "102-01-043-20 Optical Interrogation of Venular Function"
+    )
+    N_1020104410_CTY_GENOMICS = "102-01-044-10 CTY Genomics"
+    N_1020104510_IVSCC = "102-01-045-10 IVSCC"
+    N_1020104720_3P_NHP_CORTICAL_IMAGING_R34 = (
+        "102-01-047-20 3P NHP cortical imaging R34"
+    )
+    N_1020104810_CTY_BARCODED_CONNECTOMICS = (
+        "102-01-048-10 CTY Barcoded Connectomics"
+    )
+    N_1020105520_CTY_EM_MOTOR_CORTEX = "102-01-055-20 CTY EM Motor Cortex"
+    N_1020199910_CTY_PROGRAM_ADMIN = "102-01-999-10 CTY Program Admin"
+    N_1020201220_BRAIN_VIRAL_STRATEGIES = (
+        "102-02-012-20: BRAIN Viral Strategies"
+    )
+    N_1020201720_BRAIN_NEUROPIXELS_ULTRA = (
+        "102-02-017-20 BRAIN Neuropixels Ultra"
+    )
+    N_1020400620_OTH_MEASURING_CONSCIOUSNESS = (
+        "102-04-006-20: OTH Measuring Consciousness"
+    )
+    N_1020400710_TARGETED_CNS_GENE_THERAPY = (
+        "102-04-007-10 Targeted CNS Gene Therapy"
+    )
+    N_1020401010_CTY_SR_SLC6A1 = "102-04-010-10 CTY SR: SLC6A1"
+    N_1020401410_CTY_PARKINSONS_DISEASE = (
+        "102-04-014-10 CTY Parkinsons Disease"
+    )
+    N_1028800410_XPG_CORE_VIRUS_PROD_TASK_CVS_PRODUCTION = (
+        "102-88-004-10 XPG Core Virus Prod, Task: CVS Production"
+    )
+    N_1028800410_XPG_CORE_VIRUS_PROD_TASK_RD = (
+        "102-88-004-10 XPG Core Virus Prod, Task: R&D"
+    )
+    N_1210100410_VIP_REGULATED_STABILIZED_NETWORKS = (
+        "121-01-004-10 VIP Regulated Stabilized Networks"
+    )
+    N_1210100710_TASK_TRAINED_NETWORKS = "121-01-007-10 Task Trained Networks"
+    N_1210100810_NEURAL_ENSEMBLE_VARIABILITY = (
+        "121-01-008-10 Neural Ensemble Variability"
+    )
+    N_1210101010_V1_OMFISH = "121-01-010-10 V1 omFISH"
+    N_1210101110_DYNAMIC_ROUTING = "121-01-011-10 Dynamic Routing"
+    N_1210101210_LEARNING_MFISH = "121-01-012-10 Learning mFISH"
+    N_1210101320_MSP_TEMPLETON = "121-01-013-20 MSP Templeton"
+    N_1210101620_BRAIN_OPENSCOPE = "121-01-016-20 BRAIN OpenScope"
+    N_1210102320_MSP_TEMPLETON__TESTING_THEORIES_OF_CONSCIOUSNESS = (
+        "121-01-023-20 MSP Templeton - Testing Theories of Consciousness"
+    )
+    N_1210199910_MINDSCOPE_MSP_CROSS_PROGRAM = (
+        "121-01-999-10 Mindscope (MSP) Cross Program"
+    )
+    N_1220100110_NEURAL_DYNAMICS_SCIENTIFIC_ACTIVITIES = (
+        "122-01-001-10 Neural Dynamics Scientific Activities"
+    )
+    N_1220100220_NEURAL_DYNAMICS_U19_PROJECT_1_PERIOD_1 = (
+        "122-01-002-20 Neural Dynamics U19- Project 1: Period 1"
+    )
+    N_1220100220_NEURAL_DYNAMICS_U19_PROJECT_2_PERIOD_1 = (
+        "122-01-002-20 Neural Dynamics U19- Project 2: Period 1"
+    )
+    N_1229999910_NEURAL_DYNAMICS_ADMIN_DIRECT = (
+        "122-99-999-10 Neural Dynamics Admin (Direct)"
+    )
+    SELECT = "Select..."
+
+
+class Scabbing(Enum):
+    MILD = "Mild"
+    MODERATE = "Moderate"
+    NONE = "None"
+    SELECT = "Select..."
+    SEVERE = "Severe"
+
+
+class SecondRoundInjIsoLevel(Enum):
+    N_025 = "0.25"
+    N_050 = "0.50"
+    N_075 = "0.75"
+    N_100 = "1.00"
+    N_125 = "1.25"
+    N_150 = "1.50"
+    N_175 = "1.75"
+    N_200 = "2.00"
+    N_225 = "2.25"
+    N_250 = "2.50"
+    N_275 = "2.75"
+    N_300 = "3.00+"
+    SELECT = "Select..."
+
+
+class SecondRoundIontoIssue(Enum):
+    NA = "N/A"
+    NO = "No"
+    SELECT = "Select..."
+    YES = "Yes"
+
+
+class SecondRoundWorkstation(Enum):
+    SELECT = "Select..."
+    SWS_1 = "SWS 1"
+    SWS_2 = "SWS 2"
+    SWS_3 = "SWS 3"
+    SWS_4 = "SWS 4"
+    SWS_5 = "SWS 5"
+    SWS_6 = "SWS 6"
+    SWS_7 = "SWS 7"
+    SWS_8 = "SWS 8"
+    SWS_9 = "SWS 9"
+
+
+class Secondroundiontonumber(Enum):
+    IONTO_1 = "Ionto #1"
+    IONTO_10 = "Ionto #10"
+    IONTO_2 = "Ionto #2"
+    IONTO_3 = "Ionto #3"
+    IONTO_4 = "Ionto #4"
+    IONTO_5 = "Ionto #5"
+    IONTO_6 = "Ionto #6"
+    IONTO_7 = "Ionto #7"
+    IONTO_8 = "Ionto #8"
+    IONTO_9 = "Ionto #9"
+    NA = "N/A"
+    SELECT = "Select..."
+
+
+class Secondroundnanojectnumber(Enum):
+    NA = "N/A"
+    NJ1 = "NJ#1"
+    NJ2 = "NJ#2"
+    NJ3 = "NJ#3"
+    NJ4 = "NJ#4"
+    NJ5 = "NJ#5"
+    NJ6 = "NJ#6"
+    NJ7 = "NJ#7"
+    NJ8 = "NJ#8"
+    SELECT = "Select..."
 
 
 class Sex(Enum):
-    """Enum class for Sex Types"""
-
-    MALE = "Male"
     FEMALE = "Female"
+    MALE = "Male"
+    SELECT = "Select..."
 
 
-class Hemisphere(Enum):
-    """Enum class for Hemisphere"""
+class SinusBleed(Enum):
+    MILD = "Mild"
+    MODERATE = "Moderate"
+    NA = "N/A"
+    NONE = "None"
+    SELECT = "Select..."
+    SEVERE = "Severe"
 
-    RIGHT = "Right"
-    LEFT = "Left"
+
+class SurgeryStatus(Enum):
+    INJECTION_PENDING = "Injection Pending"
+    NEW = "New"
+    NO_SURGERY = "No Surgery"
+    PHASE_2_PENDING = "Phase 2 Pending"
+    PLANNED_ACUTE = "Planned Acute"
+    READY_FOR_FEEDBACK = "Ready for Feedback"
+    UNPLANNED_ACUTE = "Unplanned Acute"
+
+
+class TouchUpStatus(Enum):
+    COMPLETE = "Complete"
+    PENDING = "Pending"
+    SCHEDULED = "Scheduled"
+    SELECT = "Select..."
+    UNDER_OBSERVATION = "Under Observation"
+
+
+class WindowClarity(Enum):
+    ANTERIOR = "Anterior"
+    CENTRAL = "Central"
+    LATERAL = "Lateral"
+    MEDIAL = "Medial"
+    NA = "N/A"
+    OTHER_IN_COMMENTS = "Other (In comments)"
+    POSTERIOR = "Posterior"
+    SELECT = "Select..."
 
 
 @dataclass
@@ -63,7 +781,7 @@ class HeadPostInfo:
     well_part_number: Optional[str] = None
 
     @classmethod
-    def from_headpost_type(cls, headpost_type: Optional[HeadPostType]):
+    def from_headpost_type(cls, headpost_type: Optional[HeadpostType]):
         """Builds HeadPostInfo from HeadPostType"""
         if headpost_type is None:
             return cls()
