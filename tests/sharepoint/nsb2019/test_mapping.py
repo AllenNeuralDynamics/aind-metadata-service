@@ -16,8 +16,8 @@ from aind_data_schema.procedures import (
     InjectionMaterial,
 )
 
-from aind_metadata_service.sharepoint.nsb2019.mapping import NSB2019Mapping
 from aind_metadata_service.sharepoint.nsb2019.models import NSBList2019
+from aind_metadata_service.sharepoint.nsb2019.procedures import NSB2019Mapping
 
 if os.getenv("LOG_LEVEL"):  # pragma: no cover
     logging.basicConfig(level=os.getenv("LOG_LEVEL"))
