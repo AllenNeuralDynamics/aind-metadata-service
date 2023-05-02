@@ -13,6 +13,7 @@ from aind_data_schema.procedures import (
     CraniotomyType,
     Headframe,
     IontophoresisInjection,
+    InjectionMaterial,
     NanojectInjection,
     Side,
 )
@@ -1580,7 +1581,7 @@ class MappedNSBList:
         }.get(self._nsb.work_station2nd_injection, None)
 
     @property
-    def experimenter_full_name(self) -> str:
+    def aind_experimenter_full_name(self) -> str:
         return (
             "NSB"
             if self.aind_author_id is None
@@ -1588,18 +1589,18 @@ class MappedNSBList:
         )
 
     @property
-    def anaesthetic_type(self) -> str:
+    def aind_anaesthetic_type(self) -> str:
         return "isoflurane"
 
     @property
-    def craniotomy_size(self) -> Optional[float]:
+    def aind_craniotomy_size(self) -> Optional[float]:
         return {
             self.aind_craniotomy_type.FIVE_MM: 5,
             self.aind_craniotomy_type.THREE_MM: 3,
         }.get(self.aind_craniotomy_type, None)
 
     @property
-    def craniotomy_coordinates_reference(
+    def aind_craniotomy_coordinates_reference(
         self,
     ) -> Optional[CoordinateReferenceLocation]:
         return {
@@ -1608,16 +1609,40 @@ class MappedNSBList:
             )
         }.get(self.aind_craniotomy_type, None)
 
+    @property
+    def aind_inj1_coordinates_reference(
+        self,
+    ) -> Optional[CoordinateReferenceLocation]:
+        if (
+            self._nsb.virus_a_p is not None
+            and "LAMBDA" in self._nsb.virus_a_p.upper()
+        ):
+            return CoordinateReferenceLocation.LAMBDA
+        else:
+            return None
+
+    @property
+    def aind_inj2_coordinates_reference(
+        self,
+    ) -> Optional[CoordinateReferenceLocation]:
+        if (
+            self._nsb.virus_a_p is not None
+            and "LAMBDA" in self._nsb.ap2nd_inj.upper()
+        ):
+            return CoordinateReferenceLocation.LAMBDA
+        else:
+            return None
+
     def get_headframe_procedure(self) -> Headframe:
         return Headframe.construct(
             start_date=self.aind_date_of_surgery,
             end_date=self.aind_date_of_surgery,
-            experimenter_full_name=self.experimenter_full_name,
+            experimenter_full_name=self.aind_experimenter_full_name,
             iacuc_protocol=self.aind_iacuc_protocol,
             animal_weight_prior=self.aind_weight_before_surger,
             animal_weight_post=self.aind_weight_after_surgery,
             anaesthesia=Anaesthetic.construct(
-                type=self.anaesthetic_type,
+                type=self.aind_anaesthetic_type,
                 level=self.aind_hp_iso_level,
             ),
             headframe_type=self.aind_headpost_type.headframe_type,
@@ -1632,21 +1657,229 @@ class MappedNSBList:
         return Craniotomy.construct(
             start_date=self.aind_date_of_surgery,
             end_date=self.aind_date_of_surgery,
-            experimenter_full_name=self.experimenter_full_name,
+            experimenter_full_name=self.aind_experimenter_full_name,
             iacuc_protocol=self.aind_iacuc_protocol,
             animal_weight_prior=self.aind_weight_before_surger,
             animal_weight_post=self.aind_weight_after_surgery,
             anaesthesia=Anaesthetic.construct(
-                type=self.anaesthetic_type,
+                type=self.aind_anaesthetic_type,
                 level=self.aind_hp_iso_level,
             ),
             craniotomy_type=self.aind_craniotomy_type,
             craniotomy_hemisphere=self.aind_hp_loc,
             craniotomy_coordinates_ml=self.aind_hp_m_l,
             craniotomy_coordinates_ap=self.aind_hp_a_p,
-            craniotomy_coordinates_reference=self.craniotomy_coordinates_reference,
+            craniotomy_coordinates_reference=(
+                self.aind_craniotomy_coordinates_reference
+            ),
             bregma_to_lambda_distance=self.aind_breg2_lamb,
-            craniotomy_size=self.craniotomy_size,
+            craniotomy_size=self.aind_craniotomy_size,
             dura_removed=self.aind_hp_durotomy,
             workstation_id=self.aind_hp_work_station,
         )
+
+    def get_first_injection_procedure(self) -> BrainInjection:
+        if self.aind_inj1_type == InjectionType.NANOJECT:
+            return NanojectInjection.construct(
+                start_date=self.aind_date1st_injection,
+                end_date=self.aind_date1st_injection,
+                experimenter_full_name=self.aind_experimenter_full_name,
+                animal_weight_prior=self.aind_first_injection_weight_be,
+                animal_weight_post=self.aind_first_injection_weight_af,
+                anaesthesia=Anaesthetic.construct(
+                    type=self.aind_anaesthetic_type,
+                    duration=self.aind_first_injection_iso_durat,
+                    level=self.aind_hp_iso_level,
+                ),
+                injection_materials=(
+                    [
+                        InjectionMaterial.construct(
+                            full_genome_name=self.aind_inj1_virus_strain_rt
+                        )
+                    ]
+                ),
+                recovery_time=self.aind_first_inj_recovery,
+                injection_duration=self.aind_inj1_lenghtof_time,
+                workstation_id=self.aind_work_station1st_injection,
+                instrument_id=self.aind_nanoject_number_inj10,
+                injection_coordinate_ml=self.aind_virus_m_l,
+                injection_coordinate_ap=self.aind_virus_a_p,
+                injection_coordinate_depth=self.aind_virus_d_v,
+                injection_coordinate_reference=(
+                    self.aind_inj1_coordinates_reference
+                ),
+                bregma_to_lambda_distance=self.aind_breg2_lamb,
+                injection_angle=self.aind_inj1angle0,
+                injection_hemisphere=self.aind_virus_hemisphere,
+                injection_volume=self.aind_inj1_vol,
+            )
+        elif self.aind_inj1_type == InjectionType.IONTOPHORESIS:
+            return IontophoresisInjection.construct(
+                start_date=self.aind_date1st_injection,
+                end_date=self.aind_date1st_injection,
+                experimenter_full_name=self.aind_experimenter_full_name,
+                animal_weight_prior=self.aind_first_injection_weight_be,
+                animal_weight_post=self.aind_first_injection_weight_af,
+                anaesthesia=Anaesthetic.construct(
+                    type=self.aind_anaesthetic_type,
+                    duration=self.aind_first_injection_iso_durat,
+                    level=self.aind_hp_iso_level,
+                ),
+                injection_materials=(
+                    [
+                        InjectionMaterial.construct(
+                            full_genome_name=self.aind_inj1_virus_strain_rt
+                        )
+                    ]
+                ),
+                recovery_time=self.aind_first_inj_recovery,
+                injection_duration=self.aind_inj1_lenghtof_time,
+                workstation_id=self.aind_work_station1st_injection,
+                instrument_id=self.aind_ionto_number_inj1,
+                injection_coordinate_ml=self.aind_virus_m_l,
+                injection_coordinate_ap=self.aind_virus_a_p,
+                injection_coordinate_depth=self.aind_virus_d_v,
+                injection_coordinate_reference=(
+                    self.aind_inj1_coordinates_reference
+                ),
+                bregma_to_lambda_distance=self.aind_breg2_lamb,
+                injection_angle=self.aind_inj1angle0,
+                injection_hemisphere=self.aind_virus_hemisphere,
+                injection_current=self.aind_inj1_current,
+                alternating_current=self.aind_inj1_alternating_time,
+            )
+        else:
+            return BrainInjection.construct(
+                start_date=self.aind_date1st_injection,
+                end_date=self.aind_date1st_injection,
+                experimenter_full_name=self.aind_experimenter_full_name,
+                animal_weight_prior=self.aind_first_injection_weight_be,
+                animal_weight_post=self.aind_first_injection_weight_af,
+                anaesthesia=Anaesthetic.construct(
+                    type=self.aind_anaesthetic_type,
+                    duration=self.aind_first_injection_iso_durat,
+                    level=self.aind_hp_iso_level,
+                ),
+                injection_materials=(
+                    [
+                        InjectionMaterial.construct(
+                            full_genome_name=self.aind_inj1_virus_strain_rt
+                        )
+                    ]
+                ),
+                recovery_time=self.aind_first_inj_recovery,
+                injection_duration=self.aind_inj1_lenghtof_time,
+                workstation_id=self.aind_work_station1st_injection,
+                injection_coordinate_ml=self.aind_virus_m_l,
+                injection_coordinate_ap=self.aind_virus_a_p,
+                injection_coordinate_depth=self.aind_virus_d_v,
+                injection_coordinate_reference=(
+                    self.aind_inj1_coordinates_reference
+                ),
+                bregma_to_lambda_distance=self.aind_breg2_lamb,
+                injection_angle=self.aind_inj1angle0,
+                injection_hemisphere=self.aind_virus_hemisphere,
+            )
+
+    def get_second_injection_procedure(self) -> BrainInjection:
+        if self.aind_inj2_type == InjectionType.NANOJECT:
+            return NanojectInjection.construct(
+                start_date=self.aind_date2nd_injection,
+                end_date=self.aind_date2nd_injection,
+                experimenter_full_name=self.aind_experimenter_full_name,
+                animal_weight_prior=self.aind_second_injection_weight_b,
+                animal_weight_post=self.aind_second_injection_weight_a,
+                anaesthesia=Anaesthetic.construct(
+                    type=self.aind_anaesthetic_type,
+                    duration=self.aind_second_injection_iso_dura,
+                    level=self.aind_hp_iso_level,
+                ),
+                injection_materials=(
+                    [
+                        InjectionMaterial.construct(
+                            full_genome_name=self.aind_inj2_virus_strain_rt
+                        )
+                    ]
+                ),
+                recovery_time=self.aind_second_inj_recover,
+                injection_duration=self.aind_inj2_lenghtof_time,
+                workstation_id=self.aind_work_station2nd_injection,
+                instrument_id=self.aind_nanoject_number_inj2,
+                injection_coordinate_ml=self.aind_ml2nd_inj,
+                injection_coordinate_ap=self.aind_ap2nd_inj,
+                injection_coordinate_depth=self.aind_dv2nd_inj,
+                injection_coordinate_reference=(
+                    self.aind_inj2_coordinates_reference
+                ),
+                bregma_to_lambda_distance=self.aind_breg2_lamb,
+                injection_angle=self.aind_inj2angle0,
+                injection_hemisphere=self.aind_hemisphere2nd_inj,
+                injection_volume=self.aind_inj2_vol,
+            )
+        elif self.aind_inj2_type == InjectionType.IONTOPHORESIS:
+            return IontophoresisInjection.construct(
+                start_date=self.aind_date2nd_injection,
+                end_date=self.aind_date2nd_injection,
+                experimenter_full_name=self.aind_experimenter_full_name,
+                animal_weight_prior=self.aind_second_injection_weight_b,
+                animal_weight_post=self.aind_second_injection_weight_a,
+                anaesthesia=Anaesthetic.construct(
+                    type=self.aind_anaesthetic_type,
+                    duration=self.aind_second_injection_iso_dura,
+                    level=self.aind_hp_iso_level,
+                ),
+                injection_materials=(
+                    [
+                        InjectionMaterial.construct(
+                            full_genome_name=self.aind_inj2_virus_strain_rt
+                        )
+                    ]
+                ),
+                recovery_time=self.aind_second_inj_recover,
+                injection_duration=self.aind_inj2_lenghtof_time,
+                workstation_id=self.aind_work_station2nd_injection,
+                instrument_id=self.aind_ionto_number_inj2,
+                injection_coordinate_ml=self.aind_ml2nd_inj,
+                injection_coordinate_ap=self.aind_ap2nd_inj,
+                injection_coordinate_depth=self.aind_dv2nd_inj,
+                injection_coordinate_reference=(
+                    self.aind_inj2_coordinates_reference
+                ),
+                bregma_to_lambda_distance=self.aind_breg2_lamb,
+                injection_angle=self.aind_inj2angle0,
+                injection_hemisphere=self.aind_hemisphere2nd_inj,
+                injection_current=self.aind_inj2_current,
+                alternating_current=self.aind_inj2_alternating_time,
+            )
+        else:
+            return BrainInjection.construct(
+                start_date=self.aind_date2nd_injection,
+                end_date=self.aind_date2nd_injection,
+                experimenter_full_name=self.aind_experimenter_full_name,
+                animal_weight_prior=self.aind_second_injection_weight_b,
+                animal_weight_post=self.aind_second_injection_weight_a,
+                anaesthesia=Anaesthetic.construct(
+                    type=self.aind_anaesthetic_type,
+                    duration=self.aind_second_injection_iso_dura,
+                    level=self.aind_hp_iso_level,
+                ),
+                injection_materials=(
+                    [
+                        InjectionMaterial.construct(
+                            full_genome_name=self.aind_inj2_virus_strain_rt
+                        )
+                    ]
+                ),
+                recovery_time=self.aind_second_inj_recover,
+                injection_duration=self.aind_inj2_lenghtof_time,
+                workstation_id=self.aind_work_station2nd_injection,
+                injection_coordinate_ml=self.aind_ml2nd_inj,
+                injection_coordinate_ap=self.aind_ap2nd_inj,
+                injection_coordinate_depth=self.aind_dv2nd_inj,
+                injection_coordinate_reference=(
+                    self.aind_inj2_coordinates_reference
+                ),
+                bregma_to_lambda_distance=self.aind_breg2_lamb,
+                injection_angle=self.aind_inj2angle0,
+                injection_hemisphere=self.aind_hemisphere2nd_inj,
+            )
