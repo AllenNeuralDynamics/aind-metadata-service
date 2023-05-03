@@ -32,13 +32,6 @@ from aind_metadata_service.sharepoint.nsb2023.models import (
     NSBList2023,
 )
 
-# from aind_metadata_service.sharepoint.nsb2019.models import (
-#     HeadPostInfo,
-#     Hemisphere,
-#     InjectionType,
-#     NSBList2019,
-# )
-
 
 class NSB2023Mapping:
     """Provides methods to retrieve procedure information from sharepoint,
