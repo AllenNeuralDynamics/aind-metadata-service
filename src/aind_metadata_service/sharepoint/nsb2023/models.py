@@ -8,13 +8,35 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel, Extra, Field, SecretStr, validator
 
-from aind_metadata_service.sharepoint.nsb2019.models import (
-    HeadPostInfo,
-    Hemisphere,
-    InjectionType,
-    NumberWithNotes,
-    Sex,
-)
+
+class Sex(Enum):
+    """Enum class for Sex Types"""
+
+    MALE = "Male"
+    FEMALE = "Female"
+
+
+@dataclass
+class NumberWithNotes:
+    """Container to hold a parsed number from a string"""
+
+    raw_input: Optional[str] = None
+    number: Optional[float] = None
+    notes: Optional[str] = None
+
+
+class InjectionType(Enum):
+    """Enum class for Injection Types"""
+
+    NANOJECT = "Nanoject (Pressure)"
+    IONTOPHORESIS = "Iontophoresis"
+
+
+class Hemisphere(Enum):
+    """Enum class for Hemisphere"""
+
+    RIGHT = "Right"
+    LEFT = "Left"
 
 
 class CraniotomyType(Enum):
@@ -63,8 +85,14 @@ class During(Enum):
     FOLLOW_UP_SURGERY = "Follow up Surgery"
 
 
-class HeadPostInfo2023(HeadPostInfo):
+@dataclass
+class HeadPostInfo2023:
     """Extends HeadPostInfo data container to include extra constructor"""
+
+    headframe_type: Optional[str] = None
+    headframe_part_number: Optional[str] = None
+    well_type: Optional[str] = None
+    well_part_number: Optional[str] = None
 
     # flake8: noqa: C901
     @classmethod

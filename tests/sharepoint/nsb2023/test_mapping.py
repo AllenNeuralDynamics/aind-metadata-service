@@ -9,7 +9,7 @@ from typing import List, Tuple
 from unittest import TestCase
 from unittest import main as unittest_main
 
-from aind_data_schema.procedures import CraniotomyType
+from aind_data_schema.procedures import CraniotomyType, InjectionMaterial
 
 from aind_metadata_service.sharepoint.nsb2023.mapping import NSB2023Mapping
 from aind_metadata_service.sharepoint.nsb2023.models import NSBList2023
@@ -109,6 +109,15 @@ class TestNSB2023Parsers(TestCase):
         nsb_model = NSBList2023.parse_obj(raw_data)
         mapper = NSB2023Mapping()
         mapped_procedure = mapper.map_nsb_model(nsb_model)
+        mapped_virus_strain = mapper._map_virus_strain_to_materials("abc-def")
+        mapped_virus_strain_none = mapper._map_virus_strain_to_materials(None)
+        mapped_coordinate_ref = mapper._map_ap_info_to_coord_reference(None)
+        self.assertEqual(
+            InjectionMaterial.construct(full_genome_name="abc-def"),
+            mapped_virus_strain,
+        )
+        self.assertIsNone(mapped_virus_strain_none)
+        self.assertIsNone(mapped_coordinate_ref)
         self.assertIsNotNone(mapped_procedure)
 
     def test_burr_hole_to_probe_edge_case(self):

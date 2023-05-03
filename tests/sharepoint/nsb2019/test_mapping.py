@@ -4,17 +4,12 @@ import json
 import logging
 import os
 from copy import deepcopy
-from datetime import timedelta
 from pathlib import Path
 from typing import List, Tuple
 from unittest import TestCase
 from unittest import main as unittest_main
 
-from aind_data_schema.procedures import (
-    BrainInjection,
-    CraniotomyType,
-    InjectionMaterial,
-)
+from aind_data_schema.procedures import BrainInjection
 
 from aind_metadata_service.sharepoint.nsb2019.mapping import MappedNSBList
 from aind_metadata_service.sharepoint.nsb2019.models import NSBList
@@ -78,6 +73,7 @@ class TestNSB2019Parsers(TestCase):
             self.assertEqual(expected_mapped_data, mapped_procedure_json)
 
     def test_properties(self):
+        """Tests that the properties are parsed correctly."""
         list_item = self.list_items[0]
         raw_data = deepcopy(list_item[0])
         nsb_model = NSBList.parse_obj(raw_data)

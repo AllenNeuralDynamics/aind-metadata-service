@@ -124,6 +124,8 @@ class TestSharepointClient(unittest.TestCase):
         expected_subject_procedures.extend(self.list_items_2023[0][1])
         response = client.get_procedure_info(subject_id="12345")
         contents = json.loads(response.body.decode("utf-8"))
+        expected_subject_procedures.sort(key=lambda x: str(x))
+        contents["data"]["subject_procedures"].sort(key=lambda x: str(x))
         self.assertEqual(200, response.status_code)
         self.assertEqual(
             expected_subject_procedures, contents["data"]["subject_procedures"]

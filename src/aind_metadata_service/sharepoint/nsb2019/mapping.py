@@ -182,7 +182,9 @@ class MappedNSBList:
             if self._nsb.craniotomy_type is None
             else {
                 self._nsb.craniotomy_type.SELECT: CraniotomyType.OTHER,
-                self._nsb.craniotomy_type.VISUAL_CORTEX_5MM: CraniotomyType.VISCTX,
+                self._nsb.craniotomy_type.VISUAL_CORTEX_5MM: (
+                    CraniotomyType.VISCTX
+                ),
                 self._nsb.craniotomy_type.FRONTAL_WINDOW_3MM: (
                     CraniotomyType.THREE_MM
                 ),
