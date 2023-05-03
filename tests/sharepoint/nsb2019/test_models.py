@@ -9,11 +9,7 @@ from typing import List, Tuple
 from unittest import TestCase
 from unittest import main as unittest_main
 
-from aind_metadata_service.sharepoint.nsb2019.models import (
-    Inj1Type,
-    NSBList,
-    Sex,
-)
+from aind_metadata_service.sharepoint.nsb2019.models import NSBList, Sex
 
 if os.getenv("LOG_LEVEL"):  # pragma: no cover
     logging.basicConfig(level=os.getenv("LOG_LEVEL"))
@@ -67,16 +63,6 @@ class TestNSB2019Models(TestCase):
         self.assertIsNone(nsb_model.inj1_type)
         self.assertIsNone(nsb_model.hp_durotomy)
         self.assertEqual(Sex.FEMALE, nsb_model.sex)
-
-    def test_boolean_properties(self):
-        """Tests the boolean methods are correct."""
-        list_item = deepcopy(self.list_items[0][0])
-        nsb_model = NSBList.parse_obj(list_item)
-        # self.assertTrue(nsb_model.has_cran_procedure())
-        # self.assertTrue(nsb_model.has_hp_procedure())
-        # self.assertTrue(nsb_model.has_inj_procedure())
-        # self.assertTrue(nsb_model.has_2nd_inj_procedure())
-        # self.assertTrue(nsb_model.has_fiber_implant_procedure())
 
 
 if __name__ == "__main__":

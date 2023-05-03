@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from datetime import date, datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import List, Optional
 
 from aind_data_schema.procedures import (
     Anaesthetic,
@@ -11,11 +11,15 @@ from aind_data_schema.procedures import (
     CoordinateReferenceLocation,
     Craniotomy,
     CraniotomyType,
+    FiberImplant,
     Headframe,
-    IontophoresisInjection,
     InjectionMaterial,
+    IontophoresisInjection,
     NanojectInjection,
+    OphysProbe,
+    ProbeName,
     Side,
+    SubjectProcedure,
 )
 from aind_data_schema.subject import Sex
 
@@ -36,8 +40,17 @@ class HeadPostInfo:
 
 
 class InjectionType(Enum):
+    """Enum class for Injection Types"""
+
     NANOJECT = "Nanoject"
     IONTOPHORESIS = "Iontophoresis"
+
+
+class InjectionRound(Enum):
+    """Enum class for Injection Rounds"""
+
+    FIRST = "First"
+    SECOND = "Second"
 
 
 class MappedNSBList:
@@ -157,163 +170,26 @@ class MappedNSBList:
         return self._nsb.color_tag
 
     @property
-    def aind_com_after1st_inj(self) -> Optional[Any]:
-        """Maps com_after1st_inj to aind model"""
-        return {
-            self._nsb.com_after1st_inj.SELECT: None,
-            self._nsb.com_after1st_inj.NO_ISSUES: None,
-            self._nsb.com_after1st_inj.BLEEDING: None,
-            self._nsb.com_after1st_inj.SWELLING: None,
-            self._nsb.com_after1st_inj.FLUID_COMING_UP: None,
-            self._nsb.com_after1st_inj.BLEEDING_FLUID_COMING_UP: None,
-            self._nsb.com_after1st_inj.NA: None,
-        }.get(self._nsb.com_after1st_inj, None)
-
-    @property
-    def aind_com_after2nd_inj(self) -> Optional[Any]:
-        """Maps com_after2nd_inj to aind model"""
-        return {
-            self._nsb.com_after2nd_inj.SELECT: None,
-            self._nsb.com_after2nd_inj.NO_ISSUES: None,
-            self._nsb.com_after2nd_inj.BLEEDING: None,
-            self._nsb.com_after2nd_inj.SWELLING: None,
-            self._nsb.com_after2nd_inj.FLUID_COMING_UP: None,
-            self._nsb.com_after2nd_inj.BLEEDING_FLUID_COMING_UP: None,
-            self._nsb.com_after2nd_inj.NA: None,
-        }.get(self._nsb.com_after2nd_inj, None)
-
-    @property
-    def aind_com_coplanar(self) -> Optional[Any]:
-        """Maps com_coplanar to aind model"""
-        return {
-            self._nsb.com_coplanar.SELECT: None,
-            self._nsb.com_coplanar.NONE: None,
-            self._nsb.com_coplanar.MILD: None,
-            self._nsb.com_coplanar.MODERATE: None,
-            self._nsb.com_coplanar.SEVERE: None,
-            self._nsb.com_coplanar.NA: None,
-        }.get(self._nsb.com_coplanar, None)
-
-    @property
-    def aind_com_damage(self) -> Optional[Any]:
-        """Maps com_damage to aind model"""
-        return {
-            self._nsb.com_damage.SELECT: None,
-            self._nsb.com_damage.NONE: None,
-            self._nsb.com_damage.MILD: None,
-            self._nsb.com_damage.MODERATE: None,
-            self._nsb.com_damage.SEVERE: None,
-            self._nsb.com_damage.NA: None,
-        }.get(self._nsb.com_damage, None)
-
-    @property
-    def aind_com_during1st_inj(self) -> Optional[Any]:
-        """Maps com_during1st_inj to aind model"""
-        return {
-            self._nsb.com_during1st_inj.SELECT: None,
-            self._nsb.com_during1st_inj.NO_ISSUES: None,
-            self._nsb.com_during1st_inj.BLEEDING: None,
-            self._nsb.com_during1st_inj.SWELLING: None,
-            self._nsb.com_during1st_inj.FLUID_COMING_UP: None,
-            self._nsb.com_during1st_inj.BLEEDING_FLUID_COMING: None,
-            self._nsb.com_during1st_inj.PIPETTE_CLOGGEDBROKE_TIP: None,
-            self._nsb.com_during1st_inj.NA: None,
-        }.get(self._nsb.com_during1st_inj, None)
-
-    @property
-    def aind_com_during2nd_inj(self) -> Optional[Any]:
-        """Maps com_during2nd_inj to aind model"""
-        return {
-            self._nsb.com_during2nd_inj.SELECT: None,
-            self._nsb.com_during2nd_inj.NO_ISSUES: None,
-            self._nsb.com_during2nd_inj.BLEEDING: None,
-            self._nsb.com_during2nd_inj.SWELLING: None,
-            self._nsb.com_during2nd_inj.FLUID_COMING_UP: None,
-            self._nsb.com_during2nd_inj.BLEEDING_FLUID_COMING_UP: None,
-            self._nsb.com_during2nd_inj.PIPETTE_CLOGGEDBROKE_TIP: None,
-            self._nsb.com_during2nd_inj.NA: None,
-        }.get(self._nsb.com_during2nd_inj, None)
-
-    @property
-    def aind_com_durotomy(self) -> Optional[Any]:
-        """Maps com_durotomy to aind model"""
-        return {
-            self._nsb.com_durotomy.SELECT: None,
-            self._nsb.com_durotomy.COMPLETE: None,
-            self._nsb.com_durotomy.TORN_COMPLETE: None,
-            self._nsb.com_durotomy.PARTIAL: None,
-            self._nsb.com_durotomy.NO: None,
-            self._nsb.com_durotomy.UNINTENTIONAL: None,
-            self._nsb.com_durotomy.NA: None,
-        }.get(self._nsb.com_durotomy, None)
-
-    @property
-    def aind_com_sinusbleed(self) -> Optional[Any]:
-        """Maps com_sinusbleed to aind model"""
-        return {
-            self._nsb.com_sinusbleed.SELECT: None,
-            self._nsb.com_sinusbleed.NONE: None,
-            self._nsb.com_sinusbleed.MILD: None,
-            self._nsb.com_sinusbleed.MODERATE: None,
-            self._nsb.com_sinusbleed.SEVERE: None,
-            self._nsb.com_sinusbleed.NA: None,
-        }.get(self._nsb.com_sinusbleed, None)
-
-    @property
-    def aind_com_swelling(self) -> Optional[Any]:
-        """Maps com_swelling to aind model"""
-        return {
-            self._nsb.com_swelling.SELECT: None,
-            self._nsb.com_swelling.NONE: None,
-            self._nsb.com_swelling.MILD: None,
-            self._nsb.com_swelling.MODERATE: None,
-            self._nsb.com_swelling.SEVERE: None,
-            self._nsb.com_swelling.NA: None,
-        }.get(self._nsb.com_swelling, None)
-
-    @property
-    def aind_com_window(self) -> Optional[Any]:
-        """Maps com_window to aind model"""
-        return {
-            self._nsb.com_window.SELECT: None,
-            self._nsb.com_window.CENTRAL: None,
-            self._nsb.com_window.ANTERIOR: None,
-            self._nsb.com_window.LATERAL: None,
-            self._nsb.com_window.MEDIAL: None,
-            self._nsb.com_window.POSTERIOR: None,
-            self._nsb.com_window.OTHER_IN_COMMENTS: None,
-            self._nsb.com_window.NA: None,
-        }.get(self._nsb.com_window, None)
-
-    @property
     def aind_compliance_asset_id(self) -> Optional[str]:
         """Maps compliance_asset_id to aind model"""
         return self._nsb.compliance_asset_id
 
     @property
-    def aind_contusion(self) -> Optional[Any]:
-        """Maps contusion to aind model"""
-        return {
-            self._nsb.contusion.SELECT: None,
-            self._nsb.contusion.NONE: None,
-            self._nsb.contusion.MILD: None,
-            self._nsb.contusion.MODERATE: None,
-            self._nsb.contusion.SEVERE: None,
-            self._nsb.contusion.NA: None,
-        }.get(self._nsb.contusion, None)
-
-    @property
     def aind_craniotomy_type(self) -> Optional[CraniotomyType]:
         """Maps craniotomy_type to aind model"""
-        return {
-            self._nsb.craniotomy_type.SELECT: None,
-            self._nsb.craniotomy_type.VISUAL_CORTEX_5MM: CraniotomyType.VISCTX,
-            self._nsb.craniotomy_type.FRONTAL_WINDOW_3MM: (
-                CraniotomyType.THREE_MM
-            ),
-            self._nsb.craniotomy_type.WHC_NP: CraniotomyType.WHC,
-            self._nsb.craniotomy_type.WHC_2_P: CraniotomyType.WHC,
-        }.get(self._nsb.craniotomy_type, None)
+        return (
+            CraniotomyType.OTHER
+            if self._nsb.craniotomy_type is None
+            else {
+                self._nsb.craniotomy_type.SELECT: CraniotomyType.OTHER,
+                self._nsb.craniotomy_type.VISUAL_CORTEX_5MM: CraniotomyType.VISCTX,
+                self._nsb.craniotomy_type.FRONTAL_WINDOW_3MM: (
+                    CraniotomyType.THREE_MM
+                ),
+                self._nsb.craniotomy_type.WHC_NP: CraniotomyType.WHC,
+                self._nsb.craniotomy_type.WHC_2_P: CraniotomyType.WHC,
+            }.get(self._nsb.craniotomy_type, CraniotomyType.OTHER)
+        )
 
     @property
     def aind_created(self) -> Optional[datetime]:
@@ -366,41 +242,6 @@ class MappedNSBList:
         return self._nsb.end_of_week
 
     @property
-    def aind_exudate_severity(self) -> Optional[Any]:
-        """Maps exudate_severity to aind model"""
-        return {
-            self._nsb.exudate_severity.SELECT: None,
-            self._nsb.exudate_severity.NONE: None,
-            self._nsb.exudate_severity.MILD: None,
-            self._nsb.exudate_severity.MODERATE: None,
-            self._nsb.exudate_severity.SEVERE: None,
-        }.get(self._nsb.exudate_severity, None)
-
-    @property
-    def aind_eye_affected(self) -> Optional[Any]:
-        """Maps eye_affected to aind model"""
-        return {
-            self._nsb.eye_affected.SELECT: None,
-            self._nsb.eye_affected.NEITHER: None,
-            self._nsb.eye_affected.LEFT: None,
-            self._nsb.eye_affected.RIGHT: None,
-            self._nsb.eye_affected.BOTH: None,
-        }.get(self._nsb.eye_affected, None)
-
-    @property
-    def aind_eye_issue(self) -> Optional[Any]:
-        """Maps eye_issue to aind model"""
-        return {
-            self._nsb.eye_issue.SELECT: None,
-            self._nsb.eye_issue.NONE: None,
-            self._nsb.eye_issue.PUFFY_SWOLLEN: None,
-            self._nsb.eye_issue.SLIGHTLY_CLOSED: None,
-            self._nsb.eye_issue.WEEPY: None,
-            self._nsb.eye_issue.CLOUD_POSSIBLY_BLIND: None,
-            self._nsb.eye_issue.OTHER_SEE_COMMENTS: None,
-        }.get(self._nsb.eye_issue, None)
-
-    @property
     def aind_fiber_implant1(self) -> Optional[bool]:
         """Maps fiber_implant1 to aind model"""
         return self._nsb.fiber_implant1
@@ -451,70 +292,68 @@ class MappedNSBList:
         return self._parse_weight_str(self._nsb.first_injection_weight_be)
 
     @property
-    def aind_first_round_ionto_issue(self) -> Optional[Any]:
-        """Maps first_round_ionto_issue to aind model"""
-        return {
-            self._nsb.first_round_ionto_issue.SELECT: None,
-            self._nsb.first_round_ionto_issue.NO: None,
-            self._nsb.first_round_ionto_issue.YES: None,
-            self._nsb.first_round_ionto_issue.NA: None,
-        }.get(self._nsb.first_round_ionto_issue, None)
-
-    @property
-    def aind_headpost_type(self) -> Optional[HeadPostInfo]:
+    def aind_headpost_type(self) -> HeadPostInfo:
         """Maps headpost_type to aind model"""
-        return {
-            self._nsb.headpost_type.SELECT: None,
-            self._nsb.headpost_type.CAMSTYLE_HEADFRAME_016010: (
-                HeadPostInfo(
-                    headframe_type="CAM-style",
-                    headframe_part_number="0160-100-10 Rev A",
-                    well_type="CAM-style",
-                )
-            ),
-            self._nsb.headpost_type.NEUROPIXELSTYLE_HEADFRAME: (
-                HeadPostInfo(
-                    headframe_type="Neuropixel-style",
-                    headframe_part_number="0160-100-10",
-                    well_type="Neuropixel-style",
-                    well_part_number="0160-200-36",
-                )
-            ),
-            self._nsb.headpost_type.MESOSCOPESTYLE_WELL_WITH: (
-                HeadPostInfo(
-                    headframe_type="NGC-style",
-                    headframe_part_number="0160-100-10",
-                    well_type="Mesoscope-style",
-                    well_part_number="0160-200-20",
-                )
-            ),
-            self._nsb.headpost_type.WHC_42_WITH_NEUROPIXEL_WE: (
-                HeadPostInfo(
-                    headframe_type="WHC #42",
-                    headframe_part_number="42",
-                    well_type="Neuropixel-style",
-                    well_part_number="0160-200-36",
-                )
-            ),
-            self._nsb.headpost_type.NGCSTYLE_HEADFRAME_NO_WEL: (
-                HeadPostInfo(
-                    headframe_type="NGC-style",
-                    headframe_part_number="0160-100-10",
-                )
-            ),
-            self._nsb.headpost_type.AI_STRAIGHT_HEADBAR: (
-                HeadPostInfo(headframe_type="AI Straight Headbar")
-            ),
-        }.get(self._nsb.headpost_type, None)
+        return (
+            HeadPostInfo()
+            if self._nsb.headpost_type is None
+            else {
+                self._nsb.headpost_type.SELECT: HeadPostInfo(),
+                self._nsb.headpost_type.CAMSTYLE_HEADFRAME_016010: (
+                    HeadPostInfo(
+                        headframe_type="CAM-style",
+                        headframe_part_number="0160-100-10 Rev A",
+                        well_type="CAM-style",
+                    )
+                ),
+                self._nsb.headpost_type.NEUROPIXELSTYLE_HEADFRAME: (
+                    HeadPostInfo(
+                        headframe_type="Neuropixel-style",
+                        headframe_part_number="0160-100-10",
+                        well_type="Neuropixel-style",
+                        well_part_number="0160-200-36",
+                    )
+                ),
+                self._nsb.headpost_type.MESOSCOPESTYLE_WELL_WITH: (
+                    HeadPostInfo(
+                        headframe_type="NGC-style",
+                        headframe_part_number="0160-100-10",
+                        well_type="Mesoscope-style",
+                        well_part_number="0160-200-20",
+                    )
+                ),
+                self._nsb.headpost_type.WHC_42_WITH_NEUROPIXEL_WE: (
+                    HeadPostInfo(
+                        headframe_type="WHC #42",
+                        headframe_part_number="42",
+                        well_type="Neuropixel-style",
+                        well_part_number="0160-200-36",
+                    )
+                ),
+                self._nsb.headpost_type.NGCSTYLE_HEADFRAME_NO_WEL: (
+                    HeadPostInfo(
+                        headframe_type="NGC-style",
+                        headframe_part_number="0160-100-10",
+                    )
+                ),
+                self._nsb.headpost_type.AI_STRAIGHT_HEADBAR: (
+                    HeadPostInfo(headframe_type="AI Straight Headbar")
+                ),
+            }.get(self._nsb.headpost_type, HeadPostInfo())
+        )
 
     @property
     def aind_hemisphere2nd_inj(self) -> Optional[Side]:
         """Maps hemisphere2nd_inj to aind model"""
-        return {
-            self._nsb.hemisphere2nd_inj.SELECT: None,
-            self._nsb.hemisphere2nd_inj.LEFT: Side.LEFT,
-            self._nsb.hemisphere2nd_inj.RIGHT: Side.RIGHT,
-        }.get(self._nsb.hemisphere2nd_inj, None)
+        return (
+            None
+            if self._nsb.hemisphere2nd_inj is None
+            else {
+                self._nsb.hemisphere2nd_inj.SELECT: None,
+                self._nsb.hemisphere2nd_inj.LEFT: Side.LEFT,
+                self._nsb.hemisphere2nd_inj.RIGHT: Side.RIGHT,
+            }.get(self._nsb.hemisphere2nd_inj, None)
+        )
 
     @property
     def aind_hp_a_p(self) -> Optional[float]:
@@ -547,55 +386,44 @@ class MappedNSBList:
     @property
     def aind_hp_iso_level(self) -> Optional[float]:
         """Maps hp_iso_level to aind model"""
-        return {
-            self._nsb.hp_iso_level.SELECT: None,
-            self._nsb.hp_iso_level.N_025: 0.25,
-            self._nsb.hp_iso_level.N_050: 0.50,
-            self._nsb.hp_iso_level.N_075: 0.75,
-            self._nsb.hp_iso_level.N_100: 1.00,
-            self._nsb.hp_iso_level.N_125: 1.25,
-            self._nsb.hp_iso_level.N_15: 1.5,
-            self._nsb.hp_iso_level.N_175: 1.75,
-            self._nsb.hp_iso_level.N_200: 2.00,
-            self._nsb.hp_iso_level.N_225: 2.25,
-            self._nsb.hp_iso_level.N_250: 2.50,
-            self._nsb.hp_iso_level.N_275: 2.75,
-            self._nsb.hp_iso_level.N_300: None,
-        }.get(self._nsb.hp_iso_level, None)
+        return (
+            None
+            if self._nsb.hp_iso_level is None
+            else {
+                self._nsb.hp_iso_level.SELECT: None,
+                self._nsb.hp_iso_level.N_025: 0.25,
+                self._nsb.hp_iso_level.N_050: 0.50,
+                self._nsb.hp_iso_level.N_075: 0.75,
+                self._nsb.hp_iso_level.N_100: 1.00,
+                self._nsb.hp_iso_level.N_125: 1.25,
+                self._nsb.hp_iso_level.N_15: 1.5,
+                self._nsb.hp_iso_level.N_175: 1.75,
+                self._nsb.hp_iso_level.N_200: 2.00,
+                self._nsb.hp_iso_level.N_225: 2.25,
+                self._nsb.hp_iso_level.N_250: 2.50,
+                self._nsb.hp_iso_level.N_275: 2.75,
+                self._nsb.hp_iso_level.N_300: None,
+            }.get(self._nsb.hp_iso_level, None)
+        )
 
     @property
     def aind_hp_loc(self) -> Optional[Side]:
         """Maps hp_loc to aind model"""
-        return {
-            self._nsb.hp_loc.SELECT: None,
-            self._nsb.hp_loc.LEFT: Side.LEFT,
-            self._nsb.hp_loc.CENTER: None,
-            self._nsb.hp_loc.RIGHT: Side.RIGHT,
-        }.get(self._nsb.hp_loc, None)
+        return (
+            None
+            if self._nsb.hp_loc is None
+            else {
+                self._nsb.hp_loc.SELECT: None,
+                self._nsb.hp_loc.LEFT: Side.LEFT,
+                self._nsb.hp_loc.CENTER: None,
+                self._nsb.hp_loc.RIGHT: Side.RIGHT,
+            }.get(self._nsb.hp_loc, None)
+        )
 
     @property
     def aind_hp_m_l(self) -> Optional[float]:
         """Maps hp_m_l to aind model"""
         return self._parse_ml_str(self._nsb.hp_m_l)
-
-    @property
-    def aind_hp_perf(self) -> Optional[Any]:
-        """Maps hp_perf to aind model"""
-        return {
-            self._nsb.hp_perf.SELECT_IF_APPLICABLE: None,
-            self._nsb.hp_perf.NA: None,
-            self._nsb.hp_perf.LEFT: None,
-            self._nsb.hp_perf.RIGHT: None,
-        }.get(self._nsb.hp_perf, None)
-
-    @property
-    def aind_hp_prev_inject(self) -> Optional[Any]:
-        """Maps hp_prev_inject to aind model"""
-        return {
-            self._nsb.hp_prev_inject.SELECT: None,
-            self._nsb.hp_prev_inject.YES: None,
-            self._nsb.hp_prev_inject.NO: None,
-        }.get(self._nsb.hp_prev_inject, None)
 
     @property
     def aind_hp_recovery(self) -> Optional[float]:
@@ -620,134 +448,125 @@ class MappedNSBList:
     @property
     def aind_hp_work_station(self) -> Optional[str]:
         """Maps hp_work_station to aind model"""
-        return {
-            self._nsb.hp_work_station.SELECT: None,
-            self._nsb.hp_work_station.SWS_1: (
-                self._nsb.hp_work_station.SWS_1.value
-            ),
-            self._nsb.hp_work_station.SWS_2: (
-                self._nsb.hp_work_station.SWS_2.value
-            ),
-            self._nsb.hp_work_station.SWS_3: (
-                self._nsb.hp_work_station.SWS_3.value
-            ),
-            self._nsb.hp_work_station.SWS_4: (
-                self._nsb.hp_work_station.SWS_4.value
-            ),
-            self._nsb.hp_work_station.SWS_5: (
-                self._nsb.hp_work_station.SWS_5.value
-            ),
-            self._nsb.hp_work_station.SWS_6: (
-                self._nsb.hp_work_station.SWS_6.value
-            ),
-            self._nsb.hp_work_station.SWS_7: (
-                self._nsb.hp_work_station.SWS_7.value
-            ),
-            self._nsb.hp_work_station.SWS_8: (
-                self._nsb.hp_work_station.SWS_8.value
-            ),
-            self._nsb.hp_work_station.SWS_9: (
-                self._nsb.hp_work_station.SWS_9.value
-            ),
-        }.get(self._nsb.hp_work_station, None)
+        return (
+            None
+            if self._nsb.hp_work_station is None
+            else {
+                self._nsb.hp_work_station.SELECT: None,
+                self._nsb.hp_work_station.SWS_1: (
+                    self._nsb.hp_work_station.SWS_1.value
+                ),
+                self._nsb.hp_work_station.SWS_2: (
+                    self._nsb.hp_work_station.SWS_2.value
+                ),
+                self._nsb.hp_work_station.SWS_3: (
+                    self._nsb.hp_work_station.SWS_3.value
+                ),
+                self._nsb.hp_work_station.SWS_4: (
+                    self._nsb.hp_work_station.SWS_4.value
+                ),
+                self._nsb.hp_work_station.SWS_5: (
+                    self._nsb.hp_work_station.SWS_5.value
+                ),
+                self._nsb.hp_work_station.SWS_6: (
+                    self._nsb.hp_work_station.SWS_6.value
+                ),
+                self._nsb.hp_work_station.SWS_7: (
+                    self._nsb.hp_work_station.SWS_7.value
+                ),
+                self._nsb.hp_work_station.SWS_8: (
+                    self._nsb.hp_work_station.SWS_8.value
+                ),
+                self._nsb.hp_work_station.SWS_9: (
+                    self._nsb.hp_work_station.SWS_9.value
+                ),
+            }.get(self._nsb.hp_work_station, None)
+        )
 
     @property
     def aind_iacuc_protocol(self) -> Optional[str]:
         """Maps iacuc_protocol to aind model"""
-        return {
-            self._nsb.iacuc_protocol.SELECT: None,
-            self._nsb.iacuc_protocol.N_2001: (
-                self._nsb.iacuc_protocol.N_2001.value
-            ),
-            self._nsb.iacuc_protocol.N_2002: (
-                self._nsb.iacuc_protocol.N_2002.value
-            ),
-            self._nsb.iacuc_protocol.N_2003: (
-                self._nsb.iacuc_protocol.N_2003.value
-            ),
-            self._nsb.iacuc_protocol.N_2004: (
-                self._nsb.iacuc_protocol.N_2004.value
-            ),
-            self._nsb.iacuc_protocol.N_2005: (
-                self._nsb.iacuc_protocol.N_2005.value
-            ),
-            self._nsb.iacuc_protocol.N_2006: (
-                self._nsb.iacuc_protocol.N_2006.value
-            ),
-            self._nsb.iacuc_protocol.N_2011: (
-                self._nsb.iacuc_protocol.N_2011.value
-            ),
-            self._nsb.iacuc_protocol.N_2102: (
-                self._nsb.iacuc_protocol.N_2102.value
-            ),
-            self._nsb.iacuc_protocol.N_2103: (
-                self._nsb.iacuc_protocol.N_2103.value
-            ),
-            self._nsb.iacuc_protocol.N_2104: (
-                self._nsb.iacuc_protocol.N_2104.value
-            ),
-            self._nsb.iacuc_protocol.N_2105: (
-                self._nsb.iacuc_protocol.N_2105.value
-            ),
-            self._nsb.iacuc_protocol.N_2106: (
-                self._nsb.iacuc_protocol.N_2106.value
-            ),
-            self._nsb.iacuc_protocol.N_2107: (
-                self._nsb.iacuc_protocol.N_2107.value
-            ),
-            self._nsb.iacuc_protocol.N_2108: (
-                self._nsb.iacuc_protocol.N_2108.value
-            ),
-            self._nsb.iacuc_protocol.N_2109: (
-                self._nsb.iacuc_protocol.N_2109.value
-            ),
-            self._nsb.iacuc_protocol.N_2110: (
-                self._nsb.iacuc_protocol.N_2110.value
-            ),
-            self._nsb.iacuc_protocol.N_2113: (
-                self._nsb.iacuc_protocol.N_2113.value
-            ),
-            self._nsb.iacuc_protocol.N_2115: (
-                self._nsb.iacuc_protocol.N_2115.value
-            ),
-            self._nsb.iacuc_protocol.N_2117: (
-                self._nsb.iacuc_protocol.N_2117.value
-            ),
-            self._nsb.iacuc_protocol.N_2201: (
-                self._nsb.iacuc_protocol.N_2201.value
-            ),
-            self._nsb.iacuc_protocol.N_2202: (
-                self._nsb.iacuc_protocol.N_2202.value
-            ),
-            self._nsb.iacuc_protocol.N_2205: (
-                self._nsb.iacuc_protocol.N_2205.value
-            ),
-            self._nsb.iacuc_protocol.N_2212: (
-                self._nsb.iacuc_protocol.N_2212.value
-            ),
-        }.get(self._nsb.iacuc_protocol, None)
+        return (
+            None
+            if self._nsb.iacuc_protocol is None
+            else {
+                self._nsb.iacuc_protocol.SELECT: None,
+                self._nsb.iacuc_protocol.N_2001: (
+                    self._nsb.iacuc_protocol.N_2001.value
+                ),
+                self._nsb.iacuc_protocol.N_2002: (
+                    self._nsb.iacuc_protocol.N_2002.value
+                ),
+                self._nsb.iacuc_protocol.N_2003: (
+                    self._nsb.iacuc_protocol.N_2003.value
+                ),
+                self._nsb.iacuc_protocol.N_2004: (
+                    self._nsb.iacuc_protocol.N_2004.value
+                ),
+                self._nsb.iacuc_protocol.N_2005: (
+                    self._nsb.iacuc_protocol.N_2005.value
+                ),
+                self._nsb.iacuc_protocol.N_2006: (
+                    self._nsb.iacuc_protocol.N_2006.value
+                ),
+                self._nsb.iacuc_protocol.N_2011: (
+                    self._nsb.iacuc_protocol.N_2011.value
+                ),
+                self._nsb.iacuc_protocol.N_2102: (
+                    self._nsb.iacuc_protocol.N_2102.value
+                ),
+                self._nsb.iacuc_protocol.N_2103: (
+                    self._nsb.iacuc_protocol.N_2103.value
+                ),
+                self._nsb.iacuc_protocol.N_2104: (
+                    self._nsb.iacuc_protocol.N_2104.value
+                ),
+                self._nsb.iacuc_protocol.N_2105: (
+                    self._nsb.iacuc_protocol.N_2105.value
+                ),
+                self._nsb.iacuc_protocol.N_2106: (
+                    self._nsb.iacuc_protocol.N_2106.value
+                ),
+                self._nsb.iacuc_protocol.N_2107: (
+                    self._nsb.iacuc_protocol.N_2107.value
+                ),
+                self._nsb.iacuc_protocol.N_2108: (
+                    self._nsb.iacuc_protocol.N_2108.value
+                ),
+                self._nsb.iacuc_protocol.N_2109: (
+                    self._nsb.iacuc_protocol.N_2109.value
+                ),
+                self._nsb.iacuc_protocol.N_2110: (
+                    self._nsb.iacuc_protocol.N_2110.value
+                ),
+                self._nsb.iacuc_protocol.N_2113: (
+                    self._nsb.iacuc_protocol.N_2113.value
+                ),
+                self._nsb.iacuc_protocol.N_2115: (
+                    self._nsb.iacuc_protocol.N_2115.value
+                ),
+                self._nsb.iacuc_protocol.N_2117: (
+                    self._nsb.iacuc_protocol.N_2117.value
+                ),
+                self._nsb.iacuc_protocol.N_2201: (
+                    self._nsb.iacuc_protocol.N_2201.value
+                ),
+                self._nsb.iacuc_protocol.N_2202: (
+                    self._nsb.iacuc_protocol.N_2202.value
+                ),
+                self._nsb.iacuc_protocol.N_2205: (
+                    self._nsb.iacuc_protocol.N_2205.value
+                ),
+                self._nsb.iacuc_protocol.N_2212: (
+                    self._nsb.iacuc_protocol.N_2212.value
+                ),
+            }.get(self._nsb.iacuc_protocol, None)
+        )
 
     @property
     def aind_id(self) -> Optional[int]:
         """Maps id to aind model"""
         return self._nsb.id
-
-    @property
-    def aind_implant_id_coverslip_type(self) -> Optional[Any]:
-        """Maps implant_id_coverslip_type to aind model"""
-        return {
-            self._nsb.implant_id_coverslip_type.SELECT: None,
-            self._nsb.implant_id_coverslip_type.N_2001: None,
-            self._nsb.implant_id_coverslip_type.N_2002: None,
-            self._nsb.implant_id_coverslip_type.N_3001: None,
-            self._nsb.implant_id_coverslip_type.CUSTOM_IMPLANT_ADD_DETAIL: (
-                None
-            ),
-            self._nsb.implant_id_coverslip_type.N_5MM_STACKED_COVERSLIP: None,
-            self._nsb.implant_id_coverslip_type.N_5MM_STACKED_COVERSLIP_W: (
-                None
-            ),
-        }.get(self._nsb.implant_id_coverslip_type, None)
 
     @property
     def aind_inj1_alternating_time(self) -> Optional[float]:
@@ -770,14 +589,18 @@ class MappedNSBList:
         return self._parse_length_of_time_str(self._nsb.inj1_lenghtof_time)
 
     @property
-    def aind_inj1_round(self) -> Optional[Any]:
+    def aind_inj1_round(self) -> Optional[InjectionRound]:
         """Maps inj1_round to aind model"""
-        return {
-            self._nsb.inj1_round.SELECT: None,
-            self._nsb.inj1_round.N_1ST: None,
-            self._nsb.inj1_round.N_2ND: None,
-            self._nsb.inj1_round.NA: None,
-        }.get(self._nsb.inj1_round, None)
+        return (
+            None
+            if self._nsb.inj1_round is None
+            else {
+                self._nsb.inj1_round.SELECT: None,
+                self._nsb.inj1_round.N_1ST: InjectionRound.FIRST,
+                self._nsb.inj1_round.N_2ND: InjectionRound.SECOND,
+                self._nsb.inj1_round.NA: None,
+            }.get(self._nsb.inj1_round, None)
+        )
 
     @property
     def aind_inj1_storage_location(self) -> Optional[str]:
@@ -787,11 +610,15 @@ class MappedNSBList:
     @property
     def aind_inj1_type(self) -> Optional[InjectionType]:
         """Maps inj1_type to aind model"""
-        return {
-            self._nsb.inj1_type.SELECT: None,
-            self._nsb.inj1_type.IONTOPHORESIS: InjectionType.IONTOPHORESIS,
-            self._nsb.inj1_type.NANOJECT_PRESSURE: InjectionType.NANOJECT,
-        }.get(self._nsb.inj1_type, None)
+        return (
+            None
+            if self._nsb.inj1_type is None
+            else {
+                self._nsb.inj1_type.SELECT: None,
+                self._nsb.inj1_type.IONTOPHORESIS: InjectionType.IONTOPHORESIS,
+                self._nsb.inj1_type.NANOJECT_PRESSURE: InjectionType.NANOJECT,
+            }.get(self._nsb.inj1_type, None)
+        )
 
     @property
     def aind_inj1_virus_strain_rt(self) -> Optional[str]:
@@ -806,15 +633,19 @@ class MappedNSBList:
     @property
     def aind_inj1angle0(self) -> Optional[float]:
         """Maps inj1angle0 to aind model"""
-        return {
-            self._nsb.inj1angle0.SELECT: None,
-            self._nsb.inj1angle0.N_0_DEGREES: 0,
-            self._nsb.inj1angle0.N_10_DEGREES: 10,
-            self._nsb.inj1angle0.N_15_DEGREES: 15,
-            self._nsb.inj1angle0.N_20_DEGREES: 20,
-            self._nsb.inj1angle0.N_30_DEGREES: 30,
-            self._nsb.inj1angle0.N_40_DEGREES: 40,
-        }.get(self._nsb.inj1angle0, None)
+        return (
+            None
+            if self._nsb.inj1angle0 is None
+            else {
+                self._nsb.inj1angle0.SELECT: None,
+                self._nsb.inj1angle0.N_0_DEGREES: 0,
+                self._nsb.inj1angle0.N_10_DEGREES: 10,
+                self._nsb.inj1angle0.N_15_DEGREES: 15,
+                self._nsb.inj1angle0.N_20_DEGREES: 20,
+                self._nsb.inj1angle0.N_30_DEGREES: 30,
+                self._nsb.inj1angle0.N_40_DEGREES: 40,
+            }.get(self._nsb.inj1angle0, None)
+        )
 
     @property
     def aind_inj1volperdepth(self) -> Optional[float]:
@@ -842,14 +673,18 @@ class MappedNSBList:
         return self._parse_length_of_time_str(self._nsb.inj2_lenghtof_time)
 
     @property
-    def aind_inj2_round(self) -> Optional[Any]:
+    def aind_inj2_round(self) -> Optional[InjectionRound]:
         """Maps inj2_round to aind model"""
-        return {
-            self._nsb.inj2_round.SELECT: None,
-            self._nsb.inj2_round.N_1ST: None,
-            self._nsb.inj2_round.N_2ND: None,
-            self._nsb.inj2_round.NA: None,
-        }.get(self._nsb.inj2_round, None)
+        return (
+            None
+            if self._nsb.inj2_round is None
+            else {
+                self._nsb.inj2_round.SELECT: None,
+                self._nsb.inj2_round.N_1ST: InjectionRound.FIRST,
+                self._nsb.inj2_round.N_2ND: InjectionRound.SECOND,
+                self._nsb.inj2_round.NA: None,
+            }.get(self._nsb.inj2_round, None)
+        )
 
     @property
     def aind_inj2_storage_location(self) -> Optional[str]:
@@ -859,11 +694,15 @@ class MappedNSBList:
     @property
     def aind_inj2_type(self) -> Optional[InjectionType]:
         """Maps inj2_type to aind model"""
-        return {
-            self._nsb.inj2_type.SELECT: None,
-            self._nsb.inj2_type.IONTOPHORESIS: InjectionType.IONTOPHORESIS,
-            self._nsb.inj2_type.NANOJECT_PRESSURE: InjectionType.NANOJECT,
-        }.get(self._nsb.inj2_type, None)
+        return (
+            None
+            if self._nsb.inj2_type is None
+            else {
+                self._nsb.inj2_type.SELECT: None,
+                self._nsb.inj2_type.IONTOPHORESIS: InjectionType.IONTOPHORESIS,
+                self._nsb.inj2_type.NANOJECT_PRESSURE: InjectionType.NANOJECT,
+            }.get(self._nsb.inj2_type, None)
+        )
 
     @property
     def aind_inj2_virus_strain_rt(self) -> Optional[str]:
@@ -878,15 +717,19 @@ class MappedNSBList:
     @property
     def aind_inj2angle0(self) -> Optional[float]:
         """Maps inj2angle0 to aind model"""
-        return {
-            self._nsb.inj2angle0.SELECT: None,
-            self._nsb.inj2angle0.N_0_DEGREES: 0,
-            self._nsb.inj2angle0.N_10_DEGREES: 10,
-            self._nsb.inj2angle0.N_15_DEGREES: 15,
-            self._nsb.inj2angle0.N_20_DEGREES: 20,
-            self._nsb.inj2angle0.N_30_DEGREES: 30,
-            self._nsb.inj2angle0.N_40_DEGREES: 40,
-        }.get(self._nsb.inj2angle0, None)
+        return (
+            None
+            if self._nsb.inj2angle0 is None
+            else {
+                self._nsb.inj2angle0.SELECT: None,
+                self._nsb.inj2angle0.N_0_DEGREES: 0,
+                self._nsb.inj2angle0.N_10_DEGREES: 10,
+                self._nsb.inj2angle0.N_15_DEGREES: 15,
+                self._nsb.inj2angle0.N_20_DEGREES: 20,
+                self._nsb.inj2angle0.N_30_DEGREES: 30,
+                self._nsb.inj2angle0.N_40_DEGREES: 40,
+            }.get(self._nsb.inj2angle0, None)
+        )
 
     @property
     def aind_inj2volperdepth(self) -> Optional[float]:
@@ -896,134 +739,128 @@ class MappedNSBList:
     @property
     def aind_ionto_number_hpinj(self) -> Optional[str]:
         """Maps ionto_number_hpinj to aind model"""
-        return {
-            self._nsb.ionto_number_hpinj.IONTO_1: (
-                self._nsb.ionto_number_hpinj.IONTO_1.value
-            ),
-            self._nsb.ionto_number_hpinj.IONTO_2: (
-                self._nsb.ionto_number_hpinj.IONTO_2.value
-            ),
-            self._nsb.ionto_number_hpinj.IONTO_3: (
-                self._nsb.ionto_number_hpinj.IONTO_3.value
-            ),
-            self._nsb.ionto_number_hpinj.IONTO_4: (
-                self._nsb.ionto_number_hpinj.IONTO_4.value
-            ),
-            self._nsb.ionto_number_hpinj.IONTO_5: (
-                self._nsb.ionto_number_hpinj.IONTO_5.value
-            ),
-            self._nsb.ionto_number_hpinj.IONTO_6: (
-                self._nsb.ionto_number_hpinj.IONTO_6.value
-            ),
-            self._nsb.ionto_number_hpinj.IONTO_7: (
-                self._nsb.ionto_number_hpinj.IONTO_7.value
-            ),
-            self._nsb.ionto_number_hpinj.IONTO_8: (
-                self._nsb.ionto_number_hpinj.IONTO_8.value
-            ),
-            self._nsb.ionto_number_hpinj.IONTO_9: (
-                self._nsb.ionto_number_hpinj.IONTO_9.value
-            ),
-        }.get(self._nsb.ionto_number_hpinj, None)
+        return (
+            None
+            if self._nsb.ionto_number_hpinj is None
+            else {
+                self._nsb.ionto_number_hpinj.IONTO_1: (
+                    self._nsb.ionto_number_hpinj.IONTO_1.value
+                ),
+                self._nsb.ionto_number_hpinj.IONTO_2: (
+                    self._nsb.ionto_number_hpinj.IONTO_2.value
+                ),
+                self._nsb.ionto_number_hpinj.IONTO_3: (
+                    self._nsb.ionto_number_hpinj.IONTO_3.value
+                ),
+                self._nsb.ionto_number_hpinj.IONTO_4: (
+                    self._nsb.ionto_number_hpinj.IONTO_4.value
+                ),
+                self._nsb.ionto_number_hpinj.IONTO_5: (
+                    self._nsb.ionto_number_hpinj.IONTO_5.value
+                ),
+                self._nsb.ionto_number_hpinj.IONTO_6: (
+                    self._nsb.ionto_number_hpinj.IONTO_6.value
+                ),
+                self._nsb.ionto_number_hpinj.IONTO_7: (
+                    self._nsb.ionto_number_hpinj.IONTO_7.value
+                ),
+                self._nsb.ionto_number_hpinj.IONTO_8: (
+                    self._nsb.ionto_number_hpinj.IONTO_8.value
+                ),
+                self._nsb.ionto_number_hpinj.IONTO_9: (
+                    self._nsb.ionto_number_hpinj.IONTO_9.value
+                ),
+            }.get(self._nsb.ionto_number_hpinj, None)
+        )
 
     @property
     def aind_ionto_number_inj1(self) -> Optional[str]:
         """Maps ionto_number_inj1 to aind model"""
-        return {
-            self._nsb.ionto_number_inj1.SELECT: None,
-            self._nsb.ionto_number_inj1.IONTO_1: (
-                self._nsb.ionto_number_inj1.IONTO_1.value
-            ),
-            self._nsb.ionto_number_inj1.IONTO_2: (
-                self._nsb.ionto_number_inj1.IONTO_2.value
-            ),
-            self._nsb.ionto_number_inj1.IONTO_3: (
-                self._nsb.ionto_number_inj1.IONTO_3.value
-            ),
-            self._nsb.ionto_number_inj1.IONTO_4: (
-                self._nsb.ionto_number_inj1.IONTO_4.value
-            ),
-            self._nsb.ionto_number_inj1.IONTO_5: (
-                self._nsb.ionto_number_inj1.IONTO_5.value
-            ),
-            self._nsb.ionto_number_inj1.IONTO_6: (
-                self._nsb.ionto_number_inj1.IONTO_6.value
-            ),
-            self._nsb.ionto_number_inj1.IONTO_7: (
-                self._nsb.ionto_number_inj1.IONTO_7.value
-            ),
-            self._nsb.ionto_number_inj1.IONTO_8: (
-                self._nsb.ionto_number_inj1.IONTO_8.value
-            ),
-            self._nsb.ionto_number_inj1.IONTO_9: (
-                self._nsb.ionto_number_inj1.IONTO_9.value
-            ),
-            self._nsb.ionto_number_inj1.IONTO_10: (
-                self._nsb.ionto_number_inj1.IONTO_10.value
-            ),
-            self._nsb.ionto_number_inj1.NA: None,
-        }.get(self._nsb.ionto_number_inj1, None)
+        return (
+            None
+            if self._nsb.ionto_number_inj1 is None
+            else {
+                self._nsb.ionto_number_inj1.SELECT: None,
+                self._nsb.ionto_number_inj1.IONTO_1: (
+                    self._nsb.ionto_number_inj1.IONTO_1.value
+                ),
+                self._nsb.ionto_number_inj1.IONTO_2: (
+                    self._nsb.ionto_number_inj1.IONTO_2.value
+                ),
+                self._nsb.ionto_number_inj1.IONTO_3: (
+                    self._nsb.ionto_number_inj1.IONTO_3.value
+                ),
+                self._nsb.ionto_number_inj1.IONTO_4: (
+                    self._nsb.ionto_number_inj1.IONTO_4.value
+                ),
+                self._nsb.ionto_number_inj1.IONTO_5: (
+                    self._nsb.ionto_number_inj1.IONTO_5.value
+                ),
+                self._nsb.ionto_number_inj1.IONTO_6: (
+                    self._nsb.ionto_number_inj1.IONTO_6.value
+                ),
+                self._nsb.ionto_number_inj1.IONTO_7: (
+                    self._nsb.ionto_number_inj1.IONTO_7.value
+                ),
+                self._nsb.ionto_number_inj1.IONTO_8: (
+                    self._nsb.ionto_number_inj1.IONTO_8.value
+                ),
+                self._nsb.ionto_number_inj1.IONTO_9: (
+                    self._nsb.ionto_number_inj1.IONTO_9.value
+                ),
+                self._nsb.ionto_number_inj1.IONTO_10: (
+                    self._nsb.ionto_number_inj1.IONTO_10.value
+                ),
+                self._nsb.ionto_number_inj1.NA: None,
+            }.get(self._nsb.ionto_number_inj1, None)
+        )
 
     @property
-    def aind_ionto_number_inj2(self) -> Optional[Any]:
+    def aind_ionto_number_inj2(self) -> Optional[str]:
         """Maps ionto_number_inj2 to aind model"""
-        return {
-            self._nsb.ionto_number_inj2.SELECT: None,
-            self._nsb.ionto_number_inj2.IONTO_1: (
-                self._nsb.ionto_number_inj2.IONTO_1.value
-            ),
-            self._nsb.ionto_number_inj2.IONTO_2: (
-                self._nsb.ionto_number_inj2.IONTO_2.value
-            ),
-            self._nsb.ionto_number_inj2.IONTO_3: (
-                self._nsb.ionto_number_inj2.IONTO_3.value
-            ),
-            self._nsb.ionto_number_inj2.IONTO_4: (
-                self._nsb.ionto_number_inj2.IONTO_4.value
-            ),
-            self._nsb.ionto_number_inj2.IONTO_5: (
-                self._nsb.ionto_number_inj2.IONTO_5.value
-            ),
-            self._nsb.ionto_number_inj2.IONTO_6: (
-                self._nsb.ionto_number_inj2.IONTO_6.value
-            ),
-            self._nsb.ionto_number_inj2.IONTO_7: (
-                self._nsb.ionto_number_inj2.IONTO_7.value
-            ),
-            self._nsb.ionto_number_inj2.IONTO_8: (
-                self._nsb.ionto_number_inj2.IONTO_8.value
-            ),
-            self._nsb.ionto_number_inj2.IONTO_9: (
-                self._nsb.ionto_number_inj2.IONTO_9.value
-            ),
-            self._nsb.ionto_number_inj2.IONTO_10: (
-                self._nsb.ionto_number_inj2.IONTO_10.value
-            ),
-            self._nsb.ionto_number_inj2.NA: None,
-        }.get(self._nsb.ionto_number_inj2, None)
+        return (
+            None
+            if self._nsb.ionto_number_inj2 is None
+            else {
+                self._nsb.ionto_number_inj2.SELECT: None,
+                self._nsb.ionto_number_inj2.IONTO_1: (
+                    self._nsb.ionto_number_inj2.IONTO_1.value
+                ),
+                self._nsb.ionto_number_inj2.IONTO_2: (
+                    self._nsb.ionto_number_inj2.IONTO_2.value
+                ),
+                self._nsb.ionto_number_inj2.IONTO_3: (
+                    self._nsb.ionto_number_inj2.IONTO_3.value
+                ),
+                self._nsb.ionto_number_inj2.IONTO_4: (
+                    self._nsb.ionto_number_inj2.IONTO_4.value
+                ),
+                self._nsb.ionto_number_inj2.IONTO_5: (
+                    self._nsb.ionto_number_inj2.IONTO_5.value
+                ),
+                self._nsb.ionto_number_inj2.IONTO_6: (
+                    self._nsb.ionto_number_inj2.IONTO_6.value
+                ),
+                self._nsb.ionto_number_inj2.IONTO_7: (
+                    self._nsb.ionto_number_inj2.IONTO_7.value
+                ),
+                self._nsb.ionto_number_inj2.IONTO_8: (
+                    self._nsb.ionto_number_inj2.IONTO_8.value
+                ),
+                self._nsb.ionto_number_inj2.IONTO_9: (
+                    self._nsb.ionto_number_inj2.IONTO_9.value
+                ),
+                self._nsb.ionto_number_inj2.IONTO_10: (
+                    self._nsb.ionto_number_inj2.IONTO_10.value
+                ),
+                self._nsb.ionto_number_inj2.NA: None,
+            }.get(self._nsb.ionto_number_inj2, None)
+        )
 
     @property
     def aind_iso_on(self) -> Optional[float]:
         """Maps iso_on to aind model"""
         return self._nsb.iso_on
-
-    @property
-    def aind_issue(self) -> Optional[Any]:
-        """Maps issue to aind model"""
-        return {
-            self._nsb.issue.SELECT: None,
-            self._nsb.issue.EXUDATE: None,
-            self._nsb.issue.EYE_ISSUE: None,
-            self._nsb.issue.METABOND: None,
-            self._nsb.issue.REPLACEMENT_COVERSLIP: None,
-            self._nsb.issue.REPLACEMENT_KWIKCAST: None,
-            self._nsb.issue.REPLACEMENT_ORING: None,
-            self._nsb.issue.SCABBING: None,
-            self._nsb.issue.Z_MOTION: None,
-            self._nsb.issue.NON_SURGICAL_ISSUE: None,
-            self._nsb.issue.MULTIPLE_ISSUES_NOTES_IN: None,
-            self._nsb.issue.OTHERWRITE_IN_COMMENTS: None,
-        }.get(self._nsb.issue, None)
 
     @property
     def aind_lab_tracks_group(self) -> Optional[str]:
@@ -1041,129 +878,9 @@ class MappedNSBList:
         return self._nsb.lab_tracks_requestor
 
     @property
-    def aind_li_ms_required(self) -> Optional[Any]:
-        """Maps li_ms_required to aind model"""
-        return {
-            self._nsb.li_ms_required.SELECT: None,
-            self._nsb.li_ms_required.YES: None,
-            self._nsb.li_ms_required.NO: None,
-        }.get(self._nsb.li_ms_required, None)
-
-    @property
-    def aind_light_cycle(self) -> Optional[Any]:
-        """Maps light_cycle to aind model"""
-        return {
-            self._nsb.light_cycle.SELECT: None,
-            self._nsb.light_cycle.REVERSE_9PM_TO_9AM: None,
-            self._nsb.light_cycle.NORMAL_6AM_TO_8PM: None,
-        }.get(self._nsb.light_cycle, None)
-
-    @property
-    def aind_lim_staskflow1(self) -> Optional[Any]:
-        """Maps lim_staskflow1 to aind model"""
-        return {
-            self._nsb.lim_staskflow1.NA: None,
-            self._nsb.lim_staskflow1.VGT_ENHANCERS_TRANSSYNAPT: None,
-            self._nsb.lim_staskflow1.AIND_U19_THALAMUS: None,
-            self._nsb.lim_staskflow1.MSP_LEARNING_M_FISH_VIRUS: None,
-            self._nsb.lim_staskflow1.MSP_LEARNING_M_FISH_FRONT: None,
-            self._nsb.lim_staskflow1.MSP_LEARNING_M_FISH_DEVEL: None,
-            self._nsb.lim_staskflow1.MSP_OM_FISH_CUX2_PILOT: None,
-            self._nsb.lim_staskflow1.IVSCC_HVA_RETRO_PATCH_SEQ: None,
-            self._nsb.lim_staskflow1.MSP_VIP_AXONAL_V1: None,
-            self._nsb.lim_staskflow1.MSP_TASK_TRAINED_NETWORKS: None,
-            self._nsb.lim_staskflow1.AIND_EPHYS_SURGERY_ONLY: None,
-            self._nsb.lim_staskflow1.AIND_EPHYS_PASSIVE_BEHAVI: None,
-            self._nsb.lim_staskflow1.MSP_OPEN_SCOPE_DENDRITE_C: None,
-            self._nsb.lim_staskflow1.MSP_OPEN_SCOPE_ILLUSION: None,
-            self._nsb.lim_staskflow1.MSP_OPEN_SCOPE_GLOBAL_LOC: None,
-            self._nsb.lim_staskflow1.MSP_OPEN_SCOPE_GLOBAL_001: None,
-            self._nsb.lim_staskflow1.MSP_DYNAMIC_ROUTING_TASK: None,
-            self._nsb.lim_staskflow1.MSP_VARIABILITY_SPONTANEO: None,
-            self._nsb.lim_staskflow1.MSP_OM_FISH_RORB_PILOT: None,
-            self._nsb.lim_staskflow1.MSP_TASK_TRAINED_NETW_001: None,
-            self._nsb.lim_staskflow1.MSP_DYNAMIC_ROUTING_SURGI: None,
-            self._nsb.lim_staskflow1.MSP_VARIABILITY_AIM_1: None,
-            self._nsb.lim_staskflow1.MSP_DYNAMIC_ROUTING_ULTRA: None,
-            self._nsb.lim_staskflow1.CITRIC_ACID_PILOT: None,
-            self._nsb.lim_staskflow1.MSP_OM_FISH_CO_REGISTRATI: None,
-            self._nsb.lim_staskflow1.MSP_OM_FISH_ROB_INJECTION: None,
-            self._nsb.lim_staskflow1.EPHYS_TAS_DEV_DYNAMIC_ROU: None,
-            self._nsb.lim_staskflow1.EPHYS_TASK_DEV_DYNAMIC_RO: None,
-            self._nsb.lim_staskflow1.EPHYS_TASK_DEV_DYNAMI_001: None,
-            self._nsb.lim_staskflow1.MSP_VIP_SOMATIC_V1: None,
-            self._nsb.lim_staskflow1.MSP_OM_FISH_GAD2_PILOT: None,
-            self._nsb.lim_staskflow1.MSP_VARIABILITY_AIM_1_PIL: None,
-            self._nsb.lim_staskflow1.MSP_LEARNING_M_FISH_D_001: None,
-            self._nsb.lim_staskflow1.BTV_BRAIN_VIRAL_STRATEGIE: None,
-            self._nsb.lim_staskflow1.TRANSGENIC_CHARACTERIZATI: None,
-            self._nsb.lim_staskflow1.IVSP_CM_INJECTION: None,
-            self._nsb.lim_staskflow1.BRAIN_LARGE_SCALE_RECORDI: None,
-            self._nsb.lim_staskflow1.TINY_BLUE_DOT_BEHAVIOR: None,
-            self._nsb.lim_staskflow1.BRAIN_OBSERVATORY_TRANSGE: None,
-            self._nsb.lim_staskflow1.BRAIN_MOUSE_BRAIN_CELL_AT: None,
-            self._nsb.lim_staskflow1.IVSC_CM_INJECTION: None,
-            self._nsb.lim_staskflow1.MGT_ANTEROGRADE_PROJECTIO: None,
-            self._nsb.lim_staskflow1.MGT_TISSUE_CYTE: None,
-            self._nsb.lim_staskflow1.MGT_LAB: None,
-            self._nsb.lim_staskflow1.OPENSCOPE_VIRUS_VALIDATIO: None,
-        }.get(self._nsb.lim_staskflow1, None)
-
-    @property
     def aind_lims_link(self) -> Optional[str]:
         """Maps lims_link to aind model"""
         return self._nsb.lims_link
-
-    @property
-    def aind_lims_project_code(self) -> Optional[Any]:
-        """Maps lims_project_code to aind model"""
-        return {
-            self._nsb.lims_project_code.SELECT: None,
-            self._nsb.lims_project_code.LEARNINGM_FISH_TASK1_A: None,
-            self._nsb.lims_project_code.OM_FISH_CUX2_MESO: None,
-            self._nsb.lims_project_code.VIP_SOMATIC_V1_MESO: None,
-            self._nsb.lims_project_code.OPENSCOPE_DEVELOPMENT: None,
-            self._nsb.lims_project_code.T301T: None,
-            self._nsb.lims_project_code.VIP_AXONAL_V1_PHASE1: None,
-            self._nsb.lims_project_code.TASK_TRAINED_NETWORKS_NEU: None,
-            self._nsb.lims_project_code.AINDEPHYS: None,
-            self._nsb.lims_project_code.AINDMSMA: None,
-            self._nsb.lims_project_code.AINDDISCOVERY: None,
-            self._nsb.lims_project_code.AINDOPHYS: None,
-            self._nsb.lims_project_code.OPEN_SCOPE_DENDRITE_COUPL: None,
-            self._nsb.lims_project_code.OPEN_SCOPE_ILLUSION: None,
-            self._nsb.lims_project_code.OPEN_SCOPE_GLOBAL_LOCAL_O: None,
-            self._nsb.lims_project_code.OM_FISH_GAD2_MESO: None,
-            self._nsb.lims_project_code.DYNAMIC_ROUTING_TASK1_PRO: None,
-            self._nsb.lims_project_code.VARIABILITY_SPONTANEOUS: None,
-            self._nsb.lims_project_code.OM_FISH_RORB_PILOT: None,
-            self._nsb.lims_project_code.TASK_TRAINED_NETWORKS_MUL: None,
-            self._nsb.lims_project_code.DYNAMIC_ROUTING_SURGICAL: None,
-            self._nsb.lims_project_code.VARIABILITY_AIM1: None,
-            self._nsb.lims_project_code.DYNAMIC_ROUTING_ULTRA_OPT: None,
-            self._nsb.lims_project_code.CITRICACIDPILOT: None,
-            self._nsb.lims_project_code.OM_FIS_HCOREGISTRATIONPIL: None,
-            self._nsb.lims_project_code.DYNAMIC_ROUTING_BEHAVIOR: None,
-            self._nsb.lims_project_code.OM_FISHRO_BINJECTIONVIRUS: None,
-            self._nsb.lims_project_code.VIP_SOMATIC_V1_PHASE1: None,
-            self._nsb.lims_project_code.VIP_SOMATIC_V1_PHASE2: None,
-            self._nsb.lims_project_code.VARIABILITY_AIM1_PILOT: None,
-            self._nsb.lims_project_code.OM_FISH_GAD2_PILOT: None,
-            self._nsb.lims_project_code.LEARNINGM_FISH_DEVELOPMEN: None,
-            self._nsb.lims_project_code.BRAINTV_VIRAL_STRATEGIES: None,
-            self._nsb.lims_project_code.TINY_BLUE_DOT_BEHAVIOR: None,
-            self._nsb.lims_project_code.MOUSE_BRAIN_CELL_ATLAS_TR: None,
-            self._nsb.lims_project_code.CELLTYPES_TRANSGENIC_CHAR: None,
-            self._nsb.lims_project_code.MINDSCOPE_TRANSGENIC_CHAR: None,
-            self._nsb.lims_project_code.MOUSE_GENETIC_TOOLS_PROJE: None,
-            self._nsb.lims_project_code.OPEN_SCOPE_INJECTION_PILO: None,
-            self._nsb.lims_project_code.M_IVSCCMET: None,
-            self._nsb.lims_project_code.M_IVSCCME_TX: None,
-            self._nsb.lims_project_code.M_MPATC_HX: None,
-            self._nsb.lims_project_code.M_M_PATCH: None,
-            self._nsb.lims_project_code.IS_IX: None,
-            self._nsb.lims_project_code.SURGERY_X: None,
-        }.get(self._nsb.lims_project_code, None)
 
     @property
     def aind_long1st_round_inj_cmts(self) -> Optional[str]:
@@ -1198,66 +915,74 @@ class MappedNSBList:
     @property
     def aind_nanoject_number_inj10(self) -> Optional[str]:
         """Maps nanoject_number_inj10 to aind model"""
-        return {
-            self._nsb.nanoject_number_inj10.SELECT: None,
-            self._nsb.nanoject_number_inj10.NJ1: (
-                self._nsb.nanoject_number_inj10.NJ1.value
-            ),
-            self._nsb.nanoject_number_inj10.NJ2: (
-                self._nsb.nanoject_number_inj10.NJ2.value
-            ),
-            self._nsb.nanoject_number_inj10.NJ3: (
-                self._nsb.nanoject_number_inj10.NJ3.value
-            ),
-            self._nsb.nanoject_number_inj10.NJ4: (
-                self._nsb.nanoject_number_inj10.NJ4.value
-            ),
-            self._nsb.nanoject_number_inj10.NJ5: (
-                self._nsb.nanoject_number_inj10.NJ5.value
-            ),
-            self._nsb.nanoject_number_inj10.NJ6: (
-                self._nsb.nanoject_number_inj10.NJ6.value
-            ),
-            self._nsb.nanoject_number_inj10.NJ7: (
-                self._nsb.nanoject_number_inj10.NJ7.value
-            ),
-            self._nsb.nanoject_number_inj10.NJ8: (
-                self._nsb.nanoject_number_inj10.NJ8.value
-            ),
-            self._nsb.nanoject_number_inj10.NA: None,
-        }.get(self._nsb.nanoject_number_inj10, None)
+        return (
+            None
+            if self._nsb.nanoject_number_inj10 is None
+            else {
+                self._nsb.nanoject_number_inj10.SELECT: None,
+                self._nsb.nanoject_number_inj10.NJ1: (
+                    self._nsb.nanoject_number_inj10.NJ1.value
+                ),
+                self._nsb.nanoject_number_inj10.NJ2: (
+                    self._nsb.nanoject_number_inj10.NJ2.value
+                ),
+                self._nsb.nanoject_number_inj10.NJ3: (
+                    self._nsb.nanoject_number_inj10.NJ3.value
+                ),
+                self._nsb.nanoject_number_inj10.NJ4: (
+                    self._nsb.nanoject_number_inj10.NJ4.value
+                ),
+                self._nsb.nanoject_number_inj10.NJ5: (
+                    self._nsb.nanoject_number_inj10.NJ5.value
+                ),
+                self._nsb.nanoject_number_inj10.NJ6: (
+                    self._nsb.nanoject_number_inj10.NJ6.value
+                ),
+                self._nsb.nanoject_number_inj10.NJ7: (
+                    self._nsb.nanoject_number_inj10.NJ7.value
+                ),
+                self._nsb.nanoject_number_inj10.NJ8: (
+                    self._nsb.nanoject_number_inj10.NJ8.value
+                ),
+                self._nsb.nanoject_number_inj10.NA: None,
+            }.get(self._nsb.nanoject_number_inj10, None)
+        )
 
     @property
     def aind_nanoject_number_inj2(self) -> Optional[str]:
         """Maps nanoject_number_inj2 to aind model"""
-        return {
-            self._nsb.nanoject_number_inj2.SELECT: None,
-            self._nsb.nanoject_number_inj2.NJ1: (
-                self._nsb.nanoject_number_inj2.NJ1
-            ),
-            self._nsb.nanoject_number_inj2.NJ2: (
-                self._nsb.nanoject_number_inj2.NJ2
-            ),
-            self._nsb.nanoject_number_inj2.NJ3: (
-                self._nsb.nanoject_number_inj2.NJ3
-            ),
-            self._nsb.nanoject_number_inj2.NJ4: (
-                self._nsb.nanoject_number_inj2.NJ4
-            ),
-            self._nsb.nanoject_number_inj2.NJ5: (
-                self._nsb.nanoject_number_inj2.NJ5
-            ),
-            self._nsb.nanoject_number_inj2.NJ6: (
-                self._nsb.nanoject_number_inj2.NJ6
-            ),
-            self._nsb.nanoject_number_inj2.NJ7: (
-                self._nsb.nanoject_number_inj2.NJ7
-            ),
-            self._nsb.nanoject_number_inj2.NJ8: (
-                self._nsb.nanoject_number_inj2.NJ8
-            ),
-            self._nsb.nanoject_number_inj2.NA: None,
-        }.get(self._nsb.nanoject_number_inj2, None)
+        return (
+            None
+            if self._nsb.nanoject_number_inj2 is None
+            else {
+                self._nsb.nanoject_number_inj2.SELECT: None,
+                self._nsb.nanoject_number_inj2.NJ1: (
+                    self._nsb.nanoject_number_inj2.NJ1
+                ),
+                self._nsb.nanoject_number_inj2.NJ2: (
+                    self._nsb.nanoject_number_inj2.NJ2
+                ),
+                self._nsb.nanoject_number_inj2.NJ3: (
+                    self._nsb.nanoject_number_inj2.NJ3
+                ),
+                self._nsb.nanoject_number_inj2.NJ4: (
+                    self._nsb.nanoject_number_inj2.NJ4
+                ),
+                self._nsb.nanoject_number_inj2.NJ5: (
+                    self._nsb.nanoject_number_inj2.NJ5
+                ),
+                self._nsb.nanoject_number_inj2.NJ6: (
+                    self._nsb.nanoject_number_inj2.NJ6
+                ),
+                self._nsb.nanoject_number_inj2.NJ7: (
+                    self._nsb.nanoject_number_inj2.NJ7
+                ),
+                self._nsb.nanoject_number_inj2.NJ8: (
+                    self._nsb.nanoject_number_inj2.NJ8
+                ),
+                self._nsb.nanoject_number_inj2.NA: None,
+            }.get(self._nsb.nanoject_number_inj2, None)
+        )
 
     @property
     def aind_nd_roung_injection_commen(self) -> Optional[str]:
@@ -1275,115 +1000,50 @@ class MappedNSBList:
         return self._nsb.procedure
 
     @property
-    def aind_project_id_te(self) -> Optional[Any]:
-        """Maps project_id_te to aind model"""
-        return {
-            self._nsb.project_id_te.SELECT: None,
-            self._nsb.project_id_te.N_1020100910_CTY_MORPHOLO: None,
-            self._nsb.project_id_te.N_1020101010_CTY_SYNAPTIC: None,
-            self._nsb.project_id_te.N_1020101410_CTY_GEN_TOOL: None,
-            self._nsb.project_id_te.N_1020102120_CTYBRAIN_MOU: None,
-            self._nsb.project_id_te.N_1020102120_CTYBRAIN_001: None,
-            self._nsb.project_id_te.N_1020104410_CTY_GENOMICS: None,
-            self._nsb.project_id_te.N_1020199910_CTY_PROGRAM: None,
-            self._nsb.project_id_te.N_1020103620_DISSEMINATIO: None,
-            self._nsb.project_id_te.N_1020104320_OPTICAL_INTE: None,
-            self._nsb.project_id_te.N_1020104510_IVSCC: None,
-            self._nsb.project_id_te.N_1020104720_3_P_NHP_CORT: None,
-            self._nsb.project_id_te.N_1020104810_CTY_BARCODED: None,
-            self._nsb.project_id_te.N_1020105520_CTY_EM_MOTOR: None,
-            self._nsb.project_id_te.N_1020201220_BRAIN_VIRAL: None,
-            self._nsb.project_id_te.N_1020201720_BRAIN_NEUROP: None,
-            self._nsb.project_id_te.N_1020400620_OTH_MEASURIN: None,
-            self._nsb.project_id_te.N_1020400710_TARGETED_CNS: None,
-            self._nsb.project_id_te.N_1020401010_CTY_SR_SLC6: None,
-            self._nsb.project_id_te.N_1020401410_CTY_PARKINSO: None,
-            self._nsb.project_id_te.N_1028800410_XPG_CORE_VIR: None,
-            self._nsb.project_id_te.N_1028800410_XPG_CORE_001: None,
-            self._nsb.project_id_te.N_1210100410_VIP_REGULATE: None,
-            self._nsb.project_id_te.N_1210100710_TASK_TRAINED: None,
-            self._nsb.project_id_te.N_1210100810_NEURAL_ENSEM: None,
-            self._nsb.project_id_te.N_1210101010_V1_OM_FISH: None,
-            self._nsb.project_id_te.N_1210101110_DYNAMIC_ROUT: None,
-            self._nsb.project_id_te.N_1210101210_LEARNING_M_F: None,
-            self._nsb.project_id_te.N_1210101320_MSP_TEMPLETO: None,
-            self._nsb.project_id_te.N_1210101620_BRAIN_OPEN_S: None,
-            self._nsb.project_id_te.N_1210102320_MSP_TEMPLETO: None,
-            self._nsb.project_id_te.N_1210199910_MINDSCOPE_MS: None,
-            self._nsb.project_id_te.N_1220100110_NEURAL_DYNAM: None,
-            self._nsb.project_id_te.N_1220100220_NEURAL_DYNAM: None,
-            self._nsb.project_id_te.N_1220100220_NEURAL_D_001: None,
-            self._nsb.project_id_te.N_1229999910_NEURAL_DYNAM: None,
-            self._nsb.project_id_te.CTYT504: None,
-            self._nsb.project_id_te.CONT503: None,
-            self._nsb.project_id_te.CAMC506: None,
-            self._nsb.project_id_te.LOCC500: None,
-        }.get(self._nsb.project_id_te, None)
-
-    @property
-    def aind_ret_setting0(self) -> Optional[Any]:
-        """Maps ret_setting0 to aind model"""
-        return {
-            self._nsb.ret_setting0.OFF: None,
-            self._nsb.ret_setting0.ON: None,
-        }.get(self._nsb.ret_setting0, None)
-
-    @property
-    def aind_ret_setting1(self) -> Optional[Any]:
-        """Maps ret_setting1 to aind model"""
-        return {
-            self._nsb.ret_setting1.OFF: None,
-            self._nsb.ret_setting1.ON: None,
-        }.get(self._nsb.ret_setting1, None)
-
-    @property
     def aind_round1_inj_isolevel(self) -> Optional[float]:
         """Maps round1_inj_isolevel to aind model"""
-        return {
-            self._nsb.round1_inj_isolevel.SELECT: None,
-            self._nsb.round1_inj_isolevel.N_025: 0.25,
-            self._nsb.round1_inj_isolevel.N_050: 0.50,
-            self._nsb.round1_inj_isolevel.N_075: 0.75,
-            self._nsb.round1_inj_isolevel.N_100: 1.00,
-            self._nsb.round1_inj_isolevel.N_125: 1.25,
-            self._nsb.round1_inj_isolevel.N_150: 1.50,
-            self._nsb.round1_inj_isolevel.N_175: 1.75,
-            self._nsb.round1_inj_isolevel.N_200: 2.00,
-            self._nsb.round1_inj_isolevel.N_225: 2.25,
-            self._nsb.round1_inj_isolevel.N_250: 2.50,
-            self._nsb.round1_inj_isolevel.N_275: 2.75,
-            self._nsb.round1_inj_isolevel.N_300: None,
-        }.get(self._nsb.round1_inj_isolevel, None)
+        return (
+            None
+            if self._nsb.round1_inj_isolevel is None
+            else {
+                self._nsb.round1_inj_isolevel.SELECT: None,
+                self._nsb.round1_inj_isolevel.N_025: 0.25,
+                self._nsb.round1_inj_isolevel.N_050: 0.50,
+                self._nsb.round1_inj_isolevel.N_075: 0.75,
+                self._nsb.round1_inj_isolevel.N_100: 1.00,
+                self._nsb.round1_inj_isolevel.N_125: 1.25,
+                self._nsb.round1_inj_isolevel.N_150: 1.50,
+                self._nsb.round1_inj_isolevel.N_175: 1.75,
+                self._nsb.round1_inj_isolevel.N_200: 2.00,
+                self._nsb.round1_inj_isolevel.N_225: 2.25,
+                self._nsb.round1_inj_isolevel.N_250: 2.50,
+                self._nsb.round1_inj_isolevel.N_275: 2.75,
+                self._nsb.round1_inj_isolevel.N_300: None,
+            }.get(self._nsb.round1_inj_isolevel, None)
+        )
 
     @property
     def aind_round2_inj_isolevel(self) -> Optional[float]:
         """Maps round2_inj_isolevel to aind model"""
-        return {
-            self._nsb.round2_inj_isolevel.SELECT: None,
-            self._nsb.round2_inj_isolevel.N_025: 0.25,
-            self._nsb.round2_inj_isolevel.N_050: 0.50,
-            self._nsb.round2_inj_isolevel.N_075: 0.75,
-            self._nsb.round2_inj_isolevel.N_100: 1.00,
-            self._nsb.round2_inj_isolevel.N_125: 1.25,
-            self._nsb.round2_inj_isolevel.N_150: 1.50,
-            self._nsb.round2_inj_isolevel.N_175: 1.75,
-            self._nsb.round2_inj_isolevel.N_200: 2.00,
-            self._nsb.round2_inj_isolevel.N_225: 2.25,
-            self._nsb.round2_inj_isolevel.N_250: 2.50,
-            self._nsb.round2_inj_isolevel.N_275: 2.75,
-            self._nsb.round2_inj_isolevel.N_300: None,
-        }.get(self._nsb.round2_inj_isolevel, None)
-
-    @property
-    def aind_scabbing(self) -> Optional[Any]:
-        """Maps scabbing to aind model"""
-        return {
-            self._nsb.scabbing.SELECT: None,
-            self._nsb.scabbing.NONE: None,
-            self._nsb.scabbing.MILD: None,
-            self._nsb.scabbing.MODERATE: None,
-            self._nsb.scabbing.SEVERE: None,
-        }.get(self._nsb.scabbing, None)
+        return (
+            None
+            if self._nsb.round2_inj_isolevel is None
+            else {
+                self._nsb.round2_inj_isolevel.SELECT: None,
+                self._nsb.round2_inj_isolevel.N_025: 0.25,
+                self._nsb.round2_inj_isolevel.N_050: 0.50,
+                self._nsb.round2_inj_isolevel.N_075: 0.75,
+                self._nsb.round2_inj_isolevel.N_100: 1.00,
+                self._nsb.round2_inj_isolevel.N_125: 1.25,
+                self._nsb.round2_inj_isolevel.N_150: 1.50,
+                self._nsb.round2_inj_isolevel.N_175: 1.75,
+                self._nsb.round2_inj_isolevel.N_200: 2.00,
+                self._nsb.round2_inj_isolevel.N_225: 2.25,
+                self._nsb.round2_inj_isolevel.N_250: 2.50,
+                self._nsb.round2_inj_isolevel.N_275: 2.75,
+                self._nsb.round2_inj_isolevel.N_300: None,
+            }.get(self._nsb.round2_inj_isolevel, None)
+        )
 
     @property
     def aind_second_inj_recover(self) -> Optional[float]:
@@ -1406,23 +1066,17 @@ class MappedNSBList:
         return self._parse_weight_str(self._nsb.second_injection_weight_b)
 
     @property
-    def aind_second_round_ionto_issue(self) -> Optional[Any]:
-        """Maps second_round_ionto_issue to aind model"""
-        return {
-            self._nsb.second_round_ionto_issue.SELECT: None,
-            self._nsb.second_round_ionto_issue.NO: None,
-            self._nsb.second_round_ionto_issue.YES: None,
-            self._nsb.second_round_ionto_issue.NA: None,
-        }.get(self._nsb.second_round_ionto_issue, None)
-
-    @property
     def aind_sex(self) -> Optional[Sex]:
         """Maps sex to aind model"""
-        return {
-            self._nsb.sex.SELECT: None,
-            self._nsb.sex.MALE: Sex.MALE,
-            self._nsb.sex.FEMALE: Sex.FEMALE,
-        }.get(self._nsb.sex, None)
+        return (
+            None
+            if self._nsb.sex is None
+            else {
+                self._nsb.sex.SELECT: None,
+                self._nsb.sex.MALE: Sex.MALE,
+                self._nsb.sex.FEMALE: Sex.FEMALE,
+            }.get(self._nsb.sex, None)
+        )
 
     @property
     def aind_st_round_injection_commen(self) -> Optional[str]:
@@ -1435,19 +1089,6 @@ class MappedNSBList:
         return self._nsb.start_of_week
 
     @property
-    def aind_surgery_status(self) -> Optional[Any]:
-        """Maps surgery_status to aind model"""
-        return {
-            self._nsb.surgery_status.NEW: None,
-            self._nsb.surgery_status.INJECTION_PENDING: None,
-            self._nsb.surgery_status.PHASE_2_PENDING: None,
-            self._nsb.surgery_status.READY_FOR_FEEDBACK: None,
-            self._nsb.surgery_status.UNPLANNED_ACUTE: None,
-            self._nsb.surgery_status.PLANNED_ACUTE: None,
-            self._nsb.surgery_status.NO_SURGERY: None,
-        }.get(self._nsb.surgery_status, None)
-
-    @property
     def aind_title(self) -> Optional[str]:
         """Maps title to aind model"""
         return self._nsb.title
@@ -1456,17 +1097,6 @@ class MappedNSBList:
     def aind_touch_up_comp(self) -> Optional[datetime]:
         """Maps touch_up_comp to aind model"""
         return self._nsb.touch_up_comp
-
-    @property
-    def aind_touch_up_status(self) -> Optional[Any]:
-        """Maps touch_up_status to aind model"""
-        return {
-            self._nsb.touch_up_status.SELECT: None,
-            self._nsb.touch_up_status.UNDER_OBSERVATION: None,
-            self._nsb.touch_up_status.PENDING: None,
-            self._nsb.touch_up_status.SCHEDULED: None,
-            self._nsb.touch_up_status.COMPLETE: None,
-        }.get(self._nsb.touch_up_status, None)
 
     @property
     def aind_touch_up_weight(self) -> Optional[float]:
@@ -1491,11 +1121,15 @@ class MappedNSBList:
     @property
     def aind_virus_hemisphere(self) -> Optional[Side]:
         """Maps virus_hemisphere to aind model"""
-        return {
-            self._nsb.virus_hemisphere.SELECT: None,
-            self._nsb.virus_hemisphere.LEFT: Side.LEFT,
-            self._nsb.virus_hemisphere.RIGHT: Side.RIGHT,
-        }.get(self._nsb.virus_hemisphere, None)
+        return (
+            None
+            if self._nsb.virus_hemisphere is None
+            else {
+                self._nsb.virus_hemisphere.SELECT: None,
+                self._nsb.virus_hemisphere.LEFT: Side.LEFT,
+                self._nsb.virus_hemisphere.RIGHT: Side.RIGHT,
+            }.get(self._nsb.virus_hemisphere, None)
+        )
 
     @property
     def aind_virus_m_l(self) -> Optional[float]:
@@ -1515,73 +1149,82 @@ class MappedNSBList:
     @property
     def aind_work_station1st_injection(self) -> Optional[str]:
         """Maps work_station1st_injection to aind model"""
-        return {
-            self._nsb.work_station1st_injection.SELECT: None,
-            self._nsb.work_station1st_injection.SWS_1: (
-                self._nsb.work_station1st_injection.SWS_1.value
-            ),
-            self._nsb.work_station1st_injection.SWS_2: (
-                self._nsb.work_station1st_injection.SWS_2.value
-            ),
-            self._nsb.work_station1st_injection.SWS_3: (
-                self._nsb.work_station1st_injection.SWS_3.value
-            ),
-            self._nsb.work_station1st_injection.SWS_4: (
-                self._nsb.work_station1st_injection.SWS_4.value
-            ),
-            self._nsb.work_station1st_injection.SWS_5: (
-                self._nsb.work_station1st_injection.SWS_5.value
-            ),
-            self._nsb.work_station1st_injection.SWS_6: (
-                self._nsb.work_station1st_injection.SWS_6.value
-            ),
-            self._nsb.work_station1st_injection.SWS_7: (
-                self._nsb.work_station1st_injection.SWS_7.value
-            ),
-            self._nsb.work_station1st_injection.SWS_8: (
-                self._nsb.work_station1st_injection.SWS_8.value
-            ),
-            self._nsb.work_station1st_injection.SWS_9: (
-                self._nsb.work_station1st_injection.SWS_9.value
-            ),
-        }.get(self._nsb.work_station1st_injection, None)
+        return (
+            None
+            if self._nsb.work_station1st_injection is None
+            else {
+                self._nsb.work_station1st_injection.SELECT: None,
+                self._nsb.work_station1st_injection.SWS_1: (
+                    self._nsb.work_station1st_injection.SWS_1.value
+                ),
+                self._nsb.work_station1st_injection.SWS_2: (
+                    self._nsb.work_station1st_injection.SWS_2.value
+                ),
+                self._nsb.work_station1st_injection.SWS_3: (
+                    self._nsb.work_station1st_injection.SWS_3.value
+                ),
+                self._nsb.work_station1st_injection.SWS_4: (
+                    self._nsb.work_station1st_injection.SWS_4.value
+                ),
+                self._nsb.work_station1st_injection.SWS_5: (
+                    self._nsb.work_station1st_injection.SWS_5.value
+                ),
+                self._nsb.work_station1st_injection.SWS_6: (
+                    self._nsb.work_station1st_injection.SWS_6.value
+                ),
+                self._nsb.work_station1st_injection.SWS_7: (
+                    self._nsb.work_station1st_injection.SWS_7.value
+                ),
+                self._nsb.work_station1st_injection.SWS_8: (
+                    self._nsb.work_station1st_injection.SWS_8.value
+                ),
+                self._nsb.work_station1st_injection.SWS_9: (
+                    self._nsb.work_station1st_injection.SWS_9.value
+                ),
+            }.get(self._nsb.work_station1st_injection, None)
+        )
 
     @property
     def aind_work_station2nd_injection(self) -> Optional[str]:
         """Maps work_station2nd_injection to aind model"""
-        return {
-            self._nsb.work_station2nd_injection.SELECT: None,
-            self._nsb.work_station2nd_injection.SWS_1: (
-                self._nsb.work_station2nd_injection.SWS_1.value
-            ),
-            self._nsb.work_station2nd_injection.SWS_2: (
-                self._nsb.work_station2nd_injection.SWS_2.value
-            ),
-            self._nsb.work_station2nd_injection.SWS_3: (
-                self._nsb.work_station2nd_injection.SWS_3.value
-            ),
-            self._nsb.work_station2nd_injection.SWS_4: (
-                self._nsb.work_station2nd_injection.SWS_4.value
-            ),
-            self._nsb.work_station2nd_injection.SWS_5: (
-                self._nsb.work_station2nd_injection.SWS_5.value
-            ),
-            self._nsb.work_station2nd_injection.SWS_6: (
-                self._nsb.work_station2nd_injection.SWS_6.value
-            ),
-            self._nsb.work_station2nd_injection.SWS_7: (
-                self._nsb.work_station2nd_injection.SWS_7.value
-            ),
-            self._nsb.work_station2nd_injection.SWS_8: (
-                self._nsb.work_station2nd_injection.SWS_8.value
-            ),
-            self._nsb.work_station2nd_injection.SWS_9: (
-                self._nsb.work_station2nd_injection.SWS_9.value
-            ),
-        }.get(self._nsb.work_station2nd_injection, None)
+        return (
+            None
+            if self._nsb.work_station2nd_injection is None
+            else {
+                self._nsb.work_station2nd_injection.SELECT: None,
+                self._nsb.work_station2nd_injection.SWS_1: (
+                    self._nsb.work_station2nd_injection.SWS_1.value
+                ),
+                self._nsb.work_station2nd_injection.SWS_2: (
+                    self._nsb.work_station2nd_injection.SWS_2.value
+                ),
+                self._nsb.work_station2nd_injection.SWS_3: (
+                    self._nsb.work_station2nd_injection.SWS_3.value
+                ),
+                self._nsb.work_station2nd_injection.SWS_4: (
+                    self._nsb.work_station2nd_injection.SWS_4.value
+                ),
+                self._nsb.work_station2nd_injection.SWS_5: (
+                    self._nsb.work_station2nd_injection.SWS_5.value
+                ),
+                self._nsb.work_station2nd_injection.SWS_6: (
+                    self._nsb.work_station2nd_injection.SWS_6.value
+                ),
+                self._nsb.work_station2nd_injection.SWS_7: (
+                    self._nsb.work_station2nd_injection.SWS_7.value
+                ),
+                self._nsb.work_station2nd_injection.SWS_8: (
+                    self._nsb.work_station2nd_injection.SWS_8.value
+                ),
+                self._nsb.work_station2nd_injection.SWS_9: (
+                    self._nsb.work_station2nd_injection.SWS_9.value
+                ),
+            }.get(self._nsb.work_station2nd_injection, None)
+        )
 
     @property
     def aind_experimenter_full_name(self) -> str:
+        """Map author id to experimenter name"""
         return (
             "NSB"
             if self.aind_author_id is None
@@ -1590,29 +1233,41 @@ class MappedNSBList:
 
     @property
     def aind_anaesthetic_type(self) -> str:
+        """Default anaesthetic type"""
         return "isoflurane"
 
     @property
     def aind_craniotomy_size(self) -> Optional[float]:
-        return {
-            self.aind_craniotomy_type.FIVE_MM: 5,
-            self.aind_craniotomy_type.THREE_MM: 3,
-        }.get(self.aind_craniotomy_type, None)
+        """Map craniotomy type to size in mm"""
+        return (
+            None
+            if self.aind_craniotomy_type is None
+            else {
+                self.aind_craniotomy_type.FIVE_MM: 5,
+                self.aind_craniotomy_type.THREE_MM: 3,
+            }.get(self.aind_craniotomy_type, None)
+        )
 
     @property
     def aind_craniotomy_coordinates_reference(
         self,
     ) -> Optional[CoordinateReferenceLocation]:
-        return {
-            self.aind_craniotomy_type.VISCTX: (
-                CoordinateReferenceLocation.LAMBDA
-            )
-        }.get(self.aind_craniotomy_type, None)
+        """Map craniotomy type to CoordinateReferenceLocation"""
+        return (
+            None
+            if self.aind_craniotomy_type is None
+            else {
+                self.aind_craniotomy_type.VISCTX: (
+                    CoordinateReferenceLocation.LAMBDA
+                )
+            }.get(self.aind_craniotomy_type, None)
+        )
 
     @property
     def aind_inj1_coordinates_reference(
         self,
     ) -> Optional[CoordinateReferenceLocation]:
+        """Map nsb inj1 field to CoordinateReferenceLocation"""
         if (
             self._nsb.virus_a_p is not None
             and "LAMBDA" in self._nsb.virus_a_p.upper()
@@ -1625,15 +1280,17 @@ class MappedNSBList:
     def aind_inj2_coordinates_reference(
         self,
     ) -> Optional[CoordinateReferenceLocation]:
+        """Map nsb inj2 field to CoordinateReferenceLocation"""
         if (
-            self._nsb.virus_a_p is not None
+            self._nsb.ap2nd_inj is not None
             and "LAMBDA" in self._nsb.ap2nd_inj.upper()
         ):
             return CoordinateReferenceLocation.LAMBDA
         else:
             return None
 
-    def get_headframe_procedure(self) -> Headframe:
+    def get_head_frame_procedure(self) -> Headframe:
+        """Get head frame procedure"""
         return Headframe.construct(
             start_date=self.aind_date_of_surgery,
             end_date=self.aind_date_of_surgery,
@@ -1654,6 +1311,7 @@ class MappedNSBList:
         )
 
     def get_craniotomy_procedure(self) -> Craniotomy:
+        """Get craniotomy procedure"""
         return Craniotomy.construct(
             start_date=self.aind_date_of_surgery,
             end_date=self.aind_date_of_surgery,
@@ -1679,6 +1337,7 @@ class MappedNSBList:
         )
 
     def get_first_injection_procedure(self) -> BrainInjection:
+        """Get first injection procedure"""
         if self.aind_inj1_type == InjectionType.NANOJECT:
             return NanojectInjection.construct(
                 start_date=self.aind_date1st_injection,
@@ -1782,6 +1441,7 @@ class MappedNSBList:
             )
 
     def get_second_injection_procedure(self) -> BrainInjection:
+        """Get second injection procedure"""
         if self.aind_inj2_type == InjectionType.NANOJECT:
             return NanojectInjection.construct(
                 start_date=self.aind_date2nd_injection,
@@ -1883,3 +1543,141 @@ class MappedNSBList:
                 injection_angle=self.aind_inj2angle0,
                 injection_hemisphere=self.aind_hemisphere2nd_inj,
             )
+
+    def get_fiber_implant(self):
+        """Get a fiber implant procedure"""
+        ophys_probes = []
+        if self.aind_fiber_implant1:
+            ophys_probes.append(
+                OphysProbe.construct(
+                    name=ProbeName.PROBE_A,
+                    stereotactic_coordinate_ap=self.aind_virus_a_p,
+                    stereotactic_coordinate_ml=self.aind_virus_m_l,
+                    stereotactic_coordinate_dv=self.aind_fiber_implant1_dv,
+                    stereotactic_coordinate_reference=(
+                        self.aind_inj1_coordinates_reference
+                    ),
+                    bregma_to_lambda_distance=self.aind_breg2_lamb,
+                    angle=self.aind_inj1_angle_v2,
+                )
+            )
+        if self.aind_fiber_implant2:
+            ophys_probes.append(
+                OphysProbe.construct(
+                    name=ProbeName.PROBE_B,
+                    stereotactic_coordinate_ap=self.aind_ap2nd_inj,
+                    stereotactic_coordinate_ml=self.aind_ml2nd_inj,
+                    stereotactic_coordinate_dv=self.aind_fiber_implant2_dv,
+                    stereotactic_coordinate_reference=(
+                        self.aind_inj2_coordinates_reference
+                    ),
+                    bregma_to_lambda_distance=self.aind_breg2_lamb,
+                    angle=self.aind_inj2_angle_v2,
+                )
+            )
+        return FiberImplant.construct(
+            start_date=self.aind_date_of_surgery,
+            end_date=self.aind_date_of_surgery,
+            experimenter_full_name=self.aind_experimenter_full_name,
+            iacuc_protocol=self.aind_iacuc_protocol,
+            animal_weight_prior=self.aind_weight_before_surger,
+            animal_weight_post=self.aind_weight_after_surgery,
+            probes=ophys_probes,
+        )
+
+    def get_basic_subject_procedure(self) -> SubjectProcedure:
+        """Get a basic subject procedure"""
+        return SubjectProcedure.construct(
+            start_date=self.aind_date_of_surgery,
+            end_date=self.aind_date_of_surgery,
+            experimenter_full_name=self.aind_experimenter_full_name,
+            iacuc_protocol=self.aind_iacuc_protocol,
+            animal_weight_prior=self.aind_weight_before_surger,
+            animal_weight_post=self.aind_weight_after_surgery,
+        )
+
+    @property
+    def has_injection_procedure(self) -> bool:
+        """Return true if injection procedure in nsb list"""
+        if self._nsb.procedure is None:
+            return False
+        else:
+            return {
+                self._nsb.procedure.INJHPC: True,
+                self._nsb.procedure.INJWHC_NP: True,
+                self._nsb.procedure.HPINJ: True,
+                self._nsb.procedure.HP_INJECTION_OPTIC_FIBER: True,
+                self._nsb.procedure.STEREOTAXIC_INJECTION: True,
+            }.get(self._nsb.procedure, False)
+
+    @property
+    def has_craniotomy_procedure(self) -> bool:
+        """Return true if craniotomy procedure in nsb list"""
+        if self._nsb.procedure is None:
+            return False
+        else:
+            return {
+                self._nsb.procedure.HPC_CAM: True,
+                self._nsb.procedure.HPC_MULTISCOPE: True,
+                self._nsb.procedure.HPC_NEUROPIXEL_STYLE: True,
+                self._nsb.procedure.INJHPC: True,
+                self._nsb.procedure.WHC_NP: True,
+                self._nsb.procedure.INJWHC_NP: True,
+            }.get(self._nsb.procedure, False)
+
+    @property
+    def has_head_frame_procedure(self) -> bool:
+        """Return true if headframe procedure in nsb list"""
+        if self._nsb.procedure is None:
+            return False
+        else:
+            return {
+                self._nsb.procedure.HPC_CAM: True,
+                self._nsb.procedure.HPC_MULTISCOPE: True,
+                self._nsb.procedure.HPC_NEUROPIXEL_STYLE: True,
+                self._nsb.procedure.INJHPC: True,
+                self._nsb.procedure.HPINJ: True,
+                self._nsb.procedure.HP_TRANSCRANIAL_FOR_ISI: True,
+                self._nsb.procedure.HP_ONLY: True,
+                self._nsb.procedure.HP_INJECTION_OPTIC_FIBER: True,
+            }.get(self._nsb.procedure, False)
+
+    @property
+    def has_fiber_implant_procedure(self) -> bool:
+        """Return true if fiber implant procedure in nsb list"""
+        if self._nsb.procedure is None:
+            return False
+        else:
+            return {
+                self._nsb.procedure.HP_INJECTION_OPTIC_FIBER: True,
+            }.get(self._nsb.procedure, False)
+
+    @property
+    def has_unknown_procedures(self) -> bool:
+        """Return true if no known procedures are found in nsb model"""
+        if self._nsb.procedure is None:
+            return True
+        else:
+            return not (
+                self.has_injection_procedure
+                or self.has_fiber_implant_procedure
+                or self.has_craniotomy_procedure
+                or self.has_head_frame_procedure
+            )
+
+    def get_procedures(self) -> List[SubjectProcedure]:
+        """Get a list of subject procedures"""
+        procedures = []
+        if self.has_head_frame_procedure:
+            procedures.append(self.get_head_frame_procedure())
+        if self.has_injection_procedure:
+            procedures.append(self.get_first_injection_procedure())
+        if self.has_injection_procedure and self.aind_inj2_round is not None:
+            procedures.append(self.get_second_injection_procedure())
+        if self.has_craniotomy_procedure:
+            procedures.append(self.get_craniotomy_procedure())
+        if self.has_fiber_implant_procedure:
+            procedures.append(self.get_fiber_implant())
+        if self.has_unknown_procedures:
+            procedures.append(self.get_basic_subject_procedure())
+        return procedures

@@ -10,7 +10,7 @@
   "LabTracks_x0020_Requestor": "Mary Smith",
   "Project_x0020_ID_x0020__x0028_te": "122-01-001-10 Neural Dynamics Scientific Activities",
   "IACUC_x0020_Protocol_x0020__x002": "2115",
-  "Procedure": "Injection+C CAM+HP",
+  "Procedure": "HP+C CAM",
   "Light_x0020_Cycle": "Reverse (9pm to 9am)",
   "LIMs_x0020_Required": "No",
   "LabTracks_x0020_Group": "Slc6a3-Cre",
