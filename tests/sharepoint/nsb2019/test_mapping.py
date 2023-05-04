@@ -4,20 +4,15 @@ import json
 import logging
 import os
 from copy import deepcopy
-from datetime import timedelta
 from pathlib import Path
 from typing import List, Tuple
 from unittest import TestCase
 from unittest import main as unittest_main
 
-from aind_data_schema.procedures import (
-    BrainInjection,
-    CraniotomyType,
-    InjectionMaterial,
-)
+from aind_data_schema.procedures import BrainInjection
 
-from aind_metadata_service.sharepoint.nsb2019.mapping import NSB2019Mapping
-from aind_metadata_service.sharepoint.nsb2019.models import NSBList2019
+from aind_metadata_service.sharepoint.nsb2019.mapping import MappedNSBList
+from aind_metadata_service.sharepoint.nsb2019.models import NSBList
 
 if os.getenv("LOG_LEVEL"):  # pragma: no cover
     logging.basicConfig(level=os.getenv("LOG_LEVEL"))
@@ -67,14 +62,29 @@ class TestNSB2019Parsers(TestCase):
             expected_mapped_data.sort(key=lambda x: str(x))
             raw_file_name = list_item[2]
             logging.debug(f"Processing file: {raw_file_name}")
-            nsb_model = NSBList2019.parse_obj(raw_data)
-            mapper = NSB2019Mapping()
-            mapped_procedure = mapper.map_nsb_model(nsb_model)
+            nsb_model = NSBList.parse_obj(raw_data)
+            mapped_model = MappedNSBList(nsb=nsb_model)
+            mapped_procedures = mapped_model.get_procedures()
             mapped_procedure_json = [
-                json.loads(p.json()) for p in mapped_procedure
+                json.loads(p.json()) for p in mapped_procedures
             ]
             mapped_procedure_json.sort(key=lambda x: str(x))
+
             self.assertEqual(expected_mapped_data, mapped_procedure_json)
+
+    def test_properties(self):
+        """Tests that the properties are parsed correctly."""
+        list_item = self.list_items[0]
+        raw_data = deepcopy(list_item[0])
+        nsb_model = NSBList.parse_obj(raw_data)
+        mapped_model = MappedNSBList(nsb=nsb_model)
+        props = []
+        for k in dir(mapped_model.__class__):
+            cls = mapped_model.__class__
+            attr = getattr(cls, k)
+            if isinstance(attr, property):
+                props.append(getattr(mapped_model, k))
+        self.assertEqual(117, len(props))
 
     def test_inj_mapping_edge_cases(self):
         """Tests the case where there is an INJ procedure, but the inj types
@@ -83,61 +93,23 @@ class TestNSB2019Parsers(TestCase):
         list_item = self.list_items[0]
         raw_data = deepcopy(list_item[0])
         raw_data["Inj1Type"] = "Select..."
-        raw_data["Inj2Type"] = "Select..."
-        raw_data["Procedure"] = "INJ"
-        raw_data["Virus_x0020_A_x002f_P"] = "Select..."
+        raw_data["Inj2Type"] = "Nanoject (Pressure)"
+        raw_data["Procedure"] = "Stereotaxic Injection"
+        raw_data["Virus_x0020_A_x002f_P"] = "3 lambda"
+        raw_data["AP2ndInj"] = "2 lambda"
         raw_data["ImplantIDCoverslipType"] = "3.5"
-        nsb_model = NSBList2019.parse_obj(raw_data)
-        mapper = NSB2019Mapping()
-        mapped_procedure = mapper.map_nsb_model(nsb_model)
+        nsb_model = NSBList.parse_obj(raw_data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        mapped_procedure = mapper.get_procedures()
         self.assertTrue(isinstance(mapped_procedure[0], BrainInjection))
         self.assertTrue(isinstance(mapped_procedure[1], BrainInjection))
-
-    def test_craniotomy_edge_case(self):
-        """Tests other craniotomy cases"""
-
-        # Check WHC type
-        list_item = self.list_items[2]  # Should be list_item3.json
-        raw_data = deepcopy(list_item[0])
-        raw_data["Procedure"] = "HP+C"
-        raw_data["CraniotomyType"] = "WHC NP"
-        nsb_model1 = NSBList2019.parse_obj(raw_data)
-        mapper = NSB2019Mapping()
-        mapped_procedure1 = mapper.map_nsb_model(nsb_model1)
-        mapped_procedure1.sort(key=lambda x: str(x))
-        cran_proc1 = mapped_procedure1[0]
-        self.assertEqual(
-            CraniotomyType.WHC, getattr(cran_proc1, "craniotomy_type")
-        )
-
-        # Check OTHER type
-        raw_data["CraniotomyType"] = "Other"
-        nsb_model2 = NSBList2019.parse_obj(raw_data)
-        mapped_procedure2 = mapper.map_nsb_model(nsb_model2)
-        mapped_procedure2.sort(key=lambda x: str(x))
-        cran_proc2 = mapped_procedure2[0]
-        self.assertEqual(
-            CraniotomyType.OTHER, getattr(cran_proc2, "craniotomy_type")
-        )
-
-    def test_map_duration_minutes(self):
-        """Tests that durations are mapped correctly"""
-        duration1 = timedelta(minutes=5)
-        mapper = NSB2019Mapping()
-        minutes1 = mapper._duration_to_minutes(duration1)
-        self.assertEqual(5, minutes1)
-        duration2 = None
-        minutes2 = mapper._duration_to_minutes(duration2)
-        self.assertIsNone(minutes2)
-
-    def test_virus_strain_mapping(self):
-        """Tests map_virus_strain_to_materials method."""
-        mapper = NSB2019Mapping()
-        inj_materials = mapper._map_virus_strain_to_materials("abc")
-        expected_inj_materials = InjectionMaterial.construct(
-            full_genome_name="abc"
-        )
-        self.assertEqual(expected_inj_materials, inj_materials)
+        raw_data["Inj2Type"] = "Select..."
+        nsb_model = NSBList.parse_obj(raw_data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        mapped_procedure = mapper.get_procedures()
+        self.assertTrue(isinstance(mapped_procedure[0], BrainInjection))
+        self.assertTrue(isinstance(mapped_procedure[1], BrainInjection))
+        self.assertIsNone(mapper._parse_basic_float_str("one"))
 
 
 if __name__ == "__main__":

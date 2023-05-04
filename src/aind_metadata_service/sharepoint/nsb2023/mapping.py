@@ -1,5 +1,6 @@
 """Maps client objects from NSB Sharepoint database to internal AIND models."""
 
+from datetime import date, datetime, timedelta
 from typing import List, Optional
 
 from aind_data_schema.procedures import (
@@ -15,23 +16,24 @@ from aind_data_schema.procedures import (
     NanojectInjection,
     OphysProbe,
     ProbeName,
+    Side,
     SubjectProcedure,
 )
 from office365.sharepoint.client_context import ClientContext
 
-from aind_metadata_service.sharepoint.nsb2019.mapping import NSB2019Mapping
 from aind_metadata_service.sharepoint.nsb2023.models import BurrHoleProcedure
 from aind_metadata_service.sharepoint.nsb2023.models import (
     CraniotomyType as NSBCraniotomyType,
 )
 from aind_metadata_service.sharepoint.nsb2023.models import (
     HeadPostInfo2023,
+    Hemisphere,
     InjectionType,
     NSBList2023,
 )
 
 
-class NSB2023Mapping(NSB2019Mapping):
+class NSB2023Mapping:
     """Provides methods to retrieve procedure information from sharepoint,
     parses the response into an intermediate data model, and maps that model
     into AIND internal Procedures model."""
@@ -388,3 +390,53 @@ class NSB2023Mapping(NSB2019Mapping):
             return ProbeName.PROBE_D
         else:
             return None
+
+    @staticmethod
+    def _map_auth_id_to_exp_name(
+        nsb_author_id: Optional[str],
+    ) -> Optional[str]:
+        """Maps NSB Author ID to Experimenter name as "NSB" + ID"""
+        return "NSB" if nsb_author_id is None else f"NSB-{nsb_author_id}"
+
+    @staticmethod
+    def _map_hemisphere(
+        nsb_hemisphere: Optional[Hemisphere],
+    ) -> Optional[Side]:
+        """Maps NSB Hemisphere to AIND Side"""
+        if nsb_hemisphere == Hemisphere.LEFT:
+            return Side.LEFT
+        elif nsb_hemisphere == Hemisphere.RIGHT:
+            return Side.RIGHT
+        else:
+            return None
+
+    @staticmethod
+    def _map_ap_info_to_coord_reference(
+        _: None,
+    ) -> Optional[CoordinateReferenceLocation]:
+        """Maps NSB virus ap into AIND CoordinateReferenceLocation"""
+        return None
+
+    @staticmethod
+    def _map_virus_strain_to_materials(
+        virus_strain: Optional[str],
+    ) -> Optional[InjectionMaterial]:
+        """Maps NASB virus strain into AIND InjectionMaterials"""
+        if virus_strain is None:
+            return None
+        else:
+            return InjectionMaterial.construct(full_genome_name=virus_strain)
+
+    @staticmethod
+    def _map_datetime_to_date(dt: datetime) -> Optional[date]:
+        """Maps datetime like '2020-10-10 00:00:00' into date like
+        '2020-10-10'"""
+        if dt is None:
+            return None
+        else:
+            return dt.date()
+
+    @staticmethod
+    def _duration_to_minutes(duration: Optional[timedelta]) -> Optional[float]:
+        """Converts Optional[timedelta] into an Optional[float]"""
+        return None if duration is None else duration.total_seconds() / 60
