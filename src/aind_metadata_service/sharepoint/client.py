@@ -6,7 +6,7 @@ from office365.runtime.auth.client_credential import ClientCredential
 from office365.sharepoint.client_context import ClientContext
 
 from aind_metadata_service.response_handler import Responses
-from aind_metadata_service.sharepoint.nsb2019.mapping import NSB2019Mapping
+from aind_metadata_service.sharepoint.nsb2019.procedures import NSB2019Mapping
 from aind_metadata_service.sharepoint.nsb2023.mapping import NSB2023Mapping
 
 
