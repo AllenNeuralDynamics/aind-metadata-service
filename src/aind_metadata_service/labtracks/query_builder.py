@@ -18,8 +18,51 @@ class SubjectQueryColumns(Enum):
     GROUP_DESCRIPTION = "group_description"
 
 
+class TaskSetQueryColumns(Enum):
+    """Expected columns in the task set query response."""
+
+    TASK_ID = "id"
+    TASK_TYPE_ID = "task_type_id"
+    DATE_START = "date_start"
+    DATE_END = "date_end"
+    INVESTIGATOR_ID = "investigator_id"
+    TASK_OBJECT = "task_object"
+
+
 class LabTracksQueries:
     """Class to hold sql query strings for LabTracks"""
+
+    @staticmethod
+    def procedures_from_subject_id(subject_id: str) -> str:
+        """
+        Retrieves the information to populate metadata about subjects.
+
+        Parameters
+        ----------
+        subject_id : str
+            This is the id in the LabTracks Task_Set table
+
+        Returns
+        -------
+        str
+            SQL query that can be used to retrieve the data from LabTracks
+            sqlserver db.
+        """
+        # TODO: find out how subject_id is tracked in Task_Set
+        return (
+            "SELECT"
+            f"    TS.ID AS {TaskSetQueryColumns.TASK_ID.value},"
+            f"    TS.TASK_TYPE_ID AS {TaskSetQueryColumns.TASK_TYPE_ID.value},"
+            f"    TS.START_DATE AS {TaskSetQueryColumns.DATE_START.value},"
+            f"    TS.END_DATE AS {TaskSetQueryColumns.DATE_END.value},"
+            f"    TS.EXPERIMENTER AS {TaskSetQueryColumns.INVESTIGATOR_ID.value},"
+            f"    TASK_SET_OBJECT.TASK_OBJECT AS {TaskSetQueryColumns.TASK_OBJECT.value},"
+            "  FROM TASK_SET TS"
+            "    LEFT OUTER JOIN TASK_SET TASK_SET_OBJECT"
+            "    ON TS.ID = TASK_SET_OBJECT.TASK_ID"
+            f" WHERE TS.TASK_NAME LIKE %{subject_id}%"
+            f" OR TS. TASK_NUMBER LIKE %{subject_id}%;"
+        )
 
     @staticmethod
     def subject_from_subject_id(subject_id: str) -> str:
