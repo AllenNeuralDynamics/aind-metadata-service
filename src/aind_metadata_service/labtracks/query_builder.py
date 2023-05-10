@@ -50,6 +50,8 @@ class LabTracksQueries:
             SQL query that can be used to retrieve the data from LabTracks
             sqlserver db.
         """
+        # TODO: how is subject_id getting tracked/is it tracked?
+        # TODO: parsers for comments/descriptions?
         return (
             "SELECT"
             f"    TS.ID AS {TaskSetQueryColumns.TASK_ID.value},"
@@ -87,6 +89,7 @@ class LabTracksQueries:
                 sqlserver db.
 
         """
+        #TODO: subject_id from
         return (
             "SELECT"
             f"    AC.ID AS {SubjectQueryColumns.ID.value},"

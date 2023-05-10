@@ -368,7 +368,7 @@ class LabTracksResponseHandler:
             start_date = result.get(TaskSetQueryColumns.DATE_START.value)
             end_date = result.get(TaskSetQueryColumns.DATE_END.value)
             experimenter_full_name = result.get(TaskSetQueryColumns.INVESTIGATOR_ID.value)
-            protocol_id = result.get(TaskSetQueryColumns.PROTOCOL_NUMBER.value)
+            iacuc_protocol = result.get(TaskSetQueryColumns.PROTOCOL_NUMBER.value)
             type_name = result.get(TaskSetQueryColumns.TYPE_NAME.value)
             if type_name in perfusion_list:
                 output_specimen_ids = result.get(TaskSetQueryColumns.TASK_OBJECT.value)
@@ -376,7 +376,7 @@ class LabTracksResponseHandler:
                     start_date=start_date,
                     end_date=end_date,
                     experimenter_full_name=experimenter_full_name,
-                    protocol_id=protocol_id,
+                    iacuc_protocol=iacuc_protocol,
                     output_specimen_ids=output_specimen_ids,
                 )
                 procedures.append(perfusion)
