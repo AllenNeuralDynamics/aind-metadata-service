@@ -27,6 +27,8 @@ class TaskSetQueryColumns(Enum):
     DATE_END = "date_end"
     INVESTIGATOR_ID = "investigator_id"
     TASK_OBJECT = "task_object"
+    TYPE_NAME = "type_name"
+    PROTOCOL_NUMBER = "protocol_number"
 
 
 class LabTracksQueries:
@@ -48,20 +50,24 @@ class LabTracksQueries:
             SQL query that can be used to retrieve the data from LabTracks
             sqlserver db.
         """
-        # TODO: find out how subject_id is tracked in Task_Set
         return (
             "SELECT"
             f"    TS.ID AS {TaskSetQueryColumns.TASK_ID.value},"
             f"    TS.TASK_TYPE_ID AS {TaskSetQueryColumns.TASK_TYPE_ID.value},"
-            f"    TS.START_DATE AS {TaskSetQueryColumns.DATE_START.value},"
-            f"    TS.END_DATE AS {TaskSetQueryColumns.DATE_END.value},"
-            f"    TS.EXPERIMENTER AS {TaskSetQueryColumns.INVESTIGATOR_ID.value},"
-            f"    TASK_SET_OBJECT.TASK_OBJECT AS {TaskSetQueryColumns.TASK_OBJECT.value},"
+            f"    TT.TYPE_NAME AS {TaskSetQueryColumns.TYPE_NAME.value},"
+            f"    TS.DATE_START AS {TaskSetQueryColumns.DATE_START.value},"
+            f"    TS.DATE_END AS {TaskSetQueryColumns.DATE_END.value},"
+            f"    TS.INVESTIGATOR_ID AS {TaskSetQueryColumns.INVESTIGATOR_ID.value},"
+            f"    TSO.TASK_OBJECT AS {TaskSetQueryColumns.TASK_OBJECT.value},"
+            f"    AP.PROTOCOL_NUMBER AS {TaskSetQueryColumns.PROTOCOL_NUMBER.value}"
             "  FROM TASK_SET TS"
-            "    LEFT OUTER JOIN TASK_SET TASK_SET_OBJECT"
-            "    ON TS.ID = TASK_SET_OBJECT.TASK_ID"
-            f" WHERE TS.TASK_NAME LIKE %{subject_id}%"
-            f" OR TS. TASK_NUMBER LIKE %{subject_id}%;"
+            "    INNER JOIN TASK_SET_OBJECT TSO "
+            "    ON TS.ID = TSO.TASK_ID"
+            "    INNER JOIN ANIMALS_COMMON AC "
+            "    ON TSO.TASK_OBJECT = AC.ID"
+            "    INNER JOIN TASK_TYPE TT ON TS.TASK_TYPE_ID = TT.ID"
+            "    INNER JOIN ACUC_PROTOCOL AP ON TS.ACUC_LINK_ID = AP.LINK_INDEX" 
+            f" WHERE AC.ID={subject_id};"
         )
 
     @staticmethod

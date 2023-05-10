@@ -4,13 +4,15 @@ from typing import List, Optional
 from xml.etree import ElementTree as ET
 
 import pyodbc
-from aind_data_schema import Subject
+from aind_data_schema import Subject, Procedures
 from aind_data_schema.subject import BackgroundStrain, Sex, Species
+from aind_data_schema.procedures import Perfusion
 from fastapi.responses import JSONResponse
 
 from aind_metadata_service.labtracks.query_builder import (
     LabTracksQueries,
     SubjectQueryColumns,
+    TaskSetQueryColumns,
 )
 from aind_metadata_service.response_handler import Responses
 
@@ -94,6 +96,44 @@ class LabTracksClient:
             else:
                 lth = LabTracksResponseHandler()
                 subjects = lth.map_response_to_subject(results)
+                # Check if multiple unique items are returned
+                if len(set([s.json() for s in subjects])) > 1:
+                    response = Responses.multiple_items_found_response(
+                        subjects
+                    )
+                    return response
+                else:
+                    subject = subjects[0]
+                    response = Responses.model_response(subject)
+                    return response
+        except pyodbc.Error:
+            return Responses.internal_server_error_response()
+
+    def get_procedures_info(self, subject_id: str) -> JSONResponse:
+        """
+        Method to retrieve LAS procedures from subject_id (int)
+        Parameters
+        ----------
+        subject_id: str
+        """
+        try:
+            query = LabTracksQueries.procedures_from_subject_id(subject_id)
+            session = self.create_session()
+            cursor = session.cursor()
+            cursor.execute(query)
+            column_names = cursor.description
+            columns = [column[0].lower() for column in column_names]
+            fetched_rows = cursor.fetchall()
+            cursor.close()
+            self.close_session(session)
+            results = []
+            for row in fetched_rows:
+                results.append(dict(zip(columns, row)))
+            if not results:
+                return Responses.no_data_found_response()
+            else:
+                lth = LabTracksResponseHandler()
+                subjects = lth.map_response_to_procedures(results)
                 # Check if multiple unique items are returned
                 if len(set([s.json() for s in subjects])) > 1:
                     response = Responses.multiple_items_found_response(
@@ -304,3 +344,40 @@ class LabTracksResponseHandler:
             )
             subjects.append(subject)
         return subjects
+
+    @staticmethod
+    def map_response_to_procedures(results: List[dict]) -> List[Perfusion]:
+        """
+        Maps a response from LabTracks to an aind_data_schema.Procedure
+        Parameters
+        ----------
+        results : List[dict]
+            Results pulled from LabTracks. In the form of [row]
+
+        Returns
+        -------
+            A List of mapped Subjects (not validated)
+        """
+
+        procedures = []
+        perfusion_list = ['Perfusion', 'Perfusion custom', 'Perfusion for IVSCC',
+                          'Perfusion for omFISH', 'Perfusion for TissueCyte',
+                          'Perfusion Gel', 'Perfusion HEPES', 'Perfusion Rat',
+                          'Perfusion VGT Primary Screening']
+        for result in results:
+            start_date = result.get(TaskSetQueryColumns.DATE_START.value)
+            end_date = result.get(TaskSetQueryColumns.DATE_END.value)
+            experimenter_full_name = result.get(TaskSetQueryColumns.INVESTIGATOR_ID.value)
+            protocol_id = result.get(TaskSetQueryColumns.PROTOCOL_NUMBER.value)
+            type_name = result.get(TaskSetQueryColumns.TYPE_NAME.value)
+            if type_name in perfusion_list:
+                output_specimen_ids = result.get(TaskSetQueryColumns.TASK_OBJECT.value)
+                perfusion = Perfusion.construct(
+                    start_date=start_date,
+                    end_date=end_date,
+                    experimenter_full_name=experimenter_full_name,
+                    protocol_id=protocol_id,
+                    output_specimen_ids=output_specimen_ids,
+                )
+                procedures.append(perfusion)
+        return procedures
