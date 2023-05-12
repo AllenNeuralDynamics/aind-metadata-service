@@ -6,7 +6,7 @@ from xml.etree import ElementTree as ET
 import pyodbc
 from aind_data_schema import Subject, Procedures
 from aind_data_schema.subject import BackgroundStrain, Sex, Species
-from aind_data_schema.procedures import Perfusion
+from aind_data_schema.procedures import Perfusion, RetroOrbitalInjection
 from fastapi.responses import JSONResponse
 
 from aind_metadata_service.labtracks.query_builder import (
@@ -346,7 +346,7 @@ class LabTracksResponseHandler:
         return subjects
 
     @staticmethod
-    def map_response_to_procedures(results: List[dict]) -> List[Perfusion]:
+    def map_response_to_procedures(results: List[dict]) -> Procedures:
         """
         Maps a response from LabTracks to an aind_data_schema.Procedure
         Parameters
@@ -359,25 +359,40 @@ class LabTracksResponseHandler:
             A List of mapped Subjects (not validated)
         """
 
-        procedures = []
+        procedures_list = []
         perfusion_list = ['Perfusion', 'Perfusion custom', 'Perfusion for IVSCC',
                           'Perfusion for omFISH', 'Perfusion for TissueCyte',
                           'Perfusion Gel', 'Perfusion HEPES', 'Perfusion Rat',
                           'Perfusion VGT Primary Screening']
+
+        ro_injection_list = ["RO Injection, RO Injection VGT"]
         for result in results:
+            subject_id = result.get(TaskSetQueryColumns.TASK_OBJECT.value)
             start_date = result.get(TaskSetQueryColumns.DATE_START.value)
             end_date = result.get(TaskSetQueryColumns.DATE_END.value)
             experimenter_full_name = result.get(TaskSetQueryColumns.INVESTIGATOR_ID.value)
             iacuc_protocol = result.get(TaskSetQueryColumns.PROTOCOL_NUMBER.value)
             type_name = result.get(TaskSetQueryColumns.TYPE_NAME.value)
             if type_name in perfusion_list:
-                output_specimen_ids = result.get(TaskSetQueryColumns.TASK_OBJECT.value)
                 perfusion = Perfusion.construct(
                     start_date=start_date,
                     end_date=end_date,
                     experimenter_full_name=experimenter_full_name,
                     iacuc_protocol=iacuc_protocol,
-                    output_specimen_ids=output_specimen_ids,
                 )
-                procedures.append(perfusion)
+                procedures_list.append(perfusion)
+
+            elif type_name in ro_injection_list:
+                # TODO: parse inj info from comments
+                ro_injection = RetroOrbitalInjection.construct(
+                    start_date=start_date,
+                    end_date=end_date,
+                    experimenter_full_name=experimenter_full_name,
+                    iacuc_protocol=iacuc_protocol,
+                )
+                procedures_list.append(ro_injection)
+        procedures = Procedures.construct(
+            subject_id=subject_id,
+            subject_procedures=procedures_list,
+        )
         return procedures

@@ -5,6 +5,7 @@ import unittest
 from aind_metadata_service.labtracks.query_builder import (
     LabTracksQueries,
     SubjectQueryColumns,
+    TaskSetQueryColumns,
 )
 
 
@@ -42,6 +43,31 @@ class TestLabTracksQueryBuilder(unittest.TestCase):
             "    ON AC.GROUP_ID = G.ID"
             "    LEFT OUTER JOIN GROUPS "
             "    ON MATERNAL.GROUP_ID = GROUPS.ID"
+            f" WHERE AC.ID={subject_id};"
+        )
+        self.assertEqual(expected_output, actual_output)
+
+    def test_procedures_from_id(self):
+        """Tests sql string is created correctly."""
+        subject_id = "625464"
+        actual_output = LabTracksQueries.procedures_from_subject_id(subject_id)
+        expected_output = (
+            "SELECT"
+            f"    TS.ID AS {TaskSetQueryColumns.TASK_ID.value},"
+            f"    TS.TASK_TYPE_ID AS {TaskSetQueryColumns.TASK_TYPE_ID.value},"
+            f"    TT.TYPE_NAME AS {TaskSetQueryColumns.TYPE_NAME.value},"
+            f"    TS.DATE_START AS {TaskSetQueryColumns.DATE_START.value},"
+            f"    TS.DATE_END AS {TaskSetQueryColumns.DATE_END.value},"
+            f"    TS.INVESTIGATOR_ID AS {TaskSetQueryColumns.INVESTIGATOR_ID.value},"
+            f"    TSO.TASK_OBJECT AS {TaskSetQueryColumns.TASK_OBJECT.value},"
+            f"    AP.PROTOCOL_NUMBER AS {TaskSetQueryColumns.PROTOCOL_NUMBER.value}"
+            "  FROM TASK_SET TS"
+            "    INNER JOIN TASK_SET_OBJECT TSO "
+            "    ON TS.ID = TSO.TASK_ID"
+            "    INNER JOIN ANIMALS_COMMON AC "
+            "    ON TSO.TASK_OBJECT = AC.ID"
+            "    INNER JOIN TASK_TYPE TT ON TS.TASK_TYPE_ID = TT.ID"
+            "    INNER JOIN ACUC_PROTOCOL AP ON TS.ACUC_LINK_ID = AP.LINK_INDEX" 
             f" WHERE AC.ID={subject_id};"
         )
         self.assertEqual(expected_output, actual_output)
