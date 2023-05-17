@@ -50,7 +50,7 @@ class LabTracksQueries:
             SQL query that can be used to retrieve the data from LabTracks
             sqlserver db.
         """
-        # TODO: parsers for comments/descriptions? 
+        # TODO: parsers for comments/descriptions?
         return (
             "SELECT"
             f"    TS.ID AS {TaskSetQueryColumns.TASK_ID.value},"
@@ -58,9 +58,11 @@ class LabTracksQueries:
             f"    TT.TYPE_NAME AS {TaskSetQueryColumns.TYPE_NAME.value},"
             f"    TS.DATE_START AS {TaskSetQueryColumns.DATE_START.value},"
             f"    TS.DATE_END AS {TaskSetQueryColumns.DATE_END.value},"
-            f"    TS.INVESTIGATOR_ID AS {TaskSetQueryColumns.INVESTIGATOR_ID.value},"
+            f"    TS.INVESTIGATOR_ID AS "
+            f"    {TaskSetQueryColumns.INVESTIGATOR_ID.value},"
             f"    TSO.TASK_OBJECT AS {TaskSetQueryColumns.TASK_OBJECT.value},"
-            f"    AP.PROTOCOL_NUMBER AS {TaskSetQueryColumns.PROTOCOL_NUMBER.value}"
+            f"    AP.PROTOCOL_NUMBER AS "
+            f"    {TaskSetQueryColumns.PROTOCOL_NUMBER.value}"
             "  FROM TASK_SET TS"
             "    INNER JOIN TASK_SET_OBJECT TSO "
             "    ON TS.ID = TSO.TASK_ID"
@@ -69,7 +71,7 @@ class LabTracksQueries:
             "    INNER JOIN TASK_TYPE TT "
             "    ON TS.TASK_TYPE_ID = TT.ID"
             "    INNER JOIN ACUC_PROTOCOL AP "
-            "    ON TS.ACUC_LINK_ID = AP.LINK_INDEX" 
+            "    ON TS.ACUC_LINK_ID = AP.LINK_INDEX"
             f" WHERE AC.ID={subject_id};"
         )
 

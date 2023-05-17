@@ -4,9 +4,13 @@ from typing import List, Optional
 from xml.etree import ElementTree as ET
 
 import pyodbc
-from aind_data_schema import Subject, Procedures
+from aind_data_schema import Procedures, Subject
+from aind_data_schema.procedures import (
+    Perfusion,
+    RetroOrbitalInjection,
+    SubjectProcedure,
+)
 from aind_data_schema.subject import BackgroundStrain, Sex, Species
-from aind_data_schema.procedures import SubjectProcedure, Perfusion, RetroOrbitalInjection
 from fastapi.responses import JSONResponse
 
 from aind_metadata_service.labtracks.query_builder import (
@@ -341,7 +345,9 @@ class LabTracksResponseHandler:
         return subjects
 
     @staticmethod
-    def map_response_to_procedures(results: List[dict]) -> List[SubjectProcedure]:
+    def map_response_to_procedures(
+        results: List[dict],
+    ) -> List[SubjectProcedure]:
         """
         Maps a response from LabTracks to an aind_data_schema.Procedure
         Parameters
@@ -355,28 +361,31 @@ class LabTracksResponseHandler:
         """
 
         procedures_list = []
-        perfusion_list = ['Perfusion', 'Perfusion custom', 'Perfusion for IVSCC',
-                          'Perfusion for omFISH', 'Perfusion for TissueCyte',
-                          'Perfusion Gel', 'Perfusion HEPES', 'Perfusion Rat',
-                          'Perfusion VGT Primary Screening']
 
-        ro_injection_list = ["RO Injection, RO Injection VGT"]
         for result in results:
             start_date = result.get(TaskSetQueryColumns.DATE_START.value)
             end_date = result.get(TaskSetQueryColumns.DATE_END.value)
-            experimenter_full_name = result.get(TaskSetQueryColumns.INVESTIGATOR_ID.value)
-            iacuc_protocol = result.get(TaskSetQueryColumns.PROTOCOL_NUMBER.value)
+            experimenter_full_name = result.get(
+                TaskSetQueryColumns.INVESTIGATOR_ID.value
+            )
+            iacuc_protocol = result.get(
+                TaskSetQueryColumns.PROTOCOL_NUMBER.value
+            )
             type_name = result.get(TaskSetQueryColumns.TYPE_NAME.value)
-            if type_name in perfusion_list:
+            if "Perfusion" in type_name:
+                output_specimen_ids = [
+                    result.get(TaskSetQueryColumns.TASK_OBJECT.value)
+                ]
                 perfusion = Perfusion.construct(
                     start_date=start_date,
                     end_date=end_date,
                     experimenter_full_name=experimenter_full_name,
                     iacuc_protocol=iacuc_protocol,
+                    output_specimen_ids=output_specimen_ids,
                 )
                 procedures_list.append(perfusion)
 
-            elif type_name in ro_injection_list:
+            elif "RO Injection" in type_name:
                 # TODO: parse inj info from comments
                 ro_injection = RetroOrbitalInjection.construct(
                     start_date=start_date,
@@ -386,4 +395,3 @@ class LabTracksResponseHandler:
                 )
                 procedures_list.append(ro_injection)
         return procedures_list
-
