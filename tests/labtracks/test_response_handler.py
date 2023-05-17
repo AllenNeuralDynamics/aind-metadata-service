@@ -4,6 +4,7 @@ import unittest
 from decimal import Decimal
 
 from aind_data_schema import Subject, Procedures
+from aind_data_schema.procedures import Perfusion
 from aind_data_schema.subject import BackgroundStrain, Sex, Species
 
 from aind_metadata_service.labtracks.client import (
@@ -86,23 +87,29 @@ class TestResponseExamples:
             "date_start": datetime.datetime(2022, 10, 11, 0, 0),
             "date_end": datetime.datetime(2022, 10, 11, 4, 30),
             "investigator_id": Decimal(28803),
-            "task_object": Decimal(000000)
+            "task_object": Decimal(115977),
+            "protocol_number": Decimal(2002)
         }
     ]
 
-    expected_procedure = Procedures.parse_obj(
+    expected_subject_procedures = [
+        Perfusion.construct(
+            start_date=datetime.datetime(2022, 10, 11, 0, 0),
+            end_date=datetime.datetime(2022, 10, 11, 4, 30),
+            experimenter_full_name=Decimal('28803'),
+            iacuc_protocol=Decimal('2002'),
+            animal_weight_prior=None,
+            animal_weight_post=None,
+            anaesthesia=None,
+            notes=None,
+            procedure_type='Perfusion')
+    ]
+
+    expected_procedures = Procedures.parse_obj(
         {
             "schema_version": "0.7.0",
-            "subject_id": "000000",
-            "subject_procedures": [
-                {
-                    "start_date": "2022-10-11",
-                    "end_date": "2022-10-11",
-                    "experimenter_full_name": "28803",
-                    "iacuc_protocol": "2002",
-                    "procedure_type": "Perfusion"
-                }
-            ]
+            "subject_id": "115977",
+            "subject_procedures": expected_subject_procedures
         }
     )
 
@@ -117,9 +124,8 @@ class TestLabTracksResponseHandler(unittest.TestCase):
         actual_procedures = self.rh.map_response_to_procedures(
             TestResponseExamples.test_procedures_response
         )
-        print(actual_procedures)
         self.assertEqual(
-            [TestResponseExamples.expected_procedure], actual_procedures
+            TestResponseExamples.expected_subject_procedures, actual_procedures
         )
 
     def test_map_response_to_subject(self):
@@ -127,9 +133,9 @@ class TestLabTracksResponseHandler(unittest.TestCase):
         actual_subject = self.rh.map_response_to_subject(
             TestResponseExamples.test_subject_response
         )
-        # self.assertEqual(
-        #     [TestResponseExamples.expected_subject], actual_subject
-        # )
+        self.assertEqual(
+            [TestResponseExamples.expected_subject], actual_subject
+        )
 
     def test_map_class_values_to_genotype(self):
         """Tests that the genotype is extracted from the xml string."""

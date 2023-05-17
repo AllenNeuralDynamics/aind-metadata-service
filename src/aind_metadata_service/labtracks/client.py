@@ -6,7 +6,7 @@ from xml.etree import ElementTree as ET
 import pyodbc
 from aind_data_schema import Subject, Procedures
 from aind_data_schema.subject import BackgroundStrain, Sex, Species
-from aind_data_schema.procedures import Perfusion, RetroOrbitalInjection
+from aind_data_schema.procedures import SubjectProcedure, Perfusion, RetroOrbitalInjection
 from fastapi.responses import JSONResponse
 
 from aind_metadata_service.labtracks.query_builder import (
@@ -105,6 +105,7 @@ class LabTracksClient:
                 else:
                     subject = subjects[0]
                     response = Responses.model_response(subject)
+                    print("subject response", response)
                     return response
         except pyodbc.Error:
             return Responses.internal_server_error_response()
@@ -130,20 +131,14 @@ class LabTracksClient:
             for row in fetched_rows:
                 results.append(dict(zip(columns, row)))
             if not results:
-                return Responses.no_data_found_response()
+                response = Responses.no_data_found_response()
             else:
                 lth = LabTracksResponseHandler()
-                subjects = lth.map_response_to_procedures(results)
-                # Check if multiple unique items are returned
-                if len(set([s.json() for s in subjects])) > 1:
-                    response = Responses.multiple_items_found_response(
-                        subjects
-                    )
-                    return response
-                else:
-                    subject = subjects[0]
-                    response = Responses.model_response(subject)
-                    return response
+                subject_procedures = lth.map_response_to_procedures(results)
+                procedures = Procedures.construct(subject_id=subject_id)
+                procedures.subject_procedures = subject_procedures
+                response = Responses.model_response(procedures)
+            return response
         except pyodbc.Error:
             return Responses.internal_server_error_response()
 
@@ -346,7 +341,7 @@ class LabTracksResponseHandler:
         return subjects
 
     @staticmethod
-    def map_response_to_procedures(results: List[dict]) -> Procedures:
+    def map_response_to_procedures(results: List[dict]) -> List[SubjectProcedure]:
         """
         Maps a response from LabTracks to an aind_data_schema.Procedure
         Parameters
@@ -367,7 +362,6 @@ class LabTracksResponseHandler:
 
         ro_injection_list = ["RO Injection, RO Injection VGT"]
         for result in results:
-            subject_id = result.get(TaskSetQueryColumns.TASK_OBJECT.value)
             start_date = result.get(TaskSetQueryColumns.DATE_START.value)
             end_date = result.get(TaskSetQueryColumns.DATE_END.value)
             experimenter_full_name = result.get(TaskSetQueryColumns.INVESTIGATOR_ID.value)
@@ -391,8 +385,5 @@ class LabTracksResponseHandler:
                     iacuc_protocol=iacuc_protocol,
                 )
                 procedures_list.append(ro_injection)
-        procedures = Procedures.construct(
-            subject_id=subject_id,
-            subject_procedures=procedures_list,
-        )
-        return procedures
+        return procedures_list
+

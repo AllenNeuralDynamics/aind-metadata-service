@@ -66,8 +66,10 @@ class LabTracksQueries:
             "    ON TS.ID = TSO.TASK_ID"
             "    INNER JOIN ANIMALS_COMMON AC "
             "    ON TSO.TASK_OBJECT = AC.ID"
-            "    INNER JOIN TASK_TYPE TT ON TS.TASK_TYPE_ID = TT.ID"
-            "    INNER JOIN ACUC_PROTOCOL AP ON TS.ACUC_LINK_ID = AP.LINK_INDEX" 
+            "    INNER JOIN TASK_TYPE TT "
+            "    ON TS.TASK_TYPE_ID = TT.ID"
+            "    INNER JOIN ACUC_PROTOCOL AP "
+            "    ON TS.ACUC_LINK_ID = AP.LINK_INDEX" 
             f" WHERE AC.ID={subject_id};"
         )
 

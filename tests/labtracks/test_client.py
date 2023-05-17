@@ -104,7 +104,7 @@ class TestLabTracksClient(unittest.TestCase):
     def test_id_does_exist(self, mock_connect: Mock) -> None:
         """
         Tests that JSONResponse error is returned to client properly
-        when queried subject_id does not exist.
+        when queried subject_id does exist.
         Parameters
         ----------
         mock_connect : Mock
@@ -181,7 +181,7 @@ class TestLabTracksClient(unittest.TestCase):
     def test_multiple_ids_exist(self, mock_connect: Mock) -> None:
         """
         Tests that JSONResponse error is returned to client properly
-        when queried subject_id does not exist.
+        when queried subject_id returns multiple items.
         Parameters
         ----------
         mock_connect : Mock
@@ -264,6 +264,75 @@ class TestLabTracksClient(unittest.TestCase):
         expected_subject2.sex = Sex.FEMALE
         expected_response = Responses.multiple_items_found_response(
             [TestResponseExamples.expected_subject, expected_subject2]
+        )
+        self.assertEqual(
+            expected_response.status_code, actual_response.status_code
+        )
+        self.assertEqual(expected_response.body, actual_response.body)
+
+    @patch("pyodbc.connect")
+    def test_get_procedure_info(self, mock_connect: Mock) -> None:
+        """
+        Tests that JSONResponse is returned to client properly
+        when queried subject_id does exist.
+        Parameters
+        ----------
+        mock_connect : Mock
+            A mocked Connection class that can be used to override methods
+            without connecting to sqlserver
+
+        Returns
+        -------
+            pass
+        """
+
+        class MockCursor:
+            """Mocked cursor object"""
+
+            description = [
+                ["id"],
+                ["task_type_id"],
+                ["date_start"],
+                ["date_end"],
+                ["investigator_id"],
+                ["task_object"],
+                ["type_name"],
+                ["protocol_number"],
+            ]
+
+            @staticmethod
+            def execute(_):
+                """Mock execute"""
+                return None
+
+            @staticmethod
+            def fetchall():
+                """Mock fetchall"""
+                return [
+                    [
+                        decimal.Decimal("00000"),
+                        decimal.Decimal("12345"),
+                        datetime.datetime(2022, 10, 11, 0, 0),
+                        datetime.datetime(2022, 10, 11, 4, 30),
+                        decimal.Decimal("28803"),
+                        decimal.Decimal("115977"),
+                        "Perfusion",
+                        decimal.Decimal("2002"),
+                    ]
+                ]
+
+            @staticmethod
+            def close():
+                """Mock close"""
+                return None
+
+        subject_id = "115977"
+
+        type(mock_connect.return_value).cursor = MockCursor
+
+        actual_response = self.lb_client.get_procedures_info(subject_id)
+        expected_response = Responses.model_response(
+            TestResponseExamples.expected_procedures
         )
         self.assertEqual(
             expected_response.status_code, actual_response.status_code
