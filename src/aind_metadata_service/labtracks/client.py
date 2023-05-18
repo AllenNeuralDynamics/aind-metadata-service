@@ -109,7 +109,6 @@ class LabTracksClient:
                 else:
                     subject = subjects[0]
                     response = Responses.model_response(subject)
-                    print("subject response", response)
                     return response
         except pyodbc.Error:
             return Responses.internal_server_error_response()
@@ -363,7 +362,9 @@ class LabTracksResponseHandler:
         procedures_list = []
 
         for result in results:
-            start_date = result.get(TaskSetQueryColumns.DATE_START.value).date()
+            start_date = result.get(
+                TaskSetQueryColumns.DATE_START.value
+            ).date()
             end_date = result.get(TaskSetQueryColumns.DATE_END.value).date()
             experimenter_full_name = result.get(
                 TaskSetQueryColumns.INVESTIGATOR_ID.value

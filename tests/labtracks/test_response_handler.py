@@ -132,7 +132,7 @@ class TestResponseExamples:
         {
             "schema_version": "0.7.0",
             "subject_id": "115977",
-            "subject_procedures": expected_subject_procedures
+            "subject_procedures": expected_subject_procedures,
         }
     )
 
