@@ -1,13 +1,12 @@
 """"Tests response_handler module"""
 
-import unittest
-import os
-
-from pathlib import Path
 import json
+import os
+import unittest
+from pathlib import Path
 
-from aind_data_schema.subject import Subject
 from aind_data_schema.procedures import Procedures
+from aind_data_schema.subject import Subject
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import validate_model
@@ -107,13 +106,21 @@ class TestResponseHandler(unittest.TestCase):
     def test_combine_invalid_responses(self):
         """Tests that invalid responses are combined as expected"""
         model1 = Procedures.construct(
-            subject_id="000000", extra_field="extra_field"
+            subject_id="115977",
+            extra_field=None,
+            subject_procedures=sp_subject_procedures["data"][
+                "subject_procedures"
+            ],
         )
         *_, validation_error_1 = validate_model(
             model1.__class__, model1.__dict__
         )
         model2 = Procedures.construct(
-            subject_id="000000", extra_field=None,
+            subject_id="115977",
+            extra_field=None,
+            subject_procedures=las_subject_procedures["data"][
+                "subject_procedures"
+            ],
         )
         *_, validation_error_2 = validate_model(
             model2.__class__, model2.__dict__
@@ -121,15 +128,15 @@ class TestResponseHandler(unittest.TestCase):
         response1 = Responses.model_response(model1)
         response2 = Responses.model_response(model2)
         response = Responses.combine_responses(
-            lb_response=response1, sp_response=response2
+            lb_response=response2, sp_response=response1
         )
         expected_response = JSONResponse(
-            status_code=207,
+            status_code=406,
             content=(
                 {
-                    "message": f"Validation Errors: {str(validation_error_1)}"
-                    f"Validation Errors: {str(validation_error_2)}",
-                    "data": None,
+                    "message": f"Validation Errors: {str(validation_error_2)}"
+                    f"Validation Errors: {str(validation_error_1)}",
+                    "data": combined_procedures["data"],
                 }
             ),
         )
@@ -146,7 +153,7 @@ class TestResponseHandler(unittest.TestCase):
             content=(
                 {
                     "message": "Error Connecting to Internal Server."
-                               "No Data Found.",
+                    "No Data Found.",
                     "data": None,
                 }
             ),

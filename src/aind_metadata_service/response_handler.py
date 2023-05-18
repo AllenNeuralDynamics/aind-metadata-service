@@ -1,13 +1,13 @@
 """Module to handle responses"""
-from typing import List
 import json
+from typing import List
 
+from aind_data_schema.procedures import Procedures
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, validate_model
 
 from aind_metadata_service.client import StatusCodes
-from aind_data_schema.procedures import Procedures
 
 
 class Responses:
@@ -140,32 +140,17 @@ class Responses:
                             }
                         ),
                     )
-            else:
-                # handle case where at least one response is valid.
-                if {
-                    lb_response.status_code == StatusCodes.VALID_DATA.value
-                } or {sp_response.status_code == StatusCodes.VALID_DATA.value}:
-                    response = JSONResponse(
-                        status_code=StatusCodes.MULTI_STATUS.value,
-                        content={
-                            "message": "Valid Model.",
-                            "data": model_json,
-                        },
-                    )
-                else:
-                    # statuses are different
-                    combine_message = (
-                        lb_contents["message"] + sp_contents["message"]
-                    )
-                    response = JSONResponse(
-                        status_code=StatusCodes.MULTI_STATUS.value,
-                        content=(
-                            {
-                                "message": combine_message,
-                                "data": model_json,
-                            }
-                        ),
-                    )
+            # handle case where at least one response is valid.
+            elif {lb_response.status_code == StatusCodes.VALID_DATA.value} or {
+                sp_response.status_code == StatusCodes.VALID_DATA.value
+            }:
+                response = JSONResponse(
+                    status_code=StatusCodes.MULTI_STATUS.value,
+                    content={
+                        "message": "Valid Model.",
+                        "data": model_json,
+                    },
+                )
         else:
             # when no data is found, combine error messages
             combine_message = lb_contents["message"] + sp_contents["message"]
