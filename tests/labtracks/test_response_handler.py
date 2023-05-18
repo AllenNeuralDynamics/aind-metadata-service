@@ -104,8 +104,8 @@ class TestResponseExamples:
 
     expected_subject_procedures = [
         Perfusion.construct(
-            start_date=datetime.datetime(2022, 10, 11, 0, 0),
-            end_date=datetime.datetime(2022, 10, 11, 4, 30),
+            start_date=datetime.date(2022, 10, 11),
+            end_date=datetime.date(2022, 10, 11),
             experimenter_full_name=Decimal("28803"),
             iacuc_protocol=Decimal("2002"),
             animal_weight_prior=None,
@@ -116,8 +116,8 @@ class TestResponseExamples:
             output_specimen_ids=[Decimal("115977")],
         ),
         RetroOrbitalInjection.construct(
-            start_date=datetime.datetime(2022, 5, 11, 0, 0),
-            end_date=datetime.datetime(2022, 5, 12, 0, 0),
+            start_date=datetime.date(2022, 5, 11),
+            end_date=datetime.date(2022, 5, 12),
             experimenter_full_name=Decimal("28803"),
             iacuc_protocol=Decimal("2002"),
             animal_weight_prior=None,
@@ -132,7 +132,7 @@ class TestResponseExamples:
         {
             "schema_version": "0.7.0",
             "subject_id": "115977",
-            "subject_procedures": expected_subject_procedures,
+            "subject_procedures": expected_subject_procedures
         }
     )
 

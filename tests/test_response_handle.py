@@ -1,13 +1,34 @@
 """"Tests response_handler module"""
 
 import unittest
+import os
+
+from pathlib import Path
+import json
 
 from aind_data_schema.subject import Subject
+from aind_data_schema.procedures import Procedures, Headframe
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import validate_model
 
 from aind_metadata_service.response_handler import Responses
+
+TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__)))
+DIR_MAP = TEST_DIR / "resources" / "json_responses"
+
+SP_RESPONSE_PATH = DIR_MAP / "mapped_sp_procedure.json"
+LAS_RESPONSE_PATH = DIR_MAP / "mapped_las_procedure.json"
+COMBINED_PATH = DIR_MAP / "combined.json"
+
+with open(SP_RESPONSE_PATH) as f:
+    sp_subject_procedures = json.load(f)
+
+with open(LAS_RESPONSE_PATH) as f:
+    las_subject_procedures = json.load(f)
+
+with open(COMBINED_PATH) as f:
+    combined_procedures = json.load(f)
 
 
 class TestResponseHandler(unittest.TestCase):
@@ -71,6 +92,60 @@ class TestResponseHandler(unittest.TestCase):
         )
         self.assertEqual(expected_response.status_code, response.status_code)
         self.assertEqual(expected_response.body, response.body)
+
+    def test_combine_valid_responses(self):
+        """Tests that responses are combined as expected"""
+        response1 = JSONResponse(las_subject_procedures)
+        response2 = JSONResponse(sp_subject_procedures)
+        response = Responses.combine_responses(lb_response=response1, sp_response=response2)
+        expected_response = JSONResponse(combined_procedures)
+        self.assertEqual(expected_response.body, response.body)
+        self.assertEqual(200, response.status_code)
+
+    def test_combine_invalid_responses(self):
+        """Tests that responses are combined as expected"""
+        model1 = Procedures.construct(
+            subject_id="000000",
+            extra_field="extra_field"
+        )
+        model2 = Procedures.construct(
+        )
+        response1 = Responses.model_response(model1)
+        response2 = Responses.model_response(model2)
+        response = Responses.combine_responses(lb_response=response1, sp_response=response2)
+        print(response1.body)
+        print(response2.body)
+        print(response.body)
+        # *_, validation_error = validate_model(model1.__class__, model1.__dict__)
+        # model_json = jsonable_encoder(model1)
+        # expected_response = JSONResponse(
+        #     status_code=406,
+        #     content=(
+        #         {
+        #             "message": f"Validation Errors: {validation_error}",
+        #             "data": model_json,
+        #         }
+        #     ),
+        # )
+        #
+        # response1 = JSONResponse(las_subject_procedures)
+        # response2 = JSONResponse(sp_subject_procedures)
+        # response = Responses.combine_responses(lb_response=response1, sp_response=response2)
+        # expected_response = JSONResponse(combined_procedures)
+        # self.assertEqual(expected_response.body, response.body)
+        # self.assertEqual(200, response.status_code)
+
+    def test_combine_error_responses(self):
+        response1 = Responses.connection_error_response()
+        response2 = Responses.no_data_found_response()
+        response = Responses.combine_responses(response1, response2)
+        print(response.body)
+
+    def test_combine_valid_and_error_responses(self):
+        response1 = Responses.no_data_found_response()
+        response2 = JSONResponse(sp_subject_procedures)
+        response = Responses.combine_responses(response1, response2)
+        print(response.body)
 
 
 if __name__ == "__main__":

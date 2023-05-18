@@ -1,11 +1,13 @@
 """Module to handle responses"""
 from typing import List
+import json
 
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, validate_model
 
 from aind_metadata_service.client import StatusCodes
+from aind_data_schema.procedures import Procedures
 
 
 class Responses:
@@ -84,6 +86,74 @@ class Responses:
                     {
                         "message": "Valid Model.",
                         "data": model_json,
+                    }
+                ),
+            )
+        return response
+
+    @staticmethod
+    def combine_responses(lb_response: JSONResponse, sp_response: JSONResponse) -> JSONResponse:
+        """
+        Combines two responses from different clients to create one JSONResponse
+        """
+        lb_data = []
+        sp_data = []
+        lb_contents = json.loads(lb_response.body)
+        sp_contents = json.loads(sp_response.body)
+        if lb_contents['data']:
+            lb_data = lb_contents['data']['subject_procedures']
+        if sp_contents['data']:
+            sp_data = sp_contents['data']['subject_procedures']
+        merged_data = lb_data + sp_data
+        if merged_data:
+            subject_id = lb_contents['data']['subject_id']
+            procedures = Procedures.construct(subject_id=subject_id)
+            procedures.subject_procedures = merged_data
+            model_json = jsonable_encoder(procedures)
+            if lb_response.status_code == sp_response.status_code:
+                if lb_response.status_code == StatusCodes.INVALID_DATA.value:
+                    # combine messages to get all validation errors
+                    combine_message = lb_contents['message'] + sp_contents['message']
+                    response = JSONResponse(
+                        status_code=StatusCodes.INVALID_DATA.value,
+                        content=(
+                            {
+                                "message": combine_message,
+                                "data": model_json,
+                            }
+                        ),
+                    )
+                else:
+                    # status message and code are the same for both responses
+                    response = JSONResponse(
+                        status_code=lb_response.status_code,
+                        content=(
+                            {
+                                "message": lb_contents['message'],
+                                "data": model_json,
+                            }
+                        ),
+                    )
+            else:
+                # if statuses are different
+                combine_message = lb_contents['message'] + sp_contents['message']
+                response = JSONResponse(
+                    status_code=StatusCodes.MULTI_STATUS.value,
+                    content=(
+                        {
+                            "message": combine_message,
+                            "data": model_json,
+                        }
+                    ),
+                )
+        else:
+            combine_message = lb_contents['message'] + sp_contents['message']
+            response = JSONResponse(
+                status_code=StatusCodes.MULTI_STATUS.value,
+                content=(
+                    {
+                        "message": combine_message,
+                        "data": None,
                     }
                 ),
             )

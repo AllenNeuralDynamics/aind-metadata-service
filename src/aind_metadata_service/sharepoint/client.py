@@ -1,6 +1,6 @@
 """Module to create client to connect to sharepoint database"""
 
-from aind_data_schema.procedures import Procedures
+from aind_data_schema.procedures import Procedures, SubjectProcedure
 from fastapi.responses import JSONResponse
 from office365.runtime.auth.client_credential import ClientCredential
 from office365.sharepoint.client_context import ClientContext

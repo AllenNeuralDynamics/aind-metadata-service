@@ -363,8 +363,8 @@ class LabTracksResponseHandler:
         procedures_list = []
 
         for result in results:
-            start_date = result.get(TaskSetQueryColumns.DATE_START.value)
-            end_date = result.get(TaskSetQueryColumns.DATE_END.value)
+            start_date = result.get(TaskSetQueryColumns.DATE_START.value).date()
+            end_date = result.get(TaskSetQueryColumns.DATE_END.value).date()
             experimenter_full_name = result.get(
                 TaskSetQueryColumns.INVESTIGATOR_ID.value
             )
