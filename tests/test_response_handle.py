@@ -96,8 +96,10 @@ class TestResponseHandler(unittest.TestCase):
         """Tests that valid responses are combined as expected"""
         response1 = JSONResponse(las_subject_procedures)
         response2 = JSONResponse(sp_subject_procedures)
-        response = Responses.combine_responses(
-            lb_response=response1, sp_response=response2
+        print(response1.status_code)
+        print(response2.status_code)
+        response = Responses.combine_procedure_responses(
+            subject_id="000000", lb_response=response1, sp_response=response2
         )
         expected_response = JSONResponse(combined_procedures)
         self.assertEqual(expected_response.body, response.body)
