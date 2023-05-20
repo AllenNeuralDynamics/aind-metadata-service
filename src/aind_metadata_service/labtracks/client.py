@@ -180,6 +180,12 @@ class LabTracksBgStrain(Enum):
     BALB_C = "BALB/c"
 
 
+class LabTracksProcedures(Enum):
+    """Keywords for LabTracks procedures"""
+    PERFUSION = "Perfusion"
+    RO_INJECTION = "RO Injection"
+
+
 class LabTracksResponseHandler:
     """This class will contain methods to handle the response from LabTracks"""
 
@@ -364,8 +370,12 @@ class LabTracksResponseHandler:
         for result in results:
             start_date = result.get(
                 TaskSetQueryColumns.DATE_START.value
-            ).date()
-            end_date = result.get(TaskSetQueryColumns.DATE_END.value).date()
+            )
+            if start_date:
+                start_date = start_date.date()
+            end_date = result.get(TaskSetQueryColumns.DATE_END.value)
+            if end_date:
+                end_date = end_date.date()
             experimenter_full_name = result.get(
                 TaskSetQueryColumns.INVESTIGATOR_ID.value
             )
@@ -373,26 +383,27 @@ class LabTracksResponseHandler:
                 TaskSetQueryColumns.PROTOCOL_NUMBER.value
             )
             type_name = result.get(TaskSetQueryColumns.TYPE_NAME.value)
-            if "Perfusion" in type_name:
-                output_specimen_ids = [
-                    result.get(TaskSetQueryColumns.TASK_OBJECT.value)
-                ]
-                perfusion = Perfusion.construct(
-                    start_date=start_date,
-                    end_date=end_date,
-                    experimenter_full_name=experimenter_full_name,
-                    iacuc_protocol=iacuc_protocol,
-                    output_specimen_ids=output_specimen_ids,
-                )
-                procedures_list.append(perfusion)
+            if type_name:
+                if LabTracksProcedures.PERFUSION.value in type_name:
+                    output_specimen_ids = [
+                        result.get(TaskSetQueryColumns.TASK_OBJECT.value)
+                    ]
+                    perfusion = Perfusion.construct(
+                        start_date=start_date,
+                        end_date=end_date,
+                        experimenter_full_name=experimenter_full_name,
+                        iacuc_protocol=iacuc_protocol,
+                        output_specimen_ids=output_specimen_ids,
+                    )
+                    procedures_list.append(perfusion)
 
-            elif "RO Injection" in type_name:
-                # TODO: parse inj info from comments
-                ro_injection = RetroOrbitalInjection.construct(
-                    start_date=start_date,
-                    end_date=end_date,
-                    experimenter_full_name=experimenter_full_name,
-                    iacuc_protocol=iacuc_protocol,
-                )
-                procedures_list.append(ro_injection)
+                elif LabTracksProcedures.RO_INJECTION.value in type_name:
+                    # TODO: parse inj info from comments
+                    ro_injection = RetroOrbitalInjection.construct(
+                        start_date=start_date,
+                        end_date=end_date,
+                        experimenter_full_name=experimenter_full_name,
+                        iacuc_protocol=iacuc_protocol,
+                    )
+                    procedures_list.append(ro_injection)
         return procedures_list
