@@ -5,7 +5,8 @@
     "schema_version":"0.7.0",
     "subject_id":"115977",
     "subject_procedures":[
-      {"start_date":"2022-01-03",
+      {
+        "start_date":"2022-01-03",
         "end_date":"2022-01-03",
         "experimenter_full_name":"NSB-187",
         "protocol_id":"2103",

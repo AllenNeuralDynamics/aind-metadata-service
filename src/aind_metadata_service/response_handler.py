@@ -2,7 +2,6 @@
 import json
 from typing import List
 
-from aind_data_schema.procedures import Procedures
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, validate_model
@@ -14,17 +13,19 @@ class Responses:
     """This class contains methods to map responses from server."""
 
     @staticmethod
-    def multi_status_response(message1: str, message2: str, data) -> JSONResponse:
-        """"""
+    def multi_status_response(
+        message1: str, message2: str, data
+    ) -> JSONResponse:
+        """Map to a multi status message."""
         response = JSONResponse(
             status_code=StatusCodes.MULTI_STATUS.value,
             content=(
                 {
                     "message": f"Message 1: {message1}, "
-                               f"Message 2: {message2}",
+                    f"Message 2: {message2}",
                     "data": data,
                 }
-            )
+            ),
         )
         return response
 
@@ -106,9 +107,10 @@ class Responses:
             )
         return response
 
+    # flake8: noqa: C901
     @staticmethod
     def combine_procedure_responses(
-        subject_id: str, lb_response: JSONResponse, sp_response: JSONResponse
+        lb_response: JSONResponse, sp_response: JSONResponse
     ) -> JSONResponse:
         """
         Combines JSONResponses from Labtracks and Sharepoint clients.
@@ -128,26 +130,63 @@ class Responses:
             return sp_response
         if sp_status_code == 404 and lb_status_code < 300:
             return lb_response
-        # handles combinations of valid and invalid responses
-        if (sp_status_code < 300 or sp_status_code == 406) and (lb_status_code < 300 or lb_status_code == 406):
+        # handles combination of invalid responses
+        if lb_status_code == 406 and sp_status_code == 406:
             lb_data = lb_contents["data"]["subject_procedures"]
             sp_data = sp_contents["data"]["subject_procedures"]
             combined_data = lb_data + sp_data
-            print(combined_data)
-            procedures = Procedures.construct(subject_id=subject_id, subject_procedures=combined_data)
-            return Responses.model_response(procedures)
+            lb_contents["data"]["subject_procedures"] = combined_data
+            message1 = sp_contents["message"]
+            message2 = lb_contents["message"]
+            return JSONResponse(
+                status_code=StatusCodes.INVALID_DATA.value,
+                content=(
+                    {
+                        "message": f"Message 1: {message1}, "
+                        f"Message 2: {message2}",
+                        "data": lb_contents["data"],
+                    }
+                ),
+            )
+        # handles combinations of valid and invalid responses
+        if (sp_status_code < 300 and lb_status_code == 406) or (
+            lb_status_code < 300 and sp_status_code == 406
+        ):
+            lb_data = lb_contents["data"]["subject_procedures"]
+            sp_data = sp_contents["data"]["subject_procedures"]
+            combined_data = lb_data + sp_data
+            sp_contents["data"]["subject_procedures"] = combined_data
+            return Responses.multi_status_response(
+                message1=sp_contents["message"],
+                message2=lb_contents["message"],
+                data=sp_contents["data"],
+            )
+        # handles case when both responses are valid
+        if sp_status_code < 300 and lb_status_code < 300:
+            lb_data = lb_contents["data"]["subject_procedures"]
+            sp_data = sp_contents["data"]["subject_procedures"]
+            combined_data = lb_data + sp_data
+            lb_contents["data"]["subject_procedures"] = combined_data
+            return JSONResponse(
+                status_code=StatusCodes.VALID_DATA.value,
+                content=(
+                    {"message": "Valid Model.", "data": lb_contents["data"]}
+                ),
+            )
         # handles combination of server/connection error and valid response
         if sp_status_code in (500, 503) and lb_status_code < 300:
             lb_data = lb_contents["data"]["subject_procedures"]
+            lb_contents["data"]["subject_procedures"] = lb_data
             return Responses.multi_status_response(
                 message1=sp_contents["message"],
                 message2=lb_contents["message"],
-                data=lb_data
+                data=lb_contents["data"],
             )
         if sp_status_code < 300 and lb_status_code in (500, 503):
             sp_data = sp_contents["data"]["subject_procedures"]
+            sp_contents["data"]["subject_procedures"] = sp_data
             return Responses.multi_status_response(
                 message1=sp_contents["message"],
                 message2=lb_contents["message"],
-                data=sp_data
+                data=sp_contents["data"],
             )

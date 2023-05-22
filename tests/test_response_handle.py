@@ -30,6 +30,7 @@ with open(COMBINED_PATH) as f:
     combined_procedures = json.load(f)
 
 
+
 class TestResponseHandler(unittest.TestCase):
     """Tests methods in Responses class"""
 
@@ -92,14 +93,64 @@ class TestResponseHandler(unittest.TestCase):
         self.assertEqual(expected_response.status_code, response.status_code)
         self.assertEqual(expected_response.body, response.body)
 
+    def test_combine_internal_error_responses(self):
+        """Tests that error responses are combined as expected"""
+        response1 = Responses.internal_server_error_response()
+        response2 = Responses.internal_server_error_response()
+        response = Responses.combine_procedure_responses(
+            lb_response=response1, sp_response=response2
+        )
+        expected_response = Responses.internal_server_error_response()
+        self.assertEqual(response.body, expected_response.body)
+        self.assertEqual(response.status_code, 500)
+
+    def test_combine_connection_error_responses(self):
+        """Tests that error responses are combined as expected"""
+        response1 = Responses.connection_error_response()
+        response2 = Responses.connection_error_response()
+        response = Responses.combine_procedure_responses(
+            lb_response=response1, sp_response=response2
+        )
+        expected_response = Responses.connection_error_response()
+        self.assertEqual(response.body, expected_response.body)
+        self.assertEqual(response.status_code, 503)
+
+    def test_combine_no_data_error_responses(self):
+        """Tests that error responses are combined as expected"""
+        response1 = Responses.no_data_found_response()
+        response2 = Responses.no_data_found_response()
+        response = Responses.combine_procedure_responses(
+            lb_response=response1, sp_response=response2
+        )
+        expected_response = Responses.no_data_found_response()
+        self.assertEqual(response.body, expected_response.body)
+        self.assertEqual(response.status_code, 404)
+
+    def test_combine_valid_no_data_error_responses(self):
+        """Tests that error responses are combined as expected"""
+        response1 = Responses.no_data_found_response()
+        response2 = JSONResponse(las_subject_procedures)
+        response3 = JSONResponse(sp_subject_procedures)
+        combined_response_1 = Responses.combine_procedure_responses(
+            lb_response=response2, sp_response=response1
+        )
+        expected_response_1 = JSONResponse(las_subject_procedures)
+        self.assertEqual(combined_response_1.body, expected_response_1.body)
+        self.assertEqual(combined_response_1.status_code, 200)
+
+        combined_response_2 = Responses.combine_procedure_responses(
+            lb_response=response1, sp_response=response3
+        )
+        expected_response_2 = JSONResponse(sp_subject_procedures)
+        self.assertEqual(combined_response_2.body, expected_response_2.body)
+        self.assertEqual(combined_response_2.status_code, 200)
+
     def test_combine_valid_responses(self):
         """Tests that valid responses are combined as expected"""
         response1 = JSONResponse(las_subject_procedures)
         response2 = JSONResponse(sp_subject_procedures)
-        print(response1.status_code)
-        print(response2.status_code)
         response = Responses.combine_procedure_responses(
-            subject_id="000000", lb_response=response1, sp_response=response2
+            lb_response=response1, sp_response=response2
         )
         expected_response = JSONResponse(combined_procedures)
         self.assertEqual(expected_response.body, response.body)
@@ -119,7 +170,6 @@ class TestResponseHandler(unittest.TestCase):
         )
         model2 = Procedures.construct(
             subject_id="115977",
-            extra_field=None,
             subject_procedures=las_subject_procedures["data"][
                 "subject_procedures"
             ],
@@ -129,15 +179,18 @@ class TestResponseHandler(unittest.TestCase):
         )
         response1 = Responses.model_response(model1)
         response2 = Responses.model_response(model2)
-        response = Responses.combine_responses(
+        response = Responses.combine_procedure_responses(
             lb_response=response2, sp_response=response1
         )
         expected_response = JSONResponse(
             status_code=406,
             content=(
                 {
-                    "message": f"Validation Errors: {str(validation_error_2)}"
-                    f"Validation Errors: {str(validation_error_1)}",
+                    "message":
+                        f"Message 1: "
+                        f"Validation Errors: {str(validation_error_1)}, "
+                        f"Message 2: "
+                        f"Validation Errors: {str(validation_error_2)}",
                     "data": combined_procedures["data"],
                 }
             ),
@@ -145,32 +198,69 @@ class TestResponseHandler(unittest.TestCase):
         self.assertEqual(response.body, expected_response.body)
         self.assertEqual(response.status_code, expected_response.status_code)
 
-    def test_combine_error_responses(self):
-        """Tests that error responses are combined as expected"""
-        response1 = Responses.connection_error_response()
-        response2 = Responses.no_data_found_response()
-        response = Responses.combine_responses(response1, response2)
+    def test_combine_valid_invalid_responses(self):
+        """Tests that valid and invalid response are combined as expected"""
+        model = Procedures.construct()
+        response1 = JSONResponse(sp_subject_procedures)
+        response2 = Responses.model_response(model)
+        *_, validation_error = validate_model(model.__class__, model.__dict__)
+        response = Responses.combine_procedure_responses(
+            lb_response=response2, sp_response=response1
+        )
         expected_response = JSONResponse(
             status_code=207,
             content=(
                 {
-                    "message": "Error Connecting to Internal Server."
-                    "No Data Found.",
-                    "data": None,
+                    "message": f"Message 1: Valid Model., "
+                    f"Message 2: Validation Errors: {str(validation_error)}",
+                    "data": sp_subject_procedures["data"],
                 }
             ),
         )
         self.assertEqual(response.body, expected_response.body)
         self.assertEqual(response.status_code, expected_response.status_code)
 
-    def test_combine_valid_and_error_responses(self):
-        """Tests that valid and invalid responses are combined as expected"""
-        response1 = Responses.no_data_found_response()
+    def test_combine_valid_error_responses(self):
+        """Tests that error responses are combined as expected"""
+        response1 = Responses.connection_error_response()
         response2 = JSONResponse(sp_subject_procedures)
-        response = Responses.combine_responses(response1, response2)
-        expected_response = JSONResponse(sp_subject_procedures)
-        self.assertEqual(expected_response.body, response.body)
-        self.assertEqual(207, response.status_code)
+        combined_response_1 = Responses.combine_procedure_responses(
+            lb_response=response1, sp_response=response2
+        )
+        expected_response_1 = JSONResponse(
+            status_code=207,
+            content=(
+                {
+                    "message": "Message 1: Valid Model., "
+                    "Message 2: Error Connecting to Internal Server.",
+                    "data": sp_subject_procedures["data"],
+                }
+            ),
+        )
+        self.assertEqual(combined_response_1.body, expected_response_1.body)
+        self.assertEqual(
+            combined_response_1.status_code, expected_response_1.status_code
+        )
+
+        response3 = JSONResponse(las_subject_procedures)
+        combined_response_2 = Responses.combine_procedure_responses(
+            lb_response=response3, sp_response=response1
+        )
+        expected_response_2 = JSONResponse(
+            status_code=207,
+            content=(
+                {
+                    "message":
+                        "Message 1: Error Connecting to Internal Server., "
+                        "Message 2: Valid Model.",
+                    "data": las_subject_procedures["data"],
+                }
+            ),
+        )
+        self.assertEqual(combined_response_2.body, expected_response_2.body)
+        self.assertEqual(
+            combined_response_2.status_code, expected_response_2.status_code
+        )
 
 
 if __name__ == "__main__":

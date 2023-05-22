@@ -182,6 +182,7 @@ class LabTracksBgStrain(Enum):
 
 class LabTracksProcedures(Enum):
     """Keywords for LabTracks procedures"""
+
     PERFUSION = "Perfusion"
     RO_INJECTION = "RO Injection"
 
@@ -368,9 +369,7 @@ class LabTracksResponseHandler:
         procedures_list = []
 
         for result in results:
-            start_date = result.get(
-                TaskSetQueryColumns.DATE_START.value
-            )
+            start_date = result.get(TaskSetQueryColumns.DATE_START.value)
             if start_date:
                 start_date = start_date.date()
             end_date = result.get(TaskSetQueryColumns.DATE_END.value)
