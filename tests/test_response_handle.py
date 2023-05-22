@@ -30,7 +30,6 @@ with open(COMBINED_PATH) as f:
     combined_procedures = json.load(f)
 
 
-
 class TestResponseHandler(unittest.TestCase):
     """Tests methods in Responses class"""
 
