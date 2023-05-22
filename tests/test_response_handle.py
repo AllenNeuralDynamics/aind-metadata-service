@@ -185,11 +185,10 @@ class TestResponseHandler(unittest.TestCase):
             status_code=406,
             content=(
                 {
-                    "message":
-                        f"Message 1: "
-                        f"Validation Errors: {str(validation_error_1)}, "
-                        f"Message 2: "
-                        f"Validation Errors: {str(validation_error_2)}",
+                    "message": f"Message 1: "
+                    f"Validation Errors: {str(validation_error_1)}, "
+                    f"Message 2: "
+                    f"Validation Errors: {str(validation_error_2)}",
                     "data": combined_procedures["data"],
                 }
             ),
@@ -249,9 +248,9 @@ class TestResponseHandler(unittest.TestCase):
             status_code=207,
             content=(
                 {
-                    "message":
-                        "Message 1: Error Connecting to Internal Server., "
-                        "Message 2: Valid Model.",
+                    "message": "Message 1: "
+                    "Error Connecting to Internal Server., "
+                    "Message 2: Valid Model.",
                     "data": las_subject_procedures["data"],
                 }
             ),
