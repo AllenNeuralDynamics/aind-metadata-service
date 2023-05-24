@@ -77,7 +77,7 @@ async def retrieve_procedures(subject_id):
     )
     lb_response = lb_client.get_procedures_info(subject_id=subject_id)
     sp_response = sharepoint_client.get_procedure_info(subject_id=subject_id)
-    response = Responses.combine_responses(lb_response, sp_response)
+    response = Responses.combine_procedure_responses(lb_response, sp_response)
     return response
 
 
