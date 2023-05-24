@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
 from aind_metadata_service.labtracks.client import LabTracksClient
+from aind_metadata_service.response_handler import Responses
 from aind_metadata_service.sharepoint.client import SharePointClient
 
 app = FastAPI()
@@ -66,9 +67,17 @@ async def retrieve_procedures(subject_id):
         client_id=nsb_sharepoint_user,
         client_secret=nsb_sharepoint_password,
     )
-
-    response = sharepoint_client.get_procedure_info(subject_id=subject_id)
-
+    lb_client = LabTracksClient(
+        driver=labtracks_driver,
+        server=labtracks_server,
+        port=labtracks_port,
+        db=labtracks_db,
+        user=labtracks_user,
+        password=labtracks_password,
+    )
+    lb_response = lb_client.get_procedures_info(subject_id=subject_id)
+    sp_response = sharepoint_client.get_procedure_info(subject_id=subject_id)
+    response = Responses.combine_procedure_responses(lb_response, sp_response)
     return response
 
 

@@ -18,8 +18,62 @@ class SubjectQueryColumns(Enum):
     GROUP_DESCRIPTION = "group_description"
 
 
+class TaskSetQueryColumns(Enum):
+    """Expected columns in the task set query response."""
+
+    TASK_ID = "id"
+    TASK_TYPE_ID = "task_type_id"
+    DATE_START = "date_start"
+    DATE_END = "date_end"
+    INVESTIGATOR_ID = "investigator_id"
+    TASK_OBJECT = "task_object"
+    TYPE_NAME = "type_name"
+    PROTOCOL_NUMBER = "protocol_number"
+
+
 class LabTracksQueries:
     """Class to hold sql query strings for LabTracks"""
+
+    @staticmethod
+    def procedures_from_subject_id(subject_id: str) -> str:
+        """
+        Retrieves the information to populate metadata about subjects.
+
+        Parameters
+        ----------
+        subject_id : str
+            This is the id in the LabTracks Task_Set table
+
+        Returns
+        -------
+        str
+            SQL query that can be used to retrieve the data from LabTracks
+            sqlserver db.
+        """
+        # TODO: parsers for comments/descriptions?
+        return (
+            "SELECT"
+            f"    TS.ID AS {TaskSetQueryColumns.TASK_ID.value},"
+            f"    TS.TASK_TYPE_ID AS {TaskSetQueryColumns.TASK_TYPE_ID.value},"
+            f"    TT.TYPE_NAME AS {TaskSetQueryColumns.TYPE_NAME.value},"
+            f"    TS.DATE_START AS {TaskSetQueryColumns.DATE_START.value},"
+            f"    TS.DATE_END AS {TaskSetQueryColumns.DATE_END.value},"
+            f"    TS.INVESTIGATOR_ID AS "
+            f"    {TaskSetQueryColumns.INVESTIGATOR_ID.value},"
+            f"    TSO.TASK_OBJECT AS {TaskSetQueryColumns.TASK_OBJECT.value},"
+            f"    AP.PROTOCOL_NUMBER AS "
+            f"    {TaskSetQueryColumns.PROTOCOL_NUMBER.value}"
+            "  FROM TASK_SET TS"
+            "    INNER JOIN TASK_SET_OBJECT TSO "
+            "    ON TS.ID = TSO.TASK_ID"
+            "    INNER JOIN ANIMALS_COMMON AC "
+            "    ON TSO.TASK_OBJECT = AC.ID"
+            "    INNER JOIN TASK_TYPE TT "
+            "    ON TS.TASK_TYPE_ID = TT.ID"
+            "    INNER JOIN ACUC_PROTOCOL AP "
+            "    ON TS.ACUC_LINK_ID = AP.LINK_INDEX"
+            f" WHERE AC.ID={subject_id};"
+        )
 
     @staticmethod
     def subject_from_subject_id(subject_id: str) -> str:
