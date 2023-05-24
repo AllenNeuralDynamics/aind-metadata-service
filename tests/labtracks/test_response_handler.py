@@ -3,7 +3,8 @@ import datetime
 import unittest
 from decimal import Decimal
 
-from aind_data_schema import Subject
+from aind_data_schema import Procedures, Subject
+from aind_data_schema.procedures import Perfusion, RetroOrbitalInjection
 from aind_data_schema.subject import BackgroundStrain, Sex, Species
 
 from aind_metadata_service.labtracks.client import (
@@ -44,7 +45,7 @@ class TestResponseExamples:
         "<Reason>Breeder Refresh</Reason>\r\n "
         "<Full_Genotype>wt/wt</Full_Genotype>\r\n</MouseCustomClass> "
     )
-    test_response = [
+    test_subject_response = [
         {
             "id": Decimal("115977"),
             "class_values": class_values_str,
@@ -78,16 +79,82 @@ class TestResponseExamples:
         }
     )
 
+    test_procedures_response = [
+        {
+            "id": Decimal(00000),
+            "task_type_id": Decimal(12345),
+            "type_name": "Perfusion Gel",
+            "date_start": datetime.datetime(2022, 10, 11, 0, 0),
+            "date_end": datetime.datetime(2022, 10, 11, 4, 30),
+            "investigator_id": Decimal(28803),
+            "task_object": Decimal(115977),
+            "protocol_number": Decimal(2002),
+        },
+        {
+            "id": Decimal(10000),
+            "task_type_id": Decimal(23),
+            "type_name": "RO Injection VGT",
+            "date_start": datetime.datetime(2022, 5, 11, 0, 0),
+            "date_end": datetime.datetime(2022, 5, 12, 0, 0),
+            "investigator_id": Decimal(28803),
+            "task_object": Decimal(115977),
+            "protocol_number": Decimal(2002),
+        },
+    ]
+
+    expected_subject_procedures = [
+        Perfusion.construct(
+            start_date=datetime.date(2022, 10, 11),
+            end_date=datetime.date(2022, 10, 11),
+            experimenter_full_name=Decimal("28803"),
+            iacuc_protocol=Decimal("2002"),
+            animal_weight_prior=None,
+            animal_weight_post=None,
+            anaesthesia=None,
+            notes=None,
+            procedure_type="Perfusion",
+            output_specimen_ids=[Decimal("115977")],
+        ),
+        RetroOrbitalInjection.construct(
+            start_date=datetime.date(2022, 5, 11),
+            end_date=datetime.date(2022, 5, 12),
+            experimenter_full_name=Decimal("28803"),
+            iacuc_protocol=Decimal("2002"),
+            animal_weight_prior=None,
+            animal_weight_post=None,
+            anaesthesia=None,
+            notes=None,
+            procedure_type="Retro-orbital injection",
+        ),
+    ]
+
+    expected_procedures = Procedures.parse_obj(
+        {
+            "schema_version": "0.7.0",
+            "subject_id": "115977",
+            "subject_procedures": expected_subject_procedures,
+        }
+    )
+
 
 class TestLabTracksResponseHandler(unittest.TestCase):
     """Class for unit tests on LabTracksResponseHandler."""
 
     rh = LabTracksResponseHandler()
 
+    def test_map_response_to_procedures(self):
+        """Tests that the response gets mapped to the subject."""
+        actual_procedures = self.rh.map_response_to_procedures(
+            TestResponseExamples.test_procedures_response
+        )
+        self.assertEqual(
+            TestResponseExamples.expected_subject_procedures, actual_procedures
+        )
+
     def test_map_response_to_subject(self):
         """Tests that the response gets mapped to the subject."""
         actual_subject = self.rh.map_response_to_subject(
-            TestResponseExamples.test_response
+            TestResponseExamples.test_subject_response
         )
         self.assertEqual(
             [TestResponseExamples.expected_subject], actual_subject

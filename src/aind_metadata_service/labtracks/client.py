@@ -4,13 +4,19 @@ from typing import List, Optional
 from xml.etree import ElementTree as ET
 
 import pyodbc
-from aind_data_schema import Subject
+from aind_data_schema import Procedures, Subject
+from aind_data_schema.procedures import (
+    Perfusion,
+    RetroOrbitalInjection,
+    SubjectProcedure,
+)
 from aind_data_schema.subject import BackgroundStrain, Sex, Species
 from fastapi.responses import JSONResponse
 
 from aind_metadata_service.labtracks.query_builder import (
     LabTracksQueries,
     SubjectQueryColumns,
+    TaskSetQueryColumns,
 )
 from aind_metadata_service.response_handler import Responses
 
@@ -107,6 +113,38 @@ class LabTracksClient:
         except pyodbc.Error:
             return Responses.internal_server_error_response()
 
+    def get_procedures_info(self, subject_id: str) -> JSONResponse:
+        """
+        Method to retrieve LAS procedures from subject_id (int)
+        Parameters
+        ----------
+        subject_id: str
+        """
+        try:
+            query = LabTracksQueries.procedures_from_subject_id(subject_id)
+            session = self.create_session()
+            cursor = session.cursor()
+            cursor.execute(query)
+            column_names = cursor.description
+            columns = [column[0].lower() for column in column_names]
+            fetched_rows = cursor.fetchall()
+            cursor.close()
+            self.close_session(session)
+            results = []
+            for row in fetched_rows:
+                results.append(dict(zip(columns, row)))
+            if not results:
+                response = Responses.no_data_found_response()
+            else:
+                lth = LabTracksResponseHandler()
+                subject_procedures = lth.map_response_to_procedures(results)
+                procedures = Procedures.construct(subject_id=subject_id)
+                procedures.subject_procedures = subject_procedures
+                response = Responses.model_response(procedures)
+            return response
+        except pyodbc.Error:
+            return Responses.internal_server_error_response()
+
 
 class MouseCustomClassFields(Enum):
     """
@@ -140,6 +178,13 @@ class LabTracksBgStrain(Enum):
     # TODO: Double check this
     C57BL_6J = "C57BL/6J"
     BALB_C = "BALB/c"
+
+
+class LabTracksProcedures(Enum):
+    """Keywords for LabTracks procedures"""
+
+    PERFUSION = "Perfusion"
+    RO_INJECTION = "RO Injection"
 
 
 class LabTracksResponseHandler:
@@ -304,3 +349,60 @@ class LabTracksResponseHandler:
             )
             subjects.append(subject)
         return subjects
+
+    @staticmethod
+    def map_response_to_procedures(
+        results: List[dict],
+    ) -> List[SubjectProcedure]:
+        """
+        Maps a response from LabTracks to an aind_data_schema.Procedure
+        Parameters
+        ----------
+        results : List[dict]
+            Results pulled from LabTracks. In the form of [row]
+
+        Returns
+        -------
+            A List of mapped Subjects (not validated)
+        """
+
+        procedures_list = []
+
+        for result in results:
+            start_date = result.get(TaskSetQueryColumns.DATE_START.value)
+            if start_date:
+                start_date = start_date.date()
+            end_date = result.get(TaskSetQueryColumns.DATE_END.value)
+            if end_date:
+                end_date = end_date.date()
+            experimenter_full_name = result.get(
+                TaskSetQueryColumns.INVESTIGATOR_ID.value
+            )
+            iacuc_protocol = result.get(
+                TaskSetQueryColumns.PROTOCOL_NUMBER.value
+            )
+            type_name = result.get(TaskSetQueryColumns.TYPE_NAME.value)
+            if type_name:
+                if LabTracksProcedures.PERFUSION.value in type_name:
+                    output_specimen_ids = [
+                        result.get(TaskSetQueryColumns.TASK_OBJECT.value)
+                    ]
+                    perfusion = Perfusion.construct(
+                        start_date=start_date,
+                        end_date=end_date,
+                        experimenter_full_name=experimenter_full_name,
+                        iacuc_protocol=iacuc_protocol,
+                        output_specimen_ids=output_specimen_ids,
+                    )
+                    procedures_list.append(perfusion)
+
+                elif LabTracksProcedures.RO_INJECTION.value in type_name:
+                    # TODO: parse inj info from comments
+                    ro_injection = RetroOrbitalInjection.construct(
+                        start_date=start_date,
+                        end_date=end_date,
+                        experimenter_full_name=experimenter_full_name,
+                        iacuc_protocol=iacuc_protocol,
+                    )
+                    procedures_list.append(ro_injection)
+        return procedures_list
