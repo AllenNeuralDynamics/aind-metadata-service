@@ -6,8 +6,8 @@ from office365.runtime.auth.client_credential import ClientCredential
 from office365.sharepoint.client_context import ClientContext
 
 from aind_metadata_service.response_handler import Responses
-from aind_metadata_service.sharepoint.nsb2019.procedures import NSB2019Mapping
-from aind_metadata_service.sharepoint.nsb2023.mapping import NSB2023Mapping
+from aind_metadata_service.sharepoint.nsb2019.procedures import NSB2019Procedures
+from aind_metadata_service.sharepoint.nsb2023.procedures import NSB2023Procedures
 
 
 class SharePointClient:
@@ -62,8 +62,8 @@ class SharePointClient:
         # TODO: Add try to handle internal server error response.
         subject_procedures = []
         nsb_ctx = self.nsb_client_context
-        nsb_2019_mapper = NSB2019Mapping()
-        nsb_2023_mapper = NSB2023Mapping()
+        nsb_2019_mapper = NSB2019Procedures()
+        nsb_2023_mapper = NSB2023Procedures()
         procedures2019 = nsb_2019_mapper.get_procedures_from_sharepoint(
             subject_id=subject_id,
             client_context=nsb_ctx,

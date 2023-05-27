@@ -5,11 +5,11 @@ from typing import List
 from aind_data_schema.procedures import SubjectProcedure
 from office365.sharepoint.client_context import ClientContext
 
-from aind_metadata_service.sharepoint.nsb2019.mapping import MappedNSBList
-from aind_metadata_service.sharepoint.nsb2019.models import NSBList
+from aind_metadata_service.sharepoint.nsb2023.mapping import MappedNSBList
+from aind_metadata_service.sharepoint.nsb2023.models import NSBList
 
 
-class NSB2019Procedures:
+class NSB2023Procedures:
     """Provides methods to retrieve procedure information from sharepoint,
     parses the response into an intermediate data model, and maps that model
     into AIND Procedures model."""
@@ -28,7 +28,7 @@ class NSB2019Procedures:
         client_context : ClientContext
           NSB Sharepoint client
         list_title : str
-          Title of the list where the 2019 procedure data is stored
+          Title of the list where the 2023 procedure data is stored
         Returns
         -------
         List[SubjectProcedure]
