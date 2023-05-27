@@ -34,7 +34,7 @@ class NSB2023Procedures:
         List[SubjectProcedure]
         """
 
-        labtrack_alias = NSBList.__fields__.get("lab_tracks_id").alias
+        labtrack_alias = NSBList.__fields__.get("lab_tracks_id1").alias
         filter_string = f"{labtrack_alias} eq '{subject_id}'"
         list_view = client_context.web.lists.get_by_title(
             list_title

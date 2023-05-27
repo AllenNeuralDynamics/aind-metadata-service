@@ -6,8 +6,12 @@ from office365.runtime.auth.client_credential import ClientCredential
 from office365.sharepoint.client_context import ClientContext
 
 from aind_metadata_service.response_handler import Responses
-from aind_metadata_service.sharepoint.nsb2019.procedures import NSB2019Procedures
-from aind_metadata_service.sharepoint.nsb2023.procedures import NSB2023Procedures
+from aind_metadata_service.sharepoint.nsb2019.procedures import (
+    NSB2019Procedures,
+)
+from aind_metadata_service.sharepoint.nsb2023.procedures import (
+    NSB2023Procedures,
+)
 
 
 class SharePointClient:

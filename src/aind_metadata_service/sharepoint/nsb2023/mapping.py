@@ -22,8 +22,8 @@ from aind_data_schema.procedures import (
     SubjectProcedure,
 )
 from aind_data_schema.subject import Sex
-from models import NSBList
 
+from aind_metadata_service.sharepoint.nsb2023.models import NSBList
 from aind_metadata_service.sharepoint.nsb2023.models import (
     Procedure as NSBProcedure,
 )
@@ -125,8 +125,8 @@ class HeadPostInfo:
         cls, hp: Optional[HeadPost], hp_type: Optional[HeadPostType]
     ):
         """Construct HeadPostInfo2023 from headpost and headpost_type"""
-        headframe_type = hp
-        well_type = hp_type
+        headframe_type = hp.value
+        well_type = hp_type.value
         if hp == HeadPost.VISUAL_CTX:
             headframe_part_number = "0160-100-10"
         elif hp == HeadPost.WHC_NP:
@@ -2239,9 +2239,11 @@ class MappedNSBList:
             NSBProcedure.FRONTAL_CTX_2_P,
             NSBProcedure.INJ_MOTOR_CTX,
             NSBProcedure.INJ_VISUAL_CTX_2_P,
+            NSBProcedure.INJ_WHC_NP_1_INJECTION_LO,
             NSBProcedure.MOTOR_CTX,
             NSBProcedure.VISUAL_CTX_NP,
             NSBProcedure.VISUAL_CTX_2_P,
+            NSBProcedure.WHC_NP,
         }
 
     def surgery_during_info(

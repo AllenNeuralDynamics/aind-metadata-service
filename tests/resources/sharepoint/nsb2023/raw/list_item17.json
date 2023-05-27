@@ -35,7 +35,7 @@
   "FirstInjectionWeightBefor": null,
   "FirstInjectionWeightAfter": null,
   "FirstInjectionIsoDuration": null,
-  "Round1InjIsolevel": "Select...",
+  "Round1InjIsolevel": null,
   "FirstInjRecovery": null,
   "Breg2Lamb": null,
   "SurgeryStatus": "Ready for Feedback",
