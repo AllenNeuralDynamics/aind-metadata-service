@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from aind_data_schema.procedures import Procedures
-from aind_data_schema.subject import Subject
+from aind_data_schema.subject import Subject, Species
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import validate_model
@@ -37,7 +37,7 @@ class TestResponseHandler(unittest.TestCase):
         """Test model_response with valid model."""
 
         model = Subject(
-            species="Mus musculus",
+            species=Species.MUS_MUSCULUS,
             subject_id="639374",
             sex="Male",
             date_of_birth="2022-06-24",

@@ -28,7 +28,8 @@
       "dura_removed": false,
       "protective_material": null,
       "workstation_id": "SWS 3",
-      "recovery_time": null
+      "recovery_time": null,
+      "recovery_time_unit": "minute"
    },
    {
       "start_date": "2022-12-06",
