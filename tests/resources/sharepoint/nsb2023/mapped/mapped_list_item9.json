@@ -29,6 +29,7 @@
       "dura_removed": null,
       "protective_material": null,
       "workstation_id": "SWS 5",
-      "recovery_time": 30.0
+      "recovery_time": 30.0,
+      "recovery_time_unit": "minute"
    }
 ]
