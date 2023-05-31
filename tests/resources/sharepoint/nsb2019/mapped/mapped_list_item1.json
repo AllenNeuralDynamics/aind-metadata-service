@@ -94,6 +94,7 @@
          }
       ],
       "recovery_time": null,
+      "recovery_time_unit": "minute",
       "injection_duration": null,
       "injection_duration_unit": "minute",
       "workstation_id": "SWS 3",
@@ -143,6 +144,7 @@
          }
       ],
       "recovery_time": null,
+      "recovery_time_unit": "minute",
       "injection_duration": null,
       "injection_duration_unit": "minute",
       "workstation_id": null,

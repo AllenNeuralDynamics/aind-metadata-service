@@ -64,7 +64,9 @@ class Responses:
     @staticmethod
     def multiple_items_found_response(models: List[BaseModel]) -> JSONResponse:
         """Map to a multiple choices error."""
-        models_json = [jsonable_encoder(model) for model in models]
+        models_json = [
+            jsonable_encoder(json.loads(model.json())) for model in models
+        ]
         response = JSONResponse(
             status_code=StatusCodes.MULTIPLE_RESPONSES.value,
             content=(
@@ -84,7 +86,7 @@ class Responses:
             model response from server
         """
         *_, validation_error = validate_model(model.__class__, model.__dict__)
-        model_json = jsonable_encoder(model)
+        model_json = jsonable_encoder(json.loads(model.json()))
         if validation_error:
             response = JSONResponse(
                 status_code=StatusCodes.INVALID_DATA.value,
