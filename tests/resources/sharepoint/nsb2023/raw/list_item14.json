@@ -34,7 +34,7 @@
   "HPRecovery": "25",
   "FirstInjectionWeightBefor": "25.2",
   "FirstInjectionWeightAfter": "28.2",
-  "FirstInjectionIsoDuration": "1.5",
+  "FirstInjectionIsoDuration": 1.5,
   "Round1InjIsolevel": "2",
   "FirstInjRecovery": "25",
   "Breg2Lamb": null,
