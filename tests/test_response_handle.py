@@ -44,7 +44,7 @@ class TestResponseHandler(unittest.TestCase):
             genotype="Pvalb-IRES-Cre/wt;RCL-somBiPoles_mCerulean-WPRE/wt",
         )
         response = Responses.model_response(model)
-        model_json = jsonable_encoder(model)
+        model_json = model.json()
         expected_response = JSONResponse(
             status_code=200,
             content=(

@@ -84,7 +84,8 @@ class Responses:
             model response from server
         """
         *_, validation_error = validate_model(model.__class__, model.__dict__)
-        model_json = jsonable_encoder(model)
+        # model_json = jsonable_encoder(model)
+        model_json = model.json()
         if validation_error:
             response = JSONResponse(
                 status_code=StatusCodes.INVALID_DATA.value,
