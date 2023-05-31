@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from aind_data_schema.procedures import Procedures
-from aind_data_schema.subject import Subject, Species
+from aind_data_schema.subject import Species, Subject
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import validate_model
@@ -44,7 +44,7 @@ class TestResponseHandler(unittest.TestCase):
             genotype="Pvalb-IRES-Cre/wt;RCL-somBiPoles_mCerulean-WPRE/wt",
         )
         response = Responses.model_response(model)
-        model_json = model.json()
+        model_json = jsonable_encoder(json.loads(model.json()))
         expected_response = JSONResponse(
             status_code=200,
             content=(
