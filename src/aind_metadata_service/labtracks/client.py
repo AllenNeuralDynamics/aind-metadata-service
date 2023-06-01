@@ -1,4 +1,5 @@
 """Module to create clients to connect to databases."""
+import logging
 from enum import Enum
 from typing import List, Optional
 from xml.etree import ElementTree as ET
@@ -110,7 +111,8 @@ class LabTracksClient:
                     subject = subjects[0]
                     response = Responses.model_response(subject)
                     return response
-        except pyodbc.Error:
+        except Exception as e:
+            logging.error(repr(e))
             return Responses.internal_server_error_response()
 
     def get_procedures_info(self, subject_id: str) -> JSONResponse:
@@ -142,7 +144,8 @@ class LabTracksClient:
                 procedures.subject_procedures = subject_procedures
                 response = Responses.model_response(procedures)
             return response
-        except pyodbc.Error:
+        except Exception as e:
+            logging.error(repr(e))
             return Responses.internal_server_error_response()
 
 
