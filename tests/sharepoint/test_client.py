@@ -6,8 +6,9 @@ import os
 import unittest
 from pathlib import Path
 from typing import List, Tuple
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, Mock, patch
 
+from aind_metadata_service.response_handler import Responses
 from aind_metadata_service.sharepoint.client import SharePointClient
 
 if os.getenv("LOG_LEVEL"):  # pragma: no cover
@@ -130,6 +131,37 @@ class TestSharepointClient(unittest.TestCase):
         self.assertEqual(
             expected_subject_procedures, contents["data"]["subject_procedures"]
         )
+
+    @patch("aind_metadata_service.sharepoint.client.ClientContext")
+    @patch(
+        "aind_metadata_service.sharepoint.nsb2023.procedures."
+        "NSB2023Procedures.get_procedures_from_sharepoint"
+    )
+    @patch("logging.error")
+    def test_error_response(
+        self,
+        mock_log: MagicMock,
+        mock_error: MagicMock,
+        mock_sharepoint_client: MagicMock,
+    ):
+        """Tests internal server error response caught correctly."""
+
+        client = SharePointClient(
+            nsb_site_url="some_url",
+            nsb_list_title_2019="some_list_title2019",
+            nsb_list_title_2023="some_list_title2023",
+            client_id="some_client_id",
+            client_secret="some_client_secret",
+        )
+
+        mock_error.side_effect = Mock(side_effect=BrokenPipeError)
+
+        response = client.get_procedure_info("12345")
+        expected_response = Responses.internal_server_error_response()
+        mock_sharepoint_client.assert_called_once()
+        mock_log.assert_called_once_with("BrokenPipeError()")
+        self.assertEqual(500, expected_response.status_code)
+        self.assertEqual(response.body, expected_response.body)
 
 
 if __name__ == "__main__":

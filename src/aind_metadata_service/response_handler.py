@@ -1,5 +1,6 @@
 """Module to handle responses"""
 import json
+import logging
 from typing import List
 
 from fastapi.encoders import jsonable_encoder
@@ -118,77 +119,84 @@ class Responses:
         Combines JSONResponses from Labtracks and Sharepoint clients.
         Handles validation errors and special cases.
         """
-        lb_contents = json.loads(lb_response.body)
-        sp_contents = json.loads(sp_response.body)
-        sp_status_code = sp_response.status_code
-        lb_status_code = lb_response.status_code
-        if sp_status_code == 500 and lb_status_code == 500:
+        try:
+            lb_contents = json.loads(lb_response.body)
+            sp_contents = json.loads(sp_response.body)
+            sp_status_code = sp_response.status_code
+            lb_status_code = lb_response.status_code
+            if sp_status_code == 500 and lb_status_code == 500:
+                return Responses.internal_server_error_response()
+            if sp_status_code == 503 and lb_status_code == 503:
+                return Responses.connection_error_response()
+            if sp_status_code == 404 and lb_status_code == 404:
+                return Responses.no_data_found_response()
+            if sp_status_code < 300 and lb_status_code == 404:
+                return sp_response
+            if sp_status_code == 404 and lb_status_code < 300:
+                return lb_response
+            # handles combination of invalid responses
+            if lb_status_code == 406 and sp_status_code == 406:
+                lb_data = lb_contents["data"]["subject_procedures"]
+                sp_data = sp_contents["data"]["subject_procedures"]
+                combined_data = lb_data + sp_data
+                lb_contents["data"]["subject_procedures"] = combined_data
+                message1 = sp_contents["message"]
+                message2 = lb_contents["message"]
+                return JSONResponse(
+                    status_code=StatusCodes.INVALID_DATA.value,
+                    content=(
+                        {
+                            "message": f"Message 1: {message1}, "
+                            f"Message 2: {message2}",
+                            "data": lb_contents["data"],
+                        }
+                    ),
+                )
+            # handles combinations of valid and invalid responses
+            if (sp_status_code < 300 and lb_status_code == 406) or (
+                lb_status_code < 300 and sp_status_code == 406
+            ):
+                lb_data = lb_contents["data"]["subject_procedures"]
+                sp_data = sp_contents["data"]["subject_procedures"]
+                combined_data = lb_data + sp_data
+                sp_contents["data"]["subject_procedures"] = combined_data
+                return Responses.multi_status_response(
+                    message1=sp_contents["message"],
+                    message2=lb_contents["message"],
+                    data=sp_contents["data"],
+                )
+            # handles case when both responses are valid
+            if sp_status_code < 300 and lb_status_code < 300:
+                lb_data = lb_contents["data"]["subject_procedures"]
+                sp_data = sp_contents["data"]["subject_procedures"]
+                combined_data = lb_data + sp_data
+                lb_contents["data"]["subject_procedures"] = combined_data
+                return JSONResponse(
+                    status_code=StatusCodes.VALID_DATA.value,
+                    content=(
+                        {
+                            "message": "Valid Model.",
+                            "data": lb_contents["data"],
+                        }
+                    ),
+                )
+            # handles combination of server/connection error and valid response
+            if sp_status_code in (500, 503) and lb_status_code < 300:
+                lb_data = lb_contents["data"]["subject_procedures"]
+                lb_contents["data"]["subject_procedures"] = lb_data
+                return Responses.multi_status_response(
+                    message1=sp_contents["message"],
+                    message2=lb_contents["message"],
+                    data=lb_contents["data"],
+                )
+            if sp_status_code < 300 and lb_status_code in (500, 503):
+                sp_data = sp_contents["data"]["subject_procedures"]
+                sp_contents["data"]["subject_procedures"] = sp_data
+                return Responses.multi_status_response(
+                    message1=sp_contents["message"],
+                    message2=lb_contents["message"],
+                    data=sp_contents["data"],
+                )
+        except Exception as e:
+            logging.error(repr(e))
             return Responses.internal_server_error_response()
-        if sp_status_code == 503 and lb_status_code == 503:
-            return Responses.connection_error_response()
-        if sp_status_code == 404 and lb_status_code == 404:
-            return Responses.no_data_found_response()
-        if sp_status_code < 300 and lb_status_code == 404:
-            return sp_response
-        if sp_status_code == 404 and lb_status_code < 300:
-            return lb_response
-        # handles combination of invalid responses
-        if lb_status_code == 406 and sp_status_code == 406:
-            lb_data = lb_contents["data"]["subject_procedures"]
-            sp_data = sp_contents["data"]["subject_procedures"]
-            combined_data = lb_data + sp_data
-            lb_contents["data"]["subject_procedures"] = combined_data
-            message1 = sp_contents["message"]
-            message2 = lb_contents["message"]
-            return JSONResponse(
-                status_code=StatusCodes.INVALID_DATA.value,
-                content=(
-                    {
-                        "message": f"Message 1: {message1}, "
-                        f"Message 2: {message2}",
-                        "data": lb_contents["data"],
-                    }
-                ),
-            )
-        # handles combinations of valid and invalid responses
-        if (sp_status_code < 300 and lb_status_code == 406) or (
-            lb_status_code < 300 and sp_status_code == 406
-        ):
-            lb_data = lb_contents["data"]["subject_procedures"]
-            sp_data = sp_contents["data"]["subject_procedures"]
-            combined_data = lb_data + sp_data
-            sp_contents["data"]["subject_procedures"] = combined_data
-            return Responses.multi_status_response(
-                message1=sp_contents["message"],
-                message2=lb_contents["message"],
-                data=sp_contents["data"],
-            )
-        # handles case when both responses are valid
-        if sp_status_code < 300 and lb_status_code < 300:
-            lb_data = lb_contents["data"]["subject_procedures"]
-            sp_data = sp_contents["data"]["subject_procedures"]
-            combined_data = lb_data + sp_data
-            lb_contents["data"]["subject_procedures"] = combined_data
-            return JSONResponse(
-                status_code=StatusCodes.VALID_DATA.value,
-                content=(
-                    {"message": "Valid Model.", "data": lb_contents["data"]}
-                ),
-            )
-        # handles combination of server/connection error and valid response
-        if sp_status_code in (500, 503) and lb_status_code < 300:
-            lb_data = lb_contents["data"]["subject_procedures"]
-            lb_contents["data"]["subject_procedures"] = lb_data
-            return Responses.multi_status_response(
-                message1=sp_contents["message"],
-                message2=lb_contents["message"],
-                data=lb_contents["data"],
-            )
-        if sp_status_code < 300 and lb_status_code in (500, 503):
-            sp_data = sp_contents["data"]["subject_procedures"]
-            sp_contents["data"]["subject_procedures"] = sp_data
-            return Responses.multi_status_response(
-                message1=sp_contents["message"],
-                message2=lb_contents["message"],
-                data=sp_contents["data"],
-            )
