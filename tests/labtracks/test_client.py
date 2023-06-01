@@ -3,15 +3,14 @@
 import datetime
 import decimal
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, call, patch
 
 import pyodbc
 from aind_data_schema.subject import Sex
 
 from aind_metadata_service.labtracks.client import LabTracksClient
 from aind_metadata_service.response_handler import Responses
-
-from .test_response_handler import TestResponseExamples
+from tests.labtracks.test_response_handler import TestResponseExamples
 
 
 class TestLabTracksClient(unittest.TestCase):
@@ -48,13 +47,16 @@ class TestLabTracksClient(unittest.TestCase):
         )
 
     @patch("pyodbc.connect")
+    @patch("logging.error")
     def test_labtracks_client_internal_server_error(
-        self, mock_connect: Mock
+        self, mock_log: MagicMock, mock_connect: Mock
     ) -> None:
         """
         Tests that pyodbc errors are returned to client properly
         Parameters
         ----------
+        mock_log : MagicMock
+            Mock the logging error.
         mock_connect : Mock
             A mocked Connection class that can be used to override methods
             without connecting to sqlserver
@@ -74,6 +76,9 @@ class TestLabTracksClient(unittest.TestCase):
         response2 = self.lb_client.get_procedures_info("123")
         expected_response = Responses.internal_server_error_response()
         mock_connect.assert_called()
+        mock_log.assert_has_calls(
+            [call("ProgrammingError()"), call("ProgrammingError()")]
+        )
         self.assertEqual(response1.status_code, expected_response.status_code)
         self.assertEqual(response1.body, expected_response.body)
         self.assertEqual(response2.status_code, expected_response.status_code)
