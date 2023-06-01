@@ -1,11 +1,11 @@
 """Module to handle responses"""
 import json
+import logging
 from typing import List
 
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, validate_model
-import logging
 
 from aind_metadata_service.client import StatusCodes
 
@@ -174,7 +174,10 @@ class Responses:
                 return JSONResponse(
                     status_code=StatusCodes.VALID_DATA.value,
                     content=(
-                        {"message": "Valid Model.", "data": lb_contents["data"]}
+                        {
+                            "message": "Valid Model.",
+                            "data": lb_contents["data"],
+                        }
                     ),
                 )
             # handles combination of server/connection error and valid response

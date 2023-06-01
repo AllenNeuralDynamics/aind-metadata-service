@@ -4,6 +4,7 @@ import json
 import os
 import unittest
 from pathlib import Path
+from unittest.mock import MagicMock, Mock, patch
 
 from aind_data_schema.procedures import Procedures
 from aind_data_schema.subject import Species, Subject
@@ -259,6 +260,25 @@ class TestResponseHandler(unittest.TestCase):
         self.assertEqual(
             combined_response_2.status_code, expected_response_2.status_code
         )
+
+    @patch("json.loads")
+    @patch("logging.error")
+    def test_error_combined_response(
+        self, mock_log: MagicMock, mock_json_error: MagicMock
+    ):
+        """Tests internal server error caught and logged correctly."""
+        response1 = JSONResponse(las_subject_procedures)
+        response2 = JSONResponse(sp_subject_procedures)
+
+        mock_json_error.side_effect = Mock(side_effect=KeyError)
+
+        response = Responses.combine_procedure_responses(
+            lb_response=response1, sp_response=response2
+        )
+        expected_response = Responses.internal_server_error_response()
+        mock_log.assert_called_once_with("KeyError()")
+        self.assertEqual(500, expected_response.status_code)
+        self.assertEqual(response.body, expected_response.body)
 
 
 if __name__ == "__main__":
