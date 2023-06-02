@@ -1656,8 +1656,10 @@ class MappedNSBList:
 
     @property
     def has_unknown_procedures(self) -> bool:
-        """Return true if no known procedures are found in nsb model"""
-        if self._nsb.procedure is None:
+        """Return true if no known procedures are found but data is found"""
+        if self._nsb.procedure is None and self.aind_date_of_surgery is None:
+            return False
+        elif self._nsb.procedure is None:
             return True
         else:
             return not (
