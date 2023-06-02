@@ -112,7 +112,7 @@
       "recovery_time_unit": "minute",
       "injection_duration": null,
       "injection_duration_unit": "minute",
-      "workstation_id": null,
+      "workstation_id": "SWS 4",
       "instrument_id": null,
       "injection_coordinate_ml": null,
       "injection_coordinate_ap": null,
