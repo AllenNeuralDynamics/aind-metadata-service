@@ -2629,7 +2629,7 @@ class MappedNSBList:
                 procedures.append(fiber_implant_proc)
 
         # Create generic procedure model if no specific procedures found
-        if len(procedures) == 0:
+        if len(procedures) == 0 and self.aind_date_of_surgery:
             subject_procedure = SubjectProcedure.construct(
                 start_date=self.aind_date_of_surgery,
                 end_date=self.aind_date_of_surgery,
