@@ -2270,6 +2270,7 @@ class MappedNSBList:
                 instrument_id = self.aind_ionto_number_inj2
             else:
                 instrument_id = None
+            # backend fields titled "1st injection" correlate with followup procedures
             return SurgeryDuringInfo(
                 anaesthetic_duration_in_minutes=(
                     self.aind_first_injection_iso_durat
@@ -2289,6 +2290,7 @@ class MappedNSBList:
                 instrument_id = self.aind_ionto_number_inj1
             else:
                 instrument_id = None
+            # backend fields titled "HP" correlate with initial procedures
             return SurgeryDuringInfo(
                 anaesthetic_duration_in_minutes=self.aind_iso_on,
                 anaesthetic_level=self.aind_hp_iso_level,
