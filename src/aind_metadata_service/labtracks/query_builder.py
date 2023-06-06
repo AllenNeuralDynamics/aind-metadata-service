@@ -29,6 +29,8 @@ class TaskSetQueryColumns(Enum):
     TASK_OBJECT = "task_object"
     TYPE_NAME = "type_name"
     PROTOCOL_NUMBER = "protocol_number"
+    TASK_COMMENT = "task_comment"
+    TASK_DESCRIPTION = "task_description"
 
 
 class LabTracksQueries:
@@ -62,7 +64,9 @@ class LabTracksQueries:
             f"    {TaskSetQueryColumns.INVESTIGATOR_ID.value},"
             f"    TSO.TASK_OBJECT AS {TaskSetQueryColumns.TASK_OBJECT.value},"
             f"    AP.PROTOCOL_NUMBER AS "
-            f"    {TaskSetQueryColumns.PROTOCOL_NUMBER.value}"
+            f"    {TaskSetQueryColumns.PROTOCOL_NUMBER.value},"
+            f"    TS.TASK_COMMENT AS {TaskSetQueryColumns.TASK_COMMENT.value},"
+            f"    TS.TASK_DESCRIPTION AS {TaskSetQueryColumns.TASK_DESCRIPTION.value}"
             "  FROM TASK_SET TS"
             "    INNER JOIN TASK_SET_OBJECT TSO "
             "    ON TS.ID = TSO.TASK_ID"

@@ -1,5 +1,6 @@
 """Module to create clients to connect to databases."""
 import logging
+import re
 from enum import Enum
 from typing import List, Optional
 from xml.etree import ElementTree as ET
@@ -10,6 +11,7 @@ from aind_data_schema.procedures import (
     Perfusion,
     RetroOrbitalInjection,
     SubjectProcedure,
+    InjectionMaterial,
 )
 from aind_data_schema.subject import BackgroundStrain, Sex, Species
 from fastapi.responses import JSONResponse
@@ -354,6 +356,26 @@ class LabTracksResponseHandler:
         return subjects
 
     @staticmethod
+    def _map_to_injection_material(task_comment: Optional[str]) -> Optional[List[InjectionMaterial]]:
+        """
+        Maps a task comment to aind_data_schema.InjectionMaterial
+        """
+        injection_materials = []
+        regex_pattern = r'(\w+)\t(\w+)\t(\d+\.?\d*E[+\-]\d+)'
+        matches = re.findall(regex_pattern, task_comment)
+        for match in matches:
+            prep_lot_number = match[0]
+            plasmid_name = match[1]  # plasmid construct number
+            genome_copy = match[2]
+            injection_material = InjectionMaterial.construct(
+                prep_lot_number=prep_lot_number,
+                plasmid_name=plasmid_name,
+                genome_copy=genome_copy
+            )
+            injection_materials.append(injection_material)
+        return injection_materials
+
+    @staticmethod
     def map_response_to_procedures(
         results: List[dict],
     ) -> List[SubjectProcedure]:
@@ -385,6 +407,8 @@ class LabTracksResponseHandler:
                 TaskSetQueryColumns.PROTOCOL_NUMBER.value
             )
             type_name = result.get(TaskSetQueryColumns.TYPE_NAME.value)
+            task_description = result.get(TaskSetQueryColumns.TASK_DESCRIPTION.value)
+            task_comment = result.get(TaskSetQueryColumns.TASK_COMMENT.value)
             if type_name:
                 if LabTracksProcedures.PERFUSION.value in type_name:
                     output_specimen_ids = [
@@ -401,6 +425,8 @@ class LabTracksResponseHandler:
 
                 elif LabTracksProcedures.RO_INJECTION.value in type_name:
                     # TODO: parse inj info from comments
+                    if type_name == "RO Injection VGT":
+                        injection_volume = 90
                     ro_injection = RetroOrbitalInjection.construct(
                         start_date=start_date,
                         end_date=end_date,
