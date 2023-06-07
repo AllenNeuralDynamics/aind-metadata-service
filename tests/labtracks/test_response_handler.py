@@ -4,7 +4,7 @@ import unittest
 from decimal import Decimal
 
 from aind_data_schema import Procedures, Subject
-from aind_data_schema.procedures import Perfusion, RetroOrbitalInjection
+from aind_data_schema.procedures import Perfusion, RetroOrbitalInjection, InjectionMaterial
 from aind_data_schema.subject import BackgroundStrain, Sex, Species
 
 from aind_metadata_service.labtracks.client import (
@@ -99,6 +99,18 @@ class TestResponseExamples:
             "investigator_id": Decimal(28803),
             "task_object": Decimal(115977),
             "protocol_number": Decimal(2002),
+            "task_comment": "(’11/11/22. P30 +/-3.\r\n656798\tVT3027C\tCN3589\t5.00E+11\r\n656799\tVT3028C\tCN3590\t5.00E+11\r\n656800\tVT3029C\tCN3591\t5.00E+11\r\n656801\tCP328\tCN2360\t5.00E+11\r\n')",
+        },
+        {
+            "id": Decimal(10000),
+            "task_type_id": Decimal(23),
+            "type_name": "RO Injection",
+            "date_start": datetime.datetime(2022, 5, 11, 0, 0),
+            "date_end": datetime.datetime(2022, 5, 12, 0, 0),
+            "investigator_id": Decimal(28803),
+            "task_object": Decimal(115977),
+            "protocol_number": Decimal(2002),
+            "task_comment": "('5/30/23. Substance can be found in LAS blue bin in Vivarium -80 freezer(1st shelf). Requester said YES to keep substance on ice (warm to room temp prior to dose), YES to spin down before injection, and YES to discarding remaining substance after dose. \r\n\r\n680228 Behind Either 90ul of VT5444C/CN3600 at 5.00E+11GC (delivered 04/25/23) /\r\n678011 Behind Either 90ul of VT5449C/CN2039 at 5.00E+11GC (delivered 05/26/23) /\r\n678014 Behind Either 90ul of VT5447C/CN2040 at 5.00E+11GC (delivered 05/26/23) /\r\n\r\nEnter RO Injections in LIMS as New Stereotaxic Injections. PID MouseGeneticToolsProjectionMapping',)",
         },
     ]
 
@@ -120,6 +132,42 @@ class TestResponseExamples:
             end_date=datetime.date(2022, 5, 12),
             experimenter_full_name=Decimal("28803"),
             iacuc_protocol=Decimal("2002"),
+            injection_materials=[
+                InjectionMaterial(
+                    plasmid_name='CN3589',
+                    genome_copy='5.00E+11',
+                    prep_lot_number='VT3027C',
+                ),
+                InjectionMaterial(
+                    plasmid_name='CN3590',
+                    genome_copy='5.00E+11',
+                    prep_lot_number='VT3028C',
+                ),
+                InjectionMaterial(
+                    plasmid_name='CN3591',
+                    genome_copy='5.00E+11',
+                    prep_lot_number='VT3029C',
+                ),
+                InjectionMaterial(
+                    plasmid_name='CN2360',
+                    genome_copy='5.00E+11',
+                    prep_lot_number='CP328',
+                )
+            ],
+            injection_volume=90.0,
+            animal_weight_prior=None,
+            animal_weight_post=None,
+            anaesthesia=None,
+            notes=None,
+            procedure_type="Retro-orbital injection",
+        ),
+        RetroOrbitalInjection.construct(
+            start_date=datetime.date(2022, 5, 11),
+            end_date=datetime.date(2022, 5, 12),
+            experimenter_full_name=Decimal("28803"),
+            iacuc_protocol=Decimal("2002"),
+            injection_materials=[],
+            injection_volume=None,
             animal_weight_prior=None,
             animal_weight_post=None,
             anaesthesia=None,

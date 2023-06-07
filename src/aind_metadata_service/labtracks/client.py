@@ -190,6 +190,7 @@ class LabTracksProcedures(Enum):
 
     PERFUSION = "Perfusion"
     RO_INJECTION = "RO Injection"
+    RO_INJECTION_VGT = "RO Injection VGT"
 
 
 class LabTracksResponseHandler:
@@ -356,28 +357,36 @@ class LabTracksResponseHandler:
         return subjects
 
     @staticmethod
-    def _map_to_injection_material(task_comment: Optional[str]) -> Optional[List[InjectionMaterial]]:
+    def _map_to_injection_materials(task_comment: Optional[str]) -> Optional[List[InjectionMaterial]]:
         """
-        Maps a task comment to aind_data_schema.InjectionMaterial
+        Maps a task comment to list of aind_data_schema.InjectionMaterial
+        if task comment follows parseable pattern.
+        Parameters
+        ----------
+        task_comment : Optional[str]
+
+        Returns
+        -------
+        Optional[List[InjectionMaterial]]
         """
         injection_materials = []
-        regex_pattern = r'(\w+)\t(\w+)\t(\d+\.?\d*E[+\-]\d+)'
-        matches = re.findall(regex_pattern, task_comment)
-        for match in matches:
-            prep_lot_number = match[0]
-            plasmid_name = match[1]  # plasmid construct number
-            genome_copy = match[2]
-            injection_material = InjectionMaterial.construct(
-                prep_lot_number=prep_lot_number,
-                plasmid_name=plasmid_name,
-                genome_copy=genome_copy
-            )
-            injection_materials.append(injection_material)
+        if task_comment:
+            regex_pattern = r'(\w+)\t(\w+)\t(\d+\.?\d*E[+\-]\d+)'
+            matches = re.findall(regex_pattern, task_comment)
+            for match in matches:
+                prep_lot_number = match[0]
+                plasmid_name = match[1]  # plasmid construct number
+                genome_copy = match[2]
+                injection_material = InjectionMaterial.construct(
+                    prep_lot_number=prep_lot_number,
+                    plasmid_name=plasmid_name,
+                    genome_copy=genome_copy
+                )
+                injection_materials.append(injection_material)
         return injection_materials
 
-    @staticmethod
     def map_response_to_procedures(
-        results: List[dict],
+        self, results: List[dict],
     ) -> List[SubjectProcedure]:
         """
         Maps a response from LabTracks to an aind_data_schema.Procedure
@@ -407,7 +416,6 @@ class LabTracksResponseHandler:
                 TaskSetQueryColumns.PROTOCOL_NUMBER.value
             )
             type_name = result.get(TaskSetQueryColumns.TYPE_NAME.value)
-            task_description = result.get(TaskSetQueryColumns.TASK_DESCRIPTION.value)
             task_comment = result.get(TaskSetQueryColumns.TASK_COMMENT.value)
             if type_name:
                 if LabTracksProcedures.PERFUSION.value in type_name:
@@ -424,14 +432,19 @@ class LabTracksResponseHandler:
                     procedures_list.append(perfusion)
 
                 elif LabTracksProcedures.RO_INJECTION.value in type_name:
-                    # TODO: parse inj info from comments
-                    if type_name == "RO Injection VGT":
-                        injection_volume = 90
+                    injection_materials = self._map_to_injection_materials(task_comment)
+                    if type_name == LabTracksProcedures.RO_INJECTION_VGT.value:
+                        # assumed value based on standardized Task Description
+                        injection_volume = 90.0
+                    else:
+                        injection_volume = None
                     ro_injection = RetroOrbitalInjection.construct(
                         start_date=start_date,
                         end_date=end_date,
                         experimenter_full_name=experimenter_full_name,
                         iacuc_protocol=iacuc_protocol,
+                        injection_materials=injection_materials,
+                        injection_volume=injection_volume,
                     )
                     procedures_list.append(ro_injection)
         return procedures_list
