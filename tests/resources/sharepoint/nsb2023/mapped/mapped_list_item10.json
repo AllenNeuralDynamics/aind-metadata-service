@@ -28,7 +28,7 @@
       "implant_part_number": null,
       "dura_removed": null,
       "protective_material": null,
-      "workstation_id": null,
+      "workstation_id": "SWS 4",
       "recovery_time": 25.0,
       "recovery_time_unit": "minute"
    }

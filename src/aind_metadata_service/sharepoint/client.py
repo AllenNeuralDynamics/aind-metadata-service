@@ -1,13 +1,19 @@
 """Module to create client to connect to sharepoint database"""
 
+import logging
+
 from aind_data_schema.procedures import Procedures
 from fastapi.responses import JSONResponse
 from office365.runtime.auth.client_credential import ClientCredential
 from office365.sharepoint.client_context import ClientContext
 
 from aind_metadata_service.response_handler import Responses
-from aind_metadata_service.sharepoint.nsb2019.procedures import NSB2019Mapping
-from aind_metadata_service.sharepoint.nsb2023.mapping import NSB2023Mapping
+from aind_metadata_service.sharepoint.nsb2019.procedures import (
+    NSB2019Procedures,
+)
+from aind_metadata_service.sharepoint.nsb2023.procedures import (
+    NSB2023Procedures,
+)
 
 
 class SharePointClient:
@@ -59,27 +65,30 @@ class SharePointClient:
           A response
 
         """
-        # TODO: Add try to handle internal server error response.
-        subject_procedures = []
-        nsb_ctx = self.nsb_client_context
-        nsb_2019_mapper = NSB2019Mapping()
-        nsb_2023_mapper = NSB2023Mapping()
-        procedures2019 = nsb_2019_mapper.get_procedures_from_sharepoint(
-            subject_id=subject_id,
-            client_context=nsb_ctx,
-            list_title=self.nsb_list_title_2019,
-        )
-        procedures2023 = nsb_2023_mapper.get_procedures_from_sharepoint(
-            subject_id=subject_id,
-            client_context=nsb_ctx,
-            list_title=self.nsb_list_title_2023,
-        )
-        subject_procedures.extend(procedures2019)
-        subject_procedures.extend(procedures2023)
-        response = self._handle_response_from_sharepoint(
-            subject_id=subject_id, subject_procedures=subject_procedures
-        )
-        return response
+        try:
+            subject_procedures = []
+            nsb_ctx = self.nsb_client_context
+            nsb_2019_mapper = NSB2019Procedures()
+            nsb_2023_mapper = NSB2023Procedures()
+            procedures2019 = nsb_2019_mapper.get_procedures_from_sharepoint(
+                subject_id=subject_id,
+                client_context=nsb_ctx,
+                list_title=self.nsb_list_title_2019,
+            )
+            procedures2023 = nsb_2023_mapper.get_procedures_from_sharepoint(
+                subject_id=subject_id,
+                client_context=nsb_ctx,
+                list_title=self.nsb_list_title_2023,
+            )
+            subject_procedures.extend(procedures2019)
+            subject_procedures.extend(procedures2023)
+            response = self._handle_response_from_sharepoint(
+                subject_id=subject_id, subject_procedures=subject_procedures
+            )
+            return response
+        except Exception as e:
+            logging.error(repr(e))
+            return Responses.internal_server_error_response()
 
     @staticmethod
     def _handle_response_from_sharepoint(
