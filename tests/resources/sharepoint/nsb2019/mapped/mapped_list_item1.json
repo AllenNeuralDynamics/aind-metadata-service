@@ -163,6 +163,6 @@
       "procedure_type": "Iontophoresis injection",
       "injection_current": null,
       "injection_current_unit": "microamps",
-      "alternating_current": null
+      "alternating_current": 7.0
    }
 ]

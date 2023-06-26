@@ -63,7 +63,7 @@ class MappedNSBList:
     ISO_DUR_REGEX2 = re.compile(r"^(\d+):(\d+)$")
     ML_REGEX = re.compile(r"^\s*([-+]?\d*\.?\d+)(?:\s*(?:mm)?\s*)$")
     ALT_TIME_REGEX = re.compile(
-        r"^\s*(\d*\.?\d+)\s*(?:s|sec|second|seconds)+\s*$"
+        r"^\s*(7)(?:.0|/7)?\s*(?:s|sec|secs|second|seconds)?\s*$"
     )
     INJ_ANGLE_REGEX = re.compile(
         r"^\s*([-+]?\d*\.?\d+)\s*(?:deg|degree|degrees)*\s*$"
