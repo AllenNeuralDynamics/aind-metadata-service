@@ -1,0 +1,617 @@
+{
+   "AP2ndInj": {
+      "unique_entries": {
+         "-4.72, rostral to lambda": null,
+         "-1.06": -1.06,
+         "0.26": 0.26,
+         "null": null,
+         "-4": -4.0,
+         "1": 1.0,
+         "+1.8": 1.8,
+         "3.08 Anterior!": null,
+         "-6": -6.0,
+         "3.08 ANT": null,
+         "-3.8mm": -3.8,
+         "-3.8 mm": -3.8,
+         ".98": 0.98,
+         "calamus -0.44": null,
+         "calamus 0": null,
+         "calamus 0.2": null,
+         "0 (calamus)": null,
+         "calamus -0.16": null,
+         "0.2 (calamus)": null,
+         "-2.3mm": -2.3,
+         "2.4(TS)": null,
+         "1.5 (TS)": null,
+         "-6.24mm": -6.24,
+         "posterior half of the craniotomy": null
+      }
+   },
+   "DV2ndInj": {
+      "unique_entries": {
+         "2.2, 2.60": null,
+         "3.38": 3.38,
+         "null": null,
+         "0.3, 0.6": null,
+         "1": 1.0,
+         "0.3 and 0.6": null,
+         ".8": 0.8,
+         "3": 3.0,
+         "0.35, 0.75": null,
+         "0.25, 0.75": null,
+         "2.64": 2.64,
+         ".6 and .3": null,
+         ".3": 0.3,
+         "0.6mm": 0.6,
+         "0.6 mm": 0.6,
+         ".": null,
+         "-2.95; -2.75": null,
+         "-3.0 / -1.5": null,
+         "+3.6": 3.6,
+         "-4.05;- 4.0": null,
+         "-0.5": -0.5,
+         "-4.05; -4.00": null,
+         "4.7": 4.7,
+         "-2.45; -2.40": null,
+         "4.4mm": 4.4,
+         "+2.6, +2.8, +3.0": null,
+         "3.0, 2.8, 2.6": null,
+         "300 microns from pia": null
+      }
+   },
+   "FiberImplant1DV": {
+      "unique_entries": {
+         "null": null,
+         "2.4": 2.4,
+         "-4.0": -4.0,
+         "see comments": null,
+         "See comments": null,
+         "+2.8": 2.8
+      }
+   },
+   "FiberImplant2DV": {
+      "unique_entries": {
+         "null": null,
+         "2.4": 2.4,
+         "-4.0": -4.0,
+         "see comments": null,
+         "See comments": null,
+         "+2.8": 2.8
+      }
+   },
+   "FirstInjectionIsoDuration": {
+      "unique_entries": {
+         "1": 60.0,
+         "1.0": 60.0,
+         ".75": 45.0,
+         "2": 120.0,
+         "0.75": 45.0,
+         "null": null,
+         "1:45": 105.0,
+         "2.40": 144.0,
+         ".7": 42.0,
+         "0:45": 45.0,
+         "0:30": 30.0,
+         "45": null,
+         "40": null,
+         "30": null,
+         "15": null,
+         "4.25": 255.0,
+         "11.5": null,
+         "Na": null,
+         "2 hours": 120.0,
+         "2.5 hour ": 150.0
+      }
+   },
+   "FirstInjectionWeightAfter": {
+      "unique_entries": {
+         "19.2": 19.2,
+         "null": null,
+         "23": 23.0
+      }
+   },
+   "FirstInjectionWeightBefor": {
+      "unique_entries": {
+         "19.1": 19.1,
+         "null": null,
+         "23": 23.0
+      }
+   },
+   "HP_x0020_A_x002f_P": {
+      "unique_entries": {
+         "null": null,
+         "1.3": 1.3,
+         "Same as CAM": null,
+         "1.3mm Anterior": null,
+         "1.3mm (anterior)": null,
+         "1.3mm (Anterior)": null,
+         "+1.3mm (anterior)": null,
+         "~1.3": null,
+         "+1.9": 1.9,
+         "NA": null
+      }
+   },
+   "HP_x0020_M_x002f_L": {
+      "unique_entries": {
+         "null": null,
+         "2.8": 2.8,
+         "Same as CAM": null,
+         "-2.7mm (Left)": null,
+         "-2.7mm (left)": null,
+         "~3.8": null,
+         "2.8/": null,
+         "~3.7 or 3.8": null,
+         "~3.7-3.8": null,
+         "3.7-3.8": null,
+         ".222x -.221 y": null,
+         "x =.352": null,
+         ".3x from lambda": null,
+         "5.137 (2.5mm from bregma)": null,
+         "5.191, 2000": null,
+         "-1.6": -1.6,
+         "standard visual cortes": null,
+         "+1.8, -1.8": null,
+         "NA": null
+      }
+   },
+   "Inj1AlternatingTime": {
+      "unique_entries": {
+         "7/7": 7.0,
+         "null": null,
+         "30sec": null,
+         "30s": null,
+         "7": 7.0,
+         "7 seconds": 7.0,
+         "0.3, 0.6": null,
+         "7 s": 7.0,
+         "7 sec": 7.0,
+         "standard": null,
+         "5min": null,
+         "7min": null,
+         "N/A": null
+      }
+   },
+   "Inj1Angle_v2": {
+      "unique_entries": {
+         "null": null,
+         "0": 0.0,
+         "0 degree": 0.0,
+         "-10 ": -10.0,
+         "-10": -10.0,
+         "12": 12.0,
+         "0 and 30": null,
+         "normal": null,
+         "10 degree lateral": null,
+         "N/A": null
+      }
+   },
+   "Inj1Current": {
+      "unique_entries": {
+         "5uA": 5.0,
+         "null": null,
+         "5min": null,
+         "3uAmp": 3.0,
+         "3 uA": 3.0,
+         "5ua": 5.0,
+         "N/A": null
+      }
+   },
+   "Inj1LenghtofTime": {
+      "unique_entries": {
+         "5min": 5.0,
+         "null": null,
+         "1 min": 1.0,
+         "5uA": null,
+         "10-20mins": null,
+         "5": null,
+         "10 minutes": 10.0,
+         "2 min": 2.0,
+         "5 mins": 5.0,
+         "10-20mins ": null,
+         "1min": 1.0,
+         "3min10sec": null,
+         "10  min": 10.0,
+         "10-20min": null,
+         "5min ": 5.0,
+         "2.5min": 2.5,
+         "10-20 min": null,
+         "5m": 5.0,
+         "30 sec": null,
+         "30sec per press": null,
+         "30 sec per press": null,
+         "30 s": null,
+         "min": null,
+         "30s": null,
+         "5min wait": null,
+         "1minute": 1.0,
+         "7min": 7.0,
+         "slow": null,
+         "3 minutes": 3.0,
+         "1 minute": 1.0,
+         "N/A": null
+      }
+   },
+   "Inj1Vol": {
+      "unique_entries": {
+         "null": null,
+         "20": null,
+         "200 nL": 200.0,
+         "300": null,
+         "500nL": 500.0,
+         "500 nl": 500.0,
+         "4.6 nl": 4.6,
+         "46 nl": 46,
+         "46": null,
+         "4.6": null,
+         "200 nl": 200.0,
+         "1000": null,
+         "500nl": 500.0,
+         "92": null,
+         "50nl": 50.0,
+         "50.6nl": 50.6,
+         "50n6nl": null,
+         "1uL (1000nl)": null,
+         "2 ul": null,
+         "2ul": null,
+         "2ul ": null,
+         "2uL": null,
+         "1.25 ul": null,
+         "1.25ul": null
+      }
+   },
+   "Inj2AlternatingTime": {
+      "unique_entries": {
+         "null": null,
+         "Select...": null,
+         "7 s": 7.0,
+         "7s": 7.0,
+         "7 sec": 7.0,
+         "5min": null,
+         "N/A": null
+      }
+   },
+   "Inj2Angle_v2": {
+      "unique_entries": {
+         "null": null,
+         "0": 0.0,
+         "0 degree": 0.0,
+         "10 degree lateral": null,
+         "N/A": null
+      }
+   },
+   "Inj2Current": {
+      "unique_entries": {
+         "null": null,
+         "Select...": null,
+         "5 uA": 5.0,
+         "5uA": 5.0,
+         "N/A": null
+      }
+   },
+   "Inj2LenghtofTime": {
+      "unique_entries": {
+         "3min10sec/depth": null,
+         "null": null,
+         "3min10sec": null,
+         "3min10sec/location": null,
+         "5": null,
+         "5 min": 5.0,
+         "2min": 2.0,
+         "5min": 5.0,
+         "30 sec": null,
+         "30sec per press": null,
+         "30 sec per press": null,
+         "30 s": null,
+         "30s": null,
+         "5min wait": null,
+         "min": null,
+         "slow": null,
+         "N/A": null,
+         "2 minutes": 2.0
+      }
+   },
+   "Inj2Vol": {
+      "unique_entries": {
+         "1000nl": 1000.0,
+         "null": null,
+         "200": null,
+         "200 nl": 200.0,
+         "500nL": 500.0,
+         "200 nL": 200.0,
+         "100nL": 100.0,
+         "101.2": null,
+         "500nl each side": null,
+         "600 nL": 600.0
+      }
+   },
+   "ML2ndInj": {
+      "unique_entries": {
+         "3.4": 3.4,
+         "3.88; 3.38": null,
+         "0.42": 0.42,
+         "null": null,
+         "Select...": null,
+         "4": 4.0,
+         "-3.6": -3.6,
+         ".35": 0.35,
+         "2.7mm": 2.7,
+         "2.7 mm": 2.7,
+         "0.06; 0.33": null,
+         "0": 0.0,
+         "-1": -1.0,
+         "-3.85 (left)": null,
+         "-3.85 left": null,
+         "-3.85 (left0": null,
+         "-3(left)": null,
+         "+0.4": 0.4,
+         "-3 (left)": null,
+         ".7": 0.7,
+         "0.05; 0.35": null,
+         "+/-3.6": null,
+         "0.85mm": 0.85,
+         "anywhere, far away from big vessels": null
+      }
+   },
+   "SecondInjectionIsoDuration": {
+      "unique_entries": {
+         "1": 60.0,
+         "1.5": 90.0,
+         "null": null,
+         ".75": 45.0,
+         "0:45": 45.0,
+         "045": null,
+         "1.1": 66.0,
+         "30": null,
+         "0.9": 54.0,
+         "10:00": null
+      }
+   },
+   "SecondInjectionWeightAfter": {
+      "unique_entries": {
+         "19.6": 19.6,
+         "null": null,
+         "24": 24.0
+      }
+   },
+   "SecondInjectionWeightBefore": {
+      "unique_entries": {
+         "19.6": 19.6,
+         "null": null,
+         "24": 24.0,
+         "0.0": 0.0
+      }
+   },
+   "Touch_x0020_Up_x0020_Weight_x002": {
+      "unique_entries": {
+         "null": null
+      }
+   },
+   "Virus_x0020_A_x002f_P": {
+      "unique_entries": {
+         "-4.72, rostral to lambda": null,
+         "-1.06": -1.06,
+         "null": null,
+         "-2.3 mm": -2.3,
+         "3.16": 3.16,
+         "-3.5mm (Posterior)": null,
+         "1.5A": null,
+         "1.5 A": null,
+         "-3.8mm (posterior)": null,
+         "-3.8 (post)": null,
+         "3.8mm P": null,
+         "-0.8 (from lamda)": null,
+         "-4.7 (post)": null,
+         "-2.3mm": -2.3,
+         "-2.7mm (Left)": null,
+         "-4": -4.0,
+         "-3.5 mm (Posterior)": null,
+         "-3.5 (posterior)": null,
+         "ISI": null,
+         "+1.8": 1.8,
+         "3.08 Anterior!": null,
+         "up to trainer": null,
+         "3.08 ANT": null,
+         ".58": 0.58,
+         "-3.7 mm": -3.7,
+         "calamus -0.44": null,
+         "calamus -.24": null,
+         "calamus 0": null,
+         "calamus 0.2": null,
+         "0 (calamus)": null,
+         "+2": 2.0,
+         "+2.5": 2.5,
+         "0.2 (calamus)": null,
+         "1.0 (TS)": null,
+         "-1.6mm": -1.6,
+         "1.5 (TS)": null,
+         "2.59(TS)": null,
+         "1.5mm ": 1.5,
+         "1.5mm": 1.5,
+         "- 0.58": null,
+         "+1.78": 1.78,
+         "3 spots around craniotomy center": null,
+         "3 spots around the craniotomy": null,
+         "3x3 grid with 600 micron spacing": null,
+         "3x3 grid": null,
+         "anterior half of the craniotomy": null
+      }
+   },
+   "Virus_x0020_D_x002f_V": {
+      "unique_entries": {
+         "2.2, 2.60": null,
+         "3.38": 3.38,
+         "null": null,
+         "2.6 mm": 2.6,
+         "0.4, 0.2": null,
+         "0.3 and 0.6": null,
+         "0.3, 0.6": null,
+         "0.4mm": 0.4,
+         "0.5V": null,
+         "0.5 V": null,
+         "0.3, 0.6 mm": null,
+         "0.4 & 0.2": null,
+         "0.3 and 0.6mm": null,
+         "1": 1.0,
+         "0.3,0.6": null,
+         "0.3mm and 0.6mm": null,
+         "-3.6 & -3.1": null,
+         ".8": 0.8,
+         "0.3 mm": 0.3,
+         ".4 and .2": null,
+         ".3": 0.3,
+         "5": 5.0,
+         "2.7, 2.9": null,
+         "[0.3, 0.6]": null,
+         "up to trainer": null,
+         "0.8,1.25": null,
+         "-1.25": -1.25,
+         "2.25,3": null,
+         "[0.3,0.6]": null,
+         ".3 and ,6": null,
+         "400um, 800jm": null,
+         "-2.95; -2.75": null,
+         "0.6/0.3": null,
+         "-3.0 / -1.5": null,
+         "+2.1": 2.1,
+         "0.8mm ": 0.8,
+         "0.8mm": 0.8,
+         "-3.10; -3.05": null,
+         "-3/2": null,
+         "400 microns": null,
+         "400 microns deep": null,
+         "+2.6, +2.8, +3.0": null,
+         "3.0, 2.8, 2.6": null,
+         "300 microns from pia": null
+      }
+   },
+   "Virus_x0020_M_x002f_L": {
+      "unique_entries": {
+         "3.4": 3.4,
+         "3.88; 3.38": null,
+         "null": null,
+         "-2.3 mm": -2.3,
+         "-0.6": -0.6,
+         "4": 4.0,
+         "-2.7mm (Left)": null,
+         "1.25L": null,
+         "1.25 L": null,
+         "-2.7mm (left)": null,
+         "-2.6 (left)": null,
+         "3.05mm L": null,
+         "0.5": 0.5,
+         "-0.8 (from lamda)": null,
+         "0 (midline)": null,
+         "-2.3": -2.3,
+         "2.2mm": 2.2,
+         "-3.5mm (Posterior)": null,
+         "1.25": 1.25,
+         "3": 3.0,
+         "-2.6 mm": -2.6,
+         "3'": null,
+         "ISI": null,
+         ".35": 0.35,
+         "up to trainer": null,
+         "2.7 mm": 2.7,
+         "0.06; 0.33": null,
+         "+2.6L": null,
+         "+2.6": 2.6,
+         "0": 0.0,
+         "-2.3mm": -2.3,
+         "-3.85 (left)": null,
+         "1.6mm": 1.6,
+         "-3.85 left": null,
+         "-3.85 (left0": null,
+         "-3(left)": null,
+         "-2.75 (left)": null,
+         "-4": -4.0,
+         "-2.5 (left)": null,
+         "-3 (left)": null,
+         "-2.55 (left)": null,
+         "-2.7 (left)": null,
+         "+0.35": 0.35,
+         "2.40; 2.80": null,
+         ".7": 0.7,
+         "-1.7mm ": -1.7,
+         "-1.7mm": -1.7,
+         "-.27": -0.27,
+         "0.05; 0.35": null,
+         "3 spots around craniotomy center": null,
+         "3 spots around the craniotomy": null,
+         "+/-3.6": null,
+         "3x3 grid with 600 micron spacing": null,
+         "4.0, 3.57": null,
+         "+2.9": 2.9,
+         "3x3 grid": null,
+         "0.25; 0.50": null,
+         "-0.4mm": -0.4,
+         "anywhere, far away from big vessels": null
+      }
+   },
+   "Weight_x0020_after_x0020_Surgery": {
+      "unique_entries": {
+         "null": null,
+         "33.3": 33.3,
+         "26": 26.0,
+         "N/A": null,
+         "-": null,
+         "2209": null,
+         "29.7/NA": null,
+         "21.5/21.7": null,
+         "32/32.4": null,
+         "35": 35.0,
+         "1.5": 1.5,
+         "15.1": 15.1
+      }
+   },
+   "Weight_x0020_before_x0020_Surger": {
+      "unique_entries": {
+         "null": null,
+         "30.6": 30.6,
+         "18": 18.0,
+         "20/0": null,
+         "22.2": 22.2,
+         "30.": 30.0,
+         "1537": null,
+         "20.5g": null,
+         "27.4/29": null,
+         "18/.2": null
+      }
+   },
+   "inj1volperdepth": {
+      "unique_entries": {
+         "null": null,
+         "20": null,
+         "500nL": 500.0,
+         "100 nL": 100.0,
+         "150 nl": 150.0,
+         "2.3 nl": 2.3,
+         "46 nl": 46.0,
+         "2": null,
+         "150nL": 150.0,
+         "150uL": null,
+         "150nl": 150.0,
+         "400": null,
+         "200 nL": 200.0,
+         "2000": null,
+         "2000nl": 2000.0,
+         "3min10sec": null,
+         "50.6nl": 50.6,
+         "N/A": null
+      }
+   },
+   "inj2volperdepth": {
+      "unique_entries": {
+         "500nl": 500.0,
+         "null": null,
+         "200 nl": 200.0,
+         "250nl": 250.0,
+         "500nl/location": null,
+         "23": null,
+         "0": null,
+         "250": null,
+         "101.2": null,
+         "200 nL": 200.0,
+         "N/A": null
+      }
+   }
+}
