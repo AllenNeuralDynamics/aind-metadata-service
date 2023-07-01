@@ -17,10 +17,10 @@
    },
    "Age_x0020_at_x0020_Injection": {
       "unique_entries": {
-         "44929.0000000000": null,
+         "44929.0000000000": 44929.0,
          "57.0000000000000": 57.0,
          "0": 0.0,
-         "44932.0000000000": null,
+         "44932.0000000000": 44932.0,
          "error;#1280": null
       }
    },
@@ -201,7 +201,7 @@
       "unique_entries": {
          "null": null,
          "7s on/7s off": 7.0,
-         "2": 2.0
+         "2": null
       }
    },
    "Inj2Angle_v2": {
@@ -217,9 +217,9 @@
    "Inj2Current": {
       "unique_entries": {
          "null": null,
-         "-5 uA": -5.0,
+         "-5 uA": null,
          "5uA": 5.0,
-         "2": null
+         "2": 2.0
       }
    },
    "Inj2IontoTime": {
@@ -313,7 +313,7 @@
          "59nl": null,
          "+0.5mm": 0.5,
          "0": 0.0,
-         "+2.2mm": 32.2,
+         "+2.2mm": 2.2,
          "around CW center": null,
          "Anterior part of the craniotomy": null,
          "-5.4\t": null,
@@ -378,7 +378,7 @@
    "inj1volperdepth": {
       "unique_entries": {
          "null": null,
-         "100": 100.0,
+         "100": null,
          "200nl": 200.0,
          "500 nL": 500.0,
          "25 nL": 25.0,
@@ -387,7 +387,7 @@
          "101.2nl": 101.2,
          "200nl/depth": null,
          "250 nL per site x 2 sites, 100 nL /min": null,
-         "0": 0.0,
+         "0": null,
          "200n": null,
          "250nl per site x 2 sites, 100nl/min": null,
          "500 nL ": 500.0,
@@ -397,12 +397,12 @@
    "inj2volperdepth": {
       "unique_entries": {
          "null": null,
-         "100": 100.0,
+         "100": null,
          "50nl": 50.0,
          "100 nl": 100.0,
          "200 nL": 200.0,
          "101.2nl": 101.2,
-         "0": 0.0,
+         "0": null,
          "100l": null,
          "None": null,
          "500nL": 500.0,
