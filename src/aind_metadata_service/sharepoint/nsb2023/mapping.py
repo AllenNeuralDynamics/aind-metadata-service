@@ -174,7 +174,7 @@ class MappedNSBList:
     INJ_ANGLE_REGEX = re.compile(
         r"^ *([-+]?\d*\.?\d+) *(?:deg|degree|degrees)* *$"
     )
-    CURRENT_REGEX = re.compile(r"^ *(\d*\.?\d+) *(?:ua|uA|uAmp)* *$")
+    CURRENT_REGEX = re.compile(r"^ *([-+]?\d*\.?\d+) *(?:ua|uA|uAmp)* *$")
     LENGTH_OF_TIME_REGEX = re.compile(
         r"^ *(\d*\.?\d+) *(?:m|min|mins|minute|minutes)+ *$"
     )

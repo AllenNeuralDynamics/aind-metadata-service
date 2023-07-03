@@ -217,7 +217,7 @@
    "Inj2Current": {
       "unique_entries": {
          "null": null,
-         "-5 uA": null,
+         "-5 uA": -5.0,
          "5uA": 5.0,
          "2": 2.0
       }
