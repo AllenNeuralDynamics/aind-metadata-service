@@ -43,6 +43,7 @@ class AindMetadataServiceClient:
           id of the subject
         pickle: bool
           option to return pickled data instead of json
+          TODO: Will be handled in future versions
 
         Returns
         -------
@@ -64,6 +65,7 @@ class AindMetadataServiceClient:
           id of the subject
         pickle: bool
           option to return pickled data instead of json
+          TODO: Will be handled in future versions
 
         Returns
         -------
