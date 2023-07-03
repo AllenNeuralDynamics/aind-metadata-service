@@ -39,7 +39,7 @@ nsb_sharepoint_password = os.getenv("NSB_SHAREPOINT_PASSWORD")
 
 
 @app.get("/subject/{subject_id}")
-async def retrieve_subject(subject_id):
+async def retrieve_subject(subject_id, pickle=False):
     """
     Retrieves subject from Labtracks server
     """
@@ -56,7 +56,7 @@ async def retrieve_subject(subject_id):
 
 
 @app.get("/procedures/{subject_id}")
-async def retrieve_procedures(subject_id):
+async def retrieve_procedures(subject_id, pickle=False):
     """
     Retrieves procedure info from SharePoint
     """

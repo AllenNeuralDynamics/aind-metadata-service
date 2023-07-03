@@ -14,7 +14,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
     @mock.patch("requests.get")
     def test_get_subject(self, mock_get: MagicMock) -> None:
-        """Tests the get_subject method."""
+        """Tests the get_subject method (with default pickle = False)."""
 
         mock_subject_id = "00000"
         mock_response = requests.Response()
@@ -56,7 +56,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_get.assert_has_calls(
             [
-                call("some_url/subject/00000"),
+                call("some_url/subject/00000", params={"pickle": False}),
                 call().__enter__(),
                 call().__exit__(None, None, None),
             ]
