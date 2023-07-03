@@ -42,6 +42,7 @@ nsb_sharepoint_password = os.getenv("NSB_SHAREPOINT_PASSWORD")
 async def retrieve_subject(subject_id, pickle=False):
     """
     Retrieves subject from Labtracks server
+    TODO: pickle option will be handled in future versions
     """
     lb_client = LabTracksClient(
         driver=labtracks_driver,
@@ -59,6 +60,7 @@ async def retrieve_subject(subject_id, pickle=False):
 async def retrieve_procedures(subject_id, pickle=False):
     """
     Retrieves procedure info from SharePoint
+    TODO: pickle option will be handled in future versions
     """
     sharepoint_client = SharePointClient(
         nsb_site_url=nsb_sharepoint_url,
