@@ -115,7 +115,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_get.assert_has_calls(
             [
-                call("some_url/procedures/00000"),
+                call("some_url/procedures/00000", params={"pickle": False}),
                 call().__enter__(),
                 call().__exit__(None, None, None),
             ]
