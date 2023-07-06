@@ -57,22 +57,22 @@ class InjectionRound(Enum):
 class MappedNSBList:
     """Mapped Fields in Sharepoint list"""
 
-    AP_REGEX = re.compile(r"^\s*([-+]?\d*\.?\d+)(?:\s*(?:mm)?\s*)$")
-    DV_REGEX = re.compile(r"^\s*([-+]?\d*\.?\d+)(?:\s*(?:mm)?\s*)$")
-    ISO_DUR_REGEX1 = re.compile(r"^\s*(\d*\.?\d+)\s*(?:hour|hours)*\s*$")
+    AP_REGEX = re.compile(r"^ *([-+]?\d*\.?\d+)(?: *(?:mm)? *)$")
+    DV_REGEX = re.compile(r"^ *([-+]?\d*\.?\d+)(?: *(?:mm)? *)$")
+    ISO_DUR_REGEX1 = re.compile(r"^ *(\d*\.?\d+) *(?:hour|hours)* *$")
     ISO_DUR_REGEX2 = re.compile(r"^(\d+):(\d+)$")
-    ML_REGEX = re.compile(r"^\s*([-+]?\d*\.?\d+)(?:\s*(?:mm)?\s*)$")
+    ML_REGEX = re.compile(r"^ *([-+]?\d*\.?\d+)(?: *(?:mm)? *)$")
     ALT_TIME_REGEX = re.compile(
-        r"^\s*(7)(?:.0|/7)?\s*(?:s|sec|secs|second|seconds)?\s*$"
+        r"^ *(7)(?:.0|/7)? *(?:s|sec|secs|second|seconds)? *$"
     )
     INJ_ANGLE_REGEX = re.compile(
-        r"^\s*([-+]?\d*\.?\d+)\s*(?:deg|degree|degrees)*\s*$"
+        r"^ *([-+]?\d*\.?\d+) *(?:deg|degree|degrees)* *$"
     )
-    CURRENT_REGEX = re.compile(r"^\s*(\d*\.?\d+)\s*(?:ua|uA|uAmp)*\s*$")
+    CURRENT_REGEX = re.compile(r"^ *([-+]?\d*\.?\d+) *(?:ua|uA|uAmp)* *$")
     LENGTH_OF_TIME_REGEX = re.compile(
-        r"^\s*(\d*\.?\d+)\s*(?:m|min|mins|minute|minutes)+\s*$"
+        r"^ *(\d*\.?\d+) *(?:m|min|mins|minute|minutes)+ *$"
     )
-    VOLUME_REGEX = re.compile(r"^\s*(\d*\.?\d+)\s*(?:nl|nL)+\s*$")
+    VOLUME_REGEX = re.compile(r"^ *(\d*\.?\d+) *(?:nl|nL)+ *$")
 
     def __init__(self, nsb: NSBList):
         """Class constructor"""
