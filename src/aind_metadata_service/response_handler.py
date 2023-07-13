@@ -31,53 +31,36 @@ class Responses:
         return response
 
     @staticmethod
-    def connection_error_response() -> JSONResponse:
+    def connection_error_response() -> Tuple[str, None]:
         """Map to a connection error"""
-        response = JSONResponse(
-            status_code=StatusCodes.CONNECTION_ERROR.value,
-            content=(
-                {
-                    "message": "Error Connecting to Internal Server.",
-                    "data": None,
-                }
-            ),
-        )
+        status_code = StatusCodes.CONNECTION_ERROR.value
+        message = Responses.generate_message(status_code, None)
+        response = (status_code, None)
         return response
 
     @staticmethod
-    def internal_server_error_response() -> JSONResponse:
+    def internal_server_error_response() -> Tuple[str, None]:
         """Map to an internal server error"""
-        response = JSONResponse(
-            status_code=StatusCodes.INTERNAL_SERVER_ERROR.value,
-            content=({"message": "Internal Server Error.", "data": None}),
-        )
+        status_code = StatusCodes.INTERNAL_SERVER_ERROR.value
+        response = (status_code, None)
         return response
 
     @staticmethod
-    def no_data_found_response() -> JSONResponse:
+    def no_data_found_response() -> Tuple[str, None]:
         """Map to a 404 error."""
-        response = JSONResponse(
-            status_code=StatusCodes.NO_DATA_FOUND.value,
-            content=({"message": "No Data Found.", "data": None}),
-        )
+        status_code = StatusCodes.NO_DATA_FOUND.value
+        response = (status_code, None)
         return response
 
     @staticmethod
-    def multiple_items_found_response(models: List[BaseModel]) -> JSONResponse:
+    def multiple_items_found_response(models: List[BaseModel]) -> Tuple[str, List[BaseModel]]:
         """Map to a multiple choices error."""
-        models_json = [
-            jsonable_encoder(json.loads(model.json())) for model in models
-        ]
-        response = JSONResponse(
-            status_code=StatusCodes.MULTIPLE_RESPONSES.value,
-            content=(
-                {"message": "Multiple Items Found.", "data": models_json}
-            ),
-        )
+        status_code = StatusCodes.MULTIPLE_RESPONSES.value
+        response = (status_code, models)
         return response
 
     @staticmethod
-    def model_response(model: BaseModel) -> JSONResponse:
+    def model_response(model: BaseModel) -> tuple[BaseModel, str]:
         """
         Parse model to a response or return model if valid.
         Handles validation errors.
@@ -87,27 +70,11 @@ class Responses:
             model response from server
         """
         *_, validation_error = validate_model(model.__class__, model.__dict__)
-        model_json = jsonable_encoder(json.loads(model.json()))
         if validation_error:
-            response = JSONResponse(
-                status_code=StatusCodes.INVALID_DATA.value,
-                content=(
-                    {
-                        "message": f"Validation Errors: {validation_error}",
-                        "data": model_json,
-                    }
-                ),
-            )
+            status_code = StatusCodes.INVALID_DATA.value
         else:
-            response = JSONResponse(
-                status_code=StatusCodes.VALID_DATA.value,
-                content=(
-                    {
-                        "message": "Valid Model.",
-                        "data": model_json,
-                    }
-                ),
-            )
+            status_code = StatusCodes.VALID_DATA.value
+        response = (status_code, model)
         return response
 
     # flake8: noqa: C901
