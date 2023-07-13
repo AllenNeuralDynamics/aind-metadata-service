@@ -32,7 +32,7 @@ with open(COMBINED_PATH) as f:
 
 
 class TestResponseHandler(unittest.TestCase):
-    """Tests methods in Responses class"""
+    """Tests JSON methods in Responses class"""
 
     def test_valid_model(self):
         """Test model_response with valid model."""
@@ -44,7 +44,9 @@ class TestResponseHandler(unittest.TestCase):
             date_of_birth="2022-06-24",
             genotype="Pvalb-IRES-Cre/wt;RCL-somBiPoles_mCerulean-WPRE/wt",
         )
-        response = Responses.model_response(model)
+        model_response = Responses.model_response(model)
+        actual_response = Responses.convert_response_to_json(model_response)
+
         model_json = jsonable_encoder(json.loads(model.json()))
         expected_response = JSONResponse(
             status_code=200,
@@ -56,13 +58,15 @@ class TestResponseHandler(unittest.TestCase):
             ),
         )
 
-        self.assertEqual(expected_response.status_code, response.status_code)
-        self.assertEqual(expected_response.body, response.body)
+        self.assertEqual(expected_response.status_code, actual_response.status_code)
+        self.assertEqual(expected_response.body, actual_response.body)
 
     def test_invalid_model(self):
         """Test model_response with invalid model."""
         model = Subject.construct()
-        response = Responses.model_response(model)
+        model_response = Responses.model_response(model)
+        actual_response = Responses.convert_response_to_json(model_response)
+
         *_, validation_error = validate_model(model.__class__, model.__dict__)
         model_json = jsonable_encoder(model)
         expected_response = JSONResponse(
@@ -75,12 +79,12 @@ class TestResponseHandler(unittest.TestCase):
             ),
         )
 
-        self.assertEqual(expected_response.status_code, response.status_code)
-        self.assertEqual(expected_response.body, response.body)
+        self.assertEqual(expected_response.status_code, actual_response.status_code)
+        self.assertEqual(expected_response.body, actual_response.body)
 
     def test_connection_error(self):
         """Test connection error response"""
-        response = Responses.connection_error_response()
+        response = Responses.convert_response_to_json(Responses.connection_error_response())
         expected_response = JSONResponse(
             status_code=503,
             content=(
@@ -100,7 +104,7 @@ class TestResponseHandler(unittest.TestCase):
         response = Responses.combine_procedure_responses(
             lb_response=response1, sp_response=response2
         )
-        expected_response = Responses.internal_server_error_response()
+        expected_response = Responses.convert_response_to_json(Responses.internal_server_error_response())
         self.assertEqual(response.body, expected_response.body)
         self.assertEqual(response.status_code, 500)
 
@@ -111,7 +115,7 @@ class TestResponseHandler(unittest.TestCase):
         response = Responses.combine_procedure_responses(
             lb_response=response1, sp_response=response2
         )
-        expected_response = Responses.connection_error_response()
+        expected_response = Responses.convert_response_to_json(Responses.connection_error_response())
         self.assertEqual(response.body, expected_response.body)
         self.assertEqual(response.status_code, 503)
 
@@ -122,7 +126,7 @@ class TestResponseHandler(unittest.TestCase):
         response = Responses.combine_procedure_responses(
             lb_response=response1, sp_response=response2
         )
-        expected_response = Responses.no_data_found_response()
+        expected_response = Responses.convert_response_to_json(Responses.no_data_found_response())
         self.assertEqual(response.body, expected_response.body)
         self.assertEqual(response.status_code, 404)
 
@@ -160,8 +164,7 @@ class TestResponseHandler(unittest.TestCase):
         """Tests that invalid responses are combined as expected"""
         model1 = Procedures.construct(
             subject_id="115977",
-            extra_field=None,
-            subject_procedures=sp_subject_procedures["data"][
+            subject_procedures=las_subject_procedures["data"][
                 "subject_procedures"
             ],
         )
@@ -170,7 +173,8 @@ class TestResponseHandler(unittest.TestCase):
         )
         model2 = Procedures.construct(
             subject_id="115977",
-            subject_procedures=las_subject_procedures["data"][
+            extra_field=None,
+            subject_procedures=sp_subject_procedures["data"][
                 "subject_procedures"
             ],
         )
@@ -179,8 +183,8 @@ class TestResponseHandler(unittest.TestCase):
         )
         response1 = Responses.model_response(model1)
         response2 = Responses.model_response(model2)
-        response = Responses.combine_procedure_responses(
-            lb_response=response2, sp_response=response1
+        actual_response = Responses.combine_procedure_responses(
+            lb_response=response1, sp_response=response2
         )
         expected_response = JSONResponse(
             status_code=406,
@@ -194,8 +198,10 @@ class TestResponseHandler(unittest.TestCase):
                 }
             ),
         )
-        self.assertEqual(response.body, expected_response.body)
-        self.assertEqual(response.status_code, expected_response.status_code)
+        self.assertEqual(
+            actual_response.body, expected_response.body
+        )
+        self.assertEqual(actual_response.status_code, expected_response.status_code)
 
     def test_combine_valid_invalid_responses(self):
         """Tests that valid and invalid response are combined as expected"""
