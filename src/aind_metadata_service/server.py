@@ -53,7 +53,7 @@ async def retrieve_subject(subject_id, pickle=False):
         password=labtracks_password,
     )
     response = lb_client.get_subject_info(subject_id)
-    return response
+    return Responses.convert_response_to_json(response)
 
 
 @app.get("/procedures/{subject_id}")
