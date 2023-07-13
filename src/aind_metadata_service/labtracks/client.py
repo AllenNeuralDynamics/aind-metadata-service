@@ -1,7 +1,9 @@
 """Module to create clients to connect to databases."""
 import logging
+import json
+from fastapi.encoders import jsonable_encoder
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Tuple, Union
 from xml.etree import ElementTree as ET
 
 import pyodbc
@@ -20,6 +22,7 @@ from aind_metadata_service.labtracks.query_builder import (
     TaskSetQueryColumns,
 )
 from aind_metadata_service.response_handler import Responses
+from pydantic import BaseModel
 
 
 class LabTracksClient:
@@ -76,7 +79,9 @@ class LabTracksClient:
         """Closes a pyodbc session connection"""
         session.close()
 
-    def get_subject_info(self, subject_id: str) -> JSONResponse:
+    def get_subject_info(
+        self, subject_id: str
+    ) -> Tuple[str, Union[BaseModel, List[BaseModel], None]]:
         """
         Method to retrieve subject from subject_id (int)
         Parameters
@@ -115,7 +120,9 @@ class LabTracksClient:
             logging.error(repr(e))
             return Responses.internal_server_error_response()
 
-    def get_procedures_info(self, subject_id: str) -> JSONResponse:
+    def get_procedures_info(
+        self, subject_id: str
+    ) -> Tuple[str, Union[BaseModel, List[BaseModel], None]]:
         """
         Method to retrieve LAS procedures from subject_id (int)
         Parameters
