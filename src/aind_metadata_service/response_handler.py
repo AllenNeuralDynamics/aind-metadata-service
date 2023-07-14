@@ -1,7 +1,7 @@
 """Module to handle responses"""
 import json
 import logging
-from typing import List, Optional, Tuple, Union
+from typing import List, Tuple, Union
 
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -14,8 +14,8 @@ class Responses:
     """This class contains methods to map responses from server."""
 
     @staticmethod
-    def generate_message(status_code: StatusCodes, model: BaseModel = None) -> str:
-        """Generate message using the status code and optional model"""
+    def generate_message(status_code: int, model: BaseModel | List[BaseModel] = None) -> str:
+        """Generate message using the status code and optional model (for Subject and Procedures)"""
         match status_code:
             case StatusCodes.INVALID_DATA.value:
                 *_, validation_error = validate_model(model.__class__, model.__dict__)
@@ -32,17 +32,8 @@ class Responses:
                 return "Multiple Items Found."
 
     @staticmethod
-    def generate_combine_message(status_code1: StatusCodes, status_code2: StatusCodes,
-                                 model1: Optional[BaseModel], model2: Optional[BaseModel]) -> str:
-        """Generate message for combined model using status codes and optional models """
-        message1 = Responses.generate_message(status_code1, model1)
-        message2 = Responses.generate_message(status_code2, model2)
-        message = f"Message 1: {message1}, Message 2: {message2}"
-        return message
-
-    @staticmethod
-    def generate_models_json(status_code: StatusCodes, models: Union[BaseModel, List[BaseModel], None]):
-        """Generate model data in JSON"""
+    def generate_models_json(status_code: int, models: Union[BaseModel, List[BaseModel], None]) -> JSONResponse:
+        """Generate model data in JSON (for Subject and Procedures)"""
         models_json = None
         if models is not None:
             if status_code == StatusCodes.MULTIPLE_RESPONSES.value:
@@ -52,46 +43,41 @@ class Responses:
         return models_json
 
     @staticmethod
-    def combine_response_json(
-            status_code: StatusCodes,
-            lb_response: Tuple[str, Union[BaseModel, List[BaseModel], None]],
-            sp_response: Tuple[str, Union[BaseModel, List[BaseModel], None]],
-            combined_model: Union[BaseModel, List[BaseModel], None]
-    ) -> JSONResponse:
-        """Map to a multi status JSON message."""
+    def convert_response_to_json(status_code: int,
+                                 model: Union[BaseModel, List[BaseModel], None],
+                                 message: str = None) -> JSONResponse:
+        """Convert status code and model response into JSON response
+        (for Subject and Procedures and combined Procedures) """
 
-        lb_model = lb_response[1]
-        sp_model = sp_response[1]
-        sp_status_code = sp_response[0]
-        lb_status_code = lb_response[0]
+        message = Responses.generate_message(status_code, model) if message is None else message
 
         return JSONResponse(
             status_code=status_code,
             content=(
                 {
-                    "message": Responses.generate_combine_message(lb_status_code, sp_status_code, lb_model, sp_model),
-                    "data": Responses.generate_models_json(status_code, combined_model)
-                }
-            )
-        )
-
-    @staticmethod
-    def convert_response_to_json(response: Tuple[str, Union[BaseModel, List[BaseModel], None]]):
-        """Convert status code and model response into JSON response"""
-        status_code = response[0]
-        model = response[1]
-
-        return JSONResponse(
-            status_code=status_code,
-            content=(
-                {
-                    "message": Responses.generate_message(status_code, model),
+                    "message": message,
                     "data": Responses.generate_models_json(status_code, model)
                 }
             )
         )
+
     @staticmethod
-    def connection_error_response() -> Tuple[str, None]:
+    def generate_mixed_message(lb_response: Tuple[int, Union[BaseModel, None]],
+                               sp_response: Tuple[int, Union[BaseModel, None]]) -> str:
+        """Generate message using the status code and optional model (for Subject and Procedures)"""
+        lb_model = lb_response[1]
+        sp_model = sp_response[1]
+        lb_status_code = lb_response[0]
+        sp_status_code = sp_response[0]
+
+        message1 = Responses.generate_message(lb_status_code, lb_model)
+        message2 = Responses.generate_message(sp_status_code, sp_model)
+        combined_message = f"Message 1: {message1}, Message 2: {message2}"
+
+        return combined_message
+
+    @staticmethod
+    def connection_error_response() -> Tuple[int, None]:
         """Map to a connection error"""
         status_code = StatusCodes.CONNECTION_ERROR.value
         message = Responses.generate_message(status_code, None)
@@ -99,28 +85,28 @@ class Responses:
         return response
 
     @staticmethod
-    def internal_server_error_response() -> Tuple[str, None]:
+    def internal_server_error_response() -> Tuple[int, None]:
         """Map to an internal server error"""
         status_code = StatusCodes.INTERNAL_SERVER_ERROR.value
         response = (status_code, None)
         return response
 
     @staticmethod
-    def no_data_found_response() -> Tuple[str, None]:
+    def no_data_found_response() -> Tuple[int, None]:
         """Map to a 404 error."""
         status_code = StatusCodes.NO_DATA_FOUND.value
         response = (status_code, None)
         return response
 
     @staticmethod
-    def multiple_items_found_response(models: List[BaseModel]) -> Tuple[str, List[BaseModel]]:
+    def multiple_items_found_response(models: List[BaseModel]) -> Tuple[int, List[BaseModel]]:
         """Map to a multiple choices error."""
         status_code = StatusCodes.MULTIPLE_RESPONSES.value
         response = (status_code, models)
         return response
 
     @staticmethod
-    def model_response(model: BaseModel) -> tuple[BaseModel, str]:
+    def model_response(model: BaseModel) -> tuple[int, BaseModel]:
         """
         Parse model to a response or return model if valid.
         Handles validation errors.
@@ -140,10 +126,12 @@ class Responses:
     # flake8: noqa: C901
     @staticmethod
     def combine_procedure_responses(
-        lb_response: Tuple[str, Union[BaseModel, List[BaseModel], None]], sp_response: Tuple[str, Union[BaseModel, List[BaseModel], None]]
-    ) -> JSONResponse:
+        lb_response: Tuple[int, Union[BaseModel, None]],
+        sp_response: Tuple[int, Union[BaseModel, None]]
+    ) -> Tuple[int, Union[BaseModel, None], str]:
         """
-        Combines JSONResponses from Labtracks and Sharepoint clients.
+        Combines Model Responses from Labtracks and Sharepoint clients.
+        Generates messages.
         Handles validation errors and special cases.
         """
         try:
@@ -152,15 +140,20 @@ class Responses:
             sp_status_code = sp_response[0]
             lb_status_code = lb_response[0]
             if sp_status_code == 500 and lb_status_code == 500:
-                return Responses.convert_response_to_json(Responses.internal_server_error_response())
+                message = Responses.generate_message(sp_status_code)
+                return Responses.internal_server_error_response() + (message,)
             if sp_status_code == 503 and lb_status_code == 503:
-                return Responses.convert_response_to_json(Responses.connection_error_response())
+                message = Responses.generate_message(sp_status_code)
+                return Responses.connection_error_response() + (message,)
             if sp_status_code == 404 and lb_status_code == 404:
-                return Responses.convert_response_to_json(Responses.no_data_found_response())
+                message = Responses.generate_message(sp_status_code)
+                return Responses.no_data_found_response() + (message,)
             if sp_status_code < 300 and lb_status_code == 404:
-                return Responses.convert_response_to_json(sp_response)
+                message = Responses.generate_message(sp_status_code)
+                return sp_response + (message,)
             if sp_status_code == 404 and lb_status_code < 300:
-                return Responses.convert_response_to_json(lb_response)
+                message = Responses.generate_message(lb_status_code)
+                return lb_response + (message,)
             # handles combination of invalid responses
             if lb_status_code == 406 and sp_status_code == 406:
                 print('both invalid')
@@ -168,8 +161,11 @@ class Responses:
                 sp_procedures = sp_model.subject_procedures
                 combined_procedures = lb_procedures + sp_procedures
                 lb_model.subject_procedures = combined_procedures
+
                 status_code = StatusCodes.INVALID_DATA.value
-                return Responses.combine_response_json(status_code, lb_response, sp_response, lb_model)
+                message = Responses.generate_mixed_message(lb_response, sp_response)
+
+                return status_code, lb_model, message
 
             # handles combinations of valid and invalid responses
             if (sp_status_code < 300 and lb_status_code == 406) or (
@@ -179,9 +175,10 @@ class Responses:
                 sp_procedures = sp_model.subject_procedures
                 combined_procedures = lb_procedures + sp_procedures
                 lb_model.subject_procedures = combined_procedures
-                status_code = StatusCodes.MULTI_STATUS.value
 
-                return Responses.combine_response_json(status_code, lb_model, sp_model, lb_model)
+                status_code = StatusCodes.MIXED_STATUS.value
+                message = Responses.generate_mixed_message(lb_response, sp_response)
+                return status_code, lb_model, message
 
             # handles case when both responses are valid
             if sp_status_code < 300 and lb_status_code < 300:
@@ -189,20 +186,23 @@ class Responses:
                 sp_procedures = sp_model.subject_procedures
                 combined_procedures = lb_procedures + sp_procedures
                 lb_model.subject_procedures = combined_procedures
-                status_code = StatusCodes.VALID_DATA.value
 
-                return Responses.combine_response_json(status_code, lb_model, sp_model, lb_model)
+                status_code = StatusCodes.VALID_DATA.value
+                message = Responses.generate_message(status_code)
+                return status_code, lb_model, message
 
             # handles combination of server/connection error and valid response
             if sp_status_code in (500, 503) and lb_status_code < 300:
-                status_code = StatusCodes.MULTI_STATUS.value
-
-                return Responses.combine_response_json(status_code, lb_model, sp_model, lb_model)
+                status_code = StatusCodes.MIXED_STATUS.value
+                message = Responses.generate_mixed_message(lb_response, sp_response)
+                return status_code, lb_model, message
 
             if sp_status_code < 300 and lb_status_code in (500, 503):
-                status_code = StatusCodes.MULTI_STATUS.value
+                status_code = StatusCodes.MIXED_STATUS.value
+                message = Responses.generate_mixed_message(lb_response, sp_response)
+                return status_code, sp_model, message
 
-                return Responses.combine_response_json(status_code, lb_model, sp_model, lb_model)
         except Exception as e:
             logging.error(repr(e))
-            return Responses.convert_response_to_json(Responses.internal_server_error_response())
+            message = Responses.generate_message(StatusCodes.INTERNAL_SERVER_ERROR.value)
+            return Responses.internal_server_error_response() + (message,)
