@@ -1,7 +1,7 @@
 """Module to handle responses"""
 import json
 import logging
-from typing import List, Tuple, Union, Optional
+from typing import List, Optional, Tuple, Union
 
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse

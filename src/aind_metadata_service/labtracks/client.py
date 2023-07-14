@@ -1,7 +1,6 @@
 """Module to create clients to connect to databases."""
-import logging
 import json
-from fastapi.encoders import jsonable_encoder
+import logging
 from enum import Enum
 from typing import List, Optional, Tuple, Union
 from xml.etree import ElementTree as ET
@@ -14,7 +13,9 @@ from aind_data_schema.procedures import (
     SubjectProcedure,
 )
 from aind_data_schema.subject import BackgroundStrain, Sex, Species
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 from aind_metadata_service.labtracks.query_builder import (
     LabTracksQueries,
@@ -22,7 +23,6 @@ from aind_metadata_service.labtracks.query_builder import (
     TaskSetQueryColumns,
 )
 from aind_metadata_service.response_handler import Responses
-from pydantic import BaseModel
 
 
 class LabTracksClient:

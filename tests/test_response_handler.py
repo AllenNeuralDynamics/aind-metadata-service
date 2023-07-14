@@ -58,7 +58,9 @@ class TestResponseHandler(unittest.TestCase):
             ),
         )
 
-        self.assertEqual(expected_response.status_code, actual_response.status_code)
+        self.assertEqual(
+            expected_response.status_code, actual_response.status_code
+        )
         self.assertEqual(expected_response.body, actual_response.body)
 
     def test_invalid_model(self):
@@ -79,12 +81,16 @@ class TestResponseHandler(unittest.TestCase):
             ),
         )
 
-        self.assertEqual(expected_response.status_code, actual_response.status_code)
+        self.assertEqual(
+            expected_response.status_code, actual_response.status_code
+        )
         self.assertEqual(expected_response.body, actual_response.body)
 
     def test_connection_error(self):
         """Test connection error response"""
-        response = Responses.convert_response_to_json(Responses.connection_error_response())
+        response = Responses.convert_response_to_json(
+            Responses.connection_error_response()
+        )
         expected_response = JSONResponse(
             status_code=503,
             content=(
@@ -104,7 +110,9 @@ class TestResponseHandler(unittest.TestCase):
         response = Responses.combine_procedure_responses(
             lb_response=response1, sp_response=response2
         )
-        expected_response = Responses.convert_response_to_json(Responses.internal_server_error_response())
+        expected_response = Responses.convert_response_to_json(
+            Responses.internal_server_error_response()
+        )
         self.assertEqual(response.body, expected_response.body)
         self.assertEqual(response.status_code, 500)
 
@@ -115,7 +123,9 @@ class TestResponseHandler(unittest.TestCase):
         response = Responses.combine_procedure_responses(
             lb_response=response1, sp_response=response2
         )
-        expected_response = Responses.convert_response_to_json(Responses.connection_error_response())
+        expected_response = Responses.convert_response_to_json(
+            Responses.connection_error_response()
+        )
         self.assertEqual(response.body, expected_response.body)
         self.assertEqual(response.status_code, 503)
 
@@ -126,7 +136,9 @@ class TestResponseHandler(unittest.TestCase):
         response = Responses.combine_procedure_responses(
             lb_response=response1, sp_response=response2
         )
-        expected_response = Responses.convert_response_to_json(Responses.no_data_found_response())
+        expected_response = Responses.convert_response_to_json(
+            Responses.no_data_found_response()
+        )
         self.assertEqual(response.body, expected_response.body)
         self.assertEqual(response.status_code, 404)
 
@@ -198,10 +210,10 @@ class TestResponseHandler(unittest.TestCase):
                 }
             ),
         )
+        self.assertEqual(actual_response.body, expected_response.body)
         self.assertEqual(
-            actual_response.body, expected_response.body
+            actual_response.status_code, expected_response.status_code
         )
-        self.assertEqual(actual_response.status_code, expected_response.status_code)
 
     def test_combine_valid_invalid_responses(self):
         """Tests that valid and invalid response are combined as expected"""
