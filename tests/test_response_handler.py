@@ -159,7 +159,9 @@ class TestResponseHandler(unittest.TestCase):
         combined_response_1 = Responses.combine_procedure_responses(
             lb_response=response2, sp_response=response1
         )
-        combined_json_1 = Responses.convert_response_to_json(*combined_response_1)
+        combined_json_1 = Responses.convert_response_to_json(
+            *combined_response_1
+        )
         expected_json_1 = JSONResponse(las_subject_procedures)
         self.assertEqual(combined_json_1.body, expected_json_1.body)
         self.assertEqual(combined_json_1.status_code, 200)
@@ -167,7 +169,9 @@ class TestResponseHandler(unittest.TestCase):
         combined_response_2 = Responses.combine_procedure_responses(
             lb_response=response1, sp_response=response3
         )
-        combined_json_2 = Responses.convert_response_to_json(*combined_response_2)
+        combined_json_2 = Responses.convert_response_to_json(
+            *combined_response_2
+        )
         expected_json_2 = JSONResponse(sp_subject_procedures)
         self.assertEqual(combined_json_2.body, expected_json_2.body)
         self.assertEqual(combined_json_2.status_code, 200)
@@ -217,9 +221,9 @@ class TestResponseHandler(unittest.TestCase):
             content=(
                 {
                     "message": f"Message 1: "
-                               f"Validation Errors: {str(validation_error_1)}, "
-                               f"Message 2: "
-                               f"Validation Errors: {str(validation_error_2)}",
+                    f"Validation Errors: {str(validation_error_1)}, "
+                    f"Message 2: "
+                    f"Validation Errors: {str(validation_error_2)}",
                     "data": combined_procedures["data"],
                 }
             ),
@@ -242,7 +246,7 @@ class TestResponseHandler(unittest.TestCase):
             content=(
                 {
                     "message": f"Message 1: Validation Errors: {str(validation_error)}, "
-                               f"Message 2: Valid Model.",
+                    f"Message 2: Valid Model.",
                     "data": sp_subject_procedures["data"],
                 }
             ),
@@ -259,13 +263,15 @@ class TestResponseHandler(unittest.TestCase):
         combined_response_1 = Responses.combine_procedure_responses(
             lb_response=response1, sp_response=response2
         )
-        actual_json_1 = Responses.convert_response_to_json(*combined_response_1)
+        actual_json_1 = Responses.convert_response_to_json(
+            *combined_response_1
+        )
         expected_json_1 = JSONResponse(
             status_code=207,
             content=(
                 {
                     "message": "Message 1: Valid Model., "
-                               "Message 2: Error Connecting to Internal Server.",
+                    "Message 2: Error Connecting to Internal Server.",
                     "data": sp_subject_procedures["data"],
                 }
             ),
@@ -279,14 +285,16 @@ class TestResponseHandler(unittest.TestCase):
         combined_response_2 = Responses.combine_procedure_responses(
             lb_response=response3, sp_response=response1
         )
-        actual_json_2 = Responses.convert_response_to_json(*combined_response_2)
+        actual_json_2 = Responses.convert_response_to_json(
+            *combined_response_2
+        )
         expected_json_2 = JSONResponse(
             status_code=207,
             content=(
                 {
                     "message": "Message 1: "
-                               "Error Connecting to Internal Server., "
-                               "Message 2: Valid Model.",
+                    "Error Connecting to Internal Server., "
+                    "Message 2: Valid Model.",
                     "data": las_subject_procedures["data"],
                 }
             ),
@@ -299,7 +307,7 @@ class TestResponseHandler(unittest.TestCase):
     @patch("json.loads")
     @patch("logging.error")
     def test_error_combined_response(
-            self, mock_log: MagicMock, mock_json_error: MagicMock
+        self, mock_log: MagicMock, mock_json_error: MagicMock
     ):
         """Tests internal server error caught and logged correctly."""
         response1 = Responses.model_response(lb_model)
@@ -311,7 +319,9 @@ class TestResponseHandler(unittest.TestCase):
             lb_response=response1, sp_response=response2
         )
         actual_json = Responses.convert_response_to_json(*combined_response)
-        expected_json = Responses.convert_response_to_json(Responses.internal_server_error_response())
+        expected_json = Responses.convert_response_to_json(
+            Responses.internal_server_error_response()
+        )
         mock_log.assert_called_once_with("KeyError()")
         self.assertEqual(500, expected_json.status_code)
         self.assertEqual(actual_json.body, expected_json.body)

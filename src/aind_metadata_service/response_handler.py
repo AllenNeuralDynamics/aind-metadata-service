@@ -14,56 +14,73 @@ class Responses:
     """This class contains methods to map responses from server."""
 
     @staticmethod
-    def generate_message(status_code: int, model: BaseModel | List[BaseModel] = None) -> str:
+    def generate_message(
+        status_code: int, model: BaseModel | List[BaseModel] = None
+    ) -> str:
         """Generate message using the status code and optional model (for Subject and Procedures)"""
-        match status_code:
-            case StatusCodes.INVALID_DATA.value:
-                *_, validation_error = validate_model(model.__class__, model.__dict__)
-                return f"Validation Errors: {validation_error}"
-            case StatusCodes.INTERNAL_SERVER_ERROR.value:
-                return "Internal Server Error."
-            case StatusCodes.CONNECTION_ERROR.value:
-                return "Error Connecting to Internal Server."
-            case StatusCodes.NO_DATA_FOUND.value:
-                return "No Data Found."
-            case StatusCodes.VALID_DATA.value:
-                return "Valid Model."
-            case StatusCodes.MULTIPLE_RESPONSES.value:
-                return "Multiple Items Found."
+
+        if status_code == StatusCodes.INVALID_DATA.value:
+            *_, validation_error = validate_model(
+                model.__class__, model.__dict__
+            )
+            return f"Validation Errors: {validation_error}"
+        elif status_code == StatusCodes.INTERNAL_SERVER_ERROR.value:
+            return "Internal Server Error."
+        elif status_code == StatusCodes.CONNECTION_ERROR.value:
+            return "Error Connecting to Internal Server."
+        elif status_code == StatusCodes.NO_DATA_FOUND.value:
+            return "No Data Found."
+        elif status_code == StatusCodes.VALID_DATA.value:
+            return "Valid Model."
+        elif status_code == StatusCodes.MULTIPLE_RESPONSES.value:
+            return "Multiple Items Found."
 
     @staticmethod
-    def generate_models_json(status_code: int, models: Union[BaseModel, List[BaseModel], None]) -> JSONResponse:
+    def generate_models_json(
+        status_code: int, models: Union[BaseModel, List[BaseModel], None]
+    ) -> JSONResponse:
         """Generate model data in JSON (for Subject and Procedures)"""
         models_json = None
         if models is not None:
             if status_code == StatusCodes.MULTIPLE_RESPONSES.value:
-                models_json = [jsonable_encoder(json.loads(model.json())) for model in models]
+                models_json = [
+                    jsonable_encoder(json.loads(model.json()))
+                    for model in models
+                ]
             else:
                 models_json = jsonable_encoder(json.loads(models.json()))
         return models_json
 
     @staticmethod
-    def convert_response_to_json(status_code: int,
-                                 model: Union[BaseModel, List[BaseModel], None],
-                                 message: str = None) -> JSONResponse:
+    def convert_response_to_json(
+        status_code: int,
+        model: Union[BaseModel, List[BaseModel], None],
+        message: str = None,
+    ) -> JSONResponse:
         """Convert status code and model response into JSON response
-        (for Subject and Procedures and combined Procedures) """
+        (for Subject and Procedures and combined Procedures)"""
 
-        message = Responses.generate_message(status_code, model) if message is None else message
+        message = (
+            Responses.generate_message(status_code, model)
+            if message is None
+            else message
+        )
 
         return JSONResponse(
             status_code=status_code,
             content=(
                 {
                     "message": message,
-                    "data": Responses.generate_models_json(status_code, model)
+                    "data": Responses.generate_models_json(status_code, model),
                 }
-            )
+            ),
         )
 
     @staticmethod
-    def generate_mixed_message(lb_response: Tuple[int, Union[BaseModel, None]],
-                               sp_response: Tuple[int, Union[BaseModel, None]]) -> str:
+    def generate_mixed_message(
+        lb_response: Tuple[int, Union[BaseModel, None]],
+        sp_response: Tuple[int, Union[BaseModel, None]],
+    ) -> str:
         """Generate message using the status code and optional model (for Subject and Procedures)"""
         lb_model = lb_response[1]
         sp_model = sp_response[1]
@@ -99,7 +116,9 @@ class Responses:
         return response
 
     @staticmethod
-    def multiple_items_found_response(models: List[BaseModel]) -> Tuple[int, List[BaseModel]]:
+    def multiple_items_found_response(
+        models: List[BaseModel],
+    ) -> Tuple[int, List[BaseModel]]:
         """Map to a multiple choices error."""
         status_code = StatusCodes.MULTIPLE_RESPONSES.value
         response = (status_code, models)
@@ -127,7 +146,7 @@ class Responses:
     @staticmethod
     def combine_procedure_responses(
         lb_response: Tuple[int, Union[BaseModel, None]],
-        sp_response: Tuple[int, Union[BaseModel, None]]
+        sp_response: Tuple[int, Union[BaseModel, None]],
     ) -> Tuple[int, Union[BaseModel, None], str]:
         """
         Combines Model Responses from Labtracks and Sharepoint clients.
@@ -156,14 +175,16 @@ class Responses:
                 return lb_response + (message,)
             # handles combination of invalid responses
             if lb_status_code == 406 and sp_status_code == 406:
-                print('both invalid')
+                print("both invalid")
                 lb_procedures = lb_model.subject_procedures
                 sp_procedures = sp_model.subject_procedures
                 combined_procedures = lb_procedures + sp_procedures
                 lb_model.subject_procedures = combined_procedures
 
                 status_code = StatusCodes.INVALID_DATA.value
-                message = Responses.generate_mixed_message(lb_response, sp_response)
+                message = Responses.generate_mixed_message(
+                    lb_response, sp_response
+                )
 
                 return status_code, lb_model, message
 
@@ -177,7 +198,9 @@ class Responses:
                 lb_model.subject_procedures = combined_procedures
 
                 status_code = StatusCodes.MIXED_STATUS.value
-                message = Responses.generate_mixed_message(lb_response, sp_response)
+                message = Responses.generate_mixed_message(
+                    lb_response, sp_response
+                )
                 return status_code, lb_model, message
 
             # handles case when both responses are valid
@@ -194,15 +217,21 @@ class Responses:
             # handles combination of server/connection error and valid response
             if sp_status_code in (500, 503) and lb_status_code < 300:
                 status_code = StatusCodes.MIXED_STATUS.value
-                message = Responses.generate_mixed_message(lb_response, sp_response)
+                message = Responses.generate_mixed_message(
+                    lb_response, sp_response
+                )
                 return status_code, lb_model, message
 
             if sp_status_code < 300 and lb_status_code in (500, 503):
                 status_code = StatusCodes.MIXED_STATUS.value
-                message = Responses.generate_mixed_message(lb_response, sp_response)
+                message = Responses.generate_mixed_message(
+                    lb_response, sp_response
+                )
                 return status_code, sp_model, message
 
         except Exception as e:
             logging.error(repr(e))
-            message = Responses.generate_message(StatusCodes.INTERNAL_SERVER_ERROR.value)
+            message = Responses.generate_message(
+                StatusCodes.INTERNAL_SERVER_ERROR.value
+            )
             return Responses.internal_server_error_response() + (message,)
