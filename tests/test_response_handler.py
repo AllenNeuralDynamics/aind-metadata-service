@@ -221,7 +221,7 @@ class TestResponseHandler(unittest.TestCase):
             content=(
                 {
                     "message": f"Message 1: "
-                    f"Validation Errors: {str(validation_error_1)}, "
+                    f"Validation Errors: {str(validation_error_1)},"
                     f"Message 2: "
                     f"Validation Errors: {str(validation_error_2)}",
                     "data": combined_procedures["data"],
@@ -232,7 +232,12 @@ class TestResponseHandler(unittest.TestCase):
         self.assertEqual(expected_json.status_code, actual_json.status_code)
 
     def test_combine_valid_invalid_responses(self):
-        """Tests that valid and invalid response are combined as expected"""
+        """Tests that valid and invalid response are combined as expected.
+        (This unit test only works when the lb_model is invalid,
+        because the simple invalid model created solely for testing sake doesn't have a subject_id field,
+        and the combine_procedure_responses uses the sp_response as basis of combination. However,
+        this is still a valid test for combine function since actual models will always have a subject_id field. )
+        """
         model = Procedures.construct()
         response1 = Responses.model_response(model)
         response2 = Responses.model_response(sp_model)
@@ -245,7 +250,7 @@ class TestResponseHandler(unittest.TestCase):
             status_code=207,
             content=(
                 {
-                    "message": f"Message 1: Validation Errors: {str(validation_error)}, "
+                    "message": f"Message 1: Validation Errors: {str(validation_error)},"
                     f"Message 2: Valid Model.",
                     "data": sp_subject_procedures["data"],
                 }
