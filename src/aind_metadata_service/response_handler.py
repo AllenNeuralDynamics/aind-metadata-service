@@ -89,7 +89,7 @@ class Responses:
 
         message1 = Responses.generate_message(lb_status_code, lb_model)
         message2 = Responses.generate_message(sp_status_code, sp_model)
-        combined_message = f"Message 1: {message1}, Message 2: {message2}"
+        combined_message = f"Message 1: {message1},Message 2: {message2}"
 
         return combined_message
 
