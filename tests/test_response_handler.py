@@ -119,8 +119,8 @@ class TestResponseHandler(unittest.TestCase):
             *Responses.internal_server_error_response(),
             "Internal Server Error.",
         )
-        self.assertEqual(actual_json.body, expected_json.body)
-        self.assertEqual(actual_json.status_code, 500)
+        self.assertEqual(expected_json.body, actual_json.body)
+        self.assertEqual(500, actual_json.status_code)
 
     def test_combine_connection_error_responses(self):
         """Tests that error responses are combined as expected"""
@@ -134,8 +134,8 @@ class TestResponseHandler(unittest.TestCase):
             *Responses.connection_error_response(),
             "Error Connecting to Internal Server.",
         )
-        self.assertEqual(actual_json.body, expected_json.body)
-        self.assertEqual(actual_json.status_code, 503)
+        self.assertEqual(expected_json.body, actual_json.body)
+        self.assertEqual(503, actual_json.status_code)
 
     def test_combine_no_data_error_responses(self):
         """Tests that error responses are combined as expected"""
@@ -148,8 +148,8 @@ class TestResponseHandler(unittest.TestCase):
         expected_json = Responses.convert_response_to_json(
             *Responses.no_data_found_response(), "No Data Found."
         )
-        self.assertEqual(actual_json.body, expected_json.body)
-        self.assertEqual(actual_json.status_code, 404)
+        self.assertEqual(expected_json.body, actual_json.body)
+        self.assertEqual(404, actual_json.status_code)
 
     def test_combine_valid_no_data_error_responses(self):
         """Tests that error responses are combined as expected"""
@@ -163,8 +163,8 @@ class TestResponseHandler(unittest.TestCase):
             *combined_response_1
         )
         expected_json_1 = JSONResponse(las_subject_procedures)
-        self.assertEqual(combined_json_1.body, expected_json_1.body)
-        self.assertEqual(combined_json_1.status_code, 200)
+        self.assertEqual(expected_json_1.body, combined_json_1.body)
+        self.assertEqual(200, combined_json_1.status_code)
 
         combined_response_2 = Responses.combine_procedure_responses(
             lb_response=response1, sp_response=response3
@@ -173,8 +173,8 @@ class TestResponseHandler(unittest.TestCase):
             *combined_response_2
         )
         expected_json_2 = JSONResponse(sp_subject_procedures)
-        self.assertEqual(combined_json_2.body, expected_json_2.body)
-        self.assertEqual(combined_json_2.status_code, 200)
+        self.assertEqual(expected_json_2.body, combined_json_2.body)
+        self.assertEqual(200, combined_json_2.status_code)
 
     def test_combine_valid_responses(self):
         """Tests that valid responses are combined as expected"""
@@ -228,8 +228,8 @@ class TestResponseHandler(unittest.TestCase):
                 }
             ),
         )
-        self.assertEqual(actual_json.body, expected_json.body)
-        self.assertEqual(actual_json.status_code, expected_json.status_code)
+        self.assertEqual(expected_json.body, actual_json.body)
+        self.assertEqual(expected_json.status_code, actual_json.status_code)
 
     def test_combine_valid_invalid_responses(self):
         """Tests that valid and invalid response are combined as expected"""
@@ -251,10 +251,8 @@ class TestResponseHandler(unittest.TestCase):
                 }
             ),
         )
-        print(actual_json.body)
-        print(expected_json.body)
-        self.assertEqual(actual_json.body, expected_json.body)
-        self.assertEqual(actual_json.status_code, expected_json.status_code)
+        self.assertEqual(expected_json.body, actual_json.body)
+        self.assertEqual(expected_json.status_code, actual_json.status_code)
 
     def test_combine_valid_error_responses(self):
         """Tests that error responses are combined as expected"""
@@ -276,9 +274,9 @@ class TestResponseHandler(unittest.TestCase):
                 }
             ),
         )
-        self.assertEqual(actual_json_1.body, expected_json_1.body)
+        self.assertEqual(expected_json_1.body, actual_json_1.body)
         self.assertEqual(
-            actual_json_1.status_code, expected_json_1.status_code
+            expected_json_1.status_code, actual_json_1.status_code
         )
 
         response3 = Responses.model_response(sp_model)
@@ -299,9 +297,9 @@ class TestResponseHandler(unittest.TestCase):
                 }
             ),
         )
-        self.assertEqual(actual_json_2.body, expected_json_2.body)
+        self.assertEqual(expected_json_2.body, actual_json_2.body)
         self.assertEqual(
-            actual_json_2.status_code, expected_json_2.status_code
+            expected_json_2.status_code, actual_json_2.status_code
         )
 
     @patch("json.loads")
