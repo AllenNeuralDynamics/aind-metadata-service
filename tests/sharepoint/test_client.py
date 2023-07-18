@@ -123,13 +123,21 @@ class TestSharepointClient(unittest.TestCase):
         expected_subject_procedures = []
         expected_subject_procedures.extend(self.list_items_2019[0][1])
         expected_subject_procedures.extend(self.list_items_2023[0][1])
+
         response = client.get_procedure_info(subject_id="12345")
-        contents = json.loads(response.body.decode("utf-8"))
+        actual_status_code = response[0]
+        actual_json = Responses.convert_response_to_json(*response)
+        actual_content = json.loads(actual_json.body)["data"]
+        actual_subject_procedures = actual_content["subject_procedures"]
+        # contents = json.loads(response.body.decode("utf-8"))
         expected_subject_procedures.sort(key=lambda x: str(x))
-        contents["data"]["subject_procedures"].sort(key=lambda x: str(x))
-        self.assertEqual(200, response.status_code)
+        actual_subject_procedures.sort(key=lambda x: str(x))
+        self.assertEqual(200, actual_status_code)
         self.assertEqual(
-            expected_subject_procedures, contents["data"]["subject_procedures"]
+            expected_subject_procedures[1], actual_subject_procedures[1]
+        )
+        self.assertEqual(
+            expected_subject_procedures, actual_subject_procedures
         )
 
     @patch("aind_metadata_service.sharepoint.client.ClientContext")
