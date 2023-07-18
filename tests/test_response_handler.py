@@ -4,7 +4,6 @@ import json
 import os
 import unittest
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
 
 from aind_data_schema.procedures import Procedures
 from aind_data_schema.subject import Species, Subject
@@ -45,20 +44,30 @@ with open(COMBINED_INVALID_PATH) as f:
 
 sp_valid_model = Procedures.construct(
     subject_id="115977",
-    subject_procedures=sp_valid_subject_procedures["data"]["subject_procedures"],
+    subject_procedures=sp_valid_subject_procedures["data"][
+        "subject_procedures"
+    ],
 )
 lb_valid_model = Procedures.construct(
     subject_id="115977",
-    subject_procedures=las_valid_subject_procedures["data"]["subject_procedures"],
+    subject_procedures=las_valid_subject_procedures["data"][
+        "subject_procedures"
+    ],
 )
 sp_invalid_model = Procedures.construct(
     subject_id="115977",
-    subject_procedures=sp_invalid_subject_procedures["data"]["subject_procedures"],
+    subject_procedures=sp_invalid_subject_procedures["data"][
+        "subject_procedures"
+    ],
 )
 lb_invalid_model = Procedures.construct(
     subject_id="115977",
-    subject_procedures=las_invalid_subject_procedures["data"]["subject_procedures"],
+    subject_procedures=las_invalid_subject_procedures["data"][
+        "subject_procedures"
+    ],
 )
+
+
 class TestResponseHandler(unittest.TestCase):
     """Tests JSON methods in Responses class"""
 
@@ -241,9 +250,11 @@ class TestResponseHandler(unittest.TestCase):
     def test_combine_valid_invalid_responses(self):
         """Tests that valid and invalid response are combined as expected.
         (This unit test only works when the lb_model is invalid,
-        because the simple invalid model created solely for testing sake doesn't have a subject_id field,
-        and the combine_procedure_responses uses the sp_response as basis of combination. However,
-        this is still a valid test for combine function since actual models will always have a subject_id field. )
+        because the simple invalid model created solely for testing sake
+        doesn't have a subject_id field, and the combine_procedure_responses
+        uses the sp_response as basis of combination. However, this is still
+        a valid test for combine function since actual models will always
+        have a subject_id field. )
         """
         model = Procedures.construct()
         response1 = Responses.model_response(model)
@@ -257,8 +268,9 @@ class TestResponseHandler(unittest.TestCase):
             status_code=207,
             content=(
                 {
-                    "message": f"Message 1: Validation Errors: {str(validation_error)},"
-                    f"Message 2: Valid Model.",
+                    "message": f"Message 1: "
+                               f"Validation Errors: {str(validation_error)},"
+                               f"Message 2: Valid Model.",
                     "data": sp_valid_subject_procedures["data"],
                 }
             ),
@@ -280,8 +292,9 @@ class TestResponseHandler(unittest.TestCase):
             status_code=207,
             content=(
                 {
-                    "message": "Message 1: Error Connecting to Internal Server.,"
-                    "Message 2: Valid Model.",
+                    "message": "Message 1: "
+                               "Error Connecting to Internal Server.,"
+                               "Message 2: Valid Model.",
                     "data": sp_valid_subject_procedures["data"],
                 }
             ),
@@ -312,6 +325,7 @@ class TestResponseHandler(unittest.TestCase):
         self.assertEqual(
             expected_json_2.status_code, actual_json_2.status_code
         )
+
 
 if __name__ == "__main__":
     unittest.main()
