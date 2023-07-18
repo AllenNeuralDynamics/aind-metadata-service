@@ -17,29 +17,48 @@ from aind_metadata_service.response_handler import Responses
 TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__)))
 DIR_MAP = TEST_DIR / "resources" / "json_responses"
 
-SP_RESPONSE_PATH = DIR_MAP / "mapped_sp_procedure.json"
-LAS_RESPONSE_PATH = DIR_MAP / "mapped_las_procedure.json"
-COMBINED_PATH = DIR_MAP / "combined.json"
+SP_VALID_RESPONSE_PATH = DIR_MAP / "mapped_sp_procedure.json"
+LAS_VALID_RESPONSE_PATH = DIR_MAP / "mapped_las_procedure.json"
+COMBINED_VALID_PATH = DIR_MAP / "combined.json"
 
-with open(SP_RESPONSE_PATH) as f:
-    sp_subject_procedures = json.load(f)
+SP_INVALID_RESPONSE_PATH = DIR_MAP / "mapped_sp_procedure_invalid.json"
+LAS_INVALID_RESPONSE_PATH = DIR_MAP / "mapped_las_procedure_invalid.json"
+COMBINED_INVALID_PATH = DIR_MAP / "combined_invalid.json"
 
-with open(LAS_RESPONSE_PATH) as f:
-    las_subject_procedures = json.load(f)
+with open(SP_VALID_RESPONSE_PATH) as f:
+    sp_valid_subject_procedures = json.load(f)
 
-with open(COMBINED_PATH) as f:
-    combined_procedures = json.load(f)
+with open(LAS_VALID_RESPONSE_PATH) as f:
+    las_valid_subject_procedures = json.load(f)
 
-sp_model = Procedures.construct(
+with open(COMBINED_VALID_PATH) as f:
+    combined_valid_procedures = json.load(f)
+
+with open(SP_INVALID_RESPONSE_PATH) as f:
+    sp_invalid_subject_procedures = json.load(f)
+
+with open(LAS_INVALID_RESPONSE_PATH) as f:
+    las_invalid_subject_procedures = json.load(f)
+
+with open(COMBINED_INVALID_PATH) as f:
+    combined_invalid_procedures = json.load(f)
+
+sp_valid_model = Procedures.construct(
     subject_id="115977",
-    subject_procedures=sp_subject_procedures["data"]["subject_procedures"],
+    subject_procedures=sp_valid_subject_procedures["data"]["subject_procedures"],
 )
-lb_model = Procedures.construct(
+lb_valid_model = Procedures.construct(
     subject_id="115977",
-    subject_procedures=las_subject_procedures["data"]["subject_procedures"],
+    subject_procedures=las_valid_subject_procedures["data"]["subject_procedures"],
 )
-
-
+sp_invalid_model = Procedures.construct(
+    subject_id="115977",
+    subject_procedures=sp_invalid_subject_procedures["data"]["subject_procedures"],
+)
+lb_invalid_model = Procedures.construct(
+    subject_id="115977",
+    subject_procedures=las_invalid_subject_procedures["data"]["subject_procedures"],
+)
 class TestResponseHandler(unittest.TestCase):
     """Tests JSON methods in Responses class"""
 
@@ -154,15 +173,15 @@ class TestResponseHandler(unittest.TestCase):
     def test_combine_valid_no_data_error_responses(self):
         """Tests that error responses are combined as expected"""
         response1 = Responses.no_data_found_response()
-        response2 = Responses.model_response(lb_model)
-        response3 = Responses.model_response(sp_model)
+        response2 = Responses.model_response(lb_valid_model)
+        response3 = Responses.model_response(sp_valid_model)
         combined_response_1 = Responses.combine_procedure_responses(
             lb_response=response2, sp_response=response1
         )
         combined_json_1 = Responses.convert_response_to_json(
             *combined_response_1
         )
-        expected_json_1 = JSONResponse(las_subject_procedures)
+        expected_json_1 = JSONResponse(las_valid_subject_procedures)
         self.assertEqual(expected_json_1.body, combined_json_1.body)
         self.assertEqual(200, combined_json_1.status_code)
 
@@ -172,41 +191,29 @@ class TestResponseHandler(unittest.TestCase):
         combined_json_2 = Responses.convert_response_to_json(
             *combined_response_2
         )
-        expected_json_2 = JSONResponse(sp_subject_procedures)
+        expected_json_2 = JSONResponse(sp_valid_subject_procedures)
         self.assertEqual(expected_json_2.body, combined_json_2.body)
         self.assertEqual(200, combined_json_2.status_code)
 
     def test_combine_valid_responses(self):
         """Tests that valid responses are combined as expected"""
-        response1 = Responses.model_response(lb_model)
-        response2 = Responses.model_response(sp_model)
+        response1 = Responses.model_response(lb_valid_model)
+        response2 = Responses.model_response(sp_valid_model)
         response = Responses.combine_procedure_responses(
             lb_response=response1, sp_response=response2
         )
         actual_json = Responses.convert_response_to_json(*response)
-        expected_json = JSONResponse(combined_procedures)
+        expected_json = JSONResponse(combined_valid_procedures)
         self.assertEqual(expected_json.body, actual_json.body)
         self.assertEqual(200, actual_json.status_code)
 
     def test_combine_invalid_responses(self):
         """Tests that invalid responses are combined as expected"""
-        model1 = Procedures.construct(
-            subject_id="115977",
-            extra_field=None,
-            subject_procedures=las_subject_procedures["data"][
-                "subject_procedures"
-            ],
-        )
+        model1 = lb_invalid_model
         *_, validation_error_1 = validate_model(
             model1.__class__, model1.__dict__
         )
-        model2 = Procedures.construct(
-            subject_id="115977",
-            extra_field=None,
-            subject_procedures=sp_subject_procedures["data"][
-                "subject_procedures"
-            ],
-        )
+        model2 = sp_invalid_model
         *_, validation_error_2 = validate_model(
             model2.__class__, model2.__dict__
         )
@@ -224,7 +231,7 @@ class TestResponseHandler(unittest.TestCase):
                     f"Validation Errors: {str(validation_error_1)},"
                     f"Message 2: "
                     f"Validation Errors: {str(validation_error_2)}",
-                    "data": combined_procedures["data"],
+                    "data": combined_invalid_procedures["data"],
                 }
             ),
         )
@@ -240,7 +247,7 @@ class TestResponseHandler(unittest.TestCase):
         """
         model = Procedures.construct()
         response1 = Responses.model_response(model)
-        response2 = Responses.model_response(sp_model)
+        response2 = Responses.model_response(sp_valid_model)
         *_, validation_error = validate_model(model.__class__, model.__dict__)
         response = Responses.combine_procedure_responses(
             lb_response=response1, sp_response=response2
@@ -262,7 +269,7 @@ class TestResponseHandler(unittest.TestCase):
     def test_combine_valid_error_responses(self):
         """Tests that error responses are combined as expected"""
         response1 = Responses.connection_error_response()
-        response2 = Responses.model_response(sp_model)
+        response2 = Responses.model_response(sp_valid_model)
         combined_response_1 = Responses.combine_procedure_responses(
             lb_response=response1, sp_response=response2
         )
@@ -275,7 +282,7 @@ class TestResponseHandler(unittest.TestCase):
                 {
                     "message": "Message 1: Valid Model., "
                     "Message 2: Error Connecting to Internal Server.",
-                    "data": sp_subject_procedures["data"],
+                    "data": sp_valid_subject_procedures["data"],
                 }
             ),
         )
@@ -298,7 +305,7 @@ class TestResponseHandler(unittest.TestCase):
                     "message": "Message 1: "
                     "Error Connecting to Internal Server., "
                     "Message 2: Valid Model.",
-                    "data": las_subject_procedures["data"],
+                    "data": las_valid_subject_procedures["data"],
                 }
             ),
         )
