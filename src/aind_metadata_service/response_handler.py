@@ -17,7 +17,8 @@ class Responses:
     def generate_message(
         status_code: int, model: BaseModel | List[BaseModel] = None
     ) -> str:
-        """Generate message using the status code and optional model (for Subject and Procedures)"""
+        """Generate message using the status code and optional model.
+        Use case: Subject and Procedures response."""
 
         if status_code == StatusCodes.INVALID_DATA.value:
             *_, validation_error = validate_model(
@@ -39,7 +40,8 @@ class Responses:
     def generate_models_json(
         status_code: int, models: Union[BaseModel, List[BaseModel], None]
     ) -> JSONResponse:
-        """Generate model data in JSON (for Subject and Procedures)"""
+        """Generate model data in JSON format.
+        Use case: Subject and Procedures response."""
         models_json = None
         if models is not None:
             if status_code == StatusCodes.MULTIPLE_RESPONSES.value:
@@ -57,8 +59,8 @@ class Responses:
         model: Union[BaseModel, List[BaseModel], None],
         message: str = None,
     ) -> JSONResponse:
-        """Convert status code and model response into JSON response
-        (for Subject and Procedures and combined Procedures)"""
+        """Convert status code and model response into JSON response.
+        Use case: Subject and Procedures response, combined Procedures responses."""
 
         message = (
             Responses.generate_message(status_code, model)
@@ -81,7 +83,8 @@ class Responses:
         lb_response: Tuple[int, Union[BaseModel, None]],
         sp_response: Tuple[int, Union[BaseModel, None]],
     ) -> str:
-        """Generate message using the status code and optional model (for Subject and Procedures)"""
+        """Generate combined message from combining two responses.
+        Use case: combine Procedures responses."""
         lb_model = lb_response[1]
         sp_model = sp_response[1]
         lb_status_code = lb_response[0]
@@ -150,8 +153,8 @@ class Responses:
     ) -> Tuple[int, Union[BaseModel, None], str]:
         """
         Combines Model Responses from Labtracks and Sharepoint clients.
-        Generates messages.
         Handles validation errors and special cases.
+        Returns status code, combined model, and message.
         """
         try:
             lb_model = lb_response[1]
