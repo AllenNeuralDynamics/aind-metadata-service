@@ -1,6 +1,8 @@
 """Module to create client to connect to sharepoint database"""
 
 import logging
+from typing import List, Tuple, Union
+from pydantic import BaseModel
 
 from aind_data_schema.procedures import Procedures
 from fastapi.responses import JSONResponse
@@ -51,7 +53,7 @@ class SharePointClient:
     def get_procedure_info(
         self,
         subject_id: str,
-    ) -> JSONResponse:
+    ) -> Tuple[int, Union[BaseModel, None]]:
         """
         Primary interface. Maps a subject_id to a response.
         Parameters
@@ -61,8 +63,10 @@ class SharePointClient:
 
         Returns
         -------
-        JSONResponse
-          A response
+        int
+          Status code
+        Union[BaseModel, None]
+          A Procedures model if valid, None otherwise.
 
         """
         try:
@@ -93,7 +97,7 @@ class SharePointClient:
     @staticmethod
     def _handle_response_from_sharepoint(
         subject_id: str, subject_procedures=None
-    ) -> JSONResponse:
+    ) -> Tuple[int, Union[BaseModel, None]]:
         """
         Maps the response from SharePoint into a Procedures model
         Parameters
@@ -104,8 +108,10 @@ class SharePointClient:
 
         Returns
         -------
-        JSONResponse
-          Either a Procedures model or an error response
+        int
+          Status code
+        Union[BaseModel, None]
+          A Procedures model if valid, None otherwise.
 
         """
         if subject_procedures:
