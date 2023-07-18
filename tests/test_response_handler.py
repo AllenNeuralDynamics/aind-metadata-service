@@ -280,8 +280,8 @@ class TestResponseHandler(unittest.TestCase):
             status_code=207,
             content=(
                 {
-                    "message": "Message 1: Valid Model., "
-                    "Message 2: Error Connecting to Internal Server.",
+                    "message": "Message 1: Error Connecting to Internal Server.,"
+                    "Message 2: Valid Model.",
                     "data": sp_valid_subject_procedures["data"],
                 }
             ),
@@ -291,7 +291,7 @@ class TestResponseHandler(unittest.TestCase):
             expected_json_1.status_code, actual_json_1.status_code
         )
 
-        response3 = Responses.model_response(sp_model)
+        response3 = Responses.model_response(lb_valid_model)
         combined_response_2 = Responses.combine_procedure_responses(
             lb_response=response3, sp_response=response1
         )
@@ -302,9 +302,8 @@ class TestResponseHandler(unittest.TestCase):
             status_code=207,
             content=(
                 {
-                    "message": "Message 1: "
-                    "Error Connecting to Internal Server., "
-                    "Message 2: Valid Model.",
+                    "message": "Message 1: Valid Model.,"
+                    "Message 2: Error Connecting to Internal Server.",
                     "data": las_valid_subject_procedures["data"],
                 }
             ),
