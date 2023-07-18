@@ -66,7 +66,7 @@ class TestSharepointClient(unittest.TestCase):
             )
             with open(file_path) as f:
                 contents = json.load(f)
-            with open(mapped_file_path) as f:
+            with open(mapped_file_path, encoding='utf-8') as f:
                 mapped_contents = json.load(f)
             list_items.append((contents, mapped_contents, file_path.name))
             list_items.sort(key=lambda x: x[2])
@@ -127,15 +127,11 @@ class TestSharepointClient(unittest.TestCase):
         response = client.get_procedure_info(subject_id="12345")
         actual_status_code = response[0]
         actual_json = Responses.convert_response_to_json(*response)
-        actual_content = json.loads(actual_json.body)["data"]
-        actual_subject_procedures = actual_content["subject_procedures"]
-        # contents = json.loads(response.body.decode("utf-8"))
+        actual_content = json.loads(actual_json.body)
+        actual_subject_procedures = actual_content["data"]["subject_procedures"]
         expected_subject_procedures.sort(key=lambda x: str(x))
         actual_subject_procedures.sort(key=lambda x: str(x))
         self.assertEqual(200, actual_status_code)
-        self.assertEqual(
-            expected_subject_procedures[1], actual_subject_procedures[1]
-        )
         self.assertEqual(
             expected_subject_procedures, actual_subject_procedures
         )
