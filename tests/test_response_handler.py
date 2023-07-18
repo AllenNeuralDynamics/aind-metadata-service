@@ -259,7 +259,7 @@ class TestResponseHandler(unittest.TestCase):
                 {
                     "message": f"Message 1: Validation Errors: {str(validation_error)},"
                     f"Message 2: Valid Model.",
-                    "data": sp_subject_procedures["data"],
+                    "data": sp_valid_subject_procedures["data"],
                 }
             ),
         )
@@ -319,8 +319,8 @@ class TestResponseHandler(unittest.TestCase):
         self, mock_log: MagicMock, mock_json_error: MagicMock
     ):
         """Tests internal server error caught and logged correctly."""
-        response1 = Responses.model_response(lb_model)
-        response2 = Responses.model_response(sp_model)
+        response1 = Responses.model_response(lb_valid_model)
+        response2 = Responses.model_response(sp_valid_model)
 
         mock_json_error.side_effect = Mock(side_effect=KeyError)
 
