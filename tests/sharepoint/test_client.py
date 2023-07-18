@@ -83,9 +83,9 @@ class TestSharepointClient(unittest.TestCase):
             client_id="some_client_id",
             client_secret="some_client_secret",
         )
-        response = client.get_procedure_info(subject_id="12345")
+        actual_status_code, actual_model = client.get_procedure_info(subject_id="12345")
         mock_sharepoint_client.assert_called()
-        self.assertEqual(404, response.status_code)
+        self.assertEqual(404, actual_status_code)
 
     @patch("aind_metadata_service.sharepoint.client.ClientContext")
     def test_data_mapped(self, mock_sharepoint_client: MagicMock):
