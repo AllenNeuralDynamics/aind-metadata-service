@@ -178,13 +178,14 @@ class Responses:
                 print("both invalid")
                 lb_procedures = lb_model.subject_procedures
                 sp_procedures = sp_model.subject_procedures
-                combined_procedures = lb_procedures + sp_procedures
-                sp_model.subject_procedures = combined_procedures
 
                 status_code = StatusCodes.INVALID_DATA.value
                 message = Responses.generate_mixed_message(
                     lb_response, sp_response
                 )
+
+                combined_procedures = lb_procedures + sp_procedures
+                sp_model.subject_procedures = combined_procedures
 
                 return status_code, sp_model, message
 
@@ -194,24 +195,27 @@ class Responses:
             ):
                 lb_procedures = lb_model.subject_procedures
                 sp_procedures = sp_model.subject_procedures
-                combined_procedures = lb_procedures + sp_procedures
-                sp_model.subject_procedures = combined_procedures
 
                 status_code = StatusCodes.MIXED_STATUS.value
                 message = Responses.generate_mixed_message(
                     lb_response, sp_response
                 )
+
+                combined_procedures = lb_procedures + sp_procedures
+                sp_model.subject_procedures = combined_procedures
                 return status_code, sp_model, message
 
             # handles case when both responses are valid
             if sp_status_code < 300 and lb_status_code < 300:
                 lb_procedures = lb_model.subject_procedures
                 sp_procedures = sp_model.subject_procedures
-                combined_procedures = lb_procedures + sp_procedures
-                sp_model.subject_procedures = combined_procedures
 
                 status_code = StatusCodes.VALID_DATA.value
                 message = Responses.generate_message(status_code)
+
+                combined_procedures = lb_procedures + sp_procedures
+                sp_model.subject_procedures = combined_procedures
+
                 return status_code, sp_model, message
 
             # handles combination of server/connection error and valid response
