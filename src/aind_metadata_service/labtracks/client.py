@@ -78,7 +78,7 @@ class LabTracksClient:
 
     def get_subject_info(
         self, subject_id: str
-    ) -> Tuple[str, Union[BaseModel, List[BaseModel], None]]:
+    ) -> Tuple[int, Union[BaseModel, List[BaseModel], None]]:
         """
         Method to retrieve subject from subject_id (int)
         Parameters
@@ -119,7 +119,7 @@ class LabTracksClient:
 
     def get_procedures_info(
         self, subject_id: str
-    ) -> Tuple[str, Union[BaseModel, List[BaseModel], None]]:
+    ) -> Tuple[int, Union[BaseModel, List[BaseModel], None]]:
         """
         Method to retrieve LAS procedures from subject_id (int)
         Parameters
