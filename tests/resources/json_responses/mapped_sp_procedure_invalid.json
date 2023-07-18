@@ -1,0 +1,30 @@
+{
+  "message":"Valid Model.",
+  "data":{
+    "describedBy":"https://raw.githubusercontent.com/AllenNeuralDynamics/aind-data-schema/main/src/aind_data_schema/procedures.py",
+    "schema_version":"0.8.1",
+    "subject_id":"115977",
+    "subject_procedures":[
+      {
+        "start_date":"2022-01-03",
+        "end_date":"2022-01-03",
+        "experimenter_full_name":"NSB-187",
+        "protocol_id": null,
+        "iacuc_protocol":null,
+        "animal_weight_prior":null,
+        "animal_weight_post":null,
+        "weight_unit":"gram",
+        "anaesthesia":null,
+        "notes":null,
+        "procedure_type":"Headframe",
+        "headframe_type":"Visual Ctx",
+        "headframe_part_number":"0160-100-10",
+        "headframe_material":null,
+        "well_part_number":null,
+        "well_type":null
+      }
+    ],
+    "specimen_procedures":[],
+    "notes":null
+  }
+}
