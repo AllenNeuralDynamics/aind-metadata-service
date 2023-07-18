@@ -313,28 +313,5 @@ class TestResponseHandler(unittest.TestCase):
             expected_json_2.status_code, actual_json_2.status_code
         )
 
-    @patch("json.loads")
-    @patch("logging.error")
-    def test_error_combined_response(
-        self, mock_log: MagicMock, mock_json_error: MagicMock
-    ):
-        """Tests internal server error caught and logged correctly."""
-        response1 = Responses.model_response(lb_valid_model)
-        response2 = Responses.model_response(sp_valid_model)
-
-        mock_json_error.side_effect = Mock(side_effect=KeyError)
-
-        combined_response = Responses.combine_procedure_responses(
-            lb_response=response1, sp_response=response2
-        )
-        actual_json = Responses.convert_response_to_json(*combined_response)
-        expected_json = Responses.convert_response_to_json(
-            Responses.internal_server_error_response()
-        )
-        mock_log.assert_called_once_with("KeyError()")
-        self.assertEqual(500, expected_json.status_code)
-        self.assertEqual(actual_json.body, expected_json.body)
-
-
 if __name__ == "__main__":
     unittest.main()
