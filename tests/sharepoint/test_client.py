@@ -156,12 +156,12 @@ class TestSharepointClient(unittest.TestCase):
 
         mock_error.side_effect = Mock(side_effect=BrokenPipeError)
 
-        response = client.get_procedure_info("12345")
-        expected_response = Responses.internal_server_error_response()
+        actual_status_code, actual_model = client.get_procedure_info("12345")
+        expected_status_code, expected_model = Responses.internal_server_error_response()
         mock_sharepoint_client.assert_called_once()
         mock_log.assert_called_once_with("BrokenPipeError()")
-        self.assertEqual(500, expected_response.status_code)
-        self.assertEqual(response.body, expected_response.body)
+        self.assertEqual(500, actual_status_code)
+        self.assertEqual(expected_model, actual_model)
 
 
 if __name__ == "__main__":
