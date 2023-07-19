@@ -135,6 +135,27 @@ class TestResponseHandler(unittest.TestCase):
         self.assertEqual(expected_json.status_code, actual_json.status_code)
         self.assertEqual(expected_json.body, actual_json.body)
 
+    def test_multiple_items_response(self):
+        """Test multiple item response"""
+        models = [sp_valid_model, sp_valid_model]
+        response = Responses.multiple_items_found_response(models)
+        actual_json = Responses.convert_response_to_json(*response)
+
+        models_json = [
+            jsonable_encoder(json.loads(model.json()))
+            for model in models
+        ]
+        expected_json = JSONResponse(
+            status_code=300,
+            content=(
+                {
+                    "message": "Multiple Items Found.",
+                    "data": models_json,
+                }
+            ),
+        )
+        self.assertEqual(expected_json.status_code, actual_json.status_code)
+        self.assertEqual(expected_json.body, actual_json.body)
     def test_combine_internal_error_responses(self):
         """Tests that error responses are combined as expected"""
         response1 = Responses.internal_server_error_response()
