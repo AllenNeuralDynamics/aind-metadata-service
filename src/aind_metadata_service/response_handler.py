@@ -14,7 +14,7 @@ class Responses:
 
     @staticmethod
     def generate_message(
-        status_code: int, model: BaseModel | List[BaseModel] = None
+        status_code: int, model: Union[BaseModel, List[BaseModel]] = None
     ) -> str:
         """Generate message using the status code and optional model.
         Use case: Subject and Procedures response."""
