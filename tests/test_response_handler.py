@@ -142,8 +142,7 @@ class TestResponseHandler(unittest.TestCase):
         actual_json = Responses.convert_response_to_json(*response)
 
         models_json = [
-            jsonable_encoder(json.loads(model.json()))
-            for model in models
+            jsonable_encoder(json.loads(model.json())) for model in models
         ]
         expected_json = JSONResponse(
             status_code=300,
@@ -156,6 +155,7 @@ class TestResponseHandler(unittest.TestCase):
         )
         self.assertEqual(expected_json.status_code, actual_json.status_code)
         self.assertEqual(expected_json.body, actual_json.body)
+
     def test_combine_internal_error_responses(self):
         """Tests that error responses are combined as expected"""
         response1 = Responses.internal_server_error_response()
@@ -290,8 +290,8 @@ class TestResponseHandler(unittest.TestCase):
             content=(
                 {
                     "message": f"Message 1: "
-                               f"Validation Errors: {str(validation_error)},"
-                               f"Message 2: Valid Model.",
+                    f"Validation Errors: {str(validation_error)},"
+                    f"Message 2: Valid Model.",
                     "data": sp_valid_subject_procedures["data"],
                 }
             ),
@@ -314,8 +314,8 @@ class TestResponseHandler(unittest.TestCase):
             content=(
                 {
                     "message": "Message 1: "
-                               "Error Connecting to Internal Server.,"
-                               "Message 2: Valid Model.",
+                    "Error Connecting to Internal Server.,"
+                    "Message 2: Valid Model.",
                     "data": sp_valid_subject_procedures["data"],
                 }
             ),
