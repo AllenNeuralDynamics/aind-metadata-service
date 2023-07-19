@@ -129,7 +129,7 @@ class Responses:
         return response
 
     @staticmethod
-    def model_response(model: BaseModel) -> tuple[int, BaseModel]:
+    def model_response(model: BaseModel) -> Tuple[int, BaseModel]:
         """
         Parse model to a response or return model if valid.
         Handles validation errors.
