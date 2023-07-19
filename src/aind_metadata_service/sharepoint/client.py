@@ -1,10 +1,9 @@
 """Module to create client to connect to sharepoint database"""
 
 import logging
-from typing import List, Tuple, Union
+from typing import Tuple, Union
 
 from aind_data_schema.procedures import Procedures
-from fastapi.responses import JSONResponse
 from office365.runtime.auth.client_credential import ClientCredential
 from office365.sharepoint.client_context import ClientContext
 from pydantic import BaseModel
