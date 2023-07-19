@@ -2,12 +2,12 @@
 
 import logging
 from typing import List, Tuple, Union
-from pydantic import BaseModel
 
 from aind_data_schema.procedures import Procedures
 from fastapi.responses import JSONResponse
 from office365.runtime.auth.client_credential import ClientCredential
 from office365.sharepoint.client_context import ClientContext
+from pydantic import BaseModel
 
 from aind_metadata_service.response_handler import Responses
 from aind_metadata_service.sharepoint.nsb2019.procedures import (

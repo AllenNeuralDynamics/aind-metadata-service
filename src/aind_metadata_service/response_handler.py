@@ -60,7 +60,8 @@ class Responses:
     ) -> JSONResponse:
         """Convert status code and model response into JSON response.
         An optional message may be provided if the response was the result of combining two responses.
-        Use case: Subject and Procedures response, combined Procedures responses."""
+        Use case: Subject and Procedures response, combined Procedures responses.
+        """
 
         message = (
             Responses.generate_message(status_code, model)
@@ -155,7 +156,7 @@ class Responses:
         Combines Model Responses from Labtracks and Sharepoint clients.
         Handles validation errors and special cases.
         Returns status code, combined model, and message.
-    """
+        """
         lb_model = lb_response[1]
         sp_model = sp_response[1]
         sp_status_code = sp_response[0]

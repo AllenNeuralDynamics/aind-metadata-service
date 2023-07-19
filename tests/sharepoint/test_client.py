@@ -66,7 +66,7 @@ class TestSharepointClient(unittest.TestCase):
             )
             with open(file_path) as f:
                 contents = json.load(f)
-            with open(mapped_file_path, encoding='utf-8') as f:
+            with open(mapped_file_path, encoding="utf-8") as f:
                 mapped_contents = json.load(f)
             list_items.append((contents, mapped_contents, file_path.name))
             list_items.sort(key=lambda x: x[2])
@@ -83,7 +83,9 @@ class TestSharepointClient(unittest.TestCase):
             client_id="some_client_id",
             client_secret="some_client_secret",
         )
-        actual_status_code, actual_model = client.get_procedure_info(subject_id="12345")
+        actual_status_code, actual_model = client.get_procedure_info(
+            subject_id="12345"
+        )
         mock_sharepoint_client.assert_called()
         self.assertEqual(404, actual_status_code)
 
@@ -128,7 +130,9 @@ class TestSharepointClient(unittest.TestCase):
         actual_status_code = response[0]
         actual_json = Responses.convert_response_to_json(*response)
         actual_content = json.loads(actual_json.body)
-        actual_subject_procedures = actual_content["data"]["subject_procedures"]
+        actual_subject_procedures = actual_content["data"][
+            "subject_procedures"
+        ]
         expected_subject_procedures.sort(key=lambda x: str(x))
         actual_subject_procedures.sort(key=lambda x: str(x))
         self.assertEqual(200, actual_status_code)
@@ -161,7 +165,10 @@ class TestSharepointClient(unittest.TestCase):
         mock_error.side_effect = Mock(side_effect=BrokenPipeError)
 
         actual_status_code, actual_model = client.get_procedure_info("12345")
-        expected_status_code, expected_model = Responses.internal_server_error_response()
+        (
+            expected_status_code,
+            expected_model,
+        ) = Responses.internal_server_error_response()
         mock_sharepoint_client.assert_called_once()
         mock_log.assert_called_once_with("BrokenPipeError()")
         self.assertEqual(500, actual_status_code)
