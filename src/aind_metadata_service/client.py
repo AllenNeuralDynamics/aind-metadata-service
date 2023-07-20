@@ -13,7 +13,7 @@ class StatusCodes(Enum):
     VALID_DATA = 200
     INVALID_DATA = 406
     NO_DATA_FOUND = 404
-    MIXED_STATUS = 207
+    MULTI_STATUS = 207
 
 
 class AindMetadataServiceClient:

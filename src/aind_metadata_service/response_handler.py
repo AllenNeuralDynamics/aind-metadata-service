@@ -199,7 +199,7 @@ class Responses:
             lb_procedures = lb_model.subject_procedures
             sp_procedures = sp_model.subject_procedures
 
-            status_code = StatusCodes.MIXED_STATUS.value
+            status_code = StatusCodes.MULTI_STATUS.value
             message = Responses.generate_mixed_message(
                 lb_response, sp_response
             )
@@ -223,14 +223,14 @@ class Responses:
 
         # handles combination of server/connection error and valid response
         if sp_status_code in (500, 503) and lb_status_code < 300:
-            status_code = StatusCodes.MIXED_STATUS.value
+            status_code = StatusCodes.MULTI_STATUS.value
             message = Responses.generate_mixed_message(
                 lb_response, sp_response
             )
             return status_code, lb_model, message
 
         if sp_status_code < 300 and lb_status_code in (500, 503):
-            status_code = StatusCodes.MIXED_STATUS.value
+            status_code = StatusCodes.MULTI_STATUS.value
             message = Responses.generate_mixed_message(
                 lb_response, sp_response
             )
