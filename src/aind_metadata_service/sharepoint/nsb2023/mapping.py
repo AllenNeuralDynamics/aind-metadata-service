@@ -126,8 +126,8 @@ class HeadPostInfo:
         cls, hp: Optional[HeadPost], hp_type: Optional[HeadPostType]
     ):
         """Construct HeadPostInfo2023 from headpost and headpost_type"""
-        headframe_type = hp.value
-        well_type = hp_type.value
+        headframe_type = None if hp is None else hp.value
+        well_type = None if hp_type is None else hp_type.value
         if hp == HeadPost.VISUAL_CTX:
             headframe_part_number = "0160-100-10"
         elif hp == HeadPost.WHC_NP:
