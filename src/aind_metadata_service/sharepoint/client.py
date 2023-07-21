@@ -1,7 +1,7 @@
 """Module to create client to connect to sharepoint database"""
 
 import logging
-from typing import Tuple, Union, Optional
+from typing import Optional, Tuple, Union
 
 from aind_data_schema.procedures import Procedures
 from office365.runtime.auth.client_credential import ClientCredential

@@ -1,12 +1,12 @@
 """Module to handle responses"""
 import json
-from typing import List, Tuple, Union, Optional
+from typing import List, Optional, Tuple, Union
 
+from aind_data_schema.procedures import Procedures
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, validate_model
 
-from aind_data_schema.procedures import Procedures
 from aind_metadata_service.client import StatusCodes
 
 

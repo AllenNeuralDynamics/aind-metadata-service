@@ -83,7 +83,6 @@ async def retrieve_procedures(subject_id, pickle=False):
     return Responses.convert_response_to_json(*response)
 
 
-
 @app.get(
     "/favicon.ico",
     include_in_schema=False,
