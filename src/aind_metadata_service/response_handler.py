@@ -178,7 +178,6 @@ class Responses:
             return lb_response + (message,)
         # handles combination of invalid responses
         if lb_status_code == 406 and sp_status_code == 406:
-            print("both invalid")
             lb_procedures = lb_model.subject_procedures
             sp_procedures = sp_model.subject_procedures
 
