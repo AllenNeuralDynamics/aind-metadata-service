@@ -6,6 +6,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, validate_model
 
+from aind_data_schema.procedures import Procedures
 from aind_metadata_service.client import StatusCodes
 
 
@@ -149,8 +150,8 @@ class Responses:
     # flake8: noqa: C901
     @staticmethod
     def combine_procedure_responses(
-        lb_response: Tuple[int, Optional[BaseModel]],
-        sp_response: Tuple[int, Optional[BaseModel]],
+        lb_response: Tuple[int, Optional[Procedures]],
+        sp_response: Tuple[int, Optional[Procedures]],
     ) -> Tuple[int, Optional[BaseModel], str]:
         """
         Combines Model Responses from Labtracks and Sharepoint clients.
