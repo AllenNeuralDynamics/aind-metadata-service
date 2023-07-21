@@ -102,7 +102,6 @@ class Responses:
     def connection_error_response() -> Tuple[int, None]:
         """Map to a connection error"""
         status_code = StatusCodes.CONNECTION_ERROR.value
-        message = Responses.generate_message(status_code, None)
         response = (status_code, None)
         return response
 
