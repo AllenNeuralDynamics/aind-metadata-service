@@ -1,7 +1,7 @@
 """Module to create client to connect to sharepoint database"""
 
 import logging
-from typing import Tuple, Union
+from typing import Tuple, Union, Optional
 
 from aind_data_schema.procedures import Procedures
 from office365.runtime.auth.client_credential import ClientCredential
@@ -52,7 +52,7 @@ class SharePointClient:
     def get_procedure_info(
         self,
         subject_id: str,
-    ) -> Tuple[int, Union[BaseModel, None]]:
+    ) -> Tuple[int, Optional[BaseModel]]:
         """
         Primary interface. Maps a subject_id to a response.
         Parameters
@@ -64,7 +64,7 @@ class SharePointClient:
         -------
         int
           Status code
-        Union[BaseModel, None]
+        Optional[BaseModel]
           A Procedures model if valid, None otherwise.
 
         """
@@ -96,7 +96,7 @@ class SharePointClient:
     @staticmethod
     def _handle_response_from_sharepoint(
         subject_id: str, subject_procedures=None
-    ) -> Tuple[int, Union[BaseModel, None]]:
+    ) -> Tuple[int, Optional[BaseModel]]:
         """
         Maps the response from SharePoint into a Procedures model
         Parameters
@@ -109,7 +109,7 @@ class SharePointClient:
         -------
         int
           Status code
-        Union[BaseModel, None]
+        Optional[BaseModel]
           A Procedures model if valid, None otherwise.
 
         """

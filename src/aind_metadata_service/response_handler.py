@@ -1,6 +1,6 @@
 """Module to handle responses"""
 import json
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Optional
 
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -81,8 +81,8 @@ class Responses:
 
     @staticmethod
     def generate_mixed_message(
-        lb_response: Tuple[int, Union[BaseModel, None]],
-        sp_response: Tuple[int, Union[BaseModel, None]],
+        lb_response: Tuple[int, Optional[BaseModel]],
+        sp_response: Tuple[int, Optional[BaseModel]],
     ) -> str:
         """Generate combined message from combining two responses.
         Use case: combine Procedures responses."""
@@ -149,9 +149,9 @@ class Responses:
     # flake8: noqa: C901
     @staticmethod
     def combine_procedure_responses(
-        lb_response: Tuple[int, Union[BaseModel, None]],
-        sp_response: Tuple[int, Union[BaseModel, None]],
-    ) -> Tuple[int, Union[BaseModel, None], str]:
+        lb_response: Tuple[int, Optional[BaseModel]],
+        sp_response: Tuple[int, Optional[BaseModel]],
+    ) -> Tuple[int, Optional[BaseModel], str]:
         """
         Combines Model Responses from Labtracks and Sharepoint clients.
         Handles validation errors and special cases.
