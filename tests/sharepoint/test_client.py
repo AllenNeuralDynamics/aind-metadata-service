@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import List, Tuple
 from unittest.mock import MagicMock, Mock, patch
 
-from aind_metadata_service.response_handler import Responses
+from aind_metadata_service.response_handler import StatusCodes
 from aind_metadata_service.sharepoint.client import SharePointClient
 
 if os.getenv("LOG_LEVEL"):  # pragma: no cover
@@ -78,16 +78,18 @@ class TestSharepointClient(unittest.TestCase):
         from NSB datatbases"""
         client = SharePointClient(
             nsb_site_url="some_url",
-            nsb_list_title_2019="some_list_title2019",
-            nsb_list_title_2023="some_list_title2023",
             client_id="some_client_id",
             client_secret="some_client_secret",
         )
-        actual_status_code, actual_model = client.get_procedure_info(
-            subject_id="12345"
+        model_response = client.get_procedure_info(
+            subject_id="12345", list_title="some_list_title"
         )
+        json_response = model_response.map_to_json_response()
         mock_sharepoint_client.assert_called()
-        self.assertEqual(404, actual_status_code)
+        self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
+        self.assertEqual(
+            StatusCodes.NO_DATA_FOUND.value, json_response.status_code
+        )
 
     @patch("aind_metadata_service.sharepoint.client.ClientContext")
     def test_data_mapped(self, mock_sharepoint_client: MagicMock):
@@ -116,8 +118,6 @@ class TestSharepointClient(unittest.TestCase):
 
         client = SharePointClient(
             nsb_site_url="some_url",
-            nsb_list_title_2019="some_list_title2019",
-            nsb_list_title_2023="some_list_title2023",
             client_id="some_client_id",
             client_secret="some_client_secret",
         )
@@ -126,16 +126,24 @@ class TestSharepointClient(unittest.TestCase):
         expected_subject_procedures.extend(self.list_items_2019[0][1])
         expected_subject_procedures.extend(self.list_items_2023[0][1])
 
-        response = client.get_procedure_info(subject_id="12345")
-        actual_status_code = response[0]
-        actual_json = Responses.convert_response_to_json(*response)
-        actual_content = json.loads(actual_json.body)
+        response2019 = client.get_procedure_info(
+            subject_id="12345", list_title="some_list_title2019"
+        )
+        response2023 = client.get_procedure_info(
+            subject_id="12345", list_title="some_list_title2023"
+        )
+        merged_responses = client.merge_responses([response2019, response2023])
+        json_response = merged_responses.map_to_json_response()
+        actual_content = json.loads(json_response.body.decode("utf-8"))
         actual_subject_procedures = actual_content["data"][
             "subject_procedures"
         ]
         expected_subject_procedures.sort(key=lambda x: str(x))
         actual_subject_procedures.sort(key=lambda x: str(x))
-        self.assertEqual(200, actual_status_code)
+        self.assertEqual(
+            StatusCodes.DB_RESPONDED, merged_responses.status_code
+        )
+        self.assertEqual(200, json_response.status_code)
         self.assertEqual(
             expected_subject_procedures, actual_subject_procedures
         )
@@ -156,23 +164,28 @@ class TestSharepointClient(unittest.TestCase):
 
         client = SharePointClient(
             nsb_site_url="some_url",
-            nsb_list_title_2019="some_list_title2019",
-            nsb_list_title_2023="some_list_title2023",
             client_id="some_client_id",
             client_secret="some_client_secret",
         )
 
         mock_error.side_effect = Mock(side_effect=BrokenPipeError)
 
-        actual_status_code, actual_model = client.get_procedure_info("12345")
-        (
-            expected_status_code,
-            expected_model,
-        ) = Responses.internal_server_error_response()
+        model_response = client.get_procedure_info(
+            subject_id="12345", list_title="some_list_title_2023"
+        )
+        json_response = model_response.map_to_json_response()
         mock_sharepoint_client.assert_called_once()
         mock_log.assert_called_once_with("BrokenPipeError()")
-        self.assertEqual(500, actual_status_code)
-        self.assertEqual(expected_model, actual_model)
+        self.assertEqual(
+            StatusCodes.INTERNAL_SERVER_ERROR, model_response.status_code
+        )
+        self.assertEqual([], model_response.aind_models)
+        self.assertEqual(
+            StatusCodes.INTERNAL_SERVER_ERROR.value, json_response.status_code
+        )
+        self.assertIsNone(
+            json.loads(json_response.body.decode("utf-8"))["data"]
+        )
 
 
 if __name__ == "__main__":
