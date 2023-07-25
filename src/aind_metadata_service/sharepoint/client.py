@@ -179,7 +179,7 @@ class SharePointClient:
         ):
             return ModelResponse(
                 aind_models=left_model_response.aind_models,
-                status_code=StatusCodes.MULTIPLE_RESPONSES,
+                status_code=StatusCodes.MULTI_STATUS,
                 message=(
                     "There was an error retrieving records from one or more "
                     "of the databases."
@@ -191,7 +191,7 @@ class SharePointClient:
         ):
             return ModelResponse(
                 aind_models=right_model_response.aind_models,
-                status_code=StatusCodes.MULTIPLE_RESPONSES,
+                status_code=StatusCodes.MULTI_STATUS,
                 message=(
                     "There was an error retrieving records from one or more "
                     "of the databases."
