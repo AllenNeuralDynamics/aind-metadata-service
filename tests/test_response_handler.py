@@ -125,42 +125,64 @@ class TestResponseHandler(unittest.TestCase):
         self.assertEqual(expected_json.status_code, actual_json.status_code)
         self.assertEqual(expected_json.body, actual_json.body)
 
-    # def test_connection_error(self):
-    #     """Test connection error response"""
-    #     response = Responses.connection_error_response()
-    #     actual_json = Responses.convert_response_to_json(*response)
-    #     expected_json = JSONResponse(
-    #         status_code=503,
-    #         content=(
-    #             {
-    #                 "message": "Error Connecting to Internal Server.",
-    #                 "data": None,
-    #             }
-    #         ),
-    #     )
-    #     self.assertEqual(expected_json.status_code, actual_json.status_code)
-    #     self.assertEqual(expected_json.body, actual_json.body)
-    #
-    # def test_multiple_items_response(self):
-    #     """Test multiple item response"""
-    #     models = [sp_valid_model, sp_valid_model]
-    #     response = Responses.multiple_items_found_response(models)
-    #     actual_json = Responses.convert_response_to_json(*response)
-    #
-    #     models_json = [
-    #         jsonable_encoder(json.loads(model.json())) for model in models
-    #     ]
-    #     expected_json = JSONResponse(
-    #         status_code=300,
-    #         content=(
-    #             {
-    #                 "message": "Multiple Items Found.",
-    #                 "data": models_json,
-    #             }
-    #         ),
-    #     )
-    #     self.assertEqual(expected_json.status_code, actual_json.status_code)
-    #     self.assertEqual(expected_json.body, actual_json.body)
+    def test_multiple_items_response(self):
+        """Test multiple item response"""
+        models = [sp_valid_model, sp_valid_model]
+        model_response = ModelResponse(
+            status_code=StatusCodes.DB_RESPONDED, aind_models=models
+        )
+        actual_json = model_response.map_to_json_response()
+
+        models_json = [
+            jsonable_encoder(json.loads(model.json())) for model in models
+        ]
+        expected_json = JSONResponse(
+            status_code=300,
+            content=(
+                {
+                    "message": "Multiple Items Found.",
+                    "data": models_json,
+                }
+            ),
+        )
+        self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
+        self.assertEqual(expected_json.status_code, actual_json.status_code)
+        self.assertEqual(expected_json.body, actual_json.body)
+
+    def test_connection_error(self):
+        """Test connection error response"""
+        model_response = ModelResponse.connection_error_response()
+        actual_json = model_response.map_to_json_response()
+        expected_json = JSONResponse(
+            status_code=503,
+            content=(
+                {
+                    "message": "Connection Error.",
+                    "data": None,
+                }
+            ),
+        )
+        self.assertEqual(StatusCodes.CONNECTION_ERROR, model_response.status_code)
+        self.assertEqual(expected_json.status_code, actual_json.status_code)
+        self.assertEqual(expected_json.body, actual_json.body)
+
+    def test_internal_error(self):
+        """Test internal error response"""
+        model_response = ModelResponse.internal_server_error_response()
+        actual_json = model_response.map_to_json_response()
+        expected_json = JSONResponse(
+            status_code=500,
+            content=(
+                {
+                    "message": "Internal Server Error.",
+                    "data": None,
+                }
+            ),
+        )
+        self.assertEqual(StatusCodes.INTERNAL_SERVER_ERROR, model_response.status_code)
+        self.assertEqual(expected_json.status_code, actual_json.status_code)
+        self.assertEqual(expected_json.body, actual_json.body)
+
     #
     # def test_combine_internal_error_responses(self):
     #     """Tests that error responses are combined as expected"""
