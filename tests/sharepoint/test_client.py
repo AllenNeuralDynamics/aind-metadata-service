@@ -238,7 +238,6 @@ class TestSharepointClient(unittest.TestCase):
             expected_subject_procedures_right, actual_subject_procedures_right
         )
 
-    '''
     @patch("aind_metadata_service.sharepoint.client.ClientContext")
     @patch(
         "aind_metadata_service.sharepoint.nsb2023.procedures."
@@ -304,7 +303,6 @@ class TestSharepointClient(unittest.TestCase):
         self.assertEqual(
             expected_subject_procedures, actual_subject_procedures
         )
-    '''
 
     def test_merge_procedures_empty_input(self):
         """Tests that merging nothing returns internal server error."""
@@ -361,46 +359,6 @@ class TestSharepointClient(unittest.TestCase):
         )
         self.assertEqual(expected_json.status_code, actual_json.status_code)
         self.assertEqual(expected_json.body, actual_json.body)
-
-    '''
-    @patch(
-        "aind_metadata_service.sharepoint.nsb2023.procedures."
-        "NSB2023Procedures.get_procedures_from_sharepoint"
-    )
-    def test_merge_error_responses_with_mock(self, mock_error: MagicMock):
-        """Test merging error responses returns internal server error."""
-
-        client = SharePointClient(
-            nsb_site_url="some_url",
-            client_id="some_client_id",
-            client_secret="some_client_secret",
-        )
-
-        mock_error.side_effect = Mock(side_effect=BrokenPipeError)
-        response1 = client.get_procedure_info(
-            subject_id="12345", list_title="some_list_title_2023"
-        )
-        response2 = client.get_procedure_info(
-            subject_id="12345", list_title="some_list_title_2023"
-        )
-        merged_responses = client.merge_responses([response1, response2])
-        actual_json = merged_responses.map_to_json_response()
-        expected_json = JSONResponse(
-            status_code=500,
-            content=(
-                {
-                    "message": "Internal Server Error.",
-                    "data": None,
-                }
-            ),
-        )
-
-        self.assertEqual(
-            StatusCodes.INTERNAL_SERVER_ERROR, merged_responses.status_code
-        )
-        self.assertEqual(expected_json.status_code, actual_json.status_code)
-        self.assertEqual(expected_json.body, actual_json.body)
-    '''
 
     @patch("aind_metadata_service.sharepoint.client.ClientContext")
     @patch(
