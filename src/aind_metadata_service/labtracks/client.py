@@ -349,6 +349,8 @@ class LabTracksResponseHandler:
         Maps a response from LabTracks to an aind_data_schema.Procedure
         Parameters
         ----------
+        subject_id : str
+            The subject id to map the procedures to
         results : List[dict]
             Results pulled from LabTracks. In the form of [row]
 
