@@ -8,7 +8,9 @@ from pathlib import Path
 from typing import List, Tuple
 from unittest.mock import MagicMock, Mock, patch
 
-from aind_metadata_service.response_handler import StatusCodes
+from fastapi.responses import JSONResponse
+
+from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 from aind_metadata_service.sharepoint.client import SharePointClient
 
 if os.getenv("LOG_LEVEL"):  # pragma: no cover

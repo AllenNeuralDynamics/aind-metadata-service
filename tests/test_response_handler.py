@@ -162,7 +162,9 @@ class TestResponseHandler(unittest.TestCase):
                 }
             ),
         )
-        self.assertEqual(StatusCodes.CONNECTION_ERROR, model_response.status_code)
+        self.assertEqual(
+            StatusCodes.CONNECTION_ERROR, model_response.status_code
+        )
         self.assertEqual(expected_json.status_code, actual_json.status_code)
         self.assertEqual(expected_json.body, actual_json.body)
 
@@ -179,7 +181,9 @@ class TestResponseHandler(unittest.TestCase):
                 }
             ),
         )
-        self.assertEqual(StatusCodes.INTERNAL_SERVER_ERROR, model_response.status_code)
+        self.assertEqual(
+            StatusCodes.INTERNAL_SERVER_ERROR, model_response.status_code
+        )
         self.assertEqual(expected_json.status_code, actual_json.status_code)
         self.assertEqual(expected_json.body, actual_json.body)
 

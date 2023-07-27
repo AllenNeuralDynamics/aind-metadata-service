@@ -291,12 +291,14 @@ class TestLabTracksClient(unittest.TestCase):
         expected_subject2.sex = Sex.FEMALE
 
         self.assertEqual(StatusCodes.DB_RESPONDED, actual_response.status_code)
-        self.assertEqual([TestResponseExamples.expected_subject, expected_subject2], actual_response.aind_models)
+        self.assertEqual(
+            [TestResponseExamples.expected_subject, expected_subject2],
+            actual_response.aind_models,
+        )
         self.assertEqual(
             StatusCodes.MULTIPLE_RESPONSES.value,
             actual_response_json.status_code,
         )
-
 
     @patch("pyodbc.connect")
     def test_get_procedure_info_success(self, mock_connect: Mock) -> None:

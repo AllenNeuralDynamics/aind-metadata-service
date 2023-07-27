@@ -145,11 +145,11 @@ class TestLabTracksResponseHandler(unittest.TestCase):
     def test_map_response_to_procedures(self):
         """Tests that the response gets mapped to the subject."""
         actual_procedures = self.rh.map_response_to_procedures(
-            "115977",
-            TestResponseExamples.test_procedures_response
+            "115977", TestResponseExamples.test_procedures_response
         )
         self.assertEqual(
-            TestResponseExamples.expected_subject_procedures, actual_procedures.subject_procedures
+            TestResponseExamples.expected_subject_procedures,
+            actual_procedures.subject_procedures,
         )
 
     def test_map_response_to_subject(self):
