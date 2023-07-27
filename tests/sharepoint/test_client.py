@@ -149,6 +149,150 @@ class TestSharepointClient(unittest.TestCase):
         )
 
     @patch("aind_metadata_service.sharepoint.client.ClientContext")
+    def test_merge_valid_empty_procedures(
+        self, mock_sharepoint_client: MagicMock
+    ):
+        """Tests that merging valid procedures list with empty list
+        returned correctly."""
+
+        inner_mock = MagicMock()
+        mock_sharepoint_client.return_value.with_credentials.return_value = (
+            inner_mock
+        )
+        mock_list_views = MagicMock()
+        inner_mock.web.lists.get_by_title.return_value.views = mock_list_views
+        mock_list_items = MagicMock()
+        mock_list_views.get_by_title.return_value.get_items.return_value = (
+            mock_list_items
+        )
+        list_item_2019_1 = self.list_items_2019[0][0]
+        list_item_2023_1 = self.list_items_2023[0][0]
+        mock_list_item2019 = MagicMock()
+        mock_list_item2023 = MagicMock()
+        mock_list_item2019.to_json.return_value = list_item_2019_1
+        mock_list_item2023.to_json.return_value = list_item_2023_1
+        mock_list_items.filter.side_effect = [
+            [mock_list_item2019],
+            [mock_list_item2023],
+        ]
+
+        client = SharePointClient(
+            nsb_site_url="some_url",
+            client_id="some_client_id",
+            client_secret="some_client_secret",
+        )
+
+        response2019 = client.get_procedure_info(
+            subject_id="12345", list_title="some_list_title2019"
+        )
+        response2019_empty = client.get_procedure_info(
+            subject_id="12345", list_title="some_list_title2019"
+        )
+        response2019_empty.aind_models = []
+
+        expected_subject_procedures_left = []
+        expected_subject_procedures_left.extend(self.list_items_2019[0][1])
+
+        expected_subject_procedures_right = []
+        expected_subject_procedures_right.extend(self.list_items_2019[0][1])
+        merged_responses_left = client.merge_responses(
+            [response2019, response2019_empty]
+        )
+        json_response_left = merged_responses_left.map_to_json_response()
+        actual_content_left = json.loads(
+            json_response_left.body.decode("utf-8")
+        )
+        actual_subject_procedures_left = actual_content_left["data"][
+            "subject_procedures"
+        ]
+
+        merged_responses_right = client.merge_responses(
+            [response2019_empty, response2019]
+        )
+        json_response_right = merged_responses_right.map_to_json_response()
+        actual_content_right = json.loads(
+            json_response_right.body.decode("utf-8")
+        )
+        actual_subject_procedures_right = actual_content_right["data"][
+            "subject_procedures"
+        ]
+        expected_subject_procedures_left.sort(key=lambda x: str(x))
+        actual_subject_procedures_left.sort(key=lambda x: str(x))
+
+        expected_subject_procedures_right.sort(key=lambda x: str(x))
+        actual_subject_procedures_right.sort(key=lambda x: str(x))
+        self.assertEqual(
+            StatusCodes.DB_RESPONDED, merged_responses_left.status_code
+        )
+        self.assertEqual(200, json_response_left.status_code)
+        self.assertEqual(
+            expected_subject_procedures_left, actual_subject_procedures_left
+        )
+        self.assertEqual(
+            StatusCodes.DB_RESPONDED, merged_responses_right.status_code
+        )
+        self.assertEqual(200, json_response_right.status_code)
+        self.assertEqual(
+            expected_subject_procedures_right, actual_subject_procedures_right
+        )
+
+    def test_merge_procedures_empty_input(self):
+        """Tests that merging nothing returns internal server error."""
+
+        client = SharePointClient(
+            nsb_site_url="some_url",
+            client_id="some_client_id",
+            client_secret="some_client_secret",
+        )
+
+        merged_responses = client.merge_responses([])
+        actual_json = merged_responses.map_to_json_response()
+        expected_json = JSONResponse(
+            status_code=500,
+            content=(
+                {
+                    "message": "Internal Server Error.",
+                    "data": None,
+                }
+            ),
+        )
+
+        self.assertEqual(
+            StatusCodes.INTERNAL_SERVER_ERROR, merged_responses.status_code
+        )
+        self.assertEqual(expected_json.status_code, actual_json.status_code)
+        self.assertEqual(expected_json.body, actual_json.body)
+
+    def test_merge_error_responses(self):
+        """Tests that merging error responses returns internal server error."""
+
+        client = SharePointClient(
+            nsb_site_url="some_url",
+            client_id="some_client_id",
+            client_secret="some_client_secret",
+        )
+
+        response1 = ModelResponse.internal_server_error_response()
+        response2 = ModelResponse.connection_error_response()
+        merged_responses = client.merge_responses([response1, response2])
+        actual_json = merged_responses.map_to_json_response()
+        expected_json = JSONResponse(
+            status_code=500,
+            content=(
+                {
+                    "message": "Internal Server Error.",
+                    "data": None,
+                }
+            ),
+        )
+
+        self.assertEqual(
+            StatusCodes.INTERNAL_SERVER_ERROR, merged_responses.status_code
+        )
+        self.assertEqual(expected_json.status_code, actual_json.status_code)
+        self.assertEqual(expected_json.body, actual_json.body)
+
+    @patch("aind_metadata_service.sharepoint.client.ClientContext")
     @patch(
         "aind_metadata_service.sharepoint.nsb2023.procedures."
         "NSB2023Procedures.get_procedures_from_sharepoint"
