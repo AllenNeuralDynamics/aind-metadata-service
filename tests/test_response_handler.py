@@ -187,5 +187,6 @@ class TestResponseHandler(unittest.TestCase):
         self.assertEqual(expected_json.status_code, actual_json.status_code)
         self.assertEqual(expected_json.body, actual_json.body)
 
+
 if __name__ == "__main__":
     unittest.main()
