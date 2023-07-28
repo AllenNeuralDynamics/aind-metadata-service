@@ -7,7 +7,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
 from aind_metadata_service.labtracks.client import LabTracksClient
-from aind_metadata_service.response_handler import Responses
 from aind_metadata_service.sharepoint.client import SharePointClient
 
 app = FastAPI()
@@ -53,7 +52,8 @@ async def retrieve_subject(subject_id, pickle=False):
         password=labtracks_password,
     )
     response = lb_client.get_subject_info(subject_id)
-    return response
+    json_response = response.map_to_json_response()
+    return json_response
 
 
 @app.get("/procedures/{subject_id}")
@@ -64,8 +64,6 @@ async def retrieve_procedures(subject_id, pickle=False):
     """
     sharepoint_client = SharePointClient(
         nsb_site_url=nsb_sharepoint_url,
-        nsb_list_title_2019=nsb_sharepoint_list_2019,
-        nsb_list_title_2023=nsb_sharepoint_list_2023,
         client_id=nsb_sharepoint_user,
         client_secret=nsb_sharepoint_password,
     )
@@ -78,9 +76,17 @@ async def retrieve_procedures(subject_id, pickle=False):
         password=labtracks_password,
     )
     lb_response = lb_client.get_procedures_info(subject_id=subject_id)
-    sp_response = sharepoint_client.get_procedure_info(subject_id=subject_id)
-    response = Responses.combine_procedure_responses(lb_response, sp_response)
-    return response
+    sp2019_response = sharepoint_client.get_procedure_info(
+        subject_id=subject_id, list_title=nsb_sharepoint_list_2019
+    )
+    sp2023_response = sharepoint_client.get_procedure_info(
+        subject_id=subject_id, list_title=nsb_sharepoint_list_2023
+    )
+    merged_response = sharepoint_client.merge_responses(
+        [lb_response, sp2019_response, sp2023_response]
+    )
+    json_response = merged_response.map_to_json_response()
+    return json_response
 
 
 @app.get(

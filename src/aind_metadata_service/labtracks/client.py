@@ -5,21 +5,19 @@ from typing import List, Optional
 from xml.etree import ElementTree as ET
 
 import pyodbc
-from aind_data_schema import Procedures, Subject
 from aind_data_schema.procedures import (
     Perfusion,
+    Procedures,
     RetroOrbitalInjection,
-    SubjectProcedure,
 )
-from aind_data_schema.subject import BackgroundStrain, Sex, Species
-from fastapi.responses import JSONResponse
+from aind_data_schema.subject import BackgroundStrain, Sex, Species, Subject
 
 from aind_metadata_service.labtracks.query_builder import (
     LabTracksQueries,
     SubjectQueryColumns,
     TaskSetQueryColumns,
 )
-from aind_metadata_service.response_handler import Responses
+from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 
 
 class LabTracksClient:
@@ -76,7 +74,7 @@ class LabTracksClient:
         """Closes a pyodbc session connection"""
         session.close()
 
-    def get_subject_info(self, subject_id: str) -> JSONResponse:
+    def get_subject_info(self, subject_id: str) -> ModelResponse:
         """
         Method to retrieve subject from subject_id (int)
         Parameters
@@ -96,26 +94,16 @@ class LabTracksClient:
             results = []
             for row in fetched_rows:
                 results.append(dict(zip(columns, row)))
-            if not results:
-                return Responses.no_data_found_response()
-            else:
-                lth = LabTracksResponseHandler()
-                subjects = lth.map_response_to_subject(results)
-                # Check if multiple unique items are returned
-                if len(set([s.json() for s in subjects])) > 1:
-                    response = Responses.multiple_items_found_response(
-                        subjects
-                    )
-                    return response
-                else:
-                    subject = subjects[0]
-                    response = Responses.model_response(subject)
-                    return response
+            lth = LabTracksResponseHandler()
+            subjects = lth.map_response_to_subject(results)
+            return ModelResponse(
+                aind_models=subjects, status_code=StatusCodes.DB_RESPONDED
+            )
         except Exception as e:
             logging.error(repr(e))
-            return Responses.internal_server_error_response()
+            return ModelResponse.internal_server_error_response()
 
-    def get_procedures_info(self, subject_id: str) -> JSONResponse:
+    def get_procedures_info(self, subject_id: str) -> ModelResponse:
         """
         Method to retrieve LAS procedures from subject_id (int)
         Parameters
@@ -135,18 +123,17 @@ class LabTracksClient:
             results = []
             for row in fetched_rows:
                 results.append(dict(zip(columns, row)))
-            if not results:
-                response = Responses.no_data_found_response()
-            else:
-                lth = LabTracksResponseHandler()
-                subject_procedures = lth.map_response_to_procedures(results)
-                procedures = Procedures.construct(subject_id=subject_id)
-                procedures.subject_procedures = subject_procedures
-                response = Responses.model_response(procedures)
-            return response
+            lth = LabTracksResponseHandler()
+            procedures = lth.map_response_to_procedures(
+                subject_id=subject_id, results=results
+            )
+            procedures = [] if procedures is None else [procedures]
+            return ModelResponse(
+                aind_models=procedures, status_code=StatusCodes.DB_RESPONDED
+            )
         except Exception as e:
             logging.error(repr(e))
-            return Responses.internal_server_error_response()
+            return ModelResponse.internal_server_error_response()
 
 
 class MouseCustomClassFields(Enum):
@@ -355,12 +342,15 @@ class LabTracksResponseHandler:
 
     @staticmethod
     def map_response_to_procedures(
+        subject_id: str,
         results: List[dict],
-    ) -> List[SubjectProcedure]:
+    ) -> Optional[Procedures]:
         """
         Maps a response from LabTracks to an aind_data_schema.Procedure
         Parameters
         ----------
+        subject_id : str
+            The subject id to map the procedures to
         results : List[dict]
             Results pulled from LabTracks. In the form of [row]
 
@@ -408,4 +398,11 @@ class LabTracksResponseHandler:
                         iacuc_protocol=iacuc_protocol,
                     )
                     procedures_list.append(ro_injection)
-        return procedures_list
+        procedures = (
+            None
+            if len(procedures_list) == 0
+            else Procedures.construct(
+                subject_id=subject_id, subject_procedures=procedures_list
+            )
+        )
+        return procedures

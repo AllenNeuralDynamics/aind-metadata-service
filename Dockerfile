@@ -1,8 +1,5 @@
 FROM python:3-slim
 WORKDIR /app
-ADD src ./src
-ADD pyproject.toml .
-ADD setup.py .
 
 # Install FreeTDS and dependencies
 RUN apt-get update \
@@ -19,7 +16,10 @@ Description = FreeTDS Driver\n\
 Driver = /usr/lib/x86_64-linux-gnu/odbc/libtdsodbc.so\n\
 Setup = /usr/lib/x86_64-linux-gnu/odbc/libtdsS.so" >> /etc/odbcinst.ini
 
-# Pip command
+# Pip install
+ADD src ./src
+ADD pyproject.toml .
+ADD setup.py .
 RUN pip install .[server]
 
 CMD ["uvicorn", "aind_metadata_service.server:app", "--host", "0.0.0.0", "--port", "5000"]

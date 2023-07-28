@@ -1,202 +1,121 @@
 """Module to handle responses"""
 import json
-import logging
-from typing import List
+from typing import Generic, List, Optional, TypeVar
 
+from aind_data_schema.procedures import Procedures
+from aind_data_schema.subject import Subject
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, validate_model
+from pydantic import validate_model
 
 from aind_metadata_service.client import StatusCodes
 
+T = TypeVar("T", Subject, Procedures)
 
-class Responses:
-    """This class contains methods to map responses from server."""
 
-    @staticmethod
-    def multi_status_response(
-        message1: str, message2: str, data
-    ) -> JSONResponse:
-        """Map to a multi status message."""
-        response = JSONResponse(
-            status_code=StatusCodes.MULTI_STATUS.value,
-            content=(
-                {
-                    "message": f"Message 1: {message1}, "
-                    f"Message 2: {message2}",
-                    "data": data,
-                }
-            ),
-        )
-        return response
+class ModelResponse(Generic[T]):
+    """Class to handle responses from backend databases. Holds pydantic models
+    without serializing them to json or running validation checks."""
 
-    @staticmethod
-    def connection_error_response() -> JSONResponse:
-        """Map to a connection error"""
-        response = JSONResponse(
-            status_code=StatusCodes.CONNECTION_ERROR.value,
-            content=(
-                {
-                    "message": "Error Connecting to Internal Server.",
-                    "data": None,
-                }
-            ),
-        )
-        return response
-
-    @staticmethod
-    def internal_server_error_response() -> JSONResponse:
-        """Map to an internal server error"""
-        response = JSONResponse(
-            status_code=StatusCodes.INTERNAL_SERVER_ERROR.value,
-            content=({"message": "Internal Server Error.", "data": None}),
-        )
-        return response
-
-    @staticmethod
-    def no_data_found_response() -> JSONResponse:
-        """Map to a 404 error."""
-        response = JSONResponse(
-            status_code=StatusCodes.NO_DATA_FOUND.value,
-            content=({"message": "No Data Found.", "data": None}),
-        )
-        return response
-
-    @staticmethod
-    def multiple_items_found_response(models: List[BaseModel]) -> JSONResponse:
-        """Map to a multiple choices error."""
-        models_json = [
-            jsonable_encoder(json.loads(model.json())) for model in models
-        ]
-        response = JSONResponse(
-            status_code=StatusCodes.MULTIPLE_RESPONSES.value,
-            content=(
-                {"message": "Multiple Items Found.", "data": models_json}
-            ),
-        )
-        return response
-
-    @staticmethod
-    def model_response(model: BaseModel) -> JSONResponse:
+    def __init__(
+        self,
+        aind_models: List[T],
+        status_code: StatusCodes,
+        message: Optional[str] = None,
+    ):
         """
-        Parse model to a response or return model if valid.
-        Handles validation errors.
+        Class constructor
         Parameters
         ----------
-        model : BaseModel
-            model response from server
+        aind_models : List[T]
+          Either a list of Subjects or a list of Procedures
+        status_code : StatusCodes
+        message : Optional[str]
+          Message to return to client.
         """
-        *_, validation_error = validate_model(model.__class__, model.__dict__)
-        model_json = jsonable_encoder(json.loads(model.json()))
-        if validation_error:
-            response = JSONResponse(
-                status_code=StatusCodes.INVALID_DATA.value,
-                content=(
-                    {
-                        "message": f"Validation Errors: {validation_error}",
-                        "data": model_json,
-                    }
-                ),
-            )
-        else:
-            response = JSONResponse(
-                status_code=StatusCodes.VALID_DATA.value,
-                content=(
-                    {
-                        "message": "Valid Model.",
-                        "data": model_json,
-                    }
-                ),
-            )
-        return response
+        self.status_code = status_code
+        self.aind_models = aind_models
+        self.message = message
 
-    # flake8: noqa: C901
-    @staticmethod
-    def combine_procedure_responses(
-        lb_response: JSONResponse, sp_response: JSONResponse
-    ) -> JSONResponse:
-        """
-        Combines JSONResponses from Labtracks and Sharepoint clients.
-        Handles validation errors and special cases.
-        """
-        try:
-            lb_contents = json.loads(lb_response.body)
-            sp_contents = json.loads(sp_response.body)
-            sp_status_code = sp_response.status_code
-            lb_status_code = lb_response.status_code
-            if sp_status_code == 500 and lb_status_code == 500:
-                return Responses.internal_server_error_response()
-            if sp_status_code == 503 and lb_status_code == 503:
-                return Responses.connection_error_response()
-            if sp_status_code == 404 and lb_status_code == 404:
-                return Responses.no_data_found_response()
-            if sp_status_code < 300 and lb_status_code == 404:
-                return sp_response
-            if sp_status_code == 404 and lb_status_code < 300:
-                return lb_response
-            # handles combination of invalid responses
-            if lb_status_code == 406 and sp_status_code == 406:
-                lb_data = lb_contents["data"]["subject_procedures"]
-                sp_data = sp_contents["data"]["subject_procedures"]
-                combined_data = lb_data + sp_data
-                lb_contents["data"]["subject_procedures"] = combined_data
-                message1 = sp_contents["message"]
-                message2 = lb_contents["message"]
-                return JSONResponse(
+    @classmethod
+    def connection_error_response(cls):
+        """Connection Error"""
+        return cls(
+            status_code=StatusCodes.CONNECTION_ERROR,
+            aind_models=[],
+            message="Connection Error.",
+        )
+
+    @classmethod
+    def internal_server_error_response(cls):
+        """Internal Server Error"""
+        return cls(
+            status_code=StatusCodes.INTERNAL_SERVER_ERROR,
+            aind_models=[],
+            message="Internal Server Error.",
+        )
+
+    def _map_data_response(self) -> JSONResponse:
+        """Map ModelResponse with StatusCodes.DB_RESPONDED to a JSONResponse.
+        Perform validations."""
+        if len(self.aind_models) == 0:
+            response = JSONResponse(
+                status_code=StatusCodes.NO_DATA_FOUND.value,
+                content=({"message": "No Data Found.", "data": None}),
+            )
+        elif len(self.aind_models) == 1:
+            aind_model = self.aind_models[0]
+            model_json = jsonable_encoder(json.loads(aind_model.json()))
+            *_, validation_error = validate_model(
+                aind_model.__class__, aind_model.__dict__
+            )
+            if validation_error:
+                response = JSONResponse(
                     status_code=StatusCodes.INVALID_DATA.value,
                     content=(
                         {
-                            "message": f"Message 1: {message1}, "
-                            f"Message 2: {message2}",
-                            "data": lb_contents["data"],
+                            "message": (
+                                f"Validation Errors: {validation_error}"
+                            ),
+                            "data": model_json,
                         }
                     ),
                 )
-            # handles combinations of valid and invalid responses
-            if (sp_status_code < 300 and lb_status_code == 406) or (
-                lb_status_code < 300 and sp_status_code == 406
-            ):
-                lb_data = lb_contents["data"]["subject_procedures"]
-                sp_data = sp_contents["data"]["subject_procedures"]
-                combined_data = lb_data + sp_data
-                sp_contents["data"]["subject_procedures"] = combined_data
-                return Responses.multi_status_response(
-                    message1=sp_contents["message"],
-                    message2=lb_contents["message"],
-                    data=sp_contents["data"],
-                )
-            # handles case when both responses are valid
-            if sp_status_code < 300 and lb_status_code < 300:
-                lb_data = lb_contents["data"]["subject_procedures"]
-                sp_data = sp_contents["data"]["subject_procedures"]
-                combined_data = lb_data + sp_data
-                lb_contents["data"]["subject_procedures"] = combined_data
-                return JSONResponse(
+            else:
+                response = JSONResponse(
                     status_code=StatusCodes.VALID_DATA.value,
                     content=(
                         {
                             "message": "Valid Model.",
-                            "data": lb_contents["data"],
+                            "data": model_json,
                         }
                     ),
                 )
-            # handles combination of server/connection error and valid response
-            if sp_status_code in (500, 503) and lb_status_code < 300:
-                lb_data = lb_contents["data"]["subject_procedures"]
-                lb_contents["data"]["subject_procedures"] = lb_data
-                return Responses.multi_status_response(
-                    message1=sp_contents["message"],
-                    message2=lb_contents["message"],
-                    data=lb_contents["data"],
-                )
-            if sp_status_code < 300 and lb_status_code in (500, 503):
-                sp_data = sp_contents["data"]["subject_procedures"]
-                sp_contents["data"]["subject_procedures"] = sp_data
-                return Responses.multi_status_response(
-                    message1=sp_contents["message"],
-                    message2=lb_contents["message"],
-                    data=sp_contents["data"],
-                )
-        except Exception as e:
-            logging.error(repr(e))
-            return Responses.internal_server_error_response()
+        else:
+            models_json = [
+                jsonable_encoder(json.loads(model.json()))
+                for model in self.aind_models
+            ]
+            response = JSONResponse(
+                status_code=StatusCodes.MULTIPLE_RESPONSES.value,
+                content=(
+                    {"message": "Multiple Items Found.", "data": models_json}
+                ),
+            )
+        return response
+
+    def map_to_json_response(self) -> JSONResponse:
+        """Map a ModelResponse to a JSONResponse."""
+        if self.status_code == StatusCodes.CONNECTION_ERROR:
+            response = JSONResponse(
+                status_code=StatusCodes.CONNECTION_ERROR.value,
+                content=({"message": self.message, "data": None}),
+            )
+        elif self.status_code == StatusCodes.INTERNAL_SERVER_ERROR:
+            response = JSONResponse(
+                status_code=StatusCodes.INTERNAL_SERVER_ERROR.value,
+                content=({"message": self.message, "data": None}),
+            )
+        else:
+            response = self._map_data_response()
+        return response
