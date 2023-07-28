@@ -48,7 +48,7 @@ class TestNSB2019Parsers(TestCase):
             )
             with open(file_path) as f:
                 contents = json.load(f)
-            with open(mapped_file_path) as f:
+            with open(mapped_file_path, encoding="utf-8") as f:
                 mapped_contents = json.load(f)
             list_items.append((contents, mapped_contents, file_path.name))
         list_items.sort(key=lambda x: x[2])
