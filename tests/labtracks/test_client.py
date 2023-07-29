@@ -2,15 +2,80 @@
 
 import datetime
 import decimal
+import os
 import unittest
 from unittest.mock import MagicMock, Mock, call, patch
 
 import pyodbc
 from aind_data_schema.subject import Sex
 
-from aind_metadata_service.labtracks.client import LabTracksClient
+from aind_metadata_service.labtracks.client import (
+    LabTracksClient,
+    LabTracksSettings,
+)
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 from tests.labtracks.test_response_handler import TestResponseExamples
+
+
+class TestLabTracksSettings(unittest.TestCase):
+    """Class to test methods for LabTracksSettings."""
+
+    EXAMPLE_ENV_VAR1 = {
+        "ODBC_DRIVER": "some_driver",
+        "LABTRACKS_SERVER": "abc.1234",
+        "LABTRACKS_PORT": "8080",
+        "LABTRACKS_DATABASE": "some_db",
+        "LABTRACKS_USER": "some_user",
+        "LABTRACKS_PASSWORD": "some_password",
+    }
+
+    @patch.dict(os.environ, EXAMPLE_ENV_VAR1, clear=True)
+    def test_settings_set_from_env_vars(self):
+        """Tests that the settings can be set from env vars."""
+        settings1 = LabTracksSettings()
+        settings2 = LabTracksSettings(labtracks_database="some_other_db")
+
+        self.assertEqual("some_driver", settings1.odbc_driver)
+        self.assertEqual("abc.1234", settings1.labtracks_server)
+        self.assertEqual("8080", settings1.labtracks_port)
+        self.assertEqual("some_user", settings1.labtracks_user)
+        self.assertEqual("some_db", settings1.labtracks_database)
+        self.assertEqual(
+            "some_password",
+            settings1.labtracks_password.get_secret_value(),
+        )
+        self.assertEqual("some_driver", settings2.odbc_driver)
+        self.assertEqual("abc.1234", settings2.labtracks_server)
+        self.assertEqual("8080", settings2.labtracks_port)
+        self.assertEqual("some_user", settings2.labtracks_user)
+        self.assertEqual("some_other_db", settings2.labtracks_database)
+        self.assertEqual(
+            "some_password",
+            settings2.labtracks_password.get_secret_value(),
+        )
+
+    def test_settings_errors(self):
+        """Tests that errors are raised if settings are incorrect."""
+
+        with self.assertRaises(ValueError) as e:
+            LabTracksSettings(
+                odbc_driver="some_driver",
+                labtracks_server="some_server",
+                labtracks_port="8080",
+                labtracks_database="some_db",
+            )
+
+        expected_error_message = (
+            "ValidationError("
+            "model='LabTracksSettings', "
+            "errors=["
+            "{'loc': ('labtracks_user',), 'msg': 'field required',"
+            " 'type': 'value_error.missing'}, "
+            "{'loc': ('labtracks_password',), 'msg': 'field required',"
+            " 'type': 'value_error.missing'}])"
+        )
+
+        self.assertEqual(expected_error_message, repr(e.exception))
 
 
 class TestLabTracksClient(unittest.TestCase):

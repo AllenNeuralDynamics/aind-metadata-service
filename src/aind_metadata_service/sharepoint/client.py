@@ -110,7 +110,7 @@ class SharePointClient:
             if list_title == self.nsb_2019_list_title:
                 mapper = NSB2019Procedures()
             elif list_title == self.nsb_2023_list_title:
-                mapper = NSB2023Procedures
+                mapper = NSB2023Procedures()
             else:
                 raise Exception(f"Unknown NSB Sharepoint List: {list_title}")
             subj_procedures = mapper.get_procedures_from_sharepoint(
