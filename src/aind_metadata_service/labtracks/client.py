@@ -11,6 +11,7 @@ from aind_data_schema.procedures import (
     RetroOrbitalInjection,
 )
 from aind_data_schema.subject import BackgroundStrain, Sex, Species, Subject
+from pydantic import BaseSettings, Field, SecretStr
 
 from aind_metadata_service.labtracks.query_builder import (
     LabTracksQueries,
@@ -18,6 +19,27 @@ from aind_metadata_service.labtracks.query_builder import (
     TaskSetQueryColumns,
 )
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
+
+
+class LabTracksSettings(BaseSettings):
+    """Settings needed to connect to LabTracks Database"""
+
+    odbc_driver: str = Field(
+        title="Driver", description="ODBC Driver used to connect to LabTracks."
+    )
+    labtracks_server: str = Field(
+        title="Server", description="Host address of the LabTracks Server."
+    )
+    labtracks_port: str = Field(
+        title="Port", description="Port number of the LabTracks Server"
+    )
+    labtracks_database: str = Field(
+        title="Database", description="Name of the database."
+    )
+    labtracks_user: str = Field(title="User", description="Username.")
+    labtracks_password: SecretStr = Field(
+        title="Password", description="Password."
+    )
 
 
 class LabTracksClient:
@@ -62,6 +84,18 @@ class LabTracksClient:
             f"Database={db};"
             f"UID={user};"
             f"PWD={password};"
+        )
+
+    @classmethod
+    def from_settings(cls, settings: LabTracksSettings):
+        """Construct client from settings object."""
+        return cls(
+            driver=settings.odbc_driver,
+            server=settings.labtracks_server,
+            port=settings.labtracks_port,
+            db=settings.labtracks_database,
+            user=settings.labtracks_user,
+            password=settings.labtracks_password.get_secret_value(),
         )
 
     def create_session(self) -> pyodbc.Connection:
