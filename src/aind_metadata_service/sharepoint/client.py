@@ -6,6 +6,7 @@ from typing import List, Optional
 from aind_data_schema.procedures import Procedures
 from office365.runtime.auth.client_credential import ClientCredential
 from office365.sharepoint.client_context import ClientContext
+from pydantic import BaseSettings, Field, SecretStr
 
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 from aind_metadata_service.sharepoint.nsb2019.procedures import (
@@ -16,6 +17,28 @@ from aind_metadata_service.sharepoint.nsb2023.procedures import (
 )
 
 
+class SharepointSettings(BaseSettings):
+    """Settings needed to connect to Sharepoint database"""
+
+    nsb_sharepoint_url: str = Field(
+        title="Sharepoint URL", description="URL of the sharepoint lists."
+    )
+    nsb_2019_list: str = Field(
+        default="SWR 2019-2022",
+        title="NSB 2019 List",
+        description="List name for 2019 database.",
+    )
+    nsb_2023_list: str = Field(
+        default="SWR 2023-Present",
+        title="NSB 2023 List",
+        description="List name for 2023 database.",
+    )
+    nsb_sharepoint_user: str = Field(title="User", description="Username.")
+    nsb_sharepoint_password: SecretStr = Field(
+        title="Password", description="Password."
+    )
+
+
 class SharePointClient:
     """This class contains the api to connect to SharePoint db."""
 
@@ -24,6 +47,8 @@ class SharePointClient:
         nsb_site_url: str,
         client_id: str,
         client_secret: str,
+        nsb_2019_list_title: str,
+        nsb_2023_list_title: str,
     ) -> None:
         """
         Initialize a client
@@ -35,6 +60,10 @@ class SharePointClient:
             username for principal account to access sharepoint
         client_secret : str
             password for principal account to access sharepoint
+        nsb_2019_list_title : str
+            Title for 2019 list
+        nsb_2023_list_title : str
+            Title for 2023 list
         """
         self.nsb_site_url = nsb_site_url
         self.client_id = client_id
@@ -43,11 +72,22 @@ class SharePointClient:
         self.nsb_client_context = ClientContext(
             self.nsb_site_url
         ).with_credentials(self.credentials)
+        self.nsb_2019_list_title = nsb_2019_list_title
+        self.nsb_2023_list_title = nsb_2023_list_title
+
+    @classmethod
+    def from_settings(cls, settings: SharepointSettings):
+        """Construct client from settings object."""
+        return cls(
+            nsb_site_url=settings.nsb_sharepoint_url,
+            client_id=settings.nsb_sharepoint_user,
+            client_secret=settings.nsb_sharepoint_password.get_secret_value(),
+            nsb_2019_list_title=settings.nsb_2019_list,
+            nsb_2023_list_title=settings.nsb_2023_list,
+        )
 
     def get_procedure_info(
-        self,
-        subject_id: str,
-        list_title: str,
+        self, subject_id: str, list_title: str
     ) -> ModelResponse:
         """
         Primary interface. Maps a subject_id to a response.
@@ -67,12 +107,12 @@ class SharePointClient:
         """
         try:
             nsb_ctx = self.nsb_client_context
-            # There's probably a cleaner way to switch on this.
-            mapper = (
-                NSB2019Procedures()
-                if "2019" in list_title
-                else NSB2023Procedures()
-            )
+            if list_title == self.nsb_2019_list_title:
+                mapper = NSB2019Procedures()
+            elif list_title == self.nsb_2023_list_title:
+                mapper = NSB2023Procedures()
+            else:
+                raise Exception(f"Unknown NSB Sharepoint List: {list_title}")
             subj_procedures = mapper.get_procedures_from_sharepoint(
                 subject_id=subject_id,
                 client_context=nsb_ctx,
