@@ -2535,6 +2535,25 @@ class MappedNSBList:
                 ),
             )
             procedures.append(cran_procedure)
+            headpost_info = HeadPostInfo.from_hp_and_hp_type(
+                hp=self.aind_headpost, hp_type=self.aind_headpost_type
+            )
+
+            # all craniotomies are done with headframe.
+            headframe_procedure = Headframe.construct(
+                start_date=cran_during_info.start_date,
+                end_date=cran_during_info.start_date,
+                experimenter_full_name=experimenter_full_name,
+                iacuc_protocol=iacuc_protocol,
+                animal_weight_prior=cran_during_info.weight_prior,
+                animal_weight_post=cran_during_info.weight_post,
+                headframe_type=headpost_info.headframe_type,
+                headframe_part_number=headpost_info.headframe_part_number,
+                well_type=headpost_info.well_type,
+                well_part_number=headpost_info.well_part_number,
+                anaesthesia=anaesthetic,
+            )
+            procedures.append(headframe_procedure)
 
         # Check if there are any procedures for burr holes 1 through 4
         for burr_hole_num in range(1, 5):
