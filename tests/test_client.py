@@ -4,12 +4,13 @@ import pickle
 import unittest
 from unittest import mock
 from unittest.mock import MagicMock, call
+
+import requests
 from aind_data_schema.procedures import Procedures
 from aind_data_schema.subject import Species, Subject
-from aind_metadata_service.response_handler import ModelResponse, StatusCodes
-import requests
 
 from aind_metadata_service.client import AindMetadataServiceClient
+from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 
 
 class TestAindMetadataServiceClient(unittest.TestCase):
@@ -107,8 +108,14 @@ class TestAindMetadataServiceClient(unittest.TestCase):
         )
 
         self.assertEqual(200, response.status_code)
-        self.assertEqual(model_response.status_code, pickle.loads(response.content).status_code)
-        self.assertEqual(model_response.aind_models, pickle.loads(response.content).aind_models)
+        self.assertEqual(
+            model_response.status_code,
+            pickle.loads(response.content).status_code,
+        )
+        self.assertEqual(
+            model_response.aind_models,
+            pickle.loads(response.content).aind_models,
+        )
 
     @mock.patch("requests.get")
     def test_get_procedures(self, mock_get: MagicMock) -> None:
@@ -120,20 +127,20 @@ class TestAindMetadataServiceClient(unittest.TestCase):
         mock_response._content = json.dumps(
             {
                 "message": "Validation Errors: 8 validation errors for "
-                           "Procedures\nheadframes\n  'NoneType' object is not "
-                           "iterable (type=type_error)\ncraniotomies\n  "
-                           "'NoneType' object is not iterable "
-                           "(type=type_error)\nmri_scans\n  'NoneType' object is "
-                           "not iterable (type=type_error)\ninjections\n  "
-                           "'NoneType' object is not iterable "
-                           "(type=type_error)\nfiber_implants\n  "
-                           "'NoneType' object is not iterable "
-                           "(type=type_error)\ntraining_protocols\n  "
-                           "'NoneType' object is not iterable "
-                           "(type=type_error)\ntissue_preparations\n  "
-                           "'NoneType' object is not iterable "
-                           "(type=type_error)\nother_procedures\n  "
-                           "'NoneType' object is not iterable (type=type_error)",
+                "Procedures\nheadframes\n  'NoneType' object is not "
+                "iterable (type=type_error)\ncraniotomies\n  "
+                "'NoneType' object is not iterable "
+                "(type=type_error)\nmri_scans\n  'NoneType' object is "
+                "not iterable (type=type_error)\ninjections\n  "
+                "'NoneType' object is not iterable "
+                "(type=type_error)\nfiber_implants\n  "
+                "'NoneType' object is not iterable "
+                "(type=type_error)\ntraining_protocols\n  "
+                "'NoneType' object is not iterable "
+                "(type=type_error)\ntissue_preparations\n  "
+                "'NoneType' object is not iterable "
+                "(type=type_error)\nother_procedures\n  "
+                "'NoneType' object is not iterable (type=type_error)",
                 "data": {
                     "describedBy": "https://acme.com/procedures.py",
                     "schema_version": "0.4.4",
@@ -197,8 +204,14 @@ class TestAindMetadataServiceClient(unittest.TestCase):
         )
 
         self.assertEqual(418, response.status_code)
-        self.assertEqual(model_response.status_code, pickle.loads(response.content).status_code)
-        self.assertEqual(model_response.aind_models, pickle.loads(response.content).aind_models)
+        self.assertEqual(
+            model_response.status_code,
+            pickle.loads(response.content).status_code,
+        )
+        self.assertEqual(
+            model_response.aind_models,
+            pickle.loads(response.content).aind_models,
+        )
 
 
 if __name__ == "__main__":
