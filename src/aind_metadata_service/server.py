@@ -1,9 +1,8 @@
 """Starts and runs a Flask Service"""
 
 import os
-import pickle
 
-from fastapi import FastAPI, Response
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
