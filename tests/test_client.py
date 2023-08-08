@@ -14,7 +14,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
     @mock.patch("requests.get")
     def test_get_subject(self, mock_get: MagicMock) -> None:
-        """Tests the get_subject method with default pickle = False."""
+        """Tests the get_subject method with default pickled = False."""
 
         mock_subject_id = "00000"
         mock_response = requests.Response()
@@ -56,7 +56,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_get.assert_has_calls(
             [
-                call("some_url/subject/00000", params={"pickle": False}),
+                call("some_url/subject/00000", params={"pickled": False}),
                 call().__enter__(),
                 call().__exit__(None, None, None),
             ]
@@ -66,8 +66,8 @@ class TestAindMetadataServiceClient(unittest.TestCase):
         self.assertEqual(mock_response.json(), response.json())
 
     @mock.patch("requests.get")
-    def test_get_subject_pickle(self, mock_get: MagicMock) -> None:
-        """Tests the get_subject method with pickle = True."""
+    def test_get_subject_pickled(self, mock_get: MagicMock) -> None:
+        """Tests the get_subject method with pickled = True."""
 
         mock_subject_id = "00000"
         mock_response = requests.Response()
@@ -105,11 +105,11 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         ams_client = AindMetadataServiceClient(domain="some_url")
 
-        response = ams_client.get_subject(mock_subject_id, pickle=True)
+        response = ams_client.get_subject(mock_subject_id, pickled=True)
 
         mock_get.assert_has_calls(
             [
-                call("some_url/subject/00000", params={"pickle": True}),
+                call("some_url/subject/00000", params={"pickled": True}),
                 call().__enter__(),
                 call().__exit__(None, None, None),
             ]
@@ -120,7 +120,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
     @mock.patch("requests.get")
     def test_get_procedures(self, mock_get: MagicMock) -> None:
-        """Tests the get_procedures method with default pickle = False"""
+        """Tests the get_procedures method with default pickled = False"""
 
         mock_subject_id = "00000"
         mock_response = requests.Response()
@@ -168,7 +168,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_get.assert_has_calls(
             [
-                call("some_url/procedures/00000", params={"pickle": False}),
+                call("some_url/procedures/00000", params={"pickled": False}),
                 call().__enter__(),
                 call().__exit__(None, None, None),
             ]
@@ -178,8 +178,8 @@ class TestAindMetadataServiceClient(unittest.TestCase):
         self.assertEqual(mock_response.json(), response.json())
 
     @mock.patch("requests.get")
-    def test_get_procedures_pickle(self, mock_get: MagicMock) -> None:
-        """Tests the get_procedures method with pickle = True"""
+    def test_get_procedures_pickled(self, mock_get: MagicMock) -> None:
+        """Tests the get_procedures method with pickled = True"""
 
         mock_subject_id = "00000"
         mock_response = requests.Response()
@@ -223,11 +223,11 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         ams_client = AindMetadataServiceClient(domain="some_url")
 
-        response = ams_client.get_procedures(mock_subject_id, pickle=True)
+        response = ams_client.get_procedures(mock_subject_id, pickled=True)
 
         mock_get.assert_has_calls(
             [
-                call("some_url/procedures/00000", params={"pickle": True}),
+                call("some_url/procedures/00000", params={"pickled": True}),
                 call().__enter__(),
                 call().__exit__(None, None, None),
             ]
