@@ -41,10 +41,7 @@ async def retrieve_subject(subject_id, pickled: bool = False):
     lb_client = LabTracksClient.from_settings(labtracks_settings)
     model_response = lb_client.get_subject_info(subject_id)
     if pickled:
-        response = pickle.dumps(model_response)
-        return Response(
-            content=response, media_type="application/octet-stream"
-        )
+        return model_response.map_to_pickled_response()
     else:
         return model_response.map_to_json_response()
 
@@ -68,10 +65,7 @@ async def retrieve_procedures(subject_id, pickled: bool = False):
         [lb_response, sp2019_response, sp2023_response]
     )
     if pickled:
-        response = pickle.dumps(merged_response)
-        return Response(
-            content=response, media_type="application/octet-stream"
-        )
+        return merged_response.map_to_pickled_response()
     else:
         return merged_response.map_to_json_response()
 
