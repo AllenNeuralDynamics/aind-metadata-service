@@ -28,11 +28,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-class OctetStreamResponse(Response):
-    media_type = "application/octet-stream"
-
-
 # TODO: Handle favicon better?
 favicon_path = os.getenv("FAVICON_PATH")
 
