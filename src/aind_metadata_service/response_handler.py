@@ -5,9 +5,9 @@ from typing import Generic, List, Optional, TypeVar
 
 from aind_data_schema.procedures import Procedures
 from aind_data_schema.subject import Subject
+from fastapi import Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from fastapi import Response
 from pydantic import validate_model
 
 from aind_metadata_service.client import StatusCodes
@@ -124,4 +124,6 @@ class ModelResponse(Generic[T]):
 
     def map_to_pickled_response(self) -> Response:
         """Map a ModelResponse to a pickled response."""
-        return Response(content=pickle.dumps(self), media_type="application/octet-stream")
+        return Response(
+            content=pickle.dumps(self), media_type="application/octet-stream"
+        )
