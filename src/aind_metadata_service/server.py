@@ -1,8 +1,9 @@
 """Starts and runs a Flask Service"""
 
 import os
+import pickle
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
@@ -27,27 +28,37 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+class OctetStreamResponse(Response):
+    media_type = "application/octet-stream"
+
+
 # TODO: Handle favicon better?
 favicon_path = os.getenv("FAVICON_PATH")
 
 
 @app.get("/subject/{subject_id}")
-async def retrieve_subject(subject_id, pickle=False):
+async def retrieve_subject(subject_id, pickled: bool = False):
     """
     Retrieves subject from Labtracks server
-    Returns pickled data if URL parameter pickle=True, else returns json
+    Returns pickled data if URL parameter pickled=True, else returns json
     """
     lb_client = LabTracksClient.from_settings(labtracks_settings)
-    response = lb_client.get_subject_info(subject_id)
-    json_response = response if pickle else response.map_to_json_response()
-    return json_response
+    model_response = lb_client.get_subject_info(subject_id)
+    if pickled:
+        response = pickle.dumps(model_response)
+        return Response(
+            content=response, media_type="application/octet-stream"
+        )
+    else:
+        return model_response.map_to_json_response()
 
 
 @app.get("/procedures/{subject_id}")
-async def retrieve_procedures(subject_id, pickle=False):
+async def retrieve_procedures(subject_id, pickled: bool = False):
     """
     Retrieves procedure info from SharePoint and Labtracks servers
-    Returns pickled data if URL parameter pickle=True, else returns json
+    Returns pickled data if URL parameter pickled=True, else returns json
     """
     sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
     lb_client = LabTracksClient.from_settings(labtracks_settings)
@@ -61,8 +72,13 @@ async def retrieve_procedures(subject_id, pickle=False):
     merged_response = sharepoint_client.merge_responses(
         [lb_response, sp2019_response, sp2023_response]
     )
-    json_response = merged_response if pickle else merged_response.map_to_json_response()
-    return json_response
+    if pickled:
+        response = pickle.dumps(merged_response)
+        return Response(
+            content=response, media_type="application/octet-stream"
+        )
+    else:
+        return merged_response.map_to_json_response()
 
 
 @app.get(

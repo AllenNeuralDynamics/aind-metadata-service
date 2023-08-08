@@ -51,7 +51,7 @@ class AindMetadataServiceClient:
 
         """
         url = "/".join([self.subject_url, subject_id])
-        with requests.get(url, params={"pickle": pickle}) as response:
+        with requests.get(url, params={"pickled": pickle}) as response:
             return response
 
     def get_procedures(
@@ -72,5 +72,5 @@ class AindMetadataServiceClient:
 
         """
         url = "/".join([self.procedures_url, subject_id])
-        with requests.get(url, params={"pickle": pickle}) as response:
+        with requests.get(url, params={"pickled": pickle}) as response:
             return response
