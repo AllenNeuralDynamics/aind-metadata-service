@@ -34,7 +34,7 @@ class AindMetadataServiceClient:
         self.procedures_url = f"{self.domain}/procedures"
 
     def get_subject(
-        self, subject_id: str, pickled: bool = False
+        self, subject_id: str, pickle: bool = False
     ) -> requests.Response:
         """
         Retrieve a subject response from the server
@@ -42,7 +42,7 @@ class AindMetadataServiceClient:
         ----------
         subject_id : str
           id of the subject
-        pickled: bool
+        pickle: bool
           option to return pickled data instead of json
 
         Returns
@@ -51,11 +51,11 @@ class AindMetadataServiceClient:
 
         """
         url = "/".join([self.subject_url, subject_id])
-        with requests.get(url, params={"pickled": pickled}) as response:
+        with requests.get(url, params={"pickle": pickle}) as response:
             return response
 
     def get_procedures(
-        self, subject_id: str, pickled: bool = False
+        self, subject_id: str, pickle: bool = False
     ) -> requests.Response:
         """
         Retrieve a procedures response from the server
@@ -63,7 +63,7 @@ class AindMetadataServiceClient:
         ----------
         subject_id : str
           id of the subject
-        pickled: bool
+        pickle: bool
           option to return pickled data instead of json
 
         Returns
@@ -72,5 +72,5 @@ class AindMetadataServiceClient:
 
         """
         url = "/".join([self.procedures_url, subject_id])
-        with requests.get(url, params={"pickled": pickled}) as response:
+        with requests.get(url, params={"pickle": pickle}) as response:
             return response

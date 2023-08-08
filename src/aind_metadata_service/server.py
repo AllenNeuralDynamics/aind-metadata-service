@@ -33,24 +33,24 @@ favicon_path = os.getenv("FAVICON_PATH")
 
 
 @app.get("/subject/{subject_id}")
-async def retrieve_subject(subject_id, pickled: bool = False):
+async def retrieve_subject(subject_id, pickle: bool = False):
     """
     Retrieves subject from Labtracks server
-    Returns pickled data if URL parameter pickled=True, else returns json
+    Returns pickled data if URL parameter pickle=True, else returns json
     """
     lb_client = LabTracksClient.from_settings(labtracks_settings)
     model_response = lb_client.get_subject_info(subject_id)
-    if pickled:
+    if pickle:
         return model_response.map_to_pickled_response()
     else:
         return model_response.map_to_json_response()
 
 
 @app.get("/procedures/{subject_id}")
-async def retrieve_procedures(subject_id, pickled: bool = False):
+async def retrieve_procedures(subject_id, pickle: bool = False):
     """
     Retrieves procedure info from SharePoint and Labtracks servers
-    Returns pickled data if URL parameter pickled=True, else returns json
+    Returns pickled data if URL parameter pickle=True, else returns json
     """
     sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
     lb_client = LabTracksClient.from_settings(labtracks_settings)
@@ -64,7 +64,7 @@ async def retrieve_procedures(subject_id, pickled: bool = False):
     merged_response = sharepoint_client.merge_responses(
         [lb_response, sp2019_response, sp2023_response]
     )
-    if pickled:
+    if pickle:
         return merged_response.map_to_pickled_response()
     else:
         return merged_response.map_to_json_response()
