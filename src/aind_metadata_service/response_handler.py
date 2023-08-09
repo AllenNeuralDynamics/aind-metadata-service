@@ -122,8 +122,33 @@ class ModelResponse(Generic[T]):
             response = self._map_data_response()
         return response
 
+    def _map_status_code(self) -> int:
+        """Map ModelResponse with StatusCodes.DB_RESPONDED to
+        corresponding status code. Perform validations.
+        """
+        if len(self.aind_models) == 0:
+           return StatusCodes.NO_DATA_FOUND.value
+        elif len(self.aind_models) == 1:
+            aind_model = self.aind_models[0]
+            *_, validation_error = validate_model(
+                aind_model.__class__, aind_model.__dict__
+            )
+            if validation_error:
+                return StatusCodes.INVALID_DATA.value
+            else:
+                return StatusCodes.VALID_DATA.value
+        else:
+            return StatusCodes.MULTIPLE_RESPONSES.value
+
     def map_to_pickled_response(self) -> Response:
         """Map a ModelResponse to a pickled response."""
+
+        if self.status_code == StatusCodes.DB_RESPONDED:
+            return_status_code = self._map_status_code()
+        else:
+            return_status_code = self.status_code.value
         return Response(
-            content=pickle.dumps(self), media_type="application/octet-stream"
+            status_code=return_status_code,
+            content=pickle.dumps(self.aind_models),
+            media_type="application/octet-stream"
         )
