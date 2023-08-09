@@ -21,7 +21,6 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_subject_id = "00000"
         mock_response = requests.Response()
-        mock_response.status_code = 200
         model = Subject(
             species=Species.MUS_MUSCULUS,
             subject_id=mock_subject_id,
@@ -37,6 +36,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
         model_response = ModelResponse(
             status_code=StatusCodes.DB_RESPONDED, aind_models=[model]
         )
+        mock_response.status_code = model_response.map_to_json_response().status_code
         mock_response._content = model_response.map_to_json_response().body
 
         mock_get.return_value.__enter__.return_value = mock_response
@@ -62,7 +62,6 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_subject_id = "00000"
         mock_response = requests.Response()
-        mock_response.status_code = 200
         model = Subject(
             species=Species.MUS_MUSCULUS,
             subject_id=mock_subject_id,
@@ -78,6 +77,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
         model_response = ModelResponse(
             status_code=StatusCodes.DB_RESPONDED, aind_models=[model]
         )
+        mock_response.status_code = model_response.map_to_pickled_response().status_code
         mock_response._content = model_response.map_to_pickled_response().body
 
         mock_get.return_value.__enter__.return_value = mock_response
@@ -96,12 +96,8 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         self.assertEqual(200, response.status_code)
         self.assertEqual(
-            model_response.status_code,
-            pickle.loads(response.content).status_code,
-        )
-        self.assertEqual(
             model_response.aind_models,
-            pickle.loads(response.content).aind_models,
+            pickle.loads(response.content),
         )
 
     @mock.patch("requests.get")
@@ -110,11 +106,11 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_subject_id = "00000"
         mock_response = requests.Response()
-        mock_response.status_code = 418
         model = Procedures.construct(subject_id=mock_subject_id)
         model_response = ModelResponse(
             status_code=StatusCodes.DB_RESPONDED, aind_models=[model]
         )
+        mock_response.status_code = model_response.map_to_json_response().status_code
         mock_response._content = model_response.map_to_json_response().body
 
         mock_get.return_value.__enter__.return_value = mock_response
@@ -131,7 +127,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
             ]
         )
 
-        self.assertEqual(418, response.status_code)
+        self.assertEqual(200, response.status_code)
         self.assertEqual(mock_response.json(), response.json())
 
     @mock.patch("requests.get")
@@ -140,11 +136,11 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_subject_id = "00000"
         mock_response = requests.Response()
-        mock_response.status_code = 418
         model = Procedures.construct(subject_id=mock_subject_id)
         model_response = ModelResponse(
             status_code=StatusCodes.DB_RESPONDED, aind_models=[model]
         )
+        mock_response.status_code = model_response.map_to_pickled_response().status_code
         mock_response._content = model_response.map_to_pickled_response().body
 
         mock_get.return_value.__enter__.return_value = mock_response
@@ -161,14 +157,10 @@ class TestAindMetadataServiceClient(unittest.TestCase):
             ]
         )
 
-        self.assertEqual(418, response.status_code)
-        self.assertEqual(
-            model_response.status_code,
-            pickle.loads(response.content).status_code,
-        )
+        self.assertEqual(200, response.status_code)
         self.assertEqual(
             model_response.aind_models,
-            pickle.loads(response.content).aind_models,
+            pickle.loads(response.content),
         )
 
 
