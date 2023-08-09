@@ -127,7 +127,7 @@ class ModelResponse(Generic[T]):
         corresponding status code. Perform validations.
         """
         if len(self.aind_models) == 0:
-           return StatusCodes.NO_DATA_FOUND.value
+            return StatusCodes.NO_DATA_FOUND.value
         elif len(self.aind_models) == 1:
             aind_model = self.aind_models[0]
             *_, validation_error = validate_model(
@@ -150,5 +150,5 @@ class ModelResponse(Generic[T]):
         return Response(
             status_code=return_status_code,
             content=pickle.dumps(self.aind_models),
-            media_type="application/octet-stream"
+            media_type="application/octet-stream",
         )

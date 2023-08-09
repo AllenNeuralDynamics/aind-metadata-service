@@ -36,7 +36,9 @@ class TestAindMetadataServiceClient(unittest.TestCase):
         model_response = ModelResponse(
             status_code=StatusCodes.DB_RESPONDED, aind_models=[model]
         )
-        mock_response.status_code = model_response.map_to_json_response().status_code
+        mock_response.status_code = (
+            model_response.map_to_json_response().status_code
+        )
         mock_response._content = model_response.map_to_json_response().body
 
         mock_get.return_value.__enter__.return_value = mock_response
@@ -77,7 +79,9 @@ class TestAindMetadataServiceClient(unittest.TestCase):
         model_response = ModelResponse(
             status_code=StatusCodes.DB_RESPONDED, aind_models=[model]
         )
-        mock_response.status_code = model_response.map_to_pickled_response().status_code
+        mock_response.status_code = (
+            model_response.map_to_pickled_response().status_code
+        )
         mock_response._content = model_response.map_to_pickled_response().body
 
         mock_get.return_value.__enter__.return_value = mock_response
@@ -110,7 +114,9 @@ class TestAindMetadataServiceClient(unittest.TestCase):
         model_response = ModelResponse(
             status_code=StatusCodes.DB_RESPONDED, aind_models=[model]
         )
-        mock_response.status_code = model_response.map_to_json_response().status_code
+        mock_response.status_code = (
+            model_response.map_to_json_response().status_code
+        )
         mock_response._content = model_response.map_to_json_response().body
 
         mock_get.return_value.__enter__.return_value = mock_response
@@ -140,7 +146,9 @@ class TestAindMetadataServiceClient(unittest.TestCase):
         model_response = ModelResponse(
             status_code=StatusCodes.DB_RESPONDED, aind_models=[model]
         )
-        mock_response.status_code = model_response.map_to_pickled_response().status_code
+        mock_response.status_code = (
+            model_response.map_to_pickled_response().status_code
+        )
         mock_response._content = model_response.map_to_pickled_response().body
 
         mock_get.return_value.__enter__.return_value = mock_response
