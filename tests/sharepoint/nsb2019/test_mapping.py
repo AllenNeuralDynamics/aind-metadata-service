@@ -84,7 +84,7 @@ class TestNSB2019Parsers(TestCase):
             attr = getattr(cls, k)
             if isinstance(attr, property):
                 props.append(getattr(mapped_model, k))
-        self.assertEqual(117, len(props))
+        self.assertEqual(118, len(props))
 
     def test_inj_mapping_edge_cases(self):
         """Tests the case where there is an INJ procedure, but the inj types

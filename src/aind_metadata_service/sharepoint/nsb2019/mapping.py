@@ -1698,6 +1698,14 @@ class MappedNSBList:
             }.get(self._nsb.procedure, False)
 
     @property
+    def has_second_injection_procedure(self) -> bool:
+        """Return true if second injection in nsb list"""
+        if self.aind_inj2_round is not None or self.aind_inj2_type is not None:
+            return True
+        else:
+            return False
+
+    @property
     def has_craniotomy_procedure(self) -> bool:
         """Return true if craniotomy procedure in nsb list"""
         if self._nsb.procedure is None:
@@ -1761,7 +1769,10 @@ class MappedNSBList:
             procedures.append(self.get_head_frame_procedure())
         if self.has_injection_procedure:
             procedures.append(self.get_first_injection_procedure())
-        if self.has_injection_procedure and self.aind_inj2_round is not None:
+        if (
+            self.has_injection_procedure
+            and self.has_second_injection_procedure
+        ):
             procedures.append(self.get_second_injection_procedure())
         if self.has_craniotomy_procedure:
             procedures.append(self.get_craniotomy_procedure())
