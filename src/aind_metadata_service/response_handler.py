@@ -57,54 +57,51 @@ class ModelResponse(Generic[T]):
             message="Internal Server Error.",
         )
 
-    def _map_data_response(self) -> JSONResponse:
+    def _map_data_response(
+        self, pickled: bool = False
+    ) -> Response | JSONResponse:
         """Map ModelResponse with StatusCodes.DB_RESPONDED to a JSONResponse.
         Perform validations."""
         if len(self.aind_models) == 0:
-            response = JSONResponse(
-                status_code=StatusCodes.NO_DATA_FOUND.value,
-                content=({"message": "No Data Found.", "data": None}),
-            )
+            status_code = StatusCodes.NO_DATA_FOUND.value
+            content_data = None
+            message = "No Data Found."
         elif len(self.aind_models) == 1:
             aind_model = self.aind_models[0]
-            model_json = jsonable_encoder(json.loads(aind_model.json()))
             *_, validation_error = validate_model(
                 aind_model.__class__, aind_model.__dict__
             )
-            if validation_error:
-                response = JSONResponse(
-                    status_code=StatusCodes.INVALID_DATA.value,
-                    content=(
-                        {
-                            "message": (
-                                f"Validation Errors: {validation_error}"
-                            ),
-                            "data": model_json,
-                        }
-                    ),
-                )
+            if pickled:
+                content_data = aind_model
             else:
-                response = JSONResponse(
-                    status_code=StatusCodes.VALID_DATA.value,
-                    content=(
-                        {
-                            "message": "Valid Model.",
-                            "data": model_json,
-                        }
-                    ),
-                )
+                content_data = jsonable_encoder(json.loads(aind_model.json()))
+            if validation_error:
+                status_code = StatusCodes.INVALID_DATA.value
+                message = f"Validation Errors: {validation_error}"
+            else:
+                status_code = StatusCodes.VALID_DATA.value
+                message = "Valid Model."
         else:
-            models_json = [
-                jsonable_encoder(json.loads(model.json()))
-                for model in self.aind_models
-            ]
-            response = JSONResponse(
-                status_code=StatusCodes.MULTIPLE_RESPONSES.value,
-                content=(
-                    {"message": "Multiple Items Found.", "data": models_json}
-                ),
+            status_code = StatusCodes.MULTIPLE_RESPONSES.value
+            message = "Multiple Items Found."
+            if pickled:
+                content_data = self.aind_models
+            else:
+                content_data = [
+                    jsonable_encoder(json.loads(model.json()))
+                    for model in self.aind_models
+                ]
+        if pickled:
+            return Response(
+                status_code=status_code,
+                content=pickle.dumps(content_data),
+                media_type="application/octet-stream",
             )
-        return response
+        else:
+            return JSONResponse(
+                status_code=status_code,
+                content=({"message": message, "data": content_data}),
+            )
 
     def map_to_json_response(self) -> JSONResponse:
         """Map a ModelResponse to a JSONResponse."""
@@ -122,33 +119,15 @@ class ModelResponse(Generic[T]):
             response = self._map_data_response()
         return response
 
-    def _map_status_code(self) -> int:
-        """Map ModelResponse with StatusCodes.DB_RESPONDED to
-        corresponding status code. Perform validations.
-        """
-        if len(self.aind_models) == 0:
-            return StatusCodes.NO_DATA_FOUND.value
-        elif len(self.aind_models) == 1:
-            aind_model = self.aind_models[0]
-            *_, validation_error = validate_model(
-                aind_model.__class__, aind_model.__dict__
-            )
-            if validation_error:
-                return StatusCodes.INVALID_DATA.value
-            else:
-                return StatusCodes.VALID_DATA.value
-        else:
-            return StatusCodes.MULTIPLE_RESPONSES.value
-
     def map_to_pickled_response(self) -> Response:
         """Map a ModelResponse to a pickled response."""
 
-        if self.status_code == StatusCodes.DB_RESPONDED:
-            return_status_code = self._map_status_code()
+        if self.status_code != StatusCodes.DB_RESPONDED:
+            response = Response(
+                status_code=self.status_code.value,
+                content=pickle.dumps(None),
+                media_type="application/octet-stream",
+            )
         else:
-            return_status_code = self.status_code.value
-        return Response(
-            status_code=return_status_code,
-            content=pickle.dumps(self.aind_models),
-            media_type="application/octet-stream",
-        )
+            response = self._map_data_response(pickled=True)
+        return response
