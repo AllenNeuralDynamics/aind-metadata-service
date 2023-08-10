@@ -1,7 +1,7 @@
 """Module to handle responses"""
 import json
 import pickle
-from typing import Generic, List, Optional, TypeVar
+from typing import Generic, List, Optional, TypeVar, Union
 
 from aind_data_schema.procedures import Procedures
 from aind_data_schema.subject import Subject
@@ -59,7 +59,7 @@ class ModelResponse(Generic[T]):
 
     def _map_data_response(
         self, pickled: bool = False
-    ) -> Response | JSONResponse:
+    ) -> Union[Response, JSONResponse]:
         """Map ModelResponse with StatusCodes.DB_RESPONDED to a JSONResponse.
         Perform validations."""
         if len(self.aind_models) == 0:
