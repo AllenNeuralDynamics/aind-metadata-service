@@ -102,7 +102,7 @@ class TestResponseHandler(unittest.TestCase):
 
         expected_pickled = Response(
             status_code=200,
-            content=pickle.dumps([model]),
+            content=pickle.dumps(model),
             media_type="application/octet-stream",
         )
 
@@ -139,7 +139,7 @@ class TestResponseHandler(unittest.TestCase):
         )
         expected_pickled = Response(
             status_code=406,
-            content=pickle.dumps([model]),
+            content=pickle.dumps(model),
             media_type="application/octet-stream",
         )
 
@@ -213,7 +213,7 @@ class TestResponseHandler(unittest.TestCase):
         )
         expected_pickled = Response(
             status_code=404,
-            content=pickle.dumps([]),
+            content=pickle.dumps(None),
             media_type="application/octet-stream",
         )
         self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
@@ -245,7 +245,7 @@ class TestResponseHandler(unittest.TestCase):
         )
         expected_pickled = Response(
             status_code=503,
-            content=pickle.dumps([]),
+            content=pickle.dumps(None),
             media_type="application/octet-stream",
         )
         self.assertEqual(
@@ -279,7 +279,7 @@ class TestResponseHandler(unittest.TestCase):
         )
         expected_pickled = Response(
             status_code=500,
-            content=pickle.dumps([]),
+            content=pickle.dumps(None),
             media_type="application/octet-stream",
         )
         self.assertEqual(

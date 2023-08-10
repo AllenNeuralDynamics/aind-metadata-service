@@ -100,7 +100,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         self.assertEqual(200, response.status_code)
         self.assertEqual(
-            model_response.aind_models,
+            model,
             pickle.loads(response.content),
         )
 
@@ -167,7 +167,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         self.assertEqual(200, response.status_code)
         self.assertEqual(
-            model_response.aind_models,
+            model,
             pickle.loads(response.content),
         )
 
