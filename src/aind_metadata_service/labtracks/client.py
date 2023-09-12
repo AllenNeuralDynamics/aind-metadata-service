@@ -211,6 +211,17 @@ class LabTracksProcedures(Enum):
     RO_INJECTION = "RO Injection"
 
 
+class LabTracksTaskStatuses(Enum):
+    """LabTracks Task Status Options"""
+
+    Finished = "F"
+    Scheduled = "S"
+    Cancelled = "C"
+    Deleted = "D"
+    Accepted = "A"
+    Declined = "L"
+
+
 class LabTracksResponseHandler:
     """This class will contain methods to handle the response from LabTracks"""
 
@@ -409,7 +420,12 @@ class LabTracksResponseHandler:
                 TaskSetQueryColumns.PROTOCOL_NUMBER.value
             )
             type_name = result.get(TaskSetQueryColumns.TYPE_NAME.value)
-            if type_name:
+            task_status = result.get(TaskSetQueryColumns.TASK_STATUS.value)
+            if type_name and task_status not in [
+                LabTracksTaskStatuses.Cancelled.value,
+                LabTracksTaskStatuses.Deleted.value,
+                LabTracksTaskStatuses.Declined.value,
+            ]:
                 if LabTracksProcedures.PERFUSION.value in type_name:
                     output_specimen_ids = [
                         result.get(TaskSetQueryColumns.TASK_OBJECT.value)

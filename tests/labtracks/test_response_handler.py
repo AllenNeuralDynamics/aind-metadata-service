@@ -89,6 +89,18 @@ class TestResponseExamples:
             "investigator_id": Decimal(28803),
             "task_object": Decimal(115977),
             "protocol_number": Decimal(2002),
+            "task_status": "F",
+        },
+        {
+            "id": Decimal(00000),
+            "task_type_id": Decimal(12345),
+            "type_name": "Perfusion Gel",
+            "date_start": datetime.datetime(2022, 10, 11, 0, 0),
+            "date_end": datetime.datetime(2022, 10, 11, 4, 30),
+            "investigator_id": Decimal(28803),
+            "task_object": Decimal(115977),
+            "protocol_number": Decimal(2002),
+            "task_status": "C",
         },
         {
             "id": Decimal(10000),
@@ -99,6 +111,7 @@ class TestResponseExamples:
             "investigator_id": Decimal(28803),
             "task_object": Decimal(115977),
             "protocol_number": Decimal(2002),
+            "task_status": "F",
         },
     ]
 
