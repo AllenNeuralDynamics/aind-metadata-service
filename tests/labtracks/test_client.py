@@ -393,6 +393,7 @@ class TestLabTracksClient(unittest.TestCase):
                 ["task_object"],
                 ["type_name"],
                 ["protocol_number"],
+                ["task_status"]
             ]
 
             @staticmethod
@@ -413,6 +414,7 @@ class TestLabTracksClient(unittest.TestCase):
                         decimal.Decimal("115977"),
                         "Perfusion",
                         decimal.Decimal("2002"),
+                        "F"
                     ],
                     [
                         decimal.Decimal("10000"),
@@ -423,6 +425,7 @@ class TestLabTracksClient(unittest.TestCase):
                         decimal.Decimal("115977"),
                         "RO Injection",
                         decimal.Decimal("2002"),
+                        "F"
                     ],
                 ]
 
