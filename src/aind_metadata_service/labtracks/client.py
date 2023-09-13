@@ -421,7 +421,10 @@ class LabTracksResponseHandler:
             )
             type_name = result.get(TaskSetQueryColumns.TYPE_NAME.value)
             task_status = result.get(TaskSetQueryColumns.TASK_STATUS.value)
-            if type_name and task_status == LabTracksTaskStatuses.Finished.value:
+            if (
+                type_name
+                and task_status == LabTracksTaskStatuses.FINISHED.value
+            ):
                 if LabTracksProcedures.PERFUSION.value in type_name:
                     output_specimen_ids = [
                         result.get(TaskSetQueryColumns.TASK_OBJECT.value)
