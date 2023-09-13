@@ -214,12 +214,12 @@ class LabTracksProcedures(Enum):
 class LabTracksTaskStatuses(Enum):
     """LabTracks Task Status Options"""
 
-    Finished = "F"
-    Scheduled = "S"
-    Cancelled = "C"
-    Deleted = "D"
-    Accepted = "A"
-    Declined = "L"
+    FINISHED = "F"
+    SCHEDULED = "S"
+    CANCELLED = "C"
+    DELETED = "D"
+    ACCEPTED = "A"
+    DECLINED = "L"
 
 
 class LabTracksResponseHandler:
