@@ -99,7 +99,7 @@ class BurrHoleInfo:
     hemisphere: Optional[Side] = None
     coordinate_ml: Optional[float] = None
     coordinate_ap: Optional[float] = None
-    coordinate_depth: Optional[float] = None
+    coordinate_depth: Optional[List[float]] = None
     angle: Optional[float] = None
     during: Optional[During] = None
     inj_type: Optional[InjectionType] = None
@@ -163,11 +163,8 @@ class HeadPostInfo:
 class MappedNSBList:
     """Mapped Fields in Sharepoint list"""
 
-    AP_REGEX = re.compile(r"^ *([-+]?\d*\.?\d+)(?: *(?:mm)? *)$")
-    DV_REGEX = re.compile(r"^ *([-+]?\d*\.?\d+)(?: *(?:mm)? *)$")
     ISO_DUR_REGEX1 = re.compile(r"^ *(\d*\.?\d+)\s*(?:hour|hours)* *$")
     ISO_DUR_REGEX2 = re.compile(r"^(\d+):(\d+)$")
-    ML_REGEX = re.compile(r"^ *([-+]?\d*\.?\d+)(?: *(?:mm)? *)$")
     ALT_TIME_REGEX = re.compile(
         r"^ *(7)(?:.0|/7|s on/7s off)? *(?:s|sec|secs|second|seconds)? *$"
     )
@@ -178,7 +175,6 @@ class MappedNSBList:
     LENGTH_OF_TIME_REGEX = re.compile(
         r"^ *(\d*\.?\d+) *(?:m|min|mins|minute|minutes)+ *$"
     )
-    VOLUME_REGEX = re.compile(r"^ *(\d*\.?\d+) *(?:nl|nL)+ *$")
 
     def __init__(self, nsb: NSBList):
         """Class constructor"""
@@ -190,50 +186,6 @@ class MappedNSBList:
         try:
             return None if float_str is None else float(float_str)
         except ValueError:
-            return None
-
-    def _parse_ap_str(self, ap_str: Optional[str]) -> Optional[float]:
-        """Parse AP String."""
-        if ap_str is not None:
-            parsed_string = re.search(self.AP_REGEX, ap_str)
-            if parsed_string is not None:
-                return self._parse_basic_float_str(parsed_string.group(1))
-            else:
-                return None
-        else:
-            return None
-
-    def _parse_dv_str(self, dv_str: Optional[str]) -> Optional[float]:
-        """Parse dv String"""
-        if dv_str is not None:
-            parsed_string = re.search(self.DV_REGEX, dv_str)
-            if parsed_string is not None:
-                return self._parse_basic_float_str(parsed_string.group(1))
-            else:
-                return None
-        else:
-            return None
-
-    def _parse_ml_str(self, ml_str: Optional[str]) -> Optional[float]:
-        """Parse ml string"""
-        if ml_str is not None:
-            parsed_string = re.search(self.ML_REGEX, ml_str)
-            if parsed_string is not None:
-                return self._parse_basic_float_str(parsed_string.group(1))
-            else:
-                return None
-        else:
-            return None
-
-    def _parse_angle_str(self, inj_ang_str: Optional[str]) -> Optional[float]:
-        """Parse angle strings"""
-        if inj_ang_str is not None:
-            parsed_string = re.search(self.INJ_ANGLE_REGEX, inj_ang_str)
-            if parsed_string is not None:
-                return self._parse_basic_float_str(parsed_string.group(1))
-            else:
-                return None
-        else:
             return None
 
     def _parse_alt_time_str(
@@ -286,17 +238,6 @@ class MappedNSBList:
         # TODO: Figure out how to parse virus strain fields
         return None
 
-    def _parse_inj_vol_str(self, vol_str: Optional[str]) -> Optional[float]:
-        """Parse injection volume strings"""
-        if vol_str is not None:
-            parsed_string = re.search(self.VOLUME_REGEX, vol_str)
-            if parsed_string is not None:
-                return self._parse_basic_float_str(parsed_string.group(1))
-            else:
-                return None
-        else:
-            return None
-
     @property
     def aind_age_at_injection(self) -> Optional[float]:
         """Maps age_at_injection to aind model"""
@@ -305,7 +246,7 @@ class MappedNSBList:
     @property
     def aind_ap2nd_inj(self) -> Optional[float]:
         """Maps ap2nd_inj to aind model"""
-        return self._parse_ap_str(self._nsb.ap2nd_inj)
+        return self._nsb.ap2nd_inj
 
     @property
     def aind_author_id(self) -> Optional[int]:
@@ -459,12 +400,12 @@ class MappedNSBList:
     @property
     def aind_burr3_a_p(self) -> Optional[float]:
         """Maps burr3_a_p to aind model"""
-        return self._parse_ap_str(self._nsb.burr3_a_p)
+        return self._nsb.burr3_a_p
 
     @property
     def aind_burr3_d_v(self) -> Optional[float]:
         """Maps burr3_d_v to aind model"""
-        return self._parse_dv_str(self._nsb.burr3_d_v)
+        return self._nsb.burr3_d_v
 
     @property
     def aind_burr3_injection_devi(self) -> Optional[Any]:
@@ -498,7 +439,7 @@ class MappedNSBList:
     @property
     def aind_burr3_m_l(self) -> Optional[float]:
         """Maps burr3_m_l to aind model"""
-        return self._parse_ml_str(self._nsb.burr3_m_l)
+        return self._nsb.burr3_m_l
 
     @property
     def aind_burr3_perform_during(self) -> Optional[During]:
@@ -549,12 +490,12 @@ class MappedNSBList:
     @property
     def aind_burr4_a_p(self) -> Optional[float]:
         """Maps burr4_a_p to aind model"""
-        return self._parse_ap_str(self._nsb.burr4_a_p)
+        return self._nsb.burr4_a_p
 
     @property
     def aind_burr4_d_v(self) -> Optional[str]:
         """Maps burr4_d_v to aind model"""
-        return self._parse_dv_str(self._nsb.burr4_d_v)
+        return self._nsb.burr4_d_v
 
     @property
     def aind_burr4_injection_devi(self) -> Optional[Any]:
@@ -588,7 +529,7 @@ class MappedNSBList:
     @property
     def aind_burr4_m_l(self) -> Optional[float]:
         """Maps burr4_m_l to aind model"""
-        return self._parse_ml_str(self._nsb.burr4_m_l)
+        return self._nsb.burr4_m_l
 
     @property
     def aind_burr4_perform_during(self) -> Optional[During]:
@@ -639,7 +580,7 @@ class MappedNSBList:
     @property
     def aind_burr_3_angle(self) -> Optional[float]:
         """Maps burr_3_angle to aind model"""
-        return self._parse_angle_str(self._nsb.burr_3_angle)
+        return self._nsb.burr_3_angle
 
     @property
     def aind_burr_3_hemisphere(self) -> Optional[Side]:
@@ -657,7 +598,7 @@ class MappedNSBList:
     @property
     def aind_burr_4_angle(self) -> Optional[float]:
         """Maps burr_4_angle to aind model"""
-        return self._parse_angle_str(self._nsb.burr_4_angle)
+        return self._nsb.burr_4_angle
 
     @property
     def aind_burr_4_hemisphere(self) -> Optional[Side]:
@@ -934,7 +875,7 @@ class MappedNSBList:
     @property
     def aind_dv2nd_inj(self) -> Optional[float]:
         """Maps dv2nd_inj to aind model"""
-        return self._parse_dv_str(self._nsb.dv2nd_inj)
+        return self._nsb.dv2nd_inj
 
     @property
     def aind_editor_id(self) -> Optional[int]:
@@ -944,7 +885,7 @@ class MappedNSBList:
     @property
     def aind_fiber_implant1_dv(self) -> Optional[float]:
         """Maps fiber_implant1_dv to aind model"""
-        return self._parse_dv_str(self._nsb.fiber_implant1_dv)
+        return self._nsb.fiber_implant1_dv
 
     @property
     def aind_fiber_implant1_lengt(self) -> Optional[Any]:
@@ -967,7 +908,7 @@ class MappedNSBList:
     @property
     def aind_fiber_implant2_dv(self) -> Optional[float]:
         """Maps fiber_implant2_dv to aind model"""
-        return self._parse_dv_str(self._nsb.fiber_implant2_dv)
+        return self._nsb.fiber_implant2_dv
 
     @property
     def aind_fiber_implant2_lengt(self) -> Optional[Any]:
@@ -990,7 +931,7 @@ class MappedNSBList:
     @property
     def aind_fiber_implant3_d_x00(self) -> Optional[float]:
         """Maps fiber_implant3_d_x00 to aind model"""
-        return self._parse_dv_str(self._nsb.fiber_implant3_d_x00)
+        return self._nsb.fiber_implant3_d_x00
 
     @property
     def aind_fiber_implant3_lengt(self) -> Optional[Any]:
@@ -1013,7 +954,7 @@ class MappedNSBList:
     @property
     def aind_fiber_implant4_d_x00(self) -> Optional[float]:
         """Maps fiber_implant4_d_x00 to aind model"""
-        return self._parse_dv_str(self._nsb.fiber_implant4_d_x00)
+        return self._nsb.fiber_implant4_d_x00
 
     @property
     def aind_fiber_implant4_lengt(self) -> Optional[Any]:
@@ -1288,7 +1229,7 @@ class MappedNSBList:
     @property
     def aind_inj1_angle_v2(self) -> Optional[float]:
         """Maps inj1_angle_v2 to aind model"""
-        return self._parse_angle_str(self._nsb.inj1_angle_v2)
+        return self._nsb.inj1_angle_v2
 
     @property
     def aind_inj1_current(self) -> Optional[float]:
@@ -1326,7 +1267,7 @@ class MappedNSBList:
     @property
     def aind_inj1volperdepth(self) -> Optional[float]:
         """Maps inj1volperdepth to aind model"""
-        return self._parse_inj_vol_str(self._nsb.inj1volperdepth)
+        return self._nsb.inj1volperdepth
 
     @property
     def aind_inj2_alternating_time(self) -> Optional[float]:
@@ -1336,7 +1277,7 @@ class MappedNSBList:
     @property
     def aind_inj2_angle_v2(self) -> Optional[float]:
         """Maps inj2_angle_v2 to aind model"""
-        return self._parse_angle_str(self._nsb.inj2_angle_v2)
+        return self._nsb.inj2_angle_v2
 
     @property
     def aind_inj2_current(self) -> Optional[float]:
@@ -1374,7 +1315,7 @@ class MappedNSBList:
     @property
     def aind_inj2volperdepth(self) -> Optional[float]:
         """Maps inj2volperdepth to aind model"""
-        return self._parse_inj_vol_str(self._nsb.inj2volperdepth)
+        return self._nsb.inj2volperdepth
 
     @property
     def aind_inj3_alternating_time(self) -> Optional[float]:
@@ -1424,7 +1365,7 @@ class MappedNSBList:
     @property
     def aind_inj3volperdepth(self) -> Optional[float]:
         """Maps inj3volperdepth to aind model"""
-        return self._parse_inj_vol_str(self._nsb.inj3volperdepth)
+        return self._nsb.inj3volperdepth
 
     @property
     def aind_inj4_alternating_time(self) -> Optional[float]:
@@ -1479,7 +1420,7 @@ class MappedNSBList:
     @property
     def aind_inj4volperdepth(self) -> Optional[float]:
         """Maps inj4volperdepth to aind model"""
-        return self._parse_inj_vol_str(self._nsb.inj4volperdepth)
+        return self._nsb.inj4volperdepth
 
     @property
     def aind_inj_virus_strain_rt(self) -> Optional[str]:
@@ -1904,7 +1845,7 @@ class MappedNSBList:
     @property
     def aind_ml2nd_inj(self) -> Optional[float]:
         """Maps ml2nd_inj to aind model"""
-        return self._parse_ml_str(self._nsb.ml2nd_inj)
+        return self._nsb.ml2nd_inj
 
     @property
     def aind_modified(self) -> Optional[datetime]:
@@ -2197,12 +2138,12 @@ class MappedNSBList:
     @property
     def aind_virus_a_p(self) -> Optional[float]:
         """Maps virus_a_p to aind model"""
-        return self._parse_ap_str(self._nsb.virus_a_p)
+        return self._nsb.virus_a_p
 
     @property
     def aind_virus_d_v(self) -> Optional[float]:
         """Maps virus_d_v to aind model"""
-        return self._parse_dv_str(self._nsb.virus_d_v)
+        return self._nsb.virus_d_v
 
     @property
     def aind_virus_hemisphere(self) -> Optional[Side]:
@@ -2220,7 +2161,7 @@ class MappedNSBList:
     @property
     def aind_virus_m_l(self) -> Optional[float]:
         """Maps virus_m_l to aind model"""
-        return self._parse_ml_str(self._nsb.virus_m_l)
+        return self._nsb.virus_m_l
 
     @property
     def aind_weight_after_surgery(self) -> Optional[float]:

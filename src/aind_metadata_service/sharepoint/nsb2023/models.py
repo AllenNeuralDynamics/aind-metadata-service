@@ -307,6 +307,24 @@ class BurrHole4(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
+class BurrHole5(Enum, metaclass=OptionalEnumMeta):
+    """Enum class for BurrHole5"""
+
+    FIBER_IMPLANT = "Fiber Implant"
+    INJECTION = "Injection"
+    INJECTION_FIBER_IMPLANT = "Injection & Fiber Implant"
+    SELECT = "Select..."
+
+
+class BurrHole6(Enum, metaclass=OptionalEnumMeta):
+    """Enum class for BurrHole6"""
+
+    FIBER_IMPLANT = "Fiber Implant"
+    INJECTION = "Injection"
+    INJECTION_FIBER_IMPLANT = "Injection & Fiber Implant"
+    SELECT = "Select..."
+
+
 class Contusion(Enum, metaclass=OptionalEnumMeta):
     """Enum class for Contusion"""
 
