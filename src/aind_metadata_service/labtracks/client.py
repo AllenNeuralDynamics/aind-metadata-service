@@ -12,11 +12,10 @@ from aind_data_schema.procedures import (
 )
 from aind_data_schema.subject import (
     BackgroundStrain,
+    Housing,
     Sex,
     Species,
     Subject,
-    Housing,
-    LightCycle
 )
 from pydantic import BaseSettings, Field, SecretStr
 
@@ -332,7 +331,9 @@ class LabTracksResponseHandler:
             return None
 
     @staticmethod
-    def _map_housing(room_id: Optional[str], cage_id: Optional[str]) -> Optional[Housing]:
+    def _map_housing(
+        room_id: Optional[str], cage_id: Optional[str]
+    ) -> Optional[Housing]:
         """
         Maps the LabTracks room_id and cage_id
         to the aind_data_schema.subject.Housing
@@ -344,7 +345,7 @@ class LabTracksResponseHandler:
         Returns
         -------
         Optional[Housing]
-         """
+        """
         if room_id is None and cage_id is None:
             return None
         else:
@@ -401,7 +402,7 @@ class LabTracksResponseHandler:
             )
             housing = self._map_housing(
                 room_id=result.get(SubjectQueryColumns.ROOM_ID.value),
-                cage_id=result.get(SubjectQueryColumns.CAGE_ID.value)
+                cage_id=result.get(SubjectQueryColumns.CAGE_ID.value),
             )
             subject = Subject.construct(
                 subject_id=subject_id_str,
@@ -415,7 +416,7 @@ class LabTracksResponseHandler:
                 genotype=full_genotype,
                 breeding_group=breeding_group,
                 background_strain=background_strain,
-                housing=housing
+                housing=housing,
             )
             subjects.append(subject)
         return subjects
