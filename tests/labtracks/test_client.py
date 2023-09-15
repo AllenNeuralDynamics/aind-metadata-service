@@ -220,6 +220,8 @@ class TestLabTracksClient(unittest.TestCase):
                 ["species_name"],
                 ["group_name"],
                 ["group_description"],
+                ["cage_id"],
+                ["room_id"],
             ]
 
             @staticmethod
@@ -244,6 +246,8 @@ class TestLabTracksClient(unittest.TestCase):
                         "mouse",
                         "C57BL6J_OLD",
                         "C57BL/6J",
+                        "1234",
+                        "000",
                     ]
                 ]
 
@@ -300,6 +304,8 @@ class TestLabTracksClient(unittest.TestCase):
                 ["species_name"],
                 ["group_name"],
                 ["group_description"],
+                ["cage_id"],
+                ["room_id"],
             ]
 
             @staticmethod
@@ -324,6 +330,8 @@ class TestLabTracksClient(unittest.TestCase):
                         "mouse",
                         "C57BL6J_OLD",
                         "C57BL/6J",
+                        "1234",
+                        "000",
                     ],
                     [
                         decimal.Decimal("115977"),
@@ -338,6 +346,8 @@ class TestLabTracksClient(unittest.TestCase):
                         "mouse",
                         "C57BL6J_OLD",
                         "C57BL/6J",
+                        "1234",
+                        "000",
                     ],
                 ]
 

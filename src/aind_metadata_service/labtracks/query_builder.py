@@ -16,6 +16,8 @@ class SubjectQueryColumns(Enum):
     SPECIES_NAME = "species_name"
     GROUP_NAME = "group_name"
     GROUP_DESCRIPTION = "group_description"
+    CAGE_ID = "cage_id"
+    ROOM_ID = "room_id"
 
 
 class TaskSetQueryColumns(Enum):
@@ -109,7 +111,9 @@ class LabTracksQueries:
             f"    S.SPECIES_NAME AS {SubjectQueryColumns.SPECIES_NAME.value},"
             f"    GROUPS.GROUP_NAME AS {SubjectQueryColumns.GROUP_NAME.value},"
             f"    G.GROUP_DESCRIPTION "
-            f"      AS {SubjectQueryColumns.GROUP_DESCRIPTION.value}"
+            f"      AS {SubjectQueryColumns.GROUP_DESCRIPTION.value},"
+            f"    AC.CAGE_ID AS {SubjectQueryColumns.CAGE_ID.value},"
+            f"    AC.ROOM_ID AS {SubjectQueryColumns.ROOM_ID.value}"
             "  FROM ANIMALS_COMMON AC"
             "    LEFT OUTER JOIN ANIMALS_COMMON MATERNAL"
             "    ON AC.MATERNAL_INDEX = MATERNAL.ID"

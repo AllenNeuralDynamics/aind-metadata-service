@@ -10,7 +10,13 @@ from aind_data_schema.procedures import (
     Procedures,
     RetroOrbitalInjection,
 )
-from aind_data_schema.subject import BackgroundStrain, Sex, Species, Subject
+from aind_data_schema.subject import (
+    BackgroundStrain,
+    Housing,
+    Sex,
+    Species,
+    Subject,
+)
 from pydantic import BaseSettings, Field, SecretStr
 
 from aind_metadata_service.labtracks.query_builder import (
@@ -324,6 +330,31 @@ class LabTracksResponseHandler:
         else:
             return None
 
+    @staticmethod
+    def _map_housing(
+        room_id: Optional[str], cage_id: Optional[str]
+    ) -> Optional[Housing]:
+        """
+        Maps the LabTracks room_id and cage_id
+        to the aind_data_schema.subject.Housing
+        Parameters
+        ----------
+        room_id : Optional[str]
+        cage_id: Optional[str]
+
+        Returns
+        -------
+        Optional[Housing]
+        """
+        if room_id is None and cage_id is None:
+            return None
+        else:
+            housing = Housing.construct(
+                room_id=room_id if room_id else None,
+                cage_id=cage_id if cage_id else None,
+            )
+            return housing
+
     def map_response_to_subject(self, results: List[dict]) -> List[Subject]:
         """
         Maps a response from LabTracks to an aind_data_schema.Subject
@@ -369,6 +400,10 @@ class LabTracksResponseHandler:
             background_strain = self._map_to_background_strain(
                 result.get(SubjectQueryColumns.GROUP_DESCRIPTION.value)
             )
+            housing = self._map_housing(
+                room_id=result.get(SubjectQueryColumns.ROOM_ID.value),
+                cage_id=result.get(SubjectQueryColumns.CAGE_ID.value),
+            )
             subject = Subject.construct(
                 subject_id=subject_id_str,
                 species=species,
@@ -381,6 +416,7 @@ class LabTracksResponseHandler:
                 genotype=full_genotype,
                 breeding_group=breeding_group,
                 background_strain=background_strain,
+                housing=housing,
             )
             subjects.append(subject)
         return subjects

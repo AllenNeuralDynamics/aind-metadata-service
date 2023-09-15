@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from aind_data_schema import Procedures, Subject
 from aind_data_schema.procedures import Perfusion, RetroOrbitalInjection
-from aind_data_schema.subject import BackgroundStrain, Sex, Species
+from aind_data_schema.subject import BackgroundStrain, Housing, Sex, Species
 
 from aind_metadata_service.labtracks.client import (
     LabTracksBgStrain,
@@ -59,8 +59,12 @@ class TestResponseExamples:
             "species_name": "mouse",
             "group_name": "C57BL6J_OLD",
             "group_description": "C57BL/6J",
+            "cage_id": "1234",
+            "room_id": "000",
         }
     ]
+
+    expected_housing = Housing.construct(room_id="000", cage_id="1234")
 
     expected_subject = Subject.parse_obj(
         {
@@ -76,6 +80,7 @@ class TestResponseExamples:
             "paternal_genotype": "Adora2a-Cre/wt",
             "breeding_group": "C57BL6J_OLD",
             "background_strain": "C57BL/6J",
+            "housing": expected_housing,
         }
     )
 
@@ -229,6 +234,22 @@ class TestLabTracksResponseHandler(unittest.TestCase):
         self.assertEqual(subject_strain2, BackgroundStrain.C57BL_6J)
         self.assertIsNone(none)
         self.assertIsNone(self.rh._map_to_background_strain(None))
+
+    def test_map_housing(self):
+        """Tests that the LabTracks housing info is mapped correctly"""
+        housing2 = Housing.construct(room_id="000")
+        housing3 = Housing.construct(cage_id="1234")
+        housing4 = Housing.construct(room_id="000", cage_id="1234")
+
+        subject_housing1 = self.rh._map_housing(room_id=None, cage_id=None)
+        subject_housing2 = self.rh._map_housing(room_id="000", cage_id=None)
+        subject_housing3 = self.rh._map_housing(room_id=None, cage_id="1234")
+        subject_housing4 = self.rh._map_housing(room_id="000", cage_id="1234")
+
+        self.assertIsNone(subject_housing1)
+        self.assertEqual(subject_housing2, housing2)
+        self.assertEqual(subject_housing3, housing3)
+        self.assertEqual(subject_housing4, housing4)
 
 
 if __name__ == "__main__":
