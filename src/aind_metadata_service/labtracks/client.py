@@ -26,7 +26,6 @@ from aind_metadata_service.labtracks.query_builder import (
     TaskSetQueryColumns,
 )
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
-from datetime import time
 
 
 class LabTracksSettings(BaseSettings):
@@ -230,29 +229,6 @@ class LabTracksTaskStatuses(Enum):
     DECLINED = "L"
 
 
-class LightTimes(Enum):
-    """LabTracks Light Cycle times"""
-
-    SIX_AM = time(6)
-    EIGHT_AM = time(8)
-    NINE_AM = time(9)
-    EIGHT_PM = time(20)
-    NINE_PM = time(21)
-
-
-class LabTracksRoomIDs(Enum):
-    """LabTracks Room IDs for LightCycle tracking"""
-    ROOM_161 = "161"
-    ROOM_159 = "159"
-    ROOM_158 = "158"
-    ROOM_157 = "157"
-    ROOM_153 = "153"
-    ROOM_249 = "249"
-    ROOM_164 = "164"
-    ROOM_349 = "349"
-    ROOM_499 = "499"
-
-
 class LabTracksResponseHandler:
     """This class will contain methods to handle the response from LabTracks"""
 
@@ -356,39 +332,7 @@ class LabTracksResponseHandler:
             return None
 
     @staticmethod
-    def _map_light_cycle(
-            room_id: Optional[str]
-    ) -> Optional[LightCycle]:
-        """
-        Maps LightCycle based on room_id
-        """
-        # TODO: better way to do this?
-        if room_id is None:
-            return None
-        if room_id in [LabTracksRoomIDs.ROOM_161.value,
-                       LabTracksRoomIDs.ROOM_159.value,
-                       LabTracksRoomIDs.ROOM_158.value,
-                       LabTracksRoomIDs.ROOM_157.value,
-                       LabTracksRoomIDs.ROOM_153.value,
-                       LabTracksRoomIDs.ROOM_249.value]:
-            return LightCycle.construct(
-                lights_on_time=LightTimes.SIX_AM.value,
-                lights_off_time=LightTimes.EIGHT_PM.value
-            )
-        elif room_id == LabTracksRoomIDs.ROOM_164.value:
-            return LightCycle.construct(
-                lights_on_time=LightTimes.NINE_PM.value,
-                lights_off_time=LightTimes.NINE_AM.value
-            )
-        elif room_id in [LabTracksRoomIDs.ROOM_349.value, LabTracksRoomIDs.ROOM_499.value]:
-            return LightCycle.construct(
-                lights_on_time=LightTimes.EIGHT_PM.value,
-                lights_off_time=LightTimes.EIGHT_AM.value
-            )
-        else:
-            return None
-
-    def _map_housing(self, room_id: Optional[str], cage_id: Optional[str]) -> Optional[Housing]:
+    def _map_housing(room_id: Optional[str], cage_id: Optional[str]) -> Optional[Housing]:
         """
         Maps the LabTracks room_id and cage_id
         to the aind_data_schema.subject.Housing
@@ -404,11 +348,9 @@ class LabTracksResponseHandler:
         if room_id is None and cage_id is None:
             return None
         else:
-            light_cycle = self._map_light_cycle(room_id)
             housing = Housing.construct(
                 room_id=room_id if room_id else None,
                 cage_id=cage_id if cage_id else None,
-                light_cycle=light_cycle
             )
             return housing
 
