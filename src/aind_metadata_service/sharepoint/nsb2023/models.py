@@ -721,6 +721,10 @@ class Hematoma(Enum, metaclass=OptionalEnumMeta):
 class IacucProtocol(Enum, metaclass=OptionalEnumMeta):
     """Enum class for IacucProtocol"""
 
+    N_1906 = "1906"
+    N_2001 = "2001"
+    N_2003 = "2003"
+    N_2004 = "2004"
     N_2005 = ('2005')
     N_2006 = ('2006')
     N_2011 = ('2011')
