@@ -2,7 +2,7 @@
 
 import re
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from enum import Enum
 from typing import Any, List, Optional
 
@@ -196,7 +196,7 @@ class MappedNSBList:
             return None
 
     def _parse_alt_time_str(
-            self, alt_time_str: Optional[str]
+        self, alt_time_str: Optional[str]
     ) -> Optional[float]:
         """Parse alternating time strings"""
         if alt_time_str is not None:
@@ -220,7 +220,7 @@ class MappedNSBList:
             return None
 
     def _parse_length_of_time_str(
-            self, len_of_time_str: Optional[str]
+        self, len_of_time_str: Optional[str]
     ) -> Optional[float]:
         """Parse length of time strings"""
         if len_of_time_str is not None:
@@ -663,7 +663,8 @@ class MappedNSBList:
     def aind_burr5_virus_biosafte(self) -> Optional[Any]:
         """Maps burr5_virus_biosafte to aind model"""
         return (
-            None if self._nsb.burr5_virus_biosafte is None
+            None
+            if self._nsb.burr5_virus_biosafte is None
             else {
                 self._nsb.burr5_virus_biosafte.SELECT: None,
                 self._nsb.burr5_virus_biosafte.BSL_1_AAV: None,
@@ -1250,10 +1251,10 @@ class MappedNSBList:
             if self._nsb.craniotomy_type is None
             else {
                 self._nsb.craniotomy_type.SELECT: None,
-                self._nsb.craniotomy_type.N_3MM: CraniotomyType.N_3MM,
-                self._nsb.craniotomy_type.N_5MM: CraniotomyType.N_5MM,
-                self._nsb.craniotomy_type.WHC_2_P: CraniotomyType.WHC_2_P,
-                self._nsb.craniotomy_type.WHC_NP: CraniotomyType.WHC_NP,
+                self._nsb.craniotomy_type.N_3MM: CraniotomyType.THREE_MM,
+                self._nsb.craniotomy_type.N_5MM: CraniotomyType.FIVE_MM,
+                self._nsb.craniotomy_type.WHC_2_P: CraniotomyType.WHC,
+                self._nsb.craniotomy_type.WHC_NP: CraniotomyType.WHC,
             }.get(self._nsb.craniotomy_type, None)
         )
 
@@ -1383,6 +1384,7 @@ class MappedNSBList:
                 self._nsb.fiber_implant4_lengt.N_50_MM: None,
             }.get(self._nsb.fiber_implant4_lengt, None)
         )
+
     @property
     def aind_fiber_implant5_d_x00(self) -> Optional[float]:
         """Maps fiber_implant5_d_x00 to aind model"""
@@ -2561,7 +2563,7 @@ class MappedNSBList:
         """Maps project_id to aind model"""
         return (
             None
-            if self._nsb.project_id  is None
+            if self._nsb.project_id is None
             else {
                 self._nsb.project_id.N_1010300110_COSTA_PGA_LA: None,
                 self._nsb.project_id.N_1020100710_CTY_M_FISH: None,
@@ -2824,7 +2826,7 @@ class MappedNSBList:
         }
 
     def surgery_during_info(
-            self, during: During, inj_type: Optional[InjectionType] = None
+        self, during: During, inj_type: Optional[InjectionType] = None
     ) -> SurgeryDuringInfo:
         """
         Compiles burr hole information from NSB data
@@ -2895,11 +2897,16 @@ class MappedNSBList:
 
         """
         if burr_hole_num == 1:
+            coordinate_depth = self._map_burr_hole_dv(
+                self.aind_virus_d_v,
+                self.aind_burr_1_d_v_x00,
+                self.aind_burr_1_dv_2,
+            )
             return BurrHoleInfo(
                 hemisphere=self.aind_virus_hemisphere,
                 coordinate_ml=self.aind_virus_m_l,
                 coordinate_ap=self.aind_virus_a_p,
-                # coordinate_depth=self.aind_virus_d_v,
+                coordinate_depth=coordinate_depth,
                 angle=self.aind_inj1_angle_v2,
                 during=self.aind_burr1_perform_during,
                 inj_type=self.aind_inj1_type,
@@ -2911,11 +2918,16 @@ class MappedNSBList:
                 fiber_implant_depth=self.aind_fiber_implant1_dv,
             )
         elif burr_hole_num == 2:
+            coordinate_depth = self._map_burr_hole_dv(
+                self.aind_dv2nd_inj,
+                self.aind_burr_2_d_v_x00,
+                self.aind_burr_2_d_v_x000,
+            )
             return BurrHoleInfo(
                 hemisphere=self.aind_hemisphere2nd_inj,
                 coordinate_ml=self.aind_ml2nd_inj,
                 coordinate_ap=self.aind_ap2nd_inj,
-                # coordinate_depth=self.aind_dv2nd_inj,
+                coordinate_depth=coordinate_depth,
                 angle=self.aind_inj2_angle_v2,
                 during=self.aind_burr2_perform_during,
                 inj_type=self.aind_inj2_type,
@@ -2927,11 +2939,16 @@ class MappedNSBList:
                 fiber_implant_depth=self.aind_fiber_implant2_dv,
             )
         elif burr_hole_num == 3:
+            coordinate_depth = self._map_burr_hole_dv(
+                self.aind_burr3_d_v,
+                self.aind_burr_3_d_v_x00,
+                self.aind_burr_3_d_v_x000,
+            )
             return BurrHoleInfo(
                 hemisphere=self.aind_burr_3_hemisphere,
                 coordinate_ml=self.aind_burr3_m_l,
                 coordinate_ap=self.aind_burr3_a_p,
-                # coordinate_depth=self.aind_burr3_d_v,
+                coordinate_depth=coordinate_depth,
                 angle=self.aind_burr_3_angle,
                 during=self.aind_burr3_perform_during,
                 inj_type=self.aind_inj3_type,
@@ -2943,11 +2960,16 @@ class MappedNSBList:
                 fiber_implant_depth=self.aind_fiber_implant3_d_x00,
             )
         elif burr_hole_num == 4:
+            coordinate_depth = self._map_burr_hole_dv(
+                self.aind_burr4_d_v,
+                self.aind_burr_4_d_v_x00,
+                self.aind_burr_4_d_v_x000,
+            )
             return BurrHoleInfo(
                 hemisphere=self.aind_burr_4_hemisphere,
                 coordinate_ml=self.aind_burr4_m_l,
                 coordinate_ap=self.aind_burr4_a_p,
-                # coordinate_depth=self.aind_burr4_d_v,
+                coordinate_depth=coordinate_depth,
                 angle=self.aind_burr_4_angle,
                 during=self.aind_burr4_perform_during,
                 inj_type=self.aind_inj4_type,
@@ -2959,11 +2981,16 @@ class MappedNSBList:
                 fiber_implant_depth=self.aind_fiber_implant4_d_x00,
             )
         elif burr_hole_num == 5:
+            coordinate_depth = self._map_burr_hole_dv(
+                self.aind_burr_5_d_v_x00,
+                self.aind_burr_5_d_v_x000,
+                self.aind_burr_5_d_v_x001,
+            )
             return BurrHoleInfo(
                 hemisphere=self.aind_burr_5_hemisphere,
                 coordinate_ml=self.aind_burr_5_m_l,
                 coordinate_ap=self.aind_burr_5_a_p,
-                # coordinate_depth=self.aind_burr4_d_v,
+                coordinate_depth=coordinate_depth,
                 angle=self.aind_burr_5_angle,
                 during=self.aind_burr5_perform_during,
                 inj_type=self.aind_inj5_type,
@@ -2975,11 +3002,16 @@ class MappedNSBList:
                 fiber_implant_depth=self.aind_fiber_implant5_d_x00,
             )
         elif burr_hole_num == 6:
+            coordinate_depth = self._map_burr_hole_dv(
+                self.aind_burr_6_d_v_x00,
+                self.aind_burr_6_d_v_x000,
+                self.aind_burr_6_d_v_x001,
+            )
             return BurrHoleInfo(
                 hemisphere=self.aind_burr_6_hemisphere,
                 coordinate_ml=self.aind_burr_6_m_l,
                 coordinate_ap=self.aind_burr_6_a_p,
-                # coordinate_depth=self.aind_burr4_d_v,
+                coordinate_depth=coordinate_depth,
                 angle=self.aind_burr_6_angle,
                 during=self.aind_burr6_perform_during,
                 inj_type=self.aind_inj6_type,
@@ -2995,7 +3027,7 @@ class MappedNSBList:
 
     @staticmethod
     def _map_burr_hole_number_to_probe(
-            burr_hole_num: int,
+        burr_hole_num: int,
     ) -> Optional[ProbeName]:
         """Maps NSB Burr hole number into AIND ProbeName"""
         # TODO: add probes for burr_hole_nums 5 and 6
@@ -3012,9 +3044,8 @@ class MappedNSBList:
 
     @staticmethod
     def _map_burr_hole_dv(dv1, dv2, dv3):
-        """Maps dvs to one coordinate depth"""
-        # TODO: edit dv mappers to return list
-        return [dv1, dv2, dv3]
+        """Maps dvs for a burr hole to one coordinate depth list"""
+        return [dv for dv in (dv1, dv2, dv3) if dv is not None]
 
     def get_procedures(self) -> List[SubjectProcedure]:
         """Get a list of subject procedures"""
