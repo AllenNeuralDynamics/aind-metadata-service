@@ -263,19 +263,19 @@ class MappedNSBList:
     @property
     def aind_behavior(self) -> Optional[Any]:
         """Maps behavior to aind model"""
-        if self._nsb.behavior is not None:
-            return {
+        return (
+            None
+            if self._nsb.behavior is None
+            else {
                 self._nsb.behavior.NO: None,
                 self._nsb.behavior.YES: None,
             }.get(self._nsb.behavior, None)
-        else:
-            return None
+        )
 
     @property
     def aind_behavior_complete(self) -> Optional[datetime]:
         """Maps behavior_complete to aind model"""
         return self._nsb.behavior_complete
-
 
     @property
     def aind_behavior_type(self) -> Optional[Any]:
@@ -659,12 +659,13 @@ class MappedNSBList:
     @property
     def aind_burr5_status(self) -> Optional[Any]:
         """Maps burr5_status to aind model"""
-        if self._nsb.burr5_status is not None:
-            return {
+        return (
+            None
+            if self._nsb.burr5_status is None
+            else {
                 self._nsb.burr5_status.COMPLETE: None,
             }.get(self._nsb.burr5_status, None)
-        else:
-            return None
+        )
 
     @property
     def aind_burr5_virus_biosafte(self) -> Optional[Any]:
@@ -3154,7 +3155,7 @@ class MappedNSBList:
             )
             procedures.append(headframe_procedure)
 
-        # Check if there are any procedures for burr holes 1 through 4
+        # Check if there are any procedures for burr holes 1 through 6
         for burr_hole_num in range(1, 7):
             if getattr(self, f"aind_burr_hole_{burr_hole_num}") in {
                 BurrHoleProcedure.INJECTION,
