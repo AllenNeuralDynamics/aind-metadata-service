@@ -692,6 +692,7 @@ class FolowUpIontoNumber(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
+# note: had to manually add WHC_NP and WHC_2P for entries pre 6/29/23
 class Headpost(Enum, metaclass=OptionalEnumMeta):
     """Enum class for Headpost"""
 
@@ -704,6 +705,8 @@ class Headpost(Enum, metaclass=OptionalEnumMeta):
     VISUAL_CTX = "Visual Ctx"
     WHC_FULL_RING = "WHC (Full ring)"
     WHC_NP_ZIRCONIA = "WHC NP (Zirconia)"
+    WHC_NP = "WHC NP"
+    WHC_2P = "WHC 2P"
 
 
 class HeadpostPerformDuring(Enum, metaclass=OptionalEnumMeta):

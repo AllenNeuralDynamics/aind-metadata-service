@@ -92,7 +92,7 @@
     "Burr3_x0020_A_x002f_P": "-2.45",
     "Burr3_x0020_M_x002f_L": "3.0",
     "Burr3_x0020_D_x002f_V": null,
-    "inj3volperdepth": "600 nl",
+    "inj3volperdepth": 600,
     "Inj3Current": null,
     "Inj3AlternatingTime": null,
     "Inj3retSetting": "Off",

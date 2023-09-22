@@ -263,15 +263,19 @@ class MappedNSBList:
     @property
     def aind_behavior(self) -> Optional[Any]:
         """Maps behavior to aind model"""
-        return {
-            self._nsb.behavior.NO: None,
-            self._nsb.behavior.YES: None,
-        }.get(self._nsb.behavior, None)
+        if self._nsb.behavior is not None:
+            return {
+                self._nsb.behavior.NO: None,
+                self._nsb.behavior.YES: None,
+            }.get(self._nsb.behavior, None)
+        else:
+            return None
 
     @property
     def aind_behavior_complete(self) -> Optional[datetime]:
         """Maps behavior_complete to aind model"""
         return self._nsb.behavior_complete
+
 
     @property
     def aind_behavior_type(self) -> Optional[Any]:
@@ -655,9 +659,12 @@ class MappedNSBList:
     @property
     def aind_burr5_status(self) -> Optional[Any]:
         """Maps burr5_status to aind model"""
-        return {
-            self._nsb.burr5_status.COMPLETE: None,
-        }.get(self._nsb.burr5_status, None)
+        if self._nsb.burr5_status is not None:
+            return {
+                self._nsb.burr5_status.COMPLETE: None,
+            }.get(self._nsb.burr5_status, None)
+        else:
+            return None
 
     @property
     def aind_burr5_virus_biosafte(self) -> Optional[Any]:
@@ -1264,9 +1271,9 @@ class MappedNSBList:
         return self._nsb.created
 
     @property
-    def aind_date1st_injection(self) -> Optional[datetime]:
+    def aind_date1st_injection(self) -> Optional[date]:
         """Maps date1st_injection to aind model"""
-        return self._nsb.date1st_injection
+        return self._parse_datetime_to_date(self._nsb.date1st_injection)
 
     @property
     def aind_date_of_birth(self) -> Optional[datetime]:
@@ -1279,9 +1286,9 @@ class MappedNSBList:
         return self._parse_datetime_to_date(self._nsb.date_of_surgery)
 
     @property
-    def aind_date_range_start(self) -> Optional[datetime]:
+    def aind_date_range_start(self) -> Optional[date]:
         """Maps date_range_start to aind model"""
-        return self._nsb.date_range_start
+        return self._parse_datetime_to_date(self._nsb.date_range_start)
 
     @property
     def aind_dv2nd_inj(self) -> Optional[float]:
@@ -1470,8 +1477,8 @@ class MappedNSBList:
                 self._nsb.headpost.LSHAPED: HeadPost.L_SHAPED,
                 self._nsb.headpost.WHC_NP_ZIRCONIA: HeadPost.WHC_NP_ZIRCONIA,
                 self._nsb.headpost.AI_STRAIGHT_BAR: HeadPost.AI_HEADBAR,
-                # self._nsb.headpost.WHC_NP: HeadPost.WHC_NP,
-                # self._nsb.headpost.WHC_2P: HeadPost.WHC_2P,
+                self._nsb.headpost.WHC_NP: HeadPost.WHC_NP,
+                self._nsb.headpost.WHC_2P: HeadPost.WHC_2P,
                 self._nsb.headpost.OTHER_ADD_DETAILS_IN_REQU: None,
             }.get(self._nsb.headpost, None)
         )
@@ -3045,7 +3052,10 @@ class MappedNSBList:
     @staticmethod
     def _map_burr_hole_dv(dv1, dv2, dv3):
         """Maps dvs for a burr hole to one coordinate depth list"""
-        return [dv for dv in (dv1, dv2, dv3) if dv is not None]
+        if all(dv is None for dv in (dv1, dv2, dv3)):
+            return None
+        else:
+            return [dv for dv in (dv1, dv2, dv3) if dv is not None]
 
     def get_procedures(self) -> List[SubjectProcedure]:
         """Get a list of subject procedures"""
