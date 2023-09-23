@@ -112,7 +112,7 @@ class BurrHoleInfo:
     inj_current: Optional[float] = None
     alternating_current: Optional[str] = None
     inj_duration: Optional[float] = None
-    inj_volume: Optional[float] = None
+    inj_volume: Optional[List[float]] = None
     fiber_implant_depth: Optional[float] = None
 
 
@@ -246,7 +246,7 @@ class MappedNSBList:
         return None
 
     @property
-    def aind_age_at_injection(self) -> Optional[str]:
+    def aind_age_at_injection(self) -> Optional[float]:
         """Maps age_at_injection to aind model"""
         return self._parse_basic_float_str(self._nsb.age_at_injection)
 
@@ -280,16 +280,20 @@ class MappedNSBList:
     @property
     def aind_behavior_type(self) -> Optional[Any]:
         """Maps behavior_type to aind model"""
-        return {
-            self._nsb.behavior_type.SELECT: None,
-            self._nsb.behavior_type.HABITUATION_ONLY: None,
-            self._nsb.behavior_type.HABITUATION_PASSIVE_TRAIN: None,
-            self._nsb.behavior_type.CHANGE_DETECTION_TASK: None,
-            self._nsb.behavior_type.DR_AUDITORY_VISUAL_TASK: None,
-            self._nsb.behavior_type.AIND_FORAGING_TASK_WITH_O: None,
-            self._nsb.behavior_type.AIBS_CHARACTERIZATION_ROT: None,
-            self._nsb.behavior_type.AIND_MOTOR_OBSERVATORY_WH: None,
-        }.get(self._nsb.behavior_type, None)
+        return (
+            None
+            if self._nsb.behavior_type is None
+            else {
+                self._nsb.behavior_type.SELECT: None,
+                self._nsb.behavior_type.HABITUATION_ONLY: None,
+                self._nsb.behavior_type.HABITUATION_PASSIVE_TRAIN: None,
+                self._nsb.behavior_type.CHANGE_DETECTION_TASK: None,
+                self._nsb.behavior_type.DR_AUDITORY_VISUAL_TASK: None,
+                self._nsb.behavior_type.AIND_FORAGING_TASK_WITH_O: None,
+                self._nsb.behavior_type.AIBS_CHARACTERIZATION_ROT: None,
+                self._nsb.behavior_type.AIND_MOTOR_OBSERVATORY_WH: None,
+            }.get(self._nsb.behavior_type, None)
+        )
 
     @property
     def aind_breg2_lamb(self) -> Optional[float]:
@@ -326,7 +330,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr1_perform_during(self) -> Optional[Any]:
+    def aind_burr1_perform_during(self) -> Optional[During]:
         """Maps burr1_perform_during to aind model"""
         return (
             None
@@ -365,7 +369,7 @@ class MappedNSBList:
         """Maps burr2_injection_devi to aind model"""
         return (
             None
-            if self._nsb.burr2_injection_devi
+            if self._nsb.burr2_injection_devi is None
             else {
                 self._nsb.burr2_injection_devi.SELECT: None,
                 self._nsb.burr2_injection_devi.NANO_1: None,
@@ -390,7 +394,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr2_perform_during(self) -> Optional[Any]:
+    def aind_burr2_perform_during(self) -> Optional[During]:
         """Maps burr2_perform_during to aind model"""
         return (
             None
@@ -417,7 +421,7 @@ class MappedNSBList:
         """Maps burr2_virus_biosafte to aind model"""
         return (
             None
-            if self._nsb.burr1_virus_biosafte is None
+            if self._nsb.burr2_virus_biosafte is None
             else {
                 self._nsb.burr2_virus_biosafte.SELECT: None,
                 self._nsb.burr2_virus_biosafte.BSL_1_AAV: None,
@@ -480,7 +484,7 @@ class MappedNSBList:
         return self._nsb.burr3_m_l
 
     @property
-    def aind_burr3_perform_during(self) -> Optional[Any]:
+    def aind_burr3_perform_during(self) -> Optional[During]:
         """Maps burr3_perform_during to aind model"""
         return (
             None
@@ -570,7 +574,7 @@ class MappedNSBList:
         return self._nsb.burr4_m_l
 
     @property
-    def aind_burr4_perform_during(self) -> Optional[Any]:
+    def aind_burr4_perform_during(self) -> Optional[During]:
         """Maps burr4_perform_during to aind model"""
         return (
             None
@@ -645,7 +649,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr5_perform_during(self) -> Optional[Any]:
+    def aind_burr5_perform_during(self) -> Optional[During]:
         """Maps burr5_perform_during to aind model"""
         return (
             None
@@ -720,7 +724,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr6_perform_during(self) -> Optional[Any]:
+    def aind_burr6_perform_during(self) -> Optional[During]:
         """Maps burr6_perform_during to aind model"""
         return (
             None
@@ -833,7 +837,7 @@ class MappedNSBList:
         }.get(self._nsb.burr_3_fiber_t, None)
 
     @property
-    def aind_burr_3_hemisphere(self) -> Optional[Any]:
+    def aind_burr_3_hemisphere(self) -> Optional[Side]:
         """Maps burr_3_hemisphere to aind model"""
         return (
             None
@@ -873,7 +877,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_4_hemisphere(self) -> Optional[Any]:
+    def aind_burr_4_hemisphere(self) -> Optional[Side]:
         """Maps burr_4_hemisphere to aind model"""
         return (
             None
@@ -923,7 +927,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_5_hemisphere(self) -> Optional[Any]:
+    def aind_burr_5_hemisphere(self) -> Optional[Side]:
         """Maps burr_5_hemisphere to aind model"""
         return (
             None
@@ -978,7 +982,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_6_hemisphere(self) -> Optional[Any]:
+    def aind_burr_6_hemisphere(self) -> Optional[Side]:
         """Maps burr_6_hemisphere to aind model"""
         return (
             None
@@ -996,7 +1000,7 @@ class MappedNSBList:
         return self._nsb.burr_6_m_l
 
     @property
-    def aind_burr_hole_1(self) -> Optional[Any]:
+    def aind_burr_hole_1(self) -> Optional[BurrHoleProcedure]:
         """Maps burr_hole_1 to aind model"""
         return (
             None
@@ -1025,7 +1029,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_hole_2(self) -> Optional[Any]:
+    def aind_burr_hole_2(self) -> Optional[BurrHoleProcedure]:
         """Maps burr_hole_2 to aind model"""
         return (
             None
@@ -1043,7 +1047,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_hole_3(self) -> Optional[Any]:
+    def aind_burr_hole_3(self) -> Optional[BurrHoleProcedure]:
         """Maps burr_hole_3 to aind model"""
         return (
             None
@@ -1061,7 +1065,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_hole_4(self) -> Optional[Any]:
+    def aind_burr_hole_4(self) -> Optional[BurrHoleProcedure]:
         """Maps burr_hole_4 to aind model"""
         return (
             None
@@ -1079,7 +1083,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_hole_5(self) -> Optional[Any]:
+    def aind_burr_hole_5(self) -> Optional[BurrHoleProcedure]:
         """Maps burr_hole_5 to aind model"""
         return (
             None
@@ -1097,7 +1101,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_hole_6(self) -> Optional[Any]:
+    def aind_burr_hole_6(self) -> Optional[BurrHoleProcedure]:
         """Maps burr_hole_6 to aind model"""
         return (
             None
@@ -1240,7 +1244,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_craniotomy_perform_d(self) -> Optional[Any]:
+    def aind_craniotomy_perform_d(self) -> Optional[During]:
         """Maps craniotomy_perform_d to aind model"""
         return (
             None
@@ -1252,7 +1256,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_craniotomy_type(self) -> Optional[Any]:
+    def aind_craniotomy_type(self) -> Optional[CraniotomyType]:
         """Maps craniotomy_type to aind model"""
         return (
             None
@@ -1287,9 +1291,9 @@ class MappedNSBList:
         return self._parse_datetime_to_date(self._nsb.date_of_surgery)
 
     @property
-    def aind_date_range_start(self) -> Optional[date]:
+    def aind_date_range_start(self) -> Optional[datetime]:
         """Maps date_range_start to aind model"""
-        return self._parse_datetime_to_date(self._nsb.date_range_start)
+        return self._nsb.date_range_start
 
     @property
     def aind_dv2nd_inj(self) -> Optional[float]:
@@ -1464,7 +1468,7 @@ class MappedNSBList:
         return self._nsb.first_injection_weight_be
 
     @property
-    def aind_headpost(self) -> Optional[Any]:
+    def aind_headpost(self) -> Optional[HeadPost]:
         """Maps headpost to aind model"""
         return (
             None
@@ -1485,7 +1489,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_headpost_perform_dur(self) -> Optional[Any]:
+    def aind_headpost_perform_dur(self) -> Optional[During]:
         """Maps headpost_perform_dur to aind model"""
         return (
             None
@@ -1497,7 +1501,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_headpost_type(self) -> Optional[Any]:
+    def aind_headpost_type(self) -> Optional[HeadPostType]:
         """Maps headpost_type to aind model"""
         # TODO: check HeadpostTypes WHC NP Zirconia and AI Straight Bar Well
         return (
@@ -1518,7 +1522,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_hemisphere2nd_inj(self) -> Optional[Any]:
+    def aind_hemisphere2nd_inj(self) -> Optional[Side]:
         """Maps hemisphere2nd_inj to aind model"""
         return (
             None
@@ -1546,7 +1550,7 @@ class MappedNSBList:
         return self._nsb.hp_surgeon_comments
 
     @property
-    def aind_hp_work_station(self) -> Optional[Any]:
+    def aind_hp_work_station(self) -> Optional[str]:
         """Maps hp_work_station to aind model"""
         return (
             None
@@ -1584,7 +1588,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_iacuc_protocol(self) -> Optional[Any]:
+    def aind_iacuc_protocol(self) -> Optional[str]:
         """Maps iacuc_protocol to aind model"""
         return (
             None
@@ -1729,7 +1733,7 @@ class MappedNSBList:
         return self._nsb.inj1_storage_location
 
     @property
-    def aind_inj1_type(self) -> Optional[Any]:
+    def aind_inj1_type(self) -> Optional[InjectionType]:
         """Maps inj1_type to aind model"""
         return (
             None
@@ -1777,7 +1781,7 @@ class MappedNSBList:
         return self._nsb.inj2_storage_location
 
     @property
-    def aind_inj2_type(self) -> Optional[Any]:
+    def aind_inj2_type(self) -> Optional[InjectionType]:
         """Maps inj2_type to aind model"""
         return (
             None
@@ -1820,7 +1824,7 @@ class MappedNSBList:
         return self._nsb.inj3_storage_location
 
     @property
-    def aind_inj3_type(self) -> Optional[Any]:
+    def aind_inj3_type(self) -> Optional[InjectionType]:
         """Maps inj3_type to aind model"""
         return (
             None
@@ -1870,7 +1874,7 @@ class MappedNSBList:
         return self._nsb.inj4_storage_location
 
     @property
-    def aind_inj4_type(self) -> Optional[Any]:
+    def aind_inj4_type(self) -> Optional[InjectionType]:
         """Maps inj4_type to aind model"""
         return (
             None
@@ -1925,7 +1929,7 @@ class MappedNSBList:
         return self._nsb.inj5_storage_location
 
     @property
-    def aind_inj5_type(self) -> Optional[Any]:
+    def aind_inj5_type(self) -> Optional[InjectionType]:
         """Maps inj5_type to aind model"""
         return (
             None
@@ -1980,7 +1984,7 @@ class MappedNSBList:
         return self._nsb.inj6_storage_location
 
     @property
-    def aind_inj6_type(self) -> Optional[Any]:
+    def aind_inj6_type(self) -> Optional[InjectionType]:
         """Maps inj6_type to aind model"""
         return {
             self._nsb.inj6_type.SELECT: None,
@@ -2012,7 +2016,7 @@ class MappedNSBList:
         return self._nsb.inj_virus_strain_rt
 
     @property
-    def aind_ionto_number_inj1(self) -> Optional[Any]:
+    def aind_ionto_number_inj1(self) -> Optional[str]:
         """Maps ionto_number_inj1 to aind model"""
         return (
             None
@@ -2054,7 +2058,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_ionto_number_inj2(self) -> Optional[Any]:
+    def aind_ionto_number_inj2(self) -> Optional[str]:
         """Maps ionto_number_inj2 to aind model"""
         return (
             None
@@ -2143,282 +2147,290 @@ class MappedNSBList:
     @property
     def aind_lims_project(self) -> Optional[Any]:
         """Maps lims_project to aind model"""
-        return {
-            self._nsb.lims_project.N_0200: None,
-            self._nsb.lims_project.N_0309: None,
-            self._nsb.lims_project.N_0310: None,
-            self._nsb.lims_project.N_0311: None,
-            self._nsb.lims_project.N_0312: None,
-            self._nsb.lims_project.N_0314: None,
-            self._nsb.lims_project.N_0316: None,
-            self._nsb.lims_project.N_0319: None,
-            self._nsb.lims_project.N_0320: None,
-            self._nsb.lims_project.N_0321: None,
-            self._nsb.lims_project.N_03212: None,
-            self._nsb.lims_project.N_03213: None,
-            self._nsb.lims_project.N_03214: None,
-            self._nsb.lims_project.N_0322: None,
-            self._nsb.lims_project.N_0324: None,
-            self._nsb.lims_project.N_0325: None,
-            self._nsb.lims_project.N_0326: None,
-            self._nsb.lims_project.N_0327: None,
-            self._nsb.lims_project.N_03272: None,
-            self._nsb.lims_project.N_0328: None,
-            self._nsb.lims_project.N_0329: None,
-            self._nsb.lims_project.N_0331: None,
-            self._nsb.lims_project.N_0334: None,
-            self._nsb.lims_project.N_03342: None,
-            self._nsb.lims_project.N_0335: None,
-            self._nsb.lims_project.N_0336: None,
-            self._nsb.lims_project.N_0338: None,
-            self._nsb.lims_project.N_0339: None,
-            self._nsb.lims_project.N_03392: None,
-            self._nsb.lims_project.N_0340: None,
-            self._nsb.lims_project.N_0342: None,
-            self._nsb.lims_project.N_03422: None,
-            self._nsb.lims_project.N_0343: None,
-            self._nsb.lims_project.N_0344: None,
-            self._nsb.lims_project.N_0345: None,
-            self._nsb.lims_project.N_0346: None,
-            self._nsb.lims_project.N_0350: None,
-            self._nsb.lims_project.N_0350X: None,
-            self._nsb.lims_project.N_0351: None,
-            self._nsb.lims_project.N_0351X: None,
-            self._nsb.lims_project.N_0354: None,
-            self._nsb.lims_project.N_0355: None,
-            self._nsb.lims_project.N_0357: None,
-            self._nsb.lims_project.N_0358: None,
-            self._nsb.lims_project.N_0359: None,
-            self._nsb.lims_project.N_0360: None,
-            self._nsb.lims_project.N_03602: None,
-            self._nsb.lims_project.N_0362: None,
-            self._nsb.lims_project.N_0363: None,
-            self._nsb.lims_project.N_0364: None,
-            self._nsb.lims_project.N_0365: None,
-            self._nsb.lims_project.N_0365X: None,
-            self._nsb.lims_project.N_0366: None,
-            self._nsb.lims_project.N_0366X: None,
-            self._nsb.lims_project.N_0367: None,
-            self._nsb.lims_project.N_0369: None,
-            self._nsb.lims_project.N_0371: None,
-            self._nsb.lims_project.N_0372: None,
-            self._nsb.lims_project.N_0372X: None,
-            self._nsb.lims_project.N_0374: None,
-            self._nsb.lims_project.N_0376: None,
-            self._nsb.lims_project.N_0376A: None,
-            self._nsb.lims_project.N_0376X: None,
-            self._nsb.lims_project.N_0378: None,
-            self._nsb.lims_project.N_0378X: None,
-            self._nsb.lims_project.N_0380: None,
-            self._nsb.lims_project.N_0384: None,
-            self._nsb.lims_project.N_0386: None,
-            self._nsb.lims_project.N_0388: None,
-            self._nsb.lims_project.AINDMSMA: None,
-            self._nsb.lims_project.AINDDISCOVERY: None,
-            self._nsb.lims_project.AINDEPHYS: None,
-            self._nsb.lims_project.AINDOPHYS: None,
-            self._nsb.lims_project.APR_OX: None,
-            self._nsb.lims_project.A_XL_OX: None,
-            self._nsb.lims_project.BRAIN_STIM: None,
-            self._nsb.lims_project.BRAINTV_VIRAL_STRATEGIES: None,
-            self._nsb.lims_project.C200: None,
-            self._nsb.lims_project.C600: None,
-            self._nsb.lims_project.C600_LATERAL: None,
-            self._nsb.lims_project.C600X: None,
-            self._nsb.lims_project.CELLTYPES_TRANSGENIC_CHAR: None,
-            self._nsb.lims_project.CITRICACIDPILOT: None,
-            self._nsb.lims_project.CON9999: None,
-            self._nsb.lims_project.CONC505: None,
-            self._nsb.lims_project.CONCS04: None,
-            self._nsb.lims_project.DEEPSCOPE_SLM_DEVELOPMENT: None,
-            self._nsb.lims_project.DYNAMIC_ROUTING_BEHAVIOR: None,
-            self._nsb.lims_project.DYNAMIC_ROUTING_OPTO_DEV: None,
-            self._nsb.lims_project.DYNAMIC_ROUTING_SURGICAL: None,
-            self._nsb.lims_project.DYNAMIC_ROUTING_TASK1_PRO: None,
-            self._nsb.lims_project.DYNAMIC_ROUTING_TASK2_PRO: None,
-            self._nsb.lims_project.DYNAMIC_ROUTING_ULTRA_OPT: None,
-            self._nsb.lims_project.H120: None,
-            self._nsb.lims_project.H200: None,
-            self._nsb.lims_project.H301: None,
-            self._nsb.lims_project.H301T: None,
-            self._nsb.lims_project.H301_X: None,
-            self._nsb.lims_project.H501_X: None,
-            self._nsb.lims_project.H504: None,
-            self._nsb.lims_project.IS_IX: None,
-            self._nsb.lims_project.LARGE_SCALE_VOLTAGE: None,
-            self._nsb.lims_project.LEARNINGM_FISH_DEVELOPMEN: None,
-            self._nsb.lims_project.LEARNINGM_FISH_TASK1_A: None,
-            self._nsb.lims_project.M301T: None,
-            self._nsb.lims_project.MESOSCOPE_DEVELOPMENT: None,
-            self._nsb.lims_project.M_FISH_PLATFORM_DEVELOPME: None,
-            self._nsb.lims_project.MINDSCOPE_TRANSGENIC_CHAR: None,
-            self._nsb.lims_project.M_IVSCCMET: None,
-            self._nsb.lims_project.M_IVSCCME_TX: None,
-            self._nsb.lims_project.M_M_PATCHX: None,
-            self._nsb.lims_project.M_MPATC_HX: None,
-            self._nsb.lims_project.MOUSE_BRAIN_CELL_ATLAS_CH: None,
-            self._nsb.lims_project.MOUSE_BRAIN_CELL_ATLA_001: None,
-            self._nsb.lims_project.MOUSE_BRAIN_CELL_ATLAS_TR: None,
-            self._nsb.lims_project.MOUSE_FULL_MORPHOLOGY_FMO: None,
-            self._nsb.lims_project.MOUSE_GENETIC_TOOLS_PROJE: None,
-            self._nsb.lims_project.M_VISPTAXLO: None,
-            self._nsb.lims_project.MULTISCOPE_SIGNAL_NOISE: None,
-            self._nsb.lims_project.N200: None,
-            self._nsb.lims_project.N310: None,
-            self._nsb.lims_project.NEUROPIXEL_VISUAL_BEHAVIO: None,
-            self._nsb.lims_project.NEUROPIXEL_VISUAL_BEH_001: None,
-            self._nsb.lims_project.NEUROPIXEL_VISUAL_CODING: None,
-            self._nsb.lims_project.OLVSX: None,
-            self._nsb.lims_project.OM_FIS_HCOREGISTRATIONPIL: None,
-            self._nsb.lims_project.OM_FISH_CUX2_MESO: None,
-            self._nsb.lims_project.OM_FISH_GAD2_MESO: None,
-            self._nsb.lims_project.OM_FISH_GAD2_PILOT: None,
-            self._nsb.lims_project.OM_FISH_RBP4_MESO: None,
-            self._nsb.lims_project.OM_FISH_RORB_PILOT: None,
-            self._nsb.lims_project.OM_FISHRO_BINJECTIONVIRUS: None,
-            self._nsb.lims_project.OM_FISH_SST_MESO: None,
-            self._nsb.lims_project.OPEN_SCOPE_DENDRITE_COUPL: None,
-            self._nsb.lims_project.OPENSCOPE_DEVELOPMENT: None,
-            self._nsb.lims_project.OPEN_SCOPE_ILLUSION: None,
-            self._nsb.lims_project.OPEN_SCOPE_GLOBAL_LOCAL_O: None,
-            self._nsb.lims_project.OPENSCOPE_GAMMA_PILOT: None,
-            self._nsb.lims_project.OPENSCOPE_GAMMA_PRODUCTLO: None,
-            self._nsb.lims_project.OPENSCOPELNJECTION_PILOT: None,
-            self._nsb.lims_project.OPENSCOPE_MOTION_PLLOT: None,
-            self._nsb.lims_project.OPENSCOPE_MOTION_PRODUCTI: None,
-            self._nsb.lims_project.OPENSCOPE_MULTIPLEX_PILOT: None,
-            self._nsb.lims_project.OPENSCOPE_MULTIPLEX_PRODU: None,
-            self._nsb.lims_project.OPEN_SCOPE_SEQUENCE_LEARN: None,
-            self._nsb.lims_project.OPEN_SCOPE_TEMPORAL_BARCO: None,
-            self._nsb.lims_project.OPEN_SCOPE_VISION2_HIPPOC: None,
-            self._nsb.lims_project.OPH5_X: None,
-            self._nsb.lims_project.S200_C: None,
-            self._nsb.lims_project.SLC6_A1_NEUROPIXEL: None,
-            self._nsb.lims_project.SMART_SPIM_GENETIC_TOOLS: None,
-            self._nsb.lims_project.SURGERY_X: None,
-            self._nsb.lims_project.T301: None,
-            self._nsb.lims_project.T301T: None,
-            self._nsb.lims_project.T301_X: None,
-            self._nsb.lims_project.T503: None,
-            self._nsb.lims_project.T503_X: None,
-            self._nsb.lims_project.T504: None,
-            self._nsb.lims_project.T504_X: None,
-            self._nsb.lims_project.T600: None,
-            self._nsb.lims_project.T601: None,
-            self._nsb.lims_project.T601_X: None,
-            self._nsb.lims_project.TCYTX: None,
-            self._nsb.lims_project.TASK_TRAINED_NETWORKS_MUL: None,
-            self._nsb.lims_project.TASK_TRAINED_NETWORKS_NEU: None,
-            self._nsb.lims_project.TEMPLETON_PSYCHEDELICS: None,
-            self._nsb.lims_project.TEMPLETON_TTOC: None,
-            self._nsb.lims_project.TINY_BLUE_DOT_BEHAVIOR: None,
-            self._nsb.lims_project.U01_BFCT: None,
-            self._nsb.lims_project.VARIABILITY_AIM1: None,
-            self._nsb.lims_project.VARIABILITY_AIM1_PILOT: None,
-            self._nsb.lims_project.VARIABILITY_SPONTANEOUS: None,
-            self._nsb.lims_project.VI_DEEP_DIVE_EM_VOLUME: None,
-            self._nsb.lims_project.VI_DEEPDLVE_DEEPSCOPE_PIE: None,
-            self._nsb.lims_project.VIP_AXONAL_V1_PHASE1: None,
-            self._nsb.lims_project.VIP_SOMATIC_V1_MESO: None,
-            self._nsb.lims_project.VIP_SOMATIC_V1_PHASE1: None,
-            self._nsb.lims_project.VIP_SOMATIC_V1_PHASE2: None,
-            self._nsb.lims_project.VISUAL_BEHAVIOR: None,
-            self._nsb.lims_project.VISUAL_BEHAVIOR_DEVELOPME: None,
-            self._nsb.lims_project.VISUAL_BEHAVIOR_MULTISCOP: None,
-            self._nsb.lims_project.VISUAL_BEHAVIOR_MULTI_001: None,
-            self._nsb.lims_project.VISUAL_BEHAV_IOR_MULTISCO: None,
-            self._nsb.lims_project.VISUAL_BEHAVIOR_TASK1_B: None,
-        }.get(self._nsb.lims_project, None)
+        return (
+            None
+            if self._nsb.lims_project is None
+            else {
+                self._nsb.lims_project.N_0200: None,
+                self._nsb.lims_project.N_0309: None,
+                self._nsb.lims_project.N_0310: None,
+                self._nsb.lims_project.N_0311: None,
+                self._nsb.lims_project.N_0312: None,
+                self._nsb.lims_project.N_0314: None,
+                self._nsb.lims_project.N_0316: None,
+                self._nsb.lims_project.N_0319: None,
+                self._nsb.lims_project.N_0320: None,
+                self._nsb.lims_project.N_0321: None,
+                self._nsb.lims_project.N_03212: None,
+                self._nsb.lims_project.N_03213: None,
+                self._nsb.lims_project.N_03214: None,
+                self._nsb.lims_project.N_0322: None,
+                self._nsb.lims_project.N_0324: None,
+                self._nsb.lims_project.N_0325: None,
+                self._nsb.lims_project.N_0326: None,
+                self._nsb.lims_project.N_0327: None,
+                self._nsb.lims_project.N_03272: None,
+                self._nsb.lims_project.N_0328: None,
+                self._nsb.lims_project.N_0329: None,
+                self._nsb.lims_project.N_0331: None,
+                self._nsb.lims_project.N_0334: None,
+                self._nsb.lims_project.N_03342: None,
+                self._nsb.lims_project.N_0335: None,
+                self._nsb.lims_project.N_0336: None,
+                self._nsb.lims_project.N_0338: None,
+                self._nsb.lims_project.N_0339: None,
+                self._nsb.lims_project.N_03392: None,
+                self._nsb.lims_project.N_0340: None,
+                self._nsb.lims_project.N_0342: None,
+                self._nsb.lims_project.N_03422: None,
+                self._nsb.lims_project.N_0343: None,
+                self._nsb.lims_project.N_0344: None,
+                self._nsb.lims_project.N_0345: None,
+                self._nsb.lims_project.N_0346: None,
+                self._nsb.lims_project.N_0350: None,
+                self._nsb.lims_project.N_0350X: None,
+                self._nsb.lims_project.N_0351: None,
+                self._nsb.lims_project.N_0351X: None,
+                self._nsb.lims_project.N_0354: None,
+                self._nsb.lims_project.N_0355: None,
+                self._nsb.lims_project.N_0357: None,
+                self._nsb.lims_project.N_0358: None,
+                self._nsb.lims_project.N_0359: None,
+                self._nsb.lims_project.N_0360: None,
+                self._nsb.lims_project.N_03602: None,
+                self._nsb.lims_project.N_0362: None,
+                self._nsb.lims_project.N_0363: None,
+                self._nsb.lims_project.N_0364: None,
+                self._nsb.lims_project.N_0365: None,
+                self._nsb.lims_project.N_0365X: None,
+                self._nsb.lims_project.N_0366: None,
+                self._nsb.lims_project.N_0366X: None,
+                self._nsb.lims_project.N_0367: None,
+                self._nsb.lims_project.N_0369: None,
+                self._nsb.lims_project.N_0371: None,
+                self._nsb.lims_project.N_0372: None,
+                self._nsb.lims_project.N_0372X: None,
+                self._nsb.lims_project.N_0374: None,
+                self._nsb.lims_project.N_0376: None,
+                self._nsb.lims_project.N_0376A: None,
+                self._nsb.lims_project.N_0376X: None,
+                self._nsb.lims_project.N_0378: None,
+                self._nsb.lims_project.N_0378X: None,
+                self._nsb.lims_project.N_0380: None,
+                self._nsb.lims_project.N_0384: None,
+                self._nsb.lims_project.N_0386: None,
+                self._nsb.lims_project.N_0388: None,
+                self._nsb.lims_project.AINDMSMA: None,
+                self._nsb.lims_project.AINDDISCOVERY: None,
+                self._nsb.lims_project.AINDEPHYS: None,
+                self._nsb.lims_project.AINDOPHYS: None,
+                self._nsb.lims_project.APR_OX: None,
+                self._nsb.lims_project.A_XL_OX: None,
+                self._nsb.lims_project.BRAIN_STIM: None,
+                self._nsb.lims_project.BRAINTV_VIRAL_STRATEGIES: None,
+                self._nsb.lims_project.C200: None,
+                self._nsb.lims_project.C600: None,
+                self._nsb.lims_project.C600_LATERAL: None,
+                self._nsb.lims_project.C600X: None,
+                self._nsb.lims_project.CELLTYPES_TRANSGENIC_CHAR: None,
+                self._nsb.lims_project.CITRICACIDPILOT: None,
+                self._nsb.lims_project.CON9999: None,
+                self._nsb.lims_project.CONC505: None,
+                self._nsb.lims_project.CONCS04: None,
+                self._nsb.lims_project.DEEPSCOPE_SLM_DEVELOPMENT: None,
+                self._nsb.lims_project.DYNAMIC_ROUTING_BEHAVIOR: None,
+                self._nsb.lims_project.DYNAMIC_ROUTING_OPTO_DEV: None,
+                self._nsb.lims_project.DYNAMIC_ROUTING_SURGICAL: None,
+                self._nsb.lims_project.DYNAMIC_ROUTING_TASK1_PRO: None,
+                self._nsb.lims_project.DYNAMIC_ROUTING_TASK2_PRO: None,
+                self._nsb.lims_project.DYNAMIC_ROUTING_ULTRA_OPT: None,
+                self._nsb.lims_project.H120: None,
+                self._nsb.lims_project.H200: None,
+                self._nsb.lims_project.H301: None,
+                self._nsb.lims_project.H301T: None,
+                self._nsb.lims_project.H301_X: None,
+                self._nsb.lims_project.H501_X: None,
+                self._nsb.lims_project.H504: None,
+                self._nsb.lims_project.IS_IX: None,
+                self._nsb.lims_project.LARGE_SCALE_VOLTAGE: None,
+                self._nsb.lims_project.LEARNINGM_FISH_DEVELOPMEN: None,
+                self._nsb.lims_project.LEARNINGM_FISH_TASK1_A: None,
+                self._nsb.lims_project.M301T: None,
+                self._nsb.lims_project.MESOSCOPE_DEVELOPMENT: None,
+                self._nsb.lims_project.M_FISH_PLATFORM_DEVELOPME: None,
+                self._nsb.lims_project.MINDSCOPE_TRANSGENIC_CHAR: None,
+                self._nsb.lims_project.M_IVSCCMET: None,
+                self._nsb.lims_project.M_IVSCCME_TX: None,
+                self._nsb.lims_project.M_M_PATCHX: None,
+                self._nsb.lims_project.M_MPATC_HX: None,
+                self._nsb.lims_project.MOUSE_BRAIN_CELL_ATLAS_CH: None,
+                self._nsb.lims_project.MOUSE_BRAIN_CELL_ATLA_001: None,
+                self._nsb.lims_project.MOUSE_BRAIN_CELL_ATLAS_TR: None,
+                self._nsb.lims_project.MOUSE_FULL_MORPHOLOGY_FMO: None,
+                self._nsb.lims_project.MOUSE_GENETIC_TOOLS_PROJE: None,
+                self._nsb.lims_project.M_VISPTAXLO: None,
+                self._nsb.lims_project.MULTISCOPE_SIGNAL_NOISE: None,
+                self._nsb.lims_project.N200: None,
+                self._nsb.lims_project.N310: None,
+                self._nsb.lims_project.NEUROPIXEL_VISUAL_BEHAVIO: None,
+                self._nsb.lims_project.NEUROPIXEL_VISUAL_BEH_001: None,
+                self._nsb.lims_project.NEUROPIXEL_VISUAL_CODING: None,
+                self._nsb.lims_project.OLVSX: None,
+                self._nsb.lims_project.OM_FIS_HCOREGISTRATIONPIL: None,
+                self._nsb.lims_project.OM_FISH_CUX2_MESO: None,
+                self._nsb.lims_project.OM_FISH_GAD2_MESO: None,
+                self._nsb.lims_project.OM_FISH_GAD2_PILOT: None,
+                self._nsb.lims_project.OM_FISH_RBP4_MESO: None,
+                self._nsb.lims_project.OM_FISH_RORB_PILOT: None,
+                self._nsb.lims_project.OM_FISHRO_BINJECTIONVIRUS: None,
+                self._nsb.lims_project.OM_FISH_SST_MESO: None,
+                self._nsb.lims_project.OPEN_SCOPE_DENDRITE_COUPL: None,
+                self._nsb.lims_project.OPENSCOPE_DEVELOPMENT: None,
+                self._nsb.lims_project.OPEN_SCOPE_ILLUSION: None,
+                self._nsb.lims_project.OPEN_SCOPE_GLOBAL_LOCAL_O: None,
+                self._nsb.lims_project.OPENSCOPE_GAMMA_PILOT: None,
+                self._nsb.lims_project.OPENSCOPE_GAMMA_PRODUCTLO: None,
+                self._nsb.lims_project.OPENSCOPELNJECTION_PILOT: None,
+                self._nsb.lims_project.OPENSCOPE_MOTION_PLLOT: None,
+                self._nsb.lims_project.OPENSCOPE_MOTION_PRODUCTI: None,
+                self._nsb.lims_project.OPENSCOPE_MULTIPLEX_PILOT: None,
+                self._nsb.lims_project.OPENSCOPE_MULTIPLEX_PRODU: None,
+                self._nsb.lims_project.OPEN_SCOPE_SEQUENCE_LEARN: None,
+                self._nsb.lims_project.OPEN_SCOPE_TEMPORAL_BARCO: None,
+                self._nsb.lims_project.OPEN_SCOPE_VISION2_HIPPOC: None,
+                self._nsb.lims_project.OPH5_X: None,
+                self._nsb.lims_project.S200_C: None,
+                self._nsb.lims_project.SLC6_A1_NEUROPIXEL: None,
+                self._nsb.lims_project.SMART_SPIM_GENETIC_TOOLS: None,
+                self._nsb.lims_project.SURGERY_X: None,
+                self._nsb.lims_project.T301: None,
+                self._nsb.lims_project.T301T: None,
+                self._nsb.lims_project.T301_X: None,
+                self._nsb.lims_project.T503: None,
+                self._nsb.lims_project.T503_X: None,
+                self._nsb.lims_project.T504: None,
+                self._nsb.lims_project.T504_X: None,
+                self._nsb.lims_project.T600: None,
+                self._nsb.lims_project.T601: None,
+                self._nsb.lims_project.T601_X: None,
+                self._nsb.lims_project.TCYTX: None,
+                self._nsb.lims_project.TASK_TRAINED_NETWORKS_MUL: None,
+                self._nsb.lims_project.TASK_TRAINED_NETWORKS_NEU: None,
+                self._nsb.lims_project.TEMPLETON_PSYCHEDELICS: None,
+                self._nsb.lims_project.TEMPLETON_TTOC: None,
+                self._nsb.lims_project.TINY_BLUE_DOT_BEHAVIOR: None,
+                self._nsb.lims_project.U01_BFCT: None,
+                self._nsb.lims_project.VARIABILITY_AIM1: None,
+                self._nsb.lims_project.VARIABILITY_AIM1_PILOT: None,
+                self._nsb.lims_project.VARIABILITY_SPONTANEOUS: None,
+                self._nsb.lims_project.VI_DEEP_DIVE_EM_VOLUME: None,
+                self._nsb.lims_project.VI_DEEPDLVE_DEEPSCOPE_PIE: None,
+                self._nsb.lims_project.VIP_AXONAL_V1_PHASE1: None,
+                self._nsb.lims_project.VIP_SOMATIC_V1_MESO: None,
+                self._nsb.lims_project.VIP_SOMATIC_V1_PHASE1: None,
+                self._nsb.lims_project.VIP_SOMATIC_V1_PHASE2: None,
+                self._nsb.lims_project.VISUAL_BEHAVIOR: None,
+                self._nsb.lims_project.VISUAL_BEHAVIOR_DEVELOPME: None,
+                self._nsb.lims_project.VISUAL_BEHAVIOR_MULTISCOP: None,
+                self._nsb.lims_project.VISUAL_BEHAVIOR_MULTI_001: None,
+                self._nsb.lims_project.VISUAL_BEHAV_IOR_MULTISCO: None,
+                self._nsb.lims_project.VISUAL_BEHAVIOR_TASK1_B: None,
+            }.get(self._nsb.lims_project, None)
+        )
 
     @property
     def aind_lims_taskflow(self) -> Optional[Any]:
         """Maps lims_taskflow to aind model"""
-        return {
-            self._nsb.lims_taskflow.AIND_EPHYS_SURGERY_ONLY: None,
-            self._nsb.lims_taskflow.AIND_EPHYS_PASSIVE_BEHAVI: None,
-            self._nsb.lims_taskflow.AIND_U19_AAV_RETROGRADE: None,
-            self._nsb.lims_taskflow.AIND_U19_RAB_V_RETROGRADE: None,
-            self._nsb.lims_taskflow.AIND_U19_THALAMUS: None,
-            self._nsb.lims_taskflow.AIND_WATERLOG: None,
-            self._nsb.lims_taskflow.BRAIN_LARGE_SCALE_RECORDI: None,
-            self._nsb.lims_taskflow.BRAIN_MOUSE_BRAIN_CELL_AT: None,
-            self._nsb.lims_taskflow.BRAIN_OBSERVATORY_DEEPSCO: None,
-            self._nsb.lims_taskflow.BRAIN_OBSERVATORY_EPHYS_D: None,
-            self._nsb.lims_taskflow.BRAIN_OBSERVATORY_MAPSCOP: None,
-            self._nsb.lims_taskflow.BRAIN_OBSERVATORY_MESOSCO: None,
-            self._nsb.lims_taskflow.BRAIN_OBSERVATORY_MES_001: None,
-            self._nsb.lims_taskflow.BRAIN_OBSERVATORY_NEUROPI: None,
-            self._nsb.lims_taskflow.BRAIN_OBSERVATORY_TRANSGE: None,
-            self._nsb.lims_taskflow.BRAIN_OBSERVATORY_V1_DD: None,
-            self._nsb.lims_taskflow.BRAIN_OBSERVATORY_VISUAL: None,
-            self._nsb.lims_taskflow.BRAIN_OBSERVATORY_VIS_001: None,
-            self._nsb.lims_taskflow.BRAIN_OBSERVATORY_VIS_002: None,
-            self._nsb.lims_taskflow.BRAIN_OBSERVATORY_VIS_003: None,
-            self._nsb.lims_taskflow.BTV_BRAIN_VIRAL_STRATEGIE: None,
-            self._nsb.lims_taskflow.CITRIC_ACID_PILOT: None,
-            self._nsb.lims_taskflow.EPHYS_DEV_VISUAL_BEHAVIOR: None,
-            self._nsb.lims_taskflow.EPHYS_TASK_DEV_DYNAMIC_RO: None,
-            self._nsb.lims_taskflow.EPHYS_TASK_DEV_DYANMIC_RO: None,
-            self._nsb.lims_taskflow.EPHYS_TASK_DEV_DYNAMI_001: None,
-            self._nsb.lims_taskflow.IVSCC_HVA_RETRO_PATCH_SEQ: None,
-            self._nsb.lims_taskflow.IVSC_CM_INJECTION: None,
-            self._nsb.lims_taskflow.IVSP_CM_INJECTION: None,
-            self._nsb.lims_taskflow.MGT_LAB: None,
-            self._nsb.lims_taskflow.MGT_TISSUE_CYTE: None,
-            self._nsb.lims_taskflow.MINDSCOPE_2_P_TESTING: None,
-            self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_BEHAV: None,
-            self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_OPTO: None,
-            self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_SURGI: None,
-            self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_ULTRA: None,
-            self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_TASK: None,
-            self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_T_001: None,
-            self._nsb.lims_taskflow.MSP_G_CA_MP8_TESTING: None,
-            self._nsb.lims_taskflow.MSP_LEARNING_M_FISH_DEVEL: None,
-            self._nsb.lims_taskflow.MSP_LEARNING_M_FISH_D_001: None,
-            self._nsb.lims_taskflow.MSP_LEARNING_M_FISH_FRONT: None,
-            self._nsb.lims_taskflow.MSP_LEARNING_M_FISH_VIRUS: None,
-            self._nsb.lims_taskflow.MSP_OM_FISH_COREGISTRATIO: None,
-            self._nsb.lims_taskflow.MSP_OM_FISH_CUX2_PILOT: None,
-            self._nsb.lims_taskflow.MSP_OM_FISH_GAD2_PILOT: None,
-            self._nsb.lims_taskflow.MSP_OM_FISH_RBP4_MESO: None,
-            self._nsb.lims_taskflow.MSP_OM_FISH_RORB_PILOT: None,
-            self._nsb.lims_taskflow.MSP_OM_FISH_ROB_INJECTION: None,
-            self._nsb.lims_taskflow.MSP_OM_FISH_SST_MESO_GAMM: None,
-            self._nsb.lims_taskflow.MSP_OPEN_SCOPE_DENDRITE_C: None,
-            self._nsb.lims_taskflow.MSP_OPEN_SCOPE_ILLUSION: None,
-            self._nsb.lims_taskflow.MSP_OPEN_SCOPE_GLOBAL_LOC: None,
-            self._nsb.lims_taskflow.MSP_OPEN_SCOPE_GLOBAL_001: None,
-            self._nsb.lims_taskflow.MSP_TASK_TRAINED_NETWORKS: None,
-            self._nsb.lims_taskflow.MSP_TASK_TRAINED_NETW_001: None,
-            self._nsb.lims_taskflow.MSP_U01_BRIDGING_FUNCTION: None,
-            self._nsb.lims_taskflow.MSP_VARIABILITY_AIM_1: None,
-            self._nsb.lims_taskflow.MSP_VARIABILITY_AIM_1_PIL: None,
-            self._nsb.lims_taskflow.MSP_VARIABILITY_SPONTANEO: None,
-            self._nsb.lims_taskflow.MSP_VIP_AXONAL_V1: None,
-            self._nsb.lims_taskflow.MSP_VIP_SOMATIC_V1: None,
-            self._nsb.lims_taskflow.OPENSCOPE_MOTION_PRODUCTI: None,
-            self._nsb.lims_taskflow.OPENSCOPE_VIRUS_VALIDATIO: None,
-            self._nsb.lims_taskflow.OPEN_SCOPE_GAMMA_PILOT: None,
-            self._nsb.lims_taskflow.OPEN_SCOPE_GAMMA_PRODUCTI: None,
-            self._nsb.lims_taskflow.OPEN_SCOPE_LNJECTION_VOLU: None,
-            self._nsb.lims_taskflow.OPEN_SCOPE_MOTION_PILOT: None,
-            self._nsb.lims_taskflow.OPEN_SCOPE_MULTIPLEX_PILO: None,
-            self._nsb.lims_taskflow.OPEN_SCOPE_MULTIPLEX__001: None,
-            self._nsb.lims_taskflow.OPEN_SCOPE_MULTIPLEX_PROD: None,
-            self._nsb.lims_taskflow.OPEN_SCOPE_MULTLPLEX_PROD: None,
-            self._nsb.lims_taskflow.OPEN_SCOPE_SEQUENCE_LEARN: None,
-            self._nsb.lims_taskflow.OPEN_SCOPE_TEMPORAL_BARCO: None,
-            self._nsb.lims_taskflow.OPEN_SCOPE_TEMPORAL_B_001: None,
-            self._nsb.lims_taskflow.OPEN_SCOPE_VISION_2_HIPPO: None,
-            self._nsb.lims_taskflow.OPEN_SCOPE_WHC_2_P_DEV: None,
-            self._nsb.lims_taskflow.TEMPLETON_PSYCHEDELICS: None,
-            self._nsb.lims_taskflow.TINY_BLUE_DOT_BEHAVIOR: None,
-            self._nsb.lims_taskflow.TRANSGENIC_CHARACTERIZATI: None,
-            self._nsb.lims_taskflow.VIS_B_DEV_CONTROL_GROUP: None,
-            self._nsb.lims_taskflow.VIS_B_LATERAL_PREP_DEVELO: None,
-            self._nsb.lims_taskflow.VIS_B_TASK_2_DEVELOPMENT: None,
-            self._nsb.lims_taskflow.VGT_ENHANCERS_TRANSSYNAPT: None,
-        }.get(self._nsb.lims_taskflow, None)
+        return (
+            None
+            if self._nsb.lims_taskflow is None
+            else {
+                self._nsb.lims_taskflow.AIND_EPHYS_SURGERY_ONLY: None,
+                self._nsb.lims_taskflow.AIND_EPHYS_PASSIVE_BEHAVI: None,
+                self._nsb.lims_taskflow.AIND_U19_AAV_RETROGRADE: None,
+                self._nsb.lims_taskflow.AIND_U19_RAB_V_RETROGRADE: None,
+                self._nsb.lims_taskflow.AIND_U19_THALAMUS: None,
+                self._nsb.lims_taskflow.AIND_WATERLOG: None,
+                self._nsb.lims_taskflow.BRAIN_LARGE_SCALE_RECORDI: None,
+                self._nsb.lims_taskflow.BRAIN_MOUSE_BRAIN_CELL_AT: None,
+                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_DEEPSCO: None,
+                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_EPHYS_D: None,
+                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_MAPSCOP: None,
+                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_MESOSCO: None,
+                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_MES_001: None,
+                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_NEUROPI: None,
+                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_TRANSGE: None,
+                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_V1_DD: None,
+                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_VISUAL: None,
+                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_VIS_001: None,
+                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_VIS_002: None,
+                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_VIS_003: None,
+                self._nsb.lims_taskflow.BTV_BRAIN_VIRAL_STRATEGIE: None,
+                self._nsb.lims_taskflow.CITRIC_ACID_PILOT: None,
+                self._nsb.lims_taskflow.EPHYS_DEV_VISUAL_BEHAVIOR: None,
+                self._nsb.lims_taskflow.EPHYS_TASK_DEV_DYNAMIC_RO: None,
+                self._nsb.lims_taskflow.EPHYS_TASK_DEV_DYANMIC_RO: None,
+                self._nsb.lims_taskflow.EPHYS_TASK_DEV_DYNAMI_001: None,
+                self._nsb.lims_taskflow.IVSCC_HVA_RETRO_PATCH_SEQ: None,
+                self._nsb.lims_taskflow.IVSC_CM_INJECTION: None,
+                self._nsb.lims_taskflow.IVSP_CM_INJECTION: None,
+                self._nsb.lims_taskflow.MGT_LAB: None,
+                self._nsb.lims_taskflow.MGT_TISSUE_CYTE: None,
+                self._nsb.lims_taskflow.MINDSCOPE_2_P_TESTING: None,
+                self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_BEHAV: None,
+                self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_OPTO: None,
+                self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_SURGI: None,
+                self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_ULTRA: None,
+                self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_TASK: None,
+                self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_T_001: None,
+                self._nsb.lims_taskflow.MSP_G_CA_MP8_TESTING: None,
+                self._nsb.lims_taskflow.MSP_LEARNING_M_FISH_DEVEL: None,
+                self._nsb.lims_taskflow.MSP_LEARNING_M_FISH_D_001: None,
+                self._nsb.lims_taskflow.MSP_LEARNING_M_FISH_FRONT: None,
+                self._nsb.lims_taskflow.MSP_LEARNING_M_FISH_VIRUS: None,
+                self._nsb.lims_taskflow.MSP_OM_FISH_COREGISTRATIO: None,
+                self._nsb.lims_taskflow.MSP_OM_FISH_CUX2_PILOT: None,
+                self._nsb.lims_taskflow.MSP_OM_FISH_GAD2_PILOT: None,
+                self._nsb.lims_taskflow.MSP_OM_FISH_RBP4_MESO: None,
+                self._nsb.lims_taskflow.MSP_OM_FISH_RORB_PILOT: None,
+                self._nsb.lims_taskflow.MSP_OM_FISH_ROB_INJECTION: None,
+                self._nsb.lims_taskflow.MSP_OM_FISH_SST_MESO_GAMM: None,
+                self._nsb.lims_taskflow.MSP_OPEN_SCOPE_DENDRITE_C: None,
+                self._nsb.lims_taskflow.MSP_OPEN_SCOPE_ILLUSION: None,
+                self._nsb.lims_taskflow.MSP_OPEN_SCOPE_GLOBAL_LOC: None,
+                self._nsb.lims_taskflow.MSP_OPEN_SCOPE_GLOBAL_001: None,
+                self._nsb.lims_taskflow.MSP_TASK_TRAINED_NETWORKS: None,
+                self._nsb.lims_taskflow.MSP_TASK_TRAINED_NETW_001: None,
+                self._nsb.lims_taskflow.MSP_U01_BRIDGING_FUNCTION: None,
+                self._nsb.lims_taskflow.MSP_VARIABILITY_AIM_1: None,
+                self._nsb.lims_taskflow.MSP_VARIABILITY_AIM_1_PIL: None,
+                self._nsb.lims_taskflow.MSP_VARIABILITY_SPONTANEO: None,
+                self._nsb.lims_taskflow.MSP_VIP_AXONAL_V1: None,
+                self._nsb.lims_taskflow.MSP_VIP_SOMATIC_V1: None,
+                self._nsb.lims_taskflow.OPENSCOPE_MOTION_PRODUCTI: None,
+                self._nsb.lims_taskflow.OPENSCOPE_VIRUS_VALIDATIO: None,
+                self._nsb.lims_taskflow.OPEN_SCOPE_GAMMA_PILOT: None,
+                self._nsb.lims_taskflow.OPEN_SCOPE_GAMMA_PRODUCTI: None,
+                self._nsb.lims_taskflow.OPEN_SCOPE_LNJECTION_VOLU: None,
+                self._nsb.lims_taskflow.OPEN_SCOPE_MOTION_PILOT: None,
+                self._nsb.lims_taskflow.OPEN_SCOPE_MULTIPLEX_PILO: None,
+                self._nsb.lims_taskflow.OPEN_SCOPE_MULTIPLEX__001: None,
+                self._nsb.lims_taskflow.OPEN_SCOPE_MULTIPLEX_PROD: None,
+                self._nsb.lims_taskflow.OPEN_SCOPE_MULTLPLEX_PROD: None,
+                self._nsb.lims_taskflow.OPEN_SCOPE_SEQUENCE_LEARN: None,
+                self._nsb.lims_taskflow.OPEN_SCOPE_TEMPORAL_BARCO: None,
+                self._nsb.lims_taskflow.OPEN_SCOPE_TEMPORAL_B_001: None,
+                self._nsb.lims_taskflow.OPEN_SCOPE_VISION_2_HIPPO: None,
+                self._nsb.lims_taskflow.OPEN_SCOPE_WHC_2_P_DEV: None,
+                self._nsb.lims_taskflow.TEMPLETON_PSYCHEDELICS: None,
+                self._nsb.lims_taskflow.TINY_BLUE_DOT_BEHAVIOR: None,
+                self._nsb.lims_taskflow.TRANSGENIC_CHARACTERIZATI: None,
+                self._nsb.lims_taskflow.VIS_B_DEV_CONTROL_GROUP: None,
+                self._nsb.lims_taskflow.VIS_B_LATERAL_PREP_DEVELO: None,
+                self._nsb.lims_taskflow.VIS_B_TASK_2_DEVELOPMENT: None,
+                self._nsb.lims_taskflow.VGT_ENHANCERS_TRANSSYNAPT: None,
+            }.get(self._nsb.lims_taskflow, None)
+        )
 
     @property
     def aind_long_requestor_comments(self) -> Optional[str]:
@@ -2436,7 +2448,7 @@ class MappedNSBList:
         return self._nsb.modified
 
     @property
-    def aind_nanoject_number_inj10(self) -> Optional[Any]:
+    def aind_nanoject_number_inj10(self) -> Optional[str]:
         """Maps nanoject_number_inj10 to aind model"""
         return (
             None
@@ -2472,7 +2484,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_nanoject_number_inj2(self) -> Optional[Any]:
+    def aind_nanoject_number_inj2(self) -> Optional[str]:
         """Maps nanoject_number_inj2 to aind model"""
         return (
             None
@@ -2508,7 +2520,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_of_burr(self) -> Optional[Any]:
+    def aind_of_burr(self) -> Optional[int]:
         """Maps of_burr to aind model"""
         return (
             None
@@ -2702,15 +2714,19 @@ class MappedNSBList:
     @property
     def aind_surgery_status(self) -> Optional[Any]:
         """Maps surgery_status to aind model"""
-        return {
-            self._nsb.surgery_status.NEW: None,
-            self._nsb.surgery_status.INJECTION_PENDING: None,
-            self._nsb.surgery_status.PHASE_2_PENDING: None,
-            self._nsb.surgery_status.READY_FOR_FEEDBACK: None,
-            self._nsb.surgery_status.UNPLANNED_ACUTE: None,
-            self._nsb.surgery_status.PLANNED_ACUTE: None,
-            self._nsb.surgery_status.NO_SURGERY: None,
-        }.get(self._nsb.surgery_status, None)
+        return (
+            None
+            if self._nsb.surgery_status is None
+            else {
+                self._nsb.surgery_status.NEW: None,
+                self._nsb.surgery_status.INJECTION_PENDING: None,
+                self._nsb.surgery_status.PHASE_2_PENDING: None,
+                self._nsb.surgery_status.READY_FOR_FEEDBACK: None,
+                self._nsb.surgery_status.UNPLANNED_ACUTE: None,
+                self._nsb.surgery_status.PLANNED_ACUTE: None,
+                self._nsb.surgery_status.NO_SURGERY: None,
+            }.get(self._nsb.surgery_status, None)
+        )
 
     @property
     def aind_title(self) -> Optional[str]:
@@ -2733,7 +2749,7 @@ class MappedNSBList:
         return self._nsb.virus_d_v
 
     @property
-    def aind_virus_hemisphere(self) -> Optional[Any]:
+    def aind_virus_hemisphere(self) -> Optional[Side]:
         """Maps virus_hemisphere to aind model"""
         return (
             None
