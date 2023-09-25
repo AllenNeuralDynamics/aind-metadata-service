@@ -32,7 +32,7 @@
   "bregma_to_lambda_distance": null,
   "bregma_to_lambda_unit": "millimeter",
   "injection_angle": null,
-  "injection_angle_unit": "degree",
+  "injection_angle_unit": "degrees",
   "targeted_structure": null,
   "injection_hemisphere": null,
   "procedure_type": "Iontophoresis injection",
@@ -72,7 +72,7 @@
   "bregma_to_lambda_distance": null,
   "bregma_to_lambda_unit": "millimeter",
   "injection_angle": 0.0,
-  "injection_angle_unit": "degree",
+  "injection_angle_unit": "degrees",
   "targeted_structure": null,
   "injection_hemisphere": "Left",
   "procedure_type": "Iontophoresis injection",
@@ -108,7 +108,7 @@
    "bregma_to_lambda_distance": null,
    "bregma_to_lambda_unit": "millimeter",
    "angle": 0.0,
-   "angle_unit": "degree",
+   "angle_unit": "degrees",
    "notes": null
   }
  },
@@ -166,7 +166,7 @@
   "bregma_to_lambda_distance": null,
   "bregma_to_lambda_unit": "millimeter",
   "injection_angle": 0.0,
-  "injection_angle_unit": "degree",
+  "injection_angle_unit": "degrees",
   "targeted_structure": null,
   "injection_hemisphere": "Left",
   "procedure_type": "Iontophoresis injection",
@@ -206,7 +206,7 @@
   "bregma_to_lambda_distance": null,
   "bregma_to_lambda_unit": "millimeter",
   "injection_angle": 0.0,
-  "injection_angle_unit": "degree",
+  "injection_angle_unit": "degrees",
   "targeted_structure": null,
   "injection_hemisphere": "Right",
   "procedure_type": "Iontophoresis injection",
@@ -246,7 +246,7 @@
   "bregma_to_lambda_distance": null,
   "bregma_to_lambda_unit": "millimeter",
   "injection_angle": 0.0,
-  "injection_angle_unit": "degree",
+  "injection_angle_unit": "degrees",
   "targeted_structure": null,
   "injection_hemisphere": "Left",
   "procedure_type": "Nanoject injection",
@@ -289,7 +289,7 @@
   "bregma_to_lambda_distance": null,
   "bregma_to_lambda_unit": "millimeter",
   "injection_angle": null,
-  "injection_angle_unit": "degree",
+  "injection_angle_unit": "degrees",
   "targeted_structure": null,
   "injection_hemisphere": "Left",
   "procedure_type": "Nanoject injection",
@@ -326,7 +326,7 @@
    "bregma_to_lambda_distance": null,
    "bregma_to_lambda_unit": "millimeter",
    "angle": 0.0,
-   "angle_unit": "degree",
+   "angle_unit": "degrees",
    "notes": null
   }
  },
@@ -358,7 +358,7 @@
    "bregma_to_lambda_distance": null,
    "bregma_to_lambda_unit": "millimeter",
    "angle": 0.0,
-   "angle_unit": "degree",
+   "angle_unit": "degrees",
    "notes": null
   }
  },
@@ -390,7 +390,7 @@
    "bregma_to_lambda_distance": null,
    "bregma_to_lambda_unit": "millimeter",
    "angle": 0.0,
-   "angle_unit": "degree",
+   "angle_unit": "degrees",
    "notes": null
   }
  }

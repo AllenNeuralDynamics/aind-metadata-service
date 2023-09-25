@@ -29,7 +29,7 @@
       "bregma_to_lambda_distance": 6.1,
       "bregma_to_lambda_unit": "millimeter",
       "injection_angle": 0.0,
-      "injection_angle_unit": "degree",
+      "injection_angle_unit": "degrees",
       "targeted_structure": null,
       "injection_hemisphere": "Right",
       "procedure_type": "Iontophoresis injection",
