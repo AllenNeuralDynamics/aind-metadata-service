@@ -1687,25 +1687,29 @@ class MappedNSBList:
     @property
     def aind_implant_id_coverslip_type(self) -> Optional[Any]:
         """Maps implant_id_coverslip_type to aind model"""
-        return {
-            self._nsb.implant_id_coverslip_type.SELECT: None,
-            self._nsb.implant_id_coverslip_type.N_2001: None,
-            self._nsb.implant_id_coverslip_type.N_2002: None,
-            self._nsb.implant_id_coverslip_type.N_2004: None,
-            self._nsb.implant_id_coverslip_type.N_2005: None,
-            self._nsb.implant_id_coverslip_type.N_2006: None,
-            self._nsb.implant_id_coverslip_type.N_2007: None,
-            self._nsb.implant_id_coverslip_type.N_2008: None,
-            self._nsb.implant_id_coverslip_type.N_2009: None,
-            self._nsb.implant_id_coverslip_type.N_3001: None,
-            self._nsb.implant_id_coverslip_type.N_3002: None,
-            self._nsb.implant_id_coverslip_type.N_3002_25_PURALUBESYSTANE: None,
-            self._nsb.implant_id_coverslip_type.N_3003: None,
-            self._nsb.implant_id_coverslip_type.WHC_2_P_CURVED_GLASS_WITH: None,
-            self._nsb.implant_id_coverslip_type.N_3MM_STACKED_COVERSLIP: None,
-            self._nsb.implant_id_coverslip_type.N_5MM_STACKED_COVERSLIP: None,
-            self._nsb.implant_id_coverslip_type.N_5MM_STACKED_COVERSLIP_W: None,
-        }.get(self._nsb.implant_id_coverslip_type, None)
+        return (
+            None
+            if self._nsb.implant_id_coverslip_type is None
+            else {
+                self._nsb.implant_id_coverslip_type.SELECT: None,
+                self._nsb.implant_id_coverslip_type.N_2001: None,
+                self._nsb.implant_id_coverslip_type.N_2002: None,
+                self._nsb.implant_id_coverslip_type.N_2004: None,
+                self._nsb.implant_id_coverslip_type.N_2005: None,
+                self._nsb.implant_id_coverslip_type.N_2006: None,
+                self._nsb.implant_id_coverslip_type.N_2007: None,
+                self._nsb.implant_id_coverslip_type.N_2008: None,
+                self._nsb.implant_id_coverslip_type.N_2009: None,
+                self._nsb.implant_id_coverslip_type.N_3001: None,
+                self._nsb.implant_id_coverslip_type.N_3002: None,
+                self._nsb.implant_id_coverslip_type.N_3002_25_PURALUBESYSTANE: None,
+                self._nsb.implant_id_coverslip_type.N_3003: None,
+                self._nsb.implant_id_coverslip_type.WHC_2_P_CURVED_GLASS_WITH: None,
+                self._nsb.implant_id_coverslip_type.N_3MM_STACKED_COVERSLIP: None,
+                self._nsb.implant_id_coverslip_type.N_5MM_STACKED_COVERSLIP: None,
+                self._nsb.implant_id_coverslip_type.N_5MM_STACKED_COVERSLIP_W: None,
+            }.get(self._nsb.implant_id_coverslip_type, None)
+        )
 
     @property
     def aind_inj1_alternating_time(self) -> Optional[float]:
@@ -1986,11 +1990,15 @@ class MappedNSBList:
     @property
     def aind_inj6_type(self) -> Optional[InjectionType]:
         """Maps inj6_type to aind model"""
-        return {
-            self._nsb.inj6_type.SELECT: None,
-            self._nsb.inj6_type.IONTOPHORESIS: InjectionType.IONTOPHORESIS,
-            self._nsb.inj6_type.NANOJECT_PRESSURE: InjectionType.NANOJECT,
-        }.get(self._nsb.inj6_type, None)
+        return (
+            None
+            if self._nsb.inj6_type is None
+            else {
+                self._nsb.inj6_type.SELECT: None,
+                self._nsb.inj6_type.IONTOPHORESIS: InjectionType.IONTOPHORESIS,
+                self._nsb.inj6_type.NANOJECT_PRESSURE: InjectionType.NANOJECT,
+            }.get(self._nsb.inj6_type, None)
+        )
 
     @property
     def aind_inj6_virus_strain_rt(self) -> Optional[str]:
@@ -2000,10 +2008,14 @@ class MappedNSBList:
     @property
     def aind_inj6ret_setting(self) -> Optional[Any]:
         """Maps inj6ret_setting to aind model"""
-        return {
-            self._nsb.inj6ret_setting.OFF: None,
-            self._nsb.inj6ret_setting.ON: None,
-        }.get(self._nsb.inj6ret_setting, None)
+        return (
+            None
+            if self._nsb.inj6ret_setting is None
+            else {
+                self._nsb.inj6ret_setting.OFF: None,
+                self._nsb.inj6ret_setting.ON: None,
+            }.get(self._nsb.inj6ret_setting, None)
+        )
 
     @property
     def aind_inj6volperdepth(self) -> Optional[float]:
