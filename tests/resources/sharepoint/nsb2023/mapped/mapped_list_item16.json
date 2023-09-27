@@ -201,7 +201,7 @@
       "targeted_structure": null,
       "injection_hemisphere": "Left",
       "procedure_type": "Nanoject injection",
-      "injection_volume": 600.0,
+      "injection_volume": [600.0],
       "injection_volume_unit": "nanoliter",
       "injection_current": null,
       "alternating_current": null

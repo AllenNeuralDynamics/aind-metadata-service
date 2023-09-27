@@ -2950,7 +2950,9 @@ class MappedNSBList:
                 inj_current=self.aind_inj1_current,
                 alternating_current=self.aind_inj1_alternating_time,
                 inj_duration=self.aind_inj1_ionto_time,
-                inj_volume=self.aind_inj1volperdepth,
+                inj_volume=self._map_burr_hole_volume(
+                    self.aind_inj1volperdepth
+                ),
                 fiber_implant_depth=self.aind_fiber_implant1_dv,
             )
         elif burr_hole_num == 2:
@@ -2971,7 +2973,9 @@ class MappedNSBList:
                 inj_current=self.aind_inj2_current,
                 alternating_current=self.aind_inj2_alternating_time,
                 inj_duration=self.aind_inj2_ionto_time,
-                inj_volume=self.aind_inj2volperdepth,
+                inj_volume=self._map_burr_hole_volume(
+                    self.aind_inj2volperdepth
+                ),
                 fiber_implant_depth=self.aind_fiber_implant2_dv,
             )
         elif burr_hole_num == 3:
@@ -2992,7 +2996,9 @@ class MappedNSBList:
                 inj_current=self.aind_inj3_current,
                 alternating_current=self.aind_inj3_alternating_time,
                 inj_duration=self.aind_inj3_ionto_time,
-                inj_volume=self.aind_inj3volperdepth,
+                inj_volume=self._map_burr_hole_volume(
+                    self.aind_inj3volperdepth
+                ),
                 fiber_implant_depth=self.aind_fiber_implant3_d_x00,
             )
         elif burr_hole_num == 4:
@@ -3013,7 +3019,9 @@ class MappedNSBList:
                 inj_current=self.aind_inj4_current,
                 alternating_current=self.aind_inj4_alternating_time,
                 inj_duration=self.aind_inj4_ionto_time,
-                inj_volume=self.aind_inj4volperdepth,
+                inj_volume=self._map_burr_hole_volume(
+                    self.aind_inj4volperdepth
+                ),
                 fiber_implant_depth=self.aind_fiber_implant4_d_x00,
             )
         elif burr_hole_num == 5:
@@ -3034,7 +3042,9 @@ class MappedNSBList:
                 inj_current=self.aind_inj5_current,
                 alternating_current=self.aind_inj5_alternating_time,
                 inj_duration=self.aind_inj5_ionto_time,
-                inj_volume=self.aind_inj5volperdepth,
+                inj_volume=self._map_burr_hole_volume(
+                    self.aind_inj5volperdepth
+                ),
                 fiber_implant_depth=self.aind_fiber_implant5_d_x00,
             )
         elif burr_hole_num == 6:
@@ -3055,7 +3065,9 @@ class MappedNSBList:
                 inj_current=self.aind_inj6_current,
                 alternating_current=self.aind_inj6_alternating_time,
                 inj_duration=self.aind_inj6_ionto_time,
-                inj_volume=self.aind_inj6volperdepth,
+                inj_volume=self._map_burr_hole_volume(
+                    self.aind_inj6volperdepth
+                ),
                 fiber_implant_depth=self.aind_fiber_implant6_d_x00,
             )
         else:
@@ -3085,6 +3097,12 @@ class MappedNSBList:
             return None
         else:
             return [dv for dv in (dv1, dv2, dv3) if dv is not None]
+
+    @staticmethod
+    def _map_burr_hole_volume(vol):
+        """Maps vol for a burr hole to a list"""
+        # TODO: followup with NSB about mult volumes
+        return None if vol is None else [vol]
 
     def get_procedures(self) -> List[SubjectProcedure]:
         """Get a list of subject procedures"""
