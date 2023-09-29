@@ -45,7 +45,7 @@
       "instrument_id": null,
       "injection_coordinate_ml": 3.0,
       "injection_coordinate_ap": -2.45,
-      "injection_coordinate_depth": null,
+      "injection_coordinate_depth": [3.1, 4.0],
       "injection_coordinate_unit": "millimeter",
       "injection_coordinate_reference": "Bregma",
       "bregma_to_lambda_distance": null,
@@ -55,7 +55,7 @@
       "targeted_structure": null,
       "injection_hemisphere": null,
       "procedure_type": "Nanoject injection",
-      "injection_volume": [500.0],
+      "injection_volume": [500.0, 500.0],
       "injection_volume_unit": "nanoliter",
       "injection_current": null,
       "alternating_current": null

@@ -2955,7 +2955,8 @@ class MappedNSBList:
                 alternating_current=self.aind_inj1_alternating_time,
                 inj_duration=self.aind_inj1_ionto_time,
                 inj_volume=self._map_burr_hole_volume(
-                    self.aind_inj1volperdepth
+                    vol=self.aind_inj1volperdepth,
+                    dv=coordinate_depth
                 ),
                 fiber_implant_depth=self.aind_fiber_implant1_dv,
             )
@@ -2978,7 +2979,8 @@ class MappedNSBList:
                 alternating_current=self.aind_inj2_alternating_time,
                 inj_duration=self.aind_inj2_ionto_time,
                 inj_volume=self._map_burr_hole_volume(
-                    self.aind_inj2volperdepth
+                    vol=self.aind_inj2volperdepth,
+                    dv=coordinate_depth
                 ),
                 fiber_implant_depth=self.aind_fiber_implant2_dv,
             )
@@ -3001,7 +3003,8 @@ class MappedNSBList:
                 alternating_current=self.aind_inj3_alternating_time,
                 inj_duration=self.aind_inj3_ionto_time,
                 inj_volume=self._map_burr_hole_volume(
-                    self.aind_inj3volperdepth
+                    vol=self.aind_inj3volperdepth,
+                    dv=coordinate_depth
                 ),
                 fiber_implant_depth=self.aind_fiber_implant3_d_x00,
             )
@@ -3024,7 +3027,8 @@ class MappedNSBList:
                 alternating_current=self.aind_inj4_alternating_time,
                 inj_duration=self.aind_inj4_ionto_time,
                 inj_volume=self._map_burr_hole_volume(
-                    self.aind_inj4volperdepth
+                    vol=self.aind_inj4volperdepth,
+                    dv=coordinate_depth
                 ),
                 fiber_implant_depth=self.aind_fiber_implant4_d_x00,
             )
@@ -3047,7 +3051,8 @@ class MappedNSBList:
                 alternating_current=self.aind_inj5_alternating_time,
                 inj_duration=self.aind_inj5_ionto_time,
                 inj_volume=self._map_burr_hole_volume(
-                    self.aind_inj5volperdepth
+                    vol=self.aind_inj5volperdepth,
+                    dv=coordinate_depth
                 ),
                 fiber_implant_depth=self.aind_fiber_implant5_d_x00,
             )
@@ -3070,7 +3075,8 @@ class MappedNSBList:
                 alternating_current=self.aind_inj6_alternating_time,
                 inj_duration=self.aind_inj6_ionto_time,
                 inj_volume=self._map_burr_hole_volume(
-                    self.aind_inj6volperdepth
+                    vol=self.aind_inj6volperdepth,
+                    dv=coordinate_depth
                 ),
                 fiber_implant_depth=self.aind_fiber_implant6_d_x00,
             )
@@ -3103,10 +3109,14 @@ class MappedNSBList:
             return [dv for dv in (dv1, dv2, dv3) if dv is not None]
 
     @staticmethod
-    def _map_burr_hole_volume(vol):
-        """Maps vol for a burr hole to a list"""
-        # TODO: followup with NSB about mult volumes
-        return None if vol is None else [vol]
+    def _map_burr_hole_volume(vol, dv):
+        """Maps volume to a list per depth"""
+        if vol is None and dv is None:
+            return None
+        elif vol is None:
+            return None
+        else:
+            return [vol] * len(dv) if dv is not None else [vol]
 
     def get_procedures(self) -> List[SubjectProcedure]:
         """Get a list of subject procedures"""
