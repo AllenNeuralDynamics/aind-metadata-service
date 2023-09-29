@@ -831,10 +831,14 @@ class MappedNSBList:
     @property
     def aind_burr_3_fiber_t(self) -> Optional[Any]:
         """Maps burr_3_fiber_t to aind model"""
-        return {
-            self._nsb.burr_3_fiber_t.STANDARD_PROVIDED_BY_NSB: None,
-            self._nsb.burr_3_fiber_t.CUSTOM: None,
-        }.get(self._nsb.burr_3_fiber_t, None)
+        return (
+            None
+            if self._nsb.burr_3_fiber_t is None
+            else {
+                self._nsb.burr_3_fiber_t.STANDARD_PROVIDED_BY_NSB: None,
+                self._nsb.burr_3_fiber_t.CUSTOM: None,
+            }.get(self._nsb.burr_3_fiber_t, None)
+        )
 
     @property
     def aind_burr_3_hemisphere(self) -> Optional[Side]:
