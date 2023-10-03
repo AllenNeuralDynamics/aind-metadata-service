@@ -23,7 +23,7 @@
         "bregma_to_lambda_distance": 4.0,
         "bregma_to_lambda_unit": "millimeter",
         "angle": 0.0,
-        "angle_unit": "degree",
+        "angle_unit": "degrees",
         "notes": null
       },
       {
@@ -38,7 +38,7 @@
         "bregma_to_lambda_distance": 4.0,
         "bregma_to_lambda_unit": "millimeter",
         "angle": 0.0,
-        "angle_unit": "degree",
+        "angle_unit": "degrees",
         "notes": null
       }
     ]
@@ -87,6 +87,8 @@
         "genome_copy": null,
         "titer": null,
         "titer_unit": "gc/mL",
+        "concentration": null,
+        "concentration_unit": null,
         "prep_lot_number": null,
         "prep_date": null,
         "prep_type": null,
@@ -107,7 +109,7 @@
     "bregma_to_lambda_distance": 4.0,
     "bregma_to_lambda_unit": "millimeter",
     "injection_angle": 0.0,
-    "injection_angle_unit": "degree",
+    "injection_angle_unit": "degrees",
     "targeted_structure": null,
     "injection_hemisphere": null,
     "procedure_type": "Iontophoresis injection",
@@ -138,6 +140,8 @@
         "genome_copy": null,
         "titer": null,
         "titer_unit": "gc/mL",
+        "concentration": null,
+        "concentration_unit": null,
         "prep_lot_number": null,
         "prep_date": null,
         "prep_type": null,
@@ -158,7 +162,7 @@
     "bregma_to_lambda_distance": 4.0,
     "bregma_to_lambda_unit": "millimeter",
     "injection_angle": null,
-    "injection_angle_unit": "degree",
+    "injection_angle_unit": "degrees",
     "targeted_structure": null,
     "injection_hemisphere": null,
     "procedure_type": "Iontophoresis injection",
