@@ -57,6 +57,9 @@ class HeadPost(Enum):
     VISUAL_CTX = "Visual Ctx"
     FRONTAL_CTX = "Frontal Ctx"
     MOTOR_CTX = "Motor Ctx"
+    WHC_FULL_RING = "WHC (Full ring)"
+    WHC_NP_ZIRCONIA = "WHC NP (Zirconia)"
+    L_SHAPED = "L-shaped"
 
 
 class HeadPostType(Enum):
@@ -68,6 +71,8 @@ class HeadPostType(Enum):
     CAM = "Scientifica (CAM)"
     WHC_NP = "WHC NP"
     WHC_2P = "WHC 2P"
+    WHC_NP_ZIRCONIA = "WHC NP (Zirconia)"
+    AI_STRAIGHT_BAR_WELL = "AI Straight bar Well"
 
 
 class InjectionType(Enum):
@@ -99,7 +104,7 @@ class BurrHoleInfo:
     hemisphere: Optional[Side] = None
     coordinate_ml: Optional[float] = None
     coordinate_ap: Optional[float] = None
-    coordinate_depth: Optional[float] = None
+    coordinate_depth: Optional[List[float]] = None
     angle: Optional[float] = None
     during: Optional[During] = None
     inj_type: Optional[InjectionType] = None
@@ -107,7 +112,7 @@ class BurrHoleInfo:
     inj_current: Optional[float] = None
     alternating_current: Optional[str] = None
     inj_duration: Optional[float] = None
-    inj_volume: Optional[float] = None
+    inj_volume: Optional[List[float]] = None
     fiber_implant_depth: Optional[float] = None
 
 
@@ -126,6 +131,8 @@ class HeadPostInfo:
         cls, hp: Optional[HeadPost], hp_type: Optional[HeadPostType]
     ):
         """Construct HeadPostInfo2023 from headpost and headpost_type"""
+        # TODO: mappings for Headpost: Zirconia, Full ring, Lshaped
+        # TODO: mappings for HeadpostType: straight bar well, zirconia
         headframe_type = None if hp is None else hp.value
         well_type = None if hp_type is None else hp_type.value
         if hp == HeadPost.VISUAL_CTX:
@@ -163,11 +170,8 @@ class HeadPostInfo:
 class MappedNSBList:
     """Mapped Fields in Sharepoint list"""
 
-    AP_REGEX = re.compile(r"^ *([-+]?\d*\.?\d+)(?: *(?:mm)? *)$")
-    DV_REGEX = re.compile(r"^ *([-+]?\d*\.?\d+)(?: *(?:mm)? *)$")
     ISO_DUR_REGEX1 = re.compile(r"^ *(\d*\.?\d+)\s*(?:hour|hours)* *$")
     ISO_DUR_REGEX2 = re.compile(r"^(\d+):(\d+)$")
-    ML_REGEX = re.compile(r"^ *([-+]?\d*\.?\d+)(?: *(?:mm)? *)$")
     ALT_TIME_REGEX = re.compile(
         r"^ *(7)(?:.0|/7|s on/7s off)? *(?:s|sec|secs|second|seconds)? *$"
     )
@@ -178,7 +182,6 @@ class MappedNSBList:
     LENGTH_OF_TIME_REGEX = re.compile(
         r"^ *(\d*\.?\d+) *(?:m|min|mins|minute|minutes)+ *$"
     )
-    VOLUME_REGEX = re.compile(r"^ *(\d*\.?\d+) *(?:nl|nL)+ *$")
 
     def __init__(self, nsb: NSBList):
         """Class constructor"""
@@ -190,50 +193,6 @@ class MappedNSBList:
         try:
             return None if float_str is None else float(float_str)
         except ValueError:
-            return None
-
-    def _parse_ap_str(self, ap_str: Optional[str]) -> Optional[float]:
-        """Parse AP String."""
-        if ap_str is not None:
-            parsed_string = re.search(self.AP_REGEX, ap_str)
-            if parsed_string is not None:
-                return self._parse_basic_float_str(parsed_string.group(1))
-            else:
-                return None
-        else:
-            return None
-
-    def _parse_dv_str(self, dv_str: Optional[str]) -> Optional[float]:
-        """Parse dv String"""
-        if dv_str is not None:
-            parsed_string = re.search(self.DV_REGEX, dv_str)
-            if parsed_string is not None:
-                return self._parse_basic_float_str(parsed_string.group(1))
-            else:
-                return None
-        else:
-            return None
-
-    def _parse_ml_str(self, ml_str: Optional[str]) -> Optional[float]:
-        """Parse ml string"""
-        if ml_str is not None:
-            parsed_string = re.search(self.ML_REGEX, ml_str)
-            if parsed_string is not None:
-                return self._parse_basic_float_str(parsed_string.group(1))
-            else:
-                return None
-        else:
-            return None
-
-    def _parse_angle_str(self, inj_ang_str: Optional[str]) -> Optional[float]:
-        """Parse angle strings"""
-        if inj_ang_str is not None:
-            parsed_string = re.search(self.INJ_ANGLE_REGEX, inj_ang_str)
-            if parsed_string is not None:
-                return self._parse_basic_float_str(parsed_string.group(1))
-            else:
-                return None
-        else:
             return None
 
     def _parse_alt_time_str(
@@ -286,17 +245,6 @@ class MappedNSBList:
         # TODO: Figure out how to parse virus strain fields
         return None
 
-    def _parse_inj_vol_str(self, vol_str: Optional[str]) -> Optional[float]:
-        """Parse injection volume strings"""
-        if vol_str is not None:
-            parsed_string = re.search(self.VOLUME_REGEX, vol_str)
-            if parsed_string is not None:
-                return self._parse_basic_float_str(parsed_string.group(1))
-            else:
-                return None
-        else:
-            return None
-
     @property
     def aind_age_at_injection(self) -> Optional[float]:
         """Maps age_at_injection to aind model"""
@@ -305,12 +253,47 @@ class MappedNSBList:
     @property
     def aind_ap2nd_inj(self) -> Optional[float]:
         """Maps ap2nd_inj to aind model"""
-        return self._parse_ap_str(self._nsb.ap2nd_inj)
+        return self._nsb.ap2nd_inj
 
     @property
     def aind_author_id(self) -> Optional[int]:
         """Maps author_id to aind model"""
         return self._nsb.author_id
+
+    @property
+    def aind_behavior(self) -> Optional[Any]:
+        """Maps behavior to aind model"""
+        return (
+            None
+            if self._nsb.behavior is None
+            else {
+                self._nsb.behavior.NO: None,
+                self._nsb.behavior.YES: None,
+            }.get(self._nsb.behavior, None)
+        )
+
+    @property
+    def aind_behavior_complete(self) -> Optional[datetime]:
+        """Maps behavior_complete to aind model"""
+        return self._nsb.behavior_complete
+
+    @property
+    def aind_behavior_type(self) -> Optional[Any]:
+        """Maps behavior_type to aind model"""
+        return (
+            None
+            if self._nsb.behavior_type is None
+            else {
+                self._nsb.behavior_type.SELECT: None,
+                self._nsb.behavior_type.HABITUATION_ONLY: None,
+                self._nsb.behavior_type.HABITUATION_PASSIVE_TRAIN: None,
+                self._nsb.behavior_type.CHANGE_DETECTION_TASK: None,
+                self._nsb.behavior_type.DR_AUDITORY_VISUAL_TASK: None,
+                self._nsb.behavior_type.AIND_FORAGING_TASK_WITH_O: None,
+                self._nsb.behavior_type.AIBS_CHARACTERIZATION_ROT: None,
+                self._nsb.behavior_type.AIND_MOTOR_OBSERVATORY_WH: None,
+            }.get(self._nsb.behavior_type, None)
+        )
 
     @property
     def aind_breg2_lamb(self) -> Optional[float]:
@@ -459,12 +442,12 @@ class MappedNSBList:
     @property
     def aind_burr3_a_p(self) -> Optional[float]:
         """Maps burr3_a_p to aind model"""
-        return self._parse_ap_str(self._nsb.burr3_a_p)
+        return self._nsb.burr3_a_p
 
     @property
     def aind_burr3_d_v(self) -> Optional[float]:
         """Maps burr3_d_v to aind model"""
-        return self._parse_dv_str(self._nsb.burr3_d_v)
+        return self._nsb.burr3_d_v
 
     @property
     def aind_burr3_injection_devi(self) -> Optional[Any]:
@@ -498,7 +481,7 @@ class MappedNSBList:
     @property
     def aind_burr3_m_l(self) -> Optional[float]:
         """Maps burr3_m_l to aind model"""
-        return self._parse_ml_str(self._nsb.burr3_m_l)
+        return self._nsb.burr3_m_l
 
     @property
     def aind_burr3_perform_during(self) -> Optional[During]:
@@ -549,12 +532,12 @@ class MappedNSBList:
     @property
     def aind_burr4_a_p(self) -> Optional[float]:
         """Maps burr4_a_p to aind model"""
-        return self._parse_ap_str(self._nsb.burr4_a_p)
+        return self._nsb.burr4_a_p
 
     @property
-    def aind_burr4_d_v(self) -> Optional[str]:
+    def aind_burr4_d_v(self) -> Optional[float]:
         """Maps burr4_d_v to aind model"""
-        return self._parse_dv_str(self._nsb.burr4_d_v)
+        return self._nsb.burr4_d_v
 
     @property
     def aind_burr4_injection_devi(self) -> Optional[Any]:
@@ -588,7 +571,7 @@ class MappedNSBList:
     @property
     def aind_burr4_m_l(self) -> Optional[float]:
         """Maps burr4_m_l to aind model"""
-        return self._parse_ml_str(self._nsb.burr4_m_l)
+        return self._nsb.burr4_m_l
 
     @property
     def aind_burr4_perform_during(self) -> Optional[During]:
@@ -637,9 +620,225 @@ class MappedNSBList:
         )
 
     @property
+    def aind_burr5_injection_devi(self) -> Optional[Any]:
+        """Maps burr5_injection_devi to aind model"""
+        return (
+            None
+            if self._nsb.burr5_injection_devi is None
+            else {
+                self._nsb.burr5_injection_devi.SELECT: None,
+                self._nsb.burr5_injection_devi.NANO_1: None,
+                self._nsb.burr5_injection_devi.IONTO_1: None,
+                self._nsb.burr5_injection_devi.NANO_2: None,
+                self._nsb.burr5_injection_devi.IONTO_2: None,
+                self._nsb.burr5_injection_devi.NANO_3: None,
+                self._nsb.burr5_injection_devi.IONTO_3: None,
+                self._nsb.burr5_injection_devi.NANO_4: None,
+                self._nsb.burr5_injection_devi.IONTO_4: None,
+                self._nsb.burr5_injection_devi.NANO_5: None,
+                self._nsb.burr5_injection_devi.IONTO_5: None,
+                self._nsb.burr5_injection_devi.NANO_6: None,
+                self._nsb.burr5_injection_devi.IONTO_6: None,
+                self._nsb.burr5_injection_devi.NANO_7: None,
+                self._nsb.burr5_injection_devi.IONTO_7: None,
+                self._nsb.burr5_injection_devi.NANO_8: None,
+                self._nsb.burr5_injection_devi.IONTO_8: None,
+                self._nsb.burr5_injection_devi.NANO_9: None,
+                self._nsb.burr5_injection_devi.IONTO_9: None,
+            }.get(self._nsb.burr5_injection_devi, None)
+        )
+
+    @property
+    def aind_burr5_perform_during(self) -> Optional[During]:
+        """Maps burr5_perform_during to aind model"""
+        return (
+            None
+            if self._nsb.burr5_status is None
+            else {
+                self._nsb.burr5_perform_during.INITIAL_SURGERY: During.INITIAL,
+                self._nsb.burr5_perform_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
+            }.get(self._nsb.burr5_perform_during, None)
+        )
+
+    @property
+    def aind_burr5_status(self) -> Optional[Any]:
+        """Maps burr5_status to aind model"""
+        return (
+            None
+            if self._nsb.burr5_status is None
+            else {
+                self._nsb.burr5_status.COMPLETE: None,
+            }.get(self._nsb.burr5_status, None)
+        )
+
+    @property
+    def aind_burr5_virus_biosafte(self) -> Optional[Any]:
+        """Maps burr5_virus_biosafte to aind model"""
+        return (
+            None
+            if self._nsb.burr5_virus_biosafte is None
+            else {
+                self._nsb.burr5_virus_biosafte.SELECT: None,
+                self._nsb.burr5_virus_biosafte.BSL_1_AAV: None,
+                self._nsb.burr5_virus_biosafte.BSL_1_BEADS: None,
+                self._nsb.burr5_virus_biosafte.BSL_1_AAV_BEADS: None,
+                self._nsb.burr5_virus_biosafte.BSL_1_OTHER_WRITE_IN_COMM: None,
+                self._nsb.burr5_virus_biosafte.BSL_2_RABIES: None,
+                self._nsb.burr5_virus_biosafte.BSL_2_CAV: None,
+                self._nsb.burr5_virus_biosafte.BSL_2_6OHDA: None,
+                self._nsb.burr5_virus_biosafte.BSL_2_SINDBIS: None,
+                self._nsb.burr5_virus_biosafte.BSL_2_HSV1: None,
+                self._nsb.burr5_virus_biosafte.BSL_2_LENTI: None,
+                self._nsb.burr5_virus_biosafte.BSL_2_CHOLERA_TOXIN_B: None,
+                self._nsb.burr5_virus_biosafte.BSL_2_OTHER_WRITE_IN_COMM: None,
+            }.get(self._nsb.burr5_virus_biosafte, None)
+        )
+
+    @property
+    def aind_burr6_injection_devi(self) -> Optional[Any]:
+        """Maps burr6_injection_devi to aind model"""
+        return (
+            None
+            if self._nsb.burr6_injection_devi is None
+            else {
+                self._nsb.burr6_injection_devi.SELECT: None,
+                self._nsb.burr6_injection_devi.NANO_1: None,
+                self._nsb.burr6_injection_devi.IONTO_1: None,
+                self._nsb.burr6_injection_devi.NANO_2: None,
+                self._nsb.burr6_injection_devi.IONTO_2: None,
+                self._nsb.burr6_injection_devi.NANO_3: None,
+                self._nsb.burr6_injection_devi.IONTO_3: None,
+                self._nsb.burr6_injection_devi.NANO_4: None,
+                self._nsb.burr6_injection_devi.IONTO_4: None,
+                self._nsb.burr6_injection_devi.NANO_5: None,
+                self._nsb.burr6_injection_devi.IONTO_5: None,
+                self._nsb.burr6_injection_devi.NANO_6: None,
+                self._nsb.burr6_injection_devi.IONTO_6: None,
+                self._nsb.burr6_injection_devi.NANO_7: None,
+                self._nsb.burr6_injection_devi.IONTO_7: None,
+                self._nsb.burr6_injection_devi.NANO_8: None,
+                self._nsb.burr6_injection_devi.IONTO_8: None,
+                self._nsb.burr6_injection_devi.NANO_9: None,
+                self._nsb.burr6_injection_devi.IONTO_9: None,
+            }.get(self._nsb.burr6_injection_devi, None)
+        )
+
+    @property
+    def aind_burr6_perform_during(self) -> Optional[During]:
+        """Maps burr6_perform_during to aind model"""
+        return (
+            None
+            if self._nsb.burr6_perform_during is None
+            else {
+                self._nsb.burr6_perform_during.INITIAL_SURGERY: During.INITIAL,
+                self._nsb.burr6_perform_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
+            }.get(self._nsb.burr6_perform_during, None)
+        )
+
+    @property
+    def aind_burr6_status(self) -> Optional[Any]:
+        """Maps burr6_status to aind model"""
+        return (
+            None
+            if self._nsb.burr6_status is None
+            else {
+                self._nsb.burr6_status.COMPLETE: None,
+            }.get(self._nsb.burr6_status, None)
+        )
+
+    @property
+    def aind_burr6_virus_biosafte(self) -> Optional[Any]:
+        """Maps burr6_virus_biosafte to aind model"""
+        return (
+            None
+            if self._nsb.burr6_virus_biosafte is None
+            else {
+                self._nsb.burr6_virus_biosafte.SELECT: None,
+                self._nsb.burr6_virus_biosafte.BSL_1_AAV: None,
+                self._nsb.burr6_virus_biosafte.BSL_1_BEADS: None,
+                self._nsb.burr6_virus_biosafte.BSL_1_AAV_BEADS: None,
+                self._nsb.burr6_virus_biosafte.BSL_1_OTHER_WRITE_IN_COMM: None,
+                self._nsb.burr6_virus_biosafte.BSL_2_RABIES: None,
+                self._nsb.burr6_virus_biosafte.BSL_2_CAV: None,
+                self._nsb.burr6_virus_biosafte.BSL_2_6OHDA: None,
+                self._nsb.burr6_virus_biosafte.BSL_2_SINDBIS: None,
+                self._nsb.burr6_virus_biosafte.BSL_2_HSV1: None,
+                self._nsb.burr6_virus_biosafte.BSL_2_LENTI: None,
+                self._nsb.burr6_virus_biosafte.BSL_2_CHOLERA_TOXIN_B: None,
+                self._nsb.burr6_virus_biosafte.BSL_2_OTHER_WRITE_IN_COMM: None,
+            }.get(self._nsb.burr6_virus_biosafte, None)
+        )
+
+    @property
+    def aind_burr_1_d_v_x00(self) -> Optional[float]:
+        """Maps burr_1_d_v_x00 to aind model"""
+        return self._nsb.burr_1_d_v_x00
+
+    @property
+    def aind_burr_1_dv_2(self) -> Optional[float]:
+        """Maps burr_1_dv_2 to aind model"""
+        return self._nsb.burr_1_dv_2
+
+    @property
+    def aind_burr_1_fiber_t(self) -> Optional[Any]:
+        """Maps burr_1_fiber_t to aind model"""
+        return (
+            None
+            if self._nsb.burr_1_fiber_t is None
+            else {
+                self._nsb.burr_1_fiber_t.STANDARD_PROVIDED_BY_NSB: None,
+                self._nsb.burr_1_fiber_t.CUSTOM: None,
+            }.get(self._nsb.burr_1_fiber_t, None)
+        )
+
+    @property
+    def aind_burr_2_d_v_x00(self) -> Optional[float]:
+        """Maps burr_2_d_v_x00 to aind model"""
+        return self._nsb.burr_2_d_v_x00
+
+    @property
+    def aind_burr_2_d_v_x000(self) -> Optional[float]:
+        """Maps burr_2_d_v_x000 to aind model"""
+        return self._nsb.burr_2_d_v_x000
+
+    @property
+    def aind_burr_2_fiber_t(self) -> Optional[Any]:
+        """Maps burr_2_fiber_t to aind model"""
+        return (
+            None
+            if self._nsb.burr_2_fiber_t is None
+            else {
+                self._nsb.burr_2_fiber_t.STANDARD_PROVIDED_BY_NSB: None,
+                self._nsb.burr_2_fiber_t.CUSTOM: None,
+            }.get(self._nsb.burr_2_fiber_t, None)
+        )
+
+    @property
     def aind_burr_3_angle(self) -> Optional[float]:
         """Maps burr_3_angle to aind model"""
-        return self._parse_angle_str(self._nsb.burr_3_angle)
+        return self._nsb.burr_3_angle
+
+    @property
+    def aind_burr_3_d_v_x00(self) -> Optional[float]:
+        """Maps burr_3_d_v_x00 to aind model"""
+        return self._nsb.burr_3_d_v_x00
+
+    @property
+    def aind_burr_3_d_v_x000(self) -> Optional[float]:
+        """Maps burr_3_d_v_x000 to aind model"""
+        return self._nsb.burr_3_d_v_x000
+
+    @property
+    def aind_burr_3_fiber_t(self) -> Optional[Any]:
+        """Maps burr_3_fiber_t to aind model"""
+        return (
+            None
+            if self._nsb.burr_3_fiber_t is None
+            else {
+                self._nsb.burr_3_fiber_t.STANDARD_PROVIDED_BY_NSB: None,
+                self._nsb.burr_3_fiber_t.CUSTOM: None,
+            }.get(self._nsb.burr_3_fiber_t, None)
+        )
 
     @property
     def aind_burr_3_hemisphere(self) -> Optional[Side]:
@@ -657,7 +856,29 @@ class MappedNSBList:
     @property
     def aind_burr_4_angle(self) -> Optional[float]:
         """Maps burr_4_angle to aind model"""
-        return self._parse_angle_str(self._nsb.burr_4_angle)
+        return self._nsb.burr_4_angle
+
+    @property
+    def aind_burr_4_d_v_x00(self) -> Optional[float]:
+        """Maps burr_4_d_v_x00 to aind model"""
+        return self._nsb.burr_4_d_v_x00
+
+    @property
+    def aind_burr_4_d_v_x000(self) -> Optional[float]:
+        """Maps burr_4_d_v_x000 to aind model"""
+        return self._nsb.burr_4_d_v_x000
+
+    @property
+    def aind_burr_4_fiber_t(self) -> Optional[Any]:
+        """Maps burr_4_fiber_t to aind model"""
+        return (
+            None
+            if self._nsb.burr_4_fiber_t is None
+            else {
+                self._nsb.burr_4_fiber_t.STANDARD_PROVIDED_BY_NSB: None,
+                self._nsb.burr_4_fiber_t.CUSTOM: None,
+            }.get(self._nsb.burr_4_fiber_t, None)
+        )
 
     @property
     def aind_burr_4_hemisphere(self) -> Optional[Side]:
@@ -671,6 +892,116 @@ class MappedNSBList:
                 self._nsb.burr_4_hemisphere.RIGHT: Side.RIGHT,
             }.get(self._nsb.burr_4_hemisphere, None)
         )
+
+    @property
+    def aind_burr_5_a_p(self) -> Optional[float]:
+        """Maps burr_5_a_p to aind model"""
+        return self._nsb.burr_5_a_p
+
+    @property
+    def aind_burr_5_angle(self) -> Optional[float]:
+        """Maps burr_5_angle to aind model"""
+        return self._nsb.burr_5_angle
+
+    @property
+    def aind_burr_5_d_v_x00(self) -> Optional[float]:
+        """Maps burr_5_d_v_x00 to aind model"""
+        return self._nsb.burr_5_d_v_x00
+
+    @property
+    def aind_burr_5_d_v_x000(self) -> Optional[float]:
+        """Maps burr_5_d_v_x000 to aind model"""
+        return self._nsb.burr_5_d_v_x000
+
+    @property
+    def aind_burr_5_d_v_x001(self) -> Optional[float]:
+        """Maps burr_5_d_v_x001 to aind model"""
+        return self._nsb.burr_5_d_v_x001
+
+    @property
+    def aind_burr_5_fiber_t(self) -> Optional[Any]:
+        """Maps burr_5_fiber_t to aind model"""
+        return (
+            None
+            if self._nsb.burr_5_fiber_t is None
+            else {
+                self._nsb.burr_5_fiber_t.STANDARD_PROVIDED_BY_NSB: None,
+                self._nsb.burr_5_fiber_t.CUSTOM: None,
+            }.get(self._nsb.burr_5_fiber_t, None)
+        )
+
+    @property
+    def aind_burr_5_hemisphere(self) -> Optional[Side]:
+        """Maps burr_5_hemisphere to aind model"""
+        return (
+            None
+            if self._nsb.burr_5_hemisphere is None
+            else {
+                self._nsb.burr_5_hemisphere.SELECT: None,
+                self._nsb.burr_5_hemisphere.LEFT: Side.LEFT,
+                self._nsb.burr_5_hemisphere.RIGHT: Side.RIGHT,
+            }.get(self._nsb.burr_5_hemisphere, None)
+        )
+
+    @property
+    def aind_burr_5_m_l(self) -> Optional[float]:
+        """Maps burr_5_m_l to aind model"""
+        return self._nsb.burr_5_m_l
+
+    @property
+    def aind_burr_6_a_p(self) -> Optional[float]:
+        """Maps burr_6_a_p to aind model"""
+        return self._nsb.burr_6_a_p
+
+    @property
+    def aind_burr_6_angle(self) -> Optional[float]:
+        """Maps burr_6_angle to aind model"""
+        return self._nsb.burr_6_angle
+
+    @property
+    def aind_burr_6_d_v_x00(self) -> Optional[float]:
+        """Maps burr_6_d_v_x00 to aind model"""
+        return self._nsb.burr_6_d_v_x00
+
+    @property
+    def aind_burr_6_d_v_x000(self) -> Optional[float]:
+        """Maps burr_6_d_v_x000 to aind model"""
+        return self._nsb.burr_6_d_v_x000
+
+    @property
+    def aind_burr_6_d_v_x001(self) -> Optional[float]:
+        """Maps burr_6_d_v_x001 to aind model"""
+        return self._nsb.burr_6_d_v_x001
+
+    @property
+    def aind_burr_6_fiber_t(self) -> Optional[Any]:
+        """Maps burr_6_fiber_t to aind model"""
+        return (
+            None
+            if self._nsb.burr_6_fiber_t is None
+            else {
+                self._nsb.burr_6_fiber_t.STANDARD_PROVIDED_BY_NSB: None,
+                self._nsb.burr_6_fiber_t.CUSTOM: None,
+            }.get(self._nsb.burr_6_fiber_t, None)
+        )
+
+    @property
+    def aind_burr_6_hemisphere(self) -> Optional[Side]:
+        """Maps burr_6_hemisphere to aind model"""
+        return (
+            None
+            if self._nsb.burr_6_hemisphere is None
+            else {
+                self._nsb.burr_6_hemisphere.SELECT: None,
+                self._nsb.burr_6_hemisphere.LEFT: Side.LEFT,
+                self._nsb.burr_6_hemisphere.RIGHT: Side.RIGHT,
+            }.get(self._nsb.burr_6_hemisphere, None)
+        )
+
+    @property
+    def aind_burr_6_m_l(self) -> Optional[float]:
+        """Maps burr_6_m_l to aind model"""
+        return self._nsb.burr_6_m_l
 
     @property
     def aind_burr_hole_1(self) -> Optional[BurrHoleProcedure]:
@@ -753,6 +1084,42 @@ class MappedNSBList:
                     BurrHoleProcedure.INJECTION_FIBER_IMPLANT
                 ),
             }.get(self._nsb.burr_hole_4, None)
+        )
+
+    @property
+    def aind_burr_hole_5(self) -> Optional[BurrHoleProcedure]:
+        """Maps burr_hole_5 to aind model"""
+        return (
+            None
+            if self._nsb.burr_hole_5 is None
+            else {
+                self._nsb.burr_hole_5.SELECT: None,
+                self._nsb.burr_hole_5.INJECTION: BurrHoleProcedure.INJECTION,
+                self._nsb.burr_hole_5.FIBER_IMPLANT: (
+                    BurrHoleProcedure.FIBER_IMPLANT
+                ),
+                self._nsb.burr_hole_5.INJECTION_FIBER_IMPLANT: (
+                    BurrHoleProcedure.INJECTION_FIBER_IMPLANT
+                ),
+            }.get(self._nsb.burr_hole_5, None)
+        )
+
+    @property
+    def aind_burr_hole_6(self) -> Optional[BurrHoleProcedure]:
+        """Maps burr_hole_6 to aind model"""
+        return (
+            None
+            if self._nsb.burr_hole_6 is None
+            else {
+                self._nsb.burr_hole_6.SELECT: None,
+                self._nsb.burr_hole_6.INJECTION: BurrHoleProcedure.INJECTION,
+                self._nsb.burr_hole_6.FIBER_IMPLANT: (
+                    BurrHoleProcedure.FIBER_IMPLANT
+                ),
+                self._nsb.burr_hole_6.INJECTION_FIBER_IMPLANT: (
+                    BurrHoleProcedure.INJECTION_FIBER_IMPLANT
+                ),
+            }.get(self._nsb.burr_hole_6, None)
         )
 
     @property
@@ -902,7 +1269,8 @@ class MappedNSBList:
                 self._nsb.craniotomy_type.SELECT: None,
                 self._nsb.craniotomy_type.N_3MM: CraniotomyType.THREE_MM,
                 self._nsb.craniotomy_type.N_5MM: CraniotomyType.FIVE_MM,
-                self._nsb.craniotomy_type.WHC: CraniotomyType.WHC,
+                self._nsb.craniotomy_type.WHC_2_P: CraniotomyType.WHC,
+                self._nsb.craniotomy_type.WHC_NP: CraniotomyType.WHC,
             }.get(self._nsb.craniotomy_type, None)
         )
 
@@ -934,7 +1302,7 @@ class MappedNSBList:
     @property
     def aind_dv2nd_inj(self) -> Optional[float]:
         """Maps dv2nd_inj to aind model"""
-        return self._parse_dv_str(self._nsb.dv2nd_inj)
+        return self._nsb.dv2nd_inj
 
     @property
     def aind_editor_id(self) -> Optional[int]:
@@ -944,7 +1312,7 @@ class MappedNSBList:
     @property
     def aind_fiber_implant1_dv(self) -> Optional[float]:
         """Maps fiber_implant1_dv to aind model"""
-        return self._parse_dv_str(self._nsb.fiber_implant1_dv)
+        return self._nsb.fiber_implant1_dv
 
     @property
     def aind_fiber_implant1_lengt(self) -> Optional[Any]:
@@ -967,7 +1335,7 @@ class MappedNSBList:
     @property
     def aind_fiber_implant2_dv(self) -> Optional[float]:
         """Maps fiber_implant2_dv to aind model"""
-        return self._parse_dv_str(self._nsb.fiber_implant2_dv)
+        return self._nsb.fiber_implant2_dv
 
     @property
     def aind_fiber_implant2_lengt(self) -> Optional[Any]:
@@ -990,7 +1358,7 @@ class MappedNSBList:
     @property
     def aind_fiber_implant3_d_x00(self) -> Optional[float]:
         """Maps fiber_implant3_d_x00 to aind model"""
-        return self._parse_dv_str(self._nsb.fiber_implant3_d_x00)
+        return self._nsb.fiber_implant3_d_x00
 
     @property
     def aind_fiber_implant3_lengt(self) -> Optional[Any]:
@@ -1013,7 +1381,7 @@ class MappedNSBList:
     @property
     def aind_fiber_implant4_d_x00(self) -> Optional[float]:
         """Maps fiber_implant4_d_x00 to aind model"""
-        return self._parse_dv_str(self._nsb.fiber_implant4_d_x00)
+        return self._nsb.fiber_implant4_d_x00
 
     @property
     def aind_fiber_implant4_lengt(self) -> Optional[Any]:
@@ -1031,6 +1399,52 @@ class MappedNSBList:
                 self._nsb.fiber_implant4_lengt.N_45_MM: None,
                 self._nsb.fiber_implant4_lengt.N_50_MM: None,
             }.get(self._nsb.fiber_implant4_lengt, None)
+        )
+
+    @property
+    def aind_fiber_implant5_d_x00(self) -> Optional[float]:
+        """Maps fiber_implant5_d_x00 to aind model"""
+        return self._nsb.fiber_implant5_d_x00
+
+    @property
+    def aind_fiber_implant5_lengt(self) -> Optional[Any]:
+        """Maps fiber_implant5_lengt to aind model"""
+        return (
+            None
+            if self._nsb.fiber_implant5_lengt is None
+            else {
+                self._nsb.fiber_implant5_lengt.SELECT: None,
+                self._nsb.fiber_implant5_lengt.N_20_MM: None,
+                self._nsb.fiber_implant5_lengt.N_25_MM: None,
+                self._nsb.fiber_implant5_lengt.N_30_MM: None,
+                self._nsb.fiber_implant5_lengt.N_35_MM: None,
+                self._nsb.fiber_implant5_lengt.N_40_MM: None,
+                self._nsb.fiber_implant5_lengt.N_45_MM: None,
+                self._nsb.fiber_implant5_lengt.N_50_MM: None,
+            }.get(self._nsb.fiber_implant5_lengt, None)
+        )
+
+    @property
+    def aind_fiber_implant6_d_x00(self) -> Optional[float]:
+        """Maps fiber_implant6_d_x00 to aind model"""
+        return self._nsb.fiber_implant6_d_x00
+
+    @property
+    def aind_fiber_implant6_lengt(self) -> Optional[Any]:
+        """Maps fiber_implant6_lengt to aind model"""
+        return (
+            None
+            if self._nsb.fiber_implant6_lengt is None
+            else {
+                self._nsb.fiber_implant6_lengt.SELECT: None,
+                self._nsb.fiber_implant6_lengt.N_20_MM: None,
+                self._nsb.fiber_implant6_lengt.N_25_MM: None,
+                self._nsb.fiber_implant6_lengt.N_30_MM: None,
+                self._nsb.fiber_implant6_lengt.N_35_MM: None,
+                self._nsb.fiber_implant6_lengt.N_40_MM: None,
+                self._nsb.fiber_implant6_lengt.N_45_MM: None,
+                self._nsb.fiber_implant6_lengt.N_50_MM: None,
+            }.get(self._nsb.fiber_implant6_lengt, None)
         )
 
     @property
@@ -1068,9 +1482,12 @@ class MappedNSBList:
                 self._nsb.headpost.VISUAL_CTX: HeadPost.VISUAL_CTX,
                 self._nsb.headpost.FRONTAL_CTX: HeadPost.FRONTAL_CTX,
                 self._nsb.headpost.MOTOR_CTX: HeadPost.MOTOR_CTX,
-                self._nsb.headpost.WHC_2_P: HeadPost.WHC_2P,
-                self._nsb.headpost.WHC_NP: HeadPost.WHC_NP,
+                self._nsb.headpost.WHC_FULL_RING: HeadPost.WHC_FULL_RING,
+                self._nsb.headpost.LSHAPED: HeadPost.L_SHAPED,
+                self._nsb.headpost.WHC_NP_ZIRCONIA: HeadPost.WHC_NP_ZIRCONIA,
                 self._nsb.headpost.AI_STRAIGHT_BAR: HeadPost.AI_HEADBAR,
+                self._nsb.headpost.WHC_NP: HeadPost.WHC_NP,
+                self._nsb.headpost.WHC_2P: HeadPost.WHC_2P,
                 self._nsb.headpost.OTHER_ADD_DETAILS_IN_REQU: None,
             }.get(self._nsb.headpost, None)
         )
@@ -1090,6 +1507,7 @@ class MappedNSBList:
     @property
     def aind_headpost_type(self) -> Optional[HeadPostType]:
         """Maps headpost_type to aind model"""
+        # TODO: check HeadpostTypes WHC NP Zirconia and AI Straight Bar Well
         return (
             None
             if self._nsb.headpost_type is None
@@ -1101,6 +1519,8 @@ class MappedNSBList:
                 self._nsb.headpost_type.NEUROPIXEL: HeadPostType.NEUROPIXEL,
                 self._nsb.headpost_type.WHC_2_P: HeadPostType.WHC_2P,
                 self._nsb.headpost_type.WHC_NP: HeadPostType.WHC_NP,
+                self._nsb.headpost_type.WHC_NP_ZIRCONIA: HeadPostType.WHC_NP_ZIRCONIA,
+                self._nsb.headpost_type.AI_STRAIGHT_BAR_WELL: HeadPostType.AI_STRAIGHT_BAR_WELL,
                 self._nsb.headpost_type.OTHER_SEE_REQUESTOR_COMME: None,
             }.get(self._nsb.headpost_type, None)
         )
@@ -1251,6 +1671,15 @@ class MappedNSBList:
                 self._nsb.iacuc_protocol.N_2301: (
                     self._nsb.iacuc_protocol.N_2301.value
                 ),
+                self._nsb.iacuc_protocol.N_2304: (
+                    self._nsb.iacuc_protocol.N_2304
+                ),
+                self._nsb.iacuc_protocol.N_2305: (
+                    self._nsb.iacuc_protocol.N_2305
+                ),
+                self._nsb.iacuc_protocol.N_2306: (
+                    self._nsb.iacuc_protocol.N_2306
+                ),
             }.get(self._nsb.iacuc_protocol, None)
         )
 
@@ -1269,14 +1698,20 @@ class MappedNSBList:
                 self._nsb.implant_id_coverslip_type.SELECT: None,
                 self._nsb.implant_id_coverslip_type.N_2001: None,
                 self._nsb.implant_id_coverslip_type.N_2002: None,
+                self._nsb.implant_id_coverslip_type.N_2004: None,
+                self._nsb.implant_id_coverslip_type.N_2005: None,
+                self._nsb.implant_id_coverslip_type.N_2006: None,
+                self._nsb.implant_id_coverslip_type.N_2007: None,
+                self._nsb.implant_id_coverslip_type.N_2008: None,
+                self._nsb.implant_id_coverslip_type.N_2009: None,
                 self._nsb.implant_id_coverslip_type.N_3001: None,
                 self._nsb.implant_id_coverslip_type.N_3002: None,
-                self._nsb.implant_id_coverslip_type.N_3MM: None,
+                self._nsb.implant_id_coverslip_type.N_3002_25_PURALUBESYSTANE: None,
+                self._nsb.implant_id_coverslip_type.N_3003: None,
+                self._nsb.implant_id_coverslip_type.WHC_2_P_CURVED_GLASS_WITH: None,
                 self._nsb.implant_id_coverslip_type.N_3MM_STACKED_COVERSLIP: None,
                 self._nsb.implant_id_coverslip_type.N_5MM_STACKED_COVERSLIP: None,
-                self._nsb.implant_id_coverslip_type.N_5MM_STACKED_COVERSLIP_W: (
-                    None
-                ),
+                self._nsb.implant_id_coverslip_type.N_5MM_STACKED_COVERSLIP_W: None,
             }.get(self._nsb.implant_id_coverslip_type, None)
         )
 
@@ -1288,7 +1723,7 @@ class MappedNSBList:
     @property
     def aind_inj1_angle_v2(self) -> Optional[float]:
         """Maps inj1_angle_v2 to aind model"""
-        return self._parse_angle_str(self._nsb.inj1_angle_v2)
+        return self._nsb.inj1_angle_v2
 
     @property
     def aind_inj1_current(self) -> Optional[float]:
@@ -1326,7 +1761,7 @@ class MappedNSBList:
     @property
     def aind_inj1volperdepth(self) -> Optional[float]:
         """Maps inj1volperdepth to aind model"""
-        return self._parse_inj_vol_str(self._nsb.inj1volperdepth)
+        return self._nsb.inj1volperdepth
 
     @property
     def aind_inj2_alternating_time(self) -> Optional[float]:
@@ -1336,7 +1771,7 @@ class MappedNSBList:
     @property
     def aind_inj2_angle_v2(self) -> Optional[float]:
         """Maps inj2_angle_v2 to aind model"""
-        return self._parse_angle_str(self._nsb.inj2_angle_v2)
+        return self._nsb.inj2_angle_v2
 
     @property
     def aind_inj2_current(self) -> Optional[float]:
@@ -1374,7 +1809,7 @@ class MappedNSBList:
     @property
     def aind_inj2volperdepth(self) -> Optional[float]:
         """Maps inj2volperdepth to aind model"""
-        return self._parse_inj_vol_str(self._nsb.inj2volperdepth)
+        return self._nsb.inj2volperdepth
 
     @property
     def aind_inj3_alternating_time(self) -> Optional[float]:
@@ -1397,7 +1832,7 @@ class MappedNSBList:
         return self._nsb.inj3_storage_location
 
     @property
-    def aind_inj3_type(self) -> Optional[Any]:
+    def aind_inj3_type(self) -> Optional[InjectionType]:
         """Maps inj3_type to aind model"""
         return (
             None
@@ -1424,7 +1859,7 @@ class MappedNSBList:
     @property
     def aind_inj3volperdepth(self) -> Optional[float]:
         """Maps inj3volperdepth to aind model"""
-        return self._parse_inj_vol_str(self._nsb.inj3volperdepth)
+        return self._nsb.inj3volperdepth
 
     @property
     def aind_inj4_alternating_time(self) -> Optional[float]:
@@ -1479,12 +1914,122 @@ class MappedNSBList:
     @property
     def aind_inj4volperdepth(self) -> Optional[float]:
         """Maps inj4volperdepth to aind model"""
-        return self._parse_inj_vol_str(self._nsb.inj4volperdepth)
+        return self._nsb.inj4volperdepth
+
+    @property
+    def aind_inj5_alternating_time(self) -> Optional[float]:
+        """Maps inj5_alternating_time to aind model"""
+        return self._parse_alt_time_str(self._nsb.inj5_alternating_time)
+
+    @property
+    def aind_inj5_current(self) -> Optional[float]:
+        """Maps inj5_current to aind model"""
+        return self._parse_current_str(self._nsb.inj5_current)
+
+    @property
+    def aind_inj5_ionto_time(self) -> Optional[float]:
+        """Maps inj5_ionto_time to aind model"""
+        return self._parse_length_of_time_str(self._nsb.inj5_ionto_time)
+
+    @property
+    def aind_inj5_storage_location(self) -> Optional[str]:
+        """Maps inj5_storage_location to aind model"""
+        return self._nsb.inj5_storage_location
+
+    @property
+    def aind_inj5_type(self) -> Optional[InjectionType]:
+        """Maps inj5_type to aind model"""
+        return (
+            None
+            if self._nsb.inj5_type is None
+            else {
+                self._nsb.inj5_type.SELECT: None,
+                self._nsb.inj5_type.IONTOPHORESIS: InjectionType.IONTOPHORESIS,
+                self._nsb.inj5_type.NANOJECT_PRESSURE: InjectionType.NANOJECT,
+            }.get(self._nsb.inj5_type, None)
+        )
+
+    @property
+    def aind_inj5_virus_strain_rt(self) -> Optional[str]:
+        """Maps inj5_virus_strain_rt to aind model"""
+        return self._nsb.inj5_virus_strain_rt
+
+    @property
+    def aind_inj5ret_setting(self) -> Optional[Any]:
+        """Maps inj5ret_setting to aind model"""
+        return (
+            None
+            if self._nsb.inj5ret_setting is None
+            else {
+                self._nsb.inj5ret_setting.OFF: None,
+                self._nsb.inj5ret_setting.ON: None,
+            }.get(self._nsb.inj5ret_setting, None)
+        )
+
+    @property
+    def aind_inj5volperdepth(self) -> Optional[float]:
+        """Maps inj5volperdepth to aind model"""
+        return self._nsb.inj5volperdepth
+
+    @property
+    def aind_inj6_alternating_time(self) -> Optional[float]:
+        """Maps inj6_alternating_time to aind model"""
+        return self._parse_alt_time_str(self._nsb.inj6_alternating_time)
+
+    @property
+    def aind_inj6_current(self) -> Optional[float]:
+        """Maps inj6_current to aind model"""
+        return self._parse_current_str(self._nsb.inj6_current)
+
+    @property
+    def aind_inj6_ionto_time(self) -> Optional[float]:
+        """Maps inj6_ionto_time to aind model"""
+        return self._parse_length_of_time_str(self._nsb.inj6_ionto_time)
+
+    @property
+    def aind_inj6_storage_location(self) -> Optional[str]:
+        """Maps inj6_storage_location to aind model"""
+        return self._nsb.inj6_storage_location
+
+    @property
+    def aind_inj6_type(self) -> Optional[InjectionType]:
+        """Maps inj6_type to aind model"""
+        return (
+            None
+            if self._nsb.inj6_type is None
+            else {
+                self._nsb.inj6_type.SELECT: None,
+                self._nsb.inj6_type.IONTOPHORESIS: InjectionType.IONTOPHORESIS,
+                self._nsb.inj6_type.NANOJECT_PRESSURE: InjectionType.NANOJECT,
+            }.get(self._nsb.inj6_type, None)
+        )
+
+    @property
+    def aind_inj6_virus_strain_rt(self) -> Optional[str]:
+        """Maps inj6_virus_strain_rt to aind model"""
+        return self._nsb.inj6_virus_strain_rt
+
+    @property
+    def aind_inj6ret_setting(self) -> Optional[Any]:
+        """Maps inj6ret_setting to aind model"""
+        return (
+            None
+            if self._nsb.inj6ret_setting is None
+            else {
+                self._nsb.inj6ret_setting.OFF: None,
+                self._nsb.inj6ret_setting.ON: None,
+            }.get(self._nsb.inj6ret_setting, None)
+        )
+
+    @property
+    def aind_inj6volperdepth(self) -> Optional[float]:
+        """Maps inj6volperdepth to aind model"""
+        return self._nsb.inj6volperdepth
 
     @property
     def aind_inj_virus_strain_rt(self) -> Optional[str]:
         """Maps inj_virus_strain_rt to aind model"""
-        return self._parse_virus_strain_str(self._nsb.inj_virus_strain_rt)
+        return self._nsb.inj_virus_strain_rt
 
     @property
     def aind_ionto_number_inj1(self) -> Optional[str]:
@@ -1529,7 +2074,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_ionto_number_inj2(self) -> Optional[Any]:
+    def aind_ionto_number_inj2(self) -> Optional[str]:
         """Maps ionto_number_inj2 to aind model"""
         return (
             None
@@ -1710,6 +2255,7 @@ class MappedNSBList:
                 self._nsb.lims_project.CONCS04: None,
                 self._nsb.lims_project.DEEPSCOPE_SLM_DEVELOPMENT: None,
                 self._nsb.lims_project.DYNAMIC_ROUTING_BEHAVIOR: None,
+                self._nsb.lims_project.DYNAMIC_ROUTING_OPTO_DEV: None,
                 self._nsb.lims_project.DYNAMIC_ROUTING_SURGICAL: None,
                 self._nsb.lims_project.DYNAMIC_ROUTING_TASK1_PRO: None,
                 self._nsb.lims_project.DYNAMIC_ROUTING_TASK2_PRO: None,
@@ -1770,6 +2316,7 @@ class MappedNSBList:
                 self._nsb.lims_project.OPEN_SCOPE_VISION2_HIPPOC: None,
                 self._nsb.lims_project.OPH5_X: None,
                 self._nsb.lims_project.S200_C: None,
+                self._nsb.lims_project.SLC6_A1_NEUROPIXEL: None,
                 self._nsb.lims_project.SMART_SPIM_GENETIC_TOOLS: None,
                 self._nsb.lims_project.SURGERY_X: None,
                 self._nsb.lims_project.T301: None,
@@ -1817,7 +2364,9 @@ class MappedNSBList:
                 self._nsb.lims_taskflow.AIND_EPHYS_SURGERY_ONLY: None,
                 self._nsb.lims_taskflow.AIND_EPHYS_PASSIVE_BEHAVI: None,
                 self._nsb.lims_taskflow.AIND_U19_AAV_RETROGRADE: None,
+                self._nsb.lims_taskflow.AIND_U19_RAB_V_RETROGRADE: None,
                 self._nsb.lims_taskflow.AIND_U19_THALAMUS: None,
+                self._nsb.lims_taskflow.AIND_WATERLOG: None,
                 self._nsb.lims_taskflow.BRAIN_LARGE_SCALE_RECORDI: None,
                 self._nsb.lims_taskflow.BRAIN_MOUSE_BRAIN_CELL_AT: None,
                 self._nsb.lims_taskflow.BRAIN_OBSERVATORY_DEEPSCO: None,
@@ -1834,7 +2383,6 @@ class MappedNSBList:
                 self._nsb.lims_taskflow.BRAIN_OBSERVATORY_VIS_003: None,
                 self._nsb.lims_taskflow.BTV_BRAIN_VIRAL_STRATEGIE: None,
                 self._nsb.lims_taskflow.CITRIC_ACID_PILOT: None,
-                self._nsb.lims_taskflow.EPHYS_DEV_VISUAL_BEHAVIOR2: None,
                 self._nsb.lims_taskflow.EPHYS_DEV_VISUAL_BEHAVIOR: None,
                 self._nsb.lims_taskflow.EPHYS_TASK_DEV_DYNAMIC_RO: None,
                 self._nsb.lims_taskflow.EPHYS_TASK_DEV_DYANMIC_RO: None,
@@ -1844,11 +2392,14 @@ class MappedNSBList:
                 self._nsb.lims_taskflow.IVSP_CM_INJECTION: None,
                 self._nsb.lims_taskflow.MGT_LAB: None,
                 self._nsb.lims_taskflow.MGT_TISSUE_CYTE: None,
+                self._nsb.lims_taskflow.MINDSCOPE_2_P_TESTING: None,
                 self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_BEHAV: None,
+                self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_OPTO: None,
                 self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_SURGI: None,
                 self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_ULTRA: None,
                 self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_TASK: None,
                 self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_T_001: None,
+                self._nsb.lims_taskflow.MSP_G_CA_MP8_TESTING: None,
                 self._nsb.lims_taskflow.MSP_LEARNING_M_FISH_DEVEL: None,
                 self._nsb.lims_taskflow.MSP_LEARNING_M_FISH_D_001: None,
                 self._nsb.lims_taskflow.MSP_LEARNING_M_FISH_FRONT: None,
@@ -1887,6 +2438,7 @@ class MappedNSBList:
                 self._nsb.lims_taskflow.OPEN_SCOPE_TEMPORAL_B_001: None,
                 self._nsb.lims_taskflow.OPEN_SCOPE_VISION_2_HIPPO: None,
                 self._nsb.lims_taskflow.OPEN_SCOPE_WHC_2_P_DEV: None,
+                self._nsb.lims_taskflow.TEMPLETON_PSYCHEDELICS: None,
                 self._nsb.lims_taskflow.TINY_BLUE_DOT_BEHAVIOR: None,
                 self._nsb.lims_taskflow.TRANSGENIC_CHARACTERIZATI: None,
                 self._nsb.lims_taskflow.VIS_B_DEV_CONTROL_GROUP: None,
@@ -1904,7 +2456,7 @@ class MappedNSBList:
     @property
     def aind_ml2nd_inj(self) -> Optional[float]:
         """Maps ml2nd_inj to aind model"""
-        return self._parse_ml_str(self._nsb.ml2nd_inj)
+        return self._nsb.ml2nd_inj
 
     @property
     def aind_modified(self) -> Optional[datetime]:
@@ -1948,7 +2500,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_nanoject_number_inj2(self) -> Optional[Any]:
+    def aind_nanoject_number_inj2(self) -> Optional[str]:
         """Maps nanoject_number_inj2 to aind model"""
         return (
             None
@@ -1995,6 +2547,8 @@ class MappedNSBList:
                 self._nsb.of_burr.N_2: 2,
                 self._nsb.of_burr.N_3: 3,
                 self._nsb.of_burr.N_4: 4,
+                self._nsb.of_burr.N_5: 5,
+                self._nsb.of_burr.N_6: 6,
             }.get(self._nsb.of_burr, None)
         )
 
@@ -2072,6 +2626,8 @@ class MappedNSBList:
                 self._nsb.project_id.N_1020106020_CTY_BRAIN_DR: None,
                 self._nsb.project_id.N_1020106220_CTY_BICAN_MO: None,
                 self._nsb.project_id.N_1020106410_CTY_GENETIC: None,
+                self._nsb.project_id.N_1020106620_CTY_CONNECTS: None,
+                self._nsb.project_id.N_1020106820_CTY_CONNECTS: None,
                 self._nsb.project_id.N_1020106920_PRE_SPEND: None,
                 self._nsb.project_id.N_1020199910_CTY_PROGRAM: None,
                 self._nsb.project_id.N_1020200410_BTV_VISUAL_B: None,
@@ -2118,6 +2674,10 @@ class MappedNSBList:
                 self._nsb.project_id.N_1220100220_PROJECT_2: None,
                 self._nsb.project_id.N_1220100220_PROJECT_4: None,
                 self._nsb.project_id.N_1220100420_AIND_BRAINST: None,
+                self._nsb.project_id.N_1220101020_AIND_POO_SIM: None,
+                self._nsb.project_id.N_1220101120_AIND_COHEN_J: None,
+                self._nsb.project_id.N_1220101220_AIND_RF1_FUN: None,
+                self._nsb.project_id.N_1220101420_AIND_SIEGLE: None,
                 self._nsb.project_id.N_1229999910_NEURAL_DYNAM: None,
                 self._nsb.project_id.AAV_PRODUCTION_1028800410: None,
                 self._nsb.project_id.CVS_PRODUCTION_1028800410: None,
@@ -2197,12 +2757,12 @@ class MappedNSBList:
     @property
     def aind_virus_a_p(self) -> Optional[float]:
         """Maps virus_a_p to aind model"""
-        return self._parse_ap_str(self._nsb.virus_a_p)
+        return self._nsb.virus_a_p
 
     @property
     def aind_virus_d_v(self) -> Optional[float]:
         """Maps virus_d_v to aind model"""
-        return self._parse_dv_str(self._nsb.virus_d_v)
+        return self._nsb.virus_d_v
 
     @property
     def aind_virus_hemisphere(self) -> Optional[Side]:
@@ -2220,7 +2780,7 @@ class MappedNSBList:
     @property
     def aind_virus_m_l(self) -> Optional[float]:
         """Maps virus_m_l to aind model"""
-        return self._parse_ml_str(self._nsb.virus_m_l)
+        return self._nsb.virus_m_l
 
     @property
     def aind_weight_after_surgery(self) -> Optional[float]:
@@ -2270,7 +2830,8 @@ class MappedNSBList:
             }.get(self._nsb.work_station1st_injection, None)
         )
 
-    # Additional properties
+        # Additional properties
+
     @property
     def aind_experimenter_full_name(self) -> str:
         """Map author id to experimenter name"""
@@ -2376,11 +2937,16 @@ class MappedNSBList:
 
         """
         if burr_hole_num == 1:
+            coordinate_depth = self._map_burr_hole_dv(
+                self.aind_virus_d_v,
+                self.aind_burr_1_d_v_x00,
+                self.aind_burr_1_dv_2,
+            )
             return BurrHoleInfo(
                 hemisphere=self.aind_virus_hemisphere,
                 coordinate_ml=self.aind_virus_m_l,
                 coordinate_ap=self.aind_virus_a_p,
-                coordinate_depth=self.aind_virus_d_v,
+                coordinate_depth=coordinate_depth,
                 angle=self.aind_inj1_angle_v2,
                 during=self.aind_burr1_perform_during,
                 inj_type=self.aind_inj1_type,
@@ -2388,15 +2954,23 @@ class MappedNSBList:
                 inj_current=self.aind_inj1_current,
                 alternating_current=self.aind_inj1_alternating_time,
                 inj_duration=self.aind_inj1_ionto_time,
-                inj_volume=self.aind_inj1volperdepth,
+                inj_volume=self._map_burr_hole_volume(
+                    vol=self.aind_inj1volperdepth,
+                    dv=coordinate_depth
+                ),
                 fiber_implant_depth=self.aind_fiber_implant1_dv,
             )
         elif burr_hole_num == 2:
+            coordinate_depth = self._map_burr_hole_dv(
+                self.aind_dv2nd_inj,
+                self.aind_burr_2_d_v_x00,
+                self.aind_burr_2_d_v_x000,
+            )
             return BurrHoleInfo(
                 hemisphere=self.aind_hemisphere2nd_inj,
                 coordinate_ml=self.aind_ml2nd_inj,
                 coordinate_ap=self.aind_ap2nd_inj,
-                coordinate_depth=self.aind_dv2nd_inj,
+                coordinate_depth=coordinate_depth,
                 angle=self.aind_inj2_angle_v2,
                 during=self.aind_burr2_perform_during,
                 inj_type=self.aind_inj2_type,
@@ -2404,15 +2978,23 @@ class MappedNSBList:
                 inj_current=self.aind_inj2_current,
                 alternating_current=self.aind_inj2_alternating_time,
                 inj_duration=self.aind_inj2_ionto_time,
-                inj_volume=self.aind_inj2volperdepth,
+                inj_volume=self._map_burr_hole_volume(
+                    vol=self.aind_inj2volperdepth,
+                    dv=coordinate_depth
+                ),
                 fiber_implant_depth=self.aind_fiber_implant2_dv,
             )
         elif burr_hole_num == 3:
+            coordinate_depth = self._map_burr_hole_dv(
+                self.aind_burr3_d_v,
+                self.aind_burr_3_d_v_x00,
+                self.aind_burr_3_d_v_x000,
+            )
             return BurrHoleInfo(
                 hemisphere=self.aind_burr_3_hemisphere,
                 coordinate_ml=self.aind_burr3_m_l,
                 coordinate_ap=self.aind_burr3_a_p,
-                coordinate_depth=self.aind_burr3_d_v,
+                coordinate_depth=coordinate_depth,
                 angle=self.aind_burr_3_angle,
                 during=self.aind_burr3_perform_during,
                 inj_type=self.aind_inj3_type,
@@ -2420,15 +3002,23 @@ class MappedNSBList:
                 inj_current=self.aind_inj3_current,
                 alternating_current=self.aind_inj3_alternating_time,
                 inj_duration=self.aind_inj3_ionto_time,
-                inj_volume=self.aind_inj3volperdepth,
+                inj_volume=self._map_burr_hole_volume(
+                    vol=self.aind_inj3volperdepth,
+                    dv=coordinate_depth
+                ),
                 fiber_implant_depth=self.aind_fiber_implant3_d_x00,
             )
         elif burr_hole_num == 4:
+            coordinate_depth = self._map_burr_hole_dv(
+                self.aind_burr4_d_v,
+                self.aind_burr_4_d_v_x00,
+                self.aind_burr_4_d_v_x000,
+            )
             return BurrHoleInfo(
                 hemisphere=self.aind_burr_4_hemisphere,
                 coordinate_ml=self.aind_burr4_m_l,
                 coordinate_ap=self.aind_burr4_a_p,
-                coordinate_depth=self.aind_burr4_d_v,
+                coordinate_depth=coordinate_depth,
                 angle=self.aind_burr_4_angle,
                 during=self.aind_burr4_perform_during,
                 inj_type=self.aind_inj4_type,
@@ -2436,8 +3026,59 @@ class MappedNSBList:
                 inj_current=self.aind_inj4_current,
                 alternating_current=self.aind_inj4_alternating_time,
                 inj_duration=self.aind_inj4_ionto_time,
-                inj_volume=self.aind_inj4volperdepth,
+                inj_volume=self._map_burr_hole_volume(
+                    vol=self.aind_inj4volperdepth,
+                    dv=coordinate_depth
+                ),
                 fiber_implant_depth=self.aind_fiber_implant4_d_x00,
+            )
+        elif burr_hole_num == 5:
+            coordinate_depth = self._map_burr_hole_dv(
+                self.aind_burr_5_d_v_x00,
+                self.aind_burr_5_d_v_x000,
+                self.aind_burr_5_d_v_x001,
+            )
+            return BurrHoleInfo(
+                hemisphere=self.aind_burr_5_hemisphere,
+                coordinate_ml=self.aind_burr_5_m_l,
+                coordinate_ap=self.aind_burr_5_a_p,
+                coordinate_depth=coordinate_depth,
+                angle=self.aind_burr_5_angle,
+                during=self.aind_burr5_perform_during,
+                inj_type=self.aind_inj5_type,
+                virus_strain=self.aind_inj5_virus_strain_rt,
+                inj_current=self.aind_inj5_current,
+                alternating_current=self.aind_inj5_alternating_time,
+                inj_duration=self.aind_inj5_ionto_time,
+                inj_volume=self._map_burr_hole_volume(
+                    vol=self.aind_inj5volperdepth,
+                    dv=coordinate_depth
+                ),
+                fiber_implant_depth=self.aind_fiber_implant5_d_x00,
+            )
+        elif burr_hole_num == 6:
+            coordinate_depth = self._map_burr_hole_dv(
+                self.aind_burr_6_d_v_x00,
+                self.aind_burr_6_d_v_x000,
+                self.aind_burr_6_d_v_x001,
+            )
+            return BurrHoleInfo(
+                hemisphere=self.aind_burr_6_hemisphere,
+                coordinate_ml=self.aind_burr_6_m_l,
+                coordinate_ap=self.aind_burr_6_a_p,
+                coordinate_depth=coordinate_depth,
+                angle=self.aind_burr_6_angle,
+                during=self.aind_burr6_perform_during,
+                inj_type=self.aind_inj6_type,
+                virus_strain=self.aind_inj6_virus_strain_rt,
+                inj_current=self.aind_inj6_current,
+                alternating_current=self.aind_inj6_alternating_time,
+                inj_duration=self.aind_inj6_ionto_time,
+                inj_volume=self._map_burr_hole_volume(
+                    vol=self.aind_inj6volperdepth,
+                    dv=coordinate_depth
+                ),
+                fiber_implant_depth=self.aind_fiber_implant6_d_x00,
             )
         else:
             return BurrHoleInfo()
@@ -2447,6 +3088,7 @@ class MappedNSBList:
         burr_hole_num: int,
     ) -> Optional[ProbeName]:
         """Maps NSB Burr hole number into AIND ProbeName"""
+        # TODO: add probes for burr_hole_nums 5 and 6
         if burr_hole_num == 1:
             return ProbeName.PROBE_A
         elif burr_hole_num == 2:
@@ -2457,6 +3099,24 @@ class MappedNSBList:
             return ProbeName.PROBE_D
         else:
             return None
+
+    @staticmethod
+    def _map_burr_hole_dv(dv1, dv2, dv3):
+        """Maps dvs for a burr hole to one coordinate depth list"""
+        if all(dv is None for dv in (dv1, dv2, dv3)):
+            return None
+        else:
+            return [dv for dv in (dv1, dv2, dv3) if dv is not None]
+
+    @staticmethod
+    def _map_burr_hole_volume(vol, dv):
+        """Maps volume to a list per depth"""
+        if vol is None and dv is None:
+            return None
+        elif vol is None:
+            return None
+        else:
+            return [vol] * len(dv) if dv is not None else [vol]
 
     def get_procedures(self) -> List[SubjectProcedure]:
         """Get a list of subject procedures"""
@@ -2555,8 +3215,8 @@ class MappedNSBList:
             )
             procedures.append(headframe_procedure)
 
-        # Check if there are any procedures for burr holes 1 through 4
-        for burr_hole_num in range(1, 5):
+        # Check if there are any procedures for burr holes 1 through 6
+        for burr_hole_num in range(1, 7):
             if getattr(self, f"aind_burr_hole_{burr_hole_num}") in {
                 BurrHoleProcedure.INJECTION,
                 BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
