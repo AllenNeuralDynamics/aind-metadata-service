@@ -38,7 +38,7 @@ server = [
     'office365-rest-python-client==2.4.1',
     'fastapi',
     'uvicorn[standard]',
-    'python-dateutil'
+    'python-dateutil',
 ]
 
 client = [
