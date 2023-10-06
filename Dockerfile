@@ -1,7 +1,6 @@
 FROM python:3.8-slim
 WORKDIR /app
 
-# RUN apt-get update && apt-get install build-essential unixodbc-dev -y
 # Install FreeTDS and dependencies
 RUN apt-get update \
  && apt-get install unixodbc -y \
