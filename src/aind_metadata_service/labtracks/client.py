@@ -346,14 +346,11 @@ class LabTracksResponseHandler:
         -------
         Optional[Housing]
         """
-        if room_id is None and cage_id is None:
-            return None
-        else:
-            housing = Housing.construct(
-                room_id=room_id if room_id else None,
-                cage_id=cage_id if cage_id else None,
-            )
-            return housing
+        room_id = None if room_id is None or int(room_id) < 0 else room_id
+        cage_id = None if cage_id is None or int(cage_id) < 0 else cage_id
+
+        return Housing.construct(room_id=room_id,
+                                 cage_id=cage_id) if room_id is not None or cage_id is not None else None
 
     def map_response_to_subject(self, results: List[dict]) -> List[Subject]:
         """
