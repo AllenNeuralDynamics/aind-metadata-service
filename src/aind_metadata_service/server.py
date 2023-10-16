@@ -14,9 +14,18 @@ from aind_metadata_service.sharepoint.client import (
     SharePointClient,
     SharepointSettings,
 )
+from aind_metadata_service.smartsheet.client import (
+    SmartSheetClient,
+    SmartsheetSettings,
+)
 
+# TODO: Move client instantiation when the server starts instead of creating
+# one for each request?
 sharepoint_settings = SharepointSettings()
 labtracks_settings = LabTracksSettings()
+
+smartsheet_settings = SmartsheetSettings()
+smartsheet_client = SmartSheetClient(smartsheet_settings=smartsheet_settings)
 
 app = FastAPI()
 

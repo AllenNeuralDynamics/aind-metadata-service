@@ -241,7 +241,9 @@ class TestLabTracksResponseHandler(unittest.TestCase):
         housing3 = Housing.construct(cage_id="1234")
         housing4 = Housing.construct(room_id="000", cage_id="1234")
 
-        subject_housing1 = self.rh._map_housing(room_id="-99999999999", cage_id=None)
+        subject_housing1 = self.rh._map_housing(
+            room_id="-99999999999", cage_id=None
+        )
         subject_housing2 = self.rh._map_housing(room_id="000", cage_id=None)
         subject_housing3 = self.rh._map_housing(room_id=None, cage_id="1234")
         subject_housing4 = self.rh._map_housing(room_id="000", cage_id="1234")
