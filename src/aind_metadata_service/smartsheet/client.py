@@ -1,9 +1,10 @@
 """Module to instantiate a client to connect to Smartsheet and provide helpful
 methods to retrieve data."""
 
+import logging
 from typing import Optional
 
-from pydantic import BaseSettings, Field, SecretStr, Extra
+from pydantic import BaseSettings, Extra, Field, SecretStr
 from smartsheet import Smartsheet
 
 from aind_metadata_service import __version__
@@ -12,6 +13,7 @@ from aind_metadata_service import __version__
 class SmartsheetSettings(BaseSettings):
     """Configuration class. Mostly a wrapper around smartsheet.Smartsheet
     class constructor arguments."""
+
     access_token: SecretStr = Field(
         ..., description="API token can be created in Smartsheet UI"
     )
@@ -35,6 +37,7 @@ class SmartsheetSettings(BaseSettings):
 
     class Config:
         """Set env prefix and forbid extra fields."""
+
         env_prefix = "SMARTSHEET_"
         extra = Extra.forbid
 
@@ -42,6 +45,7 @@ class SmartsheetSettings(BaseSettings):
 class SmartSheetClient:
     """Main client to connect to a Smartsheet sheet. Requires an API token
     and the sheet id."""
+
     def __init__(self, smartsheet_settings: SmartsheetSettings):
         """
         Class constructor
@@ -58,11 +62,14 @@ class SmartSheetClient:
             ),
         )
 
-    @property
-    def sheet(self):
+    async def get_sheet(self) -> dict:
         """Retrieve the sheet defined by the settings sheet_id."""
-        # TODO: Handle errors
-        smartsheet_response = self.smartsheet_client.Sheets.get_sheet(
-            self.smartsheet_settings.sheet_id
-        )
-        return smartsheet_response.to_json()
+        try:
+            smartsheet_response = self.smartsheet_client.Sheets.get_sheet(
+                self.smartsheet_settings.sheet_id
+            )
+            smartsheet_json = smartsheet_response.to_json()
+            return smartsheet_json
+        except Exception as e:
+            logging.error(repr(e))
+            raise Exception(e)
