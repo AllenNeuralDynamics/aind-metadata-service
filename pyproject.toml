@@ -9,7 +9,7 @@ license = {text = "MIT"}
 authors = [
     {name = "Allen Institute for Neural Dynamics"}
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3"
 ]
@@ -55,7 +55,7 @@ readme = {file = ["README.md"]}
 
 [tool.black]
 line-length = 79
-target_version = ['py36']
+target_version = ['py38']
 exclude = '''
 
 (
