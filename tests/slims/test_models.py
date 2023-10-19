@@ -78,7 +78,6 @@ class TestContentsTableColumnInfo(unittest.TestCase):
             ),
             field_str2,
         )
-        print(field_str2)
 
 
 if __name__ == "__main__":
