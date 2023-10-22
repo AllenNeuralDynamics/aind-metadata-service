@@ -1,15 +1,17 @@
 """Module to test Slims client class"""
 
+import json
 import os
-import pickle
 import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+from slims.internal import Record
+
 from aind_metadata_service.slims.client import SlimsClient, SlimsSettings
 
 TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / ".."
-EXAMPLE_PATH = TEST_DIR / "resources" / "slims" / "test_record.pkl"
+EXAMPLE_PATH = TEST_DIR / "resources" / "slims" / "json_entity.json"
 
 
 class TestSlimsSettings(unittest.TestCase):
@@ -44,8 +46,11 @@ class TestSlimsClient(unittest.IsolatedAsyncioTestCase):
     @classmethod
     def setUpClass(cls):
         """Load record object before running tests."""
-        with open(EXAMPLE_PATH, "rb") as f:
-            record_object = pickle.load(f)
+        with open(EXAMPLE_PATH, "r") as f:
+            json_entity = json.load(f)
+        # Turning off type check on slims_api argument
+        # noinspection PyTypeChecker
+        record_object = Record(json_entity=json_entity, slims_api=None)
         cls.example_record = record_object
 
     @patch("slims.slims.Slims.fetch")

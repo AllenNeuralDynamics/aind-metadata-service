@@ -1,9 +1,11 @@
 """Test models module in slims package"""
 
+import json
 import os
-import pickle
 import unittest
 from pathlib import Path
+
+from slims.internal import Record
 
 from aind_metadata_service.slims.models import (
     ContentsTableColumnInfo,
@@ -11,7 +13,7 @@ from aind_metadata_service.slims.models import (
 )
 
 TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / ".."
-EXAMPLE_PATH = TEST_DIR / "resources" / "slims" / "test_record.pkl"
+EXAMPLE_PATH = TEST_DIR / "resources" / "slims" / "json_entity.json"
 
 
 class TestContentsTableRow(unittest.TestCase):
@@ -20,8 +22,11 @@ class TestContentsTableRow(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Load record object before running tests."""
-        with open(EXAMPLE_PATH, "rb") as f:
-            record_object = pickle.load(f)
+        with open(EXAMPLE_PATH, "r") as f:
+            json_entity = json.load(f)
+        # Turning off type check on slims_api argument
+        # noinspection PyTypeChecker
+        record_object = Record(json_entity=json_entity, slims_api=None)
         cls.example_record = record_object
 
     def test_slims_model(self):
