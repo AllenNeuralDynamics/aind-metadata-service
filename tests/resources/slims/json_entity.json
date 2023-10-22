@@ -1,0 +1,942 @@
+{
+   "pk": 1,
+   "tableName": "Content",
+   "columns": [
+      {
+         "datatype": "FOREIGN_KEY",
+         "name": "cntn_fk_originalContent",
+         "title": "Original Content",
+         "position": 0,
+         "value": null,
+         "hidden": true,
+         "editable": true,
+         "foreignTable": "Content",
+         "displayValue": null,
+         "displayField": "cntn_originalContentBarCode",
+         "foreignDisplayColumn": "cntn_id"
+      },
+      {
+         "datatype": "ENUM",
+         "name": "icon",
+         "title": "Icon",
+         "position": 1,
+         "value": "data_icons/mouse.png",
+         "hidden": false,
+         "editable": true,
+         "displayValue": "data_icons/mouse.png"
+      },
+      {
+         "datatype": "ENUM",
+         "name": "containerIcon",
+         "title": "Container icon",
+         "position": 2,
+         "value": null,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "FOREIGN_KEY",
+         "name": "cntn_fk_category",
+         "title": "Category",
+         "position": 3,
+         "value": 2,
+         "hidden": false,
+         "editable": true,
+         "foreignTable": "ContentType",
+         "displayValue": "Default",
+         "displayField": "category_name",
+         "foreignDisplayColumn": "cntp_name"
+      },
+      {
+         "datatype": "FOREIGN_KEY",
+         "name": "cntn_fk_contentType",
+         "title": "Type",
+         "position": 4,
+         "value": 5,
+         "hidden": false,
+         "editable": false,
+         "foreignTable": "ContentType",
+         "displayValue": "Mouse",
+         "displayField": "cntp_name",
+         "foreignDisplayColumn": "cntp_name"
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntn_barCode",
+         "title": "Barcode",
+         "position": 5,
+         "value": "00000000",
+         "hidden": false,
+         "editable": false
+      },
+      {
+         "datatype": "FOREIGN_KEY",
+         "name": "cntn_fk_containerContentType",
+         "title": "Container type",
+         "position": 6,
+         "value": null,
+         "hidden": false,
+         "editable": true,
+         "foreignTable": "ContentType",
+         "displayValue": null,
+         "displayField": "container_name",
+         "foreignDisplayColumn": "cntp_name"
+      },
+      {
+         "datatype": "QUANTITY",
+         "name": "cntn_cf_mass",
+         "title": "Mass",
+         "position": 7,
+         "value": null,
+         "hidden": false,
+         "editable": true,
+         "unit": "&mu;g"
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntn_id",
+         "title": "ID",
+         "position": 8,
+         "value": "00000000",
+         "hidden": true,
+         "editable": false
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntn_cf_contactPerson",
+         "title": "Contact Person",
+         "position": 9,
+         "value": null,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "FLOAT",
+         "name": "cntn_dilutionFactor",
+         "title": "Dilution Factor",
+         "position": 10,
+         "value": null,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "ENUM",
+         "name": "cntn_status",
+         "title": "Status",
+         "position": 11,
+         "value": "10",
+         "hidden": false,
+         "editable": false,
+         "displayValue": "Pending"
+      },
+      {
+         "datatype": "FOREIGN_KEY",
+         "name": "cntn_fk_status",
+         "title": "Status",
+         "position": 12,
+         "value": 28,
+         "hidden": false,
+         "editable": true,
+         "foreignTable": "Status",
+         "displayValue": "Pending",
+         "displayField": "stts_name",
+         "foreignDisplayColumn": "stts_name"
+      },
+      {
+         "datatype": "FOREIGN_KEY",
+         "name": "cntn_fk_user",
+         "title": "User",
+         "position": 13,
+         "value": 5,
+         "hidden": false,
+         "editable": true,
+         "foreignTable": "User",
+         "displayValue": "PersonA",
+         "displayField": "user_userName",
+         "foreignDisplayColumn": "user_userName"
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntn_cf_lotNumber",
+         "title": "Lot number",
+         "position": 14,
+         "value": null,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "FOREIGN_KEY",
+         "name": "cntn_fk_group",
+         "title": "Group",
+         "position": 15,
+         "value": null,
+         "hidden": false,
+         "editable": true,
+         "foreignTable": "Groups",
+         "displayValue": null,
+         "displayField": "grps_groupName",
+         "foreignDisplayColumn": "grps_groupName"
+      },
+      {
+         "datatype": "FOREIGN_KEY",
+         "name": "cntn_fk_source",
+         "title": "Source",
+         "position": 16,
+         "value": null,
+         "hidden": true,
+         "editable": true,
+         "foreignTable": "Source",
+         "displayValue": null,
+         "displayField": "sorc_name",
+         "foreignDisplayColumn": "sorc_name"
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntn_position_row",
+         "title": "Located at row",
+         "position": 17,
+         "value": null,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "FOREIGN_KEY",
+         "name": "cntn_fk_location",
+         "title": "Location",
+         "position": 18,
+         "value": null,
+         "hidden": false,
+         "editable": true,
+         "foreignTable": "Location",
+         "displayValue": null,
+         "displayField": "lctn_name",
+         "foreignDisplayColumn": "lctn_name"
+      },
+      {
+         "datatype": "FOREIGN_KEY",
+         "name": "cntn_fk_location_recursive",
+         "title": "Location (including sublocations)",
+         "position": 19,
+         "value": null,
+         "hidden": false,
+         "editable": true,
+         "foreignTable": "Location",
+         "displayValue": null,
+         "displayField": "lctn_name",
+         "foreignDisplayColumn": "lctn_name"
+      },
+      {
+         "datatype": "STRING",
+         "name": "locationPath",
+         "title": "Location path",
+         "position": 20,
+         "value": null,
+         "hidden": false,
+         "editable": false
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntn_position_column",
+         "title": "Located at column",
+         "position": 21,
+         "value": null,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "DATE",
+         "name": "cntn_cf_dateOfBirth",
+         "title": "Date of birth",
+         "position": 22,
+         "value": null,
+         "hidden": false,
+         "editable": true,
+         "dateFormat": "dd/MM/yyyy",
+         "subType": "date",
+         "timeZone": "America/Los_Angeles"
+      },
+      {
+         "datatype": "DATE",
+         "name": "cntn_cf_dateRangeStart",
+         "title": "Date range start",
+         "position": 23,
+         "value": null,
+         "hidden": false,
+         "editable": true,
+         "dateFormat": "dd/MM/yyyy HH:mm:ss",
+         "subType": "datetime",
+         "timeZone": "America/Los_Angeles"
+      },
+      {
+         "datatype": "FOREIGN_KEY",
+         "name": "cntn_cf_fk_fundingCode",
+         "title": "Funding Code",
+         "position": 24,
+         "value": null,
+         "hidden": false,
+         "editable": true,
+         "foreignTable": "ReferenceDataRecord",
+         "displayValue": null,
+         "displayField": "cntn_cf_fk_fundingCode_display",
+         "foreignDisplayColumn": "rdrc_name"
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntn_cf_genotype",
+         "title": "Genotype",
+         "position": 25,
+         "value": null,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntn_cf_iacucProtocol",
+         "title": "IACUC Protocol",
+         "position": 26,
+         "value": null,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntn_cf_institution",
+         "title": "Institution",
+         "position": 27,
+         "value": null,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntn_cf_labtracksGroup",
+         "title": "LabTracks Group",
+         "position": 28,
+         "value": null,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntn_cf_labtracksId",
+         "title": "Labtracks ID",
+         "position": 29,
+         "value": null,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntn_cf_lightcycle",
+         "title": "LightCycle",
+         "position": 30,
+         "value": null,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "INTEGER",
+         "name": "cntn_cf_mouseAge",
+         "title": "Mouse age (mo)",
+         "position": 31,
+         "value": null,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntn_cf_name",
+         "title": "Name",
+         "position": 32,
+         "value": null,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntn_cf_parentBarcode",
+         "title": "Parent barcode",
+         "position": 33,
+         "value": null,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntn_cf_pedigreeName",
+         "title": "Pedigree Name",
+         "position": 34,
+         "value": null,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "ENUM",
+         "name": "cntn_cf_sex",
+         "title": "Sex",
+         "position": 35,
+         "value": null,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntn_cf_slideBarcode",
+         "title": "Slide barcode",
+         "position": 36,
+         "value": null,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "ENUM",
+         "name": "cntn_cf_strain",
+         "title": "Strain",
+         "position": 37,
+         "value": null,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "FOREIGN_KEY",
+         "name": "cntn_fk_product_strain",
+         "title": "Product (filtering without version)",
+         "position": 38,
+         "value": null,
+         "hidden": false,
+         "editable": true,
+         "foreignTable": "Product",
+         "displayValue": null,
+         "displayField": "prdc_name",
+         "foreignDisplayColumn": "prdc_name"
+      },
+      {
+         "datatype": "STRING",
+         "name": "relationToProband",
+         "title": "Relation to proband",
+         "position": 39,
+         "value": null,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "FOREIGN_KEY",
+         "name": "father",
+         "title": "Father",
+         "position": 40,
+         "value": null,
+         "hidden": false,
+         "editable": true,
+         "foreignTable": "Content",
+         "displayValue": null,
+         "displayField": "father_display",
+         "foreignDisplayColumn": "cntn_id"
+      },
+      {
+         "datatype": "FOREIGN_KEY",
+         "name": "mother",
+         "title": "Mother",
+         "position": 41,
+         "value": null,
+         "hidden": false,
+         "editable": true,
+         "foreignTable": "Content",
+         "displayValue": null,
+         "displayField": "mother_display",
+         "foreignDisplayColumn": "cntn_id"
+      },
+      {
+         "datatype": "INTEGER",
+         "name": "derivedCount",
+         "title": "Derivation count",
+         "position": 42,
+         "value": 1,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "INTEGER",
+         "name": "ingredientCount",
+         "title": "Ingredient count",
+         "position": 43,
+         "value": 0,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "INTEGER",
+         "name": "mixCount",
+         "title": "Mix count",
+         "position": 44,
+         "value": 0,
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntn_createdBy",
+         "title": "Created by",
+         "position": 45,
+         "value": "PersonA",
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "DATE",
+         "name": "cntn_createdOn",
+         "title": "Created on",
+         "position": 46,
+         "value": 1665163934763,
+         "hidden": false,
+         "editable": true,
+         "dateFormat": "dd/MM/yyyy HH:mm:ss",
+         "subType": "datetime",
+         "timeZone": "America/Los_Angeles"
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntn_modifiedBy",
+         "title": "Modified by",
+         "position": 47,
+         "value": "admin",
+         "hidden": false,
+         "editable": true
+      },
+      {
+         "datatype": "DATE",
+         "name": "cntn_modifiedOn",
+         "title": "Modified on",
+         "position": 48,
+         "value": 1695826909725,
+         "hidden": false,
+         "editable": true,
+         "dateFormat": "dd/MM/yyyy HH:mm:ss",
+         "subType": "datetime",
+         "timeZone": "America/Los_Angeles"
+      },
+      {
+         "datatype": "FOREIGN_KEY",
+         "name": "flags",
+         "title": "Flags",
+         "position": 49,
+         "value": null,
+         "hidden": false,
+         "editable": true,
+         "foreignTable": "ContentEventType",
+         "displayValue": null,
+         "displayField": "cnvt_name",
+         "foreignDisplayColumn": "cnvt_name"
+      },
+      {
+         "datatype": "FOREIGN_KEY",
+         "name": "previousFlags",
+         "title": "Previous flags",
+         "position": 50,
+         "value": null,
+         "hidden": false,
+         "editable": true,
+         "foreignTable": "ContentEventType",
+         "displayValue": null,
+         "displayField": "cnvt_name",
+         "foreignDisplayColumn": "cnvt_name"
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntn_externalId",
+         "title": "External Id",
+         "position": 51,
+         "value": null,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "lctn_columns",
+         "title": "Columns",
+         "position": 52,
+         "value": null,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "INTEGER",
+         "name": "attachmentCount",
+         "title": "attachmentCount",
+         "position": 53,
+         "value": 0,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "BOOLEAN",
+         "name": "cntp_useBarcodeAsId",
+         "title": "Use barcode as id",
+         "position": 54,
+         "value": true,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "sorc_name",
+         "title": "Name",
+         "position": 55,
+         "value": null,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "BOOLEAN",
+         "name": "cntp_containerType",
+         "title": "Is a container type",
+         "position": 56,
+         "value": null,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "BOOLEAN",
+         "name": "lctp_positionLess",
+         "title": "Don't require positions",
+         "position": 57,
+         "value": null,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "BOOLEAN",
+         "name": "cntp_slimsGeneratesBarcode",
+         "title": "SLIMS generates a barcode for content of this type",
+         "position": 58,
+         "value": true,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "diss_name",
+         "title": "Name",
+         "position": 59,
+         "value": null,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "stts_name",
+         "title": "Name",
+         "position": 60,
+         "value": "Pending",
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntp_name",
+         "title": "Name",
+         "position": 61,
+         "value": "Mouse",
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "prvd_name",
+         "title": "Name",
+         "position": 62,
+         "value": null,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "father_display",
+         "title": "father_display",
+         "position": 63,
+         "value": null,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "lctn_barCode",
+         "title": "Barcode",
+         "position": 64,
+         "value": null,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "INTEGER",
+         "name": "xprs_input",
+         "title": "xprs_input",
+         "position": 65,
+         "value": null,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "lctn_name",
+         "title": "Name",
+         "position": 66,
+         "value": null,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "isNotNaFilter",
+         "title": "Field is not N/A",
+         "position": 67,
+         "value": null,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "grps_groupName",
+         "title": "Name",
+         "position": 68,
+         "value": null,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "INTEGER",
+         "name": "cntn_pk",
+         "title": "cntn_pk",
+         "position": 69,
+         "value": 1,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "INTEGER",
+         "name": "xprs_output",
+         "title": "xprs_output",
+         "position": 70,
+         "value": null,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "cntn_originalContentBarCode",
+         "title": "Original content barcode",
+         "position": 71,
+         "value": null,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "isNaFilter",
+         "title": "Field is N/A",
+         "position": 72,
+         "value": null,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "user_userName",
+         "title": "User name",
+         "position": 73,
+         "value": "PersonA",
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "mother_display",
+         "title": "mother_display",
+         "position": 74,
+         "value": null,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "STRING",
+         "name": "lctn_rows",
+         "title": "Rows",
+         "position": 75,
+         "value": null,
+         "hidden": true,
+         "editable": true
+      },
+      {
+         "datatype": "BOOLEAN",
+         "name": "cntp_canEnrollInStudy",
+         "title": "Can enroll in a study",
+         "position": 76,
+         "value": true,
+         "hidden": true,
+         "editable": true
+      }
+   ],
+   "canUpdate": true,
+   "canDelete": true,
+   "links": [
+      {
+         "rel": "self",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Content/1"
+      },
+      {
+         "rel": "cntn_fk_category",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/ContentType/2"
+      },
+      {
+         "rel": "cntn_fk_contentType",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/ContentType/5"
+      },
+      {
+         "rel": "cntn_fk_status",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Status/28"
+      },
+      {
+         "rel": "cntn_fk_user",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/User/5"
+      },
+      {
+         "rel": "-prjo_fk_content",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/PrinterJob?prjo_fk_content=1"
+      },
+      {
+         "rel": "-flfm_fk_content",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Fulfillment?flfm_fk_content=1"
+      },
+      {
+         "rel": "-cnvn_fk_content",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/ContentEvent?cnvn_fk_content=1"
+      },
+      {
+         "rel": "-cnst_fk_content",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/ContentStudy?cnst_fk_content=1"
+      },
+      {
+         "rel": "-rlrn_fk_content",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/RuleRun?rlrn_fk_content=1"
+      },
+      {
+         "rel": "-qtus_fk_content",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/QuantityUsage?qtus_fk_content=1"
+      },
+      {
+         "rel": "-ccpt_fk_content",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Occupation?ccpt_fk_content=1"
+      },
+      {
+         "rel": "-corl_fk_to",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/ContentRelation?corl_fk_to=1"
+      },
+      {
+         "rel": "-corl_fk_from",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/ContentRelation?corl_fk_from=1"
+      },
+      {
+         "rel": "-ssnc_fk_content",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/SavedSelectionContent?ssnc_fk_content=1"
+      },
+      {
+         "rel": "-rdcn_fk_content",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/OrderContent?rdcn_fk_content=1"
+      },
+      {
+         "rel": "-rqst_fk_content",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Request?rqst_fk_content=1"
+      },
+      {
+         "rel": "-cntn_pk",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Schedule?cntn_pk=1"
+      },
+      {
+         "rel": "-qlng_fk_content",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/QueueElementIngredient?qlng_fk_content=1"
+      },
+      {
+         "rel": "-qlag_fk_content",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/QueueElementAggregator?qlag_fk_content=1"
+      },
+      {
+         "rel": "-tpnr_fk_batch",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/TimepointEnrollment?tpnr_fk_batch=1"
+      },
+      {
+         "rel": "-ssnr_fk_content",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/StabilityStudyEnrollment?ssnr_fk_content=1"
+      },
+      {
+         "rel": "-qulm_fk_content",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/QueueElement?qulm_fk_content=1"
+      },
+      {
+         "rel": "-xrsc_fk_content",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/ExperimentRunStepContent?xrsc_fk_content=1"
+      },
+      {
+         "rel": "-kitc_fk_content",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/KitContent?kitc_fk_content=1"
+      },
+      {
+         "rel": "-nrcn_fk_content",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/InstrumentRunContent?nrcn_fk_content=1"
+      },
+      {
+         "rel": "-rslt_fk_content",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Result?rslt_fk_content=1"
+      },
+      {
+         "rel": "-rslt_cf_fk_primaryAntibody",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Result?rslt_cf_fk_primaryAntibody=1"
+      },
+      {
+         "rel": "-rslt_cf_fk_secondaryAntibody",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Result?rslt_cf_fk_secondaryAntibody=1"
+      },
+      {
+         "rel": "-rslt_cf_fk_virus",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Result?rslt_cf_fk_virus=1"
+      },
+      {
+         "rel": "-rslt_fk_batch",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Result?rslt_fk_batch=1"
+      },
+      {
+         "rel": "-ordr_cf_fk_dye",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Order?ordr_cf_fk_dye=1"
+      },
+      {
+         "rel": "-ordr_fk_batch",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Order?ordr_fk_batch=1"
+      },
+      {
+         "rel": "-cntn_fk_originalContent",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Content?cntn_fk_originalContent=1"
+      },
+      {
+         "rel": "-cntn_cf_fk_primaryStain",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Content?cntn_cf_fk_primaryStain=1"
+      },
+      {
+         "rel": "-cntn_cf_fk_secondaryStain",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Content?cntn_cf_fk_secondaryStain=1"
+      },
+      {
+         "rel": "-father",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Content?father=1"
+      },
+      {
+         "rel": "-mother",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Content?mother=1"
+      },
+      {
+         "rel": "-pptp_fk_content",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/PlatePositionOutput?pptp_fk_content=1"
+      },
+      {
+         "rel": "attachments",
+         "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/attachment/Content/1"
+      }
+   ]
+}

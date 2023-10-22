@@ -273,7 +273,7 @@ class ContentsTableRow(BaseModel):
         """
         columns_info = [
             ContentsTableColumnInfo.parse_obj(c)
-            for c in record.__dict__["json_entity"]["columns"]
+            for c in record.json_entity["columns"]
         ]
         return [c.map_to_field_str() for c in columns_info]
 
