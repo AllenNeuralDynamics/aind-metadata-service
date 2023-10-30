@@ -9,7 +9,7 @@ license = {text = "MIT"}
 authors = [
     {name = "Allen Institute for Neural Dynamics"}
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3"
 ]
@@ -36,6 +36,7 @@ server = [
     'pydantic<2.0',
     'pyodbc',
     'office365-rest-python-client==2.4.1',
+    'smartsheet-python-sdk==3.0.2',
     'fastapi',
     'uvicorn[standard]',
     'python-dateutil'
@@ -54,7 +55,7 @@ readme = {file = ["README.md"]}
 
 [tool.black]
 line-length = 79
-target_version = ['py36']
+target_version = ['py38']
 exclude = '''
 
 (
