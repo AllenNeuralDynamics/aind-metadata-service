@@ -2955,8 +2955,7 @@ class MappedNSBList:
                 alternating_current=self.aind_inj1_alternating_time,
                 inj_duration=self.aind_inj1_ionto_time,
                 inj_volume=self._map_burr_hole_volume(
-                    vol=self.aind_inj1volperdepth,
-                    dv=coordinate_depth
+                    vol=self.aind_inj1volperdepth, dv=coordinate_depth
                 ),
                 fiber_implant_depth=self.aind_fiber_implant1_dv,
             )
@@ -2979,8 +2978,7 @@ class MappedNSBList:
                 alternating_current=self.aind_inj2_alternating_time,
                 inj_duration=self.aind_inj2_ionto_time,
                 inj_volume=self._map_burr_hole_volume(
-                    vol=self.aind_inj2volperdepth,
-                    dv=coordinate_depth
+                    vol=self.aind_inj2volperdepth, dv=coordinate_depth
                 ),
                 fiber_implant_depth=self.aind_fiber_implant2_dv,
             )
@@ -3003,8 +3001,7 @@ class MappedNSBList:
                 alternating_current=self.aind_inj3_alternating_time,
                 inj_duration=self.aind_inj3_ionto_time,
                 inj_volume=self._map_burr_hole_volume(
-                    vol=self.aind_inj3volperdepth,
-                    dv=coordinate_depth
+                    vol=self.aind_inj3volperdepth, dv=coordinate_depth
                 ),
                 fiber_implant_depth=self.aind_fiber_implant3_d_x00,
             )
@@ -3027,8 +3024,7 @@ class MappedNSBList:
                 alternating_current=self.aind_inj4_alternating_time,
                 inj_duration=self.aind_inj4_ionto_time,
                 inj_volume=self._map_burr_hole_volume(
-                    vol=self.aind_inj4volperdepth,
-                    dv=coordinate_depth
+                    vol=self.aind_inj4volperdepth, dv=coordinate_depth
                 ),
                 fiber_implant_depth=self.aind_fiber_implant4_d_x00,
             )
@@ -3051,8 +3047,7 @@ class MappedNSBList:
                 alternating_current=self.aind_inj5_alternating_time,
                 inj_duration=self.aind_inj5_ionto_time,
                 inj_volume=self._map_burr_hole_volume(
-                    vol=self.aind_inj5volperdepth,
-                    dv=coordinate_depth
+                    vol=self.aind_inj5volperdepth, dv=coordinate_depth
                 ),
                 fiber_implant_depth=self.aind_fiber_implant5_d_x00,
             )
@@ -3075,8 +3070,7 @@ class MappedNSBList:
                 alternating_current=self.aind_inj6_alternating_time,
                 inj_duration=self.aind_inj6_ionto_time,
                 inj_volume=self._map_burr_hole_volume(
-                    vol=self.aind_inj6volperdepth,
-                    dv=coordinate_depth
+                    vol=self.aind_inj6volperdepth, dv=coordinate_depth
                 ),
                 fiber_implant_depth=self.aind_fiber_implant6_d_x00,
             )
