@@ -38,7 +38,7 @@
         "workstation_id": null,
         "instrument_id": null,
         "procedure_type": "Retro-orbital injection",
-        "injection_volume": 1.0,
+        "injection_volume": [1.0],
         "injection_volume_unit": "microliter",
         "injection_eye": "Left"
       },
@@ -76,7 +76,7 @@
         "instrument_id": null,
         "injection_coordinate_ml": 1.0,
         "injection_coordinate_ap": 1.0,
-        "injection_coordinate_depth": 1.0,
+        "injection_coordinate_depth": [1.0],
         "injection_coordinate_unit": "millimeter",
         "injection_coordinate_reference": "Bregma",
         "bregma_to_lambda_distance": 4.1,
@@ -86,7 +86,7 @@
         "targeted_structure": "VISp6",
         "injection_hemisphere": null,
         "procedure_type": "Nanoject injection",
-        "injection_volume": 1.0,
+        "injection_volume": [1.0],
         "injection_volume_unit": "nanoliter"
       },
       {
@@ -113,7 +113,7 @@
             "targeted_structure": "MOp",
             "stereotactic_coordinate_ap": 1.0,
             "stereotactic_coordinate_ml": 3.0,
-            "stereotactic_coordinate_dv": 2.0,
+            "stereotactic_coordinate_dv": [2.0],
             "stereotactic_coordinate_unit": "millimeter",
             "stereotactic_coordinate_reference": "Bregma",
             "bregma_to_lambda_distance": 4.1,

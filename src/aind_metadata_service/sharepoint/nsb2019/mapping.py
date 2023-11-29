@@ -314,9 +314,10 @@ class MappedNSBList:
         return self._nsb.date_range_start
 
     @property
-    def aind_dv2nd_inj(self) -> Optional[float]:
+    def aind_dv2nd_inj(self) -> Optional[List[float]]:
         """Maps dv2nd_inj to aind model"""
-        return self._parse_dv_str(self._nsb.dv2nd_inj)
+        dv = self._parse_dv_str(self._nsb.dv2nd_inj)
+        return None if dv is None else [dv]
 
     @property
     def aind_editor_id(self) -> Optional[int]:
@@ -334,9 +335,10 @@ class MappedNSBList:
         return self._nsb.fiber_implant1
 
     @property
-    def aind_fiber_implant1_dv(self) -> Optional[float]:
+    def aind_fiber_implant1_dv(self) -> Optional[List[float]]:
         """Maps fiber_implant1_dv to aind model"""
-        return self._parse_dv_str(self._nsb.fiber_implant1_dv)
+        dv = self._parse_dv_str(self._nsb.fiber_implant1_dv)
+        return None if dv is None else [dv]
 
     @property
     def aind_fiber_implant2(self) -> Optional[bool]:
@@ -344,9 +346,10 @@ class MappedNSBList:
         return self._nsb.fiber_implant2
 
     @property
-    def aind_fiber_implant2_dv(self) -> Optional[float]:
+    def aind_fiber_implant2_dv(self) -> Optional[List[float]]:
         """Maps fiber_implant2_dv to aind model"""
-        return self._parse_dv_str(self._nsb.fiber_implant2_dv)
+        dv = self._parse_dv_str(self._nsb.fiber_implant2_dv)
+        return None if dv is None else [dv]
 
     @property
     def aind_field30(self) -> Optional[str]:
@@ -713,9 +716,10 @@ class MappedNSBList:
         return self._parse_virus_strain_str(self._nsb.inj1_virus_strain_rt)
 
     @property
-    def aind_inj1_vol(self) -> Optional[str]:
+    def aind_inj1_vol(self) -> Optional[List[float]]:
         """Maps inj1_vol to aind model"""
-        return self._parse_inj_vol_str(self._nsb.inj1_vol)
+        vol = self._parse_inj_vol_str(self._nsb.inj1_vol)
+        return None if vol is None else [vol]
 
     @property
     def aind_inj1angle0(self) -> Optional[float]:
@@ -735,9 +739,10 @@ class MappedNSBList:
         )
 
     @property
-    def aind_inj1volperdepth(self) -> Optional[float]:
+    def aind_inj1volperdepth(self) -> Optional[List[float]]:
         """Maps inj1volperdepth to aind model"""
-        return self._parse_inj_vol_str(self._nsb.inj1volperdepth)
+        volperdepth = self._parse_inj_vol_str(self._nsb.inj1volperdepth)
+        return None if volperdepth is None else [volperdepth]
 
     @property
     def aind_inj2_alternating_time(self) -> Optional[float]:
@@ -797,9 +802,10 @@ class MappedNSBList:
         return self._parse_virus_strain_str(self._nsb.inj2_virus_strain_rt)
 
     @property
-    def aind_inj2_vol(self) -> Optional[float]:
+    def aind_inj2_vol(self) -> Optional[List[float]]:
         """Maps inj2_vol to aind model"""
-        return self._parse_inj_vol_str(self._nsb.inj2_vol)
+        vol = self._parse_inj_vol_str(self._nsb.inj2_vol)
+        return None if vol is None else [vol]
 
     @property
     def aind_inj2angle0(self) -> Optional[float]:
@@ -819,9 +825,10 @@ class MappedNSBList:
         )
 
     @property
-    def aind_inj2volperdepth(self) -> Optional[float]:
+    def aind_inj2volperdepth(self) -> Optional[List[float]]:
         """Maps inj2volperdepth to aind model"""
-        return self._parse_inj_vol_str(self._nsb.inj2volperdepth)
+        volperdepth = self._parse_inj_vol_str(self._nsb.inj2volperdepth)
+        return None if volperdepth is None else [volperdepth]
 
     @property
     def aind_ionto_number_hpinj(self) -> Optional[str]:
@@ -1201,9 +1208,10 @@ class MappedNSBList:
         return self._parse_ap_str(self._nsb.virus_a_p)
 
     @property
-    def aind_virus_d_v(self) -> Optional[float]:
+    def aind_virus_d_v(self) -> Optional[List[float]]:
         """Maps virus_d_v to aind model"""
-        return self._parse_dv_str(self._nsb.virus_d_v)
+        dv = self._parse_dv_str(self._nsb.virus_d_v)
+        return None if dv is None else [dv]
 
     @property
     def aind_virus_hemisphere(self) -> Optional[Side]:
