@@ -69,7 +69,6 @@ class TestNSB2019Parsers(TestCase):
                 json.loads(p.json()) for p in mapped_procedures
             ]
             mapped_procedure_json.sort(key=lambda x: str(x))
-            print(mapped_procedure_json)
 
             self.assertEqual(expected_mapped_data, mapped_procedure_json)
 
