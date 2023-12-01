@@ -68,6 +68,7 @@ class ModelResponse(Generic[T]):
             message = "No Data Found."
         elif len(self.aind_models) == 1:
             aind_model = self.aind_models[0]
+            # TODO: fix validation error catching
             *_, validation_error = validate_model(
                 aind_model.__class__, aind_model.__dict__
             )

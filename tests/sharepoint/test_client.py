@@ -375,7 +375,7 @@ class TestSharepointClient(unittest.TestCase):
         mock_log.assert_called_once_with("BrokenPipeError()")
 
     @patch("aind_metadata_service.sharepoint.client.ClientContext")
-    def test_merge_3_responses(self, mock_sharepoint_client: MagicMock):
+    def test_merge_three_responses(self, mock_sharepoint_client: MagicMock):
         """Tests that multi status is returned as expected."""
         inner_mock = MagicMock()
         mock_sharepoint_client.return_value.with_credentials.return_value = (
