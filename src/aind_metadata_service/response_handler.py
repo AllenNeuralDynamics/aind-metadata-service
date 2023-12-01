@@ -81,6 +81,10 @@ class ModelResponse(Generic[T]):
             else:
                 status_code = StatusCodes.VALID_DATA.value
                 message = "Valid Model."
+            if self.status_code == StatusCodes.MULTI_STATUS:
+                status_code = self.status_code.value
+                message = self.message + message
+
         else:
             status_code = StatusCodes.MULTIPLE_RESPONSES.value
             message = "Multiple Items Found."
