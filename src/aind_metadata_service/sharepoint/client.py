@@ -254,13 +254,14 @@ class SharePointClient:
                     aind_models=procedures,
                     status_code=StatusCodes.MULTI_STATUS,
                     message=(
-                        "There was an error retrieving records from one or more "
-                        "of the databases."
+                        "There was an error retrieving records from one or "
+                        "more of the databases."
                     ),
                 )
             else:
                 return ModelResponse(
-                    aind_models=procedures, status_code=StatusCodes.DB_RESPONDED
+                    aind_models=procedures,
+                    status_code=StatusCodes.DB_RESPONDED,
                 )
 
     def merge_responses(
