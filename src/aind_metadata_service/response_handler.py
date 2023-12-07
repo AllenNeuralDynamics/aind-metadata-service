@@ -68,6 +68,7 @@ class ModelResponse(Generic[T]):
             message = "No Data Found."
         elif len(self.aind_models) == 1:
             aind_model = self.aind_models[0]
+            # TODO: fix validation error catching
             *_, validation_error = validate_model(
                 aind_model.__class__, aind_model.__dict__
             )
@@ -81,6 +82,10 @@ class ModelResponse(Generic[T]):
             else:
                 status_code = StatusCodes.VALID_DATA.value
                 message = "Valid Model."
+            if self.status_code == StatusCodes.MULTI_STATUS:
+                status_code = self.status_code.value
+                message = self.message + message
+
         else:
             status_code = StatusCodes.MULTIPLE_RESPONSES.value
             message = "Multiple Items Found."

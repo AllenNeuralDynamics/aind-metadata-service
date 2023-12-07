@@ -246,9 +246,23 @@ class SharePointClient:
                 left_procedures=left_procedures,
                 right_procedures=right_procedures,
             )
-            return ModelResponse(
-                aind_models=procedures, status_code=StatusCodes.DB_RESPONDED
-            )
+            if (
+                left_model_response.status_code == StatusCodes.MULTI_STATUS
+                or right_model_response.status_code == StatusCodes.MULTI_STATUS
+            ):
+                return ModelResponse(
+                    aind_models=procedures,
+                    status_code=StatusCodes.MULTI_STATUS,
+                    message=(
+                        "There was an error retrieving records from one or "
+                        "more of the databases."
+                    ),
+                )
+            else:
+                return ModelResponse(
+                    aind_models=procedures,
+                    status_code=StatusCodes.DB_RESPONDED,
+                )
 
     def merge_responses(
         self, model_responses: List[ModelResponse[Procedures]]
