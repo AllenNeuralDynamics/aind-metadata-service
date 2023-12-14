@@ -4,19 +4,8 @@ import requests
 
 from pydantic import BaseSettings, Field, SecretStr
 from azure.identity import ClientSecretCredential
-from enum import Enum
-
-
-class APICalls(Enum):
-    """Enum of different API calls for TARS"""
-    REFERENCE_GENOMES = "/api/v1/ReferenceGenomes"
-    TITER_IMPORTS = "/api/v1/TiterImports"
-    TITER_TYPES = "/api/v1/TiterTypes"
-    VIRAL_PREP_IMPORTS = "/api/v1/ViralPrepImports"
-    VIRAL_PREP_LOTS = "/api/v1/ViralPrepLots"
-    VIRAL_PREPS = "/api/v1/ViralPreps"
-    VIRAL_PREP_TYPES = "/api/v1/ViralPrepTypes"
-    DEFAULT_ORDER = "order=1&orderBy=id"
+from aind_metadata_service.tars.query_builder import TarsQueries
+from aind_metadata_service.tars.mapping import TarsResponseHandler
 
 
 class AzureSettings(BaseSettings):
@@ -67,37 +56,19 @@ class TarsClient:
 
     @property
     def get_headers(self):
-        return f"Authorization: Bearer {self.get_access_token}"
+        return {"Authorization": f"Bearer {self.get_access_token}"}
 
-    def get_injection_materials_info(self, viral_prep_number):
-        """Retrieve UUID for TARS with prep lot number"""
-        request_str = self.resource + APICalls.VIRAL_PREP_LOTS.value
-        search_str = f"?order=1&orderBy=ViralPrepLots.lot&searchFields=lot&search={viral_prep_number}"
-        request = requests.get(request_str + search_str)
-        data = request.json()['data'][0]
-        # NOTE: there should only be one data
-        prep_date = data['datePrepped'] #convert to date
-        viral_prep_type = data['viralPrep']['viralPrepType']['name'] # split into prep_type and prep_protocol
-
-
-class ViralPrepTypes(Enum):
-    """"""
-    CRUDE_SOP = "Crude-SOP#VC002"
-    PURIFIED_SOP = "Purified-SOP#VC003"
-    CRUDE_HGT = "Crude-HGT"
-    RABIES_SOP = "Rabies-SOP#VC001"
-    CRUDE_PHP_SOP = "CrudePHPeB-SOP#VC004"
-    CRUDE_MGT2 = "Crude-MGT#2.0"
-    CRUDE_MGT1 = "Crude-MGT#1.0"
-    PURIFIED_MGT1 = "Purified-MGT#1.0"
-    PHP_SOP_UW = "PHPeB-SOP-UW"
-    CRUDE_HGT1 = "Crude-HGT#1.0"
-    VTC_AAV1 = "VTC-AAV1"
-    UNKNOWN = "Unknown"
-    IODIXANOL = "Iodixanol gradient purification (large scale preps)"
+    def get_injection_materials_info(self, prep_lot_number):
+        """perform GET request"""
+        headers = self.get_headers
+        query = TarsQueries.prep_lot_from_number(resource=self.resource, prep_lot_number=prep_lot_number)
+        response = requests.get(query, headers=headers)
+        trh = TarsResponseHandler()
+        injection_materials = trh.map_response_to_injection_materials(response)
+        return injection_materials
 
 
-class TarsResponseHandler:
-    """This class will contain methods to handle the response from TARS"""
+
+
 
 

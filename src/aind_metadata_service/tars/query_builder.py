@@ -31,9 +31,9 @@ class TarsQueries:
     @staticmethod
     def prep_lot_from_number(resource: str, prep_lot_number: str) -> str:
         """Retrieves the information to populate injection materials metadata"""
-        prep_lot = f"{resource}{APICalls.VIRAL_PREP_LOTS.value}" \
+        query = f"{resource}{APICalls.VIRAL_PREP_LOTS.value}" \
                    f"?{URLQueries.DEFAULT_ORDER.value}" \
                    f"&{URLQueries.SEARCH_FIELDS.value}={QuerySearchFieldValues.LOT.value}" \
                    f"&{URLQueries.SEARCH.value}={prep_lot_number}"
-        return prep_lot
+        return query
 

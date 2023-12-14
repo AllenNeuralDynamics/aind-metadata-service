@@ -1,4 +1,4 @@
-"""Module to create clients to connect to databases."""
+"""Module to create clients to connect to labtracks database."""
 import logging
 from enum import Enum
 from typing import List, Optional
