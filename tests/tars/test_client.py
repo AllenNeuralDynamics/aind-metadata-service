@@ -10,7 +10,7 @@ from aind_metadata_service.tars.client import (
 )
 
 
-class TestLabTracksSettings(unittest.TestCase):
+class TestAzureSettings(unittest.TestCase):
     """Class to test methods for AzureSettings."""
 
     EXAMPLE_ENV_VAR1 = {
@@ -54,3 +54,44 @@ class TestLabTracksSettings(unittest.TestCase):
         )
 
         self.assertEqual(expected_error_message, repr(e.exception))
+
+
+class TestTarsClient(unittest.TestCase):
+    """Tests client methods"""
+
+    def setUp(self):
+        self.azure_settings = AzureSettings(
+            tenant_id="your_tenant_id",
+            client_id="your_client_id",
+            client_secret="your_client_secret",
+            scope="your_scope",
+        )
+
+        # Create a mock resource string for testing
+        self.resource = "https://your_resource"
+
+    @patch("aind_metadata_service.tars.client.ClientSecretCredential")
+    def test_get_access_token(self, mock_credential):
+        mock_credential.return_value.get_token.return_value = (
+            "mock_token",
+            "mock_exp",
+        )
+        tars_client = TarsClient(self.azure_settings, self.resource)
+
+        # Ensure that get_access_token returns the expected token value
+        expected_token = "mock_token"
+        self.assertEqual(tars_client.get_access_token, expected_token)
+
+    @patch("aind_metadata_service.tars.client.ClientSecretCredential")
+    def test_get_headers(self, mock_credential):
+        mock_credential.return_value.get_token.return_value = (
+            "mock_token",
+            "mock_exp",
+        )
+        tars_client = TarsClient(self.azure_settings, self.resource)
+        expected_headers = {"Authorization": "Bearer mock_token"}
+        self.assertEqual(tars_client.get_headers, expected_headers)
+
+
+if __name__ == "__main__":
+    unittest.main()

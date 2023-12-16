@@ -13,21 +13,15 @@ class AzureSettings(BaseSettings):
     class constructor arguments."""
 
     tenant_id: str = Field(
-        ...,
-        description="The ID of the AllenInstituteB2C Azure tenant."
+        ..., description="The ID of the AllenInstituteB2C Azure tenant."
     )
     client_id: str = Field(
-        ...,
-        description="Client ID of the service account accessing resource."
+        ..., description="Client ID of the service account accessing resource."
     )
     client_secret: SecretStr = Field(
-        ...,
-        description="Secret used to access the account."
+        ..., description="Secret used to access the account."
     )
-    scope: str = Field(
-        ...,
-        description="Scope"
-    )
+    scope: str = Field(..., description="Scope")
 
 
 class TarsClient:
@@ -42,7 +36,7 @@ class TarsClient:
         self.credentials = ClientSecretCredential(
             tenant_id=azure_settings.tenant_id,
             client_id=azure_settings.client_id,
-            client_secret=azure_settings.client_secret.get_secret_value()
+            client_secret=azure_settings.client_secret.get_secret_value(),
         )
         self.scope = azure_settings.scope
         self.resource = resource
@@ -50,8 +44,7 @@ class TarsClient:
     @property
     def get_access_token(self):
         """Retrieves Access Token"""
-        credential = self.credentials
-        token, exp = credential.get_token(self.scope)
+        token, exp = self.credentials.get_token(self.scope)
         return token
 
     @property
@@ -61,14 +54,10 @@ class TarsClient:
     def get_injection_materials_info(self, prep_lot_number):
         """perform GET request"""
         headers = self.get_headers
-        query = TarsQueries.prep_lot_from_number(resource=self.resource, prep_lot_number=prep_lot_number)
+        query = TarsQueries.prep_lot_from_number(
+            resource=self.resource, prep_lot_number=prep_lot_number
+        )
         response = requests.get(query, headers=headers)
         trh = TarsResponseHandler()
         injection_materials = trh.map_response_to_injection_materials(response)
         return injection_materials
-
-
-
-
-
-
