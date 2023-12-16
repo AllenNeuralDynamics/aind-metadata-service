@@ -28,7 +28,7 @@ dev = [
     'flake8',
     'interrogate',
     'isort',
-    'Sphinx'
+    'Sphinx',
 ]
 
 server = [
