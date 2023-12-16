@@ -91,14 +91,19 @@ class TestTarsClient(unittest.TestCase):
         expected_headers = {"Authorization": "Bearer mock_token"}
         self.assertEqual(tars_client.get_headers, expected_headers)
 
-    @patch('aind_metadata_service.tars.client.ClientSecretCredential')
+    @patch("aind_metadata_service.tars.client.ClientSecretCredential")
     # @patch('aind_metadata_service.tars.client.requests.get')
     # @patch("aind_metadata_service.tars.client.TarsResponseHandler.map_response_to_injection_materials")
     def test_get_injection_materials_info(self, mock_credential):
         """Tests that client can fetch injection materials."""
-        mock_credential.return_value.get_token.return_value = ("mock_token", "mock_exp")
+        mock_credential.return_value.get_token.return_value = (
+            "mock_token",
+            "mock_exp",
+        )
         tars_client = TarsClient(self.azure_settings, self.resource)
-        
+        url_query = "https://some_resource/api/v1/ViralPrepLots?" \
+                    "order=1&orderBy=id&searchFields=lot&search=12345"
+
         with requests_mock.mock() as mock_request:
             mock_get_response = {
                 "data": [
@@ -106,24 +111,27 @@ class TestTarsClient(unittest.TestCase):
                         "lot": "12345",
                         "datePrepped": "2023-12-15T12:34:56Z",
                         "viralPrep": {
-                            "viralPrepType": {
-                                "name": "Crude-SOP#VC002"
-                            },
+                            "viralPrepType": {"name": "Crude-SOP#VC002"},
                             "virus": {
-                                "aliases": [{"name": "AiP123"}, {"name": "AiV456"}, {"name": "rAAV-MGT_789"}]
+                                "aliases": [
+                                    {"name": "AiP123"},
+                                    {"name": "AiV456"},
+                                    {"name": "rAAV-MGT_789"},
+                                ]
                             },
                         },
                     }
                 ]
             }
-            
+
             mock_request.get(
-                'https://some_resource/api/v1/ViralPrepLots?order=1&orderBy=id&searchFields=lot&search=12345',
-                text=json.dumps(mock_get_response))
+                url_query,
+                text=json.dumps(mock_get_response),
+            )
             result = tars_client.get_injection_materials_info("12345")
 
-        self.assertEqual(result.name, 'rAAV-MGT_789')
-        self.assertEqual(result.prep_protocol, 'SOP#VC002')
+        self.assertEqual(result.name, "rAAV-MGT_789")
+        self.assertEqual(result.prep_protocol, "SOP#VC002")
         mock_credential.return_value.get_token.assert_called_once()
 
 
