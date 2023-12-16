@@ -4,10 +4,7 @@ import os
 import unittest
 from unittest.mock import patch
 
-from aind_metadata_service.tars.client import (
-    AzureSettings,
-    TarsClient,
-)
+from aind_metadata_service.tars.client import AzureSettings, TarsClient
 
 
 class TestAzureSettings(unittest.TestCase):
@@ -60,6 +57,7 @@ class TestTarsClient(unittest.TestCase):
     """Tests client methods"""
 
     def setUp(self):
+        """Sets up Test TarsClient methods"""
         self.azure_settings = AzureSettings(
             tenant_id="your_tenant_id",
             client_id="your_client_id",
@@ -72,6 +70,7 @@ class TestTarsClient(unittest.TestCase):
 
     @patch("aind_metadata_service.tars.client.ClientSecretCredential")
     def test_get_access_token(self, mock_credential):
+        """Tests that token is retrieved as expected."""
         mock_credential.return_value.get_token.return_value = (
             "mock_token",
             "mock_exp",
@@ -84,6 +83,7 @@ class TestTarsClient(unittest.TestCase):
 
     @patch("aind_metadata_service.tars.client.ClientSecretCredential")
     def test_get_headers(self, mock_credential):
+        """Tests that headers is created as expected."""
         mock_credential.return_value.get_token.return_value = (
             "mock_token",
             "mock_exp",

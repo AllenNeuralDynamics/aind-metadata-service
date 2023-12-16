@@ -1,18 +1,22 @@
-"""Module for mapping"""
+"""Module to test TARS mapping."""
 import unittest
+from datetime import date, datetime
 from unittest.mock import MagicMock
-from datetime import datetime, date
+
 from aind_metadata_service.tars.mapping import (
+    InjectionMaterial,
+    PrepProtocols,
     TarsResponseHandler,
     ViralPrepTypes,
     VirusPrepType,
-    PrepProtocols,
-    InjectionMaterial,
 )
 
 
 class TestTarsResponseHandler(unittest.TestCase):
+    """Class to test methods of TarsResponseHandler"""
+
     def test_map_prep_type_and_protocol(self):
+        """Tests that prep_type and protocol are mapped as expected."""
         (
             prep_type,
             prep_protocol,
@@ -95,6 +99,7 @@ class TestTarsResponseHandler(unittest.TestCase):
         self.assertIsNone(prep_protocol)
 
     def test_convert_datetime(self):
+        """Tests that datetime is converted as expected."""
         valid_date = "2023-12-15T12:34:56Z"
         invalid_date = "12/15/2023"
 
@@ -107,6 +112,7 @@ class TestTarsResponseHandler(unittest.TestCase):
         self.assertIsNone(converted_invalid_date)
 
     def test_map_virus_aliases(self):
+        """Tests that aliases are mapped to fields as expected."""
         aliases = [
             {"name": "AiP123"},
             {"name": "AiV456"},
@@ -124,6 +130,7 @@ class TestTarsResponseHandler(unittest.TestCase):
         self.assertEqual(full_genome_name, "UnknownVirus")
 
     def test_map_response_to_injection_materials(self):
+        """Tests that injection materials are mapped as expected."""
         response_data = {
             "data": [
                 {

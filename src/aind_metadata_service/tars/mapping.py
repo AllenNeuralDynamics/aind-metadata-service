@@ -1,9 +1,10 @@
 """Module to map data in TARS to aind_data_schema InjectionMaterial"""
 
-from enum import Enum
-from aind_data_schema.procedures import VirusPrepType, InjectionMaterial
-from datetime import datetime
 import re
+from datetime import datetime
+from enum import Enum
+
+from aind_data_schema.procedures import InjectionMaterial, VirusPrepType
 
 
 class ViralPrepTypes(Enum):
@@ -39,6 +40,9 @@ class PrepProtocols(Enum):
 
 
 class VirusAliasPatterns(Enum):
+    """Virus Alias Patterns"""
+
+    # TODO: add pattern for genome_name once confirmed
     AIP = re.compile(r"^AiP[a-zA-Z0-9_-]+$")
     AIV = re.compile(r"^AiV[a-zA-Z0-9_-]+$")
 
@@ -101,7 +105,7 @@ class TarsResponseHandler:
         return datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ")
 
     @staticmethod
-    def _map_virus_aliases(aliases: list):
+    def _map_virus_aliases(aliases: list) -> tuple[str, str, str]:
         """Maps aliases to full_genome_name, material_id, viral prep id"""
         material_id, viral_prep_id, full_genome_name = None, None, None
         for alias in aliases:
@@ -115,8 +119,17 @@ class TarsResponseHandler:
                 full_genome_name = name
         return material_id, viral_prep_id, full_genome_name
 
-    def map_response_to_injection_materials(self, response):
-        """Map prep lot dictionary to injection materials"""
+    def map_response_to_injection_materials(
+        self, response
+    ) -> InjectionMaterial:
+        """
+        Map prep lot dictionary to injection materials.
+        Parameters
+        ----------
+        response: requests.models.Response
+            Response from GET Request.
+        """
+        print("RESPONSE TYPE", type(response))
         data = response.json()["data"][0]
         prep_lot_number = data["lot"]
         prep_date = self._convert_datetime(data["datePrepped"])

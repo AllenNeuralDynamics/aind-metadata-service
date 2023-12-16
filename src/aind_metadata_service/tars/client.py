@@ -1,11 +1,12 @@
 """Module to instantiate a client to connect to TARS and retrieve data."""
 
 import requests
-
-from pydantic import BaseSettings, Field, SecretStr
+from aind_data_schema.procedures import InjectionMaterial
 from azure.identity import ClientSecretCredential
-from aind_metadata_service.tars.query_builder import TarsQueries
+from pydantic import BaseSettings, Field, SecretStr
+
 from aind_metadata_service.tars.mapping import TarsResponseHandler
+from aind_metadata_service.tars.query_builder import TarsQueries
 
 
 class AzureSettings(BaseSettings):
@@ -32,6 +33,10 @@ class TarsClient:
         Class constructor
         Parameters
         ----------
+        azure_settings: AzureSettings
+            Settings to define Azure ClientSecretCredential
+        resource: str
+            URL resource to query
         """
         self.credentials = ClientSecretCredential(
             tenant_id=azure_settings.tenant_id,
@@ -49,10 +54,19 @@ class TarsClient:
 
     @property
     def get_headers(self):
+        """Builds headers for GET request."""
         return {"Authorization": f"Bearer {self.get_access_token}"}
 
-    def get_injection_materials_info(self, prep_lot_number):
-        """perform GET request"""
+    def get_injection_materials_info(
+        self, prep_lot_number: str
+    ) -> InjectionMaterial:
+        """
+        Performs GET request.
+        Parameters
+        ----------
+        prep_lot_number: str
+            Prep lot number used to query TARS.
+        """
         headers = self.get_headers
         query = TarsQueries.prep_lot_from_number(
             resource=self.resource, prep_lot_number=prep_lot_number
