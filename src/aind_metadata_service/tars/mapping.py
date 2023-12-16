@@ -129,7 +129,6 @@ class TarsResponseHandler:
         response: requests.models.Response
             Response from GET Request.
         """
-        print("RESPONSE TYPE", type(response))
         data = response.json()["data"][0]
         prep_lot_number = data["lot"]
         prep_date = self._convert_datetime(data["datePrepped"])
