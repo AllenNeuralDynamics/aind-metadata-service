@@ -3,9 +3,9 @@
 from datetime import date, datetime
 from typing import List, Optional, Union
 
-from pydantic import BaseModel, Field
-from pydantic.typing import Literal
+from pydantic import BaseModel, ConfigDict, Field
 from slims.internal import Record
+from typing_extensions import Literal
 
 
 class ContentsTableColumnInfo(BaseModel):
@@ -21,20 +21,20 @@ class ContentsTableColumnInfo(BaseModel):
         "QUANTITY",
         "STRING",
     ]
-    dateFormat: Optional[str]
-    displayField: Optional[str]
-    displayValue: Optional[str]
+    dateFormat: Optional[str] = None
+    displayField: Optional[str] = None
+    displayValue: Optional[str] = None
     editable: bool
-    foreignDisplayColumn: Optional[str]
-    foreignTable: Optional[str]
+    foreignDisplayColumn: Optional[str] = None
+    foreignTable: Optional[str] = None
     hidden: bool
     name: str
     position: int
-    subType: Optional[str]
-    timeZone: Optional[str]
+    subType: Optional[str] = None
+    timeZone: Optional[str] = None
     title: str
-    unit: Optional[str]
-    value: Union[int, bool, str, None]
+    unit: Optional[str] = None
+    value: Union[int, bool, str, None] = None
 
     def _map_bool_to_field_str(self):
         """Map BOOLEAN to a string representing the pydantic field"""
@@ -134,6 +134,8 @@ class ContentsTableColumnInfo(BaseModel):
 
 class ContentsTableRow(BaseModel):
     """A record pulled from slims Contents Table."""
+
+    model_config = ConfigDict(coerce_numbers_to_str=True)
 
     cntn_fk_originalContent: Optional[str] = Field(
         None, title="Original Content"
@@ -272,7 +274,7 @@ class ContentsTableRow(BaseModel):
 
         """
         columns_info = [
-            ContentsTableColumnInfo.parse_obj(c)
+            ContentsTableColumnInfo.model_validate(c)
             for c in record.json_entity["columns"]
         ]
         return [c.map_to_field_str() for c in columns_info]
@@ -280,7 +282,7 @@ class ContentsTableRow(BaseModel):
     @classmethod
     def from_record(cls, record: Record):
         """Create a ContentsTableRow from a SLIMS Record"""
-        field_names = cls.__fields__
+        field_names = cls.model_fields
         field_values = {}
         for field_name in field_names:
             record_value = getattr(record, field_name, None)

@@ -1,7 +1,8 @@
 """Module for slims client"""
 import logging
 
-from pydantic import BaseSettings, Extra, Field, SecretStr
+from pydantic import Extra, Field, SecretStr
+from pydantic_settings import BaseSettings
 from slims.criteria import equals
 from slims.internal import Record
 from slims.slims import Slims
@@ -56,7 +57,7 @@ class SlimsClient:
             content_record = self.client.fetch(
                 "Content",
                 equals(
-                    ContentsTableRow.__fields__["cntn_cf_labtracksId"].name,
+                    ContentsTableRow.model_fields["cntn_cf_labtracksId"].title,
                     subject_id,
                 ),
                 start=0,
