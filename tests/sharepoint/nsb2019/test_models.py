@@ -45,7 +45,7 @@ class TestNSB2019Models(TestCase):
             list_item = self.list_items[index][0]
             filename = self.list_items[index][1]
             logging.debug(f"Processing file: {filename}")
-            nsb_model = NSBList.parse_obj(list_item)
+            nsb_model = NSBList.model_validate(list_item)
             self.assertEqual(nsb_model.author_id, list_item.get("AuthorId"))
 
     def test_aberrant_data_parsed(self):
@@ -58,7 +58,7 @@ class TestNSB2019Models(TestCase):
         list_item["HPDurotomy"] = None
         # Check that the sex types are being mapped correctly
         list_item["Sex"] = "Female"
-        nsb_model = NSBList.parse_obj(list_item)
+        nsb_model = NSBList.model_validate(list_item)
         self.assertEqual("22", nsb_model.age_at_injection)
         self.assertIsNone(nsb_model.inj1_type)
         self.assertIsNone(nsb_model.hp_durotomy)

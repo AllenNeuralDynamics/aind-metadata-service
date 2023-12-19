@@ -2,7 +2,7 @@
 
 from typing import List
 
-from aind_data_schema.procedures import SubjectProcedure
+from aind_data_schema.core.procedures import SubjectProcedure
 from office365.sharepoint.client_context import ClientContext
 
 from aind_metadata_service.sharepoint.nsb2023.mapping import MappedNSBList
@@ -34,7 +34,7 @@ class NSB2023Procedures:
         List[SubjectProcedure]
         """
 
-        labtrack_alias = NSBList.__fields__.get("lab_tracks_id1").alias
+        labtrack_alias = NSBList.model_fields.get("lab_tracks_id1").alias
         filter_string = f"{labtrack_alias} eq '{subject_id}'"
         list_view = client_context.web.lists.get_by_title(
             list_title
@@ -46,7 +46,7 @@ class NSB2023Procedures:
         client_context.execute_query()
         list_of_procedures = []
         for list_item in list_items:
-            nsb_model = NSBList.parse_obj(list_item.to_json())
+            nsb_model = NSBList.model_validate(list_item.to_json())
             mapped_model = MappedNSBList(nsb=nsb_model)
             procedures = mapped_model.get_procedures()
             list_of_procedures.extend(procedures)

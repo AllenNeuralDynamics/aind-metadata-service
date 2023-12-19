@@ -3,14 +3,17 @@ import json
 import pickle
 from typing import Generic, List, Optional, TypeVar, Union
 
-from aind_data_schema.procedures import Procedures
-from aind_data_schema.subject import Subject
+from aind_data_schema.core.procedures import Procedures
+from aind_data_schema.core.subject import Subject
 from fastapi import Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from pydantic import validate_model
+from pydantic import ValidationError
 
 from aind_metadata_service.client import StatusCodes
+
+# from pydantic import validate_model
+
 
 T = TypeVar("T", Subject, Procedures)
 
@@ -69,13 +72,17 @@ class ModelResponse(Generic[T]):
         elif len(self.aind_models) == 1:
             aind_model = self.aind_models[0]
             # TODO: fix validation error catching
-            *_, validation_error = validate_model(
-                aind_model.__class__, aind_model.__dict__
-            )
+            validation_error = None
+            try:
+                aind_model.__class__.model_validate(aind_model.model_dump())
+            except ValidationError as e:
+                validation_error = repr(e)
             if pickled:
                 content_data = aind_model
             else:
-                content_data = jsonable_encoder(json.loads(aind_model.json()))
+                content_data = jsonable_encoder(
+                    json.loads(aind_model.model_dump_json())
+                )
             if validation_error:
                 status_code = StatusCodes.INVALID_DATA.value
                 message = f"Validation Errors: {validation_error}"
@@ -84,7 +91,10 @@ class ModelResponse(Generic[T]):
                 message = "Valid Model."
             if self.status_code == StatusCodes.MULTI_STATUS:
                 status_code = self.status_code.value
-                message = self.message + message
+                message = (
+                    "There was an error retrieving records from one or more of"
+                    " the databases."
+                )
 
         else:
             status_code = StatusCodes.MULTIPLE_RESPONSES.value
@@ -93,7 +103,7 @@ class ModelResponse(Generic[T]):
                 content_data = self.aind_models
             else:
                 content_data = [
-                    jsonable_encoder(json.loads(model.json()))
+                    jsonable_encoder(json.loads(model.model_dump_json()))
                     for model in self.aind_models
                 ]
         if pickled:

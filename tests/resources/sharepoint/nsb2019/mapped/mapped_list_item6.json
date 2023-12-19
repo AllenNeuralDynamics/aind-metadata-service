@@ -6,18 +6,18 @@
       "iacuc_protocol": "2115",
       "animal_weight_prior": null,
       "animal_weight_post": null,
-      "weight_unit": "gram",
       "anaesthesia": {
          "type": "isoflurane",
-         "duration_unit": "minute",
-         "level": null
+         "level": null,
+         "duration_unit": "minute"
       },
-      "notes": null,
-      "procedure_type": "Headframe",
       "headframe_type": "NGC-style",
       "headframe_part_number": "0160-100-10",
-      "headframe_material": null,
       "well_part_number": null,
-      "well_type": null
+      "well_type": null,
+      "weight_unit": "gram",
+      "notes": null,
+      "procedure_type": "Headframe",
+      "headframe_material": null
    }
 ]
