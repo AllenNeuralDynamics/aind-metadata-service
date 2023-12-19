@@ -5,19 +5,20 @@ from typing import List, Optional
 from xml.etree import ElementTree as ET
 
 import pyodbc
-from aind_data_schema.procedures import (
+from aind_data_schema.core.procedures import (
     Perfusion,
     Procedures,
     RetroOrbitalInjection,
 )
-from aind_data_schema.subject import (
+from aind_data_schema.core.subject import (
     BackgroundStrain,
     Housing,
     Sex,
     Species,
     Subject,
 )
-from pydantic import BaseSettings, Field, SecretStr
+from pydantic import Field, SecretStr
+from pydantic_settings import BaseSettings
 
 from aind_metadata_service.labtracks.query_builder import (
     LabTracksQueries,
@@ -350,7 +351,7 @@ class LabTracksResponseHandler:
         cage_id = None if cage_id is None or int(cage_id) < 0 else cage_id
 
         return (
-            Housing.construct(room_id=room_id, cage_id=cage_id)
+            Housing.model_construct(room_id=room_id, cage_id=cage_id)
             if room_id is not None or cage_id is not None
             else None
         )
@@ -404,7 +405,7 @@ class LabTracksResponseHandler:
                 room_id=result.get(SubjectQueryColumns.ROOM_ID.value),
                 cage_id=result.get(SubjectQueryColumns.CAGE_ID.value),
             )
-            subject = Subject.construct(
+            subject = Subject.model_construct(
                 subject_id=subject_id_str,
                 species=species,
                 paternal_genotype=paternal_genotype,
@@ -449,11 +450,11 @@ class LabTracksResponseHandler:
             end_date = result.get(TaskSetQueryColumns.DATE_END.value)
             if end_date:
                 end_date = end_date.date()
-            experimenter_full_name = result.get(
-                TaskSetQueryColumns.INVESTIGATOR_ID.value
+            experimenter_full_name = str(
+                result.get(TaskSetQueryColumns.INVESTIGATOR_ID.value)
             )
-            iacuc_protocol = result.get(
-                TaskSetQueryColumns.PROTOCOL_NUMBER.value
+            iacuc_protocol = str(
+                result.get(TaskSetQueryColumns.PROTOCOL_NUMBER.value)
             )
             type_name = result.get(TaskSetQueryColumns.TYPE_NAME.value)
             task_status = result.get(TaskSetQueryColumns.TASK_STATUS.value)
@@ -462,10 +463,10 @@ class LabTracksResponseHandler:
                 and task_status == LabTracksTaskStatuses.FINISHED.value
             ):
                 if LabTracksProcedures.PERFUSION.value in type_name:
-                    output_specimen_ids = [
-                        result.get(TaskSetQueryColumns.TASK_OBJECT.value)
-                    ]
-                    perfusion = Perfusion.construct(
+                    output_specimen_ids = {
+                        str(result.get(TaskSetQueryColumns.TASK_OBJECT.value))
+                    }
+                    perfusion = Perfusion.model_construct(
                         start_date=start_date,
                         end_date=end_date,
                         experimenter_full_name=experimenter_full_name,
@@ -476,7 +477,7 @@ class LabTracksResponseHandler:
 
                 elif LabTracksProcedures.RO_INJECTION.value in type_name:
                     # TODO: parse inj info from comments
-                    ro_injection = RetroOrbitalInjection.construct(
+                    ro_injection = RetroOrbitalInjection.model_construct(
                         start_date=start_date,
                         end_date=end_date,
                         experimenter_full_name=experimenter_full_name,
@@ -486,8 +487,8 @@ class LabTracksResponseHandler:
         procedures = (
             None
             if len(procedures_list) == 0
-            else Procedures.construct(
-                subject_id=subject_id, subject_procedures=procedures_list
+            else Procedures.model_construct(
+                subject_id=str(subject_id), subject_procedures=procedures_list
             )
         )
         return procedures

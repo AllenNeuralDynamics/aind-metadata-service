@@ -6,12 +6,12 @@ import pickle
 import unittest
 from pathlib import Path
 
-from aind_data_schema.procedures import Procedures
-from aind_data_schema.subject import Species, Subject
+from aind_data_schema.core.procedures import Procedures
+from aind_data_schema.core.subject import Species, Subject
 from fastapi import Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from pydantic import validate_model
+from pydantic import ValidationError
 
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 
@@ -44,25 +44,25 @@ with open(LAS_INVALID_RESPONSE_PATH) as f:
 with open(COMBINED_INVALID_PATH) as f:
     combined_invalid_procedures = json.load(f)
 
-sp_valid_model = Procedures.construct(
+sp_valid_model = Procedures.model_construct(
     subject_id="115977",
     subject_procedures=sp_valid_subject_procedures["data"][
         "subject_procedures"
     ],
 )
-lb_valid_model = Procedures.construct(
+lb_valid_model = Procedures.model_construct(
     subject_id="115977",
     subject_procedures=las_valid_subject_procedures["data"][
         "subject_procedures"
     ],
 )
-sp_invalid_model = Procedures.construct(
+sp_invalid_model = Procedures.model_construct(
     subject_id="115977",
     subject_procedures=sp_invalid_subject_procedures["data"][
         "subject_procedures"
     ],
 )
-lb_invalid_model = Procedures.construct(
+lb_invalid_model = Procedures.model_construct(
     subject_id="115977",
     subject_procedures=las_invalid_subject_procedures["data"][
         "subject_procedures"
@@ -89,7 +89,7 @@ class TestResponseHandler(unittest.TestCase):
         actual_json = model_response.map_to_json_response()
         actual_pickled = model_response.map_to_pickled_response()
 
-        model_json = jsonable_encoder(json.loads(model.json()))
+        model_json = jsonable_encoder(json.loads(model.model_dump_json()))
         expected_json = JSONResponse(
             status_code=200,
             content=(
@@ -119,14 +119,19 @@ class TestResponseHandler(unittest.TestCase):
 
     def test_invalid_model(self):
         """Test model_response with invalid model."""
-        model = Subject.construct()
+        model = Subject.model_construct()
         model_response = ModelResponse(
             status_code=StatusCodes.DB_RESPONDED, aind_models=[model]
         )
         actual_json = model_response.map_to_json_response()
         actual_pickled = model_response.map_to_pickled_response()
 
-        *_, validation_error = validate_model(model.__class__, model.__dict__)
+        validation_error = None
+        try:
+            model.__class__.model_validate(model.model_dump())
+        except ValidationError as e:
+            validation_error = repr(e)
+
         model_json = jsonable_encoder(model)
         expected_json = JSONResponse(
             status_code=406,
@@ -165,7 +170,8 @@ class TestResponseHandler(unittest.TestCase):
         actual_pickled = model_response.map_to_pickled_response()
 
         models_json = [
-            jsonable_encoder(json.loads(model.json())) for model in models
+            jsonable_encoder(json.loads(model.model_dump_json()))
+            for model in models
         ]
         expected_json = JSONResponse(
             status_code=300,

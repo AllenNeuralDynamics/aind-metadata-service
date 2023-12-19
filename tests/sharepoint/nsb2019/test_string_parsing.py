@@ -2,6 +2,7 @@
 
 import json
 import os
+from decimal import Decimal
 from pathlib import Path
 from typing import Callable, List
 from unittest import TestCase
@@ -29,7 +30,7 @@ class TestNSB2019StringParsers(TestCase):
     def setUpClass(cls):
         """Load json files before running tests."""
         cls.string_entries = cls._load_json_file()
-        cls.blank_model = MappedNSBList(nsb=NSBList.construct())
+        cls.blank_model = MappedNSBList(nsb=NSBList.model_construct())
 
     @staticmethod
     def _load_json_file() -> dict:
@@ -59,6 +60,8 @@ class TestNSB2019StringParsers(TestCase):
             expected_entries = self.string_entries[k]["unique_entries"]
             for example_key, example_val in expected_entries.items():
                 expected = example_val
+                if isinstance(expected, float):
+                    expected = Decimal(str(example_val))
                 actual = parser(example_key)
                 self.assertEqual(expected, actual)
         self.assertIsNone(parser(None))

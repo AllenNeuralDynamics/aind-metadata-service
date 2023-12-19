@@ -3,9 +3,18 @@ import datetime
 import unittest
 from decimal import Decimal
 
-from aind_data_schema import Procedures, Subject
-from aind_data_schema.procedures import Perfusion, RetroOrbitalInjection
-from aind_data_schema.subject import BackgroundStrain, Housing, Sex, Species
+from aind_data_schema.core.procedures import (
+    Perfusion,
+    Procedures,
+    RetroOrbitalInjection,
+)
+from aind_data_schema.core.subject import (
+    BackgroundStrain,
+    Housing,
+    Sex,
+    Species,
+    Subject,
+)
 
 from aind_metadata_service.labtracks.client import (
     LabTracksBgStrain,
@@ -64,11 +73,11 @@ class TestResponseExamples:
         }
     ]
 
-    expected_housing = Housing.construct(room_id="000", cage_id="1234")
+    expected_housing = Housing.model_construct(room_id="000", cage_id="1234")
 
-    expected_subject = Subject.parse_obj(
+    expected_subject = Subject.model_validate(
         {
-            "schema_version": "0.4.2",
+            "schema_version": "0.5.0",
             "species": Species.MUS_MUSCULUS,
             "subject_id": "115977",
             "sex": "Male",
@@ -121,23 +130,23 @@ class TestResponseExamples:
     ]
 
     expected_subject_procedures = [
-        Perfusion.construct(
+        Perfusion.model_construct(
             start_date=datetime.date(2022, 10, 11),
             end_date=datetime.date(2022, 10, 11),
-            experimenter_full_name=Decimal("28803"),
-            iacuc_protocol=Decimal("2002"),
+            experimenter_full_name="28803",
+            iacuc_protocol="2002",
             animal_weight_prior=None,
             animal_weight_post=None,
             anaesthesia=None,
             notes=None,
             procedure_type="Perfusion",
-            output_specimen_ids=[Decimal("115977")],
+            output_specimen_ids={"115977"},
         ),
-        RetroOrbitalInjection.construct(
+        RetroOrbitalInjection.model_construct(
             start_date=datetime.date(2022, 5, 11),
             end_date=datetime.date(2022, 5, 12),
-            experimenter_full_name=Decimal("28803"),
-            iacuc_protocol=Decimal("2002"),
+            experimenter_full_name="28803",
+            iacuc_protocol="2002",
             animal_weight_prior=None,
             animal_weight_post=None,
             anaesthesia=None,
@@ -146,9 +155,9 @@ class TestResponseExamples:
         ),
     ]
 
-    expected_procedures = Procedures.parse_obj(
+    expected_procedures = Procedures.model_validate(
         {
-            "schema_version": "0.9.3",
+            "schema_version": "0.10.0",
             "subject_id": "115977",
             "subject_procedures": expected_subject_procedures,
         }
@@ -237,9 +246,9 @@ class TestLabTracksResponseHandler(unittest.TestCase):
 
     def test_map_housing(self):
         """Tests that the LabTracks housing info is mapped correctly"""
-        housing2 = Housing.construct(room_id="000")
-        housing3 = Housing.construct(cage_id="1234")
-        housing4 = Housing.construct(room_id="000", cage_id="1234")
+        housing2 = Housing.model_construct(room_id="000")
+        housing3 = Housing.model_construct(cage_id="1234")
+        housing4 = Housing.model_construct(room_id="000", cage_id="1234")
 
         subject_housing1 = self.rh._map_housing(
             room_id="-99999999999", cage_id=None

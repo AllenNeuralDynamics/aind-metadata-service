@@ -29,7 +29,7 @@ class TestNSB2023StringParsers(TestCase):
     def setUpClass(cls):
         """Load json files before running tests."""
         cls.string_entries = cls._load_json_file()
-        cls.blank_model = MappedNSBList(nsb=NSBList.construct())
+        cls.blank_model = MappedNSBList(nsb=NSBList.model_construct())
 
     @staticmethod
     def _load_json_file() -> dict:
@@ -62,17 +62,6 @@ class TestNSB2023StringParsers(TestCase):
                 actual = parser(example_key)
                 self.assertEqual(expected, actual)
         self.assertIsNone(parser(None))
-
-    def test_alt_time_parser(self):
-        """Checks that alternating time fields are parsed correctly"""
-
-        at_keys = [
-            "Inj1AlternatingTime",
-            "Inj2AlternatingTime",
-            "Inj3AlternatingTime",
-            "Inj4AlternatingTime",
-        ]
-        self._test_parser(at_keys, self.blank_model._parse_alt_time_str)
 
     def test_current_parser(self):
         """Checks that current fields are parsed correctly"""

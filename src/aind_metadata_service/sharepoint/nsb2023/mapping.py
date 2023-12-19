@@ -3,10 +3,11 @@
 import re
 from dataclasses import dataclass
 from datetime import date, datetime
+from decimal import Decimal, DecimalException
 from enum import Enum
 from typing import Any, List, Optional
 
-from aind_data_schema.procedures import (
+from aind_data_schema.core.procedures import (
     Anaesthetic,
     BrainInjection,
     CoordinateReferenceLocation,
@@ -18,11 +19,10 @@ from aind_data_schema.procedures import (
     IontophoresisInjection,
     NanojectInjection,
     OphysProbe,
-    ProbeName,
     Side,
     SubjectProcedure,
 )
-from aind_data_schema.subject import Sex
+from aind_data_schema.core.subject import Sex
 
 from aind_metadata_service.sharepoint.nsb2023.models import NSBList
 from aind_metadata_service.sharepoint.nsb2023.models import (
@@ -88,12 +88,12 @@ class SurgeryDuringInfo:
     follow-up sessions"""
 
     anaesthetic_duration_in_minutes: Optional[int] = None
-    anaesthetic_level: Optional[float] = None
+    anaesthetic_level: Optional[Decimal] = None
     start_date: Optional[datetime] = None
     workstation_id: Optional[str] = None
-    recovery_time: Optional[float] = None
-    weight_prior: Optional[float] = None
-    weight_post: Optional[float] = None
+    recovery_time: Optional[Decimal] = None
+    weight_prior: Optional[Decimal] = None
+    weight_post: Optional[Decimal] = None
     instrument_id: Optional[str] = None
 
 
@@ -102,18 +102,18 @@ class BurrHoleInfo:
     """Container for burr hole information"""
 
     hemisphere: Optional[Side] = None
-    coordinate_ml: Optional[float] = None
-    coordinate_ap: Optional[float] = None
-    coordinate_depth: Optional[List[float]] = None
-    angle: Optional[float] = None
+    coordinate_ml: Optional[Decimal] = None
+    coordinate_ap: Optional[Decimal] = None
+    coordinate_depth: Optional[List[Decimal]] = None
+    angle: Optional[Decimal] = None
     during: Optional[During] = None
     inj_type: Optional[InjectionType] = None
     virus_strain: Optional[str] = None
-    inj_current: Optional[float] = None
+    inj_current: Optional[Decimal] = None
     alternating_current: Optional[str] = None
-    inj_duration: Optional[float] = None
-    inj_volume: Optional[List[float]] = None
-    fiber_implant_depth: Optional[float] = None
+    inj_duration: Optional[Decimal] = None
+    inj_volume: Optional[List[Decimal]] = None
+    fiber_implant_depth: Optional[Decimal] = None
 
 
 @dataclass
@@ -188,6 +188,19 @@ class MappedNSBList:
         self._nsb = nsb
 
     @staticmethod
+    def _map_float_to_decimal(value: Optional[float]) -> Optional[Decimal]:
+        """Parse string representation of float such as '0.25'."""
+        return None if value is None else Decimal(str(value))
+
+    @staticmethod
+    def _parse_basic_decimal_str(value: Optional[str]) -> Optional[Decimal]:
+        """Parse string representation of decimal such as '0.25'."""
+        try:
+            return None if value is None else Decimal(value)
+        except (ValueError, DecimalException):
+            return None
+
+    @staticmethod
     def _parse_basic_float_str(float_str: Optional[str]) -> Optional[float]:
         """Parse string representation of float such as '0.25'."""
         try:
@@ -195,25 +208,25 @@ class MappedNSBList:
         except ValueError:
             return None
 
-    def _parse_alt_time_str(
-        self, alt_time_str: Optional[str]
-    ) -> Optional[float]:
-        """Parse alternating time strings"""
-        if alt_time_str is not None:
-            parsed_string = re.search(self.ALT_TIME_REGEX, alt_time_str)
-            if parsed_string is not None:
-                return self._parse_basic_float_str(parsed_string.group(1))
-            else:
-                return None
-        else:
-            return None
+    # def _parse_alt_time_str(
+    #     self, alt_time_str: Optional[str]
+    # ) -> Optional[float]:
+    #     """Parse alternating time strings"""
+    #     if alt_time_str is not None:
+    #         parsed_string = re.search(self.ALT_TIME_REGEX, alt_time_str)
+    #         if parsed_string is not None:
+    #             return self._parse_basic_float_str(parsed_string.group(1))
+    #         else:
+    #             return None
+    #     else:
+    #         return None
 
-    def _parse_current_str(self, cur_str: Optional[str]) -> Optional[float]:
+    def _parse_current_str(self, cur_str: Optional[str]) -> Optional[Decimal]:
         """Parse current strings"""
         if cur_str is not None:
             parsed_string = re.search(self.CURRENT_REGEX, cur_str)
             if parsed_string is not None:
-                return self._parse_basic_float_str(parsed_string.group(1))
+                return self._parse_basic_decimal_str(parsed_string.group(1))
             else:
                 return None
         else:
@@ -221,14 +234,14 @@ class MappedNSBList:
 
     def _parse_length_of_time_str(
         self, len_of_time_str: Optional[str]
-    ) -> Optional[float]:
+    ) -> Optional[Decimal]:
         """Parse length of time strings"""
         if len_of_time_str is not None:
             parsed_string = re.search(
                 self.LENGTH_OF_TIME_REGEX, len_of_time_str
             )
             if parsed_string is not None:
-                return self._parse_basic_float_str(parsed_string.group(1))
+                return self._parse_basic_decimal_str(parsed_string.group(1))
             else:
                 return None
         else:
@@ -246,14 +259,14 @@ class MappedNSBList:
         return None
 
     @property
-    def aind_age_at_injection(self) -> Optional[float]:
+    def aind_age_at_injection(self) -> Optional[Decimal]:
         """Maps age_at_injection to aind model"""
-        return self._parse_basic_float_str(self._nsb.age_at_injection)
+        return self._parse_basic_decimal_str(self._nsb.age_at_injection)
 
     @property
-    def aind_ap2nd_inj(self) -> Optional[float]:
+    def aind_ap2nd_inj(self) -> Optional[Decimal]:
         """Maps ap2nd_inj to aind model"""
-        return self._nsb.ap2nd_inj
+        return self._map_float_to_decimal(self._nsb.ap2nd_inj)
 
     @property
     def aind_author_id(self) -> Optional[int]:
@@ -296,9 +309,9 @@ class MappedNSBList:
         )
 
     @property
-    def aind_breg2_lamb(self) -> Optional[float]:
+    def aind_breg2_lamb(self) -> Optional[Decimal]:
         """Maps breg2_lamb to aind model"""
-        return self._nsb.breg2_lamb
+        return self._map_float_to_decimal(self._nsb.breg2_lamb)
 
     @property
     def aind_burr1_injection_devi(self) -> Optional[Any]:
@@ -440,14 +453,14 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr3_a_p(self) -> Optional[float]:
+    def aind_burr3_a_p(self) -> Optional[Decimal]:
         """Maps burr3_a_p to aind model"""
-        return self._nsb.burr3_a_p
+        return self._map_float_to_decimal(self._nsb.burr3_a_p)
 
     @property
-    def aind_burr3_d_v(self) -> Optional[float]:
+    def aind_burr3_d_v(self) -> Optional[Decimal]:
         """Maps burr3_d_v to aind model"""
-        return self._nsb.burr3_d_v
+        return self._map_float_to_decimal(self._nsb.burr3_d_v)
 
     @property
     def aind_burr3_injection_devi(self) -> Optional[Any]:
@@ -479,9 +492,9 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr3_m_l(self) -> Optional[float]:
+    def aind_burr3_m_l(self) -> Optional[Decimal]:
         """Maps burr3_m_l to aind model"""
-        return self._nsb.burr3_m_l
+        return self._map_float_to_decimal(self._nsb.burr3_m_l)
 
     @property
     def aind_burr3_perform_during(self) -> Optional[During]:
@@ -530,14 +543,14 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr4_a_p(self) -> Optional[float]:
+    def aind_burr4_a_p(self) -> Optional[Decimal]:
         """Maps burr4_a_p to aind model"""
-        return self._nsb.burr4_a_p
+        return self._map_float_to_decimal(self._nsb.burr4_a_p)
 
     @property
-    def aind_burr4_d_v(self) -> Optional[float]:
+    def aind_burr4_d_v(self) -> Optional[Decimal]:
         """Maps burr4_d_v to aind model"""
-        return self._nsb.burr4_d_v
+        return self._map_float_to_decimal(self._nsb.burr4_d_v)
 
     @property
     def aind_burr4_injection_devi(self) -> Optional[Any]:
@@ -569,9 +582,9 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr4_m_l(self) -> Optional[float]:
+    def aind_burr4_m_l(self) -> Optional[Decimal]:
         """Maps burr4_m_l to aind model"""
-        return self._nsb.burr4_m_l
+        return self._map_float_to_decimal(self._nsb.burr4_m_l)
 
     @property
     def aind_burr4_perform_during(self) -> Optional[During]:
@@ -770,14 +783,14 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_1_d_v_x00(self) -> Optional[float]:
+    def aind_burr_1_d_v_x00(self) -> Optional[Decimal]:
         """Maps burr_1_d_v_x00 to aind model"""
-        return self._nsb.burr_1_d_v_x00
+        return self._map_float_to_decimal(self._nsb.burr_1_d_v_x00)
 
     @property
-    def aind_burr_1_dv_2(self) -> Optional[float]:
+    def aind_burr_1_dv_2(self) -> Optional[Decimal]:
         """Maps burr_1_dv_2 to aind model"""
-        return self._nsb.burr_1_dv_2
+        return self._map_float_to_decimal(self._nsb.burr_1_dv_2)
 
     @property
     def aind_burr_1_fiber_t(self) -> Optional[Any]:
@@ -792,14 +805,14 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_2_d_v_x00(self) -> Optional[float]:
+    def aind_burr_2_d_v_x00(self) -> Optional[Decimal]:
         """Maps burr_2_d_v_x00 to aind model"""
-        return self._nsb.burr_2_d_v_x00
+        return self._map_float_to_decimal(self._nsb.burr_2_d_v_x00)
 
     @property
-    def aind_burr_2_d_v_x000(self) -> Optional[float]:
+    def aind_burr_2_d_v_x000(self) -> Optional[Decimal]:
         """Maps burr_2_d_v_x000 to aind model"""
-        return self._nsb.burr_2_d_v_x000
+        return self._map_float_to_decimal(self._nsb.burr_2_d_v_x000)
 
     @property
     def aind_burr_2_fiber_t(self) -> Optional[Any]:
@@ -814,19 +827,19 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_3_angle(self) -> Optional[float]:
+    def aind_burr_3_angle(self) -> Optional[Decimal]:
         """Maps burr_3_angle to aind model"""
-        return self._nsb.burr_3_angle
+        return self._map_float_to_decimal(self._nsb.burr_3_angle)
 
     @property
-    def aind_burr_3_d_v_x00(self) -> Optional[float]:
+    def aind_burr_3_d_v_x00(self) -> Optional[Decimal]:
         """Maps burr_3_d_v_x00 to aind model"""
-        return self._nsb.burr_3_d_v_x00
+        return self._map_float_to_decimal(self._nsb.burr_3_d_v_x00)
 
     @property
-    def aind_burr_3_d_v_x000(self) -> Optional[float]:
+    def aind_burr_3_d_v_x000(self) -> Optional[Decimal]:
         """Maps burr_3_d_v_x000 to aind model"""
-        return self._nsb.burr_3_d_v_x000
+        return self._map_float_to_decimal(self._nsb.burr_3_d_v_x000)
 
     @property
     def aind_burr_3_fiber_t(self) -> Optional[Any]:
@@ -854,19 +867,19 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_4_angle(self) -> Optional[float]:
+    def aind_burr_4_angle(self) -> Optional[Decimal]:
         """Maps burr_4_angle to aind model"""
-        return self._nsb.burr_4_angle
+        return self._map_float_to_decimal(self._nsb.burr_4_angle)
 
     @property
-    def aind_burr_4_d_v_x00(self) -> Optional[float]:
+    def aind_burr_4_d_v_x00(self) -> Optional[Decimal]:
         """Maps burr_4_d_v_x00 to aind model"""
-        return self._nsb.burr_4_d_v_x00
+        return self._map_float_to_decimal(self._nsb.burr_4_d_v_x00)
 
     @property
-    def aind_burr_4_d_v_x000(self) -> Optional[float]:
+    def aind_burr_4_d_v_x000(self) -> Optional[Decimal]:
         """Maps burr_4_d_v_x000 to aind model"""
-        return self._nsb.burr_4_d_v_x000
+        return self._map_float_to_decimal(self._nsb.burr_4_d_v_x000)
 
     @property
     def aind_burr_4_fiber_t(self) -> Optional[Any]:
@@ -894,29 +907,29 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_5_a_p(self) -> Optional[float]:
+    def aind_burr_5_a_p(self) -> Optional[Decimal]:
         """Maps burr_5_a_p to aind model"""
-        return self._nsb.burr_5_a_p
+        return self._map_float_to_decimal(self._nsb.burr_5_a_p)
 
     @property
-    def aind_burr_5_angle(self) -> Optional[float]:
+    def aind_burr_5_angle(self) -> Optional[Decimal]:
         """Maps burr_5_angle to aind model"""
-        return self._nsb.burr_5_angle
+        return self._map_float_to_decimal(self._nsb.burr_5_angle)
 
     @property
-    def aind_burr_5_d_v_x00(self) -> Optional[float]:
+    def aind_burr_5_d_v_x00(self) -> Optional[Decimal]:
         """Maps burr_5_d_v_x00 to aind model"""
-        return self._nsb.burr_5_d_v_x00
+        return self._map_float_to_decimal(self._nsb.burr_5_d_v_x00)
 
     @property
-    def aind_burr_5_d_v_x000(self) -> Optional[float]:
+    def aind_burr_5_d_v_x000(self) -> Optional[Decimal]:
         """Maps burr_5_d_v_x000 to aind model"""
-        return self._nsb.burr_5_d_v_x000
+        return self._map_float_to_decimal(self._nsb.burr_5_d_v_x000)
 
     @property
-    def aind_burr_5_d_v_x001(self) -> Optional[float]:
+    def aind_burr_5_d_v_x001(self) -> Optional[Decimal]:
         """Maps burr_5_d_v_x001 to aind model"""
-        return self._nsb.burr_5_d_v_x001
+        return self._map_float_to_decimal(self._nsb.burr_5_d_v_x001)
 
     @property
     def aind_burr_5_fiber_t(self) -> Optional[Any]:
@@ -944,34 +957,34 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_5_m_l(self) -> Optional[float]:
+    def aind_burr_5_m_l(self) -> Optional[Decimal]:
         """Maps burr_5_m_l to aind model"""
-        return self._nsb.burr_5_m_l
+        return self._map_float_to_decimal(self._nsb.burr_5_m_l)
 
     @property
-    def aind_burr_6_a_p(self) -> Optional[float]:
+    def aind_burr_6_a_p(self) -> Optional[Decimal]:
         """Maps burr_6_a_p to aind model"""
-        return self._nsb.burr_6_a_p
+        return self._map_float_to_decimal(self._nsb.burr_6_a_p)
 
     @property
-    def aind_burr_6_angle(self) -> Optional[float]:
+    def aind_burr_6_angle(self) -> Optional[Decimal]:
         """Maps burr_6_angle to aind model"""
-        return self._nsb.burr_6_angle
+        return self._map_float_to_decimal(self._nsb.burr_6_angle)
 
     @property
-    def aind_burr_6_d_v_x00(self) -> Optional[float]:
+    def aind_burr_6_d_v_x00(self) -> Optional[Decimal]:
         """Maps burr_6_d_v_x00 to aind model"""
-        return self._nsb.burr_6_d_v_x00
+        return self._map_float_to_decimal(self._nsb.burr_6_d_v_x00)
 
     @property
-    def aind_burr_6_d_v_x000(self) -> Optional[float]:
+    def aind_burr_6_d_v_x000(self) -> Optional[Decimal]:
         """Maps burr_6_d_v_x000 to aind model"""
-        return self._nsb.burr_6_d_v_x000
+        return self._map_float_to_decimal(self._nsb.burr_6_d_v_x000)
 
     @property
-    def aind_burr_6_d_v_x001(self) -> Optional[float]:
+    def aind_burr_6_d_v_x001(self) -> Optional[Decimal]:
         """Maps burr_6_d_v_x001 to aind model"""
-        return self._nsb.burr_6_d_v_x001
+        return self._map_float_to_decimal(self._nsb.burr_6_d_v_x001)
 
     @property
     def aind_burr_6_fiber_t(self) -> Optional[Any]:
@@ -999,9 +1012,9 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_6_m_l(self) -> Optional[float]:
+    def aind_burr_6_m_l(self) -> Optional[Decimal]:
         """Maps burr_6_m_l to aind model"""
-        return self._nsb.burr_6_m_l
+        return self._map_float_to_decimal(self._nsb.burr_6_m_l)
 
     @property
     def aind_burr_hole_1(self) -> Optional[BurrHoleProcedure]:
@@ -1300,9 +1313,9 @@ class MappedNSBList:
         return self._nsb.date_range_start
 
     @property
-    def aind_dv2nd_inj(self) -> Optional[float]:
+    def aind_dv2nd_inj(self) -> Optional[Decimal]:
         """Maps dv2nd_inj to aind model"""
-        return self._nsb.dv2nd_inj
+        return self._map_float_to_decimal(self._nsb.dv2nd_inj)
 
     @property
     def aind_editor_id(self) -> Optional[int]:
@@ -1310,9 +1323,9 @@ class MappedNSBList:
         return self._nsb.editor_id
 
     @property
-    def aind_fiber_implant1_dv(self) -> Optional[float]:
+    def aind_fiber_implant1_dv(self) -> Optional[Decimal]:
         """Maps fiber_implant1_dv to aind model"""
-        return self._nsb.fiber_implant1_dv
+        return self._map_float_to_decimal(self._nsb.fiber_implant1_dv)
 
     @property
     def aind_fiber_implant1_lengt(self) -> Optional[Any]:
@@ -1333,9 +1346,9 @@ class MappedNSBList:
         )
 
     @property
-    def aind_fiber_implant2_dv(self) -> Optional[float]:
+    def aind_fiber_implant2_dv(self) -> Optional[Decimal]:
         """Maps fiber_implant2_dv to aind model"""
-        return self._nsb.fiber_implant2_dv
+        return self._map_float_to_decimal(self._nsb.fiber_implant2_dv)
 
     @property
     def aind_fiber_implant2_lengt(self) -> Optional[Any]:
@@ -1356,9 +1369,9 @@ class MappedNSBList:
         )
 
     @property
-    def aind_fiber_implant3_d_x00(self) -> Optional[float]:
+    def aind_fiber_implant3_d_x00(self) -> Optional[Decimal]:
         """Maps fiber_implant3_d_x00 to aind model"""
-        return self._nsb.fiber_implant3_d_x00
+        return self._map_float_to_decimal(self._nsb.fiber_implant3_d_x00)
 
     @property
     def aind_fiber_implant3_lengt(self) -> Optional[Any]:
@@ -1379,9 +1392,9 @@ class MappedNSBList:
         )
 
     @property
-    def aind_fiber_implant4_d_x00(self) -> Optional[float]:
+    def aind_fiber_implant4_d_x00(self) -> Optional[Decimal]:
         """Maps fiber_implant4_d_x00 to aind model"""
-        return self._nsb.fiber_implant4_d_x00
+        return self._map_float_to_decimal(self._nsb.fiber_implant4_d_x00)
 
     @property
     def aind_fiber_implant4_lengt(self) -> Optional[Any]:
@@ -1402,9 +1415,9 @@ class MappedNSBList:
         )
 
     @property
-    def aind_fiber_implant5_d_x00(self) -> Optional[float]:
+    def aind_fiber_implant5_d_x00(self) -> Optional[Decimal]:
         """Maps fiber_implant5_d_x00 to aind model"""
-        return self._nsb.fiber_implant5_d_x00
+        return self._map_float_to_decimal(self._nsb.fiber_implant5_d_x00)
 
     @property
     def aind_fiber_implant5_lengt(self) -> Optional[Any]:
@@ -1425,9 +1438,9 @@ class MappedNSBList:
         )
 
     @property
-    def aind_fiber_implant6_d_x00(self) -> Optional[float]:
+    def aind_fiber_implant6_d_x00(self) -> Optional[Decimal]:
         """Maps fiber_implant6_d_x00 to aind model"""
-        return self._nsb.fiber_implant6_d_x00
+        return self._map_float_to_decimal(self._nsb.fiber_implant6_d_x00)
 
     @property
     def aind_fiber_implant6_lengt(self) -> Optional[Any]:
@@ -1448,28 +1461,32 @@ class MappedNSBList:
         )
 
     @property
-    def aind_first_inj_recovery(self) -> Optional[float]:
+    def aind_first_inj_recovery(self) -> Optional[Decimal]:
         """Maps first_inj_recovery to aind model"""
-        return self._nsb.first_inj_recovery
+        return self._map_float_to_decimal(self._nsb.first_inj_recovery)
 
     @property
-    def aind_first_injection_iso_durat(self) -> Optional[float]:
+    def aind_first_injection_iso_durat(self) -> Optional[Decimal]:
         """Maps first_injection_iso_durat to aind model"""
         return (
             None
             if self._nsb.first_injection_iso_durat is None
-            else self._nsb.first_injection_iso_durat * 60
+            else Decimal(self._nsb.first_injection_iso_durat) * 60
         )
 
     @property
-    def aind_first_injection_weight_af(self) -> Optional[float]:
+    def aind_first_injection_weight_af(self) -> Optional[Decimal]:
         """Maps first_injection_weight_af to aind model"""
-        return self._nsb.first_injection_weight_af
+        return (
+            None
+            if self._nsb.first_injection_weight_af is None
+            else Decimal(self._nsb.first_injection_weight_af)
+        )
 
     @property
-    def aind_first_injection_weight_be(self) -> Optional[float]:
+    def aind_first_injection_weight_be(self) -> Optional[Decimal]:
         """Maps first_injection_weight_be to aind model"""
-        return self._nsb.first_injection_weight_be
+        return self._map_float_to_decimal(self._nsb.first_injection_weight_be)
 
     @property
     def aind_headpost(self) -> Optional[HeadPost]:
@@ -1539,14 +1556,14 @@ class MappedNSBList:
         )
 
     @property
-    def aind_hp_iso_level(self) -> Optional[float]:
+    def aind_hp_iso_level(self) -> Optional[Decimal]:
         """Maps hp_iso_level to aind model"""
-        return self._nsb.hp_iso_level
+        return self._map_float_to_decimal(self._nsb.hp_iso_level)
 
     @property
-    def aind_hp_recovery(self) -> Optional[float]:
+    def aind_hp_recovery(self) -> Optional[Decimal]:
         """Maps hp_recovery to aind model"""
-        return self._nsb.hp_recovery
+        return self._map_float_to_decimal(self._nsb.hp_recovery)
 
     @property
     def aind_hp_surgeon_comments(self) -> Optional[str]:
@@ -1716,22 +1733,22 @@ class MappedNSBList:
         )
 
     @property
-    def aind_inj1_alternating_time(self) -> Optional[float]:
+    def aind_inj1_alternating_time(self) -> Optional[str]:
         """Maps inj1_alternating_time to aind model"""
-        return self._parse_alt_time_str(self._nsb.inj1_alternating_time)
+        return self._nsb.inj1_alternating_time
 
     @property
-    def aind_inj1_angle_v2(self) -> Optional[float]:
+    def aind_inj1_angle_v2(self) -> Optional[Decimal]:
         """Maps inj1_angle_v2 to aind model"""
-        return self._nsb.inj1_angle_v2
+        return self._map_float_to_decimal(self._nsb.inj1_angle_v2)
 
     @property
-    def aind_inj1_current(self) -> Optional[float]:
+    def aind_inj1_current(self) -> Optional[Decimal]:
         """Maps inj1_current to aind model"""
         return self._parse_current_str(self._nsb.inj1_current)
 
     @property
-    def aind_inj1_ionto_time(self) -> Optional[float]:
+    def aind_inj1_ionto_time(self) -> Optional[Decimal]:
         """Maps inj1_ionto_time to aind model"""
         return self._parse_length_of_time_str(self._nsb.inj1_ionto_time)
 
@@ -1759,22 +1776,22 @@ class MappedNSBList:
         return self._parse_virus_strain_str(self._nsb.inj1_virus_strain_rt)
 
     @property
-    def aind_inj1volperdepth(self) -> Optional[float]:
+    def aind_inj1volperdepth(self) -> Optional[Decimal]:
         """Maps inj1volperdepth to aind model"""
-        return self._nsb.inj1volperdepth
+        return self._map_float_to_decimal(self._nsb.inj1volperdepth)
 
     @property
-    def aind_inj2_alternating_time(self) -> Optional[float]:
+    def aind_inj2_alternating_time(self) -> Optional[str]:
         """Maps inj2_alternating_time to aind model"""
-        return self._parse_alt_time_str(self._nsb.inj2_alternating_time)
+        return self._nsb.inj2_alternating_time
 
     @property
-    def aind_inj2_angle_v2(self) -> Optional[float]:
+    def aind_inj2_angle_v2(self) -> Optional[Decimal]:
         """Maps inj2_angle_v2 to aind model"""
-        return self._nsb.inj2_angle_v2
+        return self._map_float_to_decimal(self._nsb.inj2_angle_v2)
 
     @property
-    def aind_inj2_current(self) -> Optional[float]:
+    def aind_inj2_current(self) -> Optional[Decimal]:
         """Maps inj2_current to aind model"""
         return self._parse_current_str(self._nsb.inj2_current)
 
@@ -1809,20 +1826,20 @@ class MappedNSBList:
     @property
     def aind_inj2volperdepth(self) -> Optional[float]:
         """Maps inj2volperdepth to aind model"""
-        return self._nsb.inj2volperdepth
+        return self._map_float_to_decimal(self._nsb.inj2volperdepth)
 
     @property
     def aind_inj3_alternating_time(self) -> Optional[float]:
         """Maps inj3_alternating_time to aind model"""
-        return self._parse_alt_time_str(self._nsb.inj3_alternating_time)
+        return self._nsb.inj3_alternating_time
 
     @property
-    def aind_inj3_current(self) -> Optional[float]:
+    def aind_inj3_current(self) -> Optional[Decimal]:
         """Maps inj3_current to aind model"""
         return self._parse_current_str(self._nsb.inj3_current)
 
     @property
-    def aind_inj3_ionto_time(self) -> Optional[float]:
+    def aind_inj3_ionto_time(self) -> Optional[Decimal]:
         """Maps inj3_ionto_time to aind model"""
         return self._parse_length_of_time_str(self._nsb.inj3_ionto_time)
 
@@ -1857,22 +1874,22 @@ class MappedNSBList:
         )
 
     @property
-    def aind_inj3volperdepth(self) -> Optional[float]:
+    def aind_inj3volperdepth(self) -> Optional[Decimal]:
         """Maps inj3volperdepth to aind model"""
-        return self._nsb.inj3volperdepth
+        return self._map_float_to_decimal(self._nsb.inj3volperdepth)
 
     @property
-    def aind_inj4_alternating_time(self) -> Optional[float]:
+    def aind_inj4_alternating_time(self) -> Optional[str]:
         """Maps inj4_alternating_time to aind model"""
-        return self._parse_alt_time_str(self._nsb.inj4_alternating_time)
+        return self._nsb.inj4_alternating_time
 
     @property
-    def aind_inj4_current(self) -> Optional[float]:
+    def aind_inj4_current(self) -> Optional[Decimal]:
         """Maps inj4_current to aind model"""
         return self._parse_current_str(self._nsb.inj4_current)
 
     @property
-    def aind_inj4_ionto_time(self) -> Optional[float]:
+    def aind_inj4_ionto_time(self) -> Optional[Decimal]:
         """Maps inj4_ionto_time to aind model"""
         return self._parse_length_of_time_str(self._nsb.inj4_ionto_time)
 
@@ -1912,22 +1929,22 @@ class MappedNSBList:
         )
 
     @property
-    def aind_inj4volperdepth(self) -> Optional[float]:
+    def aind_inj4volperdepth(self) -> Optional[Decimal]:
         """Maps inj4volperdepth to aind model"""
-        return self._nsb.inj4volperdepth
+        return self._map_float_to_decimal(self._nsb.inj4volperdepth)
 
     @property
-    def aind_inj5_alternating_time(self) -> Optional[float]:
+    def aind_inj5_alternating_time(self) -> Optional[str]:
         """Maps inj5_alternating_time to aind model"""
-        return self._parse_alt_time_str(self._nsb.inj5_alternating_time)
+        return self._nsb.inj5_alternating_time
 
     @property
-    def aind_inj5_current(self) -> Optional[float]:
+    def aind_inj5_current(self) -> Optional[Decimal]:
         """Maps inj5_current to aind model"""
         return self._parse_current_str(self._nsb.inj5_current)
 
     @property
-    def aind_inj5_ionto_time(self) -> Optional[float]:
+    def aind_inj5_ionto_time(self) -> Optional[Decimal]:
         """Maps inj5_ionto_time to aind model"""
         return self._parse_length_of_time_str(self._nsb.inj5_ionto_time)
 
@@ -1967,22 +1984,22 @@ class MappedNSBList:
         )
 
     @property
-    def aind_inj5volperdepth(self) -> Optional[float]:
+    def aind_inj5volperdepth(self) -> Optional[Decimal]:
         """Maps inj5volperdepth to aind model"""
-        return self._nsb.inj5volperdepth
+        return self._map_float_to_decimal(self._nsb.inj5volperdepth)
 
     @property
-    def aind_inj6_alternating_time(self) -> Optional[float]:
+    def aind_inj6_alternating_time(self) -> Optional[str]:
         """Maps inj6_alternating_time to aind model"""
-        return self._parse_alt_time_str(self._nsb.inj6_alternating_time)
+        return self._nsb.inj6_alternating_time
 
     @property
-    def aind_inj6_current(self) -> Optional[float]:
+    def aind_inj6_current(self) -> Optional[Decimal]:
         """Maps inj6_current to aind model"""
         return self._parse_current_str(self._nsb.inj6_current)
 
     @property
-    def aind_inj6_ionto_time(self) -> Optional[float]:
+    def aind_inj6_ionto_time(self) -> Optional[Decimal]:
         """Maps inj6_ionto_time to aind model"""
         return self._parse_length_of_time_str(self._nsb.inj6_ionto_time)
 
@@ -2022,9 +2039,9 @@ class MappedNSBList:
         )
 
     @property
-    def aind_inj6volperdepth(self) -> Optional[float]:
+    def aind_inj6volperdepth(self) -> Optional[Decimal]:
         """Maps inj6volperdepth to aind model"""
-        return self._nsb.inj6volperdepth
+        return self._map_float_to_decimal(self._nsb.inj6volperdepth)
 
     @property
     def aind_inj_virus_strain_rt(self) -> Optional[str]:
@@ -2116,9 +2133,13 @@ class MappedNSBList:
         )
 
     @property
-    def aind_iso_on(self) -> Optional[float]:
+    def aind_iso_on(self) -> Optional[Decimal]:
         """Maps iso_on to aind model"""
-        return None if self._nsb.iso_on is None else self._nsb.iso_on * 60
+        return (
+            None
+            if self._nsb.iso_on is None
+            else Decimal(self._nsb.iso_on) * 60
+        )
 
     @property
     def aind_lab_tracks_group(self) -> Optional[str]:
@@ -2454,9 +2475,9 @@ class MappedNSBList:
         return self._nsb.long_requestor_comments
 
     @property
-    def aind_ml2nd_inj(self) -> Optional[float]:
+    def aind_ml2nd_inj(self) -> Optional[Decimal]:
         """Maps ml2nd_inj to aind model"""
-        return self._nsb.ml2nd_inj
+        return self._map_float_to_decimal(self._nsb.ml2nd_inj)
 
     @property
     def aind_modified(self) -> Optional[datetime]:
@@ -2710,9 +2731,9 @@ class MappedNSBList:
         )
 
     @property
-    def aind_round1_inj_isolevel(self) -> Optional[float]:
+    def aind_round1_inj_isolevel(self) -> Optional[Decimal]:
         """Maps round1_inj_isolevel to aind model"""
-        return self._nsb.round1_inj_isolevel
+        return self._map_float_to_decimal(self._nsb.round1_inj_isolevel)
 
     @property
     def aind_sex(self) -> Optional[Any]:
@@ -2755,14 +2776,14 @@ class MappedNSBList:
         return self._nsb.ui_version_string
 
     @property
-    def aind_virus_a_p(self) -> Optional[float]:
+    def aind_virus_a_p(self) -> Optional[Decimal]:
         """Maps virus_a_p to aind model"""
-        return self._nsb.virus_a_p
+        return self._map_float_to_decimal(self._nsb.virus_a_p)
 
     @property
-    def aind_virus_d_v(self) -> Optional[float]:
+    def aind_virus_d_v(self) -> Optional[Decimal]:
         """Maps virus_d_v to aind model"""
-        return self._nsb.virus_d_v
+        return self._map_float_to_decimal(self._nsb.virus_d_v)
 
     @property
     def aind_virus_hemisphere(self) -> Optional[Side]:
@@ -2778,19 +2799,19 @@ class MappedNSBList:
         )
 
     @property
-    def aind_virus_m_l(self) -> Optional[float]:
+    def aind_virus_m_l(self) -> Optional[Decimal]:
         """Maps virus_m_l to aind model"""
-        return self._nsb.virus_m_l
+        return self._map_float_to_decimal(self._nsb.virus_m_l)
 
     @property
-    def aind_weight_after_surgery(self) -> Optional[float]:
+    def aind_weight_after_surgery(self) -> Optional[Decimal]:
         """Maps weight_after_surgery to aind model"""
-        return self._nsb.weight_after_surgery
+        return self._map_float_to_decimal(self._nsb.weight_after_surgery)
 
     @property
-    def aind_weight_before_surger(self) -> Optional[float]:
+    def aind_weight_before_surger(self) -> Optional[Decimal]:
         """Maps weight_before_surger to aind model"""
-        return self._nsb.weight_before_surger
+        return self._map_float_to_decimal(self._nsb.weight_before_surger)
 
     @property
     def aind_work_station1st_injection(self) -> Optional[str]:
@@ -3080,17 +3101,17 @@ class MappedNSBList:
     @staticmethod
     def _map_burr_hole_number_to_probe(
         burr_hole_num: int,
-    ) -> Optional[ProbeName]:
+    ) -> Optional[str]:
         """Maps NSB Burr hole number into AIND ProbeName"""
         # TODO: add probes for burr_hole_nums 5 and 6
         if burr_hole_num == 1:
-            return ProbeName.PROBE_A
+            return "Probe A"
         elif burr_hole_num == 2:
-            return ProbeName.PROBE_B
+            return "Probe B"
         elif burr_hole_num == 3:
-            return ProbeName.PROBE_C
+            return "Probe C"
         elif burr_hole_num == 4:
-            return ProbeName.PROBE_D
+            return "Probe D"
         else:
             return None
 
@@ -3122,7 +3143,7 @@ class MappedNSBList:
         if self.has_hp_procedure():
             hp_during = self.aind_headpost_perform_dur
             hf_surgery_during_info = self.surgery_during_info(hp_during)
-            anaesthetic = Anaesthetic.construct(
+            anaesthetic = Anaesthetic.model_construct(
                 type="isoflurane",
                 duration=(
                     hf_surgery_during_info.anaesthetic_duration_in_minutes
@@ -3133,7 +3154,7 @@ class MappedNSBList:
                 hp=self.aind_headpost, hp_type=self.aind_headpost_type
             )
 
-            headframe_procedure = Headframe.construct(
+            headframe_procedure = Headframe.model_construct(
                 start_date=hf_surgery_during_info.start_date,
                 end_date=hf_surgery_during_info.start_date,
                 experimenter_full_name=experimenter_full_name,
@@ -3153,7 +3174,7 @@ class MappedNSBList:
             craniotomy_type = self.aind_craniotomy_type
             cran_during = self.aind_craniotomy_perform_d
             cran_during_info = self.surgery_during_info(cran_during)
-            anaesthetic = Anaesthetic.construct(
+            anaesthetic = Anaesthetic.model_construct(
                 type="isoflurane",
                 duration=cran_during_info.anaesthetic_duration_in_minutes,
                 level=cran_during_info.anaesthetic_level,
@@ -3163,15 +3184,15 @@ class MappedNSBList:
                 craniotomy_coordinates_reference = (
                     CoordinateReferenceLocation.LAMBDA
                 )
-                craniotomy_size = 5
+                craniotomy_size = Decimal("5")
             elif craniotomy_type == CraniotomyType.THREE_MM:
                 craniotomy_coordinates_reference = None
-                craniotomy_size = 3
+                craniotomy_size = Decimal("3")
             else:
                 craniotomy_coordinates_reference = None
                 craniotomy_size = None
 
-            cran_procedure = Craniotomy.construct(
+            cran_procedure = Craniotomy.model_construct(
                 start_date=cran_during_info.start_date,
                 end_date=cran_during_info.start_date,
                 experimenter_full_name=experimenter_full_name,
@@ -3194,7 +3215,7 @@ class MappedNSBList:
             )
 
             # all craniotomies are done with headframe.
-            headframe_procedure = Headframe.construct(
+            headframe_procedure = Headframe.model_construct(
                 start_date=cran_during_info.start_date,
                 end_date=cran_during_info.start_date,
                 experimenter_full_name=experimenter_full_name,
@@ -3222,7 +3243,7 @@ class MappedNSBList:
                     during=burr_hole_info.during,
                     inj_type=burr_hole_info.inj_type,
                 )
-                anaesthetic = Anaesthetic.construct(
+                anaesthetic = Anaesthetic.model_construct(
                     type="isoflurane",
                     duration=burr_during_info.anaesthetic_duration_in_minutes,
                     level=burr_during_info.anaesthetic_level,
@@ -3230,12 +3251,12 @@ class MappedNSBList:
                 injection_materials = (
                     None
                     if burr_hole_info.virus_strain is None
-                    else InjectionMaterial.construct(
+                    else InjectionMaterial.model_construct(
                         full_genome_name=burr_hole_info.virus_strain
                     )
                 )
                 if burr_hole_info.inj_type == InjectionType.IONTOPHORESIS:
-                    injection_proc = IontophoresisInjection.construct(
+                    injection_proc = IontophoresisInjection.model_construct(
                         start_date=burr_during_info.start_date,
                         end_date=burr_during_info.start_date,
                         experimenter_full_name=experimenter_full_name,
@@ -3263,7 +3284,7 @@ class MappedNSBList:
                         injection_materials=injection_materials,
                     )
                 elif burr_hole_info.inj_type == InjectionType.NANOJECT:
-                    injection_proc = NanojectInjection.construct(
+                    injection_proc = NanojectInjection.model_construct(
                         start_date=burr_during_info.start_date,
                         end_date=burr_during_info.start_date,
                         experimenter_full_name=experimenter_full_name,
@@ -3292,7 +3313,7 @@ class MappedNSBList:
                         injection_materials=injection_materials,
                     )
                 else:
-                    injection_proc = BrainInjection.construct(
+                    injection_proc = BrainInjection.model_construct(
                         start_date=burr_during_info.start_date,
                         end_date=burr_during_info.start_date,
                         experimenter_full_name=experimenter_full_name,
@@ -3331,12 +3352,12 @@ class MappedNSBList:
                     inj_type=burr_hole_info.inj_type,
                 )
                 bregma_to_lambda_distance = self.aind_breg2_lamb
-                anaesthetic = Anaesthetic.construct(
+                anaesthetic = Anaesthetic.model_construct(
                     type="isoflurane",
                     duration=burr_during_info.anaesthetic_duration_in_minutes,
                     level=burr_during_info.anaesthetic_level,
                 )
-                ophys_probe = OphysProbe.construct(
+                ophys_probe = OphysProbe.model_construct(
                     name=probe_name,
                     stereotactic_coordinate_ml=burr_hole_info.coordinate_ml,
                     stereotactic_coordinate_ap=burr_hole_info.coordinate_ap,
@@ -3349,21 +3370,21 @@ class MappedNSBList:
                         CoordinateReferenceLocation.BREGMA
                     ),
                 )
-                fiber_implant_proc = FiberImplant.construct(
+                fiber_implant_proc = FiberImplant.model_construct(
                     start_date=burr_during_info.start_date,
                     end_date=burr_during_info.start_date,
                     experimenter_full_name=experimenter_full_name,
                     iacuc_protocol=iacuc_protocol,
                     animal_weight_prior=burr_during_info.weight_prior,
                     animal_weight_post=burr_during_info.weight_post,
-                    probes=ophys_probe,
+                    probes=[ophys_probe],
                     anaesthesia=anaesthetic,
                 )
                 procedures.append(fiber_implant_proc)
 
         # Create generic procedure model if no specific procedures found
         if len(procedures) == 0 and self.aind_date_of_surgery:
-            subject_procedure = SubjectProcedure.construct(
+            subject_procedure = SubjectProcedure.model_construct(
                 start_date=self.aind_date_of_surgery,
                 end_date=self.aind_date_of_surgery,
                 experimenter_full_name=experimenter_full_name,

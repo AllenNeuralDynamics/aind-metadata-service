@@ -9,7 +9,7 @@ from typing import List, Tuple
 from unittest import TestCase
 from unittest import main as unittest_main
 
-from aind_data_schema.procedures import BrainInjection
+from aind_data_schema.core.procedures import BrainInjection
 
 from aind_metadata_service.sharepoint.nsb2019.mapping import MappedNSBList
 from aind_metadata_service.sharepoint.nsb2019.models import NSBList
@@ -62,11 +62,11 @@ class TestNSB2019Parsers(TestCase):
             expected_mapped_data.sort(key=lambda x: str(x))
             raw_file_name = list_item[2]
             logging.debug(f"Processing file: {raw_file_name}")
-            nsb_model = NSBList.parse_obj(raw_data)
+            nsb_model = NSBList.model_validate(raw_data)
             mapped_model = MappedNSBList(nsb=nsb_model)
             mapped_procedures = mapped_model.get_procedures()
             mapped_procedure_json = [
-                json.loads(p.json()) for p in mapped_procedures
+                json.loads(p.model_dump_json()) for p in mapped_procedures
             ]
             mapped_procedure_json.sort(key=lambda x: str(x))
 
@@ -76,7 +76,7 @@ class TestNSB2019Parsers(TestCase):
         """Tests that the properties are parsed correctly."""
         list_item = self.list_items[0]
         raw_data = deepcopy(list_item[0])
-        nsb_model = NSBList.parse_obj(raw_data)
+        nsb_model = NSBList.model_validate(raw_data)
         mapped_model = MappedNSBList(nsb=nsb_model)
         props = []
         for k in dir(mapped_model.__class__):
@@ -98,13 +98,13 @@ class TestNSB2019Parsers(TestCase):
         raw_data["Virus_x0020_A_x002f_P"] = "3 lambda"
         raw_data["AP2ndInj"] = "2 lambda"
         raw_data["ImplantIDCoverslipType"] = "3.5"
-        nsb_model = NSBList.parse_obj(raw_data)
+        nsb_model = NSBList.model_validate(raw_data)
         mapper = MappedNSBList(nsb=nsb_model)
         mapped_procedure = mapper.get_procedures()
         self.assertTrue(isinstance(mapped_procedure[0], BrainInjection))
         self.assertTrue(isinstance(mapped_procedure[1], BrainInjection))
         raw_data["Inj2Type"] = "Select..."
-        nsb_model = NSBList.parse_obj(raw_data)
+        nsb_model = NSBList.model_validate(raw_data)
         mapper = MappedNSBList(nsb=nsb_model)
         mapped_procedure = mapper.get_procedures()
         self.assertTrue(isinstance(mapped_procedure[0], BrainInjection))

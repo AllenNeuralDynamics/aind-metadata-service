@@ -4,7 +4,8 @@ methods to retrieve data."""
 import logging
 from typing import Optional
 
-from pydantic import BaseSettings, Extra, Field, SecretStr
+from pydantic import Extra, Field, SecretStr
+from pydantic_settings import BaseSettings
 from smartsheet import Smartsheet
 
 from aind_metadata_service import __version__

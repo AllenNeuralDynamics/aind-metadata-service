@@ -88,13 +88,19 @@ class TestSharepointSettings(unittest.TestCase):
             SharepointSettings(nsb_sharepoint_url="some_url")
 
         expected_error_message = (
-            "ValidationError("
-            "model='SharepointSettings', "
-            "errors=["
-            "{'loc': ('nsb_sharepoint_user',), 'msg': 'field required',"
-            " 'type': 'value_error.missing'}, "
-            "{'loc': ('nsb_sharepoint_password',), 'msg': 'field required',"
-            " 'type': 'value_error.missing'}])"
+            "2 validation errors for SharepointSettings\n"
+            "nsb_sharepoint_user\n"
+            "  Field required [type=missing,"
+            " input_value={'nsb_sharepoint_url': 'some_url'},"
+            " input_type=dict]\n"
+            "    For further information visit"
+            " https://errors.pydantic.dev/2.5/v/missing\n"
+            "nsb_sharepoint_password\n"
+            "  Field required"
+            " [type=missing, input_value={'nsb_sharepoint_url': 'some_url'},"
+            " input_type=dict]\n"
+            "    For further information visit"
+            " https://errors.pydantic.dev/2.5/v/missing"
         )
 
         self.assertEqual(expected_error_message, repr(e.exception))
@@ -206,7 +212,8 @@ class TestSharepointClient(unittest.TestCase):
         self.assertEqual(
             StatusCodes.DB_RESPONDED, merged_responses.status_code
         )
-        self.assertEqual(200, json_response.status_code)
+        # Most of the models are missing required fields not in NSB
+        self.assertEqual(406, json_response.status_code)
         self.assertEqual(
             expected_subject_procedures, actual_subject_procedures
         )
@@ -289,14 +296,16 @@ class TestSharepointClient(unittest.TestCase):
         self.assertEqual(
             StatusCodes.DB_RESPONDED, merged_responses_left.status_code
         )
-        self.assertEqual(200, json_response_left.status_code)
+        # Most of the models are missing required fields not stored by NSB
+        self.assertEqual(406, json_response_left.status_code)
         self.assertEqual(
             expected_subject_procedures_left, actual_subject_procedures_left
         )
         self.assertEqual(
             StatusCodes.DB_RESPONDED, merged_responses_right.status_code
         )
-        self.assertEqual(200, json_response_right.status_code)
+        # Most of the models are missing required fields not stored by NSB
+        self.assertEqual(406, json_response_right.status_code)
         self.assertEqual(
             expected_subject_procedures_right, actual_subject_procedures_right
         )
@@ -411,7 +420,7 @@ class TestSharepointClient(unittest.TestCase):
         )
         actual_json = merged_responses.map_to_json_response()
         expected_content = jsonable_encoder(
-            json.loads(response3.aind_models[0].json())
+            json.loads(response3.aind_models[0].model_dump_json())
         )
         expected_json = JSONResponse(
             status_code=207,
@@ -419,7 +428,7 @@ class TestSharepointClient(unittest.TestCase):
                 {
                     "message": (
                         "There was an error retrieving records from one or "
-                        "more of the databases.Valid Model."
+                        "more of the databases."
                     ),
                     "data": expected_content,
                 }

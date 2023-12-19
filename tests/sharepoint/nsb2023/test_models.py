@@ -43,7 +43,7 @@ class TestNSB2023Models(TestCase):
         for index in range(len(self.list_items)):
             list_item = self.list_items[index]
             logging.debug(f"Processing file: {LIST_ITEM_FILE_NAMES[index]}")
-            nsb_model = NSBList.parse_obj(list_item)
+            nsb_model = NSBList.model_validate(list_item)
             self.assertEqual(
                 nsb_model.author_id, int(list_item.get("AuthorId"))
             )
