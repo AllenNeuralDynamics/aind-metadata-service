@@ -48,17 +48,18 @@ class TestSmartsheetClient(unittest.IsolatedAsyncioTestCase):
         """Load json files before running tests."""
         with open(EXAMPLE_PATH, "r") as f:
             contents = json.load(f)
-        cls.example_sheet = contents
+        cls.example_sheet = json.dumps(contents)
 
     @patch("smartsheet.sheets.Sheets.get_sheet")
-    async def test_get_sheet_success(self, mock_get_sheet: MagicMock):
+    def test_get_sheet_success(self, mock_get_sheet: MagicMock):
         """Tests successful sheet return response"""
         mock_get_sheet.return_value.to_json.return_value = self.example_sheet
         settings = SmartsheetSettings(
             access_token="abc-123", sheet_id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
-        sheet = await client.get_sheet()
+        sheet_str = client.get_sheet()
+        sheet = json.loads(sheet_str)
         self.assertEqual("Published Protocols", sheet["name"])
         self.assertEqual(7478444220698500, sheet["id"])
         self.assertEqual(6, sheet["version"])
@@ -66,7 +67,7 @@ class TestSmartsheetClient(unittest.IsolatedAsyncioTestCase):
 
     @patch("smartsheet.sheets.Sheets.get_sheet")
     @patch("logging.error")
-    async def test_get_sheet_error(
+    def test_get_sheet_error(
         self, mock_log_error: MagicMock, mock_get_sheet: MagicMock
     ):
         """Tests sheet return error response"""
@@ -78,7 +79,7 @@ class TestSmartsheetClient(unittest.IsolatedAsyncioTestCase):
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         with self.assertRaises(Exception) as e:
-            _ = await client.get_sheet()
+            client.get_sheet()
 
         self.assertEqual("Error connecting to server", str(e.exception))
         mock_log_error.assert_called_once_with(

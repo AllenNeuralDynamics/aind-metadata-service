@@ -14,14 +14,23 @@ from aind_metadata_service.sharepoint.client import (
     SharePointClient,
     SharepointSettings,
 )
-from aind_metadata_service.smartsheet.client import SmartsheetSettings
+from aind_metadata_service.smartsheet.client import (
+    SmartSheetClient,
+    SmartsheetSettings,
+)
+from aind_metadata_service.smartsheet.funding.mapping import FundingMapper
+
+SMARTSHEET_FUNDING_ID = os.getenv("SMARTSHEET_FUNDING_ID")
+SMARTSHEET_FUNDING_TOKEN = os.getenv("SMARTSHEET_FUNDING_TOKEN")
 
 # TODO: Move client instantiation when the server starts instead of creating
-# one for each request?
+#  one for each request?
 sharepoint_settings = SharepointSettings()
 labtracks_settings = LabTracksSettings()
+funding_smartsheet_settings = SmartsheetSettings(
+    access_token=SMARTSHEET_FUNDING_TOKEN, sheet_id=SMARTSHEET_FUNDING_ID
+)
 
-smartsheet_settings = SmartsheetSettings()
 
 app = FastAPI()
 
@@ -34,6 +43,23 @@ app.add_middleware(
 
 # TODO: Handle favicon better?
 favicon_path = os.getenv("FAVICON_PATH")
+
+
+@app.get("/funding/{project_id}")
+async def retrieve_funding(project_id, pickle: bool = False):
+    """Retrieves funding information from smartsheet"""
+    smart_sheet_client = SmartSheetClient(
+        smartsheet_settings=funding_smartsheet_settings
+    )
+    # TODO: We can probably cache funding sheet
+    funding_sheet = smart_sheet_client.get_sheet()
+    mapper = FundingMapper(sheet_contents=funding_sheet)
+    model_response = mapper.get_model_response(project_code=project_id)
+    if pickle:
+        return model_response.map_to_pickled_response()
+    else:
+        return model_response.map_to_json_response()
+
 
 
 @app.get("/subject/{subject_id}")
