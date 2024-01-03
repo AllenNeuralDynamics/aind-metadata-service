@@ -2,13 +2,14 @@
 
 from datetime import datetime
 from enum import Enum
-from typing import List, Any, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel, field_validator
 
 
 class FundingColumnNames(str, Enum):
     """These are the expected columns we expect in the Funding SmartSheet"""
+
     PROJECT_CODE = "Project Code"
     FUNDING_SOURCE = "Funding Source"
     PROJECT_NAME = "Project Name"
@@ -21,8 +22,10 @@ class FundingColumnNames(str, Enum):
 # TODO: This is probably a generic SmartSheet model and not specific to the
 #  Funding sheet. We can probably move these elsewhere.
 
+
 class FundingColumn(BaseModel):
     """SmartSheet column information"""
+
     id: int
     index: int
     title: str
@@ -36,6 +39,7 @@ class FundingColumn(BaseModel):
 
 class FundingRowCell(BaseModel):
     """SmartSheet 'row.cell' information"""
+
     columnId: int
     displayValue: Optional[str] = None
     value: Optional[str] = None
@@ -43,6 +47,7 @@ class FundingRowCell(BaseModel):
 
 class FundingRow(BaseModel):
     """SmartSheet row information"""
+
     cells: List[FundingRowCell]
     createdAt: datetime
     expanded: bool
@@ -63,6 +68,7 @@ class FundingRow(BaseModel):
 
 class FundingSheet(BaseModel):
     """SmartSheet information"""
+
     columns: List[FundingColumn]
     accessLevel: str
     createdAt: datetime

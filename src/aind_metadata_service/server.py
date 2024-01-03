@@ -52,14 +52,12 @@ async def retrieve_funding(project_id, pickle: bool = False):
         smartsheet_settings=funding_smartsheet_settings
     )
     # TODO: We can probably cache funding sheet
-    funding_sheet = smart_sheet_client.get_sheet()
-    mapper = FundingMapper(sheet_contents=funding_sheet)
+    mapper = FundingMapper(smart_sheet_client=smart_sheet_client)
     model_response = mapper.get_model_response(project_code=project_id)
     if pickle:
         return model_response.map_to_pickled_response()
     else:
         return model_response.map_to_json_response()
-
 
 
 @app.get("/subject/{subject_id}")

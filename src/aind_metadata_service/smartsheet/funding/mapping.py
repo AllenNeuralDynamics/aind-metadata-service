@@ -10,6 +10,7 @@ from pydantic import ValidationError
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
+from aind_metadata_service.smartsheet.client import SmartSheetClient
 from aind_metadata_service.smartsheet.funding.models import (
     FundingColumnNames,
     FundingRow,
@@ -19,15 +20,20 @@ from aind_metadata_service.smartsheet.funding.models import (
 
 class FundingMapper:
     """Primary class to handle mapping data models and returning a response"""
-    def __init__(self, sheet_contents: str):
+
+    def __init__(self, smart_sheet_client: SmartSheetClient):
         """
         Class Constructor
         Parameters
         ----------
-        sheet_contents : The json string response from SmartSheet
+        smart_sheet_client: SmartSheetClient
         """
-        self.sheet_contents = sheet_contents
-        self.model = FundingSheet.model_validate_json(sheet_contents)
+        self.smart_sheet_client = smart_sheet_client
+
+    @property
+    def sheet_contents(self):
+        """Return sheet contents as a json string."""
+        return self.smart_sheet_client.get_sheet()
 
     @property
     def _column_id_map(self) -> Dict[str, Any]:
@@ -36,8 +42,27 @@ class FundingMapper:
         just the titles."""
         return {c.title: c.id for c in self.model.columns}
 
+    @property
+    def model(self) -> FundingSheet:
+        """Convert sheet contents to a pydantic model"""
+        return FundingSheet.model_validate_json(self.sheet_contents)
+
     @staticmethod
     def _parse_institution(input_name: str) -> Union[Institution, str]:
+        """
+        Generate Institution from string
+        Parameters
+        ----------
+        input_name : str
+          Institution name
+
+        Returns
+        -------
+        Union[Institution, str]
+          Either an Institution parsed from the name. If the Institution can't
+          be generated from the name, then it returns the input name.
+
+        """
         try:
             return Institution.from_name(input_name)
         except KeyError:
@@ -104,7 +129,9 @@ class FundingMapper:
                     fundee=investigators,
                 )
 
-    def _reduce_funding_list(self, funding_list: List[Funding]) -> List[Funding]:
+    def _reduce_funding_list(
+        self, funding_list: List[Funding]
+    ) -> List[Funding]:
         """
         There are multiple rows associated with a single project code in the
         SmartSheet. This method reduces that information down so that there
@@ -135,15 +162,20 @@ class FundingMapper:
             map_key = (funder_name, funding_info.grant_number)
             if funder_grant_to_investigators_map.get(map_key) is None:
                 funder_grant_to_investigators_map[map_key] = set(
-                    funding_info.fundee.split(",")
+                    [f.strip() for f in funding_info.fundee.split(",")]
                 )
             else:
                 og_fundee = funder_grant_to_investigators_map.get(map_key)
-                new_fundee = set(funding_info.fundee.split(","))
+                new_fundee = set(
+                    [f.strip() for f in funding_info.fundee.split(",")]
+                )
                 funder_grant_to_investigators_map[map_key] = og_fundee.union(
                     new_fundee
                 )
-        for funder_grant_key, fundees in funder_grant_to_investigators_map.items():
+        for (
+            funder_grant_key,
+            fundees,
+        ) in funder_grant_to_investigators_map.items():
             funder_name = funder_grant_key[0]
             grant_number = funder_grant_key[1]
             # The lists are small enough that it is probably okay to sort the
