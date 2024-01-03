@@ -63,7 +63,7 @@ class SmartSheetClient:
             ),
         )
 
-    async def get_sheet(self) -> dict:
+    def get_sheet(self) -> str:
         """Retrieve the sheet defined by the settings sheet_id."""
         try:
             smartsheet_response = self.smartsheet_client.Sheets.get_sheet(
