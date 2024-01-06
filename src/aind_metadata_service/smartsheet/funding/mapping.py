@@ -2,7 +2,7 @@
 aind-data-schema Funding model."""
 
 import logging
-from typing import Any, Dict, List, Optional, Union
+from typing import List, Optional, Union
 
 from aind_data_schema.core.data_description import Funding
 from aind_data_schema.models.institutions import Institution
@@ -10,42 +10,15 @@ from pydantic import ValidationError
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
-from aind_metadata_service.smartsheet.client import SmartSheetClient
 from aind_metadata_service.smartsheet.funding.models import (
     FundingColumnNames,
-    FundingRow,
-    FundingSheet,
 )
+from aind_metadata_service.smartsheet.models import SheetRow
+from aind_metadata_service.smartsheet.mapper import SmartSheetMapper
 
 
-class FundingMapper:
+class FundingMapper(SmartSheetMapper):
     """Primary class to handle mapping data models and returning a response"""
-
-    def __init__(self, smart_sheet_client: SmartSheetClient):
-        """
-        Class Constructor
-        Parameters
-        ----------
-        smart_sheet_client: SmartSheetClient
-        """
-        self.smart_sheet_client = smart_sheet_client
-
-    @property
-    def sheet_contents(self):
-        """Return sheet contents as a json string."""
-        return self.smart_sheet_client.get_sheet()
-
-    @property
-    def _column_id_map(self) -> Dict[str, Any]:
-        """SmartSheet uses integer ids for the columns. We need a way to
-        map the column titles to the ids so we can retrieve information using
-        just the titles."""
-        return {c.title: c.id for c in self.model.columns}
-
-    @property
-    def model(self) -> FundingSheet:
-        """Convert sheet contents to a pydantic model"""
-        return FundingSheet.model_validate_json(self.sheet_contents)
 
     @staticmethod
     def _parse_institution(input_name: str) -> Union[Institution, str]:
@@ -69,13 +42,13 @@ class FundingMapper:
             return input_name
 
     def _map_row_to_funding(
-        self, row: FundingRow, input_project_code: str
+        self, row: SheetRow, input_project_code: str
     ) -> Optional[Funding]:
         """
         Map a row to an optional funding model.
         Parameters
         ----------
-        row : FundingRow
+        row : SheetRow
         input_project_code : str
           The project code the user inputs
 
@@ -223,13 +196,13 @@ class FundingMapper:
         )
         return consolidated_list
 
-    def get_model_response(self, project_code: str) -> ModelResponse:
+    def get_model_response(self, input_id: str) -> ModelResponse:
         """
-        Return a ModelResponse for a given project code.
+        Return a ModelResponse for a given id.
         Parameters
         ----------
-        project_code : str
-          The project code that the user inputs.
+        input_id : str
+          The id with which to extract information
 
         Returns
         -------
@@ -239,7 +212,7 @@ class FundingMapper:
 
         """
         try:
-            funding_list = self._get_funding_list(project_code=project_code)
+            funding_list = self._get_funding_list(project_code=input_id)
             return ModelResponse(
                 aind_models=funding_list, status_code=StatusCodes.DB_RESPONDED
             )

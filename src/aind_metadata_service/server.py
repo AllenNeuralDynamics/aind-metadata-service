@@ -19,9 +19,14 @@ from aind_metadata_service.smartsheet.client import (
     SmartsheetSettings,
 )
 from aind_metadata_service.smartsheet.funding.mapping import FundingMapper
+from aind_metadata_service.smartsheet.perfusions.mapping import \
+    PerfusionsMapper
 
 SMARTSHEET_FUNDING_ID = os.getenv("SMARTSHEET_FUNDING_ID")
 SMARTSHEET_FUNDING_TOKEN = os.getenv("SMARTSHEET_FUNDING_TOKEN")
+
+SMARTSHEET_PERFUSIONS_ID = os.getenv("SMARTSHEET_PERFUSIONS_ID")
+SMARTSHEET_PERFUSIONS_TOKEN = os.getenv("SMARTSHEET_PERFUSIONS_TOKEN")
 
 # TODO: Move client instantiation when the server starts instead of creating
 #  one for each request?
@@ -29,6 +34,9 @@ sharepoint_settings = SharepointSettings()
 labtracks_settings = LabTracksSettings()
 funding_smartsheet_settings = SmartsheetSettings(
     access_token=SMARTSHEET_FUNDING_TOKEN, sheet_id=SMARTSHEET_FUNDING_ID
+)
+perfusions_smartsheet_settings = SmartsheetSettings(
+    access_token=SMARTSHEET_PERFUSIONS_TOKEN, sheet_id=SMARTSHEET_PERFUSIONS_ID
 )
 
 
@@ -45,6 +53,21 @@ app.add_middleware(
 favicon_path = os.getenv("FAVICON_PATH")
 
 
+@app.get("/perfusions/{subject_id}")
+async def retrieve_perfusions(subject_id, pickle: bool = False):
+    """Retrieves funding information from smartsheet"""
+    smart_sheet_client = SmartSheetClient(
+        smartsheet_settings=perfusions_smartsheet_settings
+    )
+    # TODO: We can probably cache funding sheet
+    mapper = PerfusionsMapper(smart_sheet_client=smart_sheet_client)
+    model_response = mapper.get_model_response(input_id=subject_id)
+    if pickle:
+        return model_response.map_to_pickled_response()
+    else:
+        return model_response.map_to_json_response()
+
+
 @app.get("/funding/{project_id}")
 async def retrieve_funding(project_id, pickle: bool = False):
     """Retrieves funding information from smartsheet"""
@@ -53,7 +76,7 @@ async def retrieve_funding(project_id, pickle: bool = False):
     )
     # TODO: We can probably cache funding sheet
     mapper = FundingMapper(smart_sheet_client=smart_sheet_client)
-    model_response = mapper.get_model_response(project_code=project_id)
+    model_response = mapper.get_model_response(input_id=project_id)
     if pickle:
         return model_response.map_to_pickled_response()
     else:
