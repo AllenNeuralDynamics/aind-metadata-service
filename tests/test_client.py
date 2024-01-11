@@ -5,8 +5,8 @@ from unittest import mock
 from unittest.mock import MagicMock, call
 
 import requests
-from aind_data_schema.procedures import Procedures
-from aind_data_schema.subject import Species, Subject
+from aind_data_schema.core.procedures import Procedures
+from aind_data_schema.core.subject import Species, Subject
 
 from aind_metadata_service.client import AindMetadataServiceClient
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
@@ -110,7 +110,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_subject_id = "00000"
         mock_response = requests.Response()
-        model = Procedures.construct(subject_id=mock_subject_id)
+        model = Procedures.model_construct(subject_id=mock_subject_id)
         model_response = ModelResponse(
             status_code=StatusCodes.DB_RESPONDED, aind_models=[model]
         )
@@ -142,7 +142,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_subject_id = "00000"
         mock_response = requests.Response()
-        model = Procedures.construct(subject_id=mock_subject_id)
+        model = Procedures.model_construct(subject_id=mock_subject_id)
         model_response = ModelResponse(
             status_code=StatusCodes.DB_RESPONDED, aind_models=[model]
         )

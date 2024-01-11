@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import List, Tuple
 from unittest.mock import MagicMock, Mock, patch
 
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
@@ -87,13 +88,19 @@ class TestSharepointSettings(unittest.TestCase):
             SharepointSettings(nsb_sharepoint_url="some_url")
 
         expected_error_message = (
-            "ValidationError("
-            "model='SharepointSettings', "
-            "errors=["
-            "{'loc': ('nsb_sharepoint_user',), 'msg': 'field required',"
-            " 'type': 'value_error.missing'}, "
-            "{'loc': ('nsb_sharepoint_password',), 'msg': 'field required',"
-            " 'type': 'value_error.missing'}])"
+            "2 validation errors for SharepointSettings\n"
+            "nsb_sharepoint_user\n"
+            "  Field required [type=missing,"
+            " input_value={'nsb_sharepoint_url': 'some_url'},"
+            " input_type=dict]\n"
+            "    For further information visit"
+            " https://errors.pydantic.dev/2.5/v/missing\n"
+            "nsb_sharepoint_password\n"
+            "  Field required"
+            " [type=missing, input_value={'nsb_sharepoint_url': 'some_url'},"
+            " input_type=dict]\n"
+            "    For further information visit"
+            " https://errors.pydantic.dev/2.5/v/missing"
         )
 
         self.assertEqual(expected_error_message, repr(e.exception))
@@ -205,7 +212,8 @@ class TestSharepointClient(unittest.TestCase):
         self.assertEqual(
             StatusCodes.DB_RESPONDED, merged_responses.status_code
         )
-        self.assertEqual(200, json_response.status_code)
+        # Most of the models are missing required fields not in NSB
+        self.assertEqual(406, json_response.status_code)
         self.assertEqual(
             expected_subject_procedures, actual_subject_procedures
         )
@@ -288,14 +296,16 @@ class TestSharepointClient(unittest.TestCase):
         self.assertEqual(
             StatusCodes.DB_RESPONDED, merged_responses_left.status_code
         )
-        self.assertEqual(200, json_response_left.status_code)
+        # Most of the models are missing required fields not stored by NSB
+        self.assertEqual(406, json_response_left.status_code)
         self.assertEqual(
             expected_subject_procedures_left, actual_subject_procedures_left
         )
         self.assertEqual(
             StatusCodes.DB_RESPONDED, merged_responses_right.status_code
         )
-        self.assertEqual(200, json_response_right.status_code)
+        # Most of the models are missing required fields not stored by NSB
+        self.assertEqual(406, json_response_right.status_code)
         self.assertEqual(
             expected_subject_procedures_right, actual_subject_procedures_right
         )
@@ -367,11 +377,69 @@ class TestSharepointClient(unittest.TestCase):
         self.assertEqual(
             StatusCodes.MULTI_STATUS, merged_responses.status_code
         )
-        self.assertEqual(200, json_response.status_code)
+        self.assertEqual(207, json_response.status_code)
         self.assertEqual(
             expected_subject_procedures, actual_subject_procedures
         )
         mock_log.assert_called_once_with("BrokenPipeError()")
+
+    @patch("aind_metadata_service.sharepoint.client.ClientContext")
+    def test_merge_three_responses(self, mock_sharepoint_client: MagicMock):
+        """Tests that multi status is returned as expected."""
+        inner_mock = MagicMock()
+        mock_sharepoint_client.return_value.with_credentials.return_value = (
+            inner_mock
+        )
+        mock_list_views = MagicMock()
+        inner_mock.web.lists.get_by_title.return_value.views = mock_list_views
+        mock_list_items = MagicMock()
+        mock_list_views.get_by_title.return_value.get_items.return_value = (
+            mock_list_items
+        )
+        list_item_2019_1 = self.list_items_2019[0][0]
+        mock_list_item2019 = MagicMock()
+        mock_list_item2019.to_json.return_value = list_item_2019_1
+        mock_list_items.filter.side_effect = [
+            [mock_list_item2019],
+        ]
+        client = SharePointClient(
+            nsb_site_url="some_url",
+            client_id="some_client_id",
+            client_secret="some_client_secret",
+            nsb_2019_list_title="some_list_title2019",
+            nsb_2023_list_title="some_list_title2023",
+        )
+
+        response1 = ModelResponse.internal_server_error_response()
+        response2 = ModelResponse.internal_server_error_response()
+        response3 = client.get_procedure_info(
+            subject_id="12345", list_title="some_list_title2019"
+        )
+        merged_responses = client.merge_responses(
+            [response1, response2, response3]
+        )
+        actual_json = merged_responses.map_to_json_response()
+        expected_content = jsonable_encoder(
+            json.loads(response3.aind_models[0].model_dump_json())
+        )
+        expected_json = JSONResponse(
+            status_code=207,
+            content=(
+                {
+                    "message": (
+                        "There was an error retrieving records from one or "
+                        "more of the databases."
+                    ),
+                    "data": expected_content,
+                }
+            ),
+        )
+
+        self.assertEqual(
+            StatusCodes.MULTI_STATUS, merged_responses.status_code
+        )
+        self.assertEqual(expected_json.status_code, actual_json.status_code)
+        self.assertEqual(expected_json.body, actual_json.body)
 
     def test_merge_procedures_empty_input(self):
         """Tests that merging nothing returns internal server error."""

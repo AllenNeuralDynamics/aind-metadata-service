@@ -4,7 +4,8 @@ methods to retrieve data."""
 import logging
 from typing import Optional
 
-from pydantic import BaseSettings, Extra, Field, SecretStr
+from pydantic import Extra, Field, SecretStr
+from pydantic_settings import BaseSettings
 from smartsheet import Smartsheet
 
 from aind_metadata_service import __version__
@@ -62,7 +63,7 @@ class SmartSheetClient:
             ),
         )
 
-    async def get_sheet(self) -> dict:
+    def get_sheet(self) -> str:
         """Retrieve the sheet defined by the settings sheet_id."""
         try:
             smartsheet_response = self.smartsheet_client.Sheets.get_sheet(

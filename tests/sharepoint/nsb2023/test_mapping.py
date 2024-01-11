@@ -4,12 +4,13 @@ import json
 import logging
 import os
 from copy import deepcopy
+from decimal import Decimal
 from pathlib import Path
 from typing import List, Tuple
 from unittest import TestCase
 from unittest import main as unittest_main
 
-from aind_data_schema.procedures import BrainInjection, CraniotomyType
+from aind_data_schema.core.procedures import BrainInjection, CraniotomyType
 
 from aind_metadata_service.sharepoint.nsb2023.mapping import (
     BurrHoleInfo,
@@ -68,11 +69,11 @@ class TestNSB2023Parsers(TestCase):
             expected_mapped_data.sort(key=lambda x: str(x))
             raw_file_name = list_item[2]
             logging.debug(f"Processing file: {raw_file_name}")
-            nsb_model = NSBList.parse_obj(raw_data)
+            nsb_model = NSBList.model_validate(raw_data)
             mapper = MappedNSBList(nsb=nsb_model)
             mapped_procedures = mapper.get_procedures()
             mapped_procedure_json = [
-                json.loads(p.json()) for p in mapped_procedures
+                json.loads(p.model_dump_json()) for p in mapped_procedures
             ]
             mapped_procedure_json.sort(key=lambda x: str(x))
             self.assertEqual(expected_mapped_data, mapped_procedure_json)
@@ -81,7 +82,7 @@ class TestNSB2023Parsers(TestCase):
         """Tests that the properties are parsed correctly."""
         list_item = self.list_items[0]
         raw_data = deepcopy(list_item[0])
-        nsb_model = NSBList.parse_obj(raw_data)
+        nsb_model = NSBList.model_validate(raw_data)
         mapped_model = MappedNSBList(nsb=nsb_model)
         props = []
         for k in dir(mapped_model.__class__):
@@ -96,6 +97,13 @@ class TestNSB2023Parsers(TestCase):
         self.assertEqual(MappedNSBList._parse_basic_float_str("0.25"), 0.25)
         self.assertIsNone(MappedNSBList._parse_basic_float_str("abc"))
 
+    def test_parse_basic_decimal_str(self):
+        """Tests parsing of basic decimal strings"""
+        self.assertEqual(
+            MappedNSBList._parse_basic_decimal_str("0.25"), Decimal(0.25)
+        )
+        self.assertIsNone(MappedNSBList._parse_basic_decimal_str("abc"), None)
+
     def test_craniotomy_edge_case(self):
         """Tests other craniotomy cases"""
 
@@ -104,7 +112,7 @@ class TestNSB2023Parsers(TestCase):
         raw_data = deepcopy(list_item[0])
         raw_data["Procedure"] = "WHC NP"
         raw_data["CraniotomyType"] = "WHC NP"
-        nsb_model1 = NSBList.parse_obj(raw_data)
+        nsb_model1 = NSBList.model_validate(raw_data)
         mapper = MappedNSBList(nsb=nsb_model1)
         mapped_procedure1 = mapper.get_procedures()
         mapped_procedure1.sort(key=lambda x: str(x))
@@ -116,7 +124,7 @@ class TestNSB2023Parsers(TestCase):
         # Check OTHER type
         raw_data["Procedure"] = "WHC NP"
         raw_data["CraniotomyType"] = "Select..."
-        nsb_model2 = NSBList.parse_obj(raw_data)
+        nsb_model2 = NSBList.model_validate(raw_data)
         mapper = MappedNSBList(nsb=nsb_model2)
         mapped_procedure2 = mapper.get_procedures()
         mapped_procedure2.sort(key=lambda x: str(x))
@@ -142,7 +150,7 @@ class TestNSB2023Parsers(TestCase):
         list_item = self.list_items[3]
         raw_data = deepcopy(list_item[0])
         raw_data["Inj1Type"] = "Select..."
-        nsb_model = NSBList.parse_obj(raw_data)
+        nsb_model = NSBList.model_validate(raw_data)
         mapper = MappedNSBList(nsb=nsb_model)
         mapped_procedure = mapper.get_procedures()
         proc_types = [type(p) for p in mapped_procedure]
@@ -152,7 +160,7 @@ class TestNSB2023Parsers(TestCase):
         """Tests edge case where burr hole number greater than 6"""
         list_item = self.list_items[2]
         raw_data = deepcopy(list_item[0])
-        nsb_model = NSBList.parse_obj(raw_data)
+        nsb_model = NSBList.model_validate(raw_data)
         mapper = MappedNSBList(nsb=nsb_model)
         self.assertIsNone(mapper._map_burr_hole_number_to_probe(7))
         self.assertEqual(BurrHoleInfo(), mapper.burr_hole_info(7))

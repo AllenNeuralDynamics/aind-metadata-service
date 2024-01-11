@@ -3,10 +3,11 @@
 import logging
 from typing import List, Optional
 
-from aind_data_schema.procedures import Procedures
+from aind_data_schema.core.procedures import Procedures
 from office365.runtime.auth.client_credential import ClientCredential
 from office365.sharepoint.client_context import ClientContext
-from pydantic import BaseSettings, Field, SecretStr
+from pydantic import Field, SecretStr
+from pydantic_settings import BaseSettings
 
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 from aind_metadata_service.sharepoint.nsb2019.procedures import (
@@ -149,7 +150,7 @@ class SharePointClient:
 
         """
         if subject_procedures:
-            procedures = Procedures.construct(subject_id=subject_id)
+            procedures = Procedures.model_construct(subject_id=subject_id)
             procedures.subject_procedures = subject_procedures
             return procedures
         else:
@@ -184,7 +185,7 @@ class SharePointClient:
                 + right_procedures[0].subject_procedures
             )
             return [
-                Procedures.construct(
+                Procedures.model_construct(
                     subject_id=subject_id,
                     subject_procedures=new_subject_procedures,
                 )
@@ -246,9 +247,23 @@ class SharePointClient:
                 left_procedures=left_procedures,
                 right_procedures=right_procedures,
             )
-            return ModelResponse(
-                aind_models=procedures, status_code=StatusCodes.DB_RESPONDED
-            )
+            if (
+                left_model_response.status_code == StatusCodes.MULTI_STATUS
+                or right_model_response.status_code == StatusCodes.MULTI_STATUS
+            ):
+                return ModelResponse(
+                    aind_models=procedures,
+                    status_code=StatusCodes.MULTI_STATUS,
+                    message=(
+                        "There was an error retrieving records from one or "
+                        "more of the databases."
+                    ),
+                )
+            else:
+                return ModelResponse(
+                    aind_models=procedures,
+                    status_code=StatusCodes.DB_RESPONDED,
+                )
 
     def merge_responses(
         self, model_responses: List[ModelResponse[Procedures]]
