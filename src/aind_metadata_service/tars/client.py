@@ -1,12 +1,8 @@
 """Module to instantiate a client to connect to TARS and retrieve data."""
 
 import requests
-from aind_data_schema.procedures import InjectionMaterial
 from azure.identity import ClientSecretCredential
 from pydantic import BaseSettings, Field, SecretStr
-
-from aind_metadata_service.tars.mapping import TarsResponseHandler
-from aind_metadata_service.tars.query_builder import TarsQueries
 
 
 class AzureSettings(BaseSettings):
@@ -47,31 +43,32 @@ class TarsClient:
         self.resource = resource
 
     @property
-    def get_access_token(self):
+    def access_token(self):
         """Retrieves Access Token"""
         token, exp = self.credentials.get_token(self.scope)
         return token
 
     @property
-    def get_headers(self):
+    def headers(self):
         """Builds headers for GET request."""
-        return {"Authorization": f"Bearer {self.get_access_token}"}
+        return {"Authorization": f"Bearer {self.access_token}"}
 
-    def get_injection_materials_info(
+    def get_prep_lot_response(
         self, prep_lot_number: str
-    ) -> InjectionMaterial:
+    ) -> requests.models.Response:
         """
-        Performs GET request.
+        Retrieves viral prep lot response from TARS.
         Parameters
         ----------
         prep_lot_number: str
-            Prep lot number used to query TARS.
+           Prep lot number used to query ViralPrepLot endpoint.
         """
-        headers = self.get_headers
-        query = TarsQueries.prep_lot_from_number(
-            resource=self.resource, prep_lot_number=prep_lot_number
+        headers = self.headers
+        query = (
+            f"{self.resource}/api/v1/ViralPrepLots"
+            f"?order=1&orderBy=id"
+            f"&searchFields=lot"
+            f"&search={prep_lot_number}"
         )
         response = requests.get(query, headers=headers)
-        trh = TarsResponseHandler()
-        injection_materials = trh.map_response_to_injection_materials(response)
-        return injection_materials
+        return response

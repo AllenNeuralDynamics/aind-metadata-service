@@ -2,7 +2,7 @@
 
 import os
 import unittest
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
 from aind_metadata_service.tars.client import AzureSettings, TarsClient
 
@@ -68,7 +68,7 @@ class TestTarsClient(unittest.TestCase):
         self.resource = "https://some_resource"
 
     @patch("aind_metadata_service.tars.client.ClientSecretCredential")
-    def test_get_access_token(self, mock_credential):
+    def test_access_token(self, mock_credential):
         """Tests that token is retrieved as expected."""
         mock_credential.return_value.get_token.return_value = (
             "mock_token",
@@ -77,10 +77,10 @@ class TestTarsClient(unittest.TestCase):
         tars_client = TarsClient(self.azure_settings, self.resource)
 
         expected_token = "mock_token"
-        self.assertEqual(tars_client.get_access_token, expected_token)
+        self.assertEqual(tars_client.access_token, expected_token)
 
     @patch("aind_metadata_service.tars.client.ClientSecretCredential")
-    def test_get_headers(self, mock_credential):
+    def test_headers(self, mock_credential):
         """Tests that headers is created as expected."""
         mock_credential.return_value.get_token.return_value = (
             "mock_token",
@@ -88,19 +88,22 @@ class TestTarsClient(unittest.TestCase):
         )
         tars_client = TarsClient(self.azure_settings, self.resource)
         expected_headers = {"Authorization": "Bearer mock_token"}
-        self.assertEqual(tars_client.get_headers, expected_headers)
+        self.assertEqual(tars_client.headers, expected_headers)
 
     @patch("aind_metadata_service.tars.client.ClientSecretCredential")
-    def test_get_injection_materials_info(self, mock_credential):
-        """Tests that client can fetch injection materials."""
+    def test_get_prep_lot_response(self, mock_credential):
+        """Tests that client can fetch viral prep lot."""
         mock_credential.return_value.get_token.return_value = (
             "mock_token",
             "mock_exp",
         )
         tars_client = TarsClient(self.azure_settings, self.resource)
 
-        with patch('aind_metadata_service.tars.client.requests.get') as mock_get:
+        with patch(
+            "aind_metadata_service.tars.client.requests.get"
+        ) as mock_get:
             mock_response = Mock()
+
             mock_response.json.return_value = {
                 "data": [
                     {
@@ -120,11 +123,19 @@ class TestTarsClient(unittest.TestCase):
                 ]
             }
             mock_get.return_value = mock_response
-            result = tars_client.get_injection_materials_info("12345")
+            result = tars_client.get_prep_lot_response("12345")
+            expected_url = (
+                f"{tars_client.resource}/api/v1/ViralPrepLots"
+                f"?order=1&orderBy=id"
+                f"&searchFields=lot"
+                f"&search=12345"
+            )
 
-        self.assertEqual(result.name, "rAAV-MGT_789")
-        self.assertEqual(result.prep_protocol, "SOP#VC002")
+        self.assertEqual(result.json()["data"][0]["lot"], "12345")
         mock_credential.return_value.get_token.assert_called_once()
+        mock_get.assert_called_once_with(
+            expected_url, headers=tars_client.headers
+        )
 
 
 if __name__ == "__main__":
