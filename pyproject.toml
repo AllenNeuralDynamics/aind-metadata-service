@@ -30,7 +30,7 @@ dev = [
     'flake8',
     'interrogate',
     'isort',
-    'Sphinx'
+    'Sphinx',
 ]
 
 server = [
@@ -42,6 +42,7 @@ server = [
     'uvicorn[standard]',
     'python-dateutil',
     'slims-python-api==6.8.0',
+    'azure-identity==1.15.0'
 ]
 
 client = [
