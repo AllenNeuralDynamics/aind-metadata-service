@@ -44,15 +44,15 @@ class TarsClient:
         self.resource = resource
 
     @property
-    def access_token(self):
+    def _access_token(self):
         """Retrieves Access Token"""
         token, exp = self.credentials.get_token(self.scope)
         return token
 
     @property
-    def headers(self):
+    def _headers(self):
         """Builds headers for GET request."""
-        return {"Authorization": f"Bearer {self.access_token}"}
+        return {"Authorization": f"Bearer {self._access_token}"}
 
     def get_prep_lot_response(
         self, prep_lot_number: str
@@ -64,7 +64,7 @@ class TarsClient:
         prep_lot_number: str
            Prep lot number used to query ViralPrepLot endpoint.
         """
-        headers = self.headers
+        headers = self._headers
         query = (
             f"{self.resource}/api/v1/ViralPrepLots"
             f"?order=1&orderBy=id"

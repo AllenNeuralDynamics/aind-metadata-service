@@ -67,7 +67,7 @@ class TestTarsClient(unittest.TestCase):
         tars_client = TarsClient(self.azure_settings, self.resource)
 
         expected_token = "mock_token"
-        self.assertEqual(tars_client.access_token, expected_token)
+        self.assertEqual(tars_client._access_token, expected_token)
 
     @patch("aind_metadata_service.tars.client.ClientSecretCredential")
     def test_headers(self, mock_credential):
@@ -78,10 +78,11 @@ class TestTarsClient(unittest.TestCase):
         )
         tars_client = TarsClient(self.azure_settings, self.resource)
         expected_headers = {"Authorization": "Bearer mock_token"}
-        self.assertEqual(tars_client.headers, expected_headers)
+        self.assertEqual(tars_client._headers, expected_headers)
 
     @patch("aind_metadata_service.tars.client.ClientSecretCredential")
-    def test_get_prep_lot_response(self, mock_credential):
+    @patch("aind_metadata_service.tars.client.requests.get")
+    def test_get_prep_lot_response(self, mock_get, mock_credential):
         """Tests that client can fetch viral prep lot."""
         mock_credential.return_value.get_token.return_value = (
             "mock_token",
@@ -89,42 +90,39 @@ class TestTarsClient(unittest.TestCase):
         )
         tars_client = TarsClient(self.azure_settings, self.resource)
 
-        with patch(
-            "aind_metadata_service.tars.client.requests.get"
-        ) as mock_get:
-            mock_response = Mock()
+        mock_response = Mock()
 
-            mock_response.json.return_value = {
-                "data": [
-                    {
-                        "lot": "12345",
-                        "datePrepped": "2023-12-15T12:34:56Z",
-                        "viralPrep": {
-                            "viralPrepType": {"name": "Crude-SOP#VC002"},
-                            "virus": {
-                                "aliases": [
-                                    {"name": "AiP123"},
-                                    {"name": "AiV456"},
-                                    {"name": "rAAV-MGT_789"},
-                                ]
-                            },
+        mock_response.json.return_value = {
+            "data": [
+                {
+                    "lot": "12345",
+                    "datePrepped": "2023-12-15T12:34:56Z",
+                    "viralPrep": {
+                        "viralPrepType": {"name": "Crude-SOP#VC002"},
+                        "virus": {
+                            "aliases": [
+                                {"name": "AiP123"},
+                                {"name": "AiV456"},
+                                {"name": "rAAV-MGT_789"},
+                            ]
                         },
-                    }
-                ]
-            }
-            mock_get.return_value = mock_response
-            result = tars_client.get_prep_lot_response("12345")
-            expected_url = (
-                f"{tars_client.resource}/api/v1/ViralPrepLots"
-                f"?order=1&orderBy=id"
-                f"&searchFields=lot"
-                f"&search=12345"
-            )
+                    },
+                }
+            ]
+        }
+        mock_get.return_value = mock_response
+        result = tars_client.get_prep_lot_response("12345")
+        expected_url = (
+            f"{tars_client.resource}/api/v1/ViralPrepLots"
+            f"?order=1&orderBy=id"
+            f"&searchFields=lot"
+            f"&search=12345"
+        )
 
         self.assertEqual(result.json()["data"][0]["lot"], "12345")
         mock_credential.return_value.get_token.assert_called_once()
         mock_get.assert_called_once_with(
-            expected_url, headers=tars_client.headers
+            expected_url, headers=tars_client._headers
         )
 
 
