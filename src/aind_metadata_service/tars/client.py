@@ -2,7 +2,8 @@
 
 import requests
 from azure.identity import ClientSecretCredential
-from pydantic import BaseSettings, Field, SecretStr
+from pydantic import Field, SecretStr
+from pydantic_settings import BaseSettings
 
 
 class AzureSettings(BaseSettings):

@@ -40,17 +40,7 @@ class TestAzureSettings(unittest.TestCase):
                 tenant_id="some_tenant",
             )
 
-        expected_error_message = (
-            "ValidationError("
-            "model='AzureSettings', "
-            "errors=["
-            "{'loc': ('client_secret',), 'msg': 'field required',"
-            " 'type': 'value_error.missing'}, "
-            "{'loc': ('scope',), 'msg': 'field required',"
-            " 'type': 'value_error.missing'}])"
-        )
-
-        self.assertEqual(expected_error_message, repr(e.exception))
+        self.assertIn("2 validation errors for AzureSettings", repr(e.exception))
 
 
 class TestTarsClient(unittest.TestCase):
