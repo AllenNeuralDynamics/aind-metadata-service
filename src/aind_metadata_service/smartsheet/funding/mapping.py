@@ -59,43 +59,25 @@ class FundingMapper(SmartSheetMapper):
           Funding model as good as it can.
 
         """
-        project_code = None
-        grant_number = None
-        institution = None
-        investigators = None
-        for cell in row.cells:
-            if (
-                cell.columnId
-                == self._column_id_map[FundingColumnNames.PROJECT_CODE.value]
-            ):
-                project_code = cell.value
-            if (
-                cell.columnId
-                == self._column_id_map[FundingColumnNames.INSTITUTION.value]
-            ):
-                institution = cell.value
-            if (
-                cell.columnId
-                == self._column_id_map[FundingColumnNames.GRANT_NUMBER.value]
-            ):
-                grant_number = cell.value
-            if (
-                cell.columnId
-                == self._column_id_map[FundingColumnNames.INVESTIGATORS.value]
-            ):
-                investigators = cell.value
+
+        row_dict = self.map_row_to_dict(row)
+        project_code = row_dict.get(FundingColumnNames.PROJECT_CODE)
+        grant_number = row_dict.get(FundingColumnNames.GRANT_NUMBER)
+        institution_value = row_dict.get(FundingColumnNames.INSTITUTION)
+        funder = self._parse_institution(institution_value)
+        investigators = row_dict.get(FundingColumnNames.INVESTIGATORS)
         if input_project_code != project_code:
             return None
         else:
             try:
                 return Funding(
-                    funder=self._parse_institution(institution),
+                    funder=funder,
                     grant_number=grant_number,
                     fundee=investigators,
                 )
             except ValidationError:
                 return Funding.model_construct(
-                    funder=self._parse_institution(institution),
+                    funder=funder,
                     grant_number=grant_number,
                     fundee=investigators,
                 )

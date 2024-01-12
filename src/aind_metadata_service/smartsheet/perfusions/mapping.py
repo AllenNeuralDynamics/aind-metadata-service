@@ -67,66 +67,40 @@ class PerfusionsMapper(SmartSheetMapper):
           Perfusion model as good as it can.
 
         """
-        subject_id = None
-        start_date = None
-        end_date = None
-        experimenter_full_name = None
         protocol_id = PerfusionProtocol.ID_10_17504
-        iacuc_protocol = None
-        animal_weight_prior = None
         animal_weight_post = None
         anaesthesia = None
-        notes = None
-        output_specimen_ids = set()
 
-        for cell in row.cells:
-            if (
-                cell.columnId
-                == self._column_id_map[PerfusionsColumnNames.SUBJECT_ID.value]
-            ):
-                subject_id = str(int(cell.value))
-            if (
-                cell.columnId
-                == self._column_id_map[PerfusionsColumnNames.DATE.value]
-            ):
-                try:
-                    start_date = date.fromisoformat(cell.value)
-                except ValueError:
-                    start_date = cell.value
-                end_date = start_date
-            if (
-                cell.columnId
-                == self._column_id_map[
-                    PerfusionsColumnNames.EXPERIMENTER.value
-                ]
-            ):
-                experimenter_full_name = cell.value
-            if (
-                cell.columnId
-                == self._column_id_map[
-                    PerfusionsColumnNames.IACUC_PROTOCOL.value
-                ]
-            ):
-                iacuc_protocol = self._map_iacuc_protocol(cell.value)
-            if (
-                cell.columnId
-                == self._column_id_map[
-                    PerfusionsColumnNames.ANIMAL_WEIGHT_PRIOR.value
-                ]
-            ):
-                animal_weight_prior = cell.value
-            if (
-                cell.columnId
-                == self._column_id_map[
-                    PerfusionsColumnNames.OUTPUT_SPECIMEN_ID.value
-                ]
-            ):
-                output_specimen_ids = {str(int(cell.value))}
-            if (
-                cell.columnId
-                == self._column_id_map[PerfusionsColumnNames.NOTES.value]
-            ):
-                notes = cell.value
+        row_dict = self.map_row_to_dict(row)
+        subject_id_value = row_dict.get(PerfusionsColumnNames.SUBJECT_ID)
+        subject_id = (
+            None if subject_id_value is None else str(int(subject_id_value))
+        )
+        start_date_value = row_dict.get(PerfusionsColumnNames.DATE)
+        try:
+            start_date = date.fromisoformat(start_date_value)
+        except ValueError:
+            start_date = start_date_value
+        end_date = start_date
+        experimenter_full_name = row_dict.get(
+            PerfusionsColumnNames.EXPERIMENTER
+        )
+        iacuc_protocol_value = row_dict.get(
+            PerfusionsColumnNames.IACUC_PROTOCOL
+        )
+        iacuc_protocol = self._map_iacuc_protocol(iacuc_protocol_value)
+        animal_weight_prior = row_dict.get(
+            PerfusionsColumnNames.ANIMAL_WEIGHT_PRIOR
+        )
+        output_specimen_id_value = row_dict.get(
+            PerfusionsColumnNames.OUTPUT_SPECIMEN_ID
+        )
+        output_specimen_ids = (
+            set()
+            if output_specimen_id_value is None
+            else {str(int(output_specimen_id_value))}
+        )
+        notes = row_dict.get(PerfusionsColumnNames.NOTES)
 
         if input_subject_id != subject_id:
             return None
