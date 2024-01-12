@@ -19,8 +19,9 @@ from aind_metadata_service.smartsheet.client import (
     SmartsheetSettings,
 )
 from aind_metadata_service.smartsheet.funding.mapping import FundingMapper
-from aind_metadata_service.smartsheet.perfusions.mapping import \
-    PerfusionsMapper
+from aind_metadata_service.smartsheet.perfusions.mapping import (
+    PerfusionsMapper,
+)
 
 SMARTSHEET_FUNDING_ID = os.getenv("SMARTSHEET_FUNDING_ID")
 SMARTSHEET_FUNDING_TOKEN = os.getenv("SMARTSHEET_FUNDING_TOKEN")
@@ -59,7 +60,7 @@ async def retrieve_perfusions(subject_id, pickle: bool = False):
     smart_sheet_client = SmartSheetClient(
         smartsheet_settings=perfusions_smartsheet_settings
     )
-    # TODO: We can probably cache funding sheet
+    # TODO: We can probably cache perfusions sheet
     mapper = PerfusionsMapper(smart_sheet_client=smart_sheet_client)
     model_response = mapper.get_model_response(input_id=subject_id)
     if pickle:

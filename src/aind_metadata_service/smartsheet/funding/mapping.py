@@ -10,11 +10,9 @@ from pydantic import ValidationError
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
-from aind_metadata_service.smartsheet.funding.models import (
-    FundingColumnNames,
-)
-from aind_metadata_service.smartsheet.models import SheetRow
+from aind_metadata_service.smartsheet.funding.models import FundingColumnNames
 from aind_metadata_service.smartsheet.mapper import SmartSheetMapper
+from aind_metadata_service.smartsheet.models import SheetRow
 
 
 class FundingMapper(SmartSheetMapper):

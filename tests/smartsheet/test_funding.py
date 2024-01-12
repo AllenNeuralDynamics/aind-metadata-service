@@ -19,7 +19,7 @@ from aind_metadata_service.smartsheet.client import (
     SmartsheetSettings,
 )
 from aind_metadata_service.smartsheet.funding.mapping import FundingMapper
-from aind_metadata_service.smartsheet.models import SheetRow, SheetFields
+from aind_metadata_service.smartsheet.models import SheetFields, SheetRow
 
 TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / ".."
 EXAMPLE_PATH = (
@@ -27,7 +27,7 @@ EXAMPLE_PATH = (
 )
 
 
-class TestSmartsheetClient(unittest.IsolatedAsyncioTestCase):
+class TestSmartsheetFundingClient(unittest.TestCase):
     """Class to test methods for SmartsheetClient."""
 
     @classmethod
@@ -118,7 +118,7 @@ class TestSmartsheetClient(unittest.IsolatedAsyncioTestCase):
         )
 
 
-class TestModels(unittest.TestCase):
+class TestFundingModels(unittest.TestCase):
     """Test methods in models package"""
 
     def test_funding_row_datetime_parsing(self):

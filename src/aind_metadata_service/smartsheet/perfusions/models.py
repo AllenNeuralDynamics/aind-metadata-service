@@ -19,4 +19,5 @@ class PerfusionsColumnNames(str, Enum):
 # TODO: Import this from somewhere
 class PerfusionProtocol(str, Enum):
     """Protocol ids"""
+
     ID_10_17504 = "dx.doi.org/10.17504/protocols.io.bg5vjy66"

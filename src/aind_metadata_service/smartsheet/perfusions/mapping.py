@@ -2,21 +2,21 @@
 aind-data-schema Funding model."""
 
 import logging
-from typing import List, Optional, Union
+import re
+from datetime import date
+from typing import List, Optional
 
 from aind_data_schema.core.procedures import Perfusion
-from aind_data_schema.models.institutions import Institution
-from datetime import date
 from pydantic import ValidationError
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
-from aind_metadata_service.smartsheet.perfusions.models import (
-    PerfusionsColumnNames, PerfusionProtocol
-)
-from aind_metadata_service.smartsheet.models import SheetRow
 from aind_metadata_service.smartsheet.mapper import SmartSheetMapper
-import re
+from aind_metadata_service.smartsheet.models import SheetRow
+from aind_metadata_service.smartsheet.perfusions.models import (
+    PerfusionProtocol,
+    PerfusionsColumnNames,
+)
 
 
 class PerfusionsMapper(SmartSheetMapper):
@@ -24,7 +24,9 @@ class PerfusionsMapper(SmartSheetMapper):
 
     IACUC_COL_PATTERN = re.compile(r"(\d+).*")
 
-    def _map_iacuc_protocol(self, iacuc_protocol_id: Optional[str]) -> Optional[str]:
+    def _map_iacuc_protocol(
+        self, iacuc_protocol_id: Optional[str]
+    ) -> Optional[str]:
         """
         Parses the iacuc protocol number from a string. For example,
         '2109 - Analysis of brain - wide neural circuits in the mouse' is

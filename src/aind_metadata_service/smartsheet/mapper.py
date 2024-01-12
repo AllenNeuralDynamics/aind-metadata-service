@@ -1,18 +1,12 @@
 """Module that handles the methods to map the SmartSheet response to the
 aind-data-schema Funding model."""
 
-import logging
-from typing import Any, Dict, List, Optional, Union
 from abc import ABC, abstractmethod
+from typing import Any, Dict
 
-from aind_data_schema.core.data_description import Funding
-from aind_data_schema.models.institutions import Institution
-from pydantic import ValidationError
-
-from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
 from aind_metadata_service.smartsheet.client import SmartSheetClient
-from aind_metadata_service.smartsheet.models import SheetRow, SheetFields
+from aind_metadata_service.smartsheet.models import SheetFields
 
 
 class SmartSheetMapper(ABC):

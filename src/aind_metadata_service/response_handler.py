@@ -4,7 +4,7 @@ import pickle
 from typing import Generic, List, Optional, TypeVar, Union
 
 from aind_data_schema.core.data_description import Funding
-from aind_data_schema.core.procedures import Procedures, Perfusion
+from aind_data_schema.core.procedures import Perfusion, Procedures
 from aind_data_schema.core.subject import Subject
 from fastapi import Response
 from fastapi.encoders import jsonable_encoder
