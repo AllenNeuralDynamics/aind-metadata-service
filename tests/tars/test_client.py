@@ -39,7 +39,6 @@ class TestAzureSettings(unittest.TestCase):
                 client_id="some_client",
                 tenant_id="some_tenant",
             )
-
         self.assertIn("2 validation errors for AzureSettings", repr(e.exception))
 
 
