@@ -53,7 +53,8 @@ class TestAzureSettings(unittest.TestCase):
 class TestTarsClient(unittest.TestCase):
     """Tests client methods"""
 
-    def setUp(self):
+    @patch("aind_metadata_service.tars.client.ClientSecretCredential")
+    def setUp(self, mock_credential):
         """Sets up Test TarsClient methods"""
         self.azure_settings = AzureSettings(
             tenant_id="some_tenant_id",
@@ -67,38 +68,26 @@ class TestTarsClient(unittest.TestCase):
         with open(EXAMPLE_PATH, "r") as f:
             self.expected_materials = json.load(f)
 
-    @patch("aind_metadata_service.tars.client.ClientSecretCredential")
-    def test_access_token(self, mock_credential):
+        mock_credential.return_value.get_token.return_value = (
+            "mock_token",
+            "mock_exp",
+        )
+        self.tars_client = TarsClient(self.azure_settings, self.resource)
+        # mock_credential.return_value.get_token.assert_called_once()
+
+    def test_access_token(self):
         """Tests that token is retrieved as expected."""
-        mock_credential.return_value.get_token.return_value = (
-            "mock_token",
-            "mock_exp",
-        )
-        tars_client = TarsClient(self.azure_settings, self.resource)
-
         expected_token = "mock_token"
-        self.assertEqual(tars_client._access_token, expected_token)
+        self.assertEqual(self.tars_client._access_token, expected_token)
 
-    @patch("aind_metadata_service.tars.client.ClientSecretCredential")
-    def test_headers(self, mock_credential):
+    def test_headers(self):
         """Tests that headers is created as expected."""
-        mock_credential.return_value.get_token.return_value = (
-            "mock_token",
-            "mock_exp",
-        )
-        tars_client = TarsClient(self.azure_settings, self.resource)
         expected_headers = {"Authorization": "Bearer mock_token"}
-        self.assertEqual(tars_client._headers, expected_headers)
+        self.assertEqual(self.tars_client._headers, expected_headers)
 
-    @patch("aind_metadata_service.tars.client.ClientSecretCredential")
     @patch("aind_metadata_service.tars.client.requests.get")
-    def test_get_prep_lot_response(self, mock_get, mock_credential):
+    def test_get_prep_lot_response(self, mock_get):
         """Tests that client can fetch viral prep lot."""
-        mock_credential.return_value.get_token.return_value = (
-            "mock_token",
-            "mock_exp",
-        )
-        tars_client = TarsClient(self.azure_settings, self.resource)
 
         mock_response = Mock()
 
@@ -121,21 +110,19 @@ class TestTarsClient(unittest.TestCase):
             ]
         }
         mock_get.return_value = mock_response
-        result = tars_client._get_prep_lot_response("12345")
+        result = self.tars_client._get_prep_lot_response("12345")
         expected_url = (
-            f"{tars_client.resource}/api/v1/ViralPrepLots"
+            f"{self.resource}/api/v1/ViralPrepLots"
             f"?order=1&orderBy=id"
             f"&searchFields=lot"
             f"&search=12345"
         )
 
         self.assertEqual(result.json()["data"][0]["lot"], "12345")
-        mock_credential.return_value.get_token.assert_called_once()
         mock_get.assert_called_once_with(
-            expected_url, headers=tars_client._headers
+            expected_url, headers=self.tars_client._headers
         )
 
-    @patch("aind_metadata_service.tars.client.ClientSecretCredential")
     @patch(
         "aind_metadata_service.tars.client.TarsClient._get_prep_lot_response"
     )
@@ -143,14 +130,9 @@ class TestTarsClient(unittest.TestCase):
         "aind_metadata_service.tars.mapping.TarsResponseHandler.map_response_to_injection_materials" # noqa
     )
     def test_get_injection_materials_info_success(
-        self, mock_map_response, mock_get_prep_lot_response, mock_credential
+        self, mock_map_response, mock_get_prep_lot_response
     ):
         """Tests that ModelResponse is created successfully."""
-        mock_credential.return_value.get_token.return_value = (
-            "mock_token",
-            "mock_exp",
-        )
-        tars_client = TarsClient(self.azure_settings, self.resource)
         mock_get_prep_lot_response.return_value = {
             "data": [
                 {
@@ -170,7 +152,7 @@ class TestTarsClient(unittest.TestCase):
             ]
         }
         mock_map_response.return_value = self.expected_materials
-        result = tars_client.get_injection_materials_info(
+        result = self.tars_client.get_injection_materials_info(
             "your_prep_lot_number"
         )
         expected_response = ModelResponse(
@@ -180,25 +162,19 @@ class TestTarsClient(unittest.TestCase):
         self.assertEqual(result.aind_models, expected_response.aind_models)
         self.assertEqual(result.status_code, expected_response.status_code)
 
-    @patch("aind_metadata_service.tars.client.ClientSecretCredential")
     @patch(
         "aind_metadata_service.tars.client.TarsClient._get_prep_lot_response"
     )
     def test_get_injection_materials_info_connection_error(
-        self, mock_get_prep_lot_response, mock_credential
+        self, mock_get_prep_lot_response
     ):
         """Tests that connection error is returned as expected."""
-        mock_credential.return_value.get_token.return_value = (
-            "mock_token",
-            "mock_exp",
-        )
-        tars_client = TarsClient(self.azure_settings, self.resource)
         mock_get_prep_lot_response.side_effect = ConnectionError(
             "Connection error"
         )
 
         # Call the method you want to test
-        result = tars_client.get_injection_materials_info(
+        result = self.tars_client.get_injection_materials_info(
             "your_prep_lot_number"
         )
 
@@ -208,22 +184,16 @@ class TestTarsClient(unittest.TestCase):
         self.assertEqual(result.aind_models, expected_response.aind_models)
         self.assertEqual(result.message, expected_response.message)
 
-    @patch("aind_metadata_service.tars.client.ClientSecretCredential")
     @patch(
         "aind_metadata_service.tars.client.TarsClient._get_prep_lot_response"
     )
     def test_get_injection_materials_info_internal_error(
-        self, mock_get_prep_lot_response, mock_credential
+        self, mock_get_prep_lot_response
     ):
         """Tests that Internal Error Response is returned as expected."""
-        mock_credential.return_value.get_token.return_value = (
-            "mock_token",
-            "mock_exp",
-        )
-        tars_client = TarsClient(self.azure_settings, self.resource)
         mock_get_prep_lot_response.side_effect = Exception("Some server error")
 
-        result = tars_client.get_injection_materials_info(
+        result = self.tars_client.get_injection_materials_info(
             "your_prep_lot_number"
         )
 
