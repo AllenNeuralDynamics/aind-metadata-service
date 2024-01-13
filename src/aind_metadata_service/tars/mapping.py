@@ -3,8 +3,9 @@
 import re
 from datetime import datetime
 from enum import Enum
+from typing import Optional
 
-from aind_data_schema.procedures import InjectionMaterial, VirusPrepType
+from aind_data_schema.core.procedures import InjectionMaterial, VirusPrepType
 
 
 class ViralPrepTypes(Enum):
@@ -121,7 +122,7 @@ class TarsResponseHandler:
 
     def map_response_to_injection_materials(
         self, response
-    ) -> InjectionMaterial:
+    ) -> Optional[list[InjectionMaterial]]:
         """
         Map prep lot dictionary to injection materials.
         Parameters
@@ -129,20 +130,25 @@ class TarsResponseHandler:
         response: requests.models.Response
             Response from GET Request.
         """
-        data = response.json()["data"][0]
-        prep_lot_number = data["lot"]
-        prep_date = self._convert_datetime(data["datePrepped"])
-        prep_type, prep_protocol = self._map_prep_type_and_protocol(
-            data["viralPrep"]["viralPrepType"]["name"]
-        )
-        material_id, viral_prep_id, name = self._map_virus_aliases(
-            data["viralPrep"]["virus"]["aliases"]
-        )
-        return InjectionMaterial(
-            prep_lot_number=prep_lot_number,
-            prep_date=prep_date,
-            prep_type=prep_type,
-            prep_protocol=prep_protocol,
-            material_id=material_id,
-            name=name,
-        )
+        injection_materials = []
+        data = response.json()["data"]
+        for lot in data:
+
+            prep_lot_number = lot["lot"]
+            prep_date = self._convert_datetime(lot["datePrepped"])
+            prep_type, prep_protocol = self._map_prep_type_and_protocol(
+                lot["viralPrep"]["viralPrepType"]["name"]
+            )
+            material_id, viral_prep_id, name = self._map_virus_aliases(
+                lot["viralPrep"]["virus"]["aliases"]
+            )
+            material = InjectionMaterial.model_construct(
+                prep_lot_number=prep_lot_number,
+                prep_date=prep_date,
+                prep_type=prep_type,
+                prep_protocol=prep_protocol,
+                material_id=material_id,
+                name=name,
+            )
+            injection_materials.append(material)
+        return None if injection_materials is None else injection_materials

@@ -5,6 +5,12 @@ import unittest
 from unittest.mock import Mock, patch
 
 from aind_metadata_service.tars.client import AzureSettings, TarsClient
+from aind_metadata_service.response_handler import ModelResponse, StatusCodes
+from pathlib import Path
+import json
+
+TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / ".."
+EXAMPLE_PATH = TEST_DIR / "resources" / "tars" / "mapped_materials.json"
 
 
 class TestAzureSettings(unittest.TestCase):
@@ -39,7 +45,9 @@ class TestAzureSettings(unittest.TestCase):
                 client_id="some_client",
                 tenant_id="some_tenant",
             )
-        self.assertIn("2 validation errors for AzureSettings", repr(e.exception))
+        self.assertIn(
+            "2 validation errors for AzureSettings", repr(e.exception)
+        )
 
 
 class TestTarsClient(unittest.TestCase):
@@ -55,6 +63,9 @@ class TestTarsClient(unittest.TestCase):
         )
 
         self.resource = "https://some_resource"
+
+        with open(EXAMPLE_PATH, "r") as f:
+            self.expected_materials = json.load(f)
 
     @patch("aind_metadata_service.tars.client.ClientSecretCredential")
     def test_access_token(self, mock_credential):
@@ -110,7 +121,7 @@ class TestTarsClient(unittest.TestCase):
             ]
         }
         mock_get.return_value = mock_response
-        result = tars_client.get_prep_lot_response("12345")
+        result = tars_client._get_prep_lot_response("12345")
         expected_url = (
             f"{tars_client.resource}/api/v1/ViralPrepLots"
             f"?order=1&orderBy=id"
@@ -123,6 +134,103 @@ class TestTarsClient(unittest.TestCase):
         mock_get.assert_called_once_with(
             expected_url, headers=tars_client._headers
         )
+
+    @patch("aind_metadata_service.tars.client.ClientSecretCredential")
+    @patch(
+        "aind_metadata_service.tars.client.TarsClient._get_prep_lot_response"
+    )
+    @patch(
+        "aind_metadata_service.tars.mapping.TarsResponseHandler.map_response_to_injection_materials" # noqa
+    )
+    def test_get_injection_materials_info_success(
+        self, mock_map_response, mock_get_prep_lot_response, mock_credential
+    ):
+        """Tests that ModelResponse is created successfully."""
+        mock_credential.return_value.get_token.return_value = (
+            "mock_token",
+            "mock_exp",
+        )
+        tars_client = TarsClient(self.azure_settings, self.resource)
+        mock_get_prep_lot_response.return_value = {
+            "data": [
+                {
+                    "lot": "12345",
+                    "datePrepped": "2023-12-15T12:34:56Z",
+                    "viralPrep": {
+                        "viralPrepType": {"name": "Crude-SOP#VC002"},
+                        "virus": {
+                            "aliases": [
+                                {"name": "AiP123"},
+                                {"name": "AiV456"},
+                                {"name": "rAAV-MGT_789"},
+                            ]
+                        },
+                    },
+                }
+            ]
+        }
+        mock_map_response.return_value = self.expected_materials
+        result = tars_client.get_injection_materials_info(
+            "your_prep_lot_number"
+        )
+        expected_response = ModelResponse(
+            aind_models=self.expected_materials,
+            status_code=StatusCodes.DB_RESPONDED,
+        )
+        self.assertEqual(result.aind_models, expected_response.aind_models)
+        self.assertEqual(result.status_code, expected_response.status_code)
+
+    @patch("aind_metadata_service.tars.client.ClientSecretCredential")
+    @patch(
+        "aind_metadata_service.tars.client.TarsClient._get_prep_lot_response"
+    )
+    def test_get_injection_materials_info_connection_error(
+        self, mock_get_prep_lot_response, mock_credential
+    ):
+        """Tests that connection error is returned as expected."""
+        mock_credential.return_value.get_token.return_value = (
+            "mock_token",
+            "mock_exp",
+        )
+        tars_client = TarsClient(self.azure_settings, self.resource)
+        mock_get_prep_lot_response.side_effect = ConnectionError(
+            "Connection error"
+        )
+
+        # Call the method you want to test
+        result = tars_client.get_injection_materials_info(
+            "your_prep_lot_number"
+        )
+
+        # Assert that the ModelResponse for connection error is returned
+        expected_response = ModelResponse.connection_error_response()
+        self.assertEqual(result.status_code, expected_response.status_code)
+        self.assertEqual(result.aind_models, expected_response.aind_models)
+        self.assertEqual(result.message, expected_response.message)
+
+    @patch("aind_metadata_service.tars.client.ClientSecretCredential")
+    @patch(
+        "aind_metadata_service.tars.client.TarsClient._get_prep_lot_response"
+    )
+    def test_get_injection_materials_info_internal_error(
+        self, mock_get_prep_lot_response, mock_credential
+    ):
+        """Tests that Internal Error Response is returned as expected."""
+        mock_credential.return_value.get_token.return_value = (
+            "mock_token",
+            "mock_exp",
+        )
+        tars_client = TarsClient(self.azure_settings, self.resource)
+        mock_get_prep_lot_response.side_effect = Exception("Some server error")
+
+        result = tars_client.get_injection_materials_info(
+            "your_prep_lot_number"
+        )
+
+        expected_response = ModelResponse.internal_server_error_response()
+        self.assertEqual(result.status_code, expected_response.status_code)
+        self.assertEqual(result.aind_models, expected_response.aind_models)
+        self.assertEqual(result.message, expected_response.message)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 """Module to test TARS mapping."""
 import unittest
-from datetime import date, datetime
+from datetime import datetime
 from unittest.mock import MagicMock
 
 from aind_metadata_service.tars.mapping import (
@@ -158,17 +158,16 @@ class TestTarsResponseHandler(unittest.TestCase):
         injection_material = handler.map_response_to_injection_materials(
             mock_response
         )
-        expected_injection_material = InjectionMaterial(
+        expected_injection_material = InjectionMaterial.model_construct(
             name="rAAV-MGT_789",
             material_id="AiP123",
-            full_genome_name=None,
             prep_lot_number="12345",
-            prep_date=date(2023, 12, 15),
+            prep_date=datetime(2023, 12, 15, 12, 34, 56),
             prep_type=VirusPrepType.CRUDE,
             prep_protocol="SOP#VC002",
         )
-        self.assertIsInstance(injection_material, InjectionMaterial)
-        self.assertEqual(injection_material, expected_injection_material)
+        self.assertIsInstance(injection_material[0], InjectionMaterial)
+        self.assertEqual(injection_material[0], expected_injection_material)
 
 
 if __name__ == "__main__":
