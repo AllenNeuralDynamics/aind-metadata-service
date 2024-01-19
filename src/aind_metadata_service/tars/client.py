@@ -4,6 +4,9 @@ import requests
 from azure.identity import ClientSecretCredential
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings
+from aind_metadata_service.tars.mapping import TarsResponseHandler
+from aind_metadata_service.response_handler import ModelResponse, StatusCodes
+import logging
 
 
 class AzureSettings(BaseSettings):
@@ -54,7 +57,7 @@ class TarsClient:
         """Builds headers for GET request."""
         return {"Authorization": f"Bearer {self._access_token}"}
 
-    def get_prep_lot_response(
+    def _get_prep_lot_response(
         self, prep_lot_number: str
     ) -> requests.models.Response:
         """
@@ -73,3 +76,26 @@ class TarsClient:
         )
         response = requests.get(query, headers=headers)
         return response
+
+    def get_injection_materials_info(
+        self, prep_lot_number: str
+    ) -> ModelResponse:
+        """
+        Handles response from TARS. Map the response, create a ModelResponse
+        """
+        try:
+            response = self._get_prep_lot_response(prep_lot_number)
+            trh = TarsResponseHandler()
+            injection_materials = trh.map_response_to_injection_materials(
+                response
+            )
+            return ModelResponse(
+                aind_models=injection_materials,
+                status_code=StatusCodes.DB_RESPONDED,
+            )
+        except ConnectionError as e:
+            logging.error(repr(e))
+            return ModelResponse.connection_error_response()
+        except Exception as e:
+            logging.error(repr(e))
+            return ModelResponse.internal_server_error_response()
