@@ -77,26 +77,6 @@ class TarsClient:
         response = requests.get(query, headers=headers)
         return response
 
-    def _get_molecular_response(
-        self, prep_lot_number: str
-    ) -> requests.models.Response:
-        """
-        Retrieves viral prep lot response from TARS.
-        Parameters
-        ----------
-        prep_lot_number: str
-           Prep lot number used to query ViralPrepLot endpoint.
-        """
-        headers = self._headers
-        query = (
-            f"{self.resource}/api/v1/ViralPrepLots"
-            f"?order=1&orderBy=id"
-            f"&searchFields=lot"
-            f"&search={prep_lot_number}"
-        )
-        response = requests.get(query, headers=headers)
-        return response
-
     def get_injection_materials_info(
         self, prep_lot_number: str
     ) -> ModelResponse:
