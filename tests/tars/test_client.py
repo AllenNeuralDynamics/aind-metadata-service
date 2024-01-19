@@ -127,7 +127,8 @@ class TestTarsClient(unittest.TestCase):
         "aind_metadata_service.tars.client.TarsClient._get_prep_lot_response"
     )
     @patch(
-        "aind_metadata_service.tars.mapping.TarsResponseHandler.map_response_to_injection_materials" # noqa
+        "aind_metadata_service.tars.mapping.TarsResponseHandler."
+        "map_response_to_injection_materials"
     )
     def test_get_injection_materials_info_success(
         self, mock_map_response, mock_get_prep_lot_response

@@ -166,7 +166,7 @@ class TestTarsResponseHandler(unittest.TestCase):
             prep_type=VirusPrepType.CRUDE,
             prep_protocol="SOP#VC002",
             full_genome_name="rAAV-MGT_789",
-            plasmid_name="AiP123"
+            plasmid_name="AiP123",
         )
         self.assertIsInstance(injection_material[0], InjectionMaterial)
         self.assertEqual(injection_material[0], expected_injection_material)

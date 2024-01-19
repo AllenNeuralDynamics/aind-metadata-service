@@ -139,9 +139,11 @@ class TarsResponseHandler:
             prep_type, prep_protocol = self._map_prep_type_and_protocol(
                 lot["viralPrep"]["viralPrepType"]["name"]
             )
-            plasmid_name, material_id, full_genome_name = self._map_virus_aliases(
-                lot["viralPrep"]["virus"]["aliases"]
-            )
+            (
+                plasmid_name,
+                material_id,
+                full_genome_name,
+            ) = self._map_virus_aliases(lot["viralPrep"]["virus"]["aliases"])
             material = InjectionMaterial.model_construct(
                 prep_lot_number=prep_lot_number,
                 prep_date=prep_date,
@@ -150,7 +152,7 @@ class TarsResponseHandler:
                 material_id=material_id,
                 name=full_genome_name,
                 full_genome_name=full_genome_name,
-                plasmid_name=plasmid_name
+                plasmid_name=plasmid_name,
             )
             injection_materials.append(material)
         return None if injection_materials is None else injection_materials
