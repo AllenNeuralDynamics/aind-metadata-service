@@ -3,7 +3,7 @@
 import re
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import Optional, List
 
 from aind_data_schema.core.procedures import InjectionMaterial, VirusPrepType
 
@@ -122,7 +122,7 @@ class TarsResponseHandler:
 
     def map_response_to_injection_materials(
         self, response
-    ) -> Optional[list[InjectionMaterial]]:
+    ) -> Optional[List[InjectionMaterial]]:
         """
         Map prep lot dictionary to injection materials.
         Parameters
@@ -155,4 +155,4 @@ class TarsResponseHandler:
                 plasmid_name=plasmid_name,
             )
             injection_materials.append(material)
-        return None if injection_materials is None else injection_materials
+        return None if injection_materials is [] else injection_materials
