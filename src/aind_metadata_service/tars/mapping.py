@@ -108,17 +108,17 @@ class TarsResponseHandler:
     @staticmethod
     def _map_virus_aliases(aliases: list) -> tuple[str, str, str]:
         """Maps aliases to full_genome_name, material_id, viral prep id"""
-        material_id, viral_prep_id, full_genome_name = None, None, None
+        plasmid_name, material_id, full_genome_name = None, None, None
         for alias in aliases:
             name = alias["name"]
             if VirusAliasPatterns.AIP.value.match(name):
-                material_id = name
+                plasmid_name = name
             elif VirusAliasPatterns.AIV.value.match(name):
-                viral_prep_id = name
+                material_id = name
             else:
-                # TODO: check pattern
                 full_genome_name = name
-        return material_id, viral_prep_id, full_genome_name
+        # TODO:  check molecular registry for genome name with plasmid name
+        return plasmid_name, material_id, full_genome_name
 
     def map_response_to_injection_materials(
         self, response
@@ -139,7 +139,7 @@ class TarsResponseHandler:
             prep_type, prep_protocol = self._map_prep_type_and_protocol(
                 lot["viralPrep"]["viralPrepType"]["name"]
             )
-            material_id, viral_prep_id, name = self._map_virus_aliases(
+            plasmid_name, material_id, full_genome_name = self._map_virus_aliases(
                 lot["viralPrep"]["virus"]["aliases"]
             )
             material = InjectionMaterial.model_construct(
@@ -148,7 +148,9 @@ class TarsResponseHandler:
                 prep_type=prep_type,
                 prep_protocol=prep_protocol,
                 material_id=material_id,
-                name=name,
+                name=full_genome_name,
+                full_genome_name=full_genome_name,
+                plasmid_name=plasmid_name
             )
             injection_materials.append(material)
         return None if injection_materials is None else injection_materials

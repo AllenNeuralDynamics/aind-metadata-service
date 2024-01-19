@@ -160,11 +160,13 @@ class TestTarsResponseHandler(unittest.TestCase):
         )
         expected_injection_material = InjectionMaterial.model_construct(
             name="rAAV-MGT_789",
-            material_id="AiP123",
+            material_id="AiV456",
             prep_lot_number="12345",
             prep_date=datetime(2023, 12, 15, 12, 34, 56),
             prep_type=VirusPrepType.CRUDE,
             prep_protocol="SOP#VC002",
+            full_genome_name="rAAV-MGT_789",
+            plasmid_name="AiP123"
         )
         self.assertIsInstance(injection_material[0], InjectionMaterial)
         self.assertEqual(injection_material[0], expected_injection_material)
