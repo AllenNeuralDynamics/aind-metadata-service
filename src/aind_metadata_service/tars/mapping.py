@@ -106,19 +106,27 @@ class TarsResponseHandler:
         return datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ")
 
     @staticmethod
-    def _map_virus_aliases(aliases: list) -> tuple[str, str, str]:
+    def _map_virus_aliases(aliases: list) -> tuple[str, str]:
         """Maps aliases to full_genome_name, material_id, viral prep id"""
-        plasmid_name, material_id, full_genome_name = None, None, None
+        plasmid_name, material_id = None, None
         for alias in aliases:
             name = alias["name"]
             if VirusAliasPatterns.AIP.value.match(name):
                 plasmid_name = name
             elif VirusAliasPatterns.AIV.value.match(name):
                 material_id = name
-            else:
-                full_genome_name = name
-        # TODO:  check molecular registry for genome name with plasmid name
-        return plasmid_name, material_id, full_genome_name
+        return plasmid_name, material_id
+
+    @staticmethod
+    def _map_genome_name(response, plasmid_name):
+        """"""
+        full_genome_name = None
+        data = response.json()["data"][0]
+        aliases = data["aliases"]
+        for alias in aliases:
+            if alias["name"] != plasmid_name:
+                full_genome_name = alias["name"]
+        return full_genome_name
 
     def map_response_to_injection_materials(
         self, response
@@ -142,8 +150,10 @@ class TarsResponseHandler:
             (
                 plasmid_name,
                 material_id,
-                full_genome_name,
             ) = self._map_virus_aliases(lot["viralPrep"]["virus"]["aliases"])
+            if plasmid_name:
+                # TODO: figure out how best to get molecules response bc creating a TARSclient here feels WRONG
+                full_genome_name = self._map_genome_name(molecule_response, plasmid_name)
             material = InjectionMaterial.model_construct(
                 prep_lot_number=prep_lot_number,
                 prep_date=prep_date,
