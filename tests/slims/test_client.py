@@ -54,20 +54,20 @@ class TestSlimsClient(unittest.IsolatedAsyncioTestCase):
         cls.example_record = record_object
 
     @patch("slims.slims.Slims.fetch")
-    async def test_slims_fetch_success(self, mock_fetch: MagicMock):
+    def test_slims_fetch_success(self, mock_fetch: MagicMock):
         """Tests successful record return response"""
         mock_fetch.return_value = [self.example_record]
         settings = SlimsSettings(
             username="test-user", password="pw", host="slims-host", db="test"
         )
         client = SlimsClient(settings=settings)
-        record = await client.get_record("123456")
+        record = client.get_record("123456")
         self.assertEqual(1, record.json_entity["pk"])
         self.assertEqual("Content", record.json_entity["tableName"])
 
     @patch("slims.slims.Slims.fetch")
     @patch("logging.error")
-    async def test_get_sheet_error(
+    def test_get_sheet_error(
         self, mock_log_error: MagicMock, mock_fetch: MagicMock
     ):
         """Tests sheet return error response"""
@@ -79,7 +79,7 @@ class TestSlimsClient(unittest.IsolatedAsyncioTestCase):
         )
         client = SlimsClient(settings=settings)
         with self.assertRaises(Exception) as e:
-            _ = await client.get_record(subject_id="12345")
+            client.get_record(subject_id="12345")
 
         self.assertEqual("Error connecting to server", str(e.exception))
         mock_log_error.assert_called_once_with(
