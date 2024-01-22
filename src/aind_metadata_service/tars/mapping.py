@@ -3,7 +3,7 @@
 import re
 from datetime import datetime
 from enum import Enum
-from typing import Optional, List
+from typing import List, Optional
 
 from aind_data_schema.core.procedures import InjectionMaterial, VirusPrepType
 
@@ -133,7 +133,6 @@ class TarsResponseHandler:
         injection_materials = []
         data = response.json()["data"]
         for lot in data:
-
             prep_lot_number = lot["lot"]
             prep_date = self._convert_datetime(lot["datePrepped"])
             prep_type, prep_protocol = self._map_prep_type_and_protocol(

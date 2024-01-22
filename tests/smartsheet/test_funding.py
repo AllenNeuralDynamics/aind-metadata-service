@@ -19,10 +19,7 @@ from aind_metadata_service.smartsheet.client import (
     SmartsheetSettings,
 )
 from aind_metadata_service.smartsheet.funding.mapping import FundingMapper
-from aind_metadata_service.smartsheet.funding.models import (
-    FundingRow,
-    FundingSheet,
-)
+from aind_metadata_service.smartsheet.models import SheetFields, SheetRow
 
 TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / ".."
 EXAMPLE_PATH = (
@@ -30,7 +27,7 @@ EXAMPLE_PATH = (
 )
 
 
-class TestSmartsheetClient(unittest.IsolatedAsyncioTestCase):
+class TestSmartsheetFundingClient(unittest.TestCase):
     """Class to test methods for SmartsheetClient."""
 
     @classmethod
@@ -49,9 +46,7 @@ class TestSmartsheetClient(unittest.IsolatedAsyncioTestCase):
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         mapper = FundingMapper(smart_sheet_client=client)
-        model_response = mapper.get_model_response(
-            project_code="122-01-001-10"
-        )
+        model_response = mapper.get_model_response(input_id="122-01-001-10")
         expected_models = [
             Funding(
                 funder=Institution.AI,
@@ -79,9 +74,7 @@ class TestSmartsheetClient(unittest.IsolatedAsyncioTestCase):
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         mapper = FundingMapper(smart_sheet_client=client)
-        model_response = mapper.get_model_response(
-            project_code="122-01-001-10"
-        )
+        model_response = mapper.get_model_response(input_id="122-01-001-10")
         expected_models = [
             Funding.model_construct(
                 funder="Some Institute",
@@ -112,9 +105,7 @@ class TestSmartsheetClient(unittest.IsolatedAsyncioTestCase):
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         mapper = FundingMapper(smart_sheet_client=client)
-        model_response = mapper.get_model_response(
-            project_code="122-01-001-10"
-        )
+        model_response = mapper.get_model_response(input_id="122-01-001-10")
         self.assertEqual(
             ModelResponse.internal_server_error_response().status_code,
             model_response.status_code,
@@ -127,13 +118,13 @@ class TestSmartsheetClient(unittest.IsolatedAsyncioTestCase):
         )
 
 
-class TestModels(unittest.TestCase):
+class TestFundingModels(unittest.TestCase):
     """Test methods in models package"""
 
     def test_funding_row_datetime_parsing(self):
         """Tests that datetime strings are being parsed correctly"""
 
-        funding_row = FundingRow(
+        funding_row = SheetRow(
             cells=[],
             createdAt=datetime(2020, 10, 10, 10, 10, 10, tzinfo=tz.UTC),
             expanded=True,
@@ -141,7 +132,7 @@ class TestModels(unittest.TestCase):
             modifiedAt=datetime(2020, 10, 10, 10, 10, 10, tzinfo=tz.UTC),
             rowNumber=1,
         )
-        funding_row_string0 = FundingRow(
+        funding_row_string0 = SheetRow(
             cells=[],
             createdAt="2020-10-10T10:10:10+00:00Z",
             expanded=True,
@@ -149,7 +140,7 @@ class TestModels(unittest.TestCase):
             modifiedAt="2020-10-10T10:10:10+00:00Z",
             rowNumber=1,
         )
-        funding_row_string1 = FundingRow(
+        funding_row_string1 = SheetRow(
             cells=[],
             createdAt="2020-10-10T10:10:10+00:00",
             expanded=True,
@@ -163,7 +154,7 @@ class TestModels(unittest.TestCase):
     def test_funding_sheet_datetime_parsing(self):
         """Tests that datetime strings are being parsed correctly"""
 
-        funding_sheet = FundingSheet(
+        funding_sheet = SheetFields(
             columns=[],
             accessLevel="",
             createdAt=datetime(2020, 10, 10, 10, 10, 10, tzinfo=tz.UTC),
@@ -184,7 +175,7 @@ class TestModels(unittest.TestCase):
             version=2,
             workspace={},
         )
-        funding_sheet_string0 = FundingSheet(
+        funding_sheet_string0 = SheetFields(
             columns=[],
             accessLevel="",
             createdAt="2020-10-10T10:10:10+00:00Z",
@@ -205,7 +196,7 @@ class TestModels(unittest.TestCase):
             version=2,
             workspace={},
         )
-        funding_sheet_string1 = FundingSheet(
+        funding_sheet_string1 = SheetFields(
             columns=[],
             accessLevel="",
             createdAt="2020-10-10T10:10:10+00:00",

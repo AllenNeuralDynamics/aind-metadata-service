@@ -54,6 +54,7 @@ class TestLabTracksSettings(unittest.TestCase):
             settings2.labtracks_password.get_secret_value(),
         )
 
+    @patch.dict(os.environ, {}, clear=True)
     def test_settings_errors(self):
         """Tests that errors are raised if settings are incorrect."""
 
