@@ -49,7 +49,7 @@ class TestSmartsheetPerfusionsClient(unittest.TestCase):
                 animal_weight_post=None,
                 weight_unit=MassUnit.G,
                 anaesthesia=None,
-                notes="Good",
+                notes=None,
                 procedure_type="Perfusion",
                 output_specimen_ids={"689418"},
             )

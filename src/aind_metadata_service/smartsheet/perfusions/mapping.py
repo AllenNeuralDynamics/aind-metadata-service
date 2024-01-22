@@ -100,7 +100,8 @@ class PerfusionsMapper(SmartSheetMapper):
             if output_specimen_id_value is None
             else {str(int(output_specimen_id_value))}
         )
-        notes = row_dict.get(PerfusionsColumnNames.NOTES)
+        # Notes should be None unless told otherwise
+        notes = None
 
         if input_subject_id != subject_id:
             return None
