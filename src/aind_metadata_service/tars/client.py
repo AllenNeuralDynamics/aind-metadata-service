@@ -1,12 +1,14 @@
 """Module to instantiate a client to connect to TARS and retrieve data."""
 
+import logging
+
 import requests
 from azure.identity import ClientSecretCredential
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings
-from aind_metadata_service.tars.mapping import TarsResponseHandler
+
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
-import logging
+from aind_metadata_service.tars.mapping import TarsResponseHandler
 
 
 class AzureSettings(BaseSettings):

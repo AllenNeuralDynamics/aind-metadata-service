@@ -39,7 +39,7 @@ class SlimsClient:
             settings.password.get_secret_value(),
         )
 
-    async def get_record(self, subject_id: str) -> Record:
+    def get_record(self, subject_id: str) -> Record:
         """
         Retrieve a record from the Contents Table
         Parameters
