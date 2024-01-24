@@ -127,7 +127,7 @@ class TestTarsResponseHandler(unittest.TestCase):
         self.assertEqual(viral_prep_aliases.full_genome_name, "UnknownVirus")
 
     def test_map_full_genome_name(self):
-        """"""
+        """Tests that genome name is mapped as expected."""
         response_data = {
             "data": [
                 {"aliases": [{"name": "AiP123"}, {"name": "rAAV-MGT_789"}]}
