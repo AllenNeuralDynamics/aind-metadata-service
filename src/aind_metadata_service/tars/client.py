@@ -114,7 +114,10 @@ class TarsClient:
                 viral_prep_aliases = trh.map_virus_aliases(
                     aliases=lot["viralPrep"]["virus"]["aliases"]
                 )
-                if viral_prep_aliases.plasmid_name and viral_prep_aliases.full_genome_name is None:
+                if (
+                    viral_prep_aliases.plasmid_name
+                    and viral_prep_aliases.full_genome_name is None
+                ):
                     # check molecular registry for full genome name
                     molecule_response = self._get_molecules_response(
                         viral_prep_aliases.plasmid_name
