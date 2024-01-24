@@ -144,6 +144,9 @@ class TestTarsClient(unittest.TestCase):
             f"&search=AiP123"
         )
 
+        self.assertEqual(
+            result.json()["data"][0]["aliases"][0]["name"], "AiP123"
+        )
         mock_get.assert_called_once_with(
             expected_url, headers=self.tars_client._headers
         )
