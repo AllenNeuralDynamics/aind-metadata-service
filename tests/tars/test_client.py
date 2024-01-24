@@ -4,8 +4,7 @@ import json
 import os
 import unittest
 from pathlib import Path
-from unittest.mock import Mock, patch
-
+from unittest.mock import Mock, MagicMock, patch
 from aind_data_schema.core.procedures import InjectionMaterial
 
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
@@ -173,8 +172,9 @@ class TestTarsClient(unittest.TestCase):
     @patch(
         "aind_metadata_service.tars.client.TarsClient._get_prep_lot_response"
     )
+    @patch("logging.error")
     def test_get_injection_materials_info_connection_error(
-        self, mock_get_prep_lot_response
+        self, mock_log_error: MagicMock, mock_get_prep_lot_response: MagicMock
     ):
         """Tests that connection error is returned as expected."""
         mock_get_prep_lot_response.side_effect = ConnectionError(
@@ -191,12 +191,16 @@ class TestTarsClient(unittest.TestCase):
         self.assertEqual(result.status_code, expected_response.status_code)
         self.assertEqual(result.aind_models, expected_response.aind_models)
         self.assertEqual(result.message, expected_response.message)
+        mock_log_error.assert_called_once_with(
+            "ConnectionError('Connection error')"
+        )
 
     @patch(
         "aind_metadata_service.tars.client.TarsClient._get_prep_lot_response"
     )
+    @patch("logging.error")
     def test_get_injection_materials_info_internal_error(
-        self, mock_get_prep_lot_response
+        self, mock_log_error: MagicMock, mock_get_prep_lot_response: MagicMock
     ):
         """Tests that Internal Error Response is returned as expected."""
         mock_get_prep_lot_response.side_effect = Exception("Some server error")
@@ -209,6 +213,9 @@ class TestTarsClient(unittest.TestCase):
         self.assertEqual(result.status_code, expected_response.status_code)
         self.assertEqual(result.aind_models, expected_response.aind_models)
         self.assertEqual(result.message, expected_response.message)
+        mock_log_error.assert_called_once_with(
+            "Exception('Some server error')"
+        )
 
 
 if __name__ == "__main__":

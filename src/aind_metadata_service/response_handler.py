@@ -4,7 +4,11 @@ import pickle
 from typing import Generic, List, Optional, TypeVar, Union
 
 from aind_data_schema.core.data_description import Funding
-from aind_data_schema.core.procedures import InjectionMaterial, Procedures
+from aind_data_schema.core.procedures import (
+    InjectionMaterial,
+    Perfusion,
+    Procedures,
+)
 from aind_data_schema.core.subject import Subject
 from fastapi import Response
 from fastapi.encoders import jsonable_encoder
@@ -13,7 +17,7 @@ from pydantic import ValidationError
 
 from aind_metadata_service.client import StatusCodes
 
-T = TypeVar("T", Subject, Procedures, Funding, InjectionMaterial)
+T = TypeVar("T", Subject, Procedures, Funding, Perfusion, InjectionMaterial)
 
 
 class ModelResponse(Generic[T]):

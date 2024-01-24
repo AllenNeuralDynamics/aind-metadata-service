@@ -3,7 +3,6 @@
 import datetime
 import re
 from enum import Enum
-
 from aind_data_schema.core.procedures import InjectionMaterial, VirusPrepType
 from pydantic import BaseModel, Field
 

@@ -81,6 +81,7 @@ class TestSharepointSettings(unittest.TestCase):
             settings2.nsb_sharepoint_password.get_secret_value(),
         )
 
+    @patch.dict(os.environ, {}, clear=True)
     def test_settings_errors(self):
         """Tests that errors are raised if settings are incorrect."""
 

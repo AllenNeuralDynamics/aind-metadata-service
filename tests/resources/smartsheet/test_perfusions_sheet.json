@@ -1,0 +1,200 @@
+{
+   "accessLevel": "OWNER",
+   "columns": [
+      {
+         "id": 3203397935124356,
+         "index": 0,
+         "primary": true,
+         "title": "subject id",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 0,
+         "width": 150
+      },
+      {
+         "id": 7706997562494852,
+         "index": 1,
+         "title": "date",
+         "type": "DATE",
+         "validation": true,
+         "version": 0,
+         "width": 150
+      },
+      {
+         "description": "Provide the full name of the person performing the perfusion or a unique identifier",
+         "id": 2077498028281732,
+         "index": 2,
+         "title": "experimenter",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 0,
+         "width": 150
+      },
+      {
+         "id": 6581097655652228,
+         "index": 3,
+         "options": [
+            "2005 - In Vivo Brain Stimulation",
+            "2006 - Optical Physiology Brain Observatory Pipelines",
+            "2010 - Validation of brain cell type enhancer AAV vectors in rats",
+            "2011 - Trans - synaptic tracing of whole - brain connections",
+            "2101 - Characterization of cell types and molecular adaptations in drug addiction",
+            "2102 - Surgical development for brain - wide Neuropixels recordings",
+            "2103 - Optical Physiology Mindscope Phase 4",
+            "2104 - Electrophysiology Mindscope Phase 4",
+            "2105 - Characterization of mouse genetic tools",
+            "2106 - Analysis of Integrated Neuronal Phenotypes",
+            "2107 - Circuit tracing and optical physiology of mouse cortex",
+            "2109 - Analysis of brain - wide neural circuits in the mouse",
+            "2110 - Specificity and Strength of Synaptic Signaling Within and Between Brain Areas",
+            "2112 - Characterization of the cell - type - specific molecular adaptations that occur during opioid use",
+            "2113 - In Vitro Single Cell Characterization",
+            "2114 - Characterization of transcriptomic cell types and molecular adaptations that occur during psychedelic drug use",
+            "2115 - Optical Physiology of Mouse Brain Circuits",
+            "2116 - Mouse Breeding",
+            "2117 - OpenScope Mindscope animal protocol for Optical Physiology and Neuropixel",
+            "2118 - Animal Holding and Procedures",
+            "2119 - Training and qualification of animal users",
+            "2120 - Analysis of Gene Expression - Function and Structure in the Mouse Brain",
+            "2201 - Interrogating projections and gene expression of neurons by in situ sequencing",
+            "2202 - Testing AAVs in Parkinson's mouse models",
+            "2204 - Primary neuron and brain slice culture from postnatal rodent brain",
+            "2205 - Optimization and validation of viral vectors",
+            "2207 - In Vitro Brain Stimulation",
+            "2212 - Investigating Brain States",
+            "2301 - Testing of enhancers and AAV gene therapy vectors",
+            "2304 - Neurosurgery & Behavior Training Protocol",
+            "2305 - In Vivo Brain Stimulation",
+            "2306 - Patch-seq characterization of mouse neurons in acute brain slices for cross-species comparison studies"
+         ],
+         "title": "iacuc protocol",
+         "type": "TEXT_NUMBER",
+         "validation": true,
+         "version": 2,
+         "width": 150
+      },
+      {
+         "id": 4329297841966980,
+         "index": 4,
+         "title": "animal weight prior (g)",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 0,
+         "width": 150
+      },
+      {
+         "description": "Provide the ids for the tissue following perfusion.",
+         "id": 8938618089328516,
+         "index": 5,
+         "title": "Output specimen id(s)",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 0,
+         "width": 150
+      },
+      {
+         "id": 4554304736153476,
+         "index": 6,
+         "options": [
+            "30% Sucrose",
+            "1xPBS",
+            "1xPBS (foil-wrapped tube)",
+            "1xPBS+ 0.01%Azide",
+            "1xPBS+ 0.01%Azide (foil-wrapped tube)"
+         ],
+         "title": "Postfix solution",
+         "type": "TEXT_NUMBER",
+         "validation": true,
+         "version": 2,
+         "width": 150
+      },
+      {
+         "id": 36971950854020,
+         "index": 7,
+         "title": "Notes",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 0,
+         "width": 414
+      }
+   ],
+   "createdAt": "2023-09-11T17:51:10+00:00Z",
+   "dependenciesEnabled": false,
+   "effectiveAttachmentOptions": [
+      "ONEDRIVE",
+      "FILE",
+      "BOX_COM",
+      "EGNYTE",
+      "DROPBOX",
+      "GOOGLE_DRIVE",
+      "EVERNOTE",
+      "LINK"
+   ],
+   "ganttEnabled": false,
+   "hasSummaryFields": false,
+   "id": 6224804269956,
+   "modifiedAt": "2023-10-02T19:20:03+00:00Z",
+   "name": "Perfusions",
+   "permalink": "https://app.smartsheet.com/sheets/j7VfHXXP2BVG277447tttwFA37V2X4GVw2VVQFR1",
+   "readOnly": true,
+   "resourceManagementEnabled": false,
+   "rows": [
+      {
+         "cells": [
+            {
+               "columnId": 3203397935124356,
+               "displayValue": "689418",
+               "value": 689418.0
+            },
+            {
+               "columnId": 7706997562494852,
+               "value": "2023-10-02"
+            },
+            {
+               "columnId": 2077498028281732,
+               "displayValue": "Jane Smith",
+               "value": "Jane Smith"
+            },
+            {
+               "columnId": 6581097655652228,
+               "displayValue": "2109 - Analysis of brain - wide neural circuits in the mouse",
+               "value": "2109 - Analysis of brain - wide neural circuits in the mouse"
+            },
+            {
+               "columnId": 4329297841966980,
+               "displayValue": "22",
+               "value": 22.0
+            },
+            {
+               "columnId": 8938618089328516,
+               "displayValue": "689418",
+               "value": 689418.0
+            },
+            {
+               "columnId": 4554304736153476,
+               "displayValue": "1xPBS",
+               "value": "1xPBS"
+            },
+            {
+               "columnId": 36971950854020,
+               "displayValue": "Good",
+               "value": "Good"
+            }
+         ],
+         "createdAt": "2023-10-02T19:20:03+00:00Z",
+         "expanded": true,
+         "id": 4072835845492612,
+         "modifiedAt": "2023-10-02T19:20:03+00:00Z",
+         "rowNumber": 1
+      }
+   ],
+   "totalRowCount": 1,
+   "userPermissions": {
+      "summaryPermissions": "ADMIN"
+   },
+   "userSettings": {
+      "criticalPathEnabled": false,
+      "displaySummaryTasks": true
+   },
+   "version": 8
+}
