@@ -124,6 +124,30 @@ class TestTarsClient(unittest.TestCase):
             expected_url, headers=self.tars_client._headers
         )
 
+    @patch("aind_metadata_service.tars.client.requests.get")
+    def test_get_molecules_response(self, mock_get):
+        """Tests that client can fetch viral prep lot."""
+
+        mock_response = Mock()
+
+        mock_response.json.return_value = {
+            "data": [
+                {"aliases": [{"name": "AiP123"}, {"name": "rAAV-MGT_789"}]}
+            ]
+        }
+        mock_get.return_value = mock_response
+        result = self.tars_client._get_molecules_response("AiP123")
+        expected_url = (
+            f"{self.resource}/api/v1/Molecules"
+            f"?order=1&orderBy=id"
+            f"&searchFields=name"
+            f"&search=AiP123"
+        )
+
+        mock_get.assert_called_once_with(
+            expected_url, headers=self.tars_client._headers
+        )
+
     @patch(
         "aind_metadata_service.tars.client.TarsClient._get_prep_lot_response"
     )
