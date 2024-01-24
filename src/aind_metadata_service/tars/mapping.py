@@ -1,11 +1,11 @@
 """Module to map data in TARS to aind_data_schema InjectionMaterial"""
 
+import datetime
 import re
-from datetime import datetime
 from enum import Enum
-from typing import Optional, List
 
 from aind_data_schema.core.procedures import InjectionMaterial, VirusPrepType
+from pydantic import BaseModel, Field
 
 
 class ViralPrepTypes(Enum):
@@ -46,6 +46,14 @@ class VirusAliasPatterns(Enum):
     # TODO: add pattern for genome_name once confirmed
     AIP = re.compile(r"^AiP[a-zA-Z0-9_-]+$")
     AIV = re.compile(r"^AiV[a-zA-Z0-9_-]+$")
+
+
+class ViralPrepAliases(BaseModel):
+    """Model for mapping viral prep aliases"""
+
+    plasmid_name: str = Field(..., title="Plasmid name")
+    material_id: str = Field(..., title="Material ID")
+    full_genome_name: str = Field(..., title="Full genome name")
 
 
 class TarsResponseHandler:
@@ -91,7 +99,7 @@ class TarsResponseHandler:
         return prep_type, prep_protocol
 
     @staticmethod
-    def _convert_datetime(date: str):
+    def _convert_datetime(date: str) -> datetime.date:
         """Converts date string to datetime date"""
         # Is it safe to assume it'll always be in this pattern
         date_pattern = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
@@ -102,24 +110,30 @@ class TarsResponseHandler:
                 " Please provide a date in the format: YYYY-MM-DDTHH:MM:SSZ"
             )
             return None
-
-        return datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ")
+        return datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ").date()
 
     @staticmethod
-    def _map_virus_aliases(aliases: list) -> tuple[str, str]:
+    def map_virus_aliases(aliases: list) -> ViralPrepAliases:
         """Maps aliases to full_genome_name, material_id, viral prep id"""
-        plasmid_name, material_id = None, None
+        plasmid_name, material_id, full_genome_name = None, None, None
         for alias in aliases:
             name = alias["name"]
             if VirusAliasPatterns.AIP.value.match(name):
                 plasmid_name = name
             elif VirusAliasPatterns.AIV.value.match(name):
                 material_id = name
-        return plasmid_name, material_id
+            else:
+                full_genome_name = name
+        viral_prep_aliases = ViralPrepAliases.model_construct(
+            plasmid_name=plasmid_name,
+            material_id=material_id,
+            full_genome_name=full_genome_name,
+        )
+        return viral_prep_aliases
 
     @staticmethod
-    def _map_genome_name(response, plasmid_name):
-        """"""
+    def map_full_genome_name(response, plasmid_name):
+        """Maps genome name from molecular response"""
         full_genome_name = None
         data = response.json()["data"][0]
         aliases = data["aliases"]
@@ -128,41 +142,31 @@ class TarsResponseHandler:
                 full_genome_name = alias["name"]
         return full_genome_name
 
-    def map_response_to_injection_materials(
-        self, response
-    ) -> Optional[List[InjectionMaterial]]:
+    def map_lot_to_injection_material(
+        self, viral_prep_lot: dict, viral_prep_aliases: ViralPrepAliases
+    ) -> InjectionMaterial:
         """
-        Map prep lot dictionary to injection materials.
+        Map prep lot dictionary to injection materials
         Parameters
         ----------
-        response: requests.models.Response
-            Response from GET Request.
+        viral_prep_lot: dict
+            Dictionary of raw viral prep lot data from TARS response.
+        viral_prep_aliases: ViralPrepAliases
+            Prep aliases mapped from TARS viral prep and molecular endpoints.
         """
-        injection_materials = []
-        data = response.json()["data"]
-        for lot in data:
-
-            prep_lot_number = lot["lot"]
-            prep_date = self._convert_datetime(lot["datePrepped"])
-            prep_type, prep_protocol = self._map_prep_type_and_protocol(
-                lot["viralPrep"]["viralPrepType"]["name"]
-            )
-            (
-                plasmid_name,
-                material_id,
-            ) = self._map_virus_aliases(lot["viralPrep"]["virus"]["aliases"])
-            if plasmid_name:
-                # TODO: figure out how best to get molecules response bc creating a TARSclient here feels WRONG
-                full_genome_name = self._map_genome_name(molecule_response, plasmid_name)
-            material = InjectionMaterial.model_construct(
-                prep_lot_number=prep_lot_number,
-                prep_date=prep_date,
-                prep_type=prep_type,
-                prep_protocol=prep_protocol,
-                material_id=material_id,
-                name=full_genome_name,
-                full_genome_name=full_genome_name,
-                plasmid_name=plasmid_name,
-            )
-            injection_materials.append(material)
-        return None if injection_materials is [] else injection_materials
+        prep_lot_number = viral_prep_lot["lot"]
+        prep_date = self._convert_datetime(viral_prep_lot["datePrepped"])
+        prep_type, prep_protocol = self._map_prep_type_and_protocol(
+            viral_prep_lot["viralPrep"]["viralPrepType"]["name"]
+        )
+        injection_material = InjectionMaterial.model_construct(
+            prep_lot_number=prep_lot_number,
+            prep_date=prep_date,
+            prep_type=prep_type,
+            prep_protocol=prep_protocol,
+            material_id=viral_prep_aliases.material_id,
+            name=viral_prep_aliases.full_genome_name,
+            full_genome_name=viral_prep_aliases.full_genome_name,
+            plasmid_name=viral_prep_aliases.plasmid_name,
+        )
+        return injection_material

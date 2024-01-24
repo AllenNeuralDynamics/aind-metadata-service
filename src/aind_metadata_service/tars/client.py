@@ -1,12 +1,14 @@
 """Module to instantiate a client to connect to TARS and retrieve data."""
 
+import logging
+
 import requests
 from azure.identity import ClientSecretCredential
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings
-from aind_metadata_service.tars.mapping import TarsResponseHandler
+
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
-import logging
+from aind_metadata_service.tars.mapping import TarsResponseHandler
 
 
 class AzureSettings(BaseSettings):
@@ -106,9 +108,26 @@ class TarsClient:
         try:
             response = self._get_prep_lot_response(prep_lot_number)
             trh = TarsResponseHandler()
-            injection_materials = trh.map_response_to_injection_materials(
-                response
-            )
+            injection_materials = []
+            data = response.json()["data"]
+            for lot in data:
+                viral_prep_aliases = trh.map_virus_aliases(
+                    aliases=lot["viralPrep"]["virus"]["aliases"]
+                )
+                if viral_prep_aliases.plasmid_name:
+                    # check molecular registry for full genome name
+                    molecule_response = self._get_molecules_response(
+                        viral_prep_aliases.plasmid_name
+                    )
+                    viral_prep_aliases.full_genome_name = (
+                        trh.map_full_genome_name(
+                            molecule_response, viral_prep_aliases.plasmid_name
+                        )
+                    )
+                injection_material = trh.map_lot_to_injection_material(
+                    viral_prep_lot=lot, viral_prep_aliases=viral_prep_aliases
+                )
+                injection_materials.append(injection_material)
             return ModelResponse(
                 aind_models=injection_materials,
                 status_code=StatusCodes.DB_RESPONDED,
