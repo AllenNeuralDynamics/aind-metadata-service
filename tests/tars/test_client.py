@@ -4,7 +4,8 @@ import json
 import os
 import unittest
 from pathlib import Path
-from unittest.mock import Mock, MagicMock, patch
+from unittest.mock import MagicMock, Mock, patch
+
 from aind_data_schema.core.procedures import InjectionMaterial
 
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes

@@ -1,8 +1,10 @@
 """Module to map data in TARS to aind_data_schema InjectionMaterial"""
 
-import datetime
 import re
+from datetime import date, datetime
 from enum import Enum
+from typing import Optional
+
 from aind_data_schema.core.procedures import InjectionMaterial, VirusPrepType
 from pydantic import BaseModel, Field
 
@@ -98,7 +100,7 @@ class TarsResponseHandler:
         return prep_type, prep_protocol
 
     @staticmethod
-    def _convert_datetime(date: str) -> datetime.date:
+    def _convert_datetime(date: str) -> Optional[date]:
         """Converts date string to datetime date"""
         # Is it safe to assume it'll always be in this pattern
         date_pattern = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
@@ -109,7 +111,7 @@ class TarsResponseHandler:
                 " Please provide a date in the format: YYYY-MM-DDTHH:MM:SSZ"
             )
             return None
-        return datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ").date()
+        return datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ").date()
 
     @staticmethod
     def map_virus_aliases(aliases: list) -> ViralPrepAliases:
@@ -131,7 +133,7 @@ class TarsResponseHandler:
         return viral_prep_aliases
 
     @staticmethod
-    def map_full_genome_name(response, plasmid_name):
+    def map_full_genome_name(response, plasmid_name) -> str:
         """Maps genome name from molecular response"""
         full_genome_name = None
         data = response.json()["data"][0]
