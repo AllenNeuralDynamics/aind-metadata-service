@@ -133,15 +133,39 @@ class TestTarsResponseHandler(unittest.TestCase):
                 {"aliases": [{"name": "AiP123"}, {"name": "rAAV-MGT_789"}]}
             ]
         }
+        response_data2 = {
+            "data": [
+                {"aliases": [{"name": "rAAV-MGT_789"}, {"name": "AiP123"}]}
+            ]
+        }
+        response_data3 = {
+            "data": [{"aliases": [{"name": None}, {"name": "AiP123"}]}]
+        }
         mock_response = MagicMock()
         mock_response.json.return_value = response_data
+
+        mock_response2 = MagicMock()
+        mock_response2.json.return_value = response_data2
+
+        mock_response3 = MagicMock()
+        mock_response3.json.return_value = response_data3
 
         handler = TarsResponseHandler()
         genome_name = handler.map_full_genome_name(
             mock_response, plasmid_name="AiP123"
         )
 
+        genome_name2 = handler.map_full_genome_name(
+            mock_response2, plasmid_name="AiP123"
+        )
+
+        genome_name3 = handler.map_full_genome_name(
+            mock_response3, plasmid_name="AiP123"
+        )
+
         self.assertEqual(genome_name, "rAAV-MGT_789")
+        self.assertEqual(genome_name2, "rAAV-MGT_789")
+        self.assertIsNone(genome_name3)
 
     def test_map_lot_to_injection_materials(self):
         """Tests that prep lot is mapped to InjectionMaterial as expected."""

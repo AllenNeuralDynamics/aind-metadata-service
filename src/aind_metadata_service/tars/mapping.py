@@ -1,12 +1,12 @@
 """Module to map data in TARS to aind_data_schema InjectionMaterial"""
 
 import re
+from dataclasses import dataclass
 from datetime import date, datetime
 from enum import Enum
 from typing import Optional
 
 from aind_data_schema.core.procedures import InjectionMaterial, VirusPrepType
-from dataclasses import dataclass
 
 
 class ViralPrepTypes(Enum):
@@ -139,10 +139,11 @@ class TarsResponseHandler:
         full_genome_name = None
         data = response.json()["data"][0]
         aliases = data["aliases"]
-        for alias in aliases:
-            if alias["name"] != plasmid_name:
-                full_genome_name = alias["name"]
-                break
+        if len(aliases) == 2:
+            if aliases[0]["name"] != plasmid_name:
+                full_genome_name = aliases[0]["name"]
+            elif aliases[1]["name"] != plasmid_name:
+                full_genome_name = aliases[1]["name"]
         return full_genome_name
 
     def map_lot_to_injection_material(
