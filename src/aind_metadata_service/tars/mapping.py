@@ -6,7 +6,7 @@ from enum import Enum
 from typing import Optional
 
 from aind_data_schema.core.procedures import InjectionMaterial, VirusPrepType
-from pydantic import BaseModel, Field
+from dataclasses import dataclass
 
 
 class ViralPrepTypes(Enum):
@@ -49,12 +49,13 @@ class VirusAliasPatterns(Enum):
     AIV = re.compile(r"^AiV[a-zA-Z0-9_-]+$")
 
 
-class ViralPrepAliases(BaseModel):
+@dataclass
+class ViralPrepAliases:
     """Model for mapping viral prep aliases"""
 
-    plasmid_name: str = Field(..., title="Plasmid name")
-    material_id: str = Field(..., title="Material ID")
-    full_genome_name: str = Field(..., title="Full genome name")
+    plasmid_name: str
+    material_id: str
+    full_genome_name: str
 
 
 class TarsResponseHandler:
@@ -125,7 +126,7 @@ class TarsResponseHandler:
                 material_id = name
             else:
                 full_genome_name = name
-        viral_prep_aliases = ViralPrepAliases.model_construct(
+        viral_prep_aliases = ViralPrepAliases(
             plasmid_name=plasmid_name,
             material_id=material_id,
             full_genome_name=full_genome_name,
@@ -133,7 +134,7 @@ class TarsResponseHandler:
         return viral_prep_aliases
 
     @staticmethod
-    def map_full_genome_name(response, plasmid_name) -> str:
+    def map_full_genome_name(response, plasmid_name) -> Optional[str]:
         """Maps genome name from molecular response"""
         full_genome_name = None
         data = response.json()["data"][0]
@@ -141,6 +142,7 @@ class TarsResponseHandler:
         for alias in aliases:
             if alias["name"] != plasmid_name:
                 full_genome_name = alias["name"]
+                break
         return full_genome_name
 
     def map_lot_to_injection_material(

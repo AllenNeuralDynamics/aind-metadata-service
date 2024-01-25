@@ -87,7 +87,7 @@ class TarsClient:
         Parameters
         ----------
         plasmid_name: str
-           Prep lot number used to query ViralPrepLot endpoint.
+           Plasmid name used to query Molecules endpoint.
         """
         headers = self._headers
         query = (
