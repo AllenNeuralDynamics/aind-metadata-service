@@ -64,7 +64,7 @@ class TarsResponseHandler:
     @staticmethod
     def _map_prep_type_and_protocol(
         viral_prep_type: str,
-    ) -> tuple[VirusPrepType, str]:
+    ) -> tuple[Optional[VirusPrepType], Optional[str]]:
         """Maps TARS viral prep type to prep_type and prep_protocol"""
         if viral_prep_type == ViralPrepTypes.CRUDE_SOP.value:
             prep_type = VirusPrepType.CRUDE
