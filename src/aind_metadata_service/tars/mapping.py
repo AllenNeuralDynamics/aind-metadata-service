@@ -53,9 +53,9 @@ class VirusAliasPatterns(Enum):
 class ViralPrepAliases:
     """Model for mapping viral prep aliases"""
 
-    plasmid_name: str
-    material_id: str
-    full_genome_name: str
+    plasmid_name: Optional[str]
+    material_id: Optional[str]
+    full_genome_name: Optional[str]
 
 
 class TarsResponseHandler:
