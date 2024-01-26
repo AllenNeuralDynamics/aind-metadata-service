@@ -6,6 +6,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, Mock, patch
 
+from aind_data_schema.core.procedures import InjectionMaterial
+
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 from aind_metadata_service.tars.client import AzureSettings, TarsClient
 
@@ -123,18 +125,44 @@ class TestTarsClient(unittest.TestCase):
             expected_url, headers=self.tars_client._headers
         )
 
+    @patch("aind_metadata_service.tars.client.requests.get")
+    def test_get_molecules_response(self, mock_get):
+        """Tests that client can fetch viral prep lot."""
+
+        mock_response = Mock()
+
+        mock_response.json.return_value = {
+            "data": [
+                {"aliases": [{"name": "AiP123"}, {"name": "rAAV-MGT_789"}]}
+            ]
+        }
+        mock_get.return_value = mock_response
+        result = self.tars_client._get_molecules_response("AiP123")
+        expected_url = (
+            f"{self.resource}/api/v1/Molecules"
+            f"?order=1&orderBy=id"
+            f"&searchFields=name"
+            f"&search=AiP123"
+        )
+
+        self.assertEqual(
+            result.json()["data"][0]["aliases"][0]["name"], "AiP123"
+        )
+        mock_get.assert_called_once_with(
+            expected_url, headers=self.tars_client._headers
+        )
+
     @patch(
         "aind_metadata_service.tars.client.TarsClient._get_prep_lot_response"
     )
     @patch(
-        "aind_metadata_service.tars.mapping.TarsResponseHandler."
-        "map_response_to_injection_materials"
+        "aind_metadata_service.tars.client.TarsClient._get_molecules_response"
     )
     def test_get_injection_materials_info_success(
-        self, mock_map_response, mock_get_prep_lot_response
+        self, mock_molecules_response, mock_get_prep_lot_response
     ):
         """Tests that ModelResponse is created successfully."""
-        mock_get_prep_lot_response.return_value = {
+        mock_get_prep_lot_response.return_value.json.return_value = {
             "data": [
                 {
                     "lot": "12345",
@@ -145,19 +173,25 @@ class TestTarsClient(unittest.TestCase):
                             "aliases": [
                                 {"name": "AiP123"},
                                 {"name": "AiV456"},
-                                {"name": "rAAV-MGT_789"},
                             ]
                         },
                     },
                 }
             ]
         }
-        mock_map_response.return_value = self.expected_materials
+        mock_molecules_response.return_value.json.return_value = {
+            "data": [
+                {"aliases": [{"name": "AiP123"}, {"name": "rAAV-MGT_789"}]}
+            ]
+        }
+
         result = self.tars_client.get_injection_materials_info(
             "your_prep_lot_number"
         )
         expected_response = ModelResponse(
-            aind_models=self.expected_materials,
+            aind_models=[
+                InjectionMaterial.model_validate(self.expected_materials)
+            ],
             status_code=StatusCodes.DB_RESPONDED,
         )
         self.assertEqual(result.aind_models, expected_response.aind_models)

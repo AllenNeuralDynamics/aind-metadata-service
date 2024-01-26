@@ -1,9 +1,10 @@
 """Module to map data in TARS to aind_data_schema InjectionMaterial"""
 
 import re
-from datetime import datetime
+from dataclasses import dataclass
+from datetime import date, datetime
 from enum import Enum
-from typing import List, Optional
+from typing import Optional
 
 from aind_data_schema.core.procedures import InjectionMaterial, VirusPrepType
 
@@ -48,13 +49,22 @@ class VirusAliasPatterns(Enum):
     AIV = re.compile(r"^AiV[a-zA-Z0-9_-]+$")
 
 
+@dataclass
+class ViralPrepAliases:
+    """Model for mapping viral prep aliases"""
+
+    plasmid_name: Optional[str]
+    material_id: Optional[str]
+    full_genome_name: Optional[str]
+
+
 class TarsResponseHandler:
     """This class will contain methods to handle the response from TARS"""
 
     @staticmethod
     def _map_prep_type_and_protocol(
         viral_prep_type: str,
-    ) -> tuple[VirusPrepType, str]:
+    ) -> tuple[Optional[VirusPrepType], Optional[str]]:
         """Maps TARS viral prep type to prep_type and prep_protocol"""
         if viral_prep_type == ViralPrepTypes.CRUDE_SOP.value:
             prep_type = VirusPrepType.CRUDE
@@ -91,7 +101,7 @@ class TarsResponseHandler:
         return prep_type, prep_protocol
 
     @staticmethod
-    def _convert_datetime(date: str):
+    def _convert_datetime(date: str) -> Optional[date]:
         """Converts date string to datetime date"""
         # Is it safe to assume it'll always be in this pattern
         date_pattern = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
@@ -102,11 +112,10 @@ class TarsResponseHandler:
                 " Please provide a date in the format: YYYY-MM-DDTHH:MM:SSZ"
             )
             return None
-
-        return datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ")
+        return datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ").date()
 
     @staticmethod
-    def _map_virus_aliases(aliases: list) -> tuple[str, str, str]:
+    def map_virus_aliases(aliases: list) -> ViralPrepAliases:
         """Maps aliases to full_genome_name, material_id, viral prep id"""
         plasmid_name, material_id, full_genome_name = None, None, None
         for alias in aliases:
@@ -117,41 +126,51 @@ class TarsResponseHandler:
                 material_id = name
             else:
                 full_genome_name = name
-        # TODO:  check molecular registry for genome name with plasmid name
-        return plasmid_name, material_id, full_genome_name
+        viral_prep_aliases = ViralPrepAliases(
+            plasmid_name=plasmid_name,
+            material_id=material_id,
+            full_genome_name=full_genome_name,
+        )
+        return viral_prep_aliases
 
-    def map_response_to_injection_materials(
-        self, response
-    ) -> Optional[List[InjectionMaterial]]:
+    @staticmethod
+    def map_full_genome_name(response, plasmid_name) -> Optional[str]:
+        """Maps genome name from molecular response"""
+        full_genome_name = None
+        data = response.json()["data"][0]
+        aliases = data["aliases"]
+        if len(aliases) == 2:
+            if aliases[0]["name"] != plasmid_name:
+                full_genome_name = aliases[0]["name"]
+            elif aliases[1]["name"] != plasmid_name:
+                full_genome_name = aliases[1]["name"]
+        return full_genome_name
+
+    def map_lot_to_injection_material(
+        self, viral_prep_lot: dict, viral_prep_aliases: ViralPrepAliases
+    ) -> InjectionMaterial:
         """
-        Map prep lot dictionary to injection materials.
+        Map prep lot dictionary to injection materials
         Parameters
         ----------
-        response: requests.models.Response
-            Response from GET Request.
+        viral_prep_lot: dict
+            Dictionary of raw viral prep lot data from TARS response.
+        viral_prep_aliases: ViralPrepAliases
+            Prep aliases mapped from TARS viral prep and molecular endpoints.
         """
-        injection_materials = []
-        data = response.json()["data"]
-        for lot in data:
-            prep_lot_number = lot["lot"]
-            prep_date = self._convert_datetime(lot["datePrepped"])
-            prep_type, prep_protocol = self._map_prep_type_and_protocol(
-                lot["viralPrep"]["viralPrepType"]["name"]
-            )
-            (
-                plasmid_name,
-                material_id,
-                full_genome_name,
-            ) = self._map_virus_aliases(lot["viralPrep"]["virus"]["aliases"])
-            material = InjectionMaterial.model_construct(
-                prep_lot_number=prep_lot_number,
-                prep_date=prep_date,
-                prep_type=prep_type,
-                prep_protocol=prep_protocol,
-                material_id=material_id,
-                name=full_genome_name,
-                full_genome_name=full_genome_name,
-                plasmid_name=plasmid_name,
-            )
-            injection_materials.append(material)
-        return None if injection_materials is [] else injection_materials
+        prep_lot_number = viral_prep_lot["lot"]
+        prep_date = self._convert_datetime(viral_prep_lot["datePrepped"])
+        prep_type, prep_protocol = self._map_prep_type_and_protocol(
+            viral_prep_lot["viralPrep"]["viralPrepType"]["name"]
+        )
+        injection_material = InjectionMaterial.model_construct(
+            prep_lot_number=prep_lot_number,
+            prep_date=prep_date,
+            prep_type=prep_type,
+            prep_protocol=prep_protocol,
+            material_id=viral_prep_aliases.material_id,
+            name=viral_prep_aliases.full_genome_name,
+            full_genome_name=viral_prep_aliases.full_genome_name,
+            plasmid_name=viral_prep_aliases.plasmid_name,
+        )
+        return injection_material
