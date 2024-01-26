@@ -21,7 +21,7 @@ class TestAzureSettings(unittest.TestCase):
     EXAMPLE_ENV_VAR1 = {
         "TENANT_ID": "some_tenant",
         "CLIENT_ID": "some_client",
-        "AUTHORITY": "some_authority",
+        "RESOURCE": "some_resource",
         "CLIENT_SECRET": "some_secret",
         "SCOPE": "some_scope",
     }
@@ -33,6 +33,7 @@ class TestAzureSettings(unittest.TestCase):
 
         self.assertEqual("some_tenant", settings1.tenant_id)
         self.assertEqual("some_client", settings1.client_id)
+        self.assertEqual("some_resource", settings1.resource)
         self.assertEqual("some_scope", settings1.scope)
         self.assertEqual(
             "some_secret",
@@ -48,7 +49,7 @@ class TestAzureSettings(unittest.TestCase):
                 tenant_id="some_tenant",
             )
         self.assertIn(
-            "2 validation errors for AzureSettings", repr(e.exception)
+            "3 validation errors for AzureSettings", repr(e.exception)
         )
 
 
@@ -63,9 +64,9 @@ class TestTarsClient(unittest.TestCase):
             client_id="some_client_id",
             client_secret="some_client_secret",
             scope="some_scope",
-        )
+            resource="https://some_resource"
 
-        self.resource = "https://some_resource"
+        )
 
         with open(EXAMPLE_PATH, "r") as f:
             self.expected_materials = json.load(f)
@@ -74,7 +75,7 @@ class TestTarsClient(unittest.TestCase):
             "mock_token",
             "mock_exp",
         )
-        self.tars_client = TarsClient(self.azure_settings, self.resource)
+        self.tars_client = TarsClient(self.azure_settings)
         # mock_credential.return_value.get_token.assert_called_once()
 
     def test_access_token(self):
@@ -114,7 +115,7 @@ class TestTarsClient(unittest.TestCase):
         mock_get.return_value = mock_response
         result = self.tars_client._get_prep_lot_response("12345")
         expected_url = (
-            f"{self.resource}/api/v1/ViralPrepLots"
+            f"{self.azure_settings.resource}/api/v1/ViralPrepLots"
             f"?order=1&orderBy=id"
             f"&searchFields=lot"
             f"&search=12345"
@@ -139,7 +140,7 @@ class TestTarsClient(unittest.TestCase):
         mock_get.return_value = mock_response
         result = self.tars_client._get_molecules_response("AiP123")
         expected_url = (
-            f"{self.resource}/api/v1/Molecules"
+            f"{self.azure_settings.resource}/api/v1/Molecules"
             f"?order=1&orderBy=id"
             f"&searchFields=name"
             f"&search=AiP123"

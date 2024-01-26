@@ -25,12 +25,13 @@ class AzureSettings(BaseSettings):
         ..., description="Secret used to access the account."
     )
     scope: str = Field(..., description="Scope")
+    resource: str = Field(..., description="Resource")
 
 
 class TarsClient:
     """Main client to connect to a TARS"""
 
-    def __init__(self, azure_settings: AzureSettings, resource: str) -> None:
+    def __init__(self, azure_settings: AzureSettings) -> None:
         """
         Class constructor
         Parameters
@@ -46,7 +47,7 @@ class TarsClient:
             client_secret=azure_settings.client_secret.get_secret_value(),
         )
         self.scope = azure_settings.scope
-        self.resource = resource
+        self.resource = azure_settings.resource
 
     @property
     def _access_token(self):
