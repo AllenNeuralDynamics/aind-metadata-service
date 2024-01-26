@@ -79,6 +79,26 @@ class TarsClient:
         response = requests.get(query, headers=headers)
         return response
 
+    def _get_molecules_response(
+        self, plasmid_name: str
+    ) -> requests.models.Response:
+        """
+        Retrieves molecules from TARS.
+        Parameters
+        ----------
+        plasmid_name: str
+           Plasmid name used to query Molecules endpoint.
+        """
+        headers = self._headers
+        query = (
+            f"{self.resource}/api/v1/Molecules"
+            f"?order=1&orderBy=id"
+            f"&searchFields=name"
+            f"&search={plasmid_name}"
+        )
+        response = requests.get(query, headers=headers)
+        return response
+
     def get_injection_materials_info(
         self, prep_lot_number: str
     ) -> ModelResponse:
@@ -88,9 +108,29 @@ class TarsClient:
         try:
             response = self._get_prep_lot_response(prep_lot_number)
             trh = TarsResponseHandler()
-            injection_materials = trh.map_response_to_injection_materials(
-                response
-            )
+            injection_materials = []
+            data = response.json()["data"]
+            for lot in data:
+                viral_prep_aliases = trh.map_virus_aliases(
+                    aliases=lot["viralPrep"]["virus"]["aliases"]
+                )
+                if (
+                    viral_prep_aliases.plasmid_name
+                    and viral_prep_aliases.full_genome_name is None
+                ):
+                    # check molecular registry for full genome name
+                    molecule_response = self._get_molecules_response(
+                        viral_prep_aliases.plasmid_name
+                    )
+                    viral_prep_aliases.full_genome_name = (
+                        trh.map_full_genome_name(
+                            molecule_response, viral_prep_aliases.plasmid_name
+                        )
+                    )
+                injection_material = trh.map_lot_to_injection_material(
+                    viral_prep_lot=lot, viral_prep_aliases=viral_prep_aliases
+                )
+                injection_materials.append(injection_material)
             return ModelResponse(
                 aind_models=injection_materials,
                 status_code=StatusCodes.DB_RESPONDED,
