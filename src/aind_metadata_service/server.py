@@ -119,7 +119,7 @@ async def retrieve_subject(subject_id, pickle: bool = False):
         return model_response.map_to_json_response()
 
 
-@app.get("/injection_materials/{prep_lot_number}")
+@app.get("/tars_injection_materials/{prep_lot_number}")
 async def retrieve_injection_materials(prep_lot_number, pickle: bool = False):
     """
     Retrieves injection materials from TARS server
