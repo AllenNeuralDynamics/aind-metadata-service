@@ -64,8 +64,7 @@ class TestTarsClient(unittest.TestCase):
             client_id="some_client_id",
             client_secret="some_client_secret",
             scope="some_scope",
-            resource="https://some_resource"
-
+            resource="https://some_resource",
         )
 
         with open(EXAMPLE_PATH, "r") as f:
@@ -89,7 +88,7 @@ class TestTarsClient(unittest.TestCase):
         self.assertEqual(self.tars_client._headers, expected_headers)
 
     @patch("aind_metadata_service.tars.client.requests.get")
-    def test_get_prep_lot_response(self, mock_get):
+    def test_get_prep_lot_response_success(self, mock_get):
         """Tests that client can fetch viral prep lot."""
 
         mock_response = Mock()
@@ -124,6 +123,16 @@ class TestTarsClient(unittest.TestCase):
         self.assertEqual(result.json()["data"][0]["lot"], "12345")
         mock_get.assert_called_once_with(
             expected_url, headers=self.tars_client._headers
+        )
+
+    def test_get_prep_lot_response_failure(self):
+        """Tests that exception is raised as expected"""
+        with self.assertRaises(Exception) as context:
+            self.tars_client._get_prep_lot_response(prep_lot_number="VT")
+
+        self.assertEqual(
+            "The input prep lot VT seems to be incomplete.",
+            str(context.exception),
         )
 
     @patch("aind_metadata_service.tars.client.requests.get")

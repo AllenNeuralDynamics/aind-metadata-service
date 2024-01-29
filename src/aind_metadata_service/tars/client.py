@@ -1,6 +1,7 @@
 """Module to instantiate a client to connect to TARS and retrieve data."""
 
 import logging
+from typing import Optional
 
 import requests
 from azure.identity import ClientSecretCredential
@@ -62,7 +63,7 @@ class TarsClient:
 
     def _get_prep_lot_response(
         self, prep_lot_number: str
-    ) -> requests.models.Response:
+    ) -> Optional[requests.models.Response]:
         """
         Retrieves viral prep lot response from TARS.
         Parameters
@@ -71,13 +72,19 @@ class TarsClient:
            Prep lot number used to query ViralPrepLot endpoint.
         """
         headers = self._headers
-        query = (
-            f"{self.resource}/api/v1/ViralPrepLots"
-            f"?order=1&orderBy=id"
-            f"&searchFields=lot"
-            f"&search={prep_lot_number}"
-        )
-        response = requests.get(query, headers=headers)
+        # Filter out incomplete queries so that TARS can do equal search
+        if len(prep_lot_number) >= 6:
+            query = (
+                f"{self.resource}/api/v1/ViralPrepLots"
+                f"?order=1&orderBy=id"
+                f"&searchFields=lot"
+                f"&search={prep_lot_number}"
+            )
+            response = requests.get(query, headers=headers)
+        else:
+            raise Exception(
+                f"The input prep lot {prep_lot_number} seems to be incomplete."
+            )
         return response
 
     def _get_molecules_response(
