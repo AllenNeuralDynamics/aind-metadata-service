@@ -96,7 +96,7 @@ class TestTarsClient(unittest.TestCase):
         mock_response.json.return_value = {
             "data": [
                 {
-                    "lot": "12345",
+                    "lot": "VT12345",
                     "datePrepped": "2023-12-15T12:34:56Z",
                     "viralPrep": {
                         "viralPrepType": {"name": "Crude-SOP#VC002"},
@@ -112,15 +112,15 @@ class TestTarsClient(unittest.TestCase):
             ]
         }
         mock_get.return_value = mock_response
-        result = self.tars_client._get_prep_lot_response("12345")
+        result = self.tars_client._get_prep_lot_response("VT12345")
         expected_url = (
             f"{self.azure_settings.resource}/api/v1/ViralPrepLots"
             f"?order=1&orderBy=id"
             f"&searchFields=lot"
-            f"&search=12345"
+            f"&search=VT12345"
         )
 
-        self.assertEqual(result.json()["data"][0]["lot"], "12345")
+        self.assertEqual(result.json()["data"][0]["lot"], "VT12345")
         mock_get.assert_called_once_with(
             expected_url, headers=self.tars_client._headers
         )
