@@ -1,4 +1,5 @@
 """Module that returns appropriate sql query strings"""
+
 from enum import Enum
 
 

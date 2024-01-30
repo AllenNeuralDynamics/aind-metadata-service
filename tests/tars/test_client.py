@@ -127,13 +127,39 @@ class TestTarsClient(unittest.TestCase):
 
     def test_get_prep_lot_response_failure(self):
         """Tests that exception is raised as expected"""
-        with self.assertRaises(Exception) as context:
-            self.tars_client._get_prep_lot_response(prep_lot_number="VT")
+        with self.assertRaises(ValueError) as context:
+            self.tars_client._get_prep_lot_response(prep_lot_number="")
 
         self.assertEqual(
-            "The input prep lot VT seems to be incomplete.",
+            "Please input a valid prep lot number.",
             str(context.exception),
         )
+
+    def test_filter_prep_lot_response(self):
+        """Tests that response data is filtered for exact matches"""
+        mock_response = MagicMock()
+        mock_response.return_value.json.return_value = {
+            "data": [
+                {
+                    "lot": "VT1",
+                    "datePrepped": "2023-12-15T12:34:56Z",
+                },
+                {
+                    "lot": "VT2",
+                    "datePrepped": "2023-12-15T12:34:56Z",
+                },
+                {
+                    "lot": "VT3",
+                    "datePrepped": "2023-12-15T12:34:56Z",
+                },
+            ]
+        }
+        with self.assertRaises(ValueError) as context:
+            self.tars_client._filter_prep_lot_response(
+                prep_lot_number="VT", response=mock_response
+            )
+
+        self.assertEqual("No data found for VT", str(context.exception))
 
     @patch("aind_metadata_service.tars.client.requests.get")
     def test_get_molecules_response(self, mock_get):
@@ -195,9 +221,7 @@ class TestTarsClient(unittest.TestCase):
             ]
         }
 
-        result = self.tars_client.get_injection_materials_info(
-            "your_prep_lot_number"
-        )
+        result = self.tars_client.get_injection_materials_info("12345")
         expected_response = ModelResponse(
             aind_models=[
                 InjectionMaterial.model_validate(self.expected_materials)
@@ -253,6 +277,30 @@ class TestTarsClient(unittest.TestCase):
         self.assertEqual(result.message, expected_response.message)
         mock_log_error.assert_called_once_with(
             "Exception('Some server error')"
+        )
+
+    @patch(
+        "aind_metadata_service.tars.client.TarsClient._get_prep_lot_response"
+    )
+    @patch("logging.error")
+    def test_get_injection_materials_info_no_data_found_error(
+        self, mock_log_error: MagicMock, mock_get_prep_lot_response: MagicMock
+    ):
+        """Tests that Internal Error Response is returned as expected."""
+        mock_get_prep_lot_response.return_value.json.return_value = {
+            "data": []
+        }
+
+        result = self.tars_client.get_injection_materials_info(
+            "some_invalid_number"
+        )
+
+        expected_response = ModelResponse.no_data_found_error_response()
+        self.assertEqual(result.status_code, expected_response.status_code)
+        self.assertEqual(result.aind_models, expected_response.aind_models)
+        self.assertEqual(result.message, expected_response.message)
+        mock_log_error.assert_called_once_with(
+            "ValueError('No data found for some_invalid_number')"
         )
 
 

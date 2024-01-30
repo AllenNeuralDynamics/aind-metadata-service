@@ -1,7 +1,7 @@
 """Module to instantiate a client to connect to TARS and retrieve data."""
 
 import logging
-from typing import Optional
+from typing import List, Optional
 
 import requests
 from azure.identity import ClientSecretCredential
@@ -65,27 +65,43 @@ class TarsClient:
         self, prep_lot_number: str
     ) -> Optional[requests.models.Response]:
         """
-        Retrieves viral prep lot response from TARS.
+        Retrieves viral prep lot response from TARS. Returns
+        all lots that contain prep_lot_number.
         Parameters
         ----------
         prep_lot_number: str
            Prep lot number used to query ViralPrepLot endpoint.
         """
         headers = self._headers
-        # Filter out incomplete queries so that TARS can do equal search
-        if len(prep_lot_number) >= 6:
+        if len(prep_lot_number) > 0:
             query = (
                 f"{self.resource}/api/v1/ViralPrepLots"
                 f"?order=1&orderBy=id"
                 f"&searchFields=lot"
                 f"&search={prep_lot_number}"
             )
-            response = requests.get(query, headers=headers)
+            return requests.get(query, headers=headers)
         else:
-            raise Exception(
-                f"The input prep lot {prep_lot_number} seems to be incomplete."
-            )
-        return response
+            raise ValueError("Please input a valid prep lot number.")
+
+    @staticmethod
+    def _filter_prep_lot_response(
+        prep_lot_number: str, response: requests.models.Response
+    ) -> Optional[List]:
+        """
+        Filters response from TARS for exact match.
+        Parameters
+        ----------
+        prep_lot_number: str
+           Prep lot number used to query ViralPrepLot endpoint.
+        response : requests.models.Response
+           Raw Response from ViralPrepLot endpoint
+        """
+        data = response.json()["data"]
+        filtered_data = [lot for lot in data if lot["lot"] == prep_lot_number]
+        if not filtered_data:
+            raise ValueError(f"No data found for {prep_lot_number}")
+        return filtered_data
 
     def _get_molecules_response(
         self, plasmid_name: str
@@ -111,13 +127,16 @@ class TarsClient:
         self, prep_lot_number: str
     ) -> ModelResponse:
         """
-        Handles response from TARS. Map the response, create a ModelResponse
+        Fetches response from TARS and then handles mapping to
+        create a ModelResponse. Either returns a DB_Responded
+        ModelResponse or an Error ModelResponse.
         """
         try:
             response = self._get_prep_lot_response(prep_lot_number)
+            data = self._filter_prep_lot_response(prep_lot_number, response)
             trh = TarsResponseHandler()
             injection_materials = []
-            data = response.json()["data"]
+
             for lot in data:
                 viral_prep_aliases = trh.map_virus_aliases(
                     aliases=lot["viralPrep"]["virus"]["aliases"]
@@ -143,9 +162,15 @@ class TarsClient:
                 aind_models=injection_materials,
                 status_code=StatusCodes.DB_RESPONDED,
             )
+        # handles connection error
         except ConnectionError as e:
             logging.error(repr(e))
             return ModelResponse.connection_error_response()
+        # handles if no data is found
+        except ValueError as e:
+            logging.error(repr(e))
+            return ModelResponse.no_data_found_error_response()
+        # handles all other errors
         except Exception as e:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()

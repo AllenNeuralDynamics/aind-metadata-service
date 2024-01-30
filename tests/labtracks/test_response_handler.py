@@ -1,4 +1,5 @@
 """Module to test LabTracksResponseHandler methods."""
+
 import datetime
 import unittest
 from decimal import Decimal
