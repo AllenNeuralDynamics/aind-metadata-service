@@ -21,7 +21,7 @@ class TestAzureSettings(unittest.TestCase):
     EXAMPLE_ENV_VAR1 = {
         "TENANT_ID": "some_tenant",
         "CLIENT_ID": "some_client",
-        "AUTHORITY": "some_authority",
+        "RESOURCE": "some_resource",
         "CLIENT_SECRET": "some_secret",
         "SCOPE": "some_scope",
     }
@@ -33,6 +33,7 @@ class TestAzureSettings(unittest.TestCase):
 
         self.assertEqual("some_tenant", settings1.tenant_id)
         self.assertEqual("some_client", settings1.client_id)
+        self.assertEqual("some_resource", settings1.resource)
         self.assertEqual("some_scope", settings1.scope)
         self.assertEqual(
             "some_secret",
@@ -48,7 +49,7 @@ class TestAzureSettings(unittest.TestCase):
                 tenant_id="some_tenant",
             )
         self.assertIn(
-            "2 validation errors for AzureSettings", repr(e.exception)
+            "3 validation errors for AzureSettings", repr(e.exception)
         )
 
 
@@ -63,9 +64,8 @@ class TestTarsClient(unittest.TestCase):
             client_id="some_client_id",
             client_secret="some_client_secret",
             scope="some_scope",
+            resource="https://some_resource",
         )
-
-        self.resource = "https://some_resource"
 
         with open(EXAMPLE_PATH, "r") as f:
             self.expected_materials = json.load(f)
@@ -74,7 +74,7 @@ class TestTarsClient(unittest.TestCase):
             "mock_token",
             "mock_exp",
         )
-        self.tars_client = TarsClient(self.azure_settings, self.resource)
+        self.tars_client = TarsClient(self.azure_settings)
         # mock_credential.return_value.get_token.assert_called_once()
 
     def test_access_token(self):
@@ -88,7 +88,7 @@ class TestTarsClient(unittest.TestCase):
         self.assertEqual(self.tars_client._headers, expected_headers)
 
     @patch("aind_metadata_service.tars.client.requests.get")
-    def test_get_prep_lot_response(self, mock_get):
+    def test_get_prep_lot_response_success(self, mock_get):
         """Tests that client can fetch viral prep lot."""
 
         mock_response = Mock()
@@ -96,7 +96,7 @@ class TestTarsClient(unittest.TestCase):
         mock_response.json.return_value = {
             "data": [
                 {
-                    "lot": "12345",
+                    "lot": "VT12345",
                     "datePrepped": "2023-12-15T12:34:56Z",
                     "viralPrep": {
                         "viralPrepType": {"name": "Crude-SOP#VC002"},
@@ -112,18 +112,54 @@ class TestTarsClient(unittest.TestCase):
             ]
         }
         mock_get.return_value = mock_response
-        result = self.tars_client._get_prep_lot_response("12345")
+        result = self.tars_client._get_prep_lot_response("VT12345")
         expected_url = (
-            f"{self.resource}/api/v1/ViralPrepLots"
+            f"{self.azure_settings.resource}/api/v1/ViralPrepLots"
             f"?order=1&orderBy=id"
             f"&searchFields=lot"
-            f"&search=12345"
+            f"&search=VT12345"
         )
 
-        self.assertEqual(result.json()["data"][0]["lot"], "12345")
+        self.assertEqual(result.json()["data"][0]["lot"], "VT12345")
         mock_get.assert_called_once_with(
             expected_url, headers=self.tars_client._headers
         )
+
+    def test_get_prep_lot_response_failure(self):
+        """Tests that exception is raised as expected"""
+        with self.assertRaises(ValueError) as context:
+            self.tars_client._get_prep_lot_response(prep_lot_number="")
+
+        self.assertEqual(
+            "Please input a valid prep lot number.",
+            str(context.exception),
+        )
+
+    def test_filter_prep_lot_response(self):
+        """Tests that response data is filtered for exact matches"""
+        mock_response = MagicMock()
+        mock_response.return_value.json.return_value = {
+            "data": [
+                {
+                    "lot": "VT1",
+                    "datePrepped": "2023-12-15T12:34:56Z",
+                },
+                {
+                    "lot": "VT2",
+                    "datePrepped": "2023-12-15T12:34:56Z",
+                },
+                {
+                    "lot": "VT3",
+                    "datePrepped": "2023-12-15T12:34:56Z",
+                },
+            ]
+        }
+        with self.assertRaises(ValueError) as context:
+            self.tars_client._filter_prep_lot_response(
+                prep_lot_number="VT", response=mock_response
+            )
+
+        self.assertEqual("No data found for VT", str(context.exception))
 
     @patch("aind_metadata_service.tars.client.requests.get")
     def test_get_molecules_response(self, mock_get):
@@ -139,7 +175,7 @@ class TestTarsClient(unittest.TestCase):
         mock_get.return_value = mock_response
         result = self.tars_client._get_molecules_response("AiP123")
         expected_url = (
-            f"{self.resource}/api/v1/Molecules"
+            f"{self.azure_settings.resource}/api/v1/Molecules"
             f"?order=1&orderBy=id"
             f"&searchFields=name"
             f"&search=AiP123"
@@ -185,9 +221,7 @@ class TestTarsClient(unittest.TestCase):
             ]
         }
 
-        result = self.tars_client.get_injection_materials_info(
-            "your_prep_lot_number"
-        )
+        result = self.tars_client.get_injection_materials_info("12345")
         expected_response = ModelResponse(
             aind_models=[
                 InjectionMaterial.model_validate(self.expected_materials)
@@ -243,6 +277,30 @@ class TestTarsClient(unittest.TestCase):
         self.assertEqual(result.message, expected_response.message)
         mock_log_error.assert_called_once_with(
             "Exception('Some server error')"
+        )
+
+    @patch(
+        "aind_metadata_service.tars.client.TarsClient._get_prep_lot_response"
+    )
+    @patch("logging.error")
+    def test_get_injection_materials_info_no_data_found_error(
+        self, mock_log_error: MagicMock, mock_get_prep_lot_response: MagicMock
+    ):
+        """Tests that Internal Error Response is returned as expected."""
+        mock_get_prep_lot_response.return_value.json.return_value = {
+            "data": []
+        }
+
+        result = self.tars_client.get_injection_materials_info(
+            "some_invalid_number"
+        )
+
+        expected_response = ModelResponse.no_data_found_error_response()
+        self.assertEqual(result.status_code, expected_response.status_code)
+        self.assertEqual(result.aind_models, expected_response.aind_models)
+        self.assertEqual(result.message, expected_response.message)
+        mock_log_error.assert_called_once_with(
+            "ValueError('No data found for some_invalid_number')"
         )
 
 

@@ -1,4 +1,5 @@
 """Module to test the aind_metadata_service client."""
+
 import pickle
 import unittest
 from unittest import mock

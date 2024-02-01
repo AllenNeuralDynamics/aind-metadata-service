@@ -1,4 +1,5 @@
 """Module for slims client"""
+
 import logging
 
 from pydantic import Extra, Field, SecretStr

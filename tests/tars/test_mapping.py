@@ -1,4 +1,5 @@
 """Module to test TARS mapping."""
+
 import datetime
 import unittest
 from unittest.mock import MagicMock
