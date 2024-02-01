@@ -375,6 +375,7 @@ class TestSharepointClient(unittest.TestCase):
         ]
         expected_subject_procedures.sort(key=lambda x: str(x))
         actual_subject_procedures.sort(key=lambda x: str(x))
+
         self.assertEqual(
             StatusCodes.MULTI_STATUS, merged_responses.status_code
         )

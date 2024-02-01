@@ -1,4 +1,5 @@
 """Module to handle responses"""
+
 import json
 import pickle
 from typing import Generic, List, Optional, TypeVar, Union
@@ -60,6 +61,15 @@ class ModelResponse(Generic[T]):
             status_code=StatusCodes.INTERNAL_SERVER_ERROR,
             aind_models=[],
             message="Internal Server Error.",
+        )
+
+    @classmethod
+    def no_data_found_error_response(cls):
+        """No Data Found Error"""
+        return cls(
+            status_code=StatusCodes.NO_DATA_FOUND,
+            aind_models=[],
+            message="No Data Found.",
         )
 
     def _map_data_response(

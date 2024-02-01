@@ -1,4 +1,5 @@
 """Module for client library."""
+
 from enum import Enum
 
 import requests
