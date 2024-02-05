@@ -7,8 +7,10 @@ from typing import Optional
 from pydantic import Extra, Field, SecretStr
 from pydantic_settings import BaseSettings
 from smartsheet import Smartsheet
+from starlette.responses import JSONResponse
 
 from aind_metadata_service import __version__
+from aind_metadata_service.client import StatusCodes
 
 
 class SmartsheetSettings(BaseSettings):
@@ -63,14 +65,24 @@ class SmartSheetClient:
             ),
         )
 
-    def get_sheet(self) -> str:
+    def get_sheet(self) -> JSONResponse:
         """Retrieve the sheet defined by the settings sheet_id."""
         try:
             smartsheet_response = self.smartsheet_client.Sheets.get_sheet(
                 self.smartsheet_settings.sheet_id
             )
             smartsheet_json = smartsheet_response.to_json()
-            return smartsheet_json
+            return JSONResponse(
+                status_code=StatusCodes.DB_RESPONDED.value,
+                content=(
+                    {"message": "Retrieved data", "data": smartsheet_json}
+                ),
+            )
         except Exception as e:
-            logging.error(repr(e))
-            raise Exception(e)
+            logging.error(f"{e.__class__.__name__}{e.args}")
+            return JSONResponse(
+                status_code=StatusCodes.INTERNAL_SERVER_ERROR.value,
+                content=(
+                    {"message": "Error connecting to server", "data": None}
+                ),
+            )

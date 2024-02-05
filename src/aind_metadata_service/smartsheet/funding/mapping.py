@@ -176,14 +176,9 @@ class FundingMapper(SmartSheetMapper):
         )
         return consolidated_list
 
-    def get_model_response(self, input_id: str) -> ModelResponse:
+    def _get_model_response(self) -> ModelResponse:
         """
-        Return a ModelResponse for a given id.
-        Parameters
-        ----------
-        input_id : str
-          The id with which to extract information
-
+        Return a ModelResponse
         Returns
         -------
         ModelResponse
@@ -192,7 +187,7 @@ class FundingMapper(SmartSheetMapper):
 
         """
         try:
-            funding_list = self._get_funding_list(project_code=input_id)
+            funding_list = self._get_funding_list(project_code=self.input_id)
             return ModelResponse(
                 aind_models=funding_list, status_code=StatusCodes.DB_RESPONDED
             )

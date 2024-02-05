@@ -45,8 +45,11 @@ class TestSmartsheetFundingClient(unittest.TestCase):
             access_token="abc-123", sheet_id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
-        mapper = FundingMapper(smart_sheet_client=client)
-        model_response = mapper.get_model_response(input_id="122-01-001-10")
+        smart_sheet_response = client.get_sheet()
+        mapper = FundingMapper(
+            smart_sheet_response=smart_sheet_response, input_id="122-01-001-10"
+        )
+        model_response = mapper.get_model_response()
         expected_models = [
             Funding(
                 funder=Institution.AI,
@@ -61,6 +64,23 @@ class TestSmartsheetFundingClient(unittest.TestCase):
         self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
 
     @patch("smartsheet.sheets.Sheets.get_sheet")
+    def test_mapping_empty_response(self, mock_get_sheet: MagicMock):
+        """Tests successful sheet return response"""
+        mock_get_sheet.return_value.to_json.return_value = None
+        settings = SmartsheetSettings(
+            access_token="abc-123", sheet_id=7478444220698500
+        )
+        client = SmartSheetClient(smartsheet_settings=settings)
+        smart_sheet_response = client.get_sheet()
+        mapper = FundingMapper(
+            smart_sheet_response=smart_sheet_response, input_id="122-01-001-10"
+        )
+        model_response = mapper.get_model_response()
+        expected_models = []
+        self.assertEqual(expected_models, model_response.aind_models)
+        self.assertEqual(StatusCodes.NO_DATA_FOUND, model_response.status_code)
+
+    @patch("smartsheet.sheets.Sheets.get_sheet")
     def test_mapping_invalid_institution(self, mock_get_sheet: MagicMock):
         """Tests situation where the institute name isn't in
         aind-data-schema"""
@@ -73,8 +93,11 @@ class TestSmartsheetFundingClient(unittest.TestCase):
             access_token="abc-123", sheet_id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
-        mapper = FundingMapper(smart_sheet_client=client)
-        model_response = mapper.get_model_response(input_id="122-01-001-10")
+        smart_sheet_response = client.get_sheet()
+        mapper = FundingMapper(
+            smart_sheet_response=smart_sheet_response, input_id="122-01-001-10"
+        )
+        model_response = mapper.get_model_response()
         expected_models = [
             Funding.model_construct(
                 funder="Some Institute",
@@ -104,16 +127,55 @@ class TestSmartsheetFundingClient(unittest.TestCase):
             access_token="abc-123", sheet_id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
-        mapper = FundingMapper(smart_sheet_client=client)
-        model_response = mapper.get_model_response(input_id="122-01-001-10")
+        smart_sheet_response = client.get_sheet()
+        mapper = FundingMapper(
+            smart_sheet_response=smart_sheet_response, input_id="122-01-001-10"
+        )
+        model_response = mapper.get_model_response()
         self.assertEqual(
             ModelResponse.internal_server_error_response().status_code,
             model_response.status_code,
         )
         mock_log_error.assert_has_calls(
             [
-                call("Exception('Something went wrong')"),
-                call("Exception(Exception('Something went wrong'))"),
+                call("Exception('Something went wrong',)"),
+            ]
+        )
+
+    @patch("smartsheet.sheets.Sheets.get_sheet")
+    @patch(
+        "aind_metadata_service.smartsheet.funding.mapping.FundingMapper"
+        "._get_funding_list"
+    )
+    @patch("logging.error")
+    def test_mapping_error(
+        self,
+        mock_log_error: MagicMock,
+        mock_get_funding_list: MagicMock,
+        mock_get_sheet: MagicMock,
+    ):
+        """Tests mapping error"""
+
+        mock_get_funding_list.side_effect = MagicMock(
+            side_effect=Exception("Mapping Error")
+        )
+        mock_get_sheet.return_value.to_json.return_value = self.example_sheet
+        settings = SmartsheetSettings(
+            access_token="abc-123", sheet_id=7478444220698500
+        )
+        client = SmartSheetClient(smartsheet_settings=settings)
+        smart_sheet_response = client.get_sheet()
+        mapper = FundingMapper(
+            smart_sheet_response=smart_sheet_response, input_id="122-01-001-10"
+        )
+        model_response = mapper.get_model_response()
+        self.assertEqual(
+            ModelResponse.internal_server_error_response().status_code,
+            model_response.status_code,
+        )
+        mock_log_error.assert_has_calls(
+            [
+                call("Exception('Mapping Error')"),
             ]
         )
 
