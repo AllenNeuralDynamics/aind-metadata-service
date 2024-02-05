@@ -81,11 +81,15 @@ funding_smart_sheet_client = SmartSheetClient(
 async def retrieve_perfusions(subject_id, pickle: bool = False):
     """Retrieves perfusion information from smartsheet"""
 
-    # TODO: We can probably cache perfusions sheet
-    mapper = PerfusionsMapper(smart_sheet_client=perfusions_smart_sheet_client)
-    model_response = await run_in_threadpool(
-        mapper.get_model_response, input_id=subject_id
+    # TODO: We can probably cache the response if it's 200
+    smart_sheet_response = await run_in_threadpool(
+        perfusions_smart_sheet_client.get_sheet
     )
+    mapper = PerfusionsMapper(
+        smart_sheet_response=smart_sheet_response, input_id=subject_id
+    )
+    model_response = mapper.get_model_response()
+
     if pickle:
         return model_response.map_to_pickled_response()
     else:
@@ -96,11 +100,14 @@ async def retrieve_perfusions(subject_id, pickle: bool = False):
 async def retrieve_funding(project_id, pickle: bool = False):
     """Retrieves funding information from smartsheet"""
 
-    # TODO: We can probably cache funding sheet
-    mapper = FundingMapper(smart_sheet_client=funding_smart_sheet_client)
-    model_response = await run_in_threadpool(
-        mapper.get_model_response, input_id=project_id
+    # TODO: We can probably cache the response if it's 200
+    smart_sheet_response = await run_in_threadpool(
+        funding_smart_sheet_client.get_sheet
     )
+    mapper = FundingMapper(
+        smart_sheet_response=smart_sheet_response, input_id=project_id
+    )
+    model_response = mapper.get_model_response()
     if pickle:
         return model_response.map_to_pickled_response()
     else:

@@ -157,13 +157,9 @@ class PerfusionsMapper(SmartSheetMapper):
                 rows_associated_with_subject_id.append(opt_perfusion)
         return rows_associated_with_subject_id
 
-    def get_model_response(self, input_id: str) -> ModelResponse:
+    def _get_model_response(self) -> ModelResponse:
         """
-        Return a ModelResponse for a given id.
-        Parameters
-        ----------
-        input_id : str
-          The id with which to extract information
+        Return a ModelResponse.
 
         Returns
         -------
@@ -173,7 +169,7 @@ class PerfusionsMapper(SmartSheetMapper):
 
         """
         try:
-            perfusion_list = self._get_perfusion_list(subject_id=input_id)
+            perfusion_list = self._get_perfusion_list(subject_id=self.input_id)
             return ModelResponse(
                 aind_models=perfusion_list,
                 status_code=StatusCodes.DB_RESPONDED,

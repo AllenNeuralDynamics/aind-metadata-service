@@ -63,11 +63,31 @@ class TestSmartsheetPerfusionsClient(unittest.TestCase):
             access_token="abc-123", sheet_id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
-        mapper = PerfusionsMapper(smart_sheet_client=client)
-        model_response = mapper.get_model_response(input_id="689418")
+        smart_sheet_response = client.get_sheet()
+        mapper = PerfusionsMapper(
+            smart_sheet_response=smart_sheet_response, input_id="689418"
+        )
+        model_response = mapper.get_model_response()
         expected_models = self.expected_model
         self.assertEqual(expected_models, model_response.aind_models)
         self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
+
+    @patch("smartsheet.sheets.Sheets.get_sheet")
+    def test_mapping_empty_response(self, mock_get_sheet: MagicMock):
+        """Tests successful sheet return response"""
+        mock_get_sheet.return_value.to_json.return_value = None
+        settings = SmartsheetSettings(
+            access_token="abc-123", sheet_id=7478444220698500
+        )
+        client = SmartSheetClient(smartsheet_settings=settings)
+        smart_sheet_response = client.get_sheet()
+        mapper = PerfusionsMapper(
+            smart_sheet_response=smart_sheet_response, input_id="689418"
+        )
+        model_response = mapper.get_model_response()
+        expected_models = []
+        self.assertEqual(expected_models, model_response.aind_models)
+        self.assertEqual(StatusCodes.NO_DATA_FOUND, model_response.status_code)
 
     @patch("smartsheet.sheets.Sheets.get_sheet")
     @patch("logging.error")
@@ -85,16 +105,55 @@ class TestSmartsheetPerfusionsClient(unittest.TestCase):
             access_token="abc-123", sheet_id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
-        mapper = PerfusionsMapper(smart_sheet_client=client)
-        model_response = mapper.get_model_response(input_id="689418")
+        smart_sheet_response = client.get_sheet()
+        mapper = PerfusionsMapper(
+            smart_sheet_response=smart_sheet_response, input_id="689418"
+        )
+        model_response = mapper.get_model_response()
         self.assertEqual(
             ModelResponse.internal_server_error_response().status_code,
             model_response.status_code,
         )
         mock_log_error.assert_has_calls(
             [
-                call("Exception('Something went wrong')"),
-                call("Exception(Exception('Something went wrong'))"),
+                call("Exception('Something went wrong',)"),
+            ]
+        )
+
+    @patch("smartsheet.sheets.Sheets.get_sheet")
+    @patch(
+        "aind_metadata_service.smartsheet.perfusions.mapping.PerfusionsMapper"
+        "._get_perfusion_list"
+    )
+    @patch("logging.error")
+    def test_mapping_error(
+        self,
+        mock_log_error: MagicMock,
+        mock_get_perfusions_list: MagicMock,
+        mock_get_sheet: MagicMock,
+    ):
+        """Tests mapping error"""
+        mock_get_sheet.return_value.to_json.return_value = self.example_sheet
+        mock_get_perfusions_list.side_effect = MagicMock(
+            side_effect=Exception("Mapping Error")
+        )
+        settings = SmartsheetSettings(
+            access_token="abc-123", sheet_id=7478444220698500
+        )
+        client = SmartSheetClient(smartsheet_settings=settings)
+        smart_sheet_response = client.get_sheet()
+        mapper = PerfusionsMapper(
+            smart_sheet_response=smart_sheet_response, input_id="689418"
+        )
+        model_response = mapper.get_model_response()
+        expected_models = []
+        self.assertEqual(expected_models, model_response.aind_models)
+        self.assertEqual(
+            StatusCodes.INTERNAL_SERVER_ERROR, model_response.status_code
+        )
+        mock_log_error.assert_has_calls(
+            [
+                call("Exception('Mapping Error')"),
             ]
         )
 
@@ -113,8 +172,11 @@ class TestSmartsheetPerfusionsClient(unittest.TestCase):
             access_token="abc-123", sheet_id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
-        mapper = PerfusionsMapper(smart_sheet_client=client)
-        model_response = mapper.get_model_response(input_id="689418")
+        smart_sheet_response = client.get_sheet()
+        mapper = PerfusionsMapper(
+            smart_sheet_response=smart_sheet_response, input_id="689418"
+        )
+        model_response = mapper.get_model_response()
         self.assertIsNone(model_response.aind_models[0].iacuc_protocol)
         self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
 
@@ -133,8 +195,11 @@ class TestSmartsheetPerfusionsClient(unittest.TestCase):
             access_token="abc-123", sheet_id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
-        mapper = PerfusionsMapper(smart_sheet_client=client)
-        model_response = mapper.get_model_response(input_id="689418")
+        smart_sheet_response = client.get_sheet()
+        mapper = PerfusionsMapper(
+            smart_sheet_response=smart_sheet_response, input_id="689418"
+        )
+        model_response = mapper.get_model_response()
         self.assertEqual("abc", model_response.aind_models[0].iacuc_protocol)
         self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
 
@@ -152,8 +217,11 @@ class TestSmartsheetPerfusionsClient(unittest.TestCase):
             access_token="abc-123", sheet_id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
-        mapper = PerfusionsMapper(smart_sheet_client=client)
-        model_response = mapper.get_model_response(input_id="689418")
+        smart_sheet_response = client.get_sheet()
+        mapper = PerfusionsMapper(
+            smart_sheet_response=smart_sheet_response, input_id="689418"
+        )
+        model_response = mapper.get_model_response()
         self.assertEqual(
             "12/21/2021", model_response.aind_models[0].start_date
         )
@@ -168,8 +236,11 @@ class TestSmartsheetPerfusionsClient(unittest.TestCase):
             access_token="abc-123", sheet_id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
-        mapper = PerfusionsMapper(smart_sheet_client=client)
-        model_response = mapper.get_model_response(input_id="4")
+        smart_sheet_response = client.get_sheet()
+        mapper = PerfusionsMapper(
+            smart_sheet_response=smart_sheet_response, input_id="4"
+        )
+        model_response = mapper.get_model_response()
         self.assertEqual([], model_response.aind_models)
         self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
 

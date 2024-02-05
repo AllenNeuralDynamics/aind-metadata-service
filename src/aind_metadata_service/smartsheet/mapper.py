@@ -1,30 +1,38 @@
 """Module that handles the methods to map the SmartSheet response to the
 aind-data-schema Funding model."""
 
+import json
 from abc import ABC, abstractmethod
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
+from starlette.responses import JSONResponse
+
+from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
-from aind_metadata_service.smartsheet.client import SmartSheetClient
 from aind_metadata_service.smartsheet.models import SheetFields, SheetRow
 
 
 class SmartSheetMapper(ABC):
     """Primary class to handle mapping data models and returning a response"""
 
-    def __init__(self, smart_sheet_client: SmartSheetClient):
+    def __init__(self, smart_sheet_response: JSONResponse, input_id: str):
         """
         Class Constructor
         Parameters
         ----------
-        smart_sheet_client: SmartSheetClient
+        smart_sheet_response : JSONResponse
+          JSON Response when querying smart sheet
+        input_id : str
+          Key to filter results
         """
-        self.smart_sheet_client = smart_sheet_client
+        self.smart_sheet_response = smart_sheet_response
+        self.input_id = input_id
 
     @property
-    def sheet_contents(self):
-        """Return sheet contents as a json string."""
-        return self.smart_sheet_client.get_sheet()
+    def sheet_contents(self) -> Optional[str]:
+        """Parse data out of JSONResponse object"""
+        json_content = json.loads(self.smart_sheet_response.body)
+        return json_content["data"]
 
     @property
     def _column_id_map(self) -> Dict[int, str]:
@@ -61,13 +69,12 @@ class SmartSheetMapper(ABC):
         return output_dict
 
     @abstractmethod
-    def get_model_response(self, input_id: str) -> ModelResponse:
+    def _get_model_response(self) -> ModelResponse:
+        """Parse the sheet contents into a ModelResponse"""
+
+    def get_model_response(self) -> ModelResponse:
         """
-        Return a ModelResponse for a given id.
-        Parameters
-        ----------
-        input_id : str
-          The id with which to extract information
+        Return a ModelResponse given the smart response.
 
         Returns
         -------
@@ -76,3 +83,12 @@ class SmartSheetMapper(ABC):
           responded response. Validation checks are performed downstream.
 
         """
+        if (
+            self.smart_sheet_response.status_code
+            == StatusCodes.INTERNAL_SERVER_ERROR.value
+        ):
+            return ModelResponse.internal_server_error_response()
+        elif self.sheet_contents is None:
+            return ModelResponse.no_data_found_error_response()
+        else:
+            return self._get_model_response()

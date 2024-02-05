@@ -58,7 +58,8 @@ class TestSmartsheetClient(unittest.IsolatedAsyncioTestCase):
             access_token="abc-123", sheet_id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
-        sheet_str = client.get_sheet()
+        sheet_response = client.get_sheet()
+        sheet_str = json.loads(sheet_response.body)["data"]
         sheet = json.loads(sheet_str)
         self.assertEqual("Published Protocols", sheet["name"])
         self.assertEqual(7478444220698500, sheet["id"])
@@ -78,12 +79,13 @@ class TestSmartsheetClient(unittest.IsolatedAsyncioTestCase):
             access_token="abc-123", sheet_id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
-        with self.assertRaises(Exception) as e:
-            client.get_sheet()
-
-        self.assertEqual("Error connecting to server", str(e.exception))
+        response = client.get_sheet()
+        self.assertEqual(500, response.status_code)
+        self.assertEqual(
+            "Error connecting to server", json.loads(response.body)["message"]
+        )
         mock_log_error.assert_called_once_with(
-            "Exception('Error connecting to server')"
+            "Exception('Error connecting to server',)"
         )
 
 
