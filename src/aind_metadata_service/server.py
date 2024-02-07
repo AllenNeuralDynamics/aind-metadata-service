@@ -168,7 +168,6 @@ async def retrieve_procedures(subject_id, pickle: bool = False):
         subject_id=subject_id,
         list_title=sharepoint_settings.nsb_2023_list,
     )
-
     merged_response = sharepoint_client.merge_responses(
         [lb_response, sp2019_response, sp2023_response]
     )
@@ -176,6 +175,7 @@ async def retrieve_procedures(subject_id, pickle: bool = False):
         return merged_response.map_to_pickled_response()
     else:
         return merged_response.map_to_json_response()
+
 
 
 @app.get(

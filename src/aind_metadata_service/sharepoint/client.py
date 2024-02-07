@@ -6,7 +6,7 @@ import asyncio
 import json
 
 from aind_data_schema.core.procedures import Procedures, Injection, InjectionMaterial
-from aind_metadata_service.server import retrieve_injection_materials
+from aind_metadata_service.client import AindMetadataServiceClient
 from office365.runtime.auth.client_credential import ClientCredential
 from office365.sharepoint.client_context import ClientContext
 from pydantic import Field, SecretStr
@@ -117,59 +117,55 @@ class SharePointClient:
                 mapper = NSB2023Procedures()
             else:
                 raise Exception(f"Unknown NSB Sharepoint List: {list_title}")
-            nsb_procedures = mapper.get_procedures_from_sharepoint(
+            subj_procedures = mapper.get_procedures_from_sharepoint(
                 subject_id=subject_id,
                 client_context=nsb_ctx,
                 list_title=list_title,
             )
-            # subj procedures is list of diff procedure models
-            subj_procedures, status_code = self._integrate_injection_materials(nsb_procedures=nsb_procedures)
             procedures = self._handle_response_from_sharepoint(
                 subject_id=subject_id, subject_procedures=subj_procedures
             )
+            # TODO: either integrate here or at server level and figure out domain
+            procedures.subject_procedures = self._integrate_injection_materials(
+                nsb_procedures=procedures.subject_procedures, domain=domain
+            )
             procedures = [] if procedures is None else [procedures]
             return ModelResponse(
-                aind_models=procedures, status_code=status_code
+                aind_models=procedures, status_code=StatusCodes.DB_RESPONDED
             )
         except Exception as e:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
 
     @staticmethod
-    def _integrate_injection_materials(nsb_procedures) -> tuple[List, StatusCodes]:
+    def _integrate_injection_materials(nsb_procedures: List, domain) -> ModelResponse:
         """
         Uses TARS endpoint to map injection materials
         Then integrates materials into mapped procedures.
         Parameters
         ----------
-        nsb_procedures: list
-            List of procedures as mapped from NSB
-        Returns
-        -------
-        tuple[subj_procedures, status_code]
-            (note: return type as tuple is not ideal)
+        nsb_procedures: List
+            ModelResponse procedures as mapped from NSB
         """
         subj_procedures = []
         status_code = StatusCodes.DB_RESPONDED
         for procedure in nsb_procedures:
-            if isinstance(procedure, Injection) and procedure.injection_materials:
-                # what is the best way to get the virus strain (from NSB) to here?
-                # either injection_materials = raw string or can add an extra field?
-                virus_strain = procedure.injection_materials
-                # circular import
-                response = asyncio.run(retrieve_injection_materials(prep_lot_number=virus_strain))
+            if isinstance(procedure, Injection) and procedure.injection_materials.full_genome_name:
+                virus_strain = procedure.injection_materials.full_genome_name
+                metadata_service_client = AindMetadataServiceClient(domain=domain)
+                response = metadata_service_client.get_injection_materials(prep_lot_number=virus_strain)
                 if response.status_code == StatusCodes.DB_RESPONDED:
-                    data = json.loads(response.body)["data"]
+                    data = json.loads(response.content)["data"]
                     procedure.injection_materials = InjectionMaterial(**data)
                 else:
-                    # overwrite raw injection_materials from NSB to [] if there was any error
-                    # (if we're using injection_materials as temp virus_strain)
                     procedure.injection_materials = []
                     status_code = StatusCodes.MULTI_STATUS
             else:
                 pass
             subj_procedures.append(procedure)
-            return subj_procedures, status_code
+        return ModelResponse(
+            aind_models=subj_procedures, status_code=status_code
+        )
 
     @staticmethod
     def _handle_response_from_sharepoint(
