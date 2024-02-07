@@ -572,19 +572,6 @@ class TestSharepointClient(unittest.TestCase):
         )
         self.assertEqual([], model_response.aind_models)
 
-    @patch('aind_metadata_service.sharepoint.client.retrieve_injection_materials')
-    def test_integrate_injection_materials(self, mock_retrieve):
-        with open(INJECTION_MATERIALS_PATH, "r") as f:
-            expected_materials = json.load(f)
-        model_response = ModelResponse(
-            aind_models=[
-                InjectionMaterial.model_validate(expected_materials)
-            ],
-            status_code=StatusCodes.DB_RESPONDED,
-        )
-        expected_response = model_response.map_to_json_response()
-        mock_retrieve.return_value = expected_response
-
 
 if __name__ == "__main__":
     unittest.main()

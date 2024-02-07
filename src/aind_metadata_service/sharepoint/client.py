@@ -138,36 +138,6 @@ class SharePointClient:
             return ModelResponse.internal_server_error_response()
 
     @staticmethod
-    def _integrate_injection_materials(nsb_procedures: List, domain) -> ModelResponse:
-        """
-        Uses TARS endpoint to map injection materials
-        Then integrates materials into mapped procedures.
-        Parameters
-        ----------
-        nsb_procedures: List
-            ModelResponse procedures as mapped from NSB
-        """
-        subj_procedures = []
-        status_code = StatusCodes.DB_RESPONDED
-        for procedure in nsb_procedures:
-            if isinstance(procedure, Injection) and procedure.injection_materials.full_genome_name:
-                virus_strain = procedure.injection_materials.full_genome_name
-                metadata_service_client = AindMetadataServiceClient(domain=domain)
-                response = metadata_service_client.get_injection_materials(prep_lot_number=virus_strain)
-                if response.status_code == StatusCodes.DB_RESPONDED:
-                    data = json.loads(response.content)["data"]
-                    procedure.injection_materials = InjectionMaterial(**data)
-                else:
-                    procedure.injection_materials = []
-                    status_code = StatusCodes.MULTI_STATUS
-            else:
-                pass
-            subj_procedures.append(procedure)
-        return ModelResponse(
-            aind_models=subj_procedures, status_code=status_code
-        )
-
-    @staticmethod
     def _handle_response_from_sharepoint(
         subject_id: str, subject_procedures: Optional[list] = None
     ) -> Optional[Procedures]:

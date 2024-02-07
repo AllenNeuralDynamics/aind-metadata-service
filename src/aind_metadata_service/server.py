@@ -141,6 +141,7 @@ async def retrieve_injection_materials(prep_lot_number, pickle: bool = False):
         tars_client.get_injection_materials_info,
         prep_lot_number=prep_lot_number,
     )
+    # TODO: move molecules call to here
     if pickle:
         return model_response.map_to_pickled_response()
     else:
@@ -171,11 +172,14 @@ async def retrieve_procedures(subject_id, pickle: bool = False):
     merged_response = sharepoint_client.merge_responses(
         [lb_response, sp2019_response, sp2023_response]
     )
+    # virus_strain: Optional[dict] = _some_function (merged_response)
+    # deserializing the response to get virus_strain -> injection materials
+    # call to TARS injection materials [dict: value will be InjectionMaterials]
+    # write a method that merges all the stuff back together
     if pickle:
         return merged_response.map_to_pickled_response()
     else:
         return merged_response.map_to_json_response()
-
 
 
 @app.get(

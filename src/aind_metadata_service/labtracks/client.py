@@ -165,6 +165,7 @@ class LabTracksClient:
             results = []
             for row in fetched_rows:
                 results.append(dict(zip(columns, row)))
+            # TODO: return results
             lth = LabTracksResponseHandler()
             procedures = lth.map_response_to_procedures(
                 subject_id=subject_id, results=results

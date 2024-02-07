@@ -174,3 +174,45 @@ class TarsResponseHandler:
             plasmid_name=viral_prep_aliases.plasmid_name,
         )
         return injection_material
+
+    @staticmethod
+    def _get_virus_strain(response: ModelResponse) -> Optional[dict]:
+        """
+        Iterates through procedures response and stores any virus strains in dictionary.
+        Parameters
+        ---------
+        response : ModelResponse
+        """
+        subj_procedures = response.aind_models
+        for procedure in subj_procedures:
+            if isinstance(procedure, Injection) and procedure.injection_materials.full_genome_name:
+                virus_strain = procedure.injection_materials.full_genome_name
+                # create dictionary
+
+    @staticmethod
+    def _integrate_injection_materials(tars_response: ModelResponse, procedures_response: ModelResponse) -> ModelResponse:
+        """
+        Merges tars_response with procedures_response.
+        Parameters
+        ----------
+        """
+        nsb_procedures = sp_response.aind_models
+        subj_procedures = []
+        status_code = StatusCodes.DB_RESPONDED
+        for procedure in nsb_procedures:
+            if isinstance(procedure, Injection) and procedure.injection_materials.full_genome_name:
+                virus_strain = procedure.injection_materials.full_genome_name
+                metadata_service_client = AindMetadataServiceClient(domain=domain)
+                response = metadata_service_client.get_injection_materials(prep_lot_number=virus_strain)
+                if response.status_code == StatusCodes.DB_RESPONDED:
+                    data = json.loads(response.content)["data"]
+                    procedure.injection_materials = InjectionMaterial(**data)
+                else:
+                    procedure.injection_materials = []
+                    status_code = StatusCodes.MULTI_STATUS
+            else:
+                pass
+            subj_procedures.append(procedure)
+        return ModelResponse(
+            aind_models=subj_procedures, status_code=status_code
+        )
