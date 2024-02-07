@@ -63,7 +63,9 @@ class FundingMapper(SmartSheetMapper):
         row_dict = self.map_row_to_dict(row)
         project_code = row_dict.get(FundingColumnNames.PROJECT_CODE)
         grant_number = row_dict.get(FundingColumnNames.GRANT_NUMBER)
-        institution_value = row_dict.get(FundingColumnNames.INSTITUTION)
+        institution_value = row_dict.get(
+            FundingColumnNames.FUNDING_INSTITUTION
+        )
         funder = self._parse_institution(institution_value)
         investigators = row_dict.get(FundingColumnNames.INVESTIGATORS)
         if input_project_code != project_code:
@@ -113,18 +115,19 @@ class FundingMapper(SmartSheetMapper):
             else:
                 funder_name = funding_info.funder.name
             map_key = (funder_name, funding_info.grant_number)
-            if funder_grant_to_investigators_map.get(map_key) is None:
-                funder_grant_to_investigators_map[map_key] = set(
-                    [f.strip() for f in funding_info.fundee.split(",")]
-                )
-            else:
-                og_fundee = funder_grant_to_investigators_map.get(map_key)
-                new_fundee = set(
-                    [f.strip() for f in funding_info.fundee.split(",")]
-                )
-                funder_grant_to_investigators_map[map_key] = og_fundee.union(
-                    new_fundee
-                )
+            if funding_info.fundee:
+                if funder_grant_to_investigators_map.get(map_key) is None:
+                    funder_grant_to_investigators_map[map_key] = set(
+                        [f.strip() for f in funding_info.fundee.split(",")]
+                    )
+                else:
+                    og_fundee = funder_grant_to_investigators_map.get(map_key)
+                    new_fundee = set(
+                        [f.strip() for f in funding_info.fundee.split(",")]
+                    )
+                    funder_grant_to_investigators_map[
+                        map_key
+                    ] = og_fundee.union(new_fundee)
         for (
             funder_grant_key,
             fundees,
