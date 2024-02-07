@@ -16,6 +16,7 @@ from aind_metadata_service.sharepoint.client import (
     SharePointClient,
     SharepointSettings,
 )
+from aind_data_schema.core.procedures import InjectionMaterial
 
 if os.getenv("LOG_LEVEL"):  # pragma: no cover
     logging.basicConfig(level=os.getenv("LOG_LEVEL"))
@@ -45,6 +46,7 @@ sorted(MAPPED_ITEM_FILE_NAMES_2023)
 MAPPED_FILE_PATHS_2023 = [
     DIR_MAP_2023 / str(f) for f in MAPPED_ITEM_FILE_NAMES_2023
 ]
+INJECTION_MATERIALS_PATH = TEST_DIR / "resources" / "tars" / "mapped_materials.json"
 
 
 class TestSharepointSettings(unittest.TestCase):
@@ -569,6 +571,19 @@ class TestSharepointClient(unittest.TestCase):
             model_response.status_code,
         )
         self.assertEqual([], model_response.aind_models)
+
+    @patch('aind_metadata_service.sharepoint.client.retrieve_injection_materials')
+    def test_integrate_injection_materials(self, mock_retrieve):
+        with open(INJECTION_MATERIALS_PATH, "r") as f:
+            expected_materials = json.load(f)
+        model_response = ModelResponse(
+            aind_models=[
+                InjectionMaterial.model_validate(expected_materials)
+            ],
+            status_code=StatusCodes.DB_RESPONDED,
+        )
+        expected_response = model_response.map_to_json_response()
+        mock_retrieve.return_value = expected_response
 
 
 if __name__ == "__main__":
