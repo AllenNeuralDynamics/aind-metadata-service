@@ -37,6 +37,11 @@ class FundingMapper(SmartSheetMapper):
         try:
             return Institution.from_name(input_name)
         except KeyError:
+            pass
+
+        try:
+            return Institution.from_abbreviation(input_name)
+        except KeyError:
             return input_name
 
     def _map_row_to_funding(
