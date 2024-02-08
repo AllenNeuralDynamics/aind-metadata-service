@@ -2,8 +2,17 @@
    "accessLevel": "EDITOR_SHARE",
    "columns": [
       {
-         "id": 1729551260405636,
+         "id": 3981351074090884,
          "index": 0,
+         "title": "Project Name",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 0,
+         "width": 371
+      },
+      {
+         "id": 1729551260405636,
+         "index": 1,
          "primary": true,
          "title": "Project Code",
          "type": "TEXT_NUMBER",
@@ -12,35 +21,8 @@
          "width": 150
       },
       {
-         "id": 322176376852356,
-         "index": 1,
-         "title": "Funding Source",
-         "type": "TEXT_NUMBER",
-         "validation": false,
-         "version": 0,
-         "width": 150
-      },
-      {
-         "id": 3981351074090884,
-         "index": 2,
-         "title": "Project Name",
-         "type": "TEXT_NUMBER",
-         "validation": false,
-         "version": 0,
-         "width": 371
-      },
-      {
-         "id": 8484950701461380,
-         "index": 3,
-         "title": "Project Code & Name",
-         "type": "TEXT_NUMBER",
-         "validation": false,
-         "version": 0,
-         "width": 527
-      },
-      {
          "id": 2990791841501060,
-         "index": 4,
+         "index": 2,
          "options": [
             "Allen Institute",
             "Allen Institute For Brain Science",
@@ -53,7 +35,7 @@
             "Simons Foundation",
             "National Institutes of Health"
          ],
-         "title": "Institution",
+         "title": "Funding Institution",
          "type": "PICKLIST",
          "validation": false,
          "version": 0,
@@ -61,7 +43,7 @@
       },
       {
          "id": 3446515788894084,
-         "index": 5,
+         "index": 3,
          "title": "Grant Number",
          "type": "PICKLIST",
          "validation": false,
@@ -70,7 +52,7 @@
       },
       {
          "id": 4825776004222852,
-         "index": 6,
+         "index": 4,
          "title": "Investigators",
          "type": "TEXT_NUMBER",
          "validation": false,
@@ -102,24 +84,14 @@
       {
          "cells": [
             {
-               "columnId": 1729551260405636,
-               "displayValue": "122-01-001-10",
-               "value": "122-01-001-10"
-            },
-            {
-               "columnId": 322176376852356,
-               "displayValue": "AIND PGA",
-               "value": "AIND PGA"
-            },
-            {
                "columnId": 3981351074090884,
                "displayValue": "AIND Scientific Activities",
                "value": "AIND Scientific Activities"
             },
             {
-               "columnId": 8484950701461380,
-               "displayValue": "122-01-001-10 - AIND Scientific Activities - Ephys Platform",
-               "value": "122-01-001-10 - AIND Scientific Activities - Ephys Platform"
+               "columnId": 1729551260405636,
+               "displayValue": "122-01-001-10",
+               "value": "122-01-001-10"
             },
             {
                "columnId": 2990791841501060,
@@ -144,22 +116,12 @@
       {
          "cells": [
             {
-               "columnId": 1729551260405636,
-               "displayValue": "122-01-001-10",
-               "value": "122-01-001-10"
-            },
-            {
-               "columnId": 322176376852356,
-               "displayValue": "AIND PGA",
-               "value": "AIND PGA"
-            },
-            {
                "columnId": 3981351074090884
             },
             {
-               "columnId": 8484950701461380,
-               "displayValue": "122-01-001-10 - AIND Scientific Activities - SLAP2",
-               "value": "122-01-001-10 - AIND Scientific Activities - SLAP2"
+               "columnId": 1729551260405636,
+               "displayValue": "122-01-001-10",
+               "value": "122-01-001-10"
             },
             {
                "columnId": 2990791841501060,
@@ -185,24 +147,14 @@
       {
          "cells": [
             {
-               "columnId": 1729551260405636,
-               "displayValue": "121-01-010-10",
-               "value": "121-01-010-10"
-            },
-            {
-               "columnId": 322176376852356,
-               "displayValue": "AIND PGA",
-               "value": "AIND PGA"
-            },
-            {
                "columnId": 3981351074090884,
                "displayValue": "v1omFISH",
                "value": "v1omFISH"
             },
             {
-               "columnId": 8484950701461380,
-               "displayValue": "121-01-010-10 - v1omFISH",
-               "value": "121-01-010-10 - v1omFISH"
+               "columnId": 1729551260405636,
+               "displayValue": "121-01-010-10",
+               "value": "121-01-010-10"
             },
             {
                "columnId": 2990791841501060,
