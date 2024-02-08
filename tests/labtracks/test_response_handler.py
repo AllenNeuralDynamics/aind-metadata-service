@@ -7,6 +7,7 @@ from decimal import Decimal
 from aind_data_schema.core.procedures import (
     Perfusion,
     Procedures,
+    Surgery,
     RetroOrbitalInjection,
 )
 from aind_data_schema.core.subject import (
@@ -138,39 +139,40 @@ class TestResponseExamples:
         },
     ]
 
-    # expected_subject_procedures = [
-    #     Perfusion.model_construct(
-    #         start_date=date(2022, 10, 11),
-    #         end_date=date(2022, 10, 11),
-    #         experimenter_full_name="28803",
-    #         iacuc_protocol="2002",
-    #         animal_weight_prior=None,
-    #         animal_weight_post=None,
-    #         anaesthesia=None,
-    #         notes=None,
-    #         procedure_type="Perfusion",
-    #         output_specimen_ids={"115977"},
-    #     ),
-    #     RetroOrbitalInjection.model_construct(
-    #         start_date=date(2022, 5, 11),
-    #         end_date=date(2022, 5, 12),
-    #         experimenter_full_name="28803",
-    #         iacuc_protocol="2002",
-    #         animal_weight_prior=None,
-    #         animal_weight_post=None,
-    #         anaesthesia=None,
-    #         notes=None,
-    #         procedure_type="Retro-orbital injection",
-    #     ),
-    # ]
+    expected_subject_procedures = [
+        Surgery.model_construct(
+            start_date=date(2022, 10, 11),
+            experimenter_full_name="28803",
+            iacuc_protocol="2002",
+            animal_weight_prior=None,
+            animal_weight_post=None,
+            anaesthesia=None,
+            notes=None,
+            # Perfusion missing protocol_id
+            procedures=[
+                Perfusion.model_construct(output_specimen_ids={"115977"})],
+        ),
+        Surgery.model_construct(
+            start_date=date(2022, 5, 11),
+            experimenter_full_name="28803",
+            iacuc_protocol="2002",
+            animal_weight_prior=None,
+            animal_weight_post=None,
+            anaesthesia=None,
+            notes=None,
+            # Missing injection_volume and injection_eye
+            procedures=[
+                RetroOrbitalInjection.model_construct(
+                    injection_volume=None, injection_eye=None
+                )
+            ],
+        )
+    ]
 
-    # expected_procedures = Procedures.model_validate(
-    #     {
-    #         "schema_version": "0.10.0",
-    #         "subject_id": "115977",
-    #         "subject_procedures": expected_subject_procedures,
-    #     }
-    # )
+    expected_procedures = Procedures.model_construct(
+            subject_id="115977",
+            subject_procedures=expected_subject_procedures,
+    )
 
 
 class TestLabTracksResponseHandler(unittest.TestCase):
