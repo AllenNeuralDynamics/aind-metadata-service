@@ -2,11 +2,8 @@
 
 import logging
 from typing import List, Optional
-import asyncio
-import json
 
-from aind_data_schema.core.procedures import Procedures, Injection, InjectionMaterial
-from aind_metadata_service.client import AindMetadataServiceClient
+from aind_data_schema.core.procedures import Procedures
 from office365.runtime.auth.client_credential import ClientCredential
 from office365.sharepoint.client_context import ClientContext
 from pydantic import Field, SecretStr
@@ -124,10 +121,6 @@ class SharePointClient:
             )
             procedures = self._handle_response_from_sharepoint(
                 subject_id=subject_id, subject_procedures=subj_procedures
-            )
-            # TODO: either integrate here or at server level and figure out domain
-            procedures.subject_procedures = self._integrate_injection_materials(
-                nsb_procedures=procedures.subject_procedures, domain=domain
             )
             procedures = [] if procedures is None else [procedures]
             return ModelResponse(

@@ -20,6 +20,7 @@ from aind_metadata_service.smartsheet.client import (
     SmartsheetSettings,
 )
 from aind_metadata_service.smartsheet.funding.mapping import FundingMapper
+from aind_metadata_service.tars.mapping import TarsResponseHandler
 from aind_metadata_service.smartsheet.perfusions.mapping import (
     PerfusionsMapper,
 )
@@ -31,11 +32,6 @@ SMARTSHEET_FUNDING_TOKEN = os.getenv("SMARTSHEET_FUNDING_TOKEN")
 SMARTSHEET_PERFUSIONS_ID = os.getenv("SMARTSHEET_PERFUSIONS_ID")
 SMARTSHEET_PERFUSIONS_TOKEN = os.getenv("SMARTSHEET_PERFUSIONS_TOKEN")
 
-TARS_TENANT_ID = os.getenv("TARS_TENANT_ID")
-TARS_CLIENT_ID = os.getenv("TARS_CLIENT_ID")
-TARS_CLIENT_SECRET = os.getenv("TARS_CLIENT_SECRET")
-TARS_SCOPE = os.getenv("TARS_SCOPE")
-TARS_RESOURCE = os.getenv("TARS_RESOURCE")
 
 # TODO: Move client instantiation when the server starts instead of creating
 #  one for each request?
@@ -47,13 +43,7 @@ funding_smartsheet_settings = SmartsheetSettings(
 perfusions_smartsheet_settings = SmartsheetSettings(
     access_token=SMARTSHEET_PERFUSIONS_TOKEN, sheet_id=SMARTSHEET_PERFUSIONS_ID
 )
-tars_settings = AzureSettings(
-    tenant_id=TARS_TENANT_ID,
-    client_id=TARS_CLIENT_ID,
-    client_secret=TARS_CLIENT_SECRET,
-    scope=TARS_SCOPE,
-    resource=TARS_RESOURCE,
-)
+tars_settings = AzureSettings()
 
 
 app = FastAPI()
@@ -172,6 +162,9 @@ async def retrieve_procedures(subject_id, pickle: bool = False):
     merged_response = sharepoint_client.merge_responses(
         [lb_response, sp2019_response, sp2023_response]
     )
+    mapper = TarsResponseHandler()
+    viral_dict = mapper.get_virus_strain(merged_response)
+    print(viral_dict)
     # virus_strain: Optional[dict] = _some_function (merged_response)
     # deserializing the response to get virus_strain -> injection materials
     # call to TARS injection materials [dict: value will be InjectionMaterials]

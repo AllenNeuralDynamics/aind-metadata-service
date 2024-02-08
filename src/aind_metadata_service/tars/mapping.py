@@ -6,7 +6,8 @@ from datetime import date, datetime
 from enum import Enum
 from typing import Optional
 
-from aind_data_schema.core.procedures import InjectionMaterial, VirusPrepType
+from aind_data_schema.core.procedures import InjectionMaterial, VirusPrepType, Injection
+from aind_metadata_service.response_handler import ModelResponse
 
 
 class ViralPrepTypes(Enum):
@@ -176,18 +177,20 @@ class TarsResponseHandler:
         return injection_material
 
     @staticmethod
-    def _get_virus_strain(response: ModelResponse) -> Optional[dict]:
+    def get_virus_strain(response: ModelResponse) -> Optional[dict]:
         """
         Iterates through procedures response and stores any virus strains in dictionary.
         Parameters
         ---------
         response : ModelResponse
         """
+        virus_dict = {}
         subj_procedures = response.aind_models
         for procedure in subj_procedures:
             if isinstance(procedure, Injection) and procedure.injection_materials.full_genome_name:
                 virus_strain = procedure.injection_materials.full_genome_name
-                # create dictionary
+                virus_dict.procedure = virus_strain
+        return virus_dict
 
     @staticmethod
     def _integrate_injection_materials(tars_response: ModelResponse, procedures_response: ModelResponse) -> ModelResponse:
