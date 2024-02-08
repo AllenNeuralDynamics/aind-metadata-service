@@ -6,7 +6,8 @@ from typing import Generic, List, Optional, TypeVar, Union
 
 from aind_data_schema.core.data_description import Funding
 from aind_data_schema.core.procedures import (
-    InjectionMaterial,
+    ViralMaterial,
+    NonViralMaterial,
     Perfusion,
     Procedures,
 )
@@ -18,7 +19,7 @@ from pydantic import ValidationError
 
 from aind_metadata_service.client import StatusCodes
 
-T = TypeVar("T", Subject, Procedures, Funding, Perfusion, InjectionMaterial)
+T = TypeVar("T", Subject, Procedures, Funding, Perfusion, ViralMaterial, NonViralMaterial)
 
 
 class ModelResponse(Generic[T]):

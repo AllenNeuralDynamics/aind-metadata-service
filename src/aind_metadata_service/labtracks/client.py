@@ -16,8 +16,9 @@ from aind_data_schema.core.subject import (
     Housing,
     Sex,
     Species,
-    Subject,
+    Subject, BreedingInfo,
 )
+from aind_data_schema.models.organizations import Organization
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings
 
@@ -301,9 +302,9 @@ class LabTracksResponseHandler:
         if sex is None:
             return None
         if sex.lower() == LabTracksSex.MALE.value.lower():
-            return Sex.MALE
+            return Sex.MALE.value
         elif sex.lower() == LabTracksSex.FEMALE.value.lower():
-            return Sex.FEMALE
+            return Sex.FEMALE.value
         else:
             return None
 
@@ -406,17 +407,23 @@ class LabTracksResponseHandler:
                 room_id=result.get(SubjectQueryColumns.ROOM_ID.value),
                 cage_id=result.get(SubjectQueryColumns.CAGE_ID.value),
             )
-            subject = Subject.model_construct(
-                subject_id=subject_id_str,
-                species=species,
+            breeding_info = BreedingInfo.model_construct(
+                breeding_group=breeding_group,
                 paternal_genotype=paternal_genotype,
                 paternal_id=paternal_id_str,
                 maternal_genotype=maternal_genotype,
                 maternal_id=maternal_id_str,
+            )
+            # Assume all mice from LabTracks is AI?
+            source = Organization.AI
+            subject = Subject.model_construct(
+                source=source,
+                subject_id=subject_id_str,
+                species=species,
                 sex=sex,
+                breeding_info=breeding_info,
                 date_of_birth=date_of_birth,
                 genotype=full_genotype,
-                breeding_group=breeding_group,
                 background_strain=background_strain,
                 housing=housing,
             )

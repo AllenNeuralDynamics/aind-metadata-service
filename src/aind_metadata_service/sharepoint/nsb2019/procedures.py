@@ -2,11 +2,11 @@
 
 from typing import List
 
-from aind_data_schema.core.procedures import SubjectProcedure
 from office365.sharepoint.client_context import ClientContext
 
 from aind_metadata_service.sharepoint.nsb2019.mapping import MappedNSBList
 from aind_metadata_service.sharepoint.nsb2019.models import NSBList
+from aind_metadata_service.models import SubjectProcedure
 
 
 class NSB2019Procedures:

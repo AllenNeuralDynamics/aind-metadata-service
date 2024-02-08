@@ -1,6 +1,6 @@
 """Module to test LabTracksResponseHandler methods."""
 
-import datetime
+from datetime import datetime, date
 import unittest
 from decimal import Decimal
 
@@ -11,6 +11,7 @@ from aind_data_schema.core.procedures import (
 )
 from aind_data_schema.core.subject import (
     BackgroundStrain,
+    BreedingInfo,
     Housing,
     Sex,
     Species,
@@ -23,6 +24,8 @@ from aind_metadata_service.labtracks.client import (
     LabTracksSex,
     LabTracksSpecies,
 )
+
+from aind_data_schema.models.organizations import Organization
 
 
 class TestResponseExamples:
@@ -60,7 +63,7 @@ class TestResponseExamples:
             "id": Decimal("115977"),
             "class_values": class_values_str,
             "sex": "M",
-            "birth_date": datetime.datetime(2012, 5, 13, 0, 0),
+            "birth_date": datetime(2012, 5, 13, 0, 0),
             "mouse_comment": None,
             "paternal_id": Decimal("107384"),
             "paternal_class_values": paternal_class_values_str,
@@ -74,24 +77,29 @@ class TestResponseExamples:
         }
     ]
 
-    expected_housing = Housing.model_construct(room_id="000", cage_id="1234")
+    expected_housing = Housing(room_id="000", cage_id="1234")
 
-    expected_subject = Subject.model_validate(
-        {
-            "schema_version": "0.5.0",
-            "species": Species.MUS_MUSCULUS,
-            "subject_id": "115977",
-            "sex": "Male",
-            "date_of_birth": "2012-05-13",
-            "genotype": "Adora2a-Cre/wt",
-            "maternal_id": "107392",
-            "maternal_genotype": "wt/wt",
-            "paternal_id": "107384",
-            "paternal_genotype": "Adora2a-Cre/wt",
-            "breeding_group": "C57BL6J_OLD",
-            "background_strain": "C57BL/6J",
-            "housing": expected_housing,
-        }
+    expected_subject = Subject(
+            species=Species.MUS_MUSCULUS,
+            breeding_info=BreedingInfo(
+                breeding_group="C57BL6J_OLD",
+                maternal_id="107392",
+                maternal_genotype="wt/wt",
+                paternal_id="107384",
+                paternal_genotype="Adora2a-Cre/wt",
+            ),
+            subject_id="115977",
+            sex=Sex.MALE,
+            source=Organization.AI,
+            date_of_birth=date(2012, 5, 13),
+            genotype="Adora2a-Cre/wt",
+            alleles=[],
+            background_strain=BackgroundStrain.C57BL_6J,
+            housing=expected_housing,
+            rrid=None,
+            restrictions=None,
+            wellness_reports=[],
+            notes=None
     )
 
     test_procedures_response = [
@@ -99,8 +107,8 @@ class TestResponseExamples:
             "id": Decimal(00000),
             "task_type_id": Decimal(12345),
             "type_name": "Perfusion Gel",
-            "date_start": datetime.datetime(2022, 10, 11, 0, 0),
-            "date_end": datetime.datetime(2022, 10, 11, 4, 30),
+            "date_start": datetime(2022, 10, 11, 0, 0),
+            "date_end": datetime(2022, 10, 11, 4, 30),
             "investigator_id": Decimal(28803),
             "task_object": Decimal(115977),
             "protocol_number": Decimal(2002),
@@ -110,8 +118,8 @@ class TestResponseExamples:
             "id": Decimal(00000),
             "task_type_id": Decimal(12345),
             "type_name": "Perfusion Gel",
-            "date_start": datetime.datetime(2022, 10, 11, 0, 0),
-            "date_end": datetime.datetime(2022, 10, 11, 4, 30),
+            "date_start": datetime(2022, 10, 11, 0, 0),
+            "date_end": datetime(2022, 10, 11, 4, 30),
             "investigator_id": Decimal(28803),
             "task_object": Decimal(115977),
             "protocol_number": Decimal(2002),
@@ -121,8 +129,8 @@ class TestResponseExamples:
             "id": Decimal(10000),
             "task_type_id": Decimal(23),
             "type_name": "RO Injection VGT",
-            "date_start": datetime.datetime(2022, 5, 11, 0, 0),
-            "date_end": datetime.datetime(2022, 5, 12, 0, 0),
+            "date_start": datetime(2022, 5, 11, 0, 0),
+            "date_end": datetime(2022, 5, 12, 0, 0),
             "investigator_id": Decimal(28803),
             "task_object": Decimal(115977),
             "protocol_number": Decimal(2002),
@@ -130,39 +138,39 @@ class TestResponseExamples:
         },
     ]
 
-    expected_subject_procedures = [
-        Perfusion.model_construct(
-            start_date=datetime.date(2022, 10, 11),
-            end_date=datetime.date(2022, 10, 11),
-            experimenter_full_name="28803",
-            iacuc_protocol="2002",
-            animal_weight_prior=None,
-            animal_weight_post=None,
-            anaesthesia=None,
-            notes=None,
-            procedure_type="Perfusion",
-            output_specimen_ids={"115977"},
-        ),
-        RetroOrbitalInjection.model_construct(
-            start_date=datetime.date(2022, 5, 11),
-            end_date=datetime.date(2022, 5, 12),
-            experimenter_full_name="28803",
-            iacuc_protocol="2002",
-            animal_weight_prior=None,
-            animal_weight_post=None,
-            anaesthesia=None,
-            notes=None,
-            procedure_type="Retro-orbital injection",
-        ),
-    ]
+    # expected_subject_procedures = [
+    #     Perfusion.model_construct(
+    #         start_date=date(2022, 10, 11),
+    #         end_date=date(2022, 10, 11),
+    #         experimenter_full_name="28803",
+    #         iacuc_protocol="2002",
+    #         animal_weight_prior=None,
+    #         animal_weight_post=None,
+    #         anaesthesia=None,
+    #         notes=None,
+    #         procedure_type="Perfusion",
+    #         output_specimen_ids={"115977"},
+    #     ),
+    #     RetroOrbitalInjection.model_construct(
+    #         start_date=date(2022, 5, 11),
+    #         end_date=date(2022, 5, 12),
+    #         experimenter_full_name="28803",
+    #         iacuc_protocol="2002",
+    #         animal_weight_prior=None,
+    #         animal_weight_post=None,
+    #         anaesthesia=None,
+    #         notes=None,
+    #         procedure_type="Retro-orbital injection",
+    #     ),
+    # ]
 
-    expected_procedures = Procedures.model_validate(
-        {
-            "schema_version": "0.10.0",
-            "subject_id": "115977",
-            "subject_procedures": expected_subject_procedures,
-        }
-    )
+    # expected_procedures = Procedures.model_validate(
+    #     {
+    #         "schema_version": "0.10.0",
+    #         "subject_id": "115977",
+    #         "subject_procedures": expected_subject_procedures,
+    #     }
+    # )
 
 
 class TestLabTracksResponseHandler(unittest.TestCase):

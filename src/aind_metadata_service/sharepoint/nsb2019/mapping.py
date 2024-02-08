@@ -5,7 +5,9 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal, DecimalException
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Union
+
+from aind_data_schema.core.procedures import Surgery, TrainingProtocol, WaterRestriction, OtherSubjectProcedure
 
 from aind_data_schema.core.procedures import (
     Anaesthetic,
@@ -30,6 +32,7 @@ from aind_metadata_service.sharepoint.nsb2019.models import (
     Procedure as NSBProcedure,
 )
 
+SubjectProcedure = Union[Surgery, TrainingProtocol, WaterRestriction, OtherSubjectProcedure]
 
 @dataclass
 class HeadPostInfo:
