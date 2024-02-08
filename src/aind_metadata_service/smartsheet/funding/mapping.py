@@ -40,35 +40,35 @@ class FundingMapper(SmartSheetMapper):
             return input_name
 
     def _map_row_to_funding(
-        self, row: SheetRow, input_project_code: str
+        self, row: SheetRow, input_project_name: str
     ) -> Optional[Funding]:
         """
         Map a row to an optional funding model.
         Parameters
         ----------
         row : SheetRow
-        input_project_code : str
-          The project code the user inputs
+        input_project_name : str
+          The project name the user inputs
 
         Returns
         -------
         Union[Funding, None]
-          None if the project code in the row doesn't match the
-          input_project_code. Otherwise, will try to return a valid Funding
+          None if the project name in the row doesn't match the
+          input_project_name. Otherwise, will try to return a valid Funding
           model. If there is some data entry mistake, then it will return a
           Funding model as good as it can.
 
         """
 
         row_dict = self.map_row_to_dict(row)
-        project_code = row_dict.get(FundingColumnNames.PROJECT_CODE)
+        project_name = row_dict.get(FundingColumnNames.PROJECT_NAME)
         grant_number = row_dict.get(FundingColumnNames.GRANT_NUMBER)
         institution_value = row_dict.get(
             FundingColumnNames.FUNDING_INSTITUTION
         )
         funder = self._parse_institution(institution_value)
         investigators = row_dict.get(FundingColumnNames.INVESTIGATORS)
-        if input_project_code != project_code:
+        if input_project_name != project_name:
             return None
         else:
             try:
@@ -84,100 +84,28 @@ class FundingMapper(SmartSheetMapper):
                     fundee=investigators,
                 )
 
-    def _reduce_funding_list(
-        self, funding_list: List[Funding]
-    ) -> List[Funding]:
-        """
-        There are multiple rows associated with a single project code in the
-        SmartSheet. This method reduces that information down so that there
-        is one Funding model per (project_code, grant_number) by concatenating
-        the investigators into a single string. In theory, there should only
-        be one element in the return list, but we'll return everything in case
-        there was a data-entry mistake.
-        Parameters
-        ----------
-        funding_list : List[Funding]
-          Each row for a given project code should be mapped to one element
-          in the funding_list. This needs to be reduced.
-
-        Returns
-        -------
-        List[Funding]
-          The reduced list. There should be one element per
-          (project_code, grant_number)
-
-        """
-        funder_grant_to_investigators_map = {}
-        updated_list = []
-        for funding_info in funding_list:
-            if isinstance(funding_info.funder, str):
-                funder_name = funding_info.funder
-            else:
-                funder_name = funding_info.funder.name
-            map_key = (funder_name, funding_info.grant_number)
-            if funding_info.fundee:
-                if funder_grant_to_investigators_map.get(map_key) is None:
-                    funder_grant_to_investigators_map[map_key] = set(
-                        [f.strip() for f in funding_info.fundee.split(",")]
-                    )
-                else:
-                    og_fundee = funder_grant_to_investigators_map.get(map_key)
-                    new_fundee = set(
-                        [f.strip() for f in funding_info.fundee.split(",")]
-                    )
-                    funder_grant_to_investigators_map[
-                        map_key
-                    ] = og_fundee.union(new_fundee)
-        for (
-            funder_grant_key,
-            fundees,
-        ) in funder_grant_to_investigators_map.items():
-            funder_name = funder_grant_key[0]
-            grant_number = funder_grant_key[1]
-            # The lists are small enough that it is probably okay to sort the
-            # fundees alphabetically for more consistent outputs
-            fundee = None if fundees is None else ",".join(sorted(fundees))
-            try:
-                updated_funding = Funding(
-                    funder=self._parse_institution(funder_name),
-                    grant_number=grant_number,
-                    fundee=fundee,
-                )
-            except ValidationError:
-                updated_funding = Funding.model_construct(
-                    funder=self._parse_institution(funder_name),
-                    grant_number=grant_number,
-                    fundee=fundee,
-                )
-            updated_list.append(updated_funding)
-        return updated_list
-
-    def _get_funding_list(self, project_code: str) -> List[Funding]:
+    def _get_funding_list(self, project_name: str) -> List[Funding]:
         """
         Return a list of Funding information for a give project code.
         Parameters
         ----------
-        project_code : str
-          The project code that the user inputs.
+        project_name : str
+          The project name that the user inputs.
 
         Returns
         -------
         List[Funding]
           A list of Funding models. They might not necessarily pass validation
           checks.
-
         """
-        rows_associated_with_project_code: List[Funding] = []
+        rows_associated_with_project_name: List[Funding] = []
         for row in self.model.rows:
             opt_funding: Optional[Funding] = self._map_row_to_funding(
-                row=row, input_project_code=project_code
+                row=row, input_project_name=project_name
             )
             if opt_funding is not None:
-                rows_associated_with_project_code.append(opt_funding)
-        consolidated_list = self._reduce_funding_list(
-            rows_associated_with_project_code
-        )
-        return consolidated_list
+                rows_associated_with_project_name.append(opt_funding)
+        return rows_associated_with_project_name
 
     def _get_model_response(self) -> ModelResponse:
         """
@@ -190,7 +118,7 @@ class FundingMapper(SmartSheetMapper):
 
         """
         try:
-            funding_list = self._get_funding_list(project_code=self.input_id)
+            funding_list = self._get_funding_list(project_name=self.input_id)
             return ModelResponse(
                 aind_models=funding_list, status_code=StatusCodes.DB_RESPONDED
             )
