@@ -47,17 +47,15 @@ class TestSmartsheetFundingClient(unittest.TestCase):
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
         mapper = FundingMapper(
-            smart_sheet_response=smart_sheet_response, input_id="122-01-001-10"
+            smart_sheet_response=smart_sheet_response,
+            input_id="AIND Scientific Activities",
         )
         model_response = mapper.get_model_response()
         expected_models = [
             Funding(
                 funder=Institution.AI,
                 grant_number=None,
-                fundee=(
-                    "J Smith,John Doe,John Doe II,person.one@acme.org,"
-                    "person.two@acme.org"
-                ),
+                fundee=("person.two@acme.org, J Smith, John Doe II"),
             )
         ]
         self.assertEqual(expected_models, model_response.aind_models)
@@ -73,7 +71,7 @@ class TestSmartsheetFundingClient(unittest.TestCase):
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
         mapper = FundingMapper(
-            smart_sheet_response=smart_sheet_response, input_id="122-01-001-10"
+            smart_sheet_response=smart_sheet_response, input_id="Project Name"
         )
         model_response = mapper.get_model_response()
         expected_models = []
@@ -95,17 +93,15 @@ class TestSmartsheetFundingClient(unittest.TestCase):
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
         mapper = FundingMapper(
-            smart_sheet_response=smart_sheet_response, input_id="122-01-001-10"
+            smart_sheet_response=smart_sheet_response,
+            input_id="AIND Scientific Activities",
         )
         model_response = mapper.get_model_response()
         expected_models = [
             Funding.model_construct(
                 funder="Some Institute",
                 grant_number=None,
-                fundee=(
-                    "J Smith,John Doe,John Doe II,person.one@acme.org,"
-                    "person.two@acme.org"
-                ),
+                fundee=("person.two@acme.org, J Smith, John Doe II"),
             )
         ]
         self.assertEqual(expected_models, model_response.aind_models)
@@ -129,7 +125,7 @@ class TestSmartsheetFundingClient(unittest.TestCase):
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
         mapper = FundingMapper(
-            smart_sheet_response=smart_sheet_response, input_id="122-01-001-10"
+            smart_sheet_response=smart_sheet_response, input_id="Project Name"
         )
         model_response = mapper.get_model_response()
         self.assertEqual(

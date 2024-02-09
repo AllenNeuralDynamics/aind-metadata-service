@@ -86,8 +86,8 @@ async def retrieve_perfusions(subject_id, pickle: bool = False):
         return model_response.map_to_json_response()
 
 
-@app.get("/funding/{project_id}")
-async def retrieve_funding(project_id, pickle: bool = False):
+@app.get("/funding/{project_name}")
+async def retrieve_funding(project_name, pickle: bool = False):
     """Retrieves funding information from smartsheet"""
 
     # TODO: We can probably cache the response if it's 200
@@ -95,7 +95,7 @@ async def retrieve_funding(project_id, pickle: bool = False):
         funding_smart_sheet_client.get_sheet
     )
     mapper = FundingMapper(
-        smart_sheet_response=smart_sheet_response, input_id=project_id
+        smart_sheet_response=smart_sheet_response, input_id=project_name
     )
     model_response = mapper.get_model_response()
     if pickle:
