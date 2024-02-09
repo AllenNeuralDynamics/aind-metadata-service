@@ -160,19 +160,19 @@ async def retrieve_procedures(subject_id, pickle: bool = False):
         list_title=sharepoint_settings.nsb_2023_list,
     )
     merged_response = sharepoint_client.merge_responses(
-        [lb_response, sp2019_response, sp2023_response]
+        [sp2019_response, sp2023_response]
     )
     mapper = TarsResponseHandler()
-    viral_dict = mapper.get_virus_strain(merged_response)
-    print(viral_dict)
-    # virus_strain: Optional[dict] = _some_function (merged_response)
-    # deserializing the response to get virus_strain -> injection materials
-    # call to TARS injection materials [dict: value will be InjectionMaterials]
-    # write a method that merges all the stuff back together
+    viruses = mapper.get_virus_strain(merged_response)
+    tars_mapping = {}
+    for virus_strain in viruses:
+        tars_response = await retrieve_injection_materials(prep_lot_number=virus_strain)
+        tars_mapping[virus_strain] = tars_response
+    integrated_response = mapper.integrate_injection_materials(response=merged_response, tars_mapping=tars_mapping)
     if pickle:
-        return merged_response.map_to_pickled_response()
+        return integrated_response.map_to_pickled_response()
     else:
-        return merged_response.map_to_json_response()
+        return integrated_response.map_to_json_response()
 
 
 @app.get(

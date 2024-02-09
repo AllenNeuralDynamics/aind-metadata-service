@@ -255,8 +255,8 @@ class MappedNSBList:
     @staticmethod
     def _parse_virus_strain_str(_: Optional[str]) -> Optional[str]:
         """Parse virus strain strings"""
-        # TODO: Figure out how to parse virus strain fields
-        return None
+        # TODO: Figure out how to parse virus strain field
+        return _
 
     @property
     def aind_age_at_injection(self) -> Optional[Decimal]:
@@ -3249,11 +3249,11 @@ class MappedNSBList:
                     level=burr_during_info.anaesthetic_level,
                 )
                 injection_materials = (
-                    None
+                    []
                     if burr_hole_info.virus_strain is None
-                    else InjectionMaterial.model_construct(
+                    else [InjectionMaterial.model_construct(
                         full_genome_name=burr_hole_info.virus_strain
-                    )
+                    )]
                 )
                 if burr_hole_info.inj_type == InjectionType.IONTOPHORESIS:
                     injection_proc = IontophoresisInjection.model_construct(
