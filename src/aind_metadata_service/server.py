@@ -66,6 +66,8 @@ funding_smart_sheet_client = SmartSheetClient(
     smartsheet_settings=funding_smartsheet_settings
 )
 
+tars_client = TarsClient(azure_settings=tars_settings)
+
 
 @app.get("/perfusions/{subject_id}")
 async def retrieve_perfusions(subject_id, pickle: bool = False):
@@ -126,7 +128,6 @@ async def retrieve_injection_materials(prep_lot_number, pickle: bool = False):
     Retrieves injection materials from TARS server
     Returns pickled data if URL parameter pickle=True, else returns json
     """
-    tars_client = TarsClient(azure_settings=tars_settings)
     model_response = await run_in_threadpool(
         tars_client.get_injection_materials_info,
         prep_lot_number=prep_lot_number,
