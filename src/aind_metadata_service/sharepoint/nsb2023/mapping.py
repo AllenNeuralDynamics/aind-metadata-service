@@ -256,7 +256,7 @@ class MappedNSBList:
     def _parse_virus_strain_str(_: Optional[str]) -> Optional[str]:
         """Parse virus strain strings"""
         # TODO: Figure out how to parse virus strain field
-        return _
+        return None
 
     @property
     def aind_age_at_injection(self) -> Optional[Decimal]:
@@ -1969,7 +1969,7 @@ class MappedNSBList:
     @property
     def aind_inj5_virus_strain_rt(self) -> Optional[str]:
         """Maps inj5_virus_strain_rt to aind model"""
-        return self._nsb.inj5_virus_strain_rt
+        return self._parse_virus_strain_str(self._nsb.inj5_virus_strain_rt)
 
     @property
     def aind_inj5ret_setting(self) -> Optional[Any]:
@@ -2024,7 +2024,7 @@ class MappedNSBList:
     @property
     def aind_inj6_virus_strain_rt(self) -> Optional[str]:
         """Maps inj6_virus_strain_rt to aind model"""
-        return self._nsb.inj6_virus_strain_rt
+        return self._parse_virus_strain_str(self._nsb.inj6_virus_strain_rt)
 
     @property
     def aind_inj6ret_setting(self) -> Optional[Any]:
@@ -3251,9 +3251,11 @@ class MappedNSBList:
                 injection_materials = (
                     []
                     if burr_hole_info.virus_strain is None
-                    else [InjectionMaterial.model_construct(
-                        full_genome_name=burr_hole_info.virus_strain
-                    )]
+                    else [
+                        InjectionMaterial.model_construct(
+                            full_genome_name=burr_hole_info.virus_strain
+                        )
+                    ]
                 )
                 if burr_hole_info.inj_type == InjectionType.IONTOPHORESIS:
                     injection_proc = IontophoresisInjection.model_construct(

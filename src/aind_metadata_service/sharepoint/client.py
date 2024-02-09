@@ -289,4 +289,3 @@ class SharePointClient:
                     model_response, next_response
                 )
             return model_response
-

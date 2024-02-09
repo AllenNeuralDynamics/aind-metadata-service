@@ -1,15 +1,20 @@
 """Module to map data in TARS to aind_data_schema InjectionMaterial"""
 
-import re
 import json
+import re
 from dataclasses import dataclass
 from datetime import date, datetime
 from enum import Enum
-from typing import Optional, Dict, List
+from typing import Dict, List, Optional
+
+from aind_data_schema.core.procedures import (
+    Injection,
+    InjectionMaterial,
+    VirusPrepType,
+)
 from fastapi.responses import JSONResponse
 
 from aind_metadata_service.client import StatusCodes
-from aind_data_schema.core.procedures import InjectionMaterial, VirusPrepType, Injection
 from aind_metadata_service.response_handler import ModelResponse
 
 
@@ -180,9 +185,10 @@ class TarsResponseHandler:
         return injection_material
 
     @staticmethod
-    def get_virus_strain(response: ModelResponse) -> List:
+    def get_virus_strains(response: ModelResponse) -> List:
         """
-        Iterates through procedures response and stores any virus strains in list.
+        Iterates through procedures response and creates list of
+        virus strains.
         Parameters
         ---------
         response : ModelResponse
@@ -190,14 +196,19 @@ class TarsResponseHandler:
         viruses = []
         procedures = response.aind_models[0]
         for procedure in procedures.subject_procedures:
-            if isinstance(procedure, Injection) and procedure.injection_materials[0].full_genome_name:
-                virus_strain = procedure.injection_materials[0].full_genome_name
+            if (
+                isinstance(procedure, Injection)
+                and procedure.injection_materials[0].full_genome_name
+            ):
+                virus_strain = procedure.injection_materials[
+                    0
+                ].full_genome_name
                 viruses.append(virus_strain)
         return viruses
 
     @staticmethod
     def integrate_injection_materials(
-            response: ModelResponse, tars_mapping: Dict[str, JSONResponse]
+        response: ModelResponse, tars_mapping: Dict[str, JSONResponse]
     ) -> ModelResponse:
         """
         Merges tars_response with procedures_response.
@@ -210,13 +221,17 @@ class TarsResponseHandler:
         for procedure in pre_procedures.subject_procedures:
             virus_strain = procedure.injection_materials[0].full_genome_name
             tars_response = tars_mapping.get(virus_strain)
-            if tars_response.status_code == StatusCodes.DB_RESPONDED:
-                data = json.loads(tars_response.content)["data"]
-                procedure.injection_materials = InjectionMaterial(**data)
+            if (
+                tars_response.status_code == StatusCodes.DB_RESPONDED.value
+                or tars_response.status_code == StatusCodes.VALID_DATA.value
+            ):
+                data = json.loads(tars_response.body)["data"]
+                procedure.injection_materials = [InjectionMaterial(**data)]
             else:
                 procedure.injection_materials = []
                 status_code = StatusCodes.MULTI_STATUS
             integrated_procedures.append(procedure)
         pre_procedures.subject_procedures = integrated_procedures
-        return ModelResponse(aind_models=[pre_procedures], status_code=status_code)
-
+        return ModelResponse(
+            aind_models=[pre_procedures], status_code=status_code
+        )

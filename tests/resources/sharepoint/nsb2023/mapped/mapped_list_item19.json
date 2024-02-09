@@ -34,7 +34,7 @@
          "level": "2.0",
          "duration_unit": "minute"
       },
-      "injection_materials": null,
+      "injection_materials": [],
       "recovery_time": "25.0",
       "injection_duration": null,
       "workstation_id": "SWS 4",
@@ -75,7 +75,7 @@
          "level": "2.0",
          "duration_unit": "minute"
       },
-      "injection_materials": null,
+      "injection_materials": [],
       "recovery_time": "25.0",
       "injection_duration": null,
       "workstation_id": "SWS 4",
@@ -146,7 +146,7 @@
          "level": null,
          "duration_unit": "minute"
       },
-      "injection_materials": null,
+      "injection_materials": [],
       "recovery_time": null,
       "injection_duration": null,
       "workstation_id": null,
@@ -186,7 +186,7 @@
          "level": null,
          "duration_unit": "minute"
       },
-      "injection_materials": null,
+      "injection_materials": [],
       "recovery_time": null,
       "injection_duration": null,
       "workstation_id": null,
@@ -226,7 +226,7 @@
          "level": null,
          "duration_unit": "minute"
       },
-      "injection_materials": null,
+      "injection_materials": [],
       "recovery_time": null,
       "injection_duration": null,
       "workstation_id": null,
@@ -267,7 +267,7 @@
          "level": null,
          "duration_unit": "minute"
       },
-      "injection_materials": null,
+      "injection_materials": [],
       "recovery_time": null,
       "injection_duration": null,
       "workstation_id": null,

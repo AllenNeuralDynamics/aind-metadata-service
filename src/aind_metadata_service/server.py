@@ -20,11 +20,11 @@ from aind_metadata_service.smartsheet.client import (
     SmartsheetSettings,
 )
 from aind_metadata_service.smartsheet.funding.mapping import FundingMapper
-from aind_metadata_service.tars.mapping import TarsResponseHandler
 from aind_metadata_service.smartsheet.perfusions.mapping import (
     PerfusionsMapper,
 )
 from aind_metadata_service.tars.client import AzureSettings, TarsClient
+from aind_metadata_service.tars.mapping import TarsResponseHandler
 
 SMARTSHEET_FUNDING_ID = os.getenv("SMARTSHEET_FUNDING_ID")
 SMARTSHEET_FUNDING_TOKEN = os.getenv("SMARTSHEET_FUNDING_TOKEN")
@@ -160,15 +160,19 @@ async def retrieve_procedures(subject_id, pickle: bool = False):
         list_title=sharepoint_settings.nsb_2023_list,
     )
     merged_response = sharepoint_client.merge_responses(
-        [sp2019_response, sp2023_response]
+        [lb_response, sp2019_response, sp2023_response]
     )
     mapper = TarsResponseHandler()
-    viruses = mapper.get_virus_strain(merged_response)
+    viruses = mapper.get_virus_strains(merged_response)
     tars_mapping = {}
     for virus_strain in viruses:
-        tars_response = await retrieve_injection_materials(prep_lot_number=virus_strain)
+        tars_response = await retrieve_injection_materials(
+            prep_lot_number=virus_strain
+        )
         tars_mapping[virus_strain] = tars_response
-    integrated_response = mapper.integrate_injection_materials(response=merged_response, tars_mapping=tars_mapping)
+    integrated_response = mapper.integrate_injection_materials(
+        response=merged_response, tars_mapping=tars_mapping
+    )
     if pickle:
         return integrated_response.map_to_pickled_response()
     else:
