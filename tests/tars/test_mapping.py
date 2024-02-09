@@ -273,9 +273,9 @@ class TestTarsResponseHandler(unittest.TestCase):
             "12345": tars_response1.map_to_json_response(),
             "67890": tars_response2.map_to_json_response(),
         }
-
+        procedures_response = self.procedures_response
         merged_response = self.handler.integrate_injection_materials(
-            response=self.procedures_response, tars_mapping=tars_mapping
+            response=procedures_response, tars_mapping=tars_mapping
         )
         expected_merged_response = ModelResponse(
             aind_models=[
@@ -308,9 +308,24 @@ class TestTarsResponseHandler(unittest.TestCase):
             "12345": tars_response.map_to_json_response(),
             "67890": tars_response.map_to_json_response(),
         }
-
+        inj1 = NanojectInjection.model_construct(
+            injection_materials=[
+                InjectionMaterial.model_construct(full_genome_name="12345")
+            ]
+        )
+        inj2 = NanojectInjection.model_construct(
+            injection_materials=[
+                InjectionMaterial.model_construct(full_genome_name="67890")
+            ]
+        )
+        procedures_response = ModelResponse(
+            aind_models=[
+                Procedures(subject_id="12345", subject_procedures=[inj1, inj2])
+            ],
+            status_code=StatusCodes.DB_RESPONDED,
+        )
         merged_response = self.handler.integrate_injection_materials(
-            response=self.procedures_response, tars_mapping=tars_mapping
+            response=procedures_response, tars_mapping=tars_mapping
         )
         self.assertEqual(merged_response.status_code, StatusCodes.MULTI_STATUS)
 
