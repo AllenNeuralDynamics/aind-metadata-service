@@ -7,8 +7,6 @@ from decimal import Decimal, DecimalException
 from enum import Enum
 from typing import List, Optional, Union
 
-from aind_data_schema.core.procedures import Surgery, TrainingProtocol, WaterRestriction, OtherSubjectProcedure
-
 from aind_data_schema.core.procedures import (
     Anaesthetic,
     BrainInjection,
@@ -21,8 +19,12 @@ from aind_data_schema.core.procedures import (
     IontophoresisInjection,
     NanojectInjection,
     OphysProbe,
+    OtherSubjectProcedure,
     Side,
     SubjectProcedure,
+    Surgery,
+    TrainingProtocol,
+    WaterRestriction,
 )
 from aind_data_schema.core.subject import Sex
 from aind_data_schema.models.devices import FiberProbe
@@ -32,7 +34,10 @@ from aind_metadata_service.sharepoint.nsb2019.models import (
     Procedure as NSBProcedure,
 )
 
-SubjectProcedure = Union[Surgery, TrainingProtocol, WaterRestriction, OtherSubjectProcedure]
+SubjectProcedure = Union[
+    Surgery, TrainingProtocol, WaterRestriction, OtherSubjectProcedure
+]
+
 
 @dataclass
 class HeadPostInfo:

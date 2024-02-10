@@ -34,15 +34,13 @@ class FundingMapper(SmartSheetMapper):
           be generated from the name, then it returns the input name.
 
         """
-        try:
-            return Organization.from_name(input_name)
-        except KeyError:
-            pass
-
-        try:
-            return Institution.from_abbreviation(input_name)
-        except KeyError:
-            return input_name
+        if Organization().name_map.get(input_name) is not None:
+            return Organization().name_map.get(input_name)
+        else:
+            try:
+                return Organization.from_abbreviation(input_name)
+            except KeyError:
+                return input_name
 
     def _map_row_to_funding(
         self, row: SheetRow, input_project_name: str

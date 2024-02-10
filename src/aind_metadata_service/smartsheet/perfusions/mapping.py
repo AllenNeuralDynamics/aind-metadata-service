@@ -6,7 +6,7 @@ import re
 from datetime import date
 from typing import List, Optional
 
-from aind_data_schema.core.procedures import Perfusion
+from aind_data_schema.core.procedures import Perfusion, Surgery
 from pydantic import ValidationError
 
 from aind_metadata_service.client import StatusCodes
@@ -49,7 +49,7 @@ class PerfusionsMapper(SmartSheetMapper):
 
     def _map_row_to_perfusion(
         self, row: SheetRow, input_subject_id: str
-    ) -> Optional[Perfusion]:
+    ) -> Optional[Surgery]:
         """
         Map a row to an optional perfusion model.
         Parameters
@@ -107,33 +107,39 @@ class PerfusionsMapper(SmartSheetMapper):
             return None
         else:
             try:
-                return Perfusion(
+                return Surgery(
                     start_date=start_date,
-                    end_date=end_date,
                     experimenter_full_name=experimenter_full_name,
-                    protocol_id=protocol_id,
                     iacuc_protocol=iacuc_protocol,
                     animal_weight_prior=animal_weight_prior,
                     animal_weight_post=animal_weight_post,
                     anaesthesia=anaesthesia,
                     notes=notes,
-                    output_specimen_ids=output_specimen_ids,
+                    procedures=[
+                        Perfusion(
+                            output_specimen_ids=output_specimen_ids,
+                            protocol_id=protocol_id,
+                        )
+                    ],
                 )
             except ValidationError:
-                return Perfusion.model_construct(
+                return Surgery.model_construct(
                     start_date=start_date,
-                    end_date=end_date,
                     experimenter_full_name=experimenter_full_name,
-                    protocol_id=protocol_id,
                     iacuc_protocol=iacuc_protocol,
                     animal_weight_prior=animal_weight_prior,
                     animal_weight_post=animal_weight_post,
                     anaesthesia=anaesthesia,
                     notes=notes,
-                    output_specimen_ids=output_specimen_ids,
+                    procedures=[
+                        Perfusion.model_construct(
+                            output_specimen_ids=output_specimen_ids,
+                            protocol_id=protocol_id,
+                        )
+                    ],
                 )
 
-    def _get_perfusion_list(self, subject_id: str) -> List[Perfusion]:
+    def _get_perfusion_list(self, subject_id: str) -> List[Surgery]:
         """
         Return a list of Perfusion information for a give subject_id.
         Parameters
@@ -148,9 +154,9 @@ class PerfusionsMapper(SmartSheetMapper):
           validation checks.
 
         """
-        rows_associated_with_subject_id: List[Perfusion] = []
+        rows_associated_with_subject_id: List[Surgery] = []
         for row in self.model.rows:
-            opt_perfusion: Optional[Perfusion] = self._map_row_to_perfusion(
+            opt_perfusion: Optional[Surgery] = self._map_row_to_perfusion(
                 row=row, input_subject_id=subject_id
             )
             if opt_perfusion is not None:

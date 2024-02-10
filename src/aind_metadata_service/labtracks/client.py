@@ -1,24 +1,25 @@
 """Module to create clients to connect to labtracks database."""
 
 import logging
+from datetime import date
 from enum import Enum
 from typing import List, Optional
 from xml.etree import ElementTree as ET
-from datetime import date
 
 import pyodbc
 from aind_data_schema.core.procedures import (
     Perfusion,
     Procedures,
-    Surgery,
     RetroOrbitalInjection,
+    Surgery,
 )
 from aind_data_schema.core.subject import (
     BackgroundStrain,
+    BreedingInfo,
     Housing,
     Sex,
     Species,
-    Subject, BreedingInfo,
+    Subject,
 )
 from aind_data_schema.models.organizations import Organization
 from pydantic import Field, SecretStr
@@ -490,7 +491,9 @@ class LabTracksResponseHandler:
                         # Perfusion missing protocol_id
                         procedures=[
                             Perfusion.model_construct(
-                                output_specimen_ids=output_specimen_ids)],
+                                output_specimen_ids=output_specimen_ids
+                            )
+                        ],
                     )
                     procedures_list.append(surgery)
 

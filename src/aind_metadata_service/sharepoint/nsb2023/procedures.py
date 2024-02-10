@@ -2,9 +2,9 @@
 
 from typing import List
 
-from aind_metadata_service.models import SubjectProcedure
 from office365.sharepoint.client_context import ClientContext
 
+from aind_metadata_service.models import SubjectProcedure
 from aind_metadata_service.sharepoint.nsb2023.mapping import MappedNSBList
 from aind_metadata_service.sharepoint.nsb2023.models import NSBList
 

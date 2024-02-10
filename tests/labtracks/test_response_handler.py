@@ -1,14 +1,14 @@
 """Module to test LabTracksResponseHandler methods."""
 
-from datetime import datetime, date
 import unittest
+from datetime import date, datetime
 from decimal import Decimal
 
 from aind_data_schema.core.procedures import (
     Perfusion,
     Procedures,
-    Surgery,
     RetroOrbitalInjection,
+    Surgery,
 )
 from aind_data_schema.core.subject import (
     BackgroundStrain,
@@ -18,6 +18,7 @@ from aind_data_schema.core.subject import (
     Species,
     Subject,
 )
+from aind_data_schema.models.organizations import Organization
 
 from aind_metadata_service.labtracks.client import (
     LabTracksBgStrain,
@@ -25,8 +26,6 @@ from aind_metadata_service.labtracks.client import (
     LabTracksSex,
     LabTracksSpecies,
 )
-
-from aind_data_schema.models.organizations import Organization
 
 
 class TestResponseExamples:
@@ -81,26 +80,26 @@ class TestResponseExamples:
     expected_housing = Housing(room_id="000", cage_id="1234")
 
     expected_subject = Subject(
-            species=Species.MUS_MUSCULUS,
-            breeding_info=BreedingInfo(
-                breeding_group="C57BL6J_OLD",
-                maternal_id="107392",
-                maternal_genotype="wt/wt",
-                paternal_id="107384",
-                paternal_genotype="Adora2a-Cre/wt",
-            ),
-            subject_id="115977",
-            sex=Sex.MALE,
-            source=Organization.AI,
-            date_of_birth=date(2012, 5, 13),
-            genotype="Adora2a-Cre/wt",
-            alleles=[],
-            background_strain=BackgroundStrain.C57BL_6J,
-            housing=expected_housing,
-            rrid=None,
-            restrictions=None,
-            wellness_reports=[],
-            notes=None
+        species=Species.MUS_MUSCULUS,
+        breeding_info=BreedingInfo(
+            breeding_group="C57BL6J_OLD",
+            maternal_id="107392",
+            maternal_genotype="wt/wt",
+            paternal_id="107384",
+            paternal_genotype="Adora2a-Cre/wt",
+        ),
+        subject_id="115977",
+        sex=Sex.MALE,
+        source=Organization.AI,
+        date_of_birth=date(2012, 5, 13),
+        genotype="Adora2a-Cre/wt",
+        alleles=[],
+        background_strain=BackgroundStrain.C57BL_6J,
+        housing=expected_housing,
+        rrid=None,
+        restrictions=None,
+        wellness_reports=[],
+        notes=None,
     )
 
     test_procedures_response = [
@@ -150,7 +149,8 @@ class TestResponseExamples:
             notes=None,
             # Perfusion missing protocol_id
             procedures=[
-                Perfusion.model_construct(output_specimen_ids={"115977"})],
+                Perfusion.model_construct(output_specimen_ids={"115977"})
+            ],
         ),
         Surgery.model_construct(
             start_date=date(2022, 5, 11),
@@ -166,12 +166,12 @@ class TestResponseExamples:
                     injection_volume=None, injection_eye=None
                 )
             ],
-        )
+        ),
     ]
 
     expected_procedures = Procedures.model_construct(
-            subject_id="115977",
-            subject_procedures=expected_subject_procedures,
+        subject_id="115977",
+        subject_procedures=expected_subject_procedures,
     )
 
 
