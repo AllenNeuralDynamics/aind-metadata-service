@@ -1,15 +1,15 @@
 """Module to test TARS mapping."""
 
-from datetime import date
 import unittest
+from datetime import date
 from unittest.mock import MagicMock, patch
 
 from aind_data_schema.core.procedures import TarsVirusIdentifiers
 
 from aind_metadata_service.tars.mapping import (
-    ViralMaterial,
     PrepProtocols,
     TarsResponseHandler,
+    ViralMaterial,
     ViralPrepAliases,
     ViralPrepTypes,
     VirusPrepType,
@@ -210,8 +210,7 @@ class TestTarsResponseHandler(unittest.TestCase):
         )
 
         expected_injection_material = ViralMaterial(
-            name="rAAV-MGT_789",
-            tars_identifiers=expected_tars_virus_ids
+            name="rAAV-MGT_789", tars_identifiers=expected_tars_virus_ids
         )
         self.assertIsInstance(injection_material, ViralMaterial)
         self.assertEqual(injection_material, expected_injection_material)
@@ -235,9 +234,7 @@ class TestTarsResponseHandler(unittest.TestCase):
 
         handler = TarsResponseHandler()
         viral_prep_aliases = ViralPrepAliases(
-            material_id="AiV456",
-            plasmid_name="AiP123",
-            full_genome_name=None
+            material_id="AiV456", plasmid_name="AiP123", full_genome_name=None
         )
         injection_material = handler.map_lot_to_injection_material(
             viral_prep_lot=response_data, viral_prep_aliases=viral_prep_aliases
@@ -252,8 +249,7 @@ class TestTarsResponseHandler(unittest.TestCase):
         )
 
         expected_injection_material = ViralMaterial.model_construct(
-            name=None,
-            tars_identifiers=expected_tars_virus_ids
+            name=None, tars_identifiers=expected_tars_virus_ids
         )
         self.assertIsInstance(injection_material, ViralMaterial)
         self.assertEqual(injection_material, expected_injection_material)

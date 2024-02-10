@@ -1,11 +1,11 @@
 """Module to map data in TARS to aind_data_schema InjectionMaterial"""
 
+import logging
 import re
 from dataclasses import dataclass
 from datetime import date, datetime
 from enum import Enum
 from typing import Optional
-import logging
 
 from aind_data_schema.core.procedures import (
     TarsVirusIdentifiers,
