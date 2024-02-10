@@ -89,6 +89,7 @@
       {
          "probes": [
             {
+               "targeted_structure": null,
                "stereotactic_coordinate_ap": "-1.6",
                "stereotactic_coordinate_ml": "-3.3",
                "stereotactic_coordinate_dv": "4.2",
@@ -101,6 +102,7 @@
                "notes": null
             },
             {
+               "targeted_structure": null,
                "stereotactic_coordinate_ap": "-3.05",
                "stereotactic_coordinate_ml": "-0.6",
                "stereotactic_coordinate_dv": "4.2",

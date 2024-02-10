@@ -65,17 +65,15 @@ class TestNSB2023Parsers(TestCase):
         """Checks that raw data is parsed correctly"""
         for list_item in self.list_items:
             raw_data = list_item[0]
-            expected_mapped_data = list(list_item[1])
-            expected_mapped_data.sort(key=lambda x: str(x))
+            expected_mapped_data = list_item[1]
             raw_file_name = list_item[2]
             logging.debug(f"Processing file: {raw_file_name}")
             nsb_model = NSBList.model_validate(raw_data)
             mapper = MappedNSBList(nsb=nsb_model)
-            mapped_procedures = mapper.get_procedures()
-            mapped_procedure_json = [
-                json.loads(p.model_dump_json()) for p in mapped_procedures
-            ]
-            mapped_procedure_json.sort(key=lambda x: str(x))
+            mapped_procedure = mapper.get_procedure()
+            mapped_procedure_json = json.loads(
+                mapped_procedure.model_dump_json()
+            )
             self.assertEqual(expected_mapped_data, mapped_procedure_json)
 
     def test_properties(self):
@@ -114,9 +112,8 @@ class TestNSB2023Parsers(TestCase):
         raw_data["CraniotomyType"] = "WHC NP"
         nsb_model1 = NSBList.model_validate(raw_data)
         mapper = MappedNSBList(nsb=nsb_model1)
-        mapped_procedure1 = mapper.get_procedures()
-        mapped_procedure1.sort(key=lambda x: str(x))
-        cran_proc1 = mapped_procedure1[0]
+        mapped_procedure1 = mapper.get_procedure()
+        cran_proc1 = mapped_procedure1.procedures[0]
         self.assertEqual(
             CraniotomyType.WHC, getattr(cran_proc1, "craniotomy_type")
         )
@@ -126,9 +123,8 @@ class TestNSB2023Parsers(TestCase):
         raw_data["CraniotomyType"] = "Select..."
         nsb_model2 = NSBList.model_validate(raw_data)
         mapper = MappedNSBList(nsb=nsb_model2)
-        mapped_procedure2 = mapper.get_procedures()
-        mapped_procedure2.sort(key=lambda x: str(x))
-        cran_proc2 = mapped_procedure2[0]
+        mapped_procedure2 = mapper.get_procedure()
+        cran_proc2 = mapped_procedure2.procedures[0]
         self.assertIsNone(getattr(cran_proc2, "craniotomy_type"))
 
     def test_headpost_edge_case(self):
@@ -152,8 +148,8 @@ class TestNSB2023Parsers(TestCase):
         raw_data["Inj1Type"] = "Select..."
         nsb_model = NSBList.model_validate(raw_data)
         mapper = MappedNSBList(nsb=nsb_model)
-        mapped_procedure = mapper.get_procedures()
-        proc_types = [type(p) for p in mapped_procedure]
+        mapped_procedure = mapper.get_procedure()
+        proc_types = [type(p) for p in mapped_procedure.procedures]
         self.assertTrue(BrainInjection in proc_types)
 
     def test_burr_hole_to_probe_edge_case(self):

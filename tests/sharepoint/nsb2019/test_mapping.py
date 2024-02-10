@@ -82,7 +82,7 @@ class TestNSB2019Parsers(TestCase):
             attr = getattr(cls, k)
             if isinstance(attr, property):
                 props.append(getattr(mapped_model, k))
-        self.assertEqual(118, len(props))
+        self.assertEqual(117, len(props))
 
     def test_inj_mapping_edge_cases(self):
         """Tests the case where there is an INJ procedure, but the inj types
@@ -105,7 +105,6 @@ class TestNSB2019Parsers(TestCase):
         raw_data["Inj2Type"] = "Select..."
         nsb_model = NSBList.model_validate(raw_data)
         mapper = MappedNSBList(nsb=nsb_model)
-        mapped_procedure = mapper.get_procedure()
         self.assertTrue(isinstance(procedures[0], BrainInjection))
         self.assertTrue(isinstance(procedures[1], BrainInjection))
         self.assertIsNone(mapper._parse_basic_float_str("one"))

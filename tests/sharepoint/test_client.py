@@ -193,8 +193,8 @@ class TestSharepointClient(unittest.TestCase):
         )
 
         expected_subject_procedures = []
-        expected_subject_procedures.extend(self.list_items_2019[0][1])
-        expected_subject_procedures.extend(self.list_items_2023[0][1])
+        expected_subject_procedures.append(self.list_items_2019[0][1])
+        expected_subject_procedures.append(self.list_items_2023[0][1])
 
         response2019 = client.get_procedure_info(
             subject_id="12345", list_title="some_list_title2019"
@@ -264,10 +264,10 @@ class TestSharepointClient(unittest.TestCase):
         response2019_empty.aind_models = []
 
         expected_subject_procedures_left = []
-        expected_subject_procedures_left.extend(self.list_items_2019[0][1])
+        expected_subject_procedures_left.append(self.list_items_2019[0][1])
 
         expected_subject_procedures_right = []
-        expected_subject_procedures_right.extend(self.list_items_2019[0][1])
+        expected_subject_procedures_right.append(self.list_items_2019[0][1])
         merged_responses_left = client.merge_responses(
             [response2019, response2019_empty]
         )
@@ -363,7 +363,7 @@ class TestSharepointClient(unittest.TestCase):
         )
 
         expected_subject_procedures = []
-        expected_subject_procedures.extend(self.list_items_2019[0][1])
+        expected_subject_procedures.append(self.list_items_2019[0][1])
 
         merged_responses = client.merge_responses(
             [response2023_error, response2019]

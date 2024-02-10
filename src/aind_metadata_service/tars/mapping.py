@@ -5,9 +5,13 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from enum import Enum
 from typing import Optional
+import logging
 
-from aind_data_schema.core.procedures import ViralMaterial, VirusPrepType, \
-    TarsVirusIdentifiers
+from aind_data_schema.core.procedures import (
+    TarsVirusIdentifiers,
+    ViralMaterial,
+    VirusPrepType,
+)
 from pydantic import ValidationError
 
 
@@ -109,7 +113,7 @@ class TarsResponseHandler:
         date_pattern = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 
         if not date_pattern.match(date):
-            print(
+            logging.warning(
                 "Invalid date format."
                 " Please provide a date in the format: YYYY-MM-DDTHH:MM:SSZ"
             )
@@ -172,11 +176,11 @@ class TarsResponseHandler:
                 prep_lot_number=prep_lot_number,
                 prep_date=prep_date,
                 prep_type=prep_type,
-                prep_protocol=prep_protocol
+                prep_protocol=prep_protocol,
             )
             return ViralMaterial(
                 name=viral_prep_aliases.full_genome_name,
-                tars_identifiers=tars_virus_identifiers
+                tars_identifiers=tars_virus_identifiers,
             )
         except ValidationError:
             tars_virus_identifiers = TarsVirusIdentifiers.model_construct(
@@ -185,9 +189,9 @@ class TarsResponseHandler:
                 prep_lot_number=prep_lot_number,
                 prep_date=prep_date,
                 prep_type=prep_type,
-                prep_protocol=prep_protocol
+                prep_protocol=prep_protocol,
             )
             return ViralMaterial.model_construct(
                 name=viral_prep_aliases.full_genome_name,
-                tars_identifiers=tars_virus_identifiers
+                tars_identifiers=tars_virus_identifiers,
             )

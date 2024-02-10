@@ -1,7 +1,6 @@
 """Module to create clients to connect to labtracks database."""
 
 import logging
-from datetime import date
 from enum import Enum
 from typing import List, Optional
 from xml.etree import ElementTree as ET

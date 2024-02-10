@@ -1576,17 +1576,21 @@ class MappedNSBList:
 
     def get_fiber_implant(self):
         """Get a fiber implant procedure"""
+
+        # Need to figure out core_diameter, numerical_aperture, total_length,
+        # and targeted_structure
         ophys_probes = []
         if self.aind_fiber_implant1:
             fiber_probe = FiberProbe.model_construct(
                 name="Probe A",
                 core_diameter=None,
                 numerical_aperture=None,
-                total_lenth=None,
+                total_length=None,
             )
             ophys_probes.append(
                 OphysProbe.model_construct(
                     fiber_probe=fiber_probe,
+                    targeted_structure=None,
                     stereotactic_coordinate_ap=self.aind_virus_a_p,
                     stereotactic_coordinate_ml=self.aind_virus_m_l,
                     stereotactic_coordinate_dv=self.aind_fiber_implant1_dv,
@@ -1602,11 +1606,12 @@ class MappedNSBList:
                 name="Probe B",
                 core_diameter=None,
                 numerical_aperture=None,
-                total_lenth=None,
+                total_length=None,
             )
             ophys_probes.append(
                 OphysProbe.model_construct(
                     fiber_probe=fiber_probe,
+                    targeted_structure=None,
                     stereotactic_coordinate_ap=self.aind_ap2nd_inj,
                     stereotactic_coordinate_ml=self.aind_ml2nd_inj,
                     stereotactic_coordinate_dv=self.aind_fiber_implant2_dv,
@@ -1686,26 +1691,8 @@ class MappedNSBList:
                 self._nsb.procedure.HP_INJECTION_OPTIC_FIBER: True,
             }.get(self._nsb.procedure, False)
 
-    @property
-    def has_unknown_procedures(self) -> bool:
-        """Return true if no known procedures are found but data is found"""
-        if self._nsb.procedure is None and self.aind_date_of_surgery is None:
-            return False
-        elif self._nsb.procedure is None:
-            return True
-        else:
-            return not (
-                self.has_injection_procedure
-                or self.has_fiber_implant_procedure
-                or self.has_craniotomy_procedure
-                or self.has_head_frame_procedure
-            )
-
     def get_procedure(self) -> Surgery:
         """Return Surgery as best as possible from a record."""
-
-        # It seems like the record received from NSB contains one surgery with
-        # multiple procedures.
 
         # Surgery info
         start_date = self.aind_date_of_surgery

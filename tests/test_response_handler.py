@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 
 from aind_data_schema.core.procedures import Procedures
-from aind_data_schema.core.subject import Species, Subject, BreedingInfo
+from aind_data_schema.core.subject import BreedingInfo, Species, Subject
 from aind_data_schema.models.organizations import Organization
 from fastapi import Response
 from fastapi.encoders import jsonable_encoder

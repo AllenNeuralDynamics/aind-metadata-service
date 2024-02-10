@@ -15,14 +15,15 @@ from aind_data_schema.core.procedures import (
     CraniotomyType,
     FiberImplant,
     Headframe,
-    InjectionMaterial,
     IontophoresisInjection,
     NanojectInjection,
     OphysProbe,
     Side,
-    SubjectProcedure,
+    Surgery,
+    ViralMaterial,
 )
 from aind_data_schema.core.subject import Sex
+from aind_data_schema.models.devices import FiberProbe
 
 from aind_metadata_service.sharepoint.nsb2023.models import NSBList
 from aind_metadata_service.sharepoint.nsb2023.models import (
@@ -2910,7 +2911,8 @@ class MappedNSBList:
                 instrument_id = self.aind_ionto_number_inj2
             else:
                 instrument_id = None
-            # backend fields titled "1st injection" correlate with followup procedures
+            # backend fields titled "1st injection" correlate with followup
+            # procedures
             return SurgeryDuringInfo(
                 anaesthetic_duration_in_minutes=(
                     self.aind_first_injection_iso_durat
@@ -3133,39 +3135,45 @@ class MappedNSBList:
         else:
             return [vol] * len(dv) if dv is not None else [vol]
 
-    def get_procedures(self) -> List[SubjectProcedure]:
+    def get_procedure(self) -> Surgery:
         """Get a list of subject procedures"""
-        procedures = []
+        # Surgery info
+        start_date = self.aind_date_of_surgery
         experimenter_full_name = self.aind_experimenter_full_name
         iacuc_protocol = self.aind_iacuc_protocol
+        animal_weight_prior = self.aind_weight_before_surger
+        animal_weight_post = self.aind_weight_after_surgery
+        # TODO: Look into how these two fields are defined. It looks like they
+        #  depend on the During class. The if statements below will override
+        #  these Nones with something proper hopefully
+        anaesthesia = None
+        workstation_id = None
+        notes = None
+        procedures = []
 
         # Check if any headframe procedures
         if self.has_hp_procedure():
             hp_during = self.aind_headpost_perform_dur
             hf_surgery_during_info = self.surgery_during_info(hp_during)
-            anaesthetic = Anaesthetic.model_construct(
-                type="isoflurane",
-                duration=(
-                    hf_surgery_during_info.anaesthetic_duration_in_minutes
-                ),
-                level=hf_surgery_during_info.anaesthetic_level,
-            )
+            if hp_during is not None:
+                anaesthesia = Anaesthetic.model_construct(
+                    type="isoflurane",
+                    duration=(
+                        hf_surgery_during_info.anaesthetic_duration_in_minutes
+                    ),
+                    level=hf_surgery_during_info.anaesthetic_level,
+                )
+                workstation_id = self.aind_hp_work_station
             headpost_info = HeadPostInfo.from_hp_and_hp_type(
                 hp=self.aind_headpost, hp_type=self.aind_headpost_type
             )
 
+            # Missing protocol_id
             headframe_procedure = Headframe.model_construct(
-                start_date=hf_surgery_during_info.start_date,
-                end_date=hf_surgery_during_info.start_date,
-                experimenter_full_name=experimenter_full_name,
-                iacuc_protocol=iacuc_protocol,
-                animal_weight_prior=hf_surgery_during_info.weight_prior,
-                animal_weight_post=hf_surgery_during_info.weight_post,
                 headframe_type=headpost_info.headframe_type,
                 headframe_part_number=headpost_info.headframe_part_number,
                 well_type=headpost_info.well_type,
                 well_part_number=headpost_info.well_part_number,
-                anaesthesia=anaesthetic,
             )
             procedures.append(headframe_procedure)
 
@@ -3174,11 +3182,13 @@ class MappedNSBList:
             craniotomy_type = self.aind_craniotomy_type
             cran_during = self.aind_craniotomy_perform_d
             cran_during_info = self.surgery_during_info(cran_during)
-            anaesthetic = Anaesthetic.model_construct(
-                type="isoflurane",
-                duration=cran_during_info.anaesthetic_duration_in_minutes,
-                level=cran_during_info.anaesthetic_level,
-            )
+            if cran_during is not None:
+                anaesthesia = Anaesthetic.model_construct(
+                    type="isoflurane",
+                    duration=cran_during_info.anaesthetic_duration_in_minutes,
+                    level=cran_during_info.anaesthetic_level,
+                )
+                workstation_id = self.aind_hp_work_station
             bregma_to_lambda_distance = self.aind_breg2_lamb
             if craniotomy_type == CraniotomyType.FIVE_MM:
                 craniotomy_coordinates_reference = (
@@ -3193,16 +3203,8 @@ class MappedNSBList:
                 craniotomy_size = None
 
             cran_procedure = Craniotomy.model_construct(
-                start_date=cran_during_info.start_date,
-                end_date=cran_during_info.start_date,
-                experimenter_full_name=experimenter_full_name,
-                iacuc_protocol=iacuc_protocol,
-                animal_weight_prior=cran_during_info.weight_prior,
-                animal_weight_post=cran_during_info.weight_post,
                 craniotomy_type=craniotomy_type,
                 craniotomy_size=craniotomy_size,
-                anaesthesia=anaesthetic,
-                workstation_id=cran_during_info.workstation_id,
                 recovery_time=cran_during_info.recovery_time,
                 bregma_to_lambda_distance=bregma_to_lambda_distance,
                 craniotomy_coordinates_reference=(
@@ -3216,17 +3218,10 @@ class MappedNSBList:
 
             # all craniotomies are done with headframe.
             headframe_procedure = Headframe.model_construct(
-                start_date=cran_during_info.start_date,
-                end_date=cran_during_info.start_date,
-                experimenter_full_name=experimenter_full_name,
-                iacuc_protocol=iacuc_protocol,
-                animal_weight_prior=cran_during_info.weight_prior,
-                animal_weight_post=cran_during_info.weight_post,
                 headframe_type=headpost_info.headframe_type,
                 headframe_part_number=headpost_info.headframe_part_number,
                 well_type=headpost_info.well_type,
                 well_part_number=headpost_info.well_part_number,
-                anaesthesia=anaesthetic,
             )
             procedures.append(headframe_procedure)
 
@@ -3243,27 +3238,22 @@ class MappedNSBList:
                     during=burr_hole_info.during,
                     inj_type=burr_hole_info.inj_type,
                 )
-                anaesthetic = Anaesthetic.model_construct(
-                    type="isoflurane",
-                    duration=burr_during_info.anaesthetic_duration_in_minutes,
-                    level=burr_during_info.anaesthetic_level,
-                )
+                if burr_hole_info.during is not None:
+                    anaesthesia = Anaesthetic.model_construct(
+                        type="isoflurane",
+                        duration=burr_during_info.anaesthetic_duration_in_minutes,
+                        level=burr_during_info.anaesthetic_level,
+                    )
+                    workstation_id = burr_during_info.workstation_id
                 injection_materials = (
                     None
                     if burr_hole_info.virus_strain is None
-                    else InjectionMaterial.model_construct(
-                        full_genome_name=burr_hole_info.virus_strain
+                    else ViralMaterial.model_construct(
+                        name=burr_hole_info.virus_strain
                     )
                 )
                 if burr_hole_info.inj_type == InjectionType.IONTOPHORESIS:
                     injection_proc = IontophoresisInjection.model_construct(
-                        start_date=burr_during_info.start_date,
-                        end_date=burr_during_info.start_date,
-                        experimenter_full_name=experimenter_full_name,
-                        iacuc_protocol=iacuc_protocol,
-                        animal_weight_prior=burr_during_info.weight_prior,
-                        animal_weight_post=burr_during_info.weight_post,
-                        workstation_id=burr_during_info.workstation_id,
                         injection_hemisphere=burr_hole_info.hemisphere,
                         injection_coordinate_ml=burr_hole_info.coordinate_ml,
                         injection_coordinate_ap=burr_hole_info.coordinate_ap,
@@ -3276,7 +3266,6 @@ class MappedNSBList:
                         alternating_current=burr_hole_info.alternating_current,
                         recovery_time=burr_during_info.recovery_time,
                         instrument_id=burr_during_info.instrument_id,
-                        anaesthesia=anaesthetic,
                         bregma_to_lambda_distance=self.aind_breg2_lamb,
                         injection_coordinate_reference=(
                             CoordinateReferenceLocation.BREGMA
@@ -3285,13 +3274,6 @@ class MappedNSBList:
                     )
                 elif burr_hole_info.inj_type == InjectionType.NANOJECT:
                     injection_proc = NanojectInjection.model_construct(
-                        start_date=burr_during_info.start_date,
-                        end_date=burr_during_info.start_date,
-                        experimenter_full_name=experimenter_full_name,
-                        iacuc_protocol=iacuc_protocol,
-                        animal_weight_prior=burr_during_info.weight_prior,
-                        animal_weight_post=burr_during_info.weight_post,
-                        workstation_id=burr_during_info.workstation_id,
                         injection_hemisphere=burr_hole_info.hemisphere,
                         injection_coordinate_ml=burr_hole_info.coordinate_ml,
                         injection_coordinate_ap=burr_hole_info.coordinate_ap,
@@ -3305,7 +3287,6 @@ class MappedNSBList:
                         alternating_current=burr_hole_info.alternating_current,
                         recovery_time=burr_during_info.recovery_time,
                         instrument_id=burr_during_info.instrument_id,
-                        anaesthesia=anaesthetic,
                         bregma_to_lambda_distance=self.aind_breg2_lamb,
                         injection_coordinate_reference=(
                             CoordinateReferenceLocation.BREGMA
@@ -3314,13 +3295,6 @@ class MappedNSBList:
                     )
                 else:
                     injection_proc = BrainInjection.model_construct(
-                        start_date=burr_during_info.start_date,
-                        end_date=burr_during_info.start_date,
-                        experimenter_full_name=experimenter_full_name,
-                        iacuc_protocol=iacuc_protocol,
-                        animal_weight_prior=burr_during_info.weight_prior,
-                        animal_weight_post=burr_during_info.weight_post,
-                        workstation_id=burr_during_info.workstation_id,
                         injection_hemisphere=burr_hole_info.hemisphere,
                         injection_coordinate_ml=burr_hole_info.coordinate_ml,
                         injection_coordinate_ap=burr_hole_info.coordinate_ap,
@@ -3331,7 +3305,6 @@ class MappedNSBList:
                         injection_duration=burr_hole_info.inj_duration,
                         recovery_time=burr_during_info.recovery_time,
                         instrument_id=burr_during_info.instrument_id,
-                        anaesthesia=anaesthetic,
                         bregma_to_lambda_distance=self.aind_breg2_lamb,
                         injection_coordinate_reference=(
                             CoordinateReferenceLocation.BREGMA
@@ -3352,13 +3325,25 @@ class MappedNSBList:
                     inj_type=burr_hole_info.inj_type,
                 )
                 bregma_to_lambda_distance = self.aind_breg2_lamb
-                anaesthetic = Anaesthetic.model_construct(
-                    type="isoflurane",
-                    duration=burr_during_info.anaesthetic_duration_in_minutes,
-                    level=burr_during_info.anaesthetic_level,
+                if burr_hole_info.during is not None:
+                    anaesthesia = Anaesthetic.model_construct(
+                        type="isoflurane",
+                        duration=burr_during_info.anaesthetic_duration_in_minutes,
+                        level=burr_during_info.anaesthetic_level,
+                    )
+                    workstation_id = burr_during_info.workstation_id
+
+                # Need to figure out core_diameter, numerical_aperture,
+                # total_length, and targeted_structure
+                fiber_probe = FiberProbe.model_construct(
+                    name=probe_name,
+                    core_diameter=None,
+                    numerical_aperture=None,
+                    total_length=None,
                 )
                 ophys_probe = OphysProbe.model_construct(
-                    name=probe_name,
+                    fiber_probe=fiber_probe,
+                    targeted_structure=None,
                     stereotactic_coordinate_ml=burr_hole_info.coordinate_ml,
                     stereotactic_coordinate_ap=burr_hole_info.coordinate_ap,
                     stereotactic_coordinate_dv=(
@@ -3371,27 +3356,20 @@ class MappedNSBList:
                     ),
                 )
                 fiber_implant_proc = FiberImplant.model_construct(
-                    start_date=burr_during_info.start_date,
-                    end_date=burr_during_info.start_date,
-                    experimenter_full_name=experimenter_full_name,
-                    iacuc_protocol=iacuc_protocol,
-                    animal_weight_prior=burr_during_info.weight_prior,
-                    animal_weight_post=burr_during_info.weight_post,
-                    probes=[ophys_probe],
-                    anaesthesia=anaesthetic,
+                    probes=[ophys_probe]
                 )
                 procedures.append(fiber_implant_proc)
 
-        # Create generic procedure model if no specific procedures found
-        if len(procedures) == 0 and self.aind_date_of_surgery:
-            subject_procedure = SubjectProcedure.model_construct(
-                start_date=self.aind_date_of_surgery,
-                end_date=self.aind_date_of_surgery,
-                experimenter_full_name=experimenter_full_name,
-                iacuc_protocol=iacuc_protocol,
-                animal_weight_prior=self.aind_weight_before_surger,
-                animal_weight_post=self.aind_weight_after_surgery,
-            )
-            procedures.append(subject_procedure)
+        surgery = Surgery.model_construct(
+            start_date=start_date,
+            experimenter_full_name=experimenter_full_name,
+            iacuc_protocol=iacuc_protocol,
+            animal_weight_prior=animal_weight_prior,
+            animal_weight_post=animal_weight_post,
+            anaesthesia=anaesthesia,
+            workstation_id=workstation_id,
+            notes=notes,
+            procedures=procedures,
+        )
 
-        return procedures
+        return surgery

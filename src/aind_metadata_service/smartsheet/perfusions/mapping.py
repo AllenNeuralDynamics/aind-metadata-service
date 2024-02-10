@@ -81,7 +81,6 @@ class PerfusionsMapper(SmartSheetMapper):
             start_date = date.fromisoformat(start_date_value)
         except ValueError:
             start_date = start_date_value
-        end_date = start_date
         experimenter_full_name = row_dict.get(
             PerfusionsColumnNames.EXPERIMENTER
         )
