@@ -1,55 +1,45 @@
-[
-   {
-      "start_date": "2022-12-06",
-      "end_date": "2022-12-06",
-      "experimenter_full_name": "NSB-187",
-      "iacuc_protocol": "2115",
-      "animal_weight_prior": null,
-      "animal_weight_post": null,
-      "anaesthesia": {
-         "type": "isoflurane",
-         "level": null,
-         "duration_unit": "minute"
-      },
-      "craniotomy_type": "Other",
-      "craniotomy_hemisphere": null,
-      "craniotomy_coordinates_ml": "2.8",
-      "craniotomy_coordinates_ap": "1.3",
-      "craniotomy_coordinates_reference": null,
-      "bregma_to_lambda_distance": null,
-      "craniotomy_size": null,
-      "dura_removed": null,
-      "workstation_id": "SWS 3",
-      "weight_unit": "gram",
-      "notes": null,
-      "procedure_type": "Craniotomy",
-      "craniotomy_coordinates_unit": "millimeter",
-      "bregma_to_lambda_unit": "millimeter",
-      "craniotomy_size_unit": "millimeter",
-      "implant_part_number": null,
-      "protective_material": null,
-      "recovery_time": null,
-      "recovery_time_unit": "minute"
+{
+   "start_date": "2022-12-06",
+   "experimenter_full_name": "NSB-187",
+   "iacuc_protocol": "2115",
+   "animal_weight_prior": null,
+   "animal_weight_post": null,
+   "anaesthesia": {
+      "type": "isoflurane",
+      "duration": null,
+      "level": null,
+      "duration_unit": "minute"
    },
-   {
-      "start_date": "2022-12-06",
-      "end_date": "2022-12-06",
-      "experimenter_full_name": "NSB-187",
-      "iacuc_protocol": "2115",
-      "animal_weight_prior": null,
-      "animal_weight_post": null,
-      "anaesthesia": {
-         "type": "isoflurane",
-         "level": null,
-         "duration_unit": "minute"
+   "workstation_id": "SWS 3",
+   "procedures": [
+      {
+         "headframe_type": "Neuropixel-style",
+         "headframe_part_number": "0160-100-10",
+         "well_part_number": "0160-200-36",
+         "well_type": "Neuropixel-style",
+         "procedure_type": "Headframe",
+         "headframe_material": null
       },
-      "headframe_type": "Neuropixel-style",
-      "headframe_part_number": "0160-100-10",
-      "well_part_number": "0160-200-36",
-      "well_type": "Neuropixel-style",
-      "weight_unit": "gram",
-      "notes": null,
-      "procedure_type": "Headframe",
-      "headframe_material": null
-   }
-]
+      {
+         "craniotomy_type": "Other",
+         "craniotomy_hemisphere": null,
+         "craniotomy_coordinates_ml": "2.8",
+         "craniotomy_coordinates_ap": "1.3",
+         "craniotomy_coordinates_reference": null,
+         "bregma_to_lambda_distance": null,
+         "craniotomy_size": null,
+         "dura_removed": null,
+         "procedure_type": "Craniotomy",
+         "craniotomy_coordinates_unit": "millimeter",
+         "bregma_to_lambda_unit": "millimeter",
+         "craniotomy_size_unit": "millimeter",
+         "implant_part_number": null,
+         "protective_material": null,
+         "recovery_time": null,
+         "recovery_time_unit": "minute"
+      }
+   ],
+   "notes": null,
+   "procedure_type": "Surgery",
+   "weight_unit": "gram"
+}

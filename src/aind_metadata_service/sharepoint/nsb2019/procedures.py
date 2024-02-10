@@ -48,6 +48,6 @@ class NSB2019Procedures:
         for list_item in list_items:
             nsb_model = NSBList.model_validate(list_item.to_json())
             mapped_model = MappedNSBList(nsb=nsb_model)
-            procedures = mapped_model.get_procedures()
-            list_of_procedures.extend(procedures)
+            procedure = mapped_model.get_procedure()
+            list_of_procedures.append(procedure)
         return list_of_procedures

@@ -1,1 +1,18 @@
-[]
+{
+   "start_date": null,
+   "experimenter_full_name": "NSB-187",
+   "iacuc_protocol": "2115",
+   "animal_weight_prior": null,
+   "animal_weight_post": null,
+   "anaesthesia": {
+      "type": "isoflurane",
+      "duration": null,
+      "level": null,
+      "duration_unit": "minute"
+   },
+   "workstation_id": "SWS 3",
+   "procedures": [],
+   "notes": null,
+   "procedure_type": "Surgery",
+   "weight_unit": "gram"
+}

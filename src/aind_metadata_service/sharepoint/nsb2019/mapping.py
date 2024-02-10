@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal, DecimalException
 from enum import Enum
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from aind_data_schema.core.procedures import (
     Anaesthetic,
@@ -15,16 +15,12 @@ from aind_data_schema.core.procedures import (
     CraniotomyType,
     FiberImplant,
     Headframe,
-    InjectionMaterial,
     IontophoresisInjection,
     NanojectInjection,
     OphysProbe,
-    OtherSubjectProcedure,
     Side,
-    SubjectProcedure,
     Surgery,
-    TrainingProtocol,
-    WaterRestriction,
+    ViralMaterial,
 )
 from aind_data_schema.core.subject import Sex
 from aind_data_schema.models.devices import FiberProbe
@@ -33,10 +29,6 @@ from aind_metadata_service.sharepoint.nsb2019.models import NSBList
 from aind_metadata_service.sharepoint.nsb2019.models import (
     Procedure as NSBProcedure,
 )
-
-SubjectProcedure = Union[
-    Surgery, TrainingProtocol, WaterRestriction, OtherSubjectProcedure
-]
 
 
 @dataclass
@@ -66,11 +58,11 @@ class InjectionRound(Enum):
 class MappedNSBList:
     """Mapped Fields in Sharepoint list"""
 
-    AP_REGEX = re.compile(r"^ *([-+]?\d*\.?\d+)(?: *(?:mm)? *)$")
-    DV_REGEX = re.compile(r"^ *([-+]?\d*\.?\d+)(?: *(?:mm)? *)$")
+    AP_REGEX = re.compile(r"^ *([-+]?\d*\.?\d+) *(?:mm)? *$")
+    DV_REGEX = re.compile(r"^ *([-+]?\d*\.?\d+) *(?:mm)? *$")
     ISO_DUR_REGEX1 = re.compile(r"^ *(\d*\.?\d+) *(?:hour|hours)* *$")
     ISO_DUR_REGEX2 = re.compile(r"^(\d+):(\d+)$")
-    ML_REGEX = re.compile(r"^ *([-+]?\d*\.?\d+)(?: *(?:mm)? *)$")
+    ML_REGEX = re.compile(r"^ *([-+]?\d*\.?\d+) *(?:mm)? *$")
     ALT_TIME_REGEX = re.compile(
         r"^ *(7)(?:.0|/7)? *(?:s|sec|secs|second|seconds)? *$"
     )
@@ -1415,17 +1407,8 @@ class MappedNSBList:
 
     def get_head_frame_procedure(self) -> Headframe:
         """Get head frame procedure"""
+        # Missing protocol_id
         return Headframe.model_construct(
-            start_date=self.aind_date_of_surgery,
-            end_date=self.aind_date_of_surgery,
-            experimenter_full_name=self.aind_experimenter_full_name,
-            iacuc_protocol=self.aind_iacuc_protocol,
-            animal_weight_prior=self.aind_weight_before_surger,
-            animal_weight_post=self.aind_weight_after_surgery,
-            anaesthesia=Anaesthetic.model_construct(
-                type=self.aind_anaesthetic_type,
-                level=self.aind_hp_iso_level,
-            ),
             headframe_type=self.aind_headpost_type.headframe_type,
             headframe_part_number=(
                 self.aind_headpost_type.headframe_part_number
@@ -1436,17 +1419,8 @@ class MappedNSBList:
 
     def get_craniotomy_procedure(self) -> Craniotomy:
         """Get craniotomy procedure"""
+        # Missing protocol_id
         return Craniotomy.model_construct(
-            start_date=self.aind_date_of_surgery,
-            end_date=self.aind_date_of_surgery,
-            experimenter_full_name=self.aind_experimenter_full_name,
-            iacuc_protocol=self.aind_iacuc_protocol,
-            animal_weight_prior=self.aind_weight_before_surger,
-            animal_weight_post=self.aind_weight_after_surgery,
-            anaesthesia=Anaesthetic.model_construct(
-                type=self.aind_anaesthetic_type,
-                level=self.aind_hp_iso_level,
-            ),
             craniotomy_type=self.aind_craniotomy_type,
             craniotomy_hemisphere=self.aind_hp_loc,
             craniotomy_coordinates_ml=self.aind_hp_m_l,
@@ -1457,33 +1431,20 @@ class MappedNSBList:
             bregma_to_lambda_distance=self.aind_breg2_lamb,
             craniotomy_size=self.aind_craniotomy_size,
             dura_removed=self.aind_hp_durotomy,
-            workstation_id=self.aind_hp_work_station,
         )
 
     def get_first_injection_procedure(self) -> BrainInjection:
         """Get first injection procedure"""
         if self.aind_inj1_type == InjectionType.NANOJECT:
+            # Missing protocol_id
             return NanojectInjection.model_construct(
-                start_date=self.aind_date1st_injection,
-                end_date=self.aind_date1st_injection,
-                experimenter_full_name=self.aind_experimenter_full_name,
-                animal_weight_prior=self.aind_first_injection_weight_be,
-                animal_weight_post=self.aind_first_injection_weight_af,
-                anaesthesia=Anaesthetic.model_construct(
-                    type=self.aind_anaesthetic_type,
-                    duration=self.aind_first_injection_iso_durat,
-                    level=self.aind_hp_iso_level,
-                ),
-                injection_materials=(
-                    [
-                        InjectionMaterial.model_construct(
-                            full_genome_name=self.aind_inj1_virus_strain_rt
-                        )
-                    ]
-                ),
+                injection_materials=[
+                    ViralMaterial.model_construct(
+                        name=self.aind_inj1_virus_strain_rt
+                    )
+                ],
                 recovery_time=self.aind_first_inj_recovery,
                 injection_duration=self.aind_inj1_lenghtof_time,
-                workstation_id=self.aind_work_station1st_injection,
                 instrument_id=self.aind_nanoject_number_inj10,
                 injection_coordinate_ml=self.aind_virus_m_l,
                 injection_coordinate_ap=self.aind_virus_a_p,
@@ -1498,26 +1459,15 @@ class MappedNSBList:
             )
         elif self.aind_inj1_type == InjectionType.IONTOPHORESIS:
             return IontophoresisInjection.model_construct(
-                start_date=self.aind_date1st_injection,
-                end_date=self.aind_date1st_injection,
-                experimenter_full_name=self.aind_experimenter_full_name,
-                animal_weight_prior=self.aind_first_injection_weight_be,
-                animal_weight_post=self.aind_first_injection_weight_af,
-                anaesthesia=Anaesthetic.model_construct(
-                    type=self.aind_anaesthetic_type,
-                    duration=self.aind_first_injection_iso_durat,
-                    level=self.aind_hp_iso_level,
-                ),
                 injection_materials=(
                     [
-                        InjectionMaterial.model_construct(
-                            full_genome_name=self.aind_inj1_virus_strain_rt
+                        ViralMaterial.model_construct(
+                            name=self.aind_inj1_virus_strain_rt
                         )
                     ]
                 ),
                 recovery_time=self.aind_first_inj_recovery,
                 injection_duration=self.aind_inj1_lenghtof_time,
-                workstation_id=self.aind_work_station1st_injection,
                 instrument_id=self.aind_ionto_number_inj1,
                 injection_coordinate_ml=self.aind_virus_m_l,
                 injection_coordinate_ap=self.aind_virus_a_p,
@@ -1533,26 +1483,15 @@ class MappedNSBList:
             )
         else:
             return BrainInjection.model_construct(
-                start_date=self.aind_date1st_injection,
-                end_date=self.aind_date1st_injection,
-                experimenter_full_name=self.aind_experimenter_full_name,
-                animal_weight_prior=self.aind_first_injection_weight_be,
-                animal_weight_post=self.aind_first_injection_weight_af,
-                anaesthesia=Anaesthetic.model_construct(
-                    type=self.aind_anaesthetic_type,
-                    duration=self.aind_first_injection_iso_durat,
-                    level=self.aind_hp_iso_level,
-                ),
                 injection_materials=(
                     [
-                        InjectionMaterial.model_construct(
-                            full_genome_name=self.aind_inj1_virus_strain_rt
+                        ViralMaterial.model_construct(
+                            name=self.aind_inj1_virus_strain_rt
                         )
                     ]
                 ),
                 recovery_time=self.aind_first_inj_recovery,
                 injection_duration=self.aind_inj1_lenghtof_time,
-                workstation_id=self.aind_work_station1st_injection,
                 injection_coordinate_ml=self.aind_virus_m_l,
                 injection_coordinate_ap=self.aind_virus_a_p,
                 injection_coordinate_depth=self.aind_virus_d_v,
@@ -1568,26 +1507,15 @@ class MappedNSBList:
         """Get second injection procedure"""
         if self.aind_inj2_type == InjectionType.NANOJECT:
             return NanojectInjection.model_construct(
-                start_date=self.aind_date2nd_injection,
-                end_date=self.aind_date2nd_injection,
-                experimenter_full_name=self.aind_experimenter_full_name,
-                animal_weight_prior=self.aind_second_injection_weight_b,
-                animal_weight_post=self.aind_second_injection_weight_a,
-                anaesthesia=Anaesthetic.model_construct(
-                    type=self.aind_anaesthetic_type,
-                    duration=self.aind_second_injection_iso_dura,
-                    level=self.aind_hp_iso_level,
-                ),
                 injection_materials=(
                     [
-                        InjectionMaterial.model_construct(
-                            full_genome_name=self.aind_inj2_virus_strain_rt
+                        ViralMaterial.model_construct(
+                            name=self.aind_inj2_virus_strain_rt
                         )
                     ]
                 ),
                 recovery_time=self.aind_second_inj_recover,
                 injection_duration=self.aind_inj2_lenghtof_time,
-                workstation_id=self.aind_work_station2nd_injection,
                 instrument_id=self.aind_nanoject_number_inj2,
                 injection_coordinate_ml=self.aind_ml2nd_inj,
                 injection_coordinate_ap=self.aind_ap2nd_inj,
@@ -1602,26 +1530,15 @@ class MappedNSBList:
             )
         elif self.aind_inj2_type == InjectionType.IONTOPHORESIS:
             return IontophoresisInjection.model_construct(
-                start_date=self.aind_date2nd_injection,
-                end_date=self.aind_date2nd_injection,
-                experimenter_full_name=self.aind_experimenter_full_name,
-                animal_weight_prior=self.aind_second_injection_weight_b,
-                animal_weight_post=self.aind_second_injection_weight_a,
-                anaesthesia=Anaesthetic.model_construct(
-                    type=self.aind_anaesthetic_type,
-                    duration=self.aind_second_injection_iso_dura,
-                    level=self.aind_hp_iso_level,
-                ),
                 injection_materials=(
                     [
-                        InjectionMaterial.model_construct(
-                            full_genome_name=self.aind_inj2_virus_strain_rt
+                        ViralMaterial.model_construct(
+                            name=self.aind_inj2_virus_strain_rt
                         )
                     ]
                 ),
                 recovery_time=self.aind_second_inj_recover,
                 injection_duration=self.aind_inj2_lenghtof_time,
-                workstation_id=self.aind_work_station2nd_injection,
                 instrument_id=self.aind_ionto_number_inj2,
                 injection_coordinate_ml=self.aind_ml2nd_inj,
                 injection_coordinate_ap=self.aind_ap2nd_inj,
@@ -1637,26 +1554,15 @@ class MappedNSBList:
             )
         else:
             return BrainInjection.model_construct(
-                start_date=self.aind_date2nd_injection,
-                end_date=self.aind_date2nd_injection,
-                experimenter_full_name=self.aind_experimenter_full_name,
-                animal_weight_prior=self.aind_second_injection_weight_b,
-                animal_weight_post=self.aind_second_injection_weight_a,
-                anaesthesia=Anaesthetic.model_construct(
-                    type=self.aind_anaesthetic_type,
-                    duration=self.aind_second_injection_iso_dura,
-                    level=self.aind_hp_iso_level,
-                ),
                 injection_materials=(
                     [
-                        InjectionMaterial.model_construct(
-                            full_genome_name=self.aind_inj2_virus_strain_rt
+                        ViralMaterial.model_construct(
+                            name=self.aind_inj2_virus_strain_rt
                         )
                     ]
                 ),
                 recovery_time=self.aind_second_inj_recover,
                 injection_duration=self.aind_inj2_lenghtof_time,
-                workstation_id=self.aind_work_station2nd_injection,
                 injection_coordinate_ml=self.aind_ml2nd_inj,
                 injection_coordinate_ap=self.aind_ap2nd_inj,
                 injection_coordinate_depth=self.aind_dv2nd_inj,
@@ -1711,25 +1617,9 @@ class MappedNSBList:
                     angle=self.aind_inj2_angle_v2,
                 )
             )
+        # Missing protocol_id
         return FiberImplant.model_construct(
-            start_date=self.aind_date_of_surgery,
-            end_date=self.aind_date_of_surgery,
-            experimenter_full_name=self.aind_experimenter_full_name,
-            iacuc_protocol=self.aind_iacuc_protocol,
-            animal_weight_prior=self.aind_weight_before_surger,
-            animal_weight_post=self.aind_weight_after_surgery,
             probes=ophys_probes,
-        )
-
-    def get_basic_subject_procedure(self) -> SubjectProcedure:
-        """Get a basic subject procedure"""
-        return SubjectProcedure.model_construct(
-            start_date=self.aind_date_of_surgery,
-            end_date=self.aind_date_of_surgery,
-            experimenter_full_name=self.aind_experimenter_full_name,
-            iacuc_protocol=self.aind_iacuc_protocol,
-            animal_weight_prior=self.aind_weight_before_surger,
-            animal_weight_post=self.aind_weight_after_surgery,
         )
 
     @property
@@ -1811,8 +1701,25 @@ class MappedNSBList:
                 or self.has_head_frame_procedure
             )
 
-    def get_procedures(self) -> List[SubjectProcedure]:
-        """Get a list of subject procedures"""
+    def get_procedure(self) -> Surgery:
+        """Return Surgery as best as possible from a record."""
+
+        # It seems like the record received from NSB contains one surgery with
+        # multiple procedures.
+
+        # Surgery info
+        start_date = self.aind_date_of_surgery
+        experimenter_full_name = self.aind_experimenter_full_name
+        iacuc_protocol = self.aind_iacuc_protocol
+        animal_weight_prior = self.aind_weight_before_surger
+        animal_weight_post = self.aind_weight_after_surgery
+        anaesthesia = Anaesthetic.model_construct(
+            type=self.aind_anaesthetic_type,
+            duration=self.aind_second_injection_iso_dura,
+            level=self.aind_hp_iso_level,
+        )
+        workstation_id = self.aind_hp_work_station
+        notes = None
         procedures = []
         if self.has_head_frame_procedure:
             procedures.append(self.get_head_frame_procedure())
@@ -1827,6 +1734,15 @@ class MappedNSBList:
             procedures.append(self.get_craniotomy_procedure())
         if self.has_fiber_implant_procedure:
             procedures.append(self.get_fiber_implant())
-        if self.has_unknown_procedures:
-            procedures.append(self.get_basic_subject_procedure())
-        return procedures
+        surgery = Surgery.model_construct(
+            start_date=start_date,
+            experimenter_full_name=experimenter_full_name,
+            iacuc_protocol=iacuc_protocol,
+            animal_weight_prior=animal_weight_prior,
+            animal_weight_post=animal_weight_post,
+            anaesthesia=anaesthesia,
+            workstation_id=workstation_id,
+            notes=notes,
+            procedures=procedures,
+        )
+        return surgery

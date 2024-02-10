@@ -1,12 +1,7 @@
-from typing import Union
+from typing import get_args
 
 from aind_data_schema.core.procedures import (
-    OtherSubjectProcedure,
-    Surgery,
-    TrainingProtocol,
-    WaterRestriction,
+    Procedures
 )
 
-SubjectProcedure = Union[
-    Surgery, TrainingProtocol, WaterRestriction, OtherSubjectProcedure
-]
+SubjectProcedure = get_args(get_args(Procedures.model_fields["subject_procedures"].annotation)[0])[0]
