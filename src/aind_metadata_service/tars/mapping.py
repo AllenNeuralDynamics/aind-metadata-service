@@ -197,7 +197,7 @@ class TarsResponseHandler:
         procedures = response.aind_models[0]
         for procedure in procedures.subject_procedures:
             if (
-                isinstance(procedure, Injection)
+                isinstance(procedure, Injection) and procedure.injection_materials
                 and procedure.injection_materials[0].full_genome_name
             ):
                 virus_strain = procedure.injection_materials[
@@ -219,17 +219,18 @@ class TarsResponseHandler:
         status_code = response.status_code
         integrated_procedures = []
         for procedure in pre_procedures.subject_procedures:
-            virus_strain = procedure.injection_materials[0].full_genome_name
-            tars_response = tars_mapping.get(virus_strain)
-            if (
-                tars_response.status_code == StatusCodes.DB_RESPONDED.value
-                or tars_response.status_code == StatusCodes.VALID_DATA.value
-            ):
-                data = json.loads(tars_response.body)["data"]
-                procedure.injection_materials = [InjectionMaterial(**data)]
-            else:
-                procedure.injection_materials = []
-                status_code = StatusCodes.MULTI_STATUS
+            if isinstance(procedure, Injection) and procedure.injection_materials:
+                virus_strain = procedure.injection_materials[0].full_genome_name
+                tars_response = tars_mapping.get(virus_strain)
+                if (
+                    tars_response.status_code == StatusCodes.DB_RESPONDED.value
+                    or tars_response.status_code == StatusCodes.VALID_DATA.value
+                ):
+                    data = json.loads(tars_response.body)["data"]
+                    procedure.injection_materials = [InjectionMaterial(**data)]
+                else:
+                    procedure.injection_materials = []
+                    status_code = StatusCodes.MULTI_STATUS
             integrated_procedures.append(procedure)
         pre_procedures.subject_procedures = integrated_procedures
         return ModelResponse(

@@ -256,7 +256,7 @@ class MappedNSBList:
     def _parse_virus_strain_str(_: Optional[str]) -> Optional[str]:
         """Parse virus strain strings"""
         # TODO: Figure out how to parse virus strain field
-        return None
+        return _
 
     @property
     def aind_age_at_injection(self) -> Optional[Decimal]:

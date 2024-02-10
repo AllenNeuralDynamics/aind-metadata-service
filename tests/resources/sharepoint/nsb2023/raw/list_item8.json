@@ -50,7 +50,7 @@
   "ImplantIDCoverslipType": "5mm stacked coverslip",
   "OData__x0023__x0020_of_x0020_Burr_x002": "1",
   "Burr_x0020_hole_x0020_1": "Injection",
-  "Inj1VirusStrain_rt": "Premixied &quot;\u200bdL+Cre&quot;",
+  "Inj1VirusStrain_rt": null,
   "Burr1_x0020_Virus_x0020_Biosafte": null,
   "Burr_x0020_Hole_x0020_1_x0020_st": null,
   "Inj1StorageLocation": "Select...",
