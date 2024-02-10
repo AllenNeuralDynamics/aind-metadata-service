@@ -7,7 +7,8 @@ import unittest
 from pathlib import Path
 
 from aind_data_schema.core.procedures import Procedures
-from aind_data_schema.core.subject import Species, Subject
+from aind_data_schema.core.subject import Species, Subject, BreedingInfo
+from aind_data_schema.models.organizations import Organization
 from fastapi import Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -78,6 +79,14 @@ class TestResponseHandler(unittest.TestCase):
 
         model = Subject(
             species=Species.MUS_MUSCULUS,
+            source=Organization.AI,
+            breeding_info=BreedingInfo(
+                breeding_group="C57BL6J_OLD",
+                maternal_id="107392",
+                maternal_genotype="wt/wt",
+                paternal_id="107384",
+                paternal_genotype="Adora2a-Cre/wt",
+            ),
             subject_id="639374",
             sex="Male",
             date_of_birth="2022-06-24",

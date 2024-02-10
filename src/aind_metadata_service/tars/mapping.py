@@ -6,7 +6,9 @@ from datetime import date, datetime
 from enum import Enum
 from typing import Optional
 
-from aind_data_schema.core.procedures import InjectionMaterial, VirusPrepType
+from aind_data_schema.core.procedures import ViralMaterial, VirusPrepType, \
+    TarsVirusIdentifiers
+from pydantic import ValidationError
 
 
 class ViralPrepTypes(Enum):
@@ -148,7 +150,7 @@ class TarsResponseHandler:
 
     def map_lot_to_injection_material(
         self, viral_prep_lot: dict, viral_prep_aliases: ViralPrepAliases
-    ) -> InjectionMaterial:
+    ) -> ViralMaterial:
         """
         Map prep lot dictionary to injection materials
         Parameters
@@ -163,14 +165,29 @@ class TarsResponseHandler:
         prep_type, prep_protocol = self._map_prep_type_and_protocol(
             viral_prep_lot["viralPrep"]["viralPrepType"]["name"]
         )
-        injection_material = InjectionMaterial.model_construct(
-            prep_lot_number=prep_lot_number,
-            prep_date=prep_date,
-            prep_type=prep_type,
-            prep_protocol=prep_protocol,
-            material_id=viral_prep_aliases.material_id,
-            name=viral_prep_aliases.full_genome_name,
-            full_genome_name=viral_prep_aliases.full_genome_name,
-            plasmid_name=viral_prep_aliases.plasmid_name,
-        )
-        return injection_material
+        try:
+            tars_virus_identifiers = TarsVirusIdentifiers(
+                virus_tars_id=viral_prep_aliases.material_id,
+                plasmid_tars_alias=viral_prep_aliases.plasmid_name,
+                prep_lot_number=prep_lot_number,
+                prep_date=prep_date,
+                prep_type=prep_type,
+                prep_protocol=prep_protocol
+            )
+            return ViralMaterial(
+                name=viral_prep_aliases.full_genome_name,
+                tars_identifiers=tars_virus_identifiers
+            )
+        except ValidationError:
+            tars_virus_identifiers = TarsVirusIdentifiers.model_construct(
+                virus_tars_id=viral_prep_aliases.material_id,
+                plasmid_tars_alias=viral_prep_aliases.plasmid_name,
+                prep_lot_number=prep_lot_number,
+                prep_date=prep_date,
+                prep_type=prep_type,
+                prep_protocol=prep_protocol
+            )
+            return ViralMaterial.model_construct(
+                name=viral_prep_aliases.full_genome_name,
+                tars_identifiers=tars_virus_identifiers
+            )
