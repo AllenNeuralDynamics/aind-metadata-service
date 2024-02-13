@@ -1435,14 +1435,16 @@ class MappedNSBList:
 
     def get_first_injection_procedure(self) -> BrainInjection:
         """Get first injection procedure"""
+        injection_materials = (
+                    [] if self.aind_inj1_virus_strain_rt is None
+                    else [ViralMaterial.model_construct(
+                        name=self.aind_inj1_virus_strain_rt
+                    )]
+                )
         if self.aind_inj1_type == InjectionType.NANOJECT:
             # Missing protocol_id
             return NanojectInjection.model_construct(
-                injection_materials=[
-                    ViralMaterial.model_construct(
-                        name=self.aind_inj1_virus_strain_rt
-                    )
-                ],
+                injection_materials=injection_materials,
                 recovery_time=self.aind_first_inj_recovery,
                 injection_duration=self.aind_inj1_lenghtof_time,
                 instrument_id=self.aind_nanoject_number_inj10,
@@ -1459,13 +1461,7 @@ class MappedNSBList:
             )
         elif self.aind_inj1_type == InjectionType.IONTOPHORESIS:
             return IontophoresisInjection.model_construct(
-                injection_materials=(
-                    [
-                        ViralMaterial.model_construct(
-                            name=self.aind_inj1_virus_strain_rt
-                        )
-                    ]
-                ),
+                injection_materials=injection_materials,
                 recovery_time=self.aind_first_inj_recovery,
                 injection_duration=self.aind_inj1_lenghtof_time,
                 instrument_id=self.aind_ionto_number_inj1,
@@ -1483,13 +1479,7 @@ class MappedNSBList:
             )
         else:
             return BrainInjection.model_construct(
-                injection_materials=(
-                    [
-                        ViralMaterial.model_construct(
-                            name=self.aind_inj1_virus_strain_rt
-                        )
-                    ]
-                ),
+                injection_materials=injection_materials,
                 recovery_time=self.aind_first_inj_recovery,
                 injection_duration=self.aind_inj1_lenghtof_time,
                 injection_coordinate_ml=self.aind_virus_m_l,
@@ -1505,15 +1495,15 @@ class MappedNSBList:
 
     def get_second_injection_procedure(self) -> BrainInjection:
         """Get second injection procedure"""
+        injection_materials = (
+            [] if self.aind_inj2_virus_strain_rt is None
+            else [ViralMaterial.model_construct(
+                name=self.aind_inj2_virus_strain_rt
+            )]
+        )
         if self.aind_inj2_type == InjectionType.NANOJECT:
             return NanojectInjection.model_construct(
-                injection_materials=(
-                    [
-                        ViralMaterial.model_construct(
-                            name=self.aind_inj2_virus_strain_rt
-                        )
-                    ]
-                ),
+                injection_materials=injection_materials,
                 recovery_time=self.aind_second_inj_recover,
                 injection_duration=self.aind_inj2_lenghtof_time,
                 instrument_id=self.aind_nanoject_number_inj2,
@@ -1530,13 +1520,7 @@ class MappedNSBList:
             )
         elif self.aind_inj2_type == InjectionType.IONTOPHORESIS:
             return IontophoresisInjection.model_construct(
-                injection_materials=(
-                    [
-                        ViralMaterial.model_construct(
-                            name=self.aind_inj2_virus_strain_rt
-                        )
-                    ]
-                ),
+                injection_materials=injection_materials,
                 recovery_time=self.aind_second_inj_recover,
                 injection_duration=self.aind_inj2_lenghtof_time,
                 instrument_id=self.aind_ionto_number_inj2,
@@ -1554,13 +1538,7 @@ class MappedNSBList:
             )
         else:
             return BrainInjection.model_construct(
-                injection_materials=(
-                    [
-                        ViralMaterial.model_construct(
-                            name=self.aind_inj2_virus_strain_rt
-                        )
-                    ]
-                ),
+                injection_materials=injection_materials,
                 recovery_time=self.aind_second_inj_recover,
                 injection_duration=self.aind_inj2_lenghtof_time,
                 injection_coordinate_ml=self.aind_ml2nd_inj,

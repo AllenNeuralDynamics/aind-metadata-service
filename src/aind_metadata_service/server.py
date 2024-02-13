@@ -154,10 +154,10 @@ async def retrieve_procedures(subject_id, pickle: bool = False):
     Returns pickled data if URL parameter pickle=True, else returns json
     """
     sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
-    lb_client = LabTracksClient.from_settings(labtracks_settings)
-    lb_response = await run_in_threadpool(
-        lb_client.get_procedures_info, subject_id=subject_id
-    )
+    # lb_client = LabTracksClient.from_settings(labtracks_settings)
+    # lb_response = await run_in_threadpool(
+    #     lb_client.get_procedures_info, subject_id=subject_id
+    # )
     sp2019_response = await run_in_threadpool(
         sharepoint_client.get_procedure_info,
         subject_id=subject_id,
@@ -169,7 +169,7 @@ async def retrieve_procedures(subject_id, pickle: bool = False):
         list_title=sharepoint_settings.nsb_2023_list,
     )
     merged_response = sharepoint_client.merge_responses(
-        [lb_response, sp2019_response, sp2023_response]
+        [sp2019_response, sp2023_response]
     )
     if pickle:
         return merged_response.map_to_pickled_response()

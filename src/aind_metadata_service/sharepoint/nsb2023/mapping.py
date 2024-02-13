@@ -1970,7 +1970,7 @@ class MappedNSBList:
     @property
     def aind_inj5_virus_strain_rt(self) -> Optional[str]:
         """Maps inj5_virus_strain_rt to aind model"""
-        return self._nsb.inj5_virus_strain_rt
+        return self._parse_virus_strain_str(self._nsb.inj5_virus_strain_rt)
 
     @property
     def aind_inj5ret_setting(self) -> Optional[Any]:
@@ -2025,7 +2025,7 @@ class MappedNSBList:
     @property
     def aind_inj6_virus_strain_rt(self) -> Optional[str]:
         """Maps inj6_virus_strain_rt to aind model"""
-        return self._nsb.inj6_virus_strain_rt
+        return self._parse_virus_strain_str(self._nsb.inj6_virus_strain_rt)
 
     @property
     def aind_inj6ret_setting(self) -> Optional[Any]:
@@ -2047,7 +2047,7 @@ class MappedNSBList:
     @property
     def aind_inj_virus_strain_rt(self) -> Optional[str]:
         """Maps inj_virus_strain_rt to aind model"""
-        return self._nsb.inj_virus_strain_rt
+        return self._parse_virus_strain_str(self._nsb.inj_virus_strain_rt)
 
     @property
     def aind_ionto_number_inj1(self) -> Optional[str]:
@@ -3138,6 +3138,7 @@ class MappedNSBList:
     def get_procedure(self) -> Surgery:
         """Get a list of subject procedures"""
         # Surgery info
+        # TODO: start_date should be based on During class
         start_date = self.aind_date_of_surgery
         experimenter_full_name = self.aind_experimenter_full_name
         iacuc_protocol = self.aind_iacuc_protocol
@@ -3246,11 +3247,11 @@ class MappedNSBList:
                     )
                     workstation_id = burr_during_info.workstation_id
                 injection_materials = (
-                    None
+                    []
                     if burr_hole_info.virus_strain is None
-                    else ViralMaterial.model_construct(
+                    else [ViralMaterial.model_construct(
                         name=burr_hole_info.virus_strain
-                    )
+                    )]
                 )
                 if burr_hole_info.inj_type == InjectionType.IONTOPHORESIS:
                     injection_proc = IontophoresisInjection.model_construct(

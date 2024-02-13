@@ -13,7 +13,7 @@
    "workstation_id": "SWS 4",
    "procedures": [
       {
-         "injection_materials": null,
+         "injection_materials": [],
          "recovery_time": null,
          "injection_duration": null,
          "instrument_id": "Ionto #1",

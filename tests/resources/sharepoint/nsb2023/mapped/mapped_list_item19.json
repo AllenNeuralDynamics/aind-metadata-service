@@ -21,7 +21,7 @@
          "headframe_material": null
       },
       {
-         "injection_materials": null,
+         "injection_materials": [],
          "recovery_time": null,
          "injection_duration": null,
          "instrument_id": null,
@@ -65,7 +65,7 @@
          "procedure_type": "Fiber implant"
       },
       {
-         "injection_materials": null,
+         "injection_materials": [],
          "recovery_time": "25.0",
          "injection_duration": null,
          "instrument_id": null,
@@ -108,7 +108,7 @@
          "procedure_type": "Fiber implant"
       },
       {
-         "injection_materials": null,
+         "injection_materials": [],
          "recovery_time": null,
          "injection_duration": null,
          "instrument_id": null,
@@ -151,7 +151,7 @@
          "procedure_type": "Fiber implant"
       },
       {
-         "injection_materials": null,
+         "injection_materials": [],
          "recovery_time": null,
          "injection_duration": null,
          "instrument_id": null,
@@ -194,7 +194,7 @@
          "procedure_type": "Fiber implant"
       },
       {
-         "injection_materials": null,
+         "injection_materials": [],
          "recovery_time": null,
          "injection_duration": null,
          "instrument_id": null,
@@ -220,7 +220,7 @@
          "injection_volume_unit": "nanoliter"
       },
       {
-         "injection_materials": null,
+         "injection_materials": [],
          "recovery_time": "25.0",
          "injection_duration": null,
          "instrument_id": null,

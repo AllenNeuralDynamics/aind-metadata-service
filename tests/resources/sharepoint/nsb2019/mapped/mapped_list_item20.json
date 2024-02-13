@@ -21,16 +21,7 @@
          "headframe_material": null
       },
       {
-         "injection_materials": [
-            {
-               "name": null,
-               "material_type": "Virus",
-               "tars_identifiers": null,
-               "addgene_id": null,
-               "titer": null,
-               "titer_unit": "gc/mL"
-            }
-         ],
+         "injection_materials": [],
          "recovery_time": null,
          "injection_duration": "5",
          "instrument_id": null,
