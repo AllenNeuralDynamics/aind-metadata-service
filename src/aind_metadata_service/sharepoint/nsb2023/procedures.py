@@ -49,5 +49,5 @@ class NSB2023Procedures:
             nsb_model = NSBList.model_validate(list_item.to_json())
             mapped_model = MappedNSBList(nsb=nsb_model)
             procedure = mapped_model.get_procedure()
-            list_of_procedures.append(procedure)
+            list_of_procedures.extend(procedure)
         return list_of_procedures

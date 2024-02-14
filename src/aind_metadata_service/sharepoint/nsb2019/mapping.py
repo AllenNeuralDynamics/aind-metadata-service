@@ -1443,6 +1443,9 @@ class MappedNSBList:
                 )
         if self.aind_inj1_type == InjectionType.NANOJECT:
             # Missing protocol_id
+            injection_volume = (
+                [] if self.aind_inj1_vol is None else [self.aind_inj1_vol]
+            )
             return NanojectInjection.model_construct(
                 injection_materials=injection_materials,
                 recovery_time=self.aind_first_inj_recovery,
@@ -1457,7 +1460,7 @@ class MappedNSBList:
                 bregma_to_lambda_distance=self.aind_breg2_lamb,
                 injection_angle=self.aind_inj1angle0,
                 injection_hemisphere=self.aind_virus_hemisphere,
-                injection_volume=self.aind_inj1_vol,
+                injection_volume=injection_volume,
             )
         elif self.aind_inj1_type == InjectionType.IONTOPHORESIS:
             return IontophoresisInjection.model_construct(
@@ -1502,6 +1505,9 @@ class MappedNSBList:
             )]
         )
         if self.aind_inj2_type == InjectionType.NANOJECT:
+            injection_volume = (
+                [] if self.aind_inj2_vol is None else [self.aind_inj2_vol]
+            )
             return NanojectInjection.model_construct(
                 injection_materials=injection_materials,
                 recovery_time=self.aind_second_inj_recover,
@@ -1516,7 +1522,7 @@ class MappedNSBList:
                 bregma_to_lambda_distance=self.aind_breg2_lamb,
                 injection_angle=self.aind_inj2angle0,
                 injection_hemisphere=self.aind_hemisphere2nd_inj,
-                injection_volume=self.aind_inj2_vol,
+                injection_volume=injection_volume,
             )
         elif self.aind_inj2_type == InjectionType.IONTOPHORESIS:
             return IontophoresisInjection.model_construct(
@@ -1669,45 +1675,93 @@ class MappedNSBList:
                 self._nsb.procedure.HP_INJECTION_OPTIC_FIBER: True,
             }.get(self._nsb.procedure, False)
 
-    def get_procedure(self) -> Surgery:
+    def get_procedure(self) -> List[Surgery]:
         """Return Surgery as best as possible from a record."""
 
         # Surgery info
-        start_date = self.aind_date_of_surgery
         experimenter_full_name = self.aind_experimenter_full_name
         iacuc_protocol = self.aind_iacuc_protocol
-        animal_weight_prior = self.aind_weight_before_surger
-        animal_weight_post = self.aind_weight_after_surgery
-        anaesthesia = Anaesthetic.model_construct(
-            type=self.aind_anaesthetic_type,
-            duration=self.aind_second_injection_iso_dura,
-            level=self.aind_hp_iso_level,
-        )
-        workstation_id = self.aind_hp_work_station
         notes = None
+        surgeries = []
+
+        # Add craniotomy, headframe, and fiber implant into one surgery
         procedures = []
         if self.has_head_frame_procedure:
             procedures.append(self.get_head_frame_procedure())
-        if self.has_injection_procedure:
-            procedures.append(self.get_first_injection_procedure())
-        if (
-            self.has_injection_procedure
-            and self.has_second_injection_procedure
-        ):
-            procedures.append(self.get_second_injection_procedure())
         if self.has_craniotomy_procedure:
             procedures.append(self.get_craniotomy_procedure())
         if self.has_fiber_implant_procedure:
             procedures.append(self.get_fiber_implant())
-        surgery = Surgery.model_construct(
-            start_date=start_date,
-            experimenter_full_name=experimenter_full_name,
-            iacuc_protocol=iacuc_protocol,
-            animal_weight_prior=animal_weight_prior,
-            animal_weight_post=animal_weight_post,
-            anaesthesia=anaesthesia,
-            workstation_id=workstation_id,
-            notes=notes,
-            procedures=procedures,
-        )
-        return surgery
+        if self.has_head_frame_procedure or self.has_craniotomy_procedure or self.has_fiber_implant_procedure:
+            start_date = self.aind_date_of_surgery
+            animal_weight_prior = self.aind_weight_before_surger
+            animal_weight_post = self.aind_weight_after_surgery
+            anaesthesia = Anaesthetic.model_construct(
+                type=self.aind_anaesthetic_type,
+                level=self.aind_hp_iso_level,
+            )
+            workstation_id = self.aind_hp_work_station
+            surgery = Surgery.model_construct(
+                start_date=start_date,
+                experimenter_full_name=experimenter_full_name,
+                iacuc_protocol=iacuc_protocol,
+                animal_weight_prior=animal_weight_prior,
+                animal_weight_post=animal_weight_post,
+                anaesthesia=anaesthesia,
+                workstation_id=workstation_id,
+                notes=notes,
+                procedures=procedures,
+            )
+            surgeries.append(surgery)
+
+        # create a surgery for 1st injection
+        if self.has_injection_procedure:
+            start_date = self.aind_date1st_injection
+            animal_weight_prior = self.aind_first_injection_weight_be
+            animal_weight_post = self.aind_first_injection_weight_af
+            anaesthesia = Anaesthetic.model_construct(
+                type=self.aind_anaesthetic_type,
+                duration=self.aind_first_injection_iso_durat,
+                level=self.aind_hp_iso_level,
+            )
+            workstation_id = self.aind_work_station1st_injection
+            surgery = Surgery.model_construct(
+                start_date=start_date,
+                experimenter_full_name=experimenter_full_name,
+                iacuc_protocol=iacuc_protocol,
+                animal_weight_prior=animal_weight_prior,
+                animal_weight_post=animal_weight_post,
+                anaesthesia=anaesthesia,
+                workstation_id=workstation_id,
+                notes=notes,
+                procedures=[self.get_first_injection_procedure()],
+            )
+            surgeries.append(surgery)
+
+        # create a surgery for 2nd injection
+        if (
+            self.has_injection_procedure
+            and self.has_second_injection_procedure
+        ):
+            start_date = self.aind_date2nd_injection
+            animal_weight_prior = self.aind_second_injection_weight_b
+            animal_weight_post = self.aind_second_injection_weight_a
+            anaesthesia = Anaesthetic.model_construct(
+                type=self.aind_anaesthetic_type,
+                duration=self.aind_second_injection_iso_dura,
+                level=self.aind_hp_iso_level,
+            )
+            workstation_id = self.aind_work_station2nd_injection
+            surgery = Surgery.model_construct(
+                start_date=start_date,
+                experimenter_full_name=experimenter_full_name,
+                iacuc_protocol=iacuc_protocol,
+                animal_weight_prior=animal_weight_prior,
+                animal_weight_post=animal_weight_post,
+                anaesthesia=anaesthesia,
+                workstation_id=workstation_id,
+                notes=notes,
+                procedures=[self.get_second_injection_procedure()],
+            )
+            surgeries.append(surgery)
+        return surgeries

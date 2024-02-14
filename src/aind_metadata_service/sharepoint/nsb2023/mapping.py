@@ -1481,7 +1481,7 @@ class MappedNSBList:
         return (
             None
             if self._nsb.first_injection_weight_af is None
-            else Decimal(self._nsb.first_injection_weight_af)
+            else self._map_float_to_decimal(self._nsb.first_injection_weight_af)
         )
 
     @property
@@ -3135,36 +3135,35 @@ class MappedNSBList:
         else:
             return [vol] * len(dv) if dv is not None else [vol]
 
-    def get_procedure(self) -> Surgery:
-        """Get a list of subject procedures"""
+    def get_procedure(self) -> List[Surgery]:
+        """Get a List of Surgeries"""
         # Surgery info
         # TODO: start_date should be based on During class
-        start_date = self.aind_date_of_surgery
+        initial_start_date = self.aind_date_of_surgery
+        initial_animal_weight_prior = self.aind_weight_before_surger
+        initial_animal_weight_post = self.aind_weight_after_surgery
+
+        followup_start_date = self.aind_date1st_injection
+        followup_animal_weight_prior = self.aind_first_injection_weight_be
+        followup_animal_weight_post = self.aind_first_injection_weight_af
+
         experimenter_full_name = self.aind_experimenter_full_name
         iacuc_protocol = self.aind_iacuc_protocol
-        animal_weight_prior = self.aind_weight_before_surger
-        animal_weight_post = self.aind_weight_after_surgery
-        # TODO: Look into how these two fields are defined. It looks like they
-        #  depend on the During class. The if statements below will override
-        #  these Nones with something proper hopefully
-        anaesthesia = None
-        workstation_id = None
+
+        # The if statements below will override these Nones with something proper hopefully
+        initial_anaesthesia = None
+        followup_anaesthesia = None
+        initial_workstation_id = None
+        followup_workstation_id = None
         notes = None
-        procedures = []
+        other_procedures = []
+        initial_procedures = []
+        followup_procedures = []
 
         # Check if any headframe procedures
         if self.has_hp_procedure():
             hp_during = self.aind_headpost_perform_dur
             hf_surgery_during_info = self.surgery_during_info(hp_during)
-            if hp_during is not None:
-                anaesthesia = Anaesthetic.model_construct(
-                    type="isoflurane",
-                    duration=(
-                        hf_surgery_during_info.anaesthetic_duration_in_minutes
-                    ),
-                    level=hf_surgery_during_info.anaesthetic_level,
-                )
-                workstation_id = self.aind_hp_work_station
             headpost_info = HeadPostInfo.from_hp_and_hp_type(
                 hp=self.aind_headpost, hp_type=self.aind_headpost_type
             )
@@ -3176,20 +3175,35 @@ class MappedNSBList:
                 well_type=headpost_info.well_type,
                 well_part_number=headpost_info.well_part_number,
             )
-            procedures.append(headframe_procedure)
+            # add to respective surgery
+            if hp_during == During.INITIAL:
+                initial_anaesthesia = Anaesthetic.model_construct(
+                    type="isoflurane",
+                    duration=(
+                        hf_surgery_during_info.anaesthetic_duration_in_minutes
+                    ),
+                    level=hf_surgery_during_info.anaesthetic_level,
+                )
+                initial_workstation_id = self.aind_hp_work_station
+                initial_procedures.append(headframe_procedure)
+            elif hp_during == During.FOLLOW_UP:
+                followup_anaesthesia = Anaesthetic.model_construct(
+                    type="isoflurane",
+                    duration=(
+                        hf_surgery_during_info.anaesthetic_duration_in_minutes
+                    ),
+                    level=hf_surgery_during_info.anaesthetic_level,
+                )
+                followup_workstation_id = self.aind_hp_work_station
+                followup_procedures.append(headframe_procedure)
+            else:
+                other_procedures.append(headframe_procedure)
 
         # Check for craniotomy procedures
         if self.has_cran_procedure():
             craniotomy_type = self.aind_craniotomy_type
             cran_during = self.aind_craniotomy_perform_d
             cran_during_info = self.surgery_during_info(cran_during)
-            if cran_during is not None:
-                anaesthesia = Anaesthetic.model_construct(
-                    type="isoflurane",
-                    duration=cran_during_info.anaesthetic_duration_in_minutes,
-                    level=cran_during_info.anaesthetic_level,
-                )
-                workstation_id = self.aind_hp_work_station
             bregma_to_lambda_distance = self.aind_breg2_lamb
             if craniotomy_type == CraniotomyType.FIVE_MM:
                 craniotomy_coordinates_reference = (
@@ -3212,7 +3226,6 @@ class MappedNSBList:
                     craniotomy_coordinates_reference
                 ),
             )
-            procedures.append(cran_procedure)
             headpost_info = HeadPostInfo.from_hp_and_hp_type(
                 hp=self.aind_headpost, hp_type=self.aind_headpost_type
             )
@@ -3224,7 +3237,28 @@ class MappedNSBList:
                 well_type=headpost_info.well_type,
                 well_part_number=headpost_info.well_part_number,
             )
-            procedures.append(headframe_procedure)
+
+            if cran_during == During.INITIAL:
+                initial_anaesthesia = Anaesthetic.model_construct(
+                    type="isoflurane",
+                    duration=cran_during_info.anaesthetic_duration_in_minutes,
+                    level=cran_during_info.anaesthetic_level,
+                )
+                initial_workstation_id = self.aind_hp_work_station
+                initial_procedures.append(cran_procedure)
+                initial_procedures.append(headframe_procedure)
+            elif cran_during == During.FOLLOW_UP:
+                followup_anaesthesia = Anaesthetic.model_construct(
+                    type="isoflurane",
+                    duration=cran_during_info.anaesthetic_duration_in_minutes,
+                    level=cran_during_info.anaesthetic_level,
+                )
+                followup_workstation_id = self.aind_hp_work_station
+                followup_procedures.append(cran_procedure)
+                followup_procedures.append(headframe_procedure)
+            else:
+                other_procedures.append(cran_procedure)
+                other_procedures.append(headframe_procedure)
 
         # Check if there are any procedures for burr holes 1 through 6
         for burr_hole_num in range(1, 7):
@@ -3239,13 +3273,6 @@ class MappedNSBList:
                     during=burr_hole_info.during,
                     inj_type=burr_hole_info.inj_type,
                 )
-                if burr_hole_info.during is not None:
-                    anaesthesia = Anaesthetic.model_construct(
-                        type="isoflurane",
-                        duration=burr_during_info.anaesthetic_duration_in_minutes,
-                        level=burr_during_info.anaesthetic_level,
-                    )
-                    workstation_id = burr_during_info.workstation_id
                 injection_materials = (
                     []
                     if burr_hole_info.virus_strain is None
@@ -3312,7 +3339,24 @@ class MappedNSBList:
                         ),
                         injection_materials=injection_materials,
                     )
-                procedures.append(injection_proc)
+                if burr_hole_info.during == During.INITIAL:
+                    initial_anaesthesia = Anaesthetic.model_construct(
+                        type="isoflurane",
+                        duration=burr_during_info.anaesthetic_duration_in_minutes,
+                        level=burr_during_info.anaesthetic_level,
+                    )
+                    initial_workstation_id = burr_during_info.workstation_id
+                    initial_procedures.append(injection_proc)
+                elif burr_hole_info.during == During.FOLLOW_UP:
+                    followup_anaesthesia = Anaesthetic.model_construct(
+                        type="isoflurane",
+                        duration=burr_during_info.anaesthetic_duration_in_minutes,
+                        level=burr_during_info.anaesthetic_level,
+                    )
+                    followup_workstation_id = burr_during_info.workstation_id
+                    followup_procedures.append(injection_proc)
+                else:
+                    other_procedures.append(injection_proc)
             if getattr(self, f"aind_burr_hole_{burr_hole_num}") in {
                 BurrHoleProcedure.FIBER_IMPLANT,
                 BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
@@ -3326,14 +3370,6 @@ class MappedNSBList:
                     inj_type=burr_hole_info.inj_type,
                 )
                 bregma_to_lambda_distance = self.aind_breg2_lamb
-                if burr_hole_info.during is not None:
-                    anaesthesia = Anaesthetic.model_construct(
-                        type="isoflurane",
-                        duration=burr_during_info.anaesthetic_duration_in_minutes,
-                        level=burr_during_info.anaesthetic_level,
-                    )
-                    workstation_id = burr_during_info.workstation_id
-
                 # Need to figure out core_diameter, numerical_aperture,
                 # total_length, and targeted_structure
                 fiber_probe = FiberProbe.model_construct(
@@ -3359,18 +3395,65 @@ class MappedNSBList:
                 fiber_implant_proc = FiberImplant.model_construct(
                     probes=[ophys_probe]
                 )
-                procedures.append(fiber_implant_proc)
+                if burr_hole_info.during == During.INITIAL:
+                    initial_anaesthesia = Anaesthetic.model_construct(
+                        type="isoflurane",
+                        duration=burr_during_info.anaesthetic_duration_in_minutes,
+                        level=burr_during_info.anaesthetic_level,
+                    )
+                    initial_workstation_id = burr_during_info.workstation_id
+                    initial_procedures.append(fiber_implant_proc)
+                elif burr_hole_info.during == During.FOLLOW_UP:
+                    followup_anaesthesia = Anaesthetic.model_construct(
+                        type="isoflurane",
+                        duration=burr_during_info.anaesthetic_duration_in_minutes,
+                        level=burr_during_info.anaesthetic_level,
+                    )
+                    followup_workstation_id = burr_during_info.workstation_id
+                    followup_procedures.append(fiber_implant_proc)
+                else:
+                    other_procedures.append(fiber_implant_proc)
 
-        surgery = Surgery.model_construct(
-            start_date=start_date,
-            experimenter_full_name=experimenter_full_name,
-            iacuc_protocol=iacuc_protocol,
-            animal_weight_prior=animal_weight_prior,
-            animal_weight_post=animal_weight_post,
-            anaesthesia=anaesthesia,
-            workstation_id=workstation_id,
-            notes=notes,
-            procedures=procedures,
-        )
+        surgeries = []
+        if initial_procedures:
+            initial_surgery = Surgery.model_construct(
+                start_date=initial_start_date,
+                experimenter_full_name=experimenter_full_name,
+                iacuc_protocol=iacuc_protocol,
+                animal_weight_prior=initial_animal_weight_prior,
+                animal_weight_post=initial_animal_weight_post,
+                anaesthesia=initial_anaesthesia,
+                workstation_id=initial_workstation_id,
+                notes=notes,
+                procedures=initial_procedures,
+            )
+            surgeries.append(initial_surgery)
+        if followup_procedures:
+            followup_surgery = Surgery.model_construct(
+                start_date=followup_start_date,
+                experimenter_full_name=experimenter_full_name,
+                iacuc_protocol=iacuc_protocol,
+                animal_weight_prior=followup_animal_weight_prior,
+                animal_weight_post=followup_animal_weight_post,
+                anaesthesia=followup_anaesthesia,
+                workstation_id=followup_workstation_id,
+                notes=notes,
+                procedures=followup_procedures,
+            )
+            surgeries.append(followup_surgery)
 
-        return surgery
+        # any other procedures without During info will be put into one surgery object
+        if other_procedures:
+            other_surgery = Surgery.model_construct(
+                start_date=None,
+                experimenter_full_name=experimenter_full_name,
+                iacuc_protocol=iacuc_protocol,
+                animal_weight_prior=None,
+                animal_weight_post=None,
+                anaesthesia=None,
+                workstation_id=None,
+                notes=notes,
+                procedures=other_procedures,
+            )
+            surgeries.append(other_surgery)
+        return surgeries
