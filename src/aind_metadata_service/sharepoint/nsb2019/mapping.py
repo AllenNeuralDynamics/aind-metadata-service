@@ -1675,6 +1675,31 @@ class MappedNSBList:
                 self._nsb.procedure.HP_INJECTION_OPTIC_FIBER: True,
             }.get(self._nsb.procedure, False)
 
+    def get_basic_surgery(self) -> Surgery:
+        """Get a basic surgery if non-procedures info is available."""
+        return Surgery.model_construct(
+            start_date=self.aind_date_of_surgery,
+            experimenter_full_name=self.aind_experimenter_full_name,
+            iacuc_protocol=self.aind_iacuc_protocol,
+            animal_weight_prior=self.aind_weight_before_surger,
+            animal_weight_post=self.aind_weight_after_surgery,
+        )
+
+    @property
+    def has_unknown_surgery(self) -> bool:
+        """Return true if no known procedures are found but data is found"""
+        if self._nsb.procedure is None and self.aind_date_of_surgery is None:
+            return False
+        elif self._nsb.procedure is None:
+            return True
+        else:
+            return not (
+                    self.has_injection_procedure
+                    or self.has_fiber_implant_procedure
+                    or self.has_craniotomy_procedure
+                    or self.has_head_frame_procedure
+            )
+
     def get_procedure(self) -> List[Surgery]:
         """Return Surgery as best as possible from a record."""
 
@@ -1764,4 +1789,6 @@ class MappedNSBList:
                 procedures=[self.get_second_injection_procedure()],
             )
             surgeries.append(surgery)
+        if self.has_unknown_surgery:
+            surgeries.append(self.get_basic_surgery())
         return surgeries

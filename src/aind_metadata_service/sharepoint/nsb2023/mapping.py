@@ -3442,7 +3442,7 @@ class MappedNSBList:
             )
             surgeries.append(followup_surgery)
 
-        # any other procedures without During info will be put into one surgery object
+        # any other mapped procedures without During info will be put into one surgery object
         if other_procedures:
             other_surgery = Surgery.model_construct(
                 start_date=None,
@@ -3456,4 +3456,17 @@ class MappedNSBList:
                 procedures=other_procedures,
             )
             surgeries.append(other_surgery)
+
+        # generic surgery model if non-procedure info is available
+        if len(other_procedures) == 0 and len(initial_procedures) == 0 and self.aind_date_of_surgery:
+            generic_surgery = Surgery.model_construct(
+                start_date=self.aind_date_of_surgery,
+                experimenter_full_name=experimenter_full_name,
+                iacuc_protocol=iacuc_protocol,
+                animal_weight_prior=self.aind_weight_before_surger,
+                animal_weight_post=self.aind_weight_after_surgery,
+                procedures=[]
+            )
+            surgeries.append(generic_surgery)
+
         return surgeries

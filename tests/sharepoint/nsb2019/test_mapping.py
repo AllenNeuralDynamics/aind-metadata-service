@@ -64,11 +64,9 @@ class TestNSB2019Parsers(TestCase):
             nsb_model = NSBList.model_validate(raw_data)
             mapped_model = MappedNSBList(nsb=nsb_model)
             mapped_procedure = mapped_model.get_procedure()
-            mapped_procedure_json = json.loads(
-                mapped_procedure.model_dump_json()
-            )
-
-            self.assertEqual(expected_mapped_data, mapped_procedure_json)
+            mapped_procedure_json = [model.model_dump_json() for model in mapped_procedure]
+            mapped_procedure_json_parsed = [json.loads(json_str) for json_str in mapped_procedure_json]
+            self.assertEqual(expected_mapped_data, mapped_procedure_json_parsed)
 
     def test_properties(self):
         """Tests that the properties are parsed correctly."""
@@ -82,7 +80,7 @@ class TestNSB2019Parsers(TestCase):
             attr = getattr(cls, k)
             if isinstance(attr, property):
                 props.append(getattr(mapped_model, k))
-        self.assertEqual(117, len(props))
+        self.assertEqual(118, len(props))
 
     def test_inj_mapping_edge_cases(self):
         """Tests the case where there is an INJ procedure, but the inj types
@@ -99,14 +97,14 @@ class TestNSB2019Parsers(TestCase):
         nsb_model = NSBList.model_validate(raw_data)
         mapper = MappedNSBList(nsb=nsb_model)
         mapped_procedure = mapper.get_procedure()
-        procedures = mapped_procedure.procedures
+        procedures = mapped_procedure[0].procedures
         self.assertTrue(isinstance(procedures[0], BrainInjection))
         self.assertTrue(isinstance(procedures[1], BrainInjection))
         raw_data["Inj2Type"] = "Select..."
         nsb_model = NSBList.model_validate(raw_data)
         mapper = MappedNSBList(nsb=nsb_model)
         mapped_procedure = mapper.get_procedure()
-        procedures = mapped_procedure.procedures
+        procedures = mapped_procedure[0].procedures
         self.assertTrue(isinstance(procedures[0], BrainInjection))
         self.assertTrue(isinstance(procedures[1], BrainInjection))
         self.assertIsNone(mapper._parse_basic_float_str("one"))

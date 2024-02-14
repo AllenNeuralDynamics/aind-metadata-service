@@ -43,5 +43,18 @@
     "notes": null,
     "procedure_type": "Surgery",
     "weight_unit": "gram"
+  },
+  {
+    "start_date": "2022-01-03",
+    "experimenter_full_name": "NSB-187",
+    "iacuc_protocol": "2103",
+    "animal_weight_prior": "25.2",
+    "animal_weight_post": "28.2",
+    "procedures": [],
+    "procedure_type": "Surgery",
+    "weight_unit": "gram",
+    "anaesthesia": null,
+    "workstation_id": null,
+    "notes": null
   }
 ]
