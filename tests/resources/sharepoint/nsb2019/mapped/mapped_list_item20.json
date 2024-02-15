@@ -77,7 +77,7 @@
         "instrument_id": null,
         "injection_coordinate_ml": "-3.3",
         "injection_coordinate_ap": "-1.6",
-        "injection_coordinate_depth": null,
+        "injection_coordinate_depth": [],
         "injection_coordinate_reference": null,
         "bregma_to_lambda_distance": "4",
         "injection_angle": "0",

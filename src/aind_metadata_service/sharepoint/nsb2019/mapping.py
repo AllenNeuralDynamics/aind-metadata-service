@@ -332,7 +332,7 @@ class MappedNSBList:
     def aind_dv2nd_inj(self) -> Optional[List[Decimal]]:
         """Maps dv2nd_inj to aind model"""
         dv = self._parse_dv_str(self._nsb.dv2nd_inj)
-        return None if dv is None else [dv]
+        return [] if dv is None else [dv]
 
     @property
     def aind_editor_id(self) -> Optional[int]:
@@ -1232,7 +1232,7 @@ class MappedNSBList:
     def aind_virus_d_v(self) -> Optional[List[Decimal]]:
         """Maps virus_d_v to aind model"""
         dv = self._parse_dv_str(self._nsb.virus_d_v)
-        return None if dv is None else [dv]
+        return [] if dv is None else [dv]
 
     @property
     def aind_virus_hemisphere(self) -> Optional[Side]:
@@ -1436,11 +1436,14 @@ class MappedNSBList:
     def get_first_injection_procedure(self) -> BrainInjection:
         """Get first injection procedure"""
         injection_materials = (
-                    [] if self.aind_inj1_virus_strain_rt is None
-                    else [ViralMaterial.model_construct(
-                        name=self.aind_inj1_virus_strain_rt
-                    )]
+            []
+            if self.aind_inj1_virus_strain_rt is None
+            else [
+                ViralMaterial.model_construct(
+                    name=self.aind_inj1_virus_strain_rt
                 )
+            ]
+        )
         if self.aind_inj1_type == InjectionType.NANOJECT:
             # Missing protocol_id
             injection_volume = (
@@ -1499,10 +1502,13 @@ class MappedNSBList:
     def get_second_injection_procedure(self) -> BrainInjection:
         """Get second injection procedure"""
         injection_materials = (
-            [] if self.aind_inj2_virus_strain_rt is None
-            else [ViralMaterial.model_construct(
-                name=self.aind_inj2_virus_strain_rt
-            )]
+            []
+            if self.aind_inj2_virus_strain_rt is None
+            else [
+                ViralMaterial.model_construct(
+                    name=self.aind_inj2_virus_strain_rt
+                )
+            ]
         )
         if self.aind_inj2_type == InjectionType.NANOJECT:
             injection_volume = (
@@ -1694,10 +1700,10 @@ class MappedNSBList:
             return True
         else:
             return not (
-                    self.has_injection_procedure
-                    or self.has_fiber_implant_procedure
-                    or self.has_craniotomy_procedure
-                    or self.has_head_frame_procedure
+                self.has_injection_procedure
+                or self.has_fiber_implant_procedure
+                or self.has_craniotomy_procedure
+                or self.has_head_frame_procedure
             )
 
     def get_procedure(self) -> List[Surgery]:
@@ -1717,7 +1723,11 @@ class MappedNSBList:
             procedures.append(self.get_craniotomy_procedure())
         if self.has_fiber_implant_procedure:
             procedures.append(self.get_fiber_implant())
-        if self.has_head_frame_procedure or self.has_craniotomy_procedure or self.has_fiber_implant_procedure:
+        if (
+            self.has_head_frame_procedure
+            or self.has_craniotomy_procedure
+            or self.has_fiber_implant_procedure
+        ):
             start_date = self.aind_date_of_surgery
             animal_weight_prior = self.aind_weight_before_surger
             animal_weight_post = self.aind_weight_after_surgery

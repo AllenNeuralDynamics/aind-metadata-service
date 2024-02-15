@@ -1481,7 +1481,9 @@ class MappedNSBList:
         return (
             None
             if self._nsb.first_injection_weight_af is None
-            else self._map_float_to_decimal(self._nsb.first_injection_weight_af)
+            else self._map_float_to_decimal(
+                self._nsb.first_injection_weight_af
+            )
         )
 
     @property
@@ -3276,9 +3278,11 @@ class MappedNSBList:
                 injection_materials = (
                     []
                     if burr_hole_info.virus_strain is None
-                    else [ViralMaterial.model_construct(
-                        name=burr_hole_info.virus_strain
-                    )]
+                    else [
+                        ViralMaterial.model_construct(
+                            name=burr_hole_info.virus_strain
+                        )
+                    ]
                 )
                 if burr_hole_info.inj_type == InjectionType.IONTOPHORESIS:
                     injection_proc = IontophoresisInjection.model_construct(
@@ -3458,14 +3462,18 @@ class MappedNSBList:
             surgeries.append(other_surgery)
 
         # generic surgery model if non-procedure info is available
-        if len(other_procedures) == 0 and len(initial_procedures) == 0 and self.aind_date_of_surgery:
+        if (
+            len(other_procedures) == 0
+            and len(initial_procedures) == 0
+            and self.aind_date_of_surgery
+        ):
             generic_surgery = Surgery.model_construct(
                 start_date=self.aind_date_of_surgery,
                 experimenter_full_name=experimenter_full_name,
                 iacuc_protocol=iacuc_protocol,
                 animal_weight_prior=self.aind_weight_before_surger,
                 animal_weight_post=self.aind_weight_after_surgery,
-                procedures=[]
+                procedures=[],
             )
             surgeries.append(generic_surgery)
 

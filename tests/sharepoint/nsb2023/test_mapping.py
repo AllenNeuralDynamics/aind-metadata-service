@@ -71,9 +71,15 @@ class TestNSB2023Parsers(TestCase):
             nsb_model = NSBList.model_validate(raw_data)
             mapper = MappedNSBList(nsb=nsb_model)
             mapped_procedure = mapper.get_procedure()
-            mapped_procedure_json = [model.model_dump_json() for model in mapped_procedure]
-            mapped_procedure_json_parsed = [json.loads(json_str) for json_str in mapped_procedure_json]
-            self.assertEqual(expected_mapped_data, mapped_procedure_json_parsed)
+            mapped_procedure_json = [
+                model.model_dump_json() for model in mapped_procedure
+            ]
+            mapped_procedure_json_parsed = [
+                json.loads(json_str) for json_str in mapped_procedure_json
+            ]
+            self.assertEqual(
+                expected_mapped_data, mapped_procedure_json_parsed
+            )
 
     def test_properties(self):
         """Tests that the properties are parsed correctly."""

@@ -1,0 +1,42 @@
+[
+  {
+    "start_date": null,
+    "experimenter_full_name": "NSB-187",
+    "iacuc_protocol": "2103",
+    "animal_weight_prior": null,
+    "animal_weight_post": null,
+    "anaesthesia": null,
+    "workstation_id": null,
+    "procedures": [
+      {
+        "craniotomy_type": "5 mm",
+        "craniotomy_coordinates_reference": "Lambda",
+        "bregma_to_lambda_distance": null,
+        "craniotomy_size": "5",
+        "recovery_time": null,
+        "procedure_type": "Craniotomy",
+        "craniotomy_hemisphere": null,
+        "craniotomy_coordinates_ml": null,
+        "craniotomy_coordinates_ap": null,
+        "craniotomy_coordinates_unit": "millimeter",
+        "bregma_to_lambda_unit": "millimeter",
+        "craniotomy_size_unit": "millimeter",
+        "implant_part_number": null,
+        "dura_removed": null,
+        "protective_material": null,
+        "recovery_time_unit": "minute"
+      },
+      {
+        "headframe_type": "Visual Ctx",
+        "headframe_part_number": "0160-100-10",
+        "well_part_number": "0160-200-20",
+        "well_type": "Mesoscope",
+        "procedure_type": "Headframe",
+        "headframe_material": null
+      }
+    ],
+    "notes": null,
+    "procedure_type": "Surgery",
+    "weight_unit": "gram"
+  }
+]

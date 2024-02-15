@@ -1,0 +1,24 @@
+[
+  {
+    "start_date": null,
+    "experimenter_full_name": "NSB-187",
+    "iacuc_protocol": "2103",
+    "animal_weight_prior": null,
+    "animal_weight_post": null,
+    "anaesthesia": null,
+    "workstation_id": null,
+    "procedures": [
+      {
+        "headframe_type": "Visual Ctx",
+        "headframe_part_number": "0160-100-10",
+        "well_part_number": "0160-200-20",
+        "well_type": "Mesoscope",
+        "procedure_type": "Headframe",
+        "headframe_material": null
+      }
+    ],
+    "notes": null,
+    "procedure_type": "Surgery",
+    "weight_unit": "gram"
+  }
+]
