@@ -10,14 +10,17 @@ from aind_data_schema.core.procedures import (
     Perfusion,
     Procedures,
     RetroOrbitalInjection,
+    Surgery,
 )
 from aind_data_schema.core.subject import (
     BackgroundStrain,
+    BreedingInfo,
     Housing,
     Sex,
     Species,
     Subject,
 )
+from aind_data_schema.models.organizations import Organization
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings
 
@@ -301,9 +304,9 @@ class LabTracksResponseHandler:
         if sex is None:
             return None
         if sex.lower() == LabTracksSex.MALE.value.lower():
-            return Sex.MALE
+            return Sex.MALE.value
         elif sex.lower() == LabTracksSex.FEMALE.value.lower():
-            return Sex.FEMALE
+            return Sex.FEMALE.value
         else:
             return None
 
@@ -406,17 +409,23 @@ class LabTracksResponseHandler:
                 room_id=result.get(SubjectQueryColumns.ROOM_ID.value),
                 cage_id=result.get(SubjectQueryColumns.CAGE_ID.value),
             )
-            subject = Subject.model_construct(
-                subject_id=subject_id_str,
-                species=species,
+            breeding_info = BreedingInfo.model_construct(
+                breeding_group=breeding_group,
                 paternal_genotype=paternal_genotype,
                 paternal_id=paternal_id_str,
                 maternal_genotype=maternal_genotype,
                 maternal_id=maternal_id_str,
+            )
+            # Assume all mice from LabTracks is AI?
+            source = Organization.AI
+            subject = Subject.model_construct(
+                source=source,
+                subject_id=subject_id_str,
+                species=species,
                 sex=sex,
+                breeding_info=breeding_info,
                 date_of_birth=date_of_birth,
                 genotype=full_genotype,
-                breeding_group=breeding_group,
                 background_strain=background_strain,
                 housing=housing,
             )
@@ -444,6 +453,9 @@ class LabTracksResponseHandler:
 
         procedures_list = []
 
+        # TODO: The Surgery class has a list of procedures that occur on the
+        #  same date and same mouse. This code will only ever map onto either
+        #  a perfusion or a RO Injection. We may need to update the this.
         for result in results:
             start_date = result.get(TaskSetQueryColumns.DATE_START.value)
             if start_date:
@@ -467,24 +479,41 @@ class LabTracksResponseHandler:
                     output_specimen_ids = {
                         str(result.get(TaskSetQueryColumns.TASK_OBJECT.value))
                     }
-                    perfusion = Perfusion.model_construct(
+                    surgery = Surgery.model_construct(
                         start_date=start_date,
-                        end_date=end_date,
                         experimenter_full_name=experimenter_full_name,
                         iacuc_protocol=iacuc_protocol,
-                        output_specimen_ids=output_specimen_ids,
+                        animal_weight_prior=None,
+                        animal_weight_post=None,
+                        anaesthesia=None,
+                        notes=None,
+                        # Perfusion missing protocol_id
+                        procedures=[
+                            Perfusion.model_construct(
+                                output_specimen_ids=output_specimen_ids
+                            )
+                        ],
                     )
-                    procedures_list.append(perfusion)
+                    procedures_list.append(surgery)
 
                 elif LabTracksProcedures.RO_INJECTION.value in type_name:
                     # TODO: parse inj info from comments
-                    ro_injection = RetroOrbitalInjection.model_construct(
+                    surgery = Surgery.model_construct(
                         start_date=start_date,
-                        end_date=end_date,
                         experimenter_full_name=experimenter_full_name,
                         iacuc_protocol=iacuc_protocol,
+                        animal_weight_prior=None,
+                        animal_weight_post=None,
+                        anaesthesia=None,
+                        notes=None,
+                        # Missing injection_volume and injection_eye
+                        procedures=[
+                            RetroOrbitalInjection.model_construct(
+                                injection_volume=None, injection_eye=None
+                            )
+                        ],
                     )
-                    procedures_list.append(ro_injection)
+                    procedures_list.append(surgery)
         procedures = (
             None
             if len(procedures_list) == 0

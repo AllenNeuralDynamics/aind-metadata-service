@@ -1,18 +1,17 @@
 """Module to test TARS Client methods"""
 
-import json
 import os
 import unittest
-from pathlib import Path
+from datetime import date
 from unittest.mock import MagicMock, Mock, patch
 
-from aind_data_schema.core.procedures import InjectionMaterial
+from aind_data_schema.core.procedures import (
+    TarsVirusIdentifiers,
+    ViralMaterial,
+)
 
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 from aind_metadata_service.tars.client import AzureSettings, TarsClient
-
-TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / ".."
-EXAMPLE_PATH = TEST_DIR / "resources" / "tars" / "mapped_materials.json"
 
 
 class TestAzureSettings(unittest.TestCase):
@@ -66,16 +65,25 @@ class TestTarsClient(unittest.TestCase):
             scope="some_scope",
             resource="https://some_resource",
         )
+        tars_virus_identifiers = TarsVirusIdentifiers(
+            virus_tars_id="AiV456",
+            plasmid_tars_alias="AiP123",
+            prep_lot_number="12345",
+            prep_date=date(2023, 12, 15),
+            prep_type="Crude",
+            prep_protocol="SOP#VC002",
+        )
 
-        with open(EXAMPLE_PATH, "r") as f:
-            self.expected_materials = json.load(f)
+        viral_material = ViralMaterial(
+            name="rAAV-MGT_789", tars_identifiers=tars_virus_identifiers
+        )
 
         mock_credential.return_value.get_token.return_value = (
             "mock_token",
             "mock_exp",
         )
+        self.expected_materials = viral_material
         self.tars_client = TarsClient(self.azure_settings)
-        # mock_credential.return_value.get_token.assert_called_once()
 
     def test_access_token(self):
         """Tests that token is retrieved as expected."""
@@ -223,13 +231,17 @@ class TestTarsClient(unittest.TestCase):
 
         result = self.tars_client.get_injection_materials_info("12345")
         expected_response = ModelResponse(
-            aind_models=[
-                InjectionMaterial.model_validate(self.expected_materials)
-            ],
+            aind_models=[self.expected_materials],
             status_code=StatusCodes.DB_RESPONDED,
         )
-        self.assertEqual(result.aind_models, expected_response.aind_models)
-        self.assertEqual(result.status_code, expected_response.status_code)
+        self.assertEqual(
+            expected_response.aind_models,
+            result.aind_models,
+        )
+        self.assertEqual(
+            expected_response.status_code,
+            result.status_code,
+        )
 
     @patch(
         "aind_metadata_service.tars.client.TarsClient._get_prep_lot_response"
