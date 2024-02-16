@@ -9,7 +9,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, call, patch
 
 from aind_data_schema.core.data_description import Funding
-from aind_data_schema.models.institutions import Institution
+from aind_data_schema.models.organizations import Organization
 from dateutil import tz
 
 from aind_metadata_service.client import StatusCodes
@@ -53,7 +53,7 @@ class TestSmartsheetFundingClient(unittest.TestCase):
         model_response = mapper.get_model_response()
         expected_models = [
             Funding(
-                funder=Institution.AI,
+                funder=Organization.AI,
                 grant_number=None,
                 fundee=("person.two@acme.org, J Smith, John Doe II"),
             )

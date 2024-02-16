@@ -14,6 +14,7 @@ from aind_metadata_service.labtracks.client import (
     LabTracksSettings,
 )
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
+from tests import PYD_VERSION
 from tests.labtracks.test_response_handler import TestResponseExamples
 
 
@@ -73,13 +74,13 @@ class TestLabTracksSettings(unittest.TestCase):
             "{'odbc_driver': 'some_dri...ks_database': 'some_db'},"
             " input_type=dict]\n"
             "    For further information visit"
-            " https://errors.pydantic.dev/2.5/v/missing\n"
+            f" https://errors.pydantic.dev/{PYD_VERSION}/v/missing\n"
             "labtracks_password\n"
             "  Field required [type=missing, input_value="
             "{'odbc_driver': 'some_dri...ks_database': 'some_db'},"
             " input_type=dict]\n"
             "    For further information visit"
-            " https://errors.pydantic.dev/2.5/v/missing"
+            f" https://errors.pydantic.dev/{PYD_VERSION}/v/missing"
         )
 
         self.assertEqual(expected_error_message, repr(e.exception))

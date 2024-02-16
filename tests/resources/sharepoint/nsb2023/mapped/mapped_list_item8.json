@@ -1,40 +1,44 @@
 [
-   {
-      "start_date": "2022-01-03",
-      "end_date": "2022-01-03",
-      "experimenter_full_name": "NSB-187",
-      "iacuc_protocol": "2103",
-      "animal_weight_prior": "25.2",
-      "animal_weight_post": "25.2",
-      "anaesthesia": {
-         "type": "isoflurane",
-         "duration": "90.0",
-         "level": "2.0",
-         "duration_unit": "minute"
-      },
-      "injection_materials": null,
-      "recovery_time": null,
-      "injection_duration": null,
-      "workstation_id": "SWS 4",
-      "instrument_id": "Ionto #1",
-      "injection_coordinate_ml": "4.72",
-      "injection_coordinate_ap": "-2.3",
-      "injection_coordinate_depth": null,
-      "injection_coordinate_reference": "Bregma",
-      "bregma_to_lambda_distance": "6.1",
-      "injection_angle": "0.0",
-      "injection_hemisphere": "Right",
-      "injection_current": "5",
-      "alternating_current": "7/7",
-      "weight_unit": "gram",
-      "notes": null,
-      "recovery_time_unit": "minute",
-      "injection_duration_unit": "minute",
-      "injection_coordinate_unit": "millimeter",
-      "bregma_to_lambda_unit": "millimeter",
-      "injection_angle_unit": "degrees",
-      "targeted_structure": null,
-      "procedure_type": "Iontophoresis injection",
-      "injection_current_unit": "microamps"
-   }
+  {
+    "start_date": "2022-01-03",
+    "experimenter_full_name": "NSB-187",
+    "iacuc_protocol": "2103",
+    "animal_weight_prior": "25.2",
+    "animal_weight_post": "25.2",
+    "anaesthesia": {
+      "type": "isoflurane",
+      "duration": "90.0",
+      "level": "2.0",
+      "duration_unit": "minute"
+    },
+    "workstation_id": "SWS 4",
+    "procedures": [
+      {
+        "injection_materials": [],
+        "recovery_time": null,
+        "injection_duration": null,
+        "instrument_id": "Ionto #1",
+        "injection_coordinate_ml": "4.72",
+        "injection_coordinate_ap": "-2.3",
+        "injection_coordinate_depth": null,
+        "injection_coordinate_reference": "Bregma",
+        "bregma_to_lambda_distance": "6.1",
+        "injection_angle": "0.0",
+        "injection_hemisphere": "Right",
+        "injection_current": "5",
+        "alternating_current": "7/7",
+        "recovery_time_unit": "minute",
+        "injection_duration_unit": "minute",
+        "injection_coordinate_unit": "millimeter",
+        "bregma_to_lambda_unit": "millimeter",
+        "injection_angle_unit": "degrees",
+        "targeted_structure": null,
+        "procedure_type": "Iontophoresis injection",
+        "injection_current_unit": "microamps"
+      }
+    ],
+    "notes": null,
+    "procedure_type": "Surgery",
+    "weight_unit": "gram"
+  }
 ]

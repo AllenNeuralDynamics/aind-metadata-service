@@ -9,7 +9,7 @@ from decimal import Decimal
 from pathlib import Path
 from unittest.mock import MagicMock, call, patch
 
-from aind_data_schema.core.procedures import Perfusion
+from aind_data_schema.core.procedures import Perfusion, Surgery
 from aind_data_schema.models.units import MassUnit
 
 from aind_metadata_service.client import StatusCodes
@@ -39,19 +39,23 @@ class TestSmartsheetPerfusionsClient(unittest.TestCase):
         cls.example_sheet_contents = contents
         cls.example_sheet = json.dumps(contents)
         cls.expected_model = [
-            Perfusion(
+            Surgery(
                 start_date=date(2023, 10, 2),
-                end_date=date(2023, 10, 2),
                 experimenter_full_name="Jane Smith",
-                protocol_id="dx.doi.org/10.17504/protocols.io.bg5vjy66",
                 iacuc_protocol="2109",
                 animal_weight_prior=Decimal("22.0"),
                 animal_weight_post=None,
                 weight_unit=MassUnit.G,
                 anaesthesia=None,
                 notes=None,
-                procedure_type="Perfusion",
-                output_specimen_ids={"689418"},
+                procedures=[
+                    Perfusion(
+                        output_specimen_ids={"689418"},
+                        protocol_id=(
+                            "dx.doi.org/10.17504/protocols.io.bg5vjy66"
+                        ),
+                    )
+                ],
             )
         ]
 
@@ -225,7 +229,6 @@ class TestSmartsheetPerfusionsClient(unittest.TestCase):
         self.assertEqual(
             "12/21/2021", model_response.aind_models[0].start_date
         )
-        self.assertEqual("12/21/2021", model_response.aind_models[0].end_date)
         self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
 
     @patch("smartsheet.sheets.Sheets.get_sheet")
