@@ -2,12 +2,21 @@
 
 import pickle
 import unittest
+from datetime import date
 from unittest import mock
 from unittest.mock import MagicMock, call
 
 import requests
 from aind_data_schema.core.procedures import Procedures
-from aind_data_schema.core.subject import Species, Subject
+from aind_data_schema.core.subject import (
+    BackgroundStrain,
+    BreedingInfo,
+    Housing,
+    Sex,
+    Species,
+    Subject,
+)
+from aind_data_schema.models.organizations import Organization
 
 from aind_metadata_service.client import AindMetadataServiceClient
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
@@ -24,15 +33,25 @@ class TestAindMetadataServiceClient(unittest.TestCase):
         mock_response = requests.Response()
         model = Subject(
             species=Species.MUS_MUSCULUS,
+            breeding_info=BreedingInfo(
+                breeding_group="breeding_group_id",
+                maternal_id="00001",
+                maternal_genotype="wt/wt",
+                paternal_id="00002",
+                paternal_genotype="wt/wt",
+            ),
             subject_id=mock_subject_id,
-            sex="Female",
-            date_of_birth="2022-05-01",
+            sex=Sex.FEMALE,
+            source=Organization.AI,
+            date_of_birth=date(2022, 5, 1),
             genotype="wt/wt",
-            breeding_group="breeding_group_id",
-            maternal_id="00001",
-            maternal_genotype="wt/wt",
-            paternal_id="00002",
-            paternal_genotype="wt/wt",
+            alleles=[],
+            background_strain=BackgroundStrain.C57BL_6J,
+            housing=Housing(),
+            rrid=None,
+            restrictions=None,
+            wellness_reports=[],
+            notes=None,
         )
         model_response = ModelResponse(
             status_code=StatusCodes.DB_RESPONDED, aind_models=[model]
@@ -67,15 +86,25 @@ class TestAindMetadataServiceClient(unittest.TestCase):
         mock_response = requests.Response()
         model = Subject(
             species=Species.MUS_MUSCULUS,
+            breeding_info=BreedingInfo(
+                breeding_group="breeding_group_id",
+                maternal_id="00001",
+                maternal_genotype="wt/wt",
+                paternal_id="00002",
+                paternal_genotype="wt/wt",
+            ),
             subject_id=mock_subject_id,
-            sex="Female",
-            date_of_birth="2022-05-01",
+            sex=Sex.FEMALE,
+            source=Organization.AI,
+            date_of_birth=date(2022, 5, 1),
             genotype="wt/wt",
-            breeding_group="breeding_group_id",
-            maternal_id="00001",
-            maternal_genotype="wt/wt",
-            paternal_id="00002",
-            paternal_genotype="wt/wt",
+            alleles=[],
+            background_strain=BackgroundStrain.C57BL_6J,
+            housing=Housing(),
+            rrid=None,
+            restrictions=None,
+            wellness_reports=[],
+            notes=None,
         )
         model_response = ModelResponse(
             status_code=StatusCodes.DB_RESPONDED, aind_models=[model]

@@ -5,7 +5,7 @@ import logging
 from typing import List, Optional, Union
 
 from aind_data_schema.core.data_description import Funding
-from aind_data_schema.models.institutions import Institution
+from aind_data_schema.models.organizations import Organization
 from pydantic import ValidationError
 
 from aind_metadata_service.client import StatusCodes
@@ -19,7 +19,7 @@ class FundingMapper(SmartSheetMapper):
     """Primary class to handle mapping data models and returning a response"""
 
     @staticmethod
-    def _parse_institution(input_name: str) -> Union[Institution, str]:
+    def _parse_institution(input_name: str) -> Union[Organization, str]:
         """
         Generate Institution from string
         Parameters
@@ -34,15 +34,13 @@ class FundingMapper(SmartSheetMapper):
           be generated from the name, then it returns the input name.
 
         """
-        try:
-            return Institution.from_name(input_name)
-        except KeyError:
-            pass
-
-        try:
-            return Institution.from_abbreviation(input_name)
-        except KeyError:
-            return input_name
+        if Organization().name_map.get(input_name) is not None:
+            return Organization().name_map.get(input_name)
+        else:
+            try:
+                return Organization.from_abbreviation(input_name)
+            except KeyError:
+                return input_name
 
     def _map_row_to_funding(
         self, row: SheetRow, input_project_name: str

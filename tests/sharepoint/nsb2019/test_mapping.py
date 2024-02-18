@@ -58,19 +58,21 @@ class TestNSB2019Parsers(TestCase):
         """Checks that raw data is parsed correctly"""
         for list_item in self.list_items:
             raw_data = list_item[0]
-            expected_mapped_data = list(list_item[1])
-            expected_mapped_data.sort(key=lambda x: str(x))
+            expected_mapped_data = list_item[1]
             raw_file_name = list_item[2]
             logging.debug(f"Processing file: {raw_file_name}")
             nsb_model = NSBList.model_validate(raw_data)
             mapped_model = MappedNSBList(nsb=nsb_model)
-            mapped_procedures = mapped_model.get_procedures()
+            mapped_procedure = mapped_model.get_procedure()
             mapped_procedure_json = [
-                json.loads(p.model_dump_json()) for p in mapped_procedures
+                model.model_dump_json() for model in mapped_procedure
             ]
-            mapped_procedure_json.sort(key=lambda x: str(x))
-
-            self.assertEqual(expected_mapped_data, mapped_procedure_json)
+            mapped_procedure_json_parsed = [
+                json.loads(json_str) for json_str in mapped_procedure_json
+            ]
+            self.assertEqual(
+                expected_mapped_data, mapped_procedure_json_parsed
+            )
 
     def test_properties(self):
         """Tests that the properties are parsed correctly."""
@@ -100,15 +102,15 @@ class TestNSB2019Parsers(TestCase):
         raw_data["ImplantIDCoverslipType"] = "3.5"
         nsb_model = NSBList.model_validate(raw_data)
         mapper = MappedNSBList(nsb=nsb_model)
-        mapped_procedure = mapper.get_procedures()
-        self.assertTrue(isinstance(mapped_procedure[0], BrainInjection))
-        self.assertTrue(isinstance(mapped_procedure[1], BrainInjection))
+        mapped_procedure = mapper.get_procedure()
+        procedures = mapped_procedure[1].procedures
+        self.assertTrue(isinstance(procedures[0], BrainInjection))
         raw_data["Inj2Type"] = "Select..."
         nsb_model = NSBList.model_validate(raw_data)
         mapper = MappedNSBList(nsb=nsb_model)
-        mapped_procedure = mapper.get_procedures()
-        self.assertTrue(isinstance(mapped_procedure[0], BrainInjection))
-        self.assertTrue(isinstance(mapped_procedure[1], BrainInjection))
+        mapped_procedure = mapper.get_procedure()
+        procedures = mapped_procedure[0].procedures
+        self.assertTrue(isinstance(procedures[0], BrainInjection))
         self.assertIsNone(mapper._parse_basic_float_str("one"))
 
 

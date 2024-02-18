@@ -76,4 +76,3 @@ class AindMetadataServiceClient:
         url = "/".join([self.procedures_url, subject_id])
         with requests.get(url, params={"pickle": pickle}) as response:
             return response
-

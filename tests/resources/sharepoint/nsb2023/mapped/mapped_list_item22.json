@@ -1,24 +1,19 @@
 [
   {
-    "start_date": "2022-01-03",
+    "start_date": null,
     "experimenter_full_name": "NSB-187",
     "iacuc_protocol": "2103",
-    "animal_weight_prior": "25.2",
-    "animal_weight_post": "28.2",
-    "anaesthesia": {
-      "type": "isoflurane",
-      "duration": "90.0",
-      "level": "2.0",
-      "duration_unit": "minute"
-    },
-    "workstation_id": "SWS 4",
+    "animal_weight_prior": null,
+    "animal_weight_post": null,
+    "anaesthesia": null,
+    "workstation_id": null,
     "procedures": [
       {
         "craniotomy_type": "5 mm",
         "craniotomy_coordinates_reference": "Lambda",
         "bregma_to_lambda_distance": null,
         "craniotomy_size": "5",
-        "recovery_time": "30.0",
+        "recovery_time": null,
         "procedure_type": "Craniotomy",
         "craniotomy_hemisphere": null,
         "craniotomy_coordinates_ml": null,
@@ -43,18 +38,5 @@
     "notes": null,
     "procedure_type": "Surgery",
     "weight_unit": "gram"
-  },
-  {
-    "start_date": "2022-01-03",
-    "experimenter_full_name": "NSB-187",
-    "iacuc_protocol": "2103",
-    "animal_weight_prior": "25.2",
-    "animal_weight_post": "28.2",
-    "procedures": [],
-    "procedure_type": "Surgery",
-    "weight_unit": "gram",
-    "anaesthesia": null,
-    "workstation_id": null,
-    "notes": null
   }
 ]

@@ -2,7 +2,7 @@
 
 from typing import List
 
-from aind_data_schema.core.procedures import SubjectProcedure
+from aind_data_schema.core.procedures import Surgery
 from office365.sharepoint.client_context import ClientContext
 
 from aind_metadata_service.sharepoint.nsb2019.mapping import MappedNSBList
@@ -18,7 +18,7 @@ class NSB2019Procedures:
 
     def get_procedures_from_sharepoint(
         self, subject_id: str, client_context: ClientContext, list_title: str
-    ) -> List[SubjectProcedure]:
+    ) -> List[Surgery]:
         """
         Get list of Procedures from NSB 2019 database.
         Parameters
@@ -48,6 +48,6 @@ class NSB2019Procedures:
         for list_item in list_items:
             nsb_model = NSBList.model_validate(list_item.to_json())
             mapped_model = MappedNSBList(nsb=nsb_model)
-            procedures = mapped_model.get_procedures()
-            list_of_procedures.extend(procedures)
+            procedure = mapped_model.get_procedure()
+            list_of_procedures.extend(procedure)
         return list_of_procedures

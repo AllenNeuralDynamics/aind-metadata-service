@@ -1,6 +1,7 @@
 """Module to map data in TARS to aind_data_schema InjectionMaterial"""
 
 import json
+import logging
 import re
 from dataclasses import dataclass
 from datetime import date, datetime
@@ -9,10 +10,12 @@ from typing import Dict, List, Optional
 
 from aind_data_schema.core.procedures import (
     Injection,
-    InjectionMaterial,
+    TarsVirusIdentifiers,
+    ViralMaterial,
     VirusPrepType,
 )
 from fastapi.responses import JSONResponse
+from pydantic import ValidationError
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
@@ -116,7 +119,7 @@ class TarsResponseHandler:
         date_pattern = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 
         if not date_pattern.match(date):
-            print(
+            logging.warning(
                 "Invalid date format."
                 " Please provide a date in the format: YYYY-MM-DDTHH:MM:SSZ"
             )
@@ -157,7 +160,7 @@ class TarsResponseHandler:
 
     def map_lot_to_injection_material(
         self, viral_prep_lot: dict, viral_prep_aliases: ViralPrepAliases
-    ) -> InjectionMaterial:
+    ) -> ViralMaterial:
         """
         Map prep lot dictionary to injection materials
         Parameters
@@ -172,17 +175,32 @@ class TarsResponseHandler:
         prep_type, prep_protocol = self._map_prep_type_and_protocol(
             viral_prep_lot["viralPrep"]["viralPrepType"]["name"]
         )
-        injection_material = InjectionMaterial.model_construct(
-            prep_lot_number=prep_lot_number,
-            prep_date=prep_date,
-            prep_type=prep_type,
-            prep_protocol=prep_protocol,
-            material_id=viral_prep_aliases.material_id,
-            name=viral_prep_aliases.full_genome_name,
-            full_genome_name=viral_prep_aliases.full_genome_name,
-            plasmid_name=viral_prep_aliases.plasmid_name,
-        )
-        return injection_material
+        try:
+            tars_virus_identifiers = TarsVirusIdentifiers(
+                virus_tars_id=viral_prep_aliases.material_id,
+                plasmid_tars_alias=viral_prep_aliases.plasmid_name,
+                prep_lot_number=prep_lot_number,
+                prep_date=prep_date,
+                prep_type=prep_type,
+                prep_protocol=prep_protocol,
+            )
+            return ViralMaterial(
+                name=viral_prep_aliases.full_genome_name,
+                tars_identifiers=tars_virus_identifiers,
+            )
+        except ValidationError:
+            tars_virus_identifiers = TarsVirusIdentifiers.model_construct(
+                virus_tars_id=viral_prep_aliases.material_id,
+                plasmid_tars_alias=viral_prep_aliases.plasmid_name,
+                prep_lot_number=prep_lot_number,
+                prep_date=prep_date,
+                prep_type=prep_type,
+                prep_protocol=prep_protocol,
+            )
+            return ViralMaterial.model_construct(
+                name=viral_prep_aliases.full_genome_name,
+                tars_identifiers=tars_virus_identifiers,
+            )
 
     @staticmethod
     def get_virus_strains(response: ModelResponse) -> List:
@@ -195,15 +213,17 @@ class TarsResponseHandler:
         """
         viruses = []
         procedures = response.aind_models[0]
-        for procedure in procedures.subject_procedures:
-            if (
-                isinstance(procedure, Injection) and procedure.injection_materials
-                and procedure.injection_materials[0].full_genome_name
-            ):
-                virus_strain = procedure.injection_materials[
-                    0
-                ].full_genome_name
-                viruses.append(virus_strain)
+        for subject_procedure in procedures.subject_procedures:
+            for procedure in subject_procedure.procedures:
+                if (
+                    isinstance(procedure, Injection)
+                    and procedure.injection_materials
+                    and procedure.injection_materials[0].full_genome_name
+                ):
+                    virus_strain = procedure.injection_materials[
+                        0
+                    ].full_genome_name
+                    viruses.append(virus_strain)
         return viruses
 
     @staticmethod
@@ -217,22 +237,33 @@ class TarsResponseHandler:
         """
         pre_procedures = response.aind_models[0]
         status_code = response.status_code
-        integrated_procedures = []
-        for procedure in pre_procedures.subject_procedures:
-            if isinstance(procedure, Injection) and procedure.injection_materials:
-                virus_strain = procedure.injection_materials[0].full_genome_name
-                tars_response = tars_mapping.get(virus_strain)
+        integrated_subject_procedures = []
+        for subject_procedure in pre_procedures.subject_procedures:
+            integrated_procedures = []
+            for procedure in subject_procedure.procedures:
                 if (
-                    tars_response.status_code == StatusCodes.DB_RESPONDED.value
-                    or tars_response.status_code == StatusCodes.VALID_DATA.value
+                    isinstance(procedure, Injection)
+                    and procedure.injection_materials
                 ):
-                    data = json.loads(tars_response.body)["data"]
-                    procedure.injection_materials = [InjectionMaterial(**data)]
-                else:
-                    procedure.injection_materials = []
-                    status_code = StatusCodes.MULTI_STATUS
-            integrated_procedures.append(procedure)
-        pre_procedures.subject_procedures = integrated_procedures
+                    virus_strain = procedure.injection_materials[
+                        0
+                    ].full_genome_name
+                    tars_response = tars_mapping.get(virus_strain)
+                    if (
+                        tars_response.status_code
+                        == StatusCodes.DB_RESPONDED.value
+                        or tars_response.status_code
+                        == StatusCodes.VALID_DATA.value
+                    ):
+                        data = json.loads(tars_response.body)["data"]
+                        procedure.injection_materials = [ViralMaterial(**data)]
+                    else:
+                        procedure.injection_materials = []
+                        status_code = StatusCodes.MULTI_STATUS
+                integrated_procedures.append(procedure)
+            subject_procedure.procedures = integrated_procedures
+            integrated_subject_procedures.append(subject_procedure)
+        pre_procedures.subject_procedures = integrated_subject_procedures
         return ModelResponse(
             aind_models=[pre_procedures], status_code=status_code
         )

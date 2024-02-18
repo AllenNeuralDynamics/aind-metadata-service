@@ -1,86 +1,29 @@
 [
-   {
-      "start_date": "2022-12-06",
-      "end_date": "2022-12-06",
-      "experimenter_full_name": "NSB-187",
-      "animal_weight_prior": "19.1",
-      "animal_weight_post": "19.2",
-      "anaesthesia": {
-         "type": "isoflurane",
-         "duration": null,
-         "level": null,
-         "duration_unit": "minute"
+  {
+    "start_date": "2022-12-06",
+    "experimenter_full_name": "NSB-187",
+    "iacuc_protocol": "2115",
+    "animal_weight_prior": null,
+    "animal_weight_post": null,
+    "anaesthesia": {
+      "type": "isoflurane",
+      "level": null,
+      "duration_unit": "minute"
+    },
+    "workstation_id": "SWS 3",
+    "procedures": [
+      {
+        "headframe_type": "AI Straight Headbar",
+        "headframe_part_number": null,
+        "well_part_number": null,
+        "well_type": null,
+        "procedure_type": "Headframe",
+        "headframe_material": null
       },
-      "injection_materials": [
-         {
-            "full_genome_name": null,
-            "material_id": null,
-            "plasmid_name": null,
-            "genome_copy": null,
-            "titer": null,
-            "titer_unit": "gc/mL",
-            "concentration": null,
-            "concentration_unit": null,
-            "prep_lot_number": null,
-            "prep_date": null,
-            "prep_type": null,
-            "prep_protocol": null
-         }
-      ],
-      "recovery_time": null,
-      "injection_duration": "5",
-      "workstation_id": "SWS 3",
-      "instrument_id": null,
-      "injection_coordinate_ml": "-3.3",
-      "injection_coordinate_ap": "-1.6",
-      "injection_coordinate_depth": null,
-      "injection_coordinate_reference": null,
-      "bregma_to_lambda_distance": "4",
-      "injection_angle": "0",
-      "injection_hemisphere": "Left",
-      "injection_volume": null,
-      "iacuc_protocol": null,
-      "weight_unit": "gram",
-      "notes": null,
-      "recovery_time_unit": "minute",
-      "injection_duration_unit": "minute",
-      "injection_coordinate_unit": "millimeter",
-      "bregma_to_lambda_unit": "millimeter",
-      "injection_angle_unit": "degrees",
-      "targeted_structure": null,
-      "procedure_type": "Nanoject injection",
-      "injection_volume_unit": "nanoliter"
-   },
-   {
-      "start_date": "2022-12-06",
-      "end_date": "2022-12-06",
-      "experimenter_full_name": "NSB-187",
-      "iacuc_protocol": "2115",
-      "animal_weight_prior": null,
-      "animal_weight_post": null,
-      "anaesthesia": {
-         "type": "isoflurane",
-         "level": null,
-         "duration_unit": "minute"
-      },
-      "headframe_type": "AI Straight Headbar",
-      "headframe_part_number": null,
-      "well_part_number": null,
-      "well_type": null,
-      "weight_unit": "gram",
-      "notes": null,
-      "procedure_type": "Headframe",
-      "headframe_material": null
-   },
-   {
-      "start_date": "2022-12-06",
-      "end_date": "2022-12-06",
-      "experimenter_full_name": "NSB-187",
-      "iacuc_protocol": "2115",
-      "animal_weight_prior": null,
-      "animal_weight_post": null,
-      "probes": [
-         {
+      {
+        "probes": [
+          {
+            "targeted_structure": null,
             "stereotactic_coordinate_ap": "-1.6",
             "stereotactic_coordinate_ml": "-3.3",
             "stereotactic_coordinate_dv": "4.2",
@@ -91,8 +34,9 @@
             "bregma_to_lambda_unit": "millimeter",
             "angle_unit": "degrees",
             "notes": null
-         },
-         {
+          },
+          {
+            "targeted_structure": null,
             "stereotactic_coordinate_ap": "-3.05",
             "stereotactic_coordinate_ml": "-0.6",
             "stereotactic_coordinate_dv": "4.2",
@@ -103,11 +47,54 @@
             "bregma_to_lambda_unit": "millimeter",
             "angle_unit": "degrees",
             "notes": null
-         }
-      ],
-      "weight_unit": "gram",
-      "anaesthesia": null,
-      "notes": null,
-      "procedure_type": "Fiber implant"
-   }
+          }
+        ],
+        "procedure_type": "Fiber implant"
+      }
+    ],
+    "notes": null,
+    "procedure_type": "Surgery",
+    "weight_unit": "gram"
+  },
+  {
+    "start_date": "2022-12-06",
+    "experimenter_full_name": "NSB-187",
+    "iacuc_protocol": "2115",
+    "animal_weight_prior": "19.1",
+    "animal_weight_post": "19.2",
+    "anaesthesia": {
+      "type": "isoflurane",
+      "duration": null,
+      "level": null,
+      "duration_unit": "minute"
+    },
+    "workstation_id": "SWS 3",
+    "procedures": [
+      {
+        "injection_materials": [],
+        "recovery_time": null,
+        "injection_duration": "5",
+        "instrument_id": null,
+        "injection_coordinate_ml": "-3.3",
+        "injection_coordinate_ap": "-1.6",
+        "injection_coordinate_depth": [],
+        "injection_coordinate_reference": null,
+        "bregma_to_lambda_distance": "4",
+        "injection_angle": "0",
+        "injection_hemisphere": "Left",
+        "injection_volume": [],
+        "recovery_time_unit": "minute",
+        "injection_duration_unit": "minute",
+        "injection_coordinate_unit": "millimeter",
+        "bregma_to_lambda_unit": "millimeter",
+        "injection_angle_unit": "degrees",
+        "targeted_structure": null,
+        "procedure_type": "Nanoject injection",
+        "injection_volume_unit": "nanoliter"
+      }
+    ],
+    "notes": null,
+    "procedure_type": "Surgery",
+    "weight_unit": "gram"
+  }
 ]
