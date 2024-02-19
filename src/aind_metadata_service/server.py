@@ -23,6 +23,7 @@ from aind_metadata_service.smartsheet.funding.mapping import FundingMapper
 from aind_metadata_service.smartsheet.perfusions.mapping import (
     PerfusionsMapper,
 )
+from aind_metadata_service.smartsheet.protocols.mapping import ProtocolsMapper
 from aind_metadata_service.tars.client import AzureSettings, TarsClient
 
 SMARTSHEET_FUNDING_ID = os.getenv("SMARTSHEET_FUNDING_ID")
@@ -30,6 +31,9 @@ SMARTSHEET_FUNDING_TOKEN = os.getenv("SMARTSHEET_FUNDING_TOKEN")
 
 SMARTSHEET_PERFUSIONS_ID = os.getenv("SMARTSHEET_PERFUSIONS_ID")
 SMARTSHEET_PERFUSIONS_TOKEN = os.getenv("SMARTSHEET_PERFUSIONS_TOKEN")
+
+SMARTSHEET_PROTOCOLS_ID = os.getenv("SMARTSHEET_PROTOCOLS_ID")
+SMARTSHEET_PROTOCOLS_TOKEN = os.getenv("SMARTSHEET_PROTOCOLS_TOKEN")
 
 TARS_TENANT_ID = os.getenv("TARS_TENANT_ID")
 TARS_CLIENT_ID = os.getenv("TARS_CLIENT_ID")
@@ -46,6 +50,9 @@ funding_smartsheet_settings = SmartsheetSettings(
 )
 perfusions_smartsheet_settings = SmartsheetSettings(
     access_token=SMARTSHEET_PERFUSIONS_TOKEN, sheet_id=SMARTSHEET_PERFUSIONS_ID
+)
+protocols_smartsheet_settings = SmartsheetSettings(
+    access_token=SMARTSHEET_PROTOCOLS_TOKEN, sheet_id=SMARTSHEET_PROTOCOLS_ID
 )
 tars_settings = AzureSettings(
     tenant_id=TARS_TENANT_ID,
@@ -75,6 +82,29 @@ perfusions_smart_sheet_client = SmartSheetClient(
 funding_smart_sheet_client = SmartSheetClient(
     smartsheet_settings=funding_smartsheet_settings
 )
+
+protocols_smart_sheet_client = SmartSheetClient(
+    smartsheet_settings=protocols_smartsheet_settings
+)
+
+
+@app.get("/protocols/{protocol_name}")
+async def retrieve_protocols(protocol_name, pickle: bool = False):
+    """Retrieves perfusion information from smartsheet"""
+
+    # TODO: We can probably cache the response if it's 200
+    smart_sheet_response = await run_in_threadpool(
+        protocols_smart_sheet_client.get_sheet
+    )
+    mapper = ProtocolsMapper(
+        smart_sheet_response=smart_sheet_response, input_id=protocol_name
+    )
+    model_response = mapper.get_model_response()
+
+    if pickle:
+        return model_response.map_to_pickled_response()
+    else:
+        return model_response.map_to_json_response()
 
 
 @app.get("/perfusions/{subject_id}")
