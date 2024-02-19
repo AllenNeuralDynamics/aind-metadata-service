@@ -18,11 +18,11 @@ class TestAzureSettings(unittest.TestCase):
     """Class to test methods for AzureSettings."""
 
     EXAMPLE_ENV_VAR1 = {
-        "TENANT_ID": "some_tenant",
-        "CLIENT_ID": "some_client",
-        "RESOURCE": "some_resource",
-        "CLIENT_SECRET": "some_secret",
-        "SCOPE": "some_scope",
+        "TARS_TENANT_ID": "some_tenant",
+        "TARS_CLIENT_ID": "some_client",
+        "TARS_RESOURCE": "some_resource",
+        "TARS_CLIENT_SECRET": "some_secret",
+        "TARS_SCOPE": "some_scope",
     }
 
     @patch.dict(os.environ, EXAMPLE_ENV_VAR1, clear=True)

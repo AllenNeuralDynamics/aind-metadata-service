@@ -6,7 +6,7 @@ from typing import List, Optional
 import requests
 from azure.identity import ClientSecretCredential
 from pydantic import Field, SecretStr
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 from aind_metadata_service.tars.mapping import TarsResponseHandler
@@ -15,6 +15,8 @@ from aind_metadata_service.tars.mapping import TarsResponseHandler
 class AzureSettings(BaseSettings):
     """Configuration class. Mostly a wrapper around AzureAuth
     class constructor arguments."""
+
+    model_config = SettingsConfigDict(env_prefix="TARS_")
 
     tenant_id: str = Field(
         ..., description="The ID of the AllenInstituteB2C Azure tenant."

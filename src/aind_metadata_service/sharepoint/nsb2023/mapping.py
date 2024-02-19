@@ -254,10 +254,10 @@ class MappedNSBList:
         return None if dt is None else dt.date()
 
     @staticmethod
-    def _parse_virus_strain_str(_: Optional[str]) -> Optional[str]:
+    def _parse_virus_strain_str(virus_strain_str: Optional[str]) -> Optional[str]:
         """Parse virus strain strings"""
-        # TODO: Figure out how to parse virus strain fields
-        return None
+        # TODO: Figure out how to parse virus strain field
+        return virus_strain_str
 
     @property
     def aind_age_at_injection(self) -> Optional[Decimal]:
