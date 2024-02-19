@@ -4,8 +4,15 @@ import unittest
 from datetime import date
 from unittest.mock import MagicMock, patch
 
-from aind_data_schema.core.procedures import TarsVirusIdentifiers
+from aind_data_schema.core.procedures import (
+    NanojectInjection,
+    Procedures,
+    Surgery,
+    TarsVirusIdentifiers,
+)
 
+from aind_metadata_service.client import StatusCodes
+from aind_metadata_service.response_handler import ModelResponse
 from aind_metadata_service.tars.mapping import (
     PrepProtocols,
     TarsResponseHandler,
@@ -18,6 +25,25 @@ from aind_metadata_service.tars.mapping import (
 
 class TestTarsResponseHandler(unittest.TestCase):
     """Class to test methods of TarsResponseHandler"""
+
+    handler = TarsResponseHandler()
+    inj1 = NanojectInjection.model_construct(
+        injection_materials=[
+            ViralMaterial.model_construct(full_genome_name="12345")
+        ]
+    )
+    inj2 = NanojectInjection.model_construct(
+        injection_materials=[
+            ViralMaterial.model_construct(full_genome_name="67890")
+        ]
+    )
+    surgery = Surgery.model_construct(procedures=[inj1, inj2])
+    procedures_response = ModelResponse(
+        aind_models=[
+            Procedures(subject_id="12345", subject_procedures=[surgery])
+        ],
+        status_code=StatusCodes.DB_RESPONDED,
+    )
 
     def test_map_prep_type_and_protocol(self):
         """Tests that prep_type and protocol are mapped as expected."""
@@ -158,16 +184,15 @@ class TestTarsResponseHandler(unittest.TestCase):
         mock_response3 = MagicMock()
         mock_response3.json.return_value = response_data3
 
-        handler = TarsResponseHandler()
-        genome_name = handler.map_full_genome_name(
+        genome_name = self.handler.map_full_genome_name(
             mock_response, plasmid_name="AiP123"
         )
 
-        genome_name2 = handler.map_full_genome_name(
+        genome_name2 = self.handler.map_full_genome_name(
             mock_response2, plasmid_name="AiP123"
         )
 
-        genome_name3 = handler.map_full_genome_name(
+        genome_name3 = self.handler.map_full_genome_name(
             mock_response3, plasmid_name="AiP123"
         )
 
@@ -191,13 +216,12 @@ class TestTarsResponseHandler(unittest.TestCase):
             },
         }
 
-        handler = TarsResponseHandler()
         viral_prep_aliases = ViralPrepAliases(
             material_id="AiV456",
             full_genome_name="rAAV-MGT_789",
             plasmid_name="AiP123",
         )
-        injection_material = handler.map_lot_to_injection_material(
+        injection_material = self.handler.map_lot_to_injection_material(
             viral_prep_lot=response_data, viral_prep_aliases=viral_prep_aliases
         )
         expected_tars_virus_ids = TarsVirusIdentifiers(
@@ -253,6 +277,112 @@ class TestTarsResponseHandler(unittest.TestCase):
         )
         self.assertIsInstance(injection_material, ViralMaterial)
         self.assertEqual(injection_material, expected_injection_material)
+
+    def test_get_virus_strains(self):
+        """Tests that virus strains are retrieved as expected"""
+        virus_strains = self.handler.get_virus_strains(
+            self.procedures_response
+        )
+        expected_virus_strains = ["12345", "67890"]
+
+        self.assertEqual(virus_strains, expected_virus_strains)
+
+    def test_integrate_injection_materials(self):
+        """Tests that injection materials are integrated into
+        procedures response as expected"""
+        expected_injection_material = ViralMaterial.model_construct(
+            name="rAAV-MGT_789",
+            tars_identifiers=TarsVirusIdentifiers.model_construct(
+                virus_tars_id="AiV456",
+                plasmid_tars_alias="AiP123",
+                prep_lot_number="12345",
+                prep_date=date(2023, 12, 15),
+                prep_type=VirusPrepType.CRUDE,
+                prep_protocol="SOP#VC002",
+            ),
+        )
+        expected_injection_material2 = ViralMaterial.model_construct(
+            name="rAAV-MGT_789",
+            tars_identifiers=TarsVirusIdentifiers.model_construct(
+                virus_tars_id="AiV456",
+                plasmid_tars_alias="AiP123",
+                prep_lot_number="12345",
+                prep_date=date(2023, 12, 15),
+                prep_type=VirusPrepType.CRUDE,
+                prep_protocol="SOP#VC002",
+            ),
+        )
+        tars_response1 = ModelResponse(
+            aind_models=[expected_injection_material],
+            status_code=StatusCodes.DB_RESPONDED,
+        )
+        tars_response2 = ModelResponse(
+            aind_models=[expected_injection_material2],
+            status_code=StatusCodes.DB_RESPONDED,
+        )
+        tars_mapping = {
+            "12345": tars_response1.map_to_json_response(),
+            "67890": tars_response2.map_to_json_response(),
+        }
+        procedures_response = self.procedures_response
+        merged_response = self.handler.integrate_injection_materials(
+            response=procedures_response, tars_mapping=tars_mapping
+        )
+        expected_surgery = Surgery.model_construct(
+            procedures=[
+                NanojectInjection.model_construct(
+                    injection_materials=[expected_injection_material]
+                ),
+                NanojectInjection.model_construct(
+                    injection_materials=[expected_injection_material2]
+                ),
+            ]
+        )
+        expected_merged_response = ModelResponse(
+            aind_models=[
+                Procedures(
+                    subject_id="12345",
+                    subject_procedures=[expected_surgery],
+                )
+            ],
+            status_code=StatusCodes.DB_RESPONDED,
+        )
+        self.assertEqual(
+            merged_response.aind_models, expected_merged_response.aind_models
+        )
+
+    def test_integrate_injection_materials_error(self):
+        """Tests that injection materials are integrated into
+        procedures response as expected"""
+        tars_response = ModelResponse(
+            aind_models=[],
+            status_code=StatusCodes.CONNECTION_ERROR,
+        )
+        tars_mapping = {
+            "12345": tars_response.map_to_json_response(),
+            "67890": tars_response.map_to_json_response(),
+        }
+        inj1 = NanojectInjection.model_construct(
+            injection_materials=[
+                ViralMaterial.model_construct(full_genome_name="12345")
+            ]
+        )
+        inj2 = NanojectInjection.model_construct(
+            injection_materials=[
+                ViralMaterial.model_construct(full_genome_name="67890")
+            ]
+        )
+        surgery = Surgery.model_construct(procedures=[inj1, inj2])
+        procedures_response = ModelResponse(
+            aind_models=[
+                Procedures(subject_id="12345", subject_procedures=[surgery])
+            ],
+            status_code=StatusCodes.DB_RESPONDED,
+        )
+        merged_response = self.handler.integrate_injection_materials(
+            response=procedures_response, tars_mapping=tars_mapping
+        )
+        self.assertEqual(merged_response.status_code, StatusCodes.MULTI_STATUS)
 
 
 if __name__ == "__main__":

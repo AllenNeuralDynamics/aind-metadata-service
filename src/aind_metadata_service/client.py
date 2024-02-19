@@ -33,6 +33,7 @@ class AindMetadataServiceClient:
         self.domain = domain
         self.subject_url = f"{self.domain}/subject"
         self.procedures_url = f"{self.domain}/procedures"
+        self.injection_materials_url = f"{self.domain}/injection_materials"
 
     def get_subject(
         self, subject_id: str, pickle: bool = False

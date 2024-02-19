@@ -46,6 +46,9 @@ sorted(MAPPED_ITEM_FILE_NAMES_2023)
 MAPPED_FILE_PATHS_2023 = [
     DIR_MAP_2023 / str(f) for f in MAPPED_ITEM_FILE_NAMES_2023
 ]
+INJECTION_MATERIALS_PATH = (
+    TEST_DIR / "resources" / "tars" / "mapped_materials.json"
+)
 
 
 class TestSharepointSettings(unittest.TestCase):
