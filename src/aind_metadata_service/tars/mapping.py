@@ -1,18 +1,24 @@
 """Module to map data in TARS to aind_data_schema InjectionMaterial"""
 
+import json
 import logging
 import re
 from dataclasses import dataclass
 from datetime import date, datetime
 from enum import Enum
-from typing import Optional
+from typing import Dict, List, Optional
 
 from aind_data_schema.core.procedures import (
+    Injection,
     TarsVirusIdentifiers,
     ViralMaterial,
     VirusPrepType,
 )
+from fastapi.responses import JSONResponse
 from pydantic import ValidationError
+
+from aind_metadata_service.client import StatusCodes
+from aind_metadata_service.response_handler import ModelResponse
 
 
 class ViralPrepTypes(Enum):
@@ -195,3 +201,69 @@ class TarsResponseHandler:
                 name=viral_prep_aliases.full_genome_name,
                 tars_identifiers=tars_virus_identifiers,
             )
+
+    @staticmethod
+    def get_virus_strains(response: ModelResponse) -> List:
+        """
+        Iterates through procedures response and creates list of
+        virus strains.
+        Parameters
+        ---------
+        response : ModelResponse
+        """
+        viruses = []
+        procedures = response.aind_models[0]
+        for subject_procedure in procedures.subject_procedures:
+            for procedure in subject_procedure.procedures:
+                if (
+                    isinstance(procedure, Injection)
+                    and procedure.injection_materials
+                    and procedure.injection_materials[0].full_genome_name
+                ):
+                    virus_strain = procedure.injection_materials[
+                        0
+                    ].full_genome_name
+                    viruses.append(virus_strain)
+        return viruses
+
+    @staticmethod
+    def integrate_injection_materials(
+        response: ModelResponse, tars_mapping: Dict[str, JSONResponse]
+    ) -> ModelResponse:
+        """
+        Merges tars_response with procedures_response.
+        Parameters
+        ----------
+        """
+        pre_procedures = response.aind_models[0]
+        status_code = response.status_code
+        integrated_subject_procedures = []
+        for subject_procedure in pre_procedures.subject_procedures:
+            integrated_procedures = []
+            for procedure in subject_procedure.procedures:
+                if (
+                    isinstance(procedure, Injection)
+                    and procedure.injection_materials
+                ):
+                    virus_strain = procedure.injection_materials[
+                        0
+                    ].full_genome_name
+                    tars_response = tars_mapping.get(virus_strain)
+                    if (
+                        tars_response.status_code
+                        == StatusCodes.DB_RESPONDED.value
+                        or tars_response.status_code
+                        == StatusCodes.VALID_DATA.value
+                    ):
+                        data = json.loads(tars_response.body)["data"]
+                        procedure.injection_materials = [ViralMaterial(**data)]
+                    else:
+                        procedure.injection_materials = []
+                        status_code = StatusCodes.MULTI_STATUS
+                integrated_procedures.append(procedure)
+            subject_procedure.procedures = integrated_procedures
+            integrated_subject_procedures.append(subject_procedure)
+        pre_procedures.subject_procedures = integrated_subject_procedures
+        return ModelResponse(
+            aind_models=[pre_procedures], status_code=status_code
+        )

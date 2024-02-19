@@ -14,7 +14,16 @@
     "workstation_id": "SWS 4",
     "procedures": [
       {
-        "injection_materials": [],
+        "injection_materials": [
+          {
+            "name": "Premixied &quot;\u200bdL+Cre&quot;",
+            "material_type": "Virus",
+            "tars_identifiers": null,
+            "addgene_id": null,
+            "titer": null,
+            "titer_unit": "gc/mL"
+          }
+        ],
         "recovery_time": null,
         "injection_duration": null,
         "instrument_id": "Ionto #1",
