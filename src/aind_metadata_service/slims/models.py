@@ -169,7 +169,7 @@ class ContentsTableRow(BaseModel):
     cntn_position_column: Optional[str] = Field(
         None, title="Located at column"
     )
-    cntn_cf_dateOfBirth: Optional[date] = Field(
+    cntn_cf_dateOfBirth: Optional[datetime] = Field(
         None,
         title="Date of birth",
         description="timeZone: America/Los_Angeles",
