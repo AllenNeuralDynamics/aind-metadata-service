@@ -1,0 +1,262 @@
+{
+  "pk": 7,
+  "tableName": "Instrument",
+  "columns": [
+    {
+      "datatype": "STRING",
+      "name": "nstr_name",
+      "title": "Name",
+      "position": 0,
+      "value": "155-SWS1",
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "datatype": "ENUM",
+      "name": "icon",
+      "title": "Icon",
+      "position": 1,
+      "value": "data_icons/scissors.png",
+      "hidden": false,
+      "editable": true,
+      "displayValue": "data_icons/scissors.png"
+    },
+    {
+      "datatype": "STRING",
+      "name": "nstr_uniqueIdentifier",
+      "title": "Unique identifier",
+      "position": 2,
+      "value": "nstr_155_dot_sws1",
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "datatype": "STRING",
+      "name": "nstr_description",
+      "title": "Description",
+      "position": 3,
+      "value": null,
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "datatype": "FOREIGN_KEY",
+      "name": "nstr_fk_instrumentType",
+      "title": "Instrument type",
+      "position": 4,
+      "value": 4,
+      "hidden": false,
+      "editable": false,
+      "foreignTable": "InstrumentType",
+      "displayValue": "Surgical Workstation (NSB)",
+      "displayField": "nstp_name",
+      "foreignDisplayColumn": "nstp_name"
+    },
+    {
+      "datatype": "FOREIGN_KEY",
+      "name": "nstr_fk_user",
+      "title": "User",
+      "position": 5,
+      "value": 7,
+      "hidden": false,
+      "editable": true,
+      "foreignTable": "User",
+      "displayValue": "JKen",
+      "displayField": "user_userName",
+      "foreignDisplayColumn": "user_userName"
+    },
+    {
+      "datatype": "FOREIGN_KEY",
+      "name": "nstr_fk_group",
+      "title": "Group",
+      "position": 6,
+      "value": null,
+      "hidden": false,
+      "editable": true,
+      "foreignTable": "Groups",
+      "displayValue": null,
+      "displayField": "grps_groupName",
+      "foreignDisplayColumn": "grps_groupName"
+    },
+    {
+      "datatype": "FOREIGN_KEY",
+      "name": "nstr_fk_status",
+      "title": "Status",
+      "position": 7,
+      "value": 34,
+      "hidden": false,
+      "editable": true,
+      "foreignTable": "Status",
+      "displayValue": "Available",
+      "displayField": "stts_name",
+      "foreignDisplayColumn": "stts_name"
+    },
+    {
+      "datatype": "BOOLEAN",
+      "name": "nstr_active",
+      "title": "Active",
+      "position": 8,
+      "value": true,
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "datatype": "BOOLEAN",
+      "name": "nstr_calibrated",
+      "title": "Calibrated",
+      "position": 9,
+      "value": false,
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "datatype": "DATE",
+      "name": "nstr_calibrationExpiryDate",
+      "title": "Calibration expiry date",
+      "position": 10,
+      "value": null,
+      "hidden": false,
+      "editable": true,
+      "dateFormat": "MM/dd/yyyy HH:mm:ss",
+      "subType": "datetime",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "datatype": "STRING",
+      "name": "nstr_createdBy",
+      "title": "Created by",
+      "position": 11,
+      "value": "JKen",
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "datatype": "DATE",
+      "name": "nstr_createdOn",
+      "title": "Created on",
+      "position": 12,
+      "value": 1698096201428,
+      "hidden": false,
+      "editable": true,
+      "dateFormat": "MM/dd/yyyy HH:mm:ss",
+      "subType": "datetime",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "datatype": "STRING",
+      "name": "nstr_modifiedBy",
+      "title": "Modified by",
+      "position": 13,
+      "value": "JKen",
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "datatype": "DATE",
+      "name": "nstr_modifiedOn",
+      "title": "Modified on",
+      "position": 14,
+      "value": 1708113016093,
+      "hidden": false,
+      "editable": true,
+      "dateFormat": "MM/dd/yyyy HH:mm:ss",
+      "subType": "datetime",
+      "timeZone": "America/Los_Angeles"
+    },
+    {
+      "datatype": "INTEGER",
+      "name": "nstr_pk",
+      "title": "nstr_pk",
+      "position": 15,
+      "value": 7,
+      "hidden": true,
+      "editable": true
+    },
+    {
+      "datatype": "FOREIGN_KEY",
+      "name": "nstr_fk_calibrationRun",
+      "title": "nstr_fk_calibrationRun",
+      "position": 16,
+      "value": null,
+      "hidden": true,
+      "editable": true,
+      "foreignTable": "ExperimentRun",
+      "displayValue": null,
+      "displayField": "xprn_name",
+      "foreignDisplayColumn": "xprn_name"
+    },
+    {
+      "datatype": "STRING",
+      "name": "nstp_name",
+      "title": "Name",
+      "position": 17,
+      "value": "Surgical Workstation (NSB)",
+      "hidden": true,
+      "editable": true
+    }
+  ],
+  "canUpdate": false,
+  "canDelete": false,
+  "links": [
+    {
+      "rel": "self",
+      "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Instrument/7"
+    },
+    {
+      "rel": "nstr_fk_instrumentType",
+      "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/InstrumentType/4"
+    },
+    {
+      "rel": "nstr_fk_user",
+      "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/User/7"
+    },
+    {
+      "rel": "nstr_fk_status",
+      "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Status/34"
+    },
+    {
+      "rel": "-rdrc_cf_fk_rigInstrument",
+      "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/ReferenceDataRecord?rdrc_cf_fk_rigInstrument=7"
+    },
+    {
+      "rel": "-rdrc_cf_fk_instrument",
+      "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/ReferenceDataRecord?rdrc_cf_fk_instrument=7"
+    },
+    {
+      "rel": "-xprn_fk_instrument",
+      "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/ExperimentRun?xprn_fk_instrument=7"
+    },
+    {
+      "rel": "-xprs_cf_fk_rigInstrument",
+      "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/ExperimentRunStep?xprs_cf_fk_rigInstrument=7"
+    },
+    {
+      "rel": "-rslt_cf_fk_balance",
+      "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Result?rslt_cf_fk_balance=7"
+    },
+    {
+      "rel": "-rslt_cf_fk_workStation",
+      "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Result?rslt_cf_fk_workStation=7"
+    },
+    {
+      "rel": "-rslt_cf_fk_injectionDevice",
+      "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Result?rslt_cf_fk_injectionDevice=7"
+    },
+    {
+      "rel": "-rslt_cf_fk_instrument",
+      "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Result?rslt_cf_fk_instrument=7"
+    },
+    {
+      "rel": "-xprm_fk_instrument",
+      "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/Experiment?xprm_fk_instrument=7"
+    },
+    {
+      "rel": "-nsrn_fk_instrument",
+      "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/InstrumentRun?nsrn_fk_instrument=7"
+    },
+    {
+      "rel": "attachments",
+      "href": "https://aifi-neural.cloud.us.genohm.com/slimsrest/rest/attachment/Instrument/7"
+    }
+  ]
+}

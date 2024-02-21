@@ -254,7 +254,9 @@ class MappedNSBList:
         return None if dt is None else dt.date()
 
     @staticmethod
-    def _parse_virus_strain_str(virus_strain_str: Optional[str]) -> Optional[str]:
+    def _parse_virus_strain_str(
+        virus_strain_str: Optional[str],
+    ) -> Optional[str]:
         """Parse virus strain strings"""
         # TODO: Figure out how to parse virus strain field
         return virus_strain_str

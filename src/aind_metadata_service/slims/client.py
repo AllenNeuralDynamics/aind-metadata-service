@@ -8,7 +8,10 @@ from slims.criteria import equals
 from slims.internal import Record
 from slims.slims import Slims
 
-from aind_metadata_service.slims.models import ContentsTableRow
+from aind_metadata_service.slims.models import (
+    ContentsTableRow,
+    InstrumentTableRow,
+)
 
 
 class SlimsSettings(BaseSettings):
@@ -65,6 +68,34 @@ class SlimsClient:
                 end=1,
             )[0]
             return content_record
+        except Exception as e:
+            logging.error(repr(e))
+            raise Exception(e)
+
+    def get_instrument_record(self, instrument_id):
+        """
+        Retrieve a record from the Instruments Table
+        Parameters
+        ----------
+        instrument_id : str
+            id of Instrument to retrieve record for
+
+        Returns
+        -------
+        Record
+          A single slims Record
+        """
+        try:
+            instrument_record = self.client.fetch(
+                "Instrument",
+                equals(
+                    InstrumentTableRow.model_fields["nstr_name"].title,
+                    instrument_id,
+                ),
+                start=0,
+                end=1,
+            )[0]
+            return instrument_record
         except Exception as e:
             logging.error(repr(e))
             raise Exception(e)
