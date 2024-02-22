@@ -1,6 +1,5 @@
 """Module to contain SLIMS db models"""
 
-from datetime import datetime
 from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -135,6 +134,8 @@ class ContentsTableColumnInfo(BaseModel):
 class SlimsTableRow(BaseModel):
     """A record pulled from slims base table model."""
 
+    model_config = ConfigDict(coerce_numbers_to_str=True)
+
     @staticmethod
     def map_record_to_model_string(record: Record) -> List[str]:
         """
@@ -177,8 +178,6 @@ class SlimsTableRow(BaseModel):
 class ContentsTableRow(SlimsTableRow):
     """A record pulled from slims Contents Table."""
 
-    model_config = ConfigDict(coerce_numbers_to_str=True)
-
     cntn_fk_originalContent: Optional[str] = Field(
         None, title="Original Content"
     )
@@ -211,15 +210,15 @@ class ContentsTableRow(SlimsTableRow):
     cntn_position_column: Optional[str] = Field(
         None, title="Located at column"
     )
-    cntn_cf_dateOfBirth: Optional[datetime] = Field(
+    cntn_cf_dateOfBirth: Optional[int] = Field(
         None,
         title="Date of birth",
-        description="timeZone: America/Los_Angeles",
+        description="Integer representation of a timestamp",
     )
-    cntn_cf_dateRangeStart: Optional[datetime] = Field(
+    cntn_cf_dateRangeStart: Optional[int] = Field(
         None,
         title="Date range start",
-        description="timeZone: America/Los_Angeles",
+        description="Integer representation of a timestamp",
     )
     cntn_cf_fk_fundingCode: Optional[str] = Field(None, title="Funding Code")
     cntn_cf_genotype: Optional[str] = Field(None, title="Genotype")
@@ -247,12 +246,12 @@ class ContentsTableRow(SlimsTableRow):
     ingredientCount: Optional[int] = Field(None, title="Ingredient count")
     mixCount: Optional[int] = Field(None, title="Mix count")
     cntn_createdBy: Optional[str] = Field(None, title="Created by")
-    cntn_createdOn: Optional[datetime] = Field(
-        None, title="Created on", description="timeZone: America/Los_Angeles"
+    cntn_createdOn: Optional[int] = Field(
+        None, title="Created on", description="Integer representation of a timestamp"
     )
     cntn_modifiedBy: Optional[str] = Field(None, title="Modified by")
-    cntn_modifiedOn: Optional[datetime] = Field(
-        None, title="Modified on", description="timeZone: America/Los_Angeles"
+    cntn_modifiedOn: Optional[int] = Field(
+        None, title="Modified on", description="Integer representation of a timestamp"
     )
     flags: Optional[str] = Field(None, title="Flags")
     previousFlags: Optional[str] = Field(None, title="Previous flags")
@@ -299,8 +298,8 @@ class ContentsTableRow(SlimsTableRow):
 class InstrumentTableRow(SlimsTableRow):
     """A record pulled from slims Instrument Table."""
 
-    nstr_created_On: Optional[datetime] = Field(
-        None, title="Created on", description="timeZone: America/Los_Angeles"
+    nstr_created_On: Optional[int] = Field(
+        None, title="Created on", description="Integer representation of a timestamp"
     )
     nstr_fk_group: Optional[str] = Field(None, title="Group")
     groupPkFieldName: Optional[str] = Field(None, title="Group Field Name")
@@ -331,8 +330,8 @@ class InstrumentTableRow(SlimsTableRow):
     rslt_cf_fk_injectionDevice_display: Optional[str] = Field(
         None, title="Injection Device Display"
     )
-    nstr_modifiedOn: Optional[datetime] = Field(
-        None, title="Modified on", description="timeZone: America/Los_Angeles"
+    nstr_modifiedOn: Optional[int] = Field(
+        None, title="Modified on", description="Integer representation of a timestamp"
     )
     rdrc_cf_fk_rigInstrument_display: Optional[str] = Field(
         None, title="Rig Instrument Display"
@@ -353,10 +352,10 @@ class InstrumentTableRow(SlimsTableRow):
         None, title="Xprs Rig Instrument Display"
     )
     user_UserName: Optional[str] = Field(None, title="User Name")
-    nstr_calibrationExpiryDate: Optional[datetime] = Field(
+    nstr_calibrationExpiryDate: Optional[int] = Field(
         None,
         title="Calibration Expiration Date",
-        description="timeZone: America/Los_Angeles",
+        description="Integer representation of a timestamp",
     )
     nstr_pk: Optional[int] = Field(None, title="pk")
     nstr_description: Optional[str] = Field(None, title="Description")
