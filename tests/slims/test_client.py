@@ -118,7 +118,7 @@ class TestSlimsClient(unittest.IsolatedAsyncioTestCase):
         )
         client = SlimsClient(settings=settings)
         with self.assertRaises(Exception) as e:
-            client.get_instrument_record(instrument_id="12345")
+            client.get_instrument_record(input_id="12345")
 
         self.assertEqual("Error connecting to server", str(e.exception))
         mock_log_error.assert_called_once_with(

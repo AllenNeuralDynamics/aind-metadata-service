@@ -8,10 +8,7 @@ from slims.criteria import equals
 from slims.internal import Record
 from slims.slims import Slims
 
-from aind_metadata_service.slims.models import (
-    ContentsTableRow,
-    InstrumentTableRow,
-)
+from aind_metadata_service.slims.models import ContentsTableRow
 
 
 class SlimsSettings(BaseSettings):
@@ -72,13 +69,14 @@ class SlimsClient:
             logging.error(repr(e))
             raise Exception(e)
 
-    def get_instrument_record(self, instrument_id):
+    def get_instrument_record(self, input_id):
         """
-        Retrieve a record from the Instruments Table
+        Retrieve a record from the Instruments Table.
+        (contains info for both rigs and imaging instruments).
         Parameters
         ----------
-        instrument_id : str
-            id of Instrument to retrieve record for
+        input_id : str
+            Id to retrieve record for. Either instrument_id or rig_id.
 
         Returns
         -------
@@ -89,11 +87,9 @@ class SlimsClient:
             instrument_record = self.client.fetch(
                 "Instrument",
                 equals(
-                    InstrumentTableRow.model_fields["nstr_name"].title,
-                    instrument_id,
+                    "nstr_name",
+                    input_id,
                 ),
-                start=0,
-                end=1,
             )[0]
             return instrument_record
         except Exception as e:
