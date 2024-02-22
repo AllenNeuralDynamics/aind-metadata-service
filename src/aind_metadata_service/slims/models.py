@@ -1,6 +1,5 @@
 """Module to contain SLIMS db models"""
 
-from datetime import date, datetime
 from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -132,10 +131,52 @@ class ContentsTableColumnInfo(BaseModel):
             return self._map_str_to_field_str()
 
 
-class ContentsTableRow(BaseModel):
-    """A record pulled from slims Contents Table."""
+class SlimsTableRow(BaseModel):
+    """A record pulled from slims base table model."""
 
     model_config = ConfigDict(coerce_numbers_to_str=True)
+
+    @staticmethod
+    def map_record_to_model_string(record: Record) -> List[str]:
+        """
+        Utility method to parse the information from a slims record into
+        pydantic fields.
+        Parameters
+        ----------
+        record : Record
+          A record pulled from the slims db. Easiest way to pull a record is
+          using:
+          record = slims.fetch(
+                   "Content", is_not_null("cntn_id"), start=0, end=1
+          )[0]
+
+        Returns
+        -------
+        List[str]
+          A list of string representations of pydantic fields
+
+        """
+        columns_info = [
+            ContentsTableColumnInfo.model_validate(c)
+            for c in record.json_entity["columns"]
+        ]
+        return [c.map_to_field_str() for c in columns_info]
+
+    @classmethod
+    def from_record(cls, record: Record):
+        """Create a ContentsTableRow from a SLIMS Record"""
+        field_names = cls.model_fields
+        field_values = {}
+        for field_name in field_names:
+            record_value = getattr(record, field_name, None)
+            if record_value is not None:
+                record_value = record_value.value
+            field_values[field_name] = record_value
+        return cls(**field_values)
+
+
+class ContentsTableRow(SlimsTableRow):
+    """A record pulled from slims Contents Table."""
 
     cntn_fk_originalContent: Optional[str] = Field(
         None, title="Original Content"
@@ -169,15 +210,15 @@ class ContentsTableRow(BaseModel):
     cntn_position_column: Optional[str] = Field(
         None, title="Located at column"
     )
-    cntn_cf_dateOfBirth: Optional[date] = Field(
+    cntn_cf_dateOfBirth: Optional[int] = Field(
         None,
         title="Date of birth",
-        description="timeZone: America/Los_Angeles",
+        description="Timestamp in millis",
     )
-    cntn_cf_dateRangeStart: Optional[datetime] = Field(
+    cntn_cf_dateRangeStart: Optional[int] = Field(
         None,
         title="Date range start",
-        description="timeZone: America/Los_Angeles",
+        description="Timestamp in millis",
     )
     cntn_cf_fk_fundingCode: Optional[str] = Field(None, title="Funding Code")
     cntn_cf_genotype: Optional[str] = Field(None, title="Genotype")
@@ -205,12 +246,12 @@ class ContentsTableRow(BaseModel):
     ingredientCount: Optional[int] = Field(None, title="Ingredient count")
     mixCount: Optional[int] = Field(None, title="Mix count")
     cntn_createdBy: Optional[str] = Field(None, title="Created by")
-    cntn_createdOn: Optional[datetime] = Field(
-        None, title="Created on", description="timeZone: America/Los_Angeles"
+    cntn_createdOn: Optional[int] = Field(
+        None, title="Created on", description="Timestamp in millis"
     )
     cntn_modifiedBy: Optional[str] = Field(None, title="Modified by")
-    cntn_modifiedOn: Optional[datetime] = Field(
-        None, title="Modified on", description="timeZone: America/Los_Angeles"
+    cntn_modifiedOn: Optional[int] = Field(
+        None, title="Modified on", description="Timestamp in millis"
     )
     flags: Optional[str] = Field(None, title="Flags")
     previousFlags: Optional[str] = Field(None, title="Previous flags")
@@ -253,40 +294,77 @@ class ContentsTableRow(BaseModel):
         None, title="Original content barcode"
     )
 
-    @staticmethod
-    def map_record_to_model_string(record: Record) -> List[str]:
-        """
-        Utility method to parse the information from a slims record into
-        pydantic fields.
-        Parameters
-        ----------
-        record : Record
-          A record pulled from the slims db. Easiest way to pull a record is
-          using:
-          record = slims.fetch(
-                   "Content", is_not_null("cntn_id"), start=0, end=1
-          )[0]
 
-        Returns
-        -------
-        List[str]
-          A list of string representations of pydantic fields
+class InstrumentTableRow(SlimsTableRow):
+    """A record pulled from slims Instrument Table."""
 
-        """
-        columns_info = [
-            ContentsTableColumnInfo.model_validate(c)
-            for c in record.json_entity["columns"]
-        ]
-        return [c.map_to_field_str() for c in columns_info]
-
-    @classmethod
-    def from_record(cls, record: Record):
-        """Create a ContentsTableRow from a SLIMS Record"""
-        field_names = cls.model_fields
-        field_values = {}
-        for field_name in field_names:
-            record_value = getattr(record, field_name, None)
-            if record_value is not None:
-                record_value = record_value.value
-            field_values[field_name] = record_value
-        return cls(**field_values)
+    nstr_created_On: Optional[int] = Field(
+        None, title="Created on", description="Timestamp in millis"
+    )
+    nstr_fk_group: Optional[str] = Field(None, title="Group")
+    groupPkFieldName: Optional[str] = Field(None, title="Group Field Name")
+    nstr_fk_instrumentType: Optional[int] = Field(
+        None, title="Instrument Type"
+    )
+    nstr_fk_calibrationRun: Optional[bool] = Field(
+        None, title="Calibration Run"
+    )
+    icon: Optional[str] = Field(None, title="Icon")
+    stts_runstepSelection: Optional[bool] = Field(
+        None, title="Run Step Selection"
+    )
+    nstp_canBeCalibrated: Optional[bool] = Field(
+        None, title="Can be Calibrated"
+    )
+    rdrc_cf_fk_instrument_display: Optional[str] = Field(
+        None, title="Rdrc Instrument Display"
+    )
+    stts_name: Optional[str] = Field(None, title="Stts Name")
+    rslt_cf_fk_instrument_display: Optional[str] = Field(
+        None, title="Rslt Instrument Display"
+    )
+    rslt_cf_fk_balance_display: Optional[str] = Field(
+        None, title="Balance Display"
+    )
+    assignedGroupPk: Optional[str] = Field(None, title="Assigned Group")
+    rslt_cf_fk_injectionDevice_display: Optional[str] = Field(
+        None, title="Injection Device Display"
+    )
+    nstr_modifiedOn: Optional[int] = Field(
+        None, title="Modified on", description="Timestamp in millis"
+    )
+    rdrc_cf_fk_rigInstrument_display: Optional[str] = Field(
+        None, title="Rig Instrument Display"
+    )
+    assignedUserPk: Optional[int] = Field(None, title="Assigned User")
+    nstr_name: Optional[str] = Field(None, title="Name")
+    nstr_modifiedBy: Optional[str] = Field(None, title="Modified By")
+    userPkFieldName: Optional[str] = Field(None, title="User Field Name")
+    nstp_name: Optional[str] = Field(None, title="Instrument Type Name")
+    nstr_active: Optional[bool] = Field(None, title="Active")
+    nstr_fk_user: Optional[int] = Field(None, title="User")
+    nstr_fk_status: Optional[int] = Field(None, title="Status")
+    lctn_name: Optional[str] = Field(None, title="Lctn Name")
+    nstr_uniqueIdentifier: Optional[str] = Field(
+        None, title="Unique Identifier"
+    )
+    xprs_cf_fk_rigInstrument_display: Optional[str] = Field(
+        None, title="Xprs Rig Instrument Display"
+    )
+    user_UserName: Optional[str] = Field(None, title="User Name")
+    nstr_calibrationExpiryDate: Optional[int] = Field(
+        None,
+        title="Calibration Expiration Date",
+        description="Timestamp in millis",
+    )
+    nstr_pk: Optional[int] = Field(None, title="pk")
+    nstr_description: Optional[str] = Field(None, title="Description")
+    attachmentCount: Optional[int] = Field(None, title="Attachment Count")
+    grps_groupName: Optional[str] = Field(None, title="Group Name")
+    nstr_fk_location: Optional[int] = Field(None, title="Location")
+    rslt_cf_fk_workStation_display: Optional[str] = Field(
+        None, title="Workstation Display"
+    )
+    selection_12: Optional[bool] = Field(None, title="Selection 12")
+    select: Optional[bool] = Field(None, title="Select")
+    rowNum: Optional[int] = Field(None, title="Row Number")
