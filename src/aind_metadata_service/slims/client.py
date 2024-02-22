@@ -68,3 +68,30 @@ class SlimsClient:
         except Exception as e:
             logging.error(repr(e))
             raise Exception(e)
+
+    def get_instrument_record(self, input_id):
+        """
+        Retrieve a record from the Instruments Table.
+        (contains info for both rigs and imaging instruments).
+        Parameters
+        ----------
+        input_id : str
+            Id to retrieve record for. Either instrument_id or rig_id.
+
+        Returns
+        -------
+        Record
+          A single slims Record
+        """
+        try:
+            instrument_record = self.client.fetch(
+                "Instrument",
+                equals(
+                    "nstr_name",
+                    input_id,
+                ),
+            )[0]
+            return instrument_record
+        except Exception as e:
+            logging.error(repr(e))
+            raise Exception(e)

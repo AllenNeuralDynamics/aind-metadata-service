@@ -11,7 +11,7 @@ from slims.internal import Record
 from aind_metadata_service.slims.client import SlimsClient, SlimsSettings
 
 TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / ".."
-EXAMPLE_PATH = TEST_DIR / "resources" / "slims" / "json_entity.json"
+EXAMPLE_PATH = TEST_DIR / "resources" / "slims"
 
 
 class TestSlimsSettings(unittest.TestCase):
@@ -46,15 +46,21 @@ class TestSlimsClient(unittest.IsolatedAsyncioTestCase):
     @classmethod
     def setUpClass(cls):
         """Load record object before running tests."""
-        with open(EXAMPLE_PATH, "r") as f:
+        with open(f"{EXAMPLE_PATH}/json_entity.json", "r") as f:
             json_entity = json.load(f)
+        with open(f"{EXAMPLE_PATH}/instrument_json_entity.json", "r") as f:
+            instrument_json_entity = json.load(f)
         # Turning off type check on slims_api argument
         # noinspection PyTypeChecker
         record_object = Record(json_entity=json_entity, slims_api=None)
+        instrument_record_object = Record(
+            json_entity=instrument_json_entity, slims_api=None
+        )
         cls.example_record = record_object
+        cls.example_instrument_record = instrument_record_object
 
     @patch("slims.slims.Slims.fetch")
-    def test_slims_fetch_success(self, mock_fetch: MagicMock):
+    def test_slims_fetch_content_success(self, mock_fetch: MagicMock):
         """Tests successful record return response"""
         mock_fetch.return_value = [self.example_record]
         settings = SlimsSettings(
@@ -64,6 +70,18 @@ class TestSlimsClient(unittest.IsolatedAsyncioTestCase):
         record = client.get_record("123456")
         self.assertEqual(1, record.json_entity["pk"])
         self.assertEqual("Content", record.json_entity["tableName"])
+
+    @patch("slims.slims.Slims.fetch")
+    def test_slims_fetch_instrument_success(self, mock_fetch: MagicMock):
+        """Tests successful instrument record return response"""
+        mock_fetch.return_value = [self.example_instrument_record]
+        settings = SlimsSettings(
+            username="test-user", password="pw", host="slims-host", db="test"
+        )
+        client = SlimsClient(settings=settings)
+        record = client.get_instrument_record("123456")
+        self.assertEqual(7, record.json_entity["pk"])
+        self.assertEqual("Instrument", record.json_entity["tableName"])
 
     @patch("slims.slims.Slims.fetch")
     @patch("logging.error")
@@ -80,6 +98,27 @@ class TestSlimsClient(unittest.IsolatedAsyncioTestCase):
         client = SlimsClient(settings=settings)
         with self.assertRaises(Exception) as e:
             client.get_record(subject_id="12345")
+
+        self.assertEqual("Error connecting to server", str(e.exception))
+        mock_log_error.assert_called_once_with(
+            "Exception('Error connecting to server')"
+        )
+
+    @patch("slims.slims.Slims.fetch")
+    @patch("logging.error")
+    def test_get_instrument_sheet_error(
+        self, mock_log_error: MagicMock, mock_fetch: MagicMock
+    ):
+        """Tests sheet return error response"""
+        mock_fetch.side_effect = MagicMock(
+            side_effect=Exception("Error connecting to server")
+        )
+        settings = SlimsSettings(
+            username="test-user", password="pw", host="slims-host", db="test"
+        )
+        client = SlimsClient(settings=settings)
+        with self.assertRaises(Exception) as e:
+            client.get_instrument_record(input_id="12345")
 
         self.assertEqual("Error connecting to server", str(e.exception))
         mock_log_error.assert_called_once_with(
