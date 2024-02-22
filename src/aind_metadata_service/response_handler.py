@@ -17,6 +17,7 @@ from fastapi import Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
+from aind_metadata_mapper.core import JobResponse
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.models import ProtocolInformation
@@ -171,3 +172,20 @@ class ModelResponse(Generic[T]):
         else:
             response = self._map_data_response(pickled=True)
         return response
+
+
+class EtlResponse:
+    """Handle responses from EtlJobs"""
+
+    @staticmethod
+    def map_data_response(
+        job_response: JobResponse
+    ) -> JSONResponse:
+        """Map JobResponse class to JSONResponse or requests Response"""
+        return JSONResponse(
+            status_code=job_response.status_code,
+            content=(
+                {"message": job_response.message,
+                 "data": job_response.data}
+            ),
+        )
