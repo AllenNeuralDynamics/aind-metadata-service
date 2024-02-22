@@ -18,6 +18,7 @@ class SheetColumn(BaseModel):
     width: int
     options: List[str] = []
     primary: bool = False
+    hidden: Optional[bool] = None
 
 
 class SheetRowCell(BaseModel):
