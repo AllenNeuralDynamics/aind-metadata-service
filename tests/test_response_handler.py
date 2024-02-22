@@ -9,12 +9,17 @@ from pathlib import Path
 from aind_data_schema.core.procedures import Procedures
 from aind_data_schema.core.subject import BreedingInfo, Species, Subject
 from aind_data_schema.models.organizations import Organization
+from aind_metadata_mapper.core import JobResponse
 from fastapi import Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
-from aind_metadata_service.response_handler import ModelResponse, StatusCodes
+from aind_metadata_service.response_handler import (
+    EtlResponse,
+    ModelResponse,
+    StatusCodes,
+)
 
 TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__)))
 DIR_MAP = TEST_DIR / "resources" / "json_responses"
@@ -310,6 +315,21 @@ class TestResponseHandler(unittest.TestCase):
             pickle.loads(expected_pickled.body),
             pickle.loads(actual_pickled.body),
         )
+
+
+class TestEtlResponse(unittest.TestCase):
+    """Tests methods in EtlResponse class"""
+
+    def test_map_job_response(self):
+        """Tests map_job_response method"""
+        job_response = JobResponse(
+            status_code=200, message="All is good!", data='{"key1":"value1"}'
+        )
+        json_response = EtlResponse.map_job_response(job_response)
+        self.assertEqual(200, json_response.status_code)
+        json_response_body = json.loads(json_response.body)
+        self.assertEqual("All is good!", json_response_body["message"])
+        self.assertEqual('{"key1":"value1"}', json_response_body["data"])
 
 
 if __name__ == "__main__":

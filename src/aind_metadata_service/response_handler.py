@@ -13,11 +13,11 @@ from aind_data_schema.core.procedures import (
     ViralMaterial,
 )
 from aind_data_schema.core.subject import Subject
+from aind_metadata_mapper.core import JobResponse
 from fastapi import Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
-from aind_metadata_mapper.core import JobResponse
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.models import ProtocolInformation
@@ -178,14 +178,11 @@ class EtlResponse:
     """Handle responses from EtlJobs"""
 
     @staticmethod
-    def map_data_response(
-        job_response: JobResponse
-    ) -> JSONResponse:
-        """Map JobResponse class to JSONResponse or requests Response"""
+    def map_job_response(job_response: JobResponse) -> JSONResponse:
+        """Map JobResponse class to JSONResponse"""
         return JSONResponse(
             status_code=job_response.status_code,
             content=(
-                {"message": job_response.message,
-                 "data": job_response.data}
+                {"message": job_response.message, "data": job_response.data}
             ),
         )

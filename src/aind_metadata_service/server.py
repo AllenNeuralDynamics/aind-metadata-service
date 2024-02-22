@@ -2,8 +2,10 @@
 
 import os
 
-from aind_metadata_service.response_handler import EtlResponse
-
+from aind_metadata_mapper.bergamo.session import BergamoEtl
+from aind_metadata_mapper.bergamo.session import (
+    JobSettings as BergamoJobSettings,
+)
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
@@ -13,6 +15,7 @@ from aind_metadata_service.labtracks.client import (
     LabTracksClient,
     LabTracksSettings,
 )
+from aind_metadata_service.response_handler import EtlResponse
 from aind_metadata_service.sharepoint.client import (
     SharePointClient,
     SharepointSettings,
@@ -28,7 +31,6 @@ from aind_metadata_service.smartsheet.perfusions.mapping import (
 from aind_metadata_service.smartsheet.protocols.mapping import ProtocolsMapper
 from aind_metadata_service.tars.client import AzureSettings, TarsClient
 from aind_metadata_service.tars.mapping import TarsResponseHandler
-from aind_metadata_mapper.bergamo.session import BergamoEtl, JobSettings as BergamoJobSettings
 
 SMARTSHEET_FUNDING_ID = os.getenv("SMARTSHEET_FUNDING_ID")
 SMARTSHEET_FUNDING_TOKEN = os.getenv("SMARTSHEET_FUNDING_TOKEN")
@@ -91,7 +93,7 @@ async def retrieve_bergamo_session(job_settings: BergamoJobSettings):
         job_settings=job_settings,
     )
     response = etl_job.run_job()
-    return EtlResponse.map_data_response(response)
+    return EtlResponse.map_job_response(response)
 
 
 @app.get("/protocols/{protocol_name}")
