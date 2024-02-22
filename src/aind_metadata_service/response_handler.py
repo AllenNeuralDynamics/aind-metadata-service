@@ -19,6 +19,7 @@ from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
 from aind_metadata_service.client import StatusCodes
+from aind_metadata_service.models import ProtocolInformation
 
 T = TypeVar(
     "T",
@@ -29,6 +30,7 @@ T = TypeVar(
     Surgery,
     ViralMaterial,
     NonViralMaterial,
+    ProtocolInformation,
 )
 
 
