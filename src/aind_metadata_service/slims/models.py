@@ -213,12 +213,12 @@ class ContentsTableRow(SlimsTableRow):
     cntn_cf_dateOfBirth: Optional[int] = Field(
         None,
         title="Date of birth",
-        description="Integer representation of a timestamp",
+        description="Timestamp in millis",
     )
     cntn_cf_dateRangeStart: Optional[int] = Field(
         None,
         title="Date range start",
-        description="Integer representation of a timestamp",
+        description="Timestamp in millis",
     )
     cntn_cf_fk_fundingCode: Optional[str] = Field(None, title="Funding Code")
     cntn_cf_genotype: Optional[str] = Field(None, title="Genotype")
@@ -247,11 +247,11 @@ class ContentsTableRow(SlimsTableRow):
     mixCount: Optional[int] = Field(None, title="Mix count")
     cntn_createdBy: Optional[str] = Field(None, title="Created by")
     cntn_createdOn: Optional[int] = Field(
-        None, title="Created on", description="Integer representation of a timestamp"
+        None, title="Created on", description="Timestamp in millis"
     )
     cntn_modifiedBy: Optional[str] = Field(None, title="Modified by")
     cntn_modifiedOn: Optional[int] = Field(
-        None, title="Modified on", description="Integer representation of a timestamp"
+        None, title="Modified on", description="Timestamp in millis"
     )
     flags: Optional[str] = Field(None, title="Flags")
     previousFlags: Optional[str] = Field(None, title="Previous flags")
@@ -299,7 +299,7 @@ class InstrumentTableRow(SlimsTableRow):
     """A record pulled from slims Instrument Table."""
 
     nstr_created_On: Optional[int] = Field(
-        None, title="Created on", description="Integer representation of a timestamp"
+        None, title="Created on", description="Timestamp in millis"
     )
     nstr_fk_group: Optional[str] = Field(None, title="Group")
     groupPkFieldName: Optional[str] = Field(None, title="Group Field Name")
@@ -331,7 +331,7 @@ class InstrumentTableRow(SlimsTableRow):
         None, title="Injection Device Display"
     )
     nstr_modifiedOn: Optional[int] = Field(
-        None, title="Modified on", description="Integer representation of a timestamp"
+        None, title="Modified on", description="Timestamp in millis"
     )
     rdrc_cf_fk_rigInstrument_display: Optional[str] = Field(
         None, title="Rig Instrument Display"
@@ -355,7 +355,7 @@ class InstrumentTableRow(SlimsTableRow):
     nstr_calibrationExpiryDate: Optional[int] = Field(
         None,
         title="Calibration Expiration Date",
-        description="Integer representation of a timestamp",
+        description="Timestamp in millis",
     )
     nstr_pk: Optional[int] = Field(None, title="pk")
     nstr_description: Optional[str] = Field(None, title="Description")
