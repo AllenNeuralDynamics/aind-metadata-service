@@ -39,6 +39,7 @@ class TestAzureSettings(unittest.TestCase):
             settings1.client_secret.get_secret_value(),
         )
 
+    @patch.dict(os.environ, {}, clear=True)
     def test_settings_errors(self):
         """Tests that errors are raised if settings are incorrect."""
 

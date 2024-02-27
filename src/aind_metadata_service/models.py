@@ -1,4 +1,5 @@
 """Additional response models not defined in aind-data-schema"""
+
 from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator
