@@ -2,6 +2,10 @@
 
 import os
 
+from aind_metadata_mapper.bergamo.session import BergamoEtl
+from aind_metadata_mapper.bergamo.session import (
+    JobSettings as BergamoJobSettings,
+)
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
@@ -11,6 +15,7 @@ from aind_metadata_service.labtracks.client import (
     LabTracksClient,
     LabTracksSettings,
 )
+from aind_metadata_service.response_handler import EtlResponse
 from aind_metadata_service.sharepoint.client import (
     SharePointClient,
     SharepointSettings,
@@ -78,6 +83,17 @@ protocols_smart_sheet_client = SmartSheetClient(
 )
 
 tars_client = TarsClient(azure_settings=tars_settings)
+
+
+@app.post("/bergamo_session/")
+async def retrieve_bergamo_session(job_settings: BergamoJobSettings):
+    """Builds a bergamo session model from the given job settings"""
+
+    etl_job = BergamoEtl(
+        job_settings=job_settings,
+    )
+    response = etl_job.run_job()
+    return EtlResponse.map_job_response(response)
 
 
 @app.get("/protocols/{protocol_name}")
