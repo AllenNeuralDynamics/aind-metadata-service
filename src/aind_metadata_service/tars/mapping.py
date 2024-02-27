@@ -218,11 +218,9 @@ class TarsResponseHandler:
                 if (
                     isinstance(procedure, Injection)
                     and procedure.injection_materials
-                    and procedure.injection_materials[0].full_genome_name
+                    and procedure.injection_materials[0].name
                 ):
-                    virus_strain = procedure.injection_materials[
-                        0
-                    ].full_genome_name
+                    virus_strain = procedure.injection_materials[0].name
                     viruses.append(virus_strain)
         return viruses
 
@@ -245,9 +243,7 @@ class TarsResponseHandler:
                     isinstance(procedure, Injection)
                     and procedure.injection_materials
                 ):
-                    virus_strain = procedure.injection_materials[
-                        0
-                    ].full_genome_name
+                    virus_strain = procedure.injection_materials[0].name
                     tars_response = tars_mapping.get(virus_strain)
                     if (
                         tars_response.status_code
