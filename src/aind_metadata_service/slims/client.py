@@ -1,7 +1,6 @@
 """Module for slims client"""
 
 import logging
-
 from pydantic import Extra, Field, SecretStr
 from pydantic_settings import BaseSettings
 from slims.criteria import equals
@@ -92,6 +91,9 @@ class SlimsClient:
                 ),
             )[0]
             return instrument_record
+
         except Exception as e:
+            # TODO: parse status code from response.text that raises SlimsApiException
             logging.error(repr(e))
-            raise Exception(e)
+
+

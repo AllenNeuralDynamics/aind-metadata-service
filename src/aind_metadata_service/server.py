@@ -28,6 +28,11 @@ from aind_metadata_service.smartsheet.funding.mapping import FundingMapper
 from aind_metadata_service.smartsheet.perfusions.mapping import (
     PerfusionsMapper,
 )
+from aind_metadata_service.slims.client import (
+    SlimsClient,
+    SlimsSettings
+)
+from aind_metadata_service.slims.mapping import SlimsResponseHandler
 from aind_metadata_service.smartsheet.protocols.mapping import ProtocolsMapper
 from aind_metadata_service.tars.client import AzureSettings, TarsClient
 from aind_metadata_service.tars.mapping import TarsResponseHandler
@@ -45,6 +50,9 @@ SMARTSHEET_PROTOCOLS_TOKEN = os.getenv("SMARTSHEET_PROTOCOLS_TOKEN")
 #  one for each request?
 sharepoint_settings = SharepointSettings()
 labtracks_settings = LabTracksSettings()
+tars_settings = AzureSettings()
+slims_settings = SlimsSettings()
+
 funding_smartsheet_settings = SmartsheetSettings(
     access_token=SMARTSHEET_FUNDING_TOKEN, sheet_id=SMARTSHEET_FUNDING_ID
 )
@@ -55,8 +63,6 @@ perfusions_smartsheet_settings = SmartsheetSettings(
 protocols_smartsheet_settings = SmartsheetSettings(
     access_token=SMARTSHEET_PROTOCOLS_TOKEN, sheet_id=SMARTSHEET_PROTOCOLS_ID
 )
-
-tars_settings = AzureSettings()
 
 app = FastAPI()
 
@@ -83,6 +89,7 @@ protocols_smart_sheet_client = SmartSheetClient(
 )
 
 tars_client = TarsClient(azure_settings=tars_settings)
+slims_client = SlimsClient(settings=slims_settings)
 
 
 @app.post("/bergamo_session/")
@@ -94,6 +101,21 @@ async def retrieve_bergamo_session(job_settings: BergamoJobSettings):
     )
     response = etl_job.run_job()
     return EtlResponse.map_job_response(response)
+
+
+@app.get("/instrument/{instrument_id}")
+async def retrieve_injection_materials(instrument_id, pickle: bool = False):
+    """
+    Retrieves injection materials from TARS server
+    Returns pickled data if URL parameter pickle=True, else returns json
+    """
+    slims_response = slims_client.get_instrument_record(instrument_id)
+    mapper = SlimsResponseHandler(record=slims_response)
+    model_response = mapper.get_instrument_model_response()
+    if pickle:
+        return model_response.map_to_pickled_response()
+    else:
+        return model_response.map_to_json_response()
 
 
 @app.get("/protocols/{protocol_name}")
