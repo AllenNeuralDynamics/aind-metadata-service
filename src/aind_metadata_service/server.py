@@ -52,7 +52,6 @@ perfusions_smartsheet_settings = SmartsheetSettings(
     access_token=SMARTSHEET_PERFUSIONS_TOKEN, sheet_id=SMARTSHEET_PERFUSIONS_ID
 )
 
-
 protocols_smartsheet_settings = SmartsheetSettings(
     access_token=SMARTSHEET_PROTOCOLS_TOKEN, sheet_id=SMARTSHEET_PROTOCOLS_ID
 )
