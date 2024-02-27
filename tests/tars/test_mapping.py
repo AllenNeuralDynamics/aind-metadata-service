@@ -28,14 +28,10 @@ class TestTarsResponseHandler(unittest.TestCase):
 
     handler = TarsResponseHandler()
     inj1 = NanojectInjection.model_construct(
-        injection_materials=[
-            ViralMaterial.model_construct(full_genome_name="12345")
-        ]
+        injection_materials=[ViralMaterial.model_construct(name="12345")]
     )
     inj2 = NanojectInjection.model_construct(
-        injection_materials=[
-            ViralMaterial.model_construct(full_genome_name="67890")
-        ]
+        injection_materials=[ViralMaterial.model_construct(name="67890")]
     )
     surgery = Surgery.model_construct(procedures=[inj1, inj2])
     procedures_response = ModelResponse(
@@ -363,14 +359,10 @@ class TestTarsResponseHandler(unittest.TestCase):
             "67890": tars_response.map_to_json_response(),
         }
         inj1 = NanojectInjection.model_construct(
-            injection_materials=[
-                ViralMaterial.model_construct(full_genome_name="12345")
-            ]
+            injection_materials=[ViralMaterial.model_construct(name="12345")]
         )
         inj2 = NanojectInjection.model_construct(
-            injection_materials=[
-                ViralMaterial.model_construct(full_genome_name="67890")
-            ]
+            injection_materials=[ViralMaterial.model_construct(name="67890")]
         )
         surgery = Surgery.model_construct(procedures=[inj1, inj2])
         procedures_response = ModelResponse(
