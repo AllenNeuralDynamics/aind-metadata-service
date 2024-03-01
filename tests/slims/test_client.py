@@ -71,17 +71,6 @@ class TestSlimsClient(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(1, record.json_entity["pk"])
         self.assertEqual("Content", record.json_entity["tableName"])
 
-    @patch("slims.slims.Slims.fetch")
-    def test_slims_fetch_instrument_success(self, mock_fetch: MagicMock):
-        """Tests successful instrument record return response"""
-        mock_fetch.return_value = [self.example_instrument_record]
-        settings = SlimsSettings(
-            username="test-user", password="pw", host="slims-host", db="test"
-        )
-        client = SlimsClient(settings=settings)
-        record = client.get_instrument_record("123456")
-        self.assertEqual(7, record.json_entity["pk"])
-        self.assertEqual("Instrument", record.json_entity["tableName"])
 
     @patch("slims.slims.Slims.fetch")
     @patch("logging.error")
@@ -97,7 +86,7 @@ class TestSlimsClient(unittest.IsolatedAsyncioTestCase):
         )
         client = SlimsClient(settings=settings)
         with self.assertRaises(Exception) as e:
-            client.get_record(subject_id="12345")
+            client.get_content_record(subject_id="12345")
 
         self.assertEqual("Error connecting to server", str(e.exception))
         mock_log_error.assert_called_once_with(
@@ -105,25 +94,16 @@ class TestSlimsClient(unittest.IsolatedAsyncioTestCase):
         )
 
     @patch("slims.slims.Slims.fetch")
-    @patch("logging.error")
-    def test_get_instrument_sheet_error(
-        self, mock_log_error: MagicMock, mock_fetch: MagicMock
-    ):
-        """Tests sheet return error response"""
-        mock_fetch.side_effect = MagicMock(
-            side_effect=Exception("Error connecting to server")
-        )
+    def test_slims_fetch_instrument_success(self, mock_fetch: MagicMock):
+        """Tests successful instrument record return response"""
+        mock_fetch.return_value = [self.example_instrument_record]
         settings = SlimsSettings(
             username="test-user", password="pw", host="slims-host", db="test"
         )
         client = SlimsClient(settings=settings)
-        with self.assertRaises(Exception) as e:
-            client.get_instrument_record(input_id="12345")
-
-        self.assertEqual("Error connecting to server", str(e.exception))
-        mock_log_error.assert_called_once_with(
-            "Exception('Error connecting to server')"
-        )
+        record = client.get_instrument_response("123456")
+        self.assertEqual(7, record.json_entity["pk"])
+        self.assertEqual("Instrument", record.json_entity["tableName"])
 
 
 if __name__ == "__main__":

@@ -2,10 +2,10 @@
 
 import os
 
-from aind_metadata_mapper.bergamo.session import BergamoEtl
-from aind_metadata_mapper.bergamo.session import (
-    JobSettings as BergamoJobSettings,
-)
+# from aind_metadata_mapper.bergamo.session import BergamoEtl
+# from aind_metadata_mapper.bergamo.session import (
+#     JobSettings as BergamoJobSettings,
+# )
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
@@ -15,7 +15,7 @@ from aind_metadata_service.labtracks.client import (
     LabTracksClient,
     LabTracksSettings,
 )
-from aind_metadata_service.response_handler import EtlResponse
+# from aind_metadata_service.response_handler import EtlResponse
 from aind_metadata_service.sharepoint.client import (
     SharePointClient,
     SharepointSettings,
@@ -92,26 +92,25 @@ tars_client = TarsClient(azure_settings=tars_settings)
 slims_client = SlimsClient(settings=slims_settings)
 
 
-@app.post("/bergamo_session/")
-async def retrieve_bergamo_session(job_settings: BergamoJobSettings):
-    """Builds a bergamo session model from the given job settings"""
-
-    etl_job = BergamoEtl(
-        job_settings=job_settings,
-    )
-    response = etl_job.run_job()
-    return EtlResponse.map_job_response(response)
+# @app.post("/bergamo_session/")
+# async def retrieve_bergamo_session(job_settings: BergamoJobSettings):
+#     """Builds a bergamo session model from the given job settings"""
+#
+#     etl_job = BergamoEtl(
+#         job_settings=job_settings,
+#     )
+#     response = etl_job.run_job()
+#     return EtlResponse.map_job_response(response)
 
 
 @app.get("/instrument/{instrument_id}")
-async def retrieve_injection_materials(instrument_id, pickle: bool = False):
+async def retrieve_instrument(instrument_id, pickle: bool = False):
     """
-    Retrieves injection materials from TARS server
+    Retrieves instrument from slims
     Returns pickled data if URL parameter pickle=True, else returns json
     """
-    slims_response = slims_client.get_instrument_record(instrument_id)
-    mapper = SlimsResponseHandler(record=slims_response)
-    model_response = mapper.get_instrument_model_response()
+    slims_response = slims_client.get_instrument_response(instrument_id)
+    model_response = slims_client.get_instrument_model_response(slims_response)
     if pickle:
         return model_response.map_to_pickled_response()
     else:
