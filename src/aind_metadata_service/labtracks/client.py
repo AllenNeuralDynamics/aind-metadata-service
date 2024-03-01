@@ -125,12 +125,13 @@ class LabTracksClient:
         Parameters
         ----------
         subject_id: str
+            This is the id in the LabTracks ANIMALS_COMMON table
         """
         try:
-            query = LabTracksQueries.subject_from_subject_id(subject_id)
+            query = LabTracksQueries.subject_from_subject_id()
             session = self.create_session()
             cursor = session.cursor()
-            cursor.execute(query)
+            cursor.execute(query, subject_id)
             column_names = cursor.description
             columns = [column[0].lower() for column in column_names]
             fetched_rows = cursor.fetchall()
@@ -154,12 +155,13 @@ class LabTracksClient:
         Parameters
         ----------
         subject_id: str
+            This is the id in the LabTracks Task_Set table
         """
         try:
-            query = LabTracksQueries.procedures_from_subject_id(subject_id)
+            query = LabTracksQueries.procedures_from_subject_id()
             session = self.create_session()
             cursor = session.cursor()
-            cursor.execute(query)
+            cursor.execute(query, subject_id)
             column_names = cursor.description
             columns = [column[0].lower() for column in column_names]
             fetched_rows = cursor.fetchall()

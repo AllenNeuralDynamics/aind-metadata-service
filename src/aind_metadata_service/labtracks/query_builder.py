@@ -39,14 +39,10 @@ class LabTracksQueries:
     """Class to hold sql query strings for LabTracks"""
 
     @staticmethod
-    def procedures_from_subject_id(subject_id: str) -> str:
+    def procedures_from_subject_id() -> str:
         """
-        Retrieves the information to populate metadata about subjects.
-
-        Parameters
-        ----------
-        subject_id : str
-            This is the id in the LabTracks Task_Set table
+        Retrieves the information to populate metadata about procedures.
+        Uses ? as a placeholder for the subject_id.
 
         Returns
         -------
@@ -77,18 +73,14 @@ class LabTracksQueries:
             "    ON TS.TASK_TYPE_ID = TT.ID"
             "    INNER JOIN ACUC_PROTOCOL AP "
             "    ON TS.ACUC_LINK_ID = AP.LINK_INDEX"
-            f" WHERE AC.ID={subject_id};"
+            f" WHERE AC.ID=?;"
         )
 
     @staticmethod
-    def subject_from_subject_id(subject_id: str) -> str:
+    def subject_from_subject_id() -> str:
         """
         Retrieves the information to populate metadata about subjects.
-
-        Parameters
-        ----------
-        subject_id : str
-            This is the id in the LabTracks ANIMALS_COMMON table
+        Uses ? as a placeholder for the subject_id.
 
         Returns
         -------
@@ -126,5 +118,5 @@ class LabTracksQueries:
             "    ON AC.GROUP_ID = G.ID"
             "    LEFT OUTER JOIN GROUPS "
             "    ON MATERNAL.GROUP_ID = GROUPS.ID"
-            f" WHERE AC.ID={subject_id};"
+            " WHERE AC.ID = ?;"
         )
