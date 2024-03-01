@@ -73,7 +73,7 @@ class LabTracksQueries:
             "    ON TS.TASK_TYPE_ID = TT.ID"
             "    INNER JOIN ACUC_PROTOCOL AP "
             "    ON TS.ACUC_LINK_ID = AP.LINK_INDEX"
-            f" WHERE AC.ID=?;"
+            " WHERE AC.ID = ?;"
         )
 
     @staticmethod
