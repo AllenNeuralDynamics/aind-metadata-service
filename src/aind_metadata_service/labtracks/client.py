@@ -127,6 +127,9 @@ class LabTracksClient:
         subject_id: str
             This is the id in the LabTracks ANIMALS_COMMON table
         """
+        if not subject_id.isalnum():
+            # TODO: check if we want to use a new invalid_input_error_response
+            return ModelResponse.no_data_found_error_response()
         try:
             query = LabTracksQueries.subject_from_subject_id()
             session = self.create_session()
@@ -157,6 +160,9 @@ class LabTracksClient:
         subject_id: str
             This is the id in the LabTracks Task_Set table
         """
+        if not subject_id.isalnum():
+            # TODO: check if we want to use a new invalid_input_error_response
+            return ModelResponse.no_data_found_error_response()
         try:
             query = LabTracksQueries.procedures_from_subject_id()
             session = self.create_session()
