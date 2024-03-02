@@ -372,7 +372,10 @@ class InstrumentTableRow(SlimsTableRow):
 
 class AttachmentTableRow(SlimsTableRow):
     """A record pulled from slims Attachments Table."""
-    attm_file_date_created: Optional[int] = Field(None, title="File Creation Date", description="Timestamp in millis")
+
+    attm_file_date_created: Optional[int] = Field(
+        None, title="File Creation Date", description="Timestamp in millis"
+    )
     attp_fecm3LcdfExpression: Optional[str] = Field(None, title="expression?")
     groupPkFieldName: Optional[str] = Field(None, title="Group Field Name")
     attm_linkCount: Optional[int] = Field(None, title="Link Count")
@@ -384,21 +387,33 @@ class AttachmentTableRow(SlimsTableRow):
     attm_isDirectory: Optional[bool] = Field(None, title="Is directory")
     attp_upload_to_Ecm3: Optional[bool] = Field(None, title="Upload to Ecm3")
     assignedGroupPk: Optional[str] = Field(None, title="Assigned groupPk")
-    rslt_cf_instrumentJson_display: Optional[str] = Field(None, title="Instrument json display")
+    rslt_cf_instrumentJson_display: Optional[str] = Field(
+        None, title="Instrument json display"
+    )
     attm_fk_user: Optional[str] = Field(None, title="User")
     assignedUserPk: Optional[str] = Field(None, title="Assigned user")
     attm_analysisRole: Optional[str] = Field(None, title="Analysis role")
     attm_path: Optional[str] = Field(None, title="Attachment Path")
     attm_isRemote: Optional[bool] = Field(None, title="Is Remote")
-    attm_currentlyLinked: Optional[bool] = Field(None, title="Currently Linked")
-    attm_createdOn: Optional[int] = Field(None, title="Created On Date", description="Timestamp in millis")
+    attm_currentlyLinked: Optional[bool] = Field(
+        None, title="Currently Linked"
+    )
+    attm_createdOn: Optional[int] = Field(
+        None, title="Created On Date", description="Timestamp in millis"
+    )
     attm_file_filename: Optional[str] = Field(None, title=" File filename")
-    attm_modifiedOn: Optional[int] = Field(None, title="Modified On Date", description="Timestamp in millis")
+    attm_modifiedOn: Optional[int] = Field(
+        None, title="Modified On Date", description="Timestamp in millis"
+    )
     userPkFieldName: Optional[str] = Field(None, title="User field name")
     attm_fk_group: Optional[str] = Field(None, title="Group")
-    attm_uniqueIdentifier: Optional[str] = Field(None, title="Unique identifier")
+    attm_uniqueIdentifier: Optional[str] = Field(
+        None, title="Unique identifier"
+    )
     attm_pk: Optional[int] = Field(None, title="Count")
-    attm_fk_attachmentType: Optional[str] = Field(None, title="Attachment type")
+    attm_fk_attachmentType: Optional[str] = Field(
+        None, title="Attachment type"
+    )
     attm_modifiedBy: Optional[str] = Field(None, title="Modified by")
     attm_ecm3Url: Optional[str] = Field(None, title="Ecm3 url")
     user_userName: Optional[str] = Field(None, title="User name")
@@ -407,6 +422,3 @@ class AttachmentTableRow(SlimsTableRow):
     attm_file_filesize: Optional[int] = Field(None, title="File size")
     grps_groupName: Optional[str] = Field(None, title="Group name")
     attm_createdBy: Optional[str] = Field(None, title="Created by")
-
-
-

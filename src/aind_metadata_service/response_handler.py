@@ -5,6 +5,7 @@ import pickle
 from typing import Generic, List, Optional, TypeVar, Union
 
 from aind_data_schema.core.data_description import Funding
+from aind_data_schema.core.instrument import Instrument
 from aind_data_schema.core.procedures import (
     NonViralMaterial,
     Perfusion,
@@ -13,7 +14,6 @@ from aind_data_schema.core.procedures import (
     ViralMaterial,
 )
 from aind_data_schema.core.subject import Subject
-from aind_data_schema.core.instrument import Instrument
 from aind_metadata_mapper.core import JobResponse
 from fastapi import Response
 from fastapi.encoders import jsonable_encoder
@@ -33,7 +33,7 @@ T = TypeVar(
     ViralMaterial,
     NonViralMaterial,
     ProtocolInformation,
-    Instrument
+    Instrument,
 )
 
 

@@ -6,11 +6,10 @@ import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import aind_metadata_service.slims.client
-from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 from aind_data_schema.core.instrument import Instrument
 from slims.internal import Record
 
+from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 from aind_metadata_service.slims.client import SlimsClient, SlimsSettings
 
 TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / ".."
@@ -66,9 +65,6 @@ class TestSlimsClient(unittest.IsolatedAsyncioTestCase):
         )
         cls.client = SlimsClient(settings=settings)
         cls.example_record = record_object
-        cls.response = MagicMock()
-        cls.attachment_response = MagicMock()
-        cls.attached_file_response = MagicMock()
 
     @patch("slims.slims.Slims.fetch")
     def test_slims_fetch_content_success(self, mock_fetch: MagicMock):
@@ -108,7 +104,9 @@ class TestSlimsClient(unittest.IsolatedAsyncioTestCase):
         self.client._get_response = MagicMock()
         self.client.get_record_response(table_name, criteria)
 
-        self.client._get_response.assert_called_once_with(expected_url, body=expected_body)
+        self.client._get_response.assert_called_once_with(
+            expected_url, body=expected_body
+        )
 
     def test_get_record_response_with_criteria(self):
         """Tests that record is retrieved with criteria as expected."""
@@ -119,14 +117,16 @@ class TestSlimsClient(unittest.IsolatedAsyncioTestCase):
             "sortBy": None,
             "startRow": None,
             "endRow": None,
-            "criteria": {"field": "value"}
+            "criteria": {"field": "value"},
         }
         expected_url = table_name + "/advanced"
 
         self.client._get_response = MagicMock()
         self.client.get_record_response(table_name, criteria)
 
-        self.client._get_response.assert_called_once_with(expected_url, body=expected_body)
+        self.client._get_response.assert_called_once_with(
+            expected_url, body=expected_body
+        )
 
     def test_get_attachment_response(self):
         """Tests that attachment response is retrieved as expected."""
@@ -138,23 +138,49 @@ class TestSlimsClient(unittest.IsolatedAsyncioTestCase):
 
         self.client._get_response.assert_called_once_with(expected_url)
 
-    @patch('aind_metadata_service.slims.client.SlimsClient.get_attachment_response')
-    @patch('aind_metadata_service.slims.client.SlimsClient.get_file_response')
-    @patch('aind_metadata_service.slims.client.SlimsClient._is_instrument_model')
-    def test_extract_models_from_response(self, mock_is_instrument, mock_get_file_response, mock_get_attachment_response):
+    def test_get_file_response(self):
+        """Tests that file response is retrieved as expected."""
+        entity = {"tableName": "example_table", "pk": 123}
+        expected_url = "repo/123"
+        self.client._get_response = MagicMock()
+        self.client.get_file_response(entity)
+
+        self.client._get_response.assert_called_once_with(expected_url)
+    @patch(
+        "aind_metadata_service.slims.client.SlimsClient."
+        "get_attachment_response"
+    )
+    @patch("aind_metadata_service.slims.client.SlimsClient.get_file_response")
+    @patch(
+        "aind_metadata_service.slims.client.SlimsClient._is_instrument_model"
+    )
+    def test_extract_models_from_response(
+        self,
+        mock_is_instrument,
+        mock_get_file_response,
+        mock_get_attachment_response,
+    ):
         """Tests that aind models are extracted as expected."""
         mock_response = MagicMock()
-        mock_response.json.return_value = {"entities": [self.instrument_json_entity]}
+        mock_response.json.return_value = {
+            "entities": [self.instrument_json_entity]
+        }
         mock_get_attachment_response.return_value.status_code = 200
-        mock_get_attachment_response.return_value.json.return_value = {"entities": [self.attachment_json_entity]}
+        mock_get_attachment_response.return_value.json.return_value = {
+            "entities": [self.attachment_json_entity]
+        }
         mock_get_file_response.return_value.status_code = 200
-        mock_get_file_response.return_value.json.return_value = self.instrument_json
+        mock_get_file_response.return_value.json.return_value = (
+            self.instrument_json
+        )
         mock_is_instrument.return_value = True
 
         models = self.client.extract_models_from_response(mock_response)
         self.assertEqual(len(models), 1)
         self.assertEqual(models[0].instrument_id, "SmartSPIM2-2")
-        mock_get_attachment_response.assert_called_with(self.instrument_json_entity)
+        mock_get_attachment_response.assert_called_with(
+            self.instrument_json_entity
+        )
         mock_get_file_response.assert_called_with(self.attachment_json_entity)
 
     def test_is_instrument_model(self):
@@ -162,27 +188,51 @@ class TestSlimsClient(unittest.IsolatedAsyncioTestCase):
         attached_file = MagicMock()
         attached_file.json.return_value = self.instrument_json
         attached_file.headers = {
-            'content-disposition': 'attachment; filename="some_instrument.json"',
-            'Content-Type': 'application/json'
+            "content-disposition": "attachment; "
+            'filename="some_instrument.json"',
+            "Content-Type": "application/json",
         }
         self.assertTrue(self.client._is_instrument_model(attached_file))
 
-    @patch('aind_metadata_service.slims.client.SlimsClient.get_record_response')
-    @patch('aind_metadata_service.slims.client.SlimsClient.extract_models_from_response')
-    def test_get_model_response_success(self, mock_extract_models_from_response, mock_get_record_response):
+    @patch(
+        "aind_metadata_service.slims.client.SlimsClient.get_record_response"
+    )
+    @patch(
+        "aind_metadata_service.slims.client.SlimsClient."
+        "extract_models_from_response"
+    )
+    def test_get_model_response_success(
+        self, mock_extract_models_from_response, mock_get_record_response
+    ):
+        """Tests that ModelResponse is retrieved successfully."""
         input_id = "12345"
         mock_response = MagicMock()
         mock_get_record_response.return_value = mock_response
 
         # Test case: Successful response
         mock_response.status_code = 200
-        mock_extract_models_from_response.return_value = [Instrument.model_construct(instrument_id="12345")]
-        expected_model_response = ModelResponse(aind_models=[Instrument.model_construct(instrument_id="12345")], status_code=StatusCodes.DB_RESPONDED)
-        self.assertEqual(self.client.get_model_response(input_id).status_code, expected_model_response.status_code)
-        self.assertEqual(self.client.get_model_response(input_id).aind_models, expected_model_response.aind_models)
+        mock_extract_models_from_response.return_value = [
+            Instrument.model_construct(instrument_id="12345")
+        ]
+        expected_model_response = ModelResponse(
+            aind_models=[Instrument.model_construct(instrument_id="12345")],
+            status_code=StatusCodes.DB_RESPONDED,
+        )
+        self.assertEqual(
+            self.client.get_model_response(input_id).status_code,
+            expected_model_response.status_code,
+        )
+        self.assertEqual(
+            self.client.get_model_response(input_id).aind_models,
+            expected_model_response.aind_models,
+        )
 
-    @patch('aind_metadata_service.slims.client.SlimsClient.get_record_response')
-    def test_get_model_response_connection_error(self, mock_get_record_response):
+    @patch(
+        "aind_metadata_service.slims.client.SlimsClient.get_record_response"
+    )
+    def test_get_model_response_connection_error(
+        self, mock_get_record_response
+    ):
         """Test case: Connection error"""
         mock_response = MagicMock()
         mock_response.status_code = 401
@@ -191,20 +241,112 @@ class TestSlimsClient(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.status_code, StatusCodes.CONNECTION_ERROR)
         self.assertEqual(response.aind_models, [])
 
-    @patch('aind_metadata_service.slims.client.SlimsClient.get_record_response')
-    def test_get_model_response_internal_server_error(self, mock_get_record_response):
+    @patch(
+        "aind_metadata_service.slims.client.SlimsClient.get_record_response"
+    )
+    def test_get_model_response_internal_server_error(
+        self, mock_get_record_response
+    ):
         """Test case: Internal Server error"""
         mock_response = MagicMock()
         mock_response.status_code = 500
         mock_get_record_response.return_value = mock_response
         response = self.client.get_model_response("12345")
-        self.assertEqual(response.status_code, StatusCodes.INTERNAL_SERVER_ERROR)
+        self.assertEqual(
+            response.status_code, StatusCodes.INTERNAL_SERVER_ERROR
+        )
         self.assertEqual(response.aind_models, [])
 
-        # # Test case: Exception during execution
-        # mock_get_record_response.side_effect = Exception("Some error")
-        # expected_exception_response = ModelResponse.internal_server_error_response()
-        # self.assertEqual(self.client.get_model_response(input_id), expected_exception_response)
+    @patch(
+        "aind_metadata_service.slims.client.SlimsClient.get_record_response"
+    )
+    def test_get_model_response_exception(self, mock_get_record_response):
+        """Test case: Exception during execution"""
+        mock_get_record_response.side_effect = Exception("Some error")
+        self.assertEqual(
+            self.client.get_model_response("12345").status_code,
+            StatusCodes.INTERNAL_SERVER_ERROR,
+        )
+
+    @patch('aind_metadata_service.slims.client.requests.get')
+    def test_get_response_with_oauth(self, mock_requests_get):
+        """Tests get response with authentication"""
+        url = "https://example.com"
+        body = {"key": "value"}
+        slims_api = MagicMock()
+        slims_api.url = "https://example.com"
+        slims_api.oauth = True
+        slims_api.oauth_session.get.return_value.status_code = 200
+        mock_response = MagicMock()
+        mock_requests_get.return_value = mock_response
+
+        settings = SlimsSettings(
+            username="test-user", password="pw", host="slims-host", db="test"
+        )
+        client = SlimsClient(settings)
+        response = client._get_response(url, body, slims_api)
+
+        slims_api.oauth_session.get.assert_called_once_with(
+            url,
+            headers=slims_api._headers(),
+            json=body,
+            **slims_api.request_params,
+        )
+        self.assertEqual(response, slims_api.oauth_session.get.return_value)
+
+    @patch('aind_metadata_service.slims.client.requests.get')
+    def test_get_response_with_oauth_url(self, mock_requests_get):
+        """Tests get response with different url."""
+        url = "other_url"
+        body = {"key": "value"}
+        slims_api = MagicMock()
+        slims_api.url = "https://example.com"
+        slims_api.oauth = True
+        slims_api.oauth_session.get.return_value.status_code = 200
+        mock_response = MagicMock()
+        mock_requests_get.return_value = mock_response
+
+        settings = SlimsSettings(
+            username="test-user", password="pw", host="slims-host", db="test"
+        )
+        client = SlimsClient(settings)
+        response = client._get_response(url, body, slims_api)
+
+        slims_api.oauth_session.get.assert_called_once_with(
+            slims_api.url + url,
+            headers=slims_api._headers(),
+            json=body,
+            **slims_api.request_params,
+        )
+        self.assertEqual(response, slims_api.oauth_session.get.return_value)
+
+    @patch('aind_metadata_service.slims.client.requests.get')
+    def test_get_response_without_oauth(self, mock_requests_get):
+        """Tests get response without authentication"""
+        url = "https://example.com"
+        body = {"key": "value"}
+        slims_api = MagicMock()
+        slims_api.url = "https://example.com"
+        slims_api.oauth = False
+        slims_api.username = "username"
+        slims_api.password = "password"
+        mock_response = MagicMock()
+        mock_requests_get.return_value = mock_response
+
+        settings = SlimsSettings(
+            username="test-user", password="pw", host="slims-host", db="test"
+        )
+        client = SlimsClient(settings)
+        response = client._get_response(url, body, slims_api)
+
+        mock_requests_get.assert_called_once_with(
+            url,
+            auth=(slims_api.username, slims_api.password),
+            headers=slims_api._headers(),
+            json=body,
+            **slims_api.request_params,
+        )
+        self.assertEqual(response, mock_response)
 
 
 if __name__ == "__main__":
