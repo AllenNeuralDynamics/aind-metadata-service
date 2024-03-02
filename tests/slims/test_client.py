@@ -6,6 +6,9 @@ import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import aind_metadata_service.slims.client
+from aind_metadata_service.response_handler import ModelResponse, StatusCodes
+from aind_data_schema.core.instrument import Instrument
 from slims.internal import Record
 
 from aind_metadata_service.slims.client import SlimsClient, SlimsSettings
@@ -49,28 +52,31 @@ class TestSlimsClient(unittest.IsolatedAsyncioTestCase):
         with open(f"{EXAMPLE_PATH}/json_entity.json", "r") as f:
             json_entity = json.load(f)
         with open(f"{EXAMPLE_PATH}/instrument_json_entity.json", "r") as f:
-            instrument_json_entity = json.load(f)
+            cls.instrument_json_entity = json.load(f)
+        with open(f"{EXAMPLE_PATH}/attachment_json_entity.json", "r") as f:
+            cls.attachment_json_entity = json.load(f)
+        with open(f"{EXAMPLE_PATH}/instrument.json", "r") as f:
+            cls.instrument_json = json.load(f)
         # Turning off type check on slims_api argument
         # noinspection PyTypeChecker
         record_object = Record(json_entity=json_entity, slims_api=None)
-        instrument_record_object = Record(
-            json_entity=instrument_json_entity, slims_api=None
+
+        settings = SlimsSettings(
+            username="test-user", password="pw", host="slims-host", db="test"
         )
+        cls.client = SlimsClient(settings=settings)
         cls.example_record = record_object
-        cls.example_instrument_record = instrument_record_object
+        cls.response = MagicMock()
+        cls.attachment_response = MagicMock()
+        cls.attached_file_response = MagicMock()
 
     @patch("slims.slims.Slims.fetch")
     def test_slims_fetch_content_success(self, mock_fetch: MagicMock):
         """Tests successful record return response"""
         mock_fetch.return_value = [self.example_record]
-        settings = SlimsSettings(
-            username="test-user", password="pw", host="slims-host", db="test"
-        )
-        client = SlimsClient(settings=settings)
-        record = client.get_record("123456")
+        record = self.client.get_content_record("123456")
         self.assertEqual(1, record.json_entity["pk"])
         self.assertEqual("Content", record.json_entity["tableName"])
-
 
     @patch("slims.slims.Slims.fetch")
     @patch("logging.error")
@@ -81,29 +87,124 @@ class TestSlimsClient(unittest.IsolatedAsyncioTestCase):
         mock_fetch.side_effect = MagicMock(
             side_effect=Exception("Error connecting to server")
         )
-        settings = SlimsSettings(
-            username="test-user", password="pw", host="slims-host", db="test"
-        )
-        client = SlimsClient(settings=settings)
         with self.assertRaises(Exception) as e:
-            client.get_content_record(subject_id="12345")
+            self.client.get_content_record(subject_id="12345")
 
         self.assertEqual("Error connecting to server", str(e.exception))
         mock_log_error.assert_called_once_with(
             "Exception('Error connecting to server')"
         )
 
-    @patch("slims.slims.Slims.fetch")
-    def test_slims_fetch_instrument_success(self, mock_fetch: MagicMock):
-        """Tests successful instrument record return response"""
-        mock_fetch.return_value = [self.example_instrument_record]
-        settings = SlimsSettings(
-            username="test-user", password="pw", host="slims-host", db="test"
-        )
-        client = SlimsClient(settings=settings)
-        record = client.get_instrument_response("123456")
-        self.assertEqual(7, record.json_entity["pk"])
-        self.assertEqual("Instrument", record.json_entity["tableName"])
+    def test_get_record_response_no_criteria(self):
+        """Tests that record is retrieved without criteria as expected."""
+        table_name = "example_table"
+        criteria = None
+        expected_body = {
+            "sortBy": None,
+            "startRow": None,
+            "endRow": None,
+        }
+        expected_url = table_name + "/advanced"
+        self.client._get_response = MagicMock()
+        self.client.get_record_response(table_name, criteria)
+
+        self.client._get_response.assert_called_once_with(expected_url, body=expected_body)
+
+    def test_get_record_response_with_criteria(self):
+        """Tests that record is retrieved with criteria as expected."""
+        table_name = "example_table"
+        criteria = MagicMock()
+        criteria.to_dict.return_value = {"field": "value"}
+        expected_body = {
+            "sortBy": None,
+            "startRow": None,
+            "endRow": None,
+            "criteria": {"field": "value"}
+        }
+        expected_url = table_name + "/advanced"
+
+        self.client._get_response = MagicMock()
+        self.client.get_record_response(table_name, criteria)
+
+        self.client._get_response.assert_called_once_with(expected_url, body=expected_body)
+
+    def test_get_attachment_response(self):
+        """Tests that attachment response is retrieved as expected."""
+        entity = {"tableName": "example_table", "pk": 123}
+        expected_url = "attachment/example_table/123"
+
+        self.client._get_response = MagicMock()
+        self.client.get_attachment_response(entity)
+
+        self.client._get_response.assert_called_once_with(expected_url)
+
+    @patch('aind_metadata_service.slims.client.SlimsClient.get_attachment_response')
+    @patch('aind_metadata_service.slims.client.SlimsClient.get_file_response')
+    @patch('aind_metadata_service.slims.client.SlimsClient._is_instrument_model')
+    def test_extract_models_from_response(self, mock_is_instrument, mock_get_file_response, mock_get_attachment_response):
+        """Tests that aind models are extracted as expected."""
+        mock_response = MagicMock()
+        mock_response.json.return_value = {"entities": [self.instrument_json_entity]}
+        mock_get_attachment_response.return_value.status_code = 200
+        mock_get_attachment_response.return_value.json.return_value = {"entities": [self.attachment_json_entity]}
+        mock_get_file_response.return_value.status_code = 200
+        mock_get_file_response.return_value.json.return_value = self.instrument_json
+        mock_is_instrument.return_value = True
+
+        models = self.client.extract_models_from_response(mock_response)
+        self.assertEqual(len(models), 1)
+        self.assertEqual(models[0].instrument_id, "SmartSPIM2-2")
+        mock_get_attachment_response.assert_called_with(self.instrument_json_entity)
+        mock_get_file_response.assert_called_with(self.attachment_json_entity)
+
+    def test_is_instrument_model(self):
+        """Tests instrument model check."""
+        attached_file = MagicMock()
+        attached_file.json.return_value = self.instrument_json
+        attached_file.headers = {
+            'content-disposition': 'attachment; filename="some_instrument.json"',
+            'Content-Type': 'application/json'
+        }
+        self.assertTrue(self.client._is_instrument_model(attached_file))
+
+    @patch('aind_metadata_service.slims.client.SlimsClient.get_record_response')
+    @patch('aind_metadata_service.slims.client.SlimsClient.extract_models_from_response')
+    def test_get_model_response_success(self, mock_extract_models_from_response, mock_get_record_response):
+        input_id = "12345"
+        mock_response = MagicMock()
+        mock_get_record_response.return_value = mock_response
+
+        # Test case: Successful response
+        mock_response.status_code = 200
+        mock_extract_models_from_response.return_value = [Instrument.model_construct(instrument_id="12345")]
+        expected_model_response = ModelResponse(aind_models=[Instrument.model_construct(instrument_id="12345")], status_code=StatusCodes.DB_RESPONDED)
+        self.assertEqual(self.client.get_model_response(input_id).status_code, expected_model_response.status_code)
+        self.assertEqual(self.client.get_model_response(input_id).aind_models, expected_model_response.aind_models)
+
+    @patch('aind_metadata_service.slims.client.SlimsClient.get_record_response')
+    def test_get_model_response_connection_error(self, mock_get_record_response):
+        """Test case: Connection error"""
+        mock_response = MagicMock()
+        mock_response.status_code = 401
+        mock_get_record_response.return_value = mock_response
+        response = self.client.get_model_response("12345")
+        self.assertEqual(response.status_code, StatusCodes.CONNECTION_ERROR)
+        self.assertEqual(response.aind_models, [])
+
+    @patch('aind_metadata_service.slims.client.SlimsClient.get_record_response')
+    def test_get_model_response_internal_server_error(self, mock_get_record_response):
+        """Test case: Internal Server error"""
+        mock_response = MagicMock()
+        mock_response.status_code = 500
+        mock_get_record_response.return_value = mock_response
+        response = self.client.get_model_response("12345")
+        self.assertEqual(response.status_code, StatusCodes.INTERNAL_SERVER_ERROR)
+        self.assertEqual(response.aind_models, [])
+
+        # # Test case: Exception during execution
+        # mock_get_record_response.side_effect = Exception("Some error")
+        # expected_exception_response = ModelResponse.internal_server_error_response()
+        # self.assertEqual(self.client.get_model_response(input_id), expected_exception_response)
 
 
 if __name__ == "__main__":

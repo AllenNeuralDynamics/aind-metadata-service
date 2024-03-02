@@ -9,7 +9,7 @@ from slims.internal import Record
 from slims.slims import Slims
 
 from aind_metadata_service.slims.models import ContentsTableRow
-from typing import Any
+from typing import Any, List
 from aind_metadata_service.response_handler import ModelResponse
 from requests.models import Response
 from aind_data_schema.core.instrument import Instrument
@@ -74,11 +74,9 @@ class SlimsClient:
             logging.error(repr(e))
             raise Exception(e)
 
-    def _get_response(self, url: str, body: dict[str, Any] = None) -> Response:
+    def _get_response(self, url: str, body: dict[str, Any] = None, slims_api=None) -> Response:
         """Method to get some response from slims"""
-        slims_api = self.client.slims_api
-        if (slims_api.url.startswith('https') and url.startswith('http') and url[4:].startswith(slims_api.url[5:])):
-            url = 'https' + url[4:]
+        slims_api = slims_api or self.client.slims_api
         if not url.startswith(slims_api.url):
             url = slims_api.url + url
 
@@ -94,7 +92,7 @@ class SlimsClient:
                                     **slims_api.request_params)
         return response
 
-    def get_record_response(self, table_name, criteria) -> Response:
+    def get_record_response(self, table_name: str, criteria: Any) -> Response:
         """Fetches the response for a record in a SLIMS table."""
         body: dict[str, Any] = {
             "sortBy": None,
@@ -104,67 +102,53 @@ class SlimsClient:
         if criteria:
             body["criteria"] = criteria.to_dict()
 
-        url = table_name + "/advanced"
+        url = f"{table_name}/advanced"
         return self._get_response(url, body=body)
 
-    def get_attachment_response(self, entity) -> Response:
+    def get_attachment_response(self, entity: dict[str, Any]) -> Response:
         """Fetches the response for attachments related to a record in a SLIMS table."""
         return self._get_response(
-            "attachment/" + entity["tableName"] + "/" + str(entity["pk"])
+            f"attachment/{entity['tableName']}/{entity['pk']}"
         )
-        # return self.client.slims_api.get("repo/" + str(entity["pk"]))
 
-    def get_instrument_response(self, input_id):
+    def get_file_response(self, entity):
+        return self._get_response(f"repo/{entity['pk']}")
+
+    def extract_models_from_response(self, response: Response) -> List[Instrument]:
         """
-        Retrieve a response from the Instruments Table.
-        (contains info for both rigs and imaging instruments).
-        Parameters
-        ----------
-        input_id : str
-            Id to retrieve record for. Either instrument_id or rig_id.
+        Fetches Attachment from SLIMS Instrument Response and extracts
+        aind_data_schema Instrument models.
+        """
+        models = []
+        for entity in response.json().get("entities", []):
+            attachment_response = self.get_attachment_response(entity)
+            if attachment_response.status_code == 200:
+                for att_entity in attachment_response.json().get("entities", []):
+                    file_response = self.get_file_response(att_entity)
+                    if file_response.status_code == 200 and self._is_instrument_model(file_response):
+                        inst = Instrument.model_construct(**file_response.json())
+                        models.append(inst)
+        return models
 
-        Returns
-        -------
-        Record
-          A single slims Record
+    @staticmethod
+    def _is_instrument_model(file: Response) -> bool:
+        """Checks whether file is an instrument.json."""
+        return "instrument" in file.headers.get('content-disposition', '') and \
+               'application/json' in file.headers.get('Content-Type', '')
+
+    def get_model_response(self, input_id) -> ModelResponse:
+        """
+        Extracts models from SLIMS Instrument Response and creates ModelResponse.
         """
         try:
-            instrument_response = self.get_record_response(
-                "Instrument",
-                equals(
-                    "nstr_name",
-                    input_id,
-                )
-            )
-            return instrument_response
-
-        # handles any errors in getting a response from slims
+            response = self.get_record_response("Instrument", equals("nstr_name", input_id))
+            if response.status_code == 200:
+                models = self.extract_models_from_response(response)
+                return ModelResponse(aind_models=models, status_code=StatusCodes.DB_RESPONDED)
+            elif response.status_code == 401:
+                return ModelResponse.connection_error_response()
+            else:
+                return ModelResponse.internal_server_error_response()
         except Exception as e:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
-
-    def get_instrument_model_response(self, response):
-        """"""
-        if response.status_code == 200:
-            models = []
-            for entity in response.json()["entities"]:
-                attachment_response = self.get_attachment_response(entity)
-                if attachment_response.status_code == 200:
-                    for att_entity in attachment_response.json()["entities"]:
-                        # TODO: add check for json and instrument file
-                        file_content = self.client.slims_api.get("repo/" + str(att_entity["pk"]))
-                        inst = Instrument.model_construct(**file_content.json())
-                        models.append(inst)
-                elif response.status_code == 401:
-                    return ModelResponse.connection_error_response()
-                else:
-                    return ModelResponse.internal_server_error_response()
-            return ModelResponse(aind_models=models, status_code=StatusCodes.DB_RESPONDED)
-        elif response.status_code == 401:
-            return ModelResponse.connection_error_response()
-        else:
-            return ModelResponse.internal_server_error_response()
-
-
-
-

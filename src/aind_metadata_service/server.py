@@ -109,8 +109,7 @@ async def retrieve_instrument(instrument_id, pickle: bool = False):
     Retrieves instrument from slims
     Returns pickled data if URL parameter pickle=True, else returns json
     """
-    slims_response = slims_client.get_instrument_response(instrument_id)
-    model_response = slims_client.get_instrument_model_response(slims_response)
+    model_response = slims_client.get_instrument_model_response(instrument_id)
     if pickle:
         return model_response.map_to_pickled_response()
     else:
