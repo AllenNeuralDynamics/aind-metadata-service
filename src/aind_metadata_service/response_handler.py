@@ -5,6 +5,7 @@ import pickle
 from typing import Generic, List, Optional, TypeVar, Union
 
 from aind_data_schema.core.data_description import Funding
+from aind_data_schema.core.instrument import Instrument
 from aind_data_schema.core.procedures import (
     NonViralMaterial,
     Perfusion,
@@ -32,6 +33,7 @@ T = TypeVar(
     ViralMaterial,
     NonViralMaterial,
     ProtocolInformation,
+    Instrument,
 )
 
 
