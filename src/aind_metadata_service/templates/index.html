@@ -2,6 +2,7 @@
 <html>
 
 <head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
   <meta charset="UTF-8">
   <title>AIND Metadata Service</title>
   <style>
@@ -41,6 +42,21 @@
         background-color: #3f51b5;
       }
     }
+    #message.success {
+      color: green;
+    }
+    #message.error {
+      color: red;
+    }
+    #json {
+      padding: 10px;
+      border: 1px solid #dddddd;
+      border-radius: 6px;
+      background-color: #f5f5f5;
+      max-width: 700px;
+      max-height: 400px;
+      overflow: auto;
+    }
   </style>
 </head>
 
@@ -57,12 +73,52 @@
     </div>
   </div>
   <div>
-    <button id="search" type="button">Search</button>
+    <button id="search" type="button" onclick="querySubject()">Search</button>
   </div>
   <div>
     <div id="message"></div>
     <pre id="json" hidden></pre>
   </div>
+
+  <script>
+    const msgTypes = {
+      "searchPending": "Searching.... Please do not refresh or re-submit.",
+      "searchSuccess": "Search returned success.",
+      "searchError": "Search returned errors."
+    }
+    setMessage = function (msgType) {
+      $("#message").removeClass("success");
+      $("#message").removeClass("error");
+      $("#message").html(msgType);
+      if (msgType == msgTypes.searchSuccess) {
+        $("#message").addClass("success");
+      } else if (msgType == msgTypes.searchError) {
+        $("#message").addClass("error");
+      }
+    };
+    querySubject = function () {
+      let subjectID = $("#subject-id").val();
+      $.ajax({
+        url: `/subject/${subjectID}`,
+        type: "GET",
+        beforeSend: function () {
+          setMessage(msgTypes.searchPending);
+          $("#json").html("");
+          $("#json").hide();
+        },
+        success: function (data) {
+          setMessage(msgTypes.searchSuccess);
+          $("#json").show();
+          $("#json").html(JSON.stringify(data, null, 2));
+        },
+        error: function (data) {
+          setMessage(msgTypes.searchError);
+          $("#json").show();
+          $("#json").html(JSON.stringify(data, null, 2));
+        }
+      });
+    };
+  </script>
 </body>
 
 </html>
