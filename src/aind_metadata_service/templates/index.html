@@ -7,21 +7,61 @@
   <style>
     body {
       font-family: arial, sans-serif;
-    }
-    #header {
-      background-color: #E8EAF6;
-      padding: 20px;
-      border-radius: 6px;
+      .header {
+        background-color: #E8EAF6;
+        padding: 20px;
+        border-radius: 6px;
+      }
+      .header~div, input {
+        margin: 10px;
+      }
     }
     h1 {
       color: #3F51B5;
+    }
+    input {
+      padding: 8px 20px;
+      border: 1px solid #5065df;
+      border-radius: 6px;
+      background-color: #E8EAF6;
+      &:focus {
+        outline: none;
+        border-width: 2px;
+      }
+    }
+    button {
+      border: none;
+      border-radius: 6px;
+      color: #ffffff;
+      padding: 8px 20px;
+      font-size: medium;
+      background-color: #5065df;
+      cursor: pointer;
+      &:hover {
+        background-color: #3f51b5;
+      }
     }
   </style>
 </head>
 
 <body>
-  <div id="header">
+  <div class="header">
     <h1>AIND Metadata Service</h1>
+  </div>
+  <div>
+    <h2>Subject</h2>
+    <span>Retrieve subject metadata from Labtracks server</span>
+    <div>
+      <label for="subject-id">Subject ID:</label>
+      <input type="text" id="subject-id" size="6" placeholder="subject_id" />
+    </div>
+  </div>
+  <div>
+    <button id="search" type="button">Search</button>
+  </div>
+  <div>
+    <div id="message"></div>
+    <pre id="json" hidden></pre>
   </div>
 </body>
 
