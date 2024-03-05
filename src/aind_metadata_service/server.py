@@ -12,6 +12,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from starlette.concurrency import run_in_threadpool
 
+from aind_metadata_service import __version__ as SERVICE_VERSION
 from aind_metadata_service.labtracks.client import (
     LabTracksClient,
     LabTracksSettings,
@@ -255,6 +256,7 @@ async def index(request: Request):
         context=(
             {
                 "request": request,
+                "version": SERVICE_VERSION,
             }
         ),
     )
