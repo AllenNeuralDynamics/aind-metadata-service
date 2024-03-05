@@ -6,9 +6,10 @@ from aind_metadata_mapper.bergamo.session import BergamoEtl
 from aind_metadata_mapper.bergamo.session import (
     JobSettings as BergamoJobSettings,
 )
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
+from fastapi.templating import Jinja2Templates
 from starlette.concurrency import run_in_threadpool
 
 from aind_metadata_service.labtracks.client import (
@@ -83,6 +84,11 @@ protocols_smart_sheet_client = SmartSheetClient(
 )
 
 tars_client = TarsClient(azure_settings=tars_settings)
+
+template_directory = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "templates")
+)
+templates = Jinja2Templates(directory=template_directory)
 
 
 @app.post("/bergamo_session/")
@@ -237,3 +243,18 @@ async def favicon():
     Returns the favicon
     """
     return favicon_path
+
+
+@app.get("/")
+async def index(request: Request):
+    """
+    Returns the index page from templates
+    """
+    return templates.TemplateResponse(
+        name="index.html",
+        context=(
+            {
+                "request": request,
+            }
+        ),
+    )
