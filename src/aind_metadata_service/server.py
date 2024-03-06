@@ -113,6 +113,19 @@ async def retrieve_instrument(instrument_id, pickle: bool = False):
         return model_response.map_to_json_response()
 
 
+@app.get("/rig/{rig_id}")
+async def retrieve_rig(rig_id, pickle: bool = False):
+    """
+    Retrieves rig from slims
+    Returns pickled data if URL parameter pickle=True, else returns json
+    """
+    model_response = slims_client.get_model_response(rig_id)
+    if pickle:
+        return model_response.map_to_pickled_response()
+    else:
+        return model_response.map_to_json_response()
+
+
 @app.get("/protocols/{protocol_name}")
 async def retrieve_protocols(protocol_name, pickle: bool = False):
     """Retrieves perfusion information from smartsheet"""

@@ -5,6 +5,7 @@ from typing import Any, List
 
 import requests
 from aind_data_schema.core.instrument import Instrument
+from aind_data_schema.core.rig import Rig
 from pydantic import Extra, Field, SecretStr
 from pydantic_settings import BaseSettings
 from requests.models import Response
@@ -134,11 +135,12 @@ class SlimsClient:
     ) -> List[Instrument]:
         """
         Fetches Attachment from SLIMS Instrument Response and extracts
-        aind_data_schema Instrument models.
+        aind_data_schema Instrument or Rig models.
         """
         models = []
         for entity in response.json().get("entities", []):
             attachment_response = self.get_attachment_response(entity)
+            instrument_type = self.get_instrument_type(entity)
             if attachment_response.status_code == 200:
                 for att_entity in attachment_response.json().get(
                     "entities", []
@@ -152,6 +154,15 @@ class SlimsClient:
                             **file_response.json()
                         )
                         models.append(inst)
+                    elif (
+                        file_response.status_code == 200
+                        and self._is_rig_model(file_response)
+                        and instrument_type == "Electrophysiology Rig"
+                    ):
+                        rig = Rig.model_construct(
+                            **file_response.json()
+                        )
+                        models.append(rig)
         return models
 
     @staticmethod
@@ -160,6 +171,20 @@ class SlimsClient:
         return "instrument" in file.headers.get(
             "content-disposition", ""
         ) and "application/json" in file.headers.get("Content-Type", "")
+
+    @staticmethod
+    def _is_rig_model(file: Response) -> bool:
+        """Checks whether file is an rig.json."""
+        return "rig" in file.headers.get(
+            "content-disposition", ""
+        ) and "application/json" in file.headers.get("Content-Type", "")
+
+    @staticmethod
+    def get_instrument_type(entity):
+        """"retrieves instrument type"""
+        for column in entity['columns']:
+            if column.get('name', '') == 'nstr_fk_instrumentType':
+                return column.get('displayValue', '')
 
     def get_model_response(self, input_id) -> ModelResponse:
         """
@@ -183,3 +208,4 @@ class SlimsClient:
         except Exception as e:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
+
