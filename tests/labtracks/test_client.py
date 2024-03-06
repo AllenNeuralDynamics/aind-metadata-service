@@ -197,6 +197,35 @@ class TestLabTracksClient(unittest.TestCase):
         self.assertEqual([], procedure_response1.aind_models)
 
     @patch("pyodbc.connect")
+    def test_id_is_invalid(self, _) -> None:
+        """
+        Tests that JSONResponse error is returned to client properly
+        when queried subject_id is invalid (not numeric).
+
+        Returns
+        -------
+            pass
+        """
+        invalid_subject_ids = [
+            "",
+            "1234ab",
+            "1159!7",
+            "115977; DROP TABLE ANIMALS_COMMON",
+            "115977; DROP TABLE TASK_SET; --",
+        ]
+        for id in invalid_subject_ids:
+            subject_response = self.lb_client.get_subject_info(id)
+            procedure_response = self.lb_client.get_procedures_info(id)
+            self.assertEqual(
+                StatusCodes.NO_DATA_FOUND, subject_response.status_code
+            )
+            self.assertEqual(
+                StatusCodes.NO_DATA_FOUND, procedure_response.status_code
+            )
+            self.assertEqual([], subject_response.aind_models)
+            self.assertEqual([], procedure_response.aind_models)
+
+    @patch("pyodbc.connect")
     def test_get_subject_info_success(self, mock_connect: Mock) -> None:
         """
         Tests that JSONResponse is returned to client properly
@@ -233,7 +262,7 @@ class TestLabTracksClient(unittest.TestCase):
             ]
 
             @staticmethod
-            def execute(_):
+            def execute(_, __):
                 """Mock execute"""
                 return None
 
@@ -317,7 +346,7 @@ class TestLabTracksClient(unittest.TestCase):
             ]
 
             @staticmethod
-            def execute(_):
+            def execute(_, __):
                 """Mock execute"""
                 return None
 
@@ -415,7 +444,7 @@ class TestLabTracksClient(unittest.TestCase):
             ]
 
             @staticmethod
-            def execute(_):
+            def execute(_, __):
                 """Mock execute"""
                 return None
 
