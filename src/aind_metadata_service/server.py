@@ -15,7 +15,6 @@ from aind_metadata_service.labtracks.client import (
     LabTracksClient,
     LabTracksSettings,
 )
-
 from aind_metadata_service.response_handler import EtlResponse
 from aind_metadata_service.sharepoint.client import (
     SharePointClient,
@@ -106,7 +105,20 @@ async def retrieve_instrument(instrument_id, pickle: bool = False):
     Retrieves instrument from slims
     Returns pickled data if URL parameter pickle=True, else returns json
     """
-    model_response = slims_client.get_model_response(instrument_id)
+    model_response = slims_client.get_instrument_model_response(instrument_id)
+    if pickle:
+        return model_response.map_to_pickled_response()
+    else:
+        return model_response.map_to_json_response()
+
+
+@app.get("/rig/{rig_id}")
+async def retrieve_rig(rig_id, pickle: bool = False):
+    """
+    Retrieves rig from slims
+    Returns pickled data if URL parameter pickle=True, else returns json
+    """
+    model_response = slims_client.get_rig_model_response(rig_id)
     if pickle:
         return model_response.map_to_pickled_response()
     else:
