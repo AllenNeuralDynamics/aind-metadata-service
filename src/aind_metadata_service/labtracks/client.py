@@ -127,7 +127,7 @@ class LabTracksClient:
         subject_id: str
             This is the id in the LabTracks ANIMALS_COMMON table
         """
-        if not subject_id.isalnum():
+        if not subject_id.isnumeric():
             return ModelResponse.no_data_found_error_response()
         try:
             query = LabTracksQueries.subject_from_subject_id()
@@ -159,7 +159,7 @@ class LabTracksClient:
         subject_id: str
             This is the id in the LabTracks Task_Set table
         """
-        if not subject_id.isalnum():
+        if not subject_id.isnumeric():
             return ModelResponse.no_data_found_error_response()
         try:
             query = LabTracksQueries.procedures_from_subject_id()

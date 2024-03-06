@@ -200,13 +200,15 @@ class TestLabTracksClient(unittest.TestCase):
     def test_id_is_invalid(self, _) -> None:
         """
         Tests that JSONResponse error is returned to client properly
-        when queried subject_id is invalid (not alphanumeric)
+        when queried subject_id is invalid (not numeric).
 
         Returns
         -------
             pass
         """
         invalid_subject_ids = [
+            "",
+            "1234ab",
             "1159!7",
             "115977; DROP TABLE ANIMALS_COMMON",
             "115977; DROP TABLE TASK_SET; --",
