@@ -13,6 +13,7 @@ from aind_data_schema.core.procedures import (
     Surgery,
     ViralMaterial,
 )
+from aind_data_schema.core.rig import Rig
 from aind_data_schema.core.subject import Subject
 from aind_metadata_mapper.core import JobResponse
 from fastapi import Response
@@ -34,6 +35,7 @@ T = TypeVar(
     NonViralMaterial,
     ProtocolInformation,
     Instrument,
+    Rig,
 )
 
 
