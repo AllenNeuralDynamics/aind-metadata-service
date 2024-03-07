@@ -698,6 +698,7 @@ class FolowUpIontoNumber(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
+# note: had to manually add WHC_NP and WHC_2P for entries pre 6/29/23
 class Headpost(Enum, metaclass=OptionalEnumMeta):
     """Enum class for Headpost"""
 
@@ -789,6 +790,12 @@ class ImplantIdCoverslipType(Enum, metaclass=OptionalEnumMeta):
     )
     SELECT = "Select..."
     WHC_2_P_CURVED_GLASS_WITH = "WHC 2P curved glass (with window frame)"
+    # note: options that were removed
+    N_2007 = "2007"
+    N_2008 = "2008"
+    N_2009 = "2009"
+    N_3002 = "3002"
+    N_3002_25_PURALUBESYSTANE = "3002 (25% puralube/systane)"
 
 
 class InitialIontoNumber(Enum, metaclass=OptionalEnumMeta):
@@ -1141,6 +1148,7 @@ class Limsproject(Enum, metaclass=OptionalEnumMeta):
     VISUAL_BEHAV_IOR_MULTISCO = "VisualBehavIorMultiscopeTask1G"
     VI_DEEPDLVE_DEEPSCOPE_PIE = "VIDeepdlveDeepscopePiezo"
     VI_DEEP_DIVE_EM_VOLUME = "VIDeepDiveEMVolume"
+    S200_C = "S200C"
 
 
 class Limstaskflow(Enum, metaclass=OptionalEnumMeta):
@@ -1408,6 +1416,34 @@ class Projectid(Enum, metaclass=OptionalEnumMeta):
     N_1220101420_AIND_SIEGLE = "122-01-014-20 - AIND Siegle U01 NPOpto"
     N_1229999910_NEURAL_DYNAM = "122-99-999-10 Neural Dynamics Admin (Direct)"
     RD_1028800410 = "R&D 102-88-004-10"
+    # note: options that were removed
+    N_1020400910_CAPSID_SCREE = "102-04-009-10  Capsid Screening"
+    N_1020400910_DRAVET_SYNDR = "102-04-009-10 Dravet Syndrome"
+    CVS_PRODUCTION_1028800410 = "CVS production 102-88-004-10"
+    N_1210100110_MSP_DEEP_INT = "121-01-001-10 MSP Deep Interpolation"
+    N_1210100210_MSP_BEHAVIOR = "121-01-002-10 MSP Behavioral Dynamics"
+    N_1210100310_MSP_X_AREA_F = (
+        "121-01-003-10 MSP X - Area Functional Interactions"
+    )
+    N_1210100410_MSP_VIP_REGU = (
+        "121-01-004-10 MSP VIP Regulated Stabilized Network"
+    )
+    N_1210100510_MSP_SURROUND = "121-01-005-10 MSP Surround Structure Function"
+    N_1210100610_MSP_AUTOMATI = (
+        "121-01-006-10 MSP Automatically Optimized Model"
+    )
+    N_1210100710_MSP_TASK_TRA = "121-01-007-10 MSP Task Trained Networks"
+    N_1210100810_MSP_NEURAL_E = "121-01-008-10 MSP Neural Ensemble Variability"
+    N_1210100910_MSP_BIO_REAL = "121-01-009-10 MSP Bio-Realistic Modeling"
+    N_1210101010_MSP_V1_OM_FI = "121-01-010-10 MSP V1 omFISH"
+    N_1210101110_MSP_DYNAMIC = "121-01-011-10 MSP Dynamic Routing"
+    N_1210101210_MSP_LEARNING = "121-01-012-10 MSP Learning mFISH"
+    N_1210101420_MSP_BRAIN_MO = (
+        "121-01-014-20 MSP BRAIN Model Structure Function"
+    )
+    N_1210101510_MSP_FALCONWO = "121-01-015-10 MSP Falconwood"
+    N_1210199910_MSP_CROSS_PR = "121-01-999-10 MSP Cross Program 10YP"
+    N_1210199910_MSP_CROS_001 = "121-01-999-10 MSP Cross Program  Scientific"
 
 
 class Sex(Enum, metaclass=OptionalEnumMeta):

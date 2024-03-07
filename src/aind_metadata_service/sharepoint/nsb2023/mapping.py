@@ -301,15 +301,15 @@ class MappedNSBList:
             None
             if self._nsb.behavior_type is None
             else {
-                     self._nsb.behavior_type.SELECT: None,
-                     self._nsb.behavior_type.HABITUATION_ONLY: None,
-                     self._nsb.behavior_type.HABITUATION_PASSIVE_TRAIN: None,
-                     self._nsb.behavior_type.CHANGE_DETECTION_TASK: None,
-                     self._nsb.behavior_type.DR_AUDITORY_VISUAL_TASK: None,
-                     self._nsb.behavior_type.AIND_FORAGING_TASK_WITH_O: None,
-                     self._nsb.behavior_type.AIBS_CHARACTERIZATION_ROT: None,
-                     self._nsb.behavior_type.AIND_MOTOR_OBSERVATORY_WH: None,
-                 }.get(self._nsb.behavior_type, None)
+                self._nsb.behavior_type.SELECT: None,
+                self._nsb.behavior_type.HABITUATION_ONLY: None,
+                self._nsb.behavior_type.HABITUATION_PASSIVE_TRAIN: None,
+                self._nsb.behavior_type.CHANGE_DETECTION_TASK: None,
+                self._nsb.behavior_type.DR_AUDITORY_VISUAL_TASK: None,
+                self._nsb.behavior_type.AIND_FORAGING_TASK_WITH_O: None,
+                self._nsb.behavior_type.AIBS_CHARACTERIZATION_ROT: None,
+                self._nsb.behavior_type.AIND_MOTOR_OBSERVATORY_WH: None,
+            }.get(self._nsb.behavior_type, None)
         )
 
     @property
@@ -1310,7 +1310,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_hole_3(self) -> Optional[Any]:
+    def aind_burr_hole_3(self) -> Optional[BurrHoleProcedure]:
         """Maps burr_hole_3 to aind model"""
         return (
             None
@@ -1423,7 +1423,7 @@ class MappedNSBList:
         """Maps com_durotomy to aind model"""
         return (
             None
-            if self._nsb.com_damage is None
+            if self._nsb.com_durotomy is None
             else {
                 self._nsb.com_durotomy.SELECT: None,
                 self._nsb.com_durotomy.COMPLETE: None,
@@ -1456,7 +1456,7 @@ class MappedNSBList:
         """Maps com_swelling to aind model"""
         return (
             None
-            if self._nsb.com_sinusbleed is None
+            if self._nsb.com_swelling is None
             else {
                 self._nsb.com_swelling.SELECT: None,
                 self._nsb.com_swelling.NONE: None,
@@ -1495,7 +1495,7 @@ class MappedNSBList:
         """Maps contusion to aind model"""
         return (
             None
-            if self._nsb.com_window is None
+            if self._nsb.contusion is None
             else {
                 self._nsb.contusion.SELECT: None,
                 self._nsb.contusion.NONE: None,
@@ -1511,7 +1511,7 @@ class MappedNSBList:
         """Maps craniotomy_perform_d to aind model"""
         return (
             None
-            if self._nsb.com_window is None
+            if self._nsb.craniotomy_perform_d is None
             else {
                 self._nsb.craniotomy_perform_d.INITIAL_SURGERY: During.INITIAL,
                 self._nsb.craniotomy_perform_d.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
@@ -1523,7 +1523,7 @@ class MappedNSBList:
         """Maps craniotomy_type to aind model"""
         return (
             None
-            if self._nsb.com_window is None
+            if self._nsb.craniotomy_type is None
             else {
                 self._nsb.craniotomy_type.SELECT: None,
                 self._nsb.craniotomy_type.N_3MM: CraniotomyType.THREE_MM,
@@ -1858,7 +1858,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_iacuc_protocol(self) -> Optional[Any]:
+    def aind_iacuc_protocol(self) -> Optional[str]:
         """Maps iacuc_protocol to aind model"""
         return (
             None
@@ -2000,7 +2000,7 @@ class MappedNSBList:
         return self._parse_current_str(self._nsb.inj1_current)
 
     @property
-    def aind_inj1_ionto_time(self) -> Optional[str]:
+    def aind_inj1_ionto_time(self) -> Optional[Decimal]:
         """Maps inj1_ionto_time to aind model"""
         return self._parse_length_of_time_str(self._nsb.inj1_ionto_time)
 
@@ -2899,7 +2899,7 @@ class MappedNSBList:
         """Maps procedure_t2 to aind model"""
         return (
             None
-            if self._nsb.project_id is None
+            if self._nsb.procedure_t2 is None
             else {
                 self._nsb.procedure_t2.SELECT: None,
                 self._nsb.procedure_t2.N_2_P: None,
@@ -2979,6 +2979,23 @@ class MappedNSBList:
                 self._nsb.project_id.N_1229999910_NEURAL_DYNAM: None,
                 self._nsb.project_id.AAV_PRODUCTION_1028800410: None,
                 self._nsb.project_id.RD_1028800410: None,
+                # deleted options
+                self._nsb.project_id.N_1210199910_MSP_CROSS_PR: None,
+                self._nsb.project_id.N_1210199910_MSP_CROS_001: None,
+                self._nsb.project_id.N_1210100110_MSP_DEEP_INT: None,
+                self._nsb.project_id.N_1210100210_MSP_BEHAVIOR: None,
+                self._nsb.project_id.N_1210100310_MSP_X_AREA_F: None,
+                self._nsb.project_id.N_1210100410_MSP_VIP_REGU: None,
+                self._nsb.project_id.N_1210100510_MSP_SURROUND: None,
+                self._nsb.project_id.N_1210100610_MSP_AUTOMATI: None,
+                self._nsb.project_id.N_1210100710_MSP_TASK_TRA: None,
+                self._nsb.project_id.N_1210100810_MSP_NEURAL_E: None,
+                self._nsb.project_id.N_1210100910_MSP_BIO_REAL: None,
+                self._nsb.project_id.N_1210101010_MSP_V1_OM_FI: None,
+                self._nsb.project_id.N_1210101110_MSP_DYNAMIC: None,
+                self._nsb.project_id.N_1210101210_MSP_LEARNING: None,
+                self._nsb.project_id.N_1210101420_MSP_BRAIN_MO: None,
+                self._nsb.project_id.N_1210101510_MSP_FALCONWO: None,
             }.get(self._nsb.project_id, None)
         )
 
