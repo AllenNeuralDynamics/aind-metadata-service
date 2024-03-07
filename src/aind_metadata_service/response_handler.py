@@ -35,6 +35,36 @@ T = TypeVar(
 )
 
 
+class ResponseHandler:
+
+    @staticmethod
+    def build_response(content: list, status_code: Optional[StatusCodes] = None) -> JSONResponse:
+
+        if status_code is None and not content:
+            final_status_code = StatusCodes.NO_DATA_FOUND
+        elif status_code is None and len(content) == 1:
+            final_status_code = StatusCodes.DB_RESPONDED
+        elif status_code is None and len(content) > 1:
+            final_status_code = StatusCodes.MULTIPLE_RESPONSES
+        elif status_code is None:
+            final_status_code = StatusCodes.INTERNAL_SERVER_ERROR
+        else:
+            final_status_code = status_code
+
+        return JSONResponse(
+            status_code=final_status_code.value,
+            content=json.dumps(content),
+        )
+
+    @staticmethod
+    def internal_server_error() -> JSONResponse:
+        return JSONResponse(
+            status_code=StatusCodes.INTERNAL_SERVER_ERROR.value,
+            content=None,
+        )
+
+
+
 class ModelResponse(Generic[T]):
     """Class to handle responses from backend databases. Holds pydantic models
     without serializing them to json or running validation checks."""

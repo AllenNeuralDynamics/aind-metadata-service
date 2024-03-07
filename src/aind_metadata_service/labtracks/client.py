@@ -21,34 +21,38 @@ from aind_data_schema.core.subject import (
     Subject,
 )
 from aind_data_schema.models.organizations import Organization
-from pydantic import Field, SecretStr
-from pydantic_settings import BaseSettings
+from pydantic import Field, SecretStr, AliasChoices
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from starlette.responses import JSONResponse
 
 from aind_metadata_service.labtracks.query_builder import (
     LabTracksQueries,
     SubjectQueryColumns,
     TaskSetQueryColumns,
 )
-from aind_metadata_service.response_handler import ModelResponse, StatusCodes
+from aind_metadata_service.response_handler import ModelResponse, StatusCodes, \
+    ResponseHandler
 
 
 class LabTracksSettings(BaseSettings):
     """Settings needed to connect to LabTracks Database"""
 
+    model_config = SettingsConfigDict(env_prefix="LABTRACKS_")
+
     odbc_driver: str = Field(
-        title="Driver", description="ODBC Driver used to connect to LabTracks."
+        title="Driver", description="ODBC Driver used to connect to LabTracks.", validation_alias=AliasChoices("odbc_driver", "ODBC_DRIVER", "LABTRACKS_ODBC_DRIVER")
     )
-    labtracks_server: str = Field(
+    server: str = Field(
         title="Server", description="Host address of the LabTracks Server."
     )
-    labtracks_port: str = Field(
+    port: str = Field(
         title="Port", description="Port number of the LabTracks Server"
     )
-    labtracks_database: str = Field(
+    database: str = Field(
         title="Database", description="Name of the database."
     )
-    labtracks_user: str = Field(title="User", description="Username.")
-    labtracks_password: SecretStr = Field(
+    user: str = Field(title="User", description="Username.")
+    password: SecretStr = Field(
         title="Password", description="Password."
     )
 
@@ -58,128 +62,117 @@ class LabTracksClient:
 
     def __init__(
         self,
-        driver: str,
-        server: str,
-        port: str,
-        db: str,
-        user: str,
-        password: str,
+        settings: LabTracksSettings
     ) -> None:
         """
         Initialize a client
         Parameters
         ----------
-        driver : str
-            ODBC Driver, example {FreeTDS}
-        server : str
-           Server DNS or IP
-        port : int
-           Server port
-        db : str
-           LabTracks Database name to connect to
-        user : str
-            LabTracks user
-        password : str
-            Password for LabTracks user
+        settings : LabTracksSettings
         """
-        self.driver = driver
-        self.server = server
-        self.port = port
-        self.db = db
-        self.user = user
-        self.password = password
-        self.connection_str = (
-            f"Driver={driver};"
-            f"Server={server};"
-            f"Port={port};"
-            f"Database={db};"
-            f"UID={user};"
-            f"PWD={password};"
+        self.settings = settings
+
+    @property
+    def _connection_str(self) -> SecretStr:
+        return SecretStr(
+            f"Driver={self.settings.odbc_driver};"
+            f"Server={self.settings.server};"
+            f"Port={self.settings.port};"
+            f"Database={self.settings.database};"
+            f"UID={self.settings.user};"
+            f"PWD={self.settings.password.get_secret_value()};"
         )
 
-    @classmethod
-    def from_settings(cls, settings: LabTracksSettings):
-        """Construct client from settings object."""
-        return cls(
-            driver=settings.odbc_driver,
-            server=settings.labtracks_server,
-            port=settings.labtracks_port,
-            db=settings.labtracks_database,
-            user=settings.labtracks_user,
-            password=settings.labtracks_password.get_secret_value(),
-        )
-
-    def create_session(self) -> pyodbc.Connection:
+    def _create_session(self) -> pyodbc.Connection:
         """Use pyodbc to create a connection to sqlserver"""
 
-        return pyodbc.connect(self.connection_str)
+        return pyodbc.connect(self._connection_str.get_secret_value())
 
     @staticmethod
-    def close_session(session: pyodbc.Connection) -> None:
+    def _close_session(session: pyodbc.Connection) -> None:
         """Closes a pyodbc session connection"""
         session.close()
 
-    def get_subject_info(self, subject_id: str) -> ModelResponse:
-        """
-        Method to retrieve subject from subject_id (int)
-        Parameters
-        ----------
-        subject_id: str
-        """
+    def run_query(self, query: str) -> JSONResponse:
         try:
-            query = LabTracksQueries.subject_from_subject_id(subject_id)
-            session = self.create_session()
+            session = self._create_session()
             cursor = session.cursor()
             cursor.execute(query)
             column_names = cursor.description
             columns = [column[0].lower() for column in column_names]
             fetched_rows = cursor.fetchall()
             cursor.close()
-            self.close_session(session)
+            self._close_session(session)
             results = []
             for row in fetched_rows:
                 results.append(dict(zip(columns, row)))
-            lth = LabTracksResponseHandler()
-            subjects = lth.map_response_to_subject(results)
-            return ModelResponse(
-                aind_models=subjects, status_code=StatusCodes.DB_RESPONDED
-            )
+            return ResponseHandler.build_response(content=results)
         except Exception as e:
-            logging.error(repr(e))
-            return ModelResponse.internal_server_error_response()
-
-    def get_procedures_info(self, subject_id: str) -> ModelResponse:
-        """
-        Method to retrieve LAS procedures from subject_id (int)
-        Parameters
-        ----------
-        subject_id: str
-        """
-        try:
-            query = LabTracksQueries.procedures_from_subject_id(subject_id)
-            session = self.create_session()
-            cursor = session.cursor()
-            cursor.execute(query)
-            column_names = cursor.description
-            columns = [column[0].lower() for column in column_names]
-            fetched_rows = cursor.fetchall()
-            cursor.close()
-            self.close_session(session)
-            results = []
-            for row in fetched_rows:
-                results.append(dict(zip(columns, row)))
-            # TODO: return results
-            lth = LabTracksResponseHandler()
-            procedures = lth.map_response_to_procedures(
-                subject_id=subject_id, results=results
-            )
-            procedures = [] if procedures is None else [procedures]
-            return ModelResponse(
-                aind_models=procedures, status_code=StatusCodes.DB_RESPONDED
-            )
-        except Exception as e:
-            logging.error(repr(e))
-            return ModelResponse.internal_server_error_response()
+            logging.error(f"{e}")
+            return ResponseHandler.internal_server_error()
+    #
+    #
+    # def get_subject_info(self, subject_id: str) -> ModelResponse:
+    #     """
+    #     Method to retrieve subject from subject_id (int)
+    #     Parameters
+    #     ----------
+    #     subject_id: str
+    #     """
+    #     try:
+    #         query = LabTracksQueries.subject_from_subject_id(subject_id)
+    #         session = self._create_session()
+    #         cursor = session.cursor()
+    #         cursor.execute(query)
+    #         column_names = cursor.description
+    #         columns = [column[0].lower() for column in column_names]
+    #         fetched_rows = cursor.fetchall()
+    #         cursor.close()
+    #         self._close_session(session)
+    #         results = []
+    #         for row in fetched_rows:
+    #             results.append(dict(zip(columns, row)))
+    #         lth = LabTracksResponseHandler()
+    #         subjects = lth.map_response_to_subject(results)
+    #         return ModelResponse(
+    #             aind_models=subjects, status_code=StatusCodes.DB_RESPONDED
+    #         )
+    #     except Exception as e:
+    #         logging.error(repr(e))
+    #         return ModelResponse.internal_server_error_response()
+    #
+    # def get_procedures_info(self, subject_id: str) -> ModelResponse:
+    #     """
+    #     Method to retrieve LAS procedures from subject_id (int)
+    #     Parameters
+    #     ----------
+    #     subject_id: str
+    #     """
+    #     try:
+    #         query = LabTracksQueries.procedures_from_subject_id(subject_id)
+    #         session = self._create_session()
+    #         cursor = session.cursor()
+    #         cursor.execute(query)
+    #         column_names = cursor.description
+    #         columns = [column[0].lower() for column in column_names]
+    #         fetched_rows = cursor.fetchall()
+    #         cursor.close()
+    #         self._close_session(session)
+    #         results = []
+    #         for row in fetched_rows:
+    #             results.append(dict(zip(columns, row)))
+    #         # TODO: return results
+    #         lth = LabTracksResponseHandler()
+    #         procedures = lth.map_response_to_procedures(
+    #             subject_id=subject_id, results=results
+    #         )
+    #         procedures = [] if procedures is None else [procedures]
+    #         return ModelResponse(
+    #             aind_models=procedures, status_code=StatusCodes.DB_RESPONDED
+    #         )
+    #     except Exception as e:
+    #         logging.error(repr(e))
+    #         return ModelResponse.internal_server_error_response()
 
 
 class MouseCustomClassFields(Enum):

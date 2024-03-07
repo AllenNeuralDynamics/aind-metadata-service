@@ -39,6 +39,7 @@ server = [
     'fastapi',
     'uvicorn[standard]',
     'python-dateutil',
+    'xmltodict==0.13.0',
     'slims-python-api==6.8.0',
     'azure-identity==1.15.0'
 ]

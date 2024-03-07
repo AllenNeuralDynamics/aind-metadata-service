@@ -1,7 +1,6 @@
 """Module to test LabTracks Client methods"""
 
-import datetime
-import decimal
+from datetime import datetime
 import os
 import unittest
 from unittest.mock import MagicMock, Mock, call, patch
@@ -13,6 +12,9 @@ from aind_metadata_service.labtracks.client import (
     LabTracksClient,
     LabTracksSettings,
 )
+from decimal import Decimal
+
+from aind_metadata_service.labtracks.query_builder import LabTracksQueries
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 from tests import PYD_VERSION
 from tests.labtracks.test_response_handler import TestResponseExamples
@@ -20,6 +22,59 @@ from tests.labtracks.test_response_handler import TestResponseExamples
 
 class TestLabTracksSettings(unittest.TestCase):
     """Class to test methods for LabTracksSettings."""
+
+    RAW_RESPONSE_EXAMPLE = [
+        {'id': Decimal('632269'),
+         'class_values': (
+             '<?xml version="1.0" encoding="utf-16"?>\r\n'
+             '<MouseCustomClass xmlns:xsd="http://www.w3.org/2001/XMLSchema" '
+             'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\r\n  '
+             '<Reserved_by>Anna Apple</Reserved_by>\r\n  '
+             '<Reserve_Date>2022-07-14T00:00:00-07:00</Reserve_Date>\r\n  '
+             '<Solution>1xPBS</Solution>\r\n  '
+             '<Full_Genotype>'
+             'Pvalb-IRES-Cre/wt;RCL-somBiPoles_mCerulean-WPRE/wt'
+             '</Full_Genotype>\r\n  '
+             '<Phenotype>P19: TSTW. Small body, large head, slightly '
+             'dehydrated. 3.78g. P22: 5.59g. P26: 8.18g. '
+             'Normal body proportions. '
+             '</Phenotype>\r\n'
+             '</MouseCustomClass>'
+         ),
+        'sex': 'F',
+         'birth_date': datetime(2022, 5, 1, 0, 0),
+         'paternal_id': Decimal('623236'),
+         'paternal_class_values': (
+             '<?xml version="1.0" encoding="utf-16"?>\r\n'
+             '<MouseCustomClass xmlns:xsd="http://www.w3.org/2001/XMLSchema" '
+             'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\r\n  '
+             '<Reserved_by>Jane Smith </Reserved_by>\r\n  '
+             '<Reserve_Date>2022-11-01T00:00:00</Reserve_Date>\r\n  '
+             '<Reason>eu-retire</Reason>\r\n  '
+             '<Full_Genotype>'
+             'RCL-somBiPoles_mCerulean-WPRE/wt'
+             '</Full_Genotype>\r\n  '
+             '<Phenotype>P87: F.G. P133: Barberer. '
+             '</Phenotype>\r\n'
+             '</MouseCustomClass>'
+         ),
+         'maternal_id': Decimal('615310'),
+         'maternal_class_values': (
+             '<?xml version="1.0" encoding="utf-16"?>\r\n'
+             '<MouseCustomClass xmlns:xsd="http://www.w3.org/2001/XMLSchema" '
+             'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\r\n  '
+             '<Reserved_by>Jane Smith </Reserved_by>\r\n  '
+             '<Reserve_Date>2022-08-03T00:00:00</Reserve_Date>\r\n  '
+             '<Reason>Eu-retire</Reason>\r\n  '
+             '<Full_Genotype>Pvalb-IRES-Cre/wt</Full_Genotype>\r\n  '
+             '<Phenotype>P100: F.G.</Phenotype>\r\n</MouseCustomClass>'
+         ),
+         'species_name': 'mouse',
+         'group_name': 'Pvalb-IRES-Cre;RCL-somBiPoles_mCerulean-WPRE(ND)',
+         'group_description': None,
+         'cage_id': Decimal('-99999999999999'),
+         'room_id': Decimal('-99999999999999')}]
+
 
     EXAMPLE_ENV_VAR1 = {
         "ODBC_DRIVER": "some_driver",
@@ -62,9 +117,9 @@ class TestLabTracksSettings(unittest.TestCase):
         with self.assertRaises(ValueError) as e:
             LabTracksSettings(
                 odbc_driver="some_driver",
-                labtracks_server="some_server",
-                labtracks_port="8080",
-                labtracks_database="some_db",
+                server="some_server",
+                port="8080",
+                database="some_db",
             )
 
         expected_error_message = (
@@ -96,12 +151,13 @@ class TestLabTracksClient(unittest.TestCase):
     user = "LabTracksUser"
     password = "LabTracksPassword"
     lb_client = LabTracksClient(
-        driver=driver,
-        server=server,
-        port=port,
-        db=db,
-        user=user,
-        password=password,
+        settings=LabTracksSettings(
+            odbc_driver=driver,
+            server=server,
+            port=port,
+            database=db,
+            user=user,
+            password=password)
     )
 
     def test_labtracks_client_connection_string(self) -> None:
@@ -116,7 +172,7 @@ class TestLabTracksClient(unittest.TestCase):
         )
 
         self.assertEqual(
-            self.lb_client.connection_str, expected_connection_string
+            self.lb_client._connection_str.get_secret_value(), expected_connection_string
         )
 
     @patch("pyodbc.connect")
@@ -144,6 +200,8 @@ class TestLabTracksClient(unittest.TestCase):
             raise pyodbc.ProgrammingError
 
         type(mock_connect.return_value).cursor = mock_cursor
+
+        query = LabTracksQueries.subject_from_subject_id("123")
 
         response1 = self.lb_client.get_subject_info("123")
         response2 = self.lb_client.get_procedures_info("123")
@@ -242,14 +300,14 @@ class TestLabTracksClient(unittest.TestCase):
                 """Mock fetchall"""
                 return [
                     [
-                        decimal.Decimal("115977"),
+                        Decimal("115977"),
                         TestResponseExamples.class_values_str,
                         "M",
-                        datetime.datetime(2012, 5, 13, 0, 0),
+                        datetime(2012, 5, 13, 0, 0),
                         None,
-                        decimal.Decimal("107384"),
+                        Decimal("107384"),
                         TestResponseExamples.paternal_class_values_str,
-                        decimal.Decimal("107392"),
+                        Decimal("107392"),
                         TestResponseExamples.maternal_class_values_str,
                         "mouse",
                         "C57BL6J_OLD",
@@ -326,14 +384,14 @@ class TestLabTracksClient(unittest.TestCase):
                 """Mock fetchall"""
                 return [
                     [
-                        decimal.Decimal("115977"),
+                        Decimal("115977"),
                         TestResponseExamples.class_values_str,
                         "M",
-                        datetime.datetime(2012, 5, 13, 0, 0),
+                        datetime(2012, 5, 13, 0, 0),
                         None,
-                        decimal.Decimal("107384"),
+                        Decimal("107384"),
                         TestResponseExamples.paternal_class_values_str,
-                        decimal.Decimal("107392"),
+                        Decimal("107392"),
                         TestResponseExamples.maternal_class_values_str,
                         "mouse",
                         "C57BL6J_OLD",
@@ -342,14 +400,14 @@ class TestLabTracksClient(unittest.TestCase):
                         "000",
                     ],
                     [
-                        decimal.Decimal("115977"),
+                        Decimal("115977"),
                         TestResponseExamples.class_values_str,
                         "F",
-                        datetime.datetime(2012, 5, 13, 0, 0),
+                        datetime(2012, 5, 13, 0, 0),
                         None,
-                        decimal.Decimal("107384"),
+                        Decimal("107384"),
                         TestResponseExamples.paternal_class_values_str,
-                        decimal.Decimal("107392"),
+                        Decimal("107392"),
                         TestResponseExamples.maternal_class_values_str,
                         "mouse",
                         "C57BL6J_OLD",
@@ -424,25 +482,25 @@ class TestLabTracksClient(unittest.TestCase):
                 """Mock fetchall"""
                 return [
                     [
-                        decimal.Decimal("00000"),
-                        decimal.Decimal("12345"),
-                        datetime.datetime(2022, 10, 11, 0, 0),
-                        datetime.datetime(2022, 10, 11, 4, 30),
-                        decimal.Decimal("28803"),
-                        decimal.Decimal("115977"),
+                        Decimal("00000"),
+                        Decimal("12345"),
+                        datetime(2022, 10, 11, 0, 0),
+                        datetime(2022, 10, 11, 4, 30),
+                        Decimal("28803"),
+                        Decimal("115977"),
                         "Perfusion",
-                        decimal.Decimal("2002"),
+                        Decimal("2002"),
                         "F",
                     ],
                     [
-                        decimal.Decimal("10000"),
-                        decimal.Decimal("23"),
-                        datetime.datetime(2022, 5, 11, 0, 0),
-                        datetime.datetime(2022, 5, 12, 0, 0),
-                        decimal.Decimal("28803"),
-                        decimal.Decimal("115977"),
+                        Decimal("10000"),
+                        Decimal("23"),
+                        datetime(2022, 5, 11, 0, 0),
+                        datetime(2022, 5, 12, 0, 0),
+                        Decimal("28803"),
+                        Decimal("115977"),
                         "RO Injection",
-                        decimal.Decimal("2002"),
+                        Decimal("2002"),
                         "F",
                     ],
                 ]

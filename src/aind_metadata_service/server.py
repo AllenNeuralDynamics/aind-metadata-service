@@ -15,6 +15,7 @@ from aind_metadata_service.labtracks.client import (
     LabTracksClient,
     LabTracksSettings,
 )
+from aind_metadata_service.labtracks.query_builder import LabTracksQueries
 from aind_metadata_service.response_handler import EtlResponse
 from aind_metadata_service.sharepoint.client import (
     SharePointClient,
@@ -83,6 +84,20 @@ protocols_smart_sheet_client = SmartSheetClient(
 )
 
 tars_client = TarsClient(azure_settings=tars_settings)
+
+lb_client = LabTracksClient(settings = labtracks_settings)
+
+
+@app.get("/labtracks/{subject_id}")
+async def retrieve_labtracks_info(subject_id: str, table: str):
+
+    # TODO: Sanitize user input
+    if table == "subject":
+        query = LabTracksQueries.subject_from_subject_id(subject_id)
+    else:
+        query = LabTracksQueries.procedures_from_subject_id(subject_id)
+    response = lb_client.run_query(query)
+    return response
 
 
 @app.post("/bergamo_session/")
@@ -158,14 +173,10 @@ async def retrieve_subject(subject_id, pickle: bool = False):
     Retrieves subject from Labtracks server
     Returns pickled data if URL parameter pickle=True, else returns json
     """
-    lb_client = LabTracksClient.from_settings(labtracks_settings)
-    model_response = await run_in_threadpool(
-        lb_client.get_subject_info, subject_id=subject_id
+    response = await run_in_threadpool(
+        retrieve_labtracks_info, subject_id=subject_id, table="subject"
     )
-    if pickle:
-        return model_response.map_to_pickled_response()
-    else:
-        return model_response.map_to_json_response()
+    return response
 
 
 @app.get("/tars_injection_materials/{prep_lot_number}")
@@ -185,45 +196,45 @@ async def retrieve_injection_materials(prep_lot_number, pickle: bool = False):
         return model_response.map_to_json_response()
 
 
-@app.get("/procedures/{subject_id}")
-async def retrieve_procedures(subject_id, pickle: bool = False):
-    """
-    Retrieves procedure info from SharePoint and Labtracks servers
-    Returns pickled data if URL parameter pickle=True, else returns json
-    """
-    sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
-    lb_client = LabTracksClient.from_settings(labtracks_settings)
-    lb_response = await run_in_threadpool(
-        lb_client.get_procedures_info, subject_id=subject_id
-    )
-    sp2019_response = await run_in_threadpool(
-        sharepoint_client.get_procedure_info,
-        subject_id=subject_id,
-        list_title=sharepoint_settings.nsb_2019_list,
-    )
-    sp2023_response = await run_in_threadpool(
-        sharepoint_client.get_procedure_info,
-        subject_id=subject_id,
-        list_title=sharepoint_settings.nsb_2023_list,
-    )
-    merged_response = sharepoint_client.merge_responses(
-        [lb_response, sp2019_response, sp2023_response]
-    )
-    mapper = TarsResponseHandler()
-    viruses = mapper.get_virus_strains(merged_response)
-    tars_mapping = {}
-    for virus_strain in viruses:
-        tars_response = await retrieve_injection_materials(
-            prep_lot_number=virus_strain
-        )
-        tars_mapping[virus_strain] = tars_response
-    integrated_response = mapper.integrate_injection_materials(
-        response=merged_response, tars_mapping=tars_mapping
-    )
-    if pickle:
-        return integrated_response.map_to_pickled_response()
-    else:
-        return integrated_response.map_to_json_response()
+# @app.get("/procedures/{subject_id}")
+# async def retrieve_procedures(subject_id, pickle: bool = False):
+#     """
+#     Retrieves procedure info from SharePoint and Labtracks servers
+#     Returns pickled data if URL parameter pickle=True, else returns json
+#     """
+#     sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
+#     lb_client = LabTracksClient.from_settings(labtracks_settings)
+#     lb_response = await run_in_threadpool(
+#         lb_client.get_procedures_info, subject_id=subject_id
+#     )
+#     sp2019_response = await run_in_threadpool(
+#         sharepoint_client.get_procedure_info,
+#         subject_id=subject_id,
+#         list_title=sharepoint_settings.nsb_2019_list,
+#     )
+#     sp2023_response = await run_in_threadpool(
+#         sharepoint_client.get_procedure_info,
+#         subject_id=subject_id,
+#         list_title=sharepoint_settings.nsb_2023_list,
+#     )
+#     merged_response = sharepoint_client.merge_responses(
+#         [lb_response, sp2019_response, sp2023_response]
+#     )
+#     mapper = TarsResponseHandler()
+#     viruses = mapper.get_virus_strains(merged_response)
+#     tars_mapping = {}
+#     for virus_strain in viruses:
+#         tars_response = await retrieve_injection_materials(
+#             prep_lot_number=virus_strain
+#         )
+#         tars_mapping[virus_strain] = tars_response
+#     integrated_response = mapper.integrate_injection_materials(
+#         response=merged_response, tars_mapping=tars_mapping
+#     )
+#     if pickle:
+#         return integrated_response.map_to_pickled_response()
+#     else:
+#         return integrated_response.map_to_json_response()
 
 
 @app.get(
