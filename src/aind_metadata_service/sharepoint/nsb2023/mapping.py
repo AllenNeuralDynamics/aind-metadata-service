@@ -949,8 +949,8 @@ class MappedNSBList:
                 self._nsb.burr_3_hemisphere.SELECT: None,
                 self._nsb.burr_3_hemisphere.LEFT: Side.LEFT,
                 self._nsb.burr_3_hemisphere.RIGHT: Side.RIGHT,
-                }.get(self._nsb.burr_3_hemisphere, None)
-            )
+            }.get(self._nsb.burr_3_hemisphere, None)
+        )
 
     @property
     def aind_burr_3_injectable_x0(self) -> Optional[str]:
@@ -1948,7 +1948,7 @@ class MappedNSBList:
                 ),
                 self._nsb.iacuc_protocol.N_2010: (
                     self._nsb.iacuc_protocol.N_2010.value
-                )
+                ),
             }.get(self._nsb.iacuc_protocol, None)
         )
 
@@ -1970,9 +1970,13 @@ class MappedNSBList:
                 self._nsb.implant_id_coverslip_type.N_2004: None,
                 self._nsb.implant_id_coverslip_type.N_2005: None,
                 self._nsb.implant_id_coverslip_type.N_2006: None,
+                self._nsb.implant_id_coverslip_type.N_2007: None,
+                self._nsb.implant_id_coverslip_type.N_2008: None,
+                self._nsb.implant_id_coverslip_type.N_2009: None,
                 self._nsb.implant_id_coverslip_type.N_2010: None,
                 self._nsb.implant_id_coverslip_type.N_2011: None,
                 self._nsb.implant_id_coverslip_type.N_3001: None,
+                self._nsb.implant_id_coverslip_type.N_3002: None,
                 self._nsb.implant_id_coverslip_type.N_3003: None,
                 self._nsb.implant_id_coverslip_type.N_3004: None,
                 self._nsb.implant_id_coverslip_type.N_3004_25_PURALUBESYSTANE: None,
@@ -2043,7 +2047,7 @@ class MappedNSBList:
         return self._map_float_to_decimal(self._nsb.inj2_angle_v2)
 
     @property
-    def aind_inj2_current(self) -> Optional[str]:
+    def aind_inj2_current(self) -> Optional[Decimal]:
         """Maps inj2_current to aind model"""
         return self._parse_current_str(self._nsb.inj2_current)
 
@@ -2589,6 +2593,7 @@ class MappedNSBList:
                 self._nsb.lims_project.OPEN_SCOPE_TEMPORAL_BARCO: None,
                 self._nsb.lims_project.OPEN_SCOPE_VISION2_HIPPOC: None,
                 self._nsb.lims_project.OPH5_X: None,
+                self._nsb.lims_project.S200_C: None,
                 self._nsb.lims_project.SLC6_A1_NEUROPIXEL: None,
                 self._nsb.lims_project.SMART_SPIM_GENETIC_TOOLS: None,
                 self._nsb.lims_project.SURGERY_X: None,
@@ -3179,7 +3184,7 @@ class MappedNSBList:
         }
 
     def surgery_during_info(
-            self, during: During, inj_type: Optional[InjectionType] = None
+        self, during: During, inj_type: Optional[InjectionType] = None
     ) -> SurgeryDuringInfo:
         """
         Compiles burr hole information from NSB data
@@ -3393,7 +3398,7 @@ class MappedNSBList:
 
     @staticmethod
     def _map_burr_hole_number_to_probe(
-            burr_hole_num: int,
+        burr_hole_num: int,
     ) -> Optional[str]:
         """Maps NSB Burr hole number into AIND ProbeName"""
         # TODO: add probes for burr_hole_nums 5 and 6
@@ -3752,9 +3757,9 @@ class MappedNSBList:
 
         # generic surgery model if non-procedure info is available
         if (
-                len(other_procedures) == 0
-                and len(initial_procedures) == 0
-                and self.aind_date_of_surgery
+            len(other_procedures) == 0
+            and len(initial_procedures) == 0
+            and self.aind_date_of_surgery
         ):
             generic_surgery = Surgery.model_construct(
                 start_date=self.aind_date_of_surgery,
@@ -3767,6 +3772,3 @@ class MappedNSBList:
             surgeries.append(generic_surgery)
 
         return surgeries
-
-
-

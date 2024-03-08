@@ -4,6 +4,7 @@ Please be careful modifying the contents."""
 from datetime import datetime
 from enum import Enum, EnumMeta
 from typing import Optional
+
 from pydantic import BaseModel, Extra, Field
 
 
@@ -2451,7 +2452,7 @@ class NSBList(BaseModel, extra=Extra.allow):
         alias="Non_x002d_NSB_x0020_Surgeon",
         title="Non-NSB Surgeon",
         description="Is this surgery going to be performed by NSB"
-                    " or someone else?",
+        " or someone else?",
     )
     of_burr: Optional[OfBurrHoles] = Field(
         default=None,
