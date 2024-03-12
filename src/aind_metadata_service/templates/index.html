@@ -16,6 +16,10 @@
       .header~div, input {
         margin: 10px;
       }
+      div, input, button, label, pre, .endpoint {
+        margin: 5px;
+        border-radius: 6px;
+      }
     }
     h1 {
       color: #3F51B5;
@@ -23,7 +27,6 @@
     input {
       padding: 8px 20px;
       border: 1px solid #5065df;
-      border-radius: 6px;
       background-color: #E8EAF6;
       &:focus {
         outline: none;
@@ -32,30 +35,51 @@
     }
     button {
       border: none;
-      border-radius: 6px;
-      color: #ffffff;
       padding: 8px 20px;
-      font-size: medium;
-      background-color: #5065df;
       cursor: pointer;
-      &:hover {
-        background-color: #3f51b5;
+      &.primary {
+        font-size: medium;
+        color: #ffffff;
+        background-color: #5065df;
+        &:hover { background-color: #3f51b5; }
+      }
+      &.secondary {
+        background-color: #c0c7f7;
+        &:hover { background-color: #aab1dc; }
       }
     }
-    #message.success {
+    #user-message.success {
       color: green;
     }
-    #message.error {
+    #user-message.error {
       color: red;
     }
-    #json {
-      padding: 10px;
+    .endpoint, pre {
+      font-family: monospace;
       border: 1px solid #dddddd;
-      border-radius: 6px;
       background-color: #f5f5f5;
-      max-width: 700px;
-      max-height: 400px;
+      font-size: small;
+    }
+    pre {
+      padding: 10px;
+      max-width: 80vw;
+      max-height: 50vh;
+      min-width: 300px;
       overflow: auto;
+    }
+    .endpoint {
+      margin-left: 10px !important;
+      padding: 5px;
+    }
+    .container {
+      padding: 15px;
+      border: 1px dashed #dddddd;
+      width: fit-content;
+      .heading {
+        font-size: x-large;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
     }
   </style>
 </head>
@@ -69,56 +93,67 @@
     </span>
   </div>
   <div>
-    <h2>Subject</h2>
-    <span>Retrieve subject metadata from Labtracks server</span>
-    <div>
+    <div class="container">
+      <div class="heading">Subject<span class="endpoint">/subject/{subject_id}</span></div>
+      <p>Retrieve subject metadata from Labtracks server</p>
       <label for="subject-id">Subject ID:</label>
       <input type="text" id="subject-id" size="6" placeholder="subject_id" />
     </div>
   </div>
   <div>
-    <button id="search" type="button" onclick="querySubject()">Search</button>
+    <button id="search" type="button" class="primary" onclick="querySubject()">Search</button>
   </div>
   <div>
-    <div id="message"></div>
-    <pre id="json" hidden></pre>
+    <div id="user-message"></div>
+    <div id="response" class="container" hidden>
+      <div class="heading">Response</div>
+      <div>Message:<pre id="response-message"></pre></div>
+      <div>Data:<pre id="response-data"></pre></div>
+      <div id="response-raw-div" hidden>Raw Response:<pre id="response-raw"></pre></div>
+      <button id="toggle-raw" type="button" class="secondary" onclick="toggleViewRawResponse()">View raw response</button>
+    </div>
   </div>
 
   <script>
-    const msgTypes = {
-      "searchPending": "Searching.... Please do not refresh or re-submit.",
-      "searchSuccess": "Search returned success.",
-      "searchError": "Search returned errors."
-    }
-    setMessage = function (msgType) {
-      $("#message").removeClass("success");
-      $("#message").removeClass("error");
-      $("#message").html(msgType);
-      if (msgType == msgTypes.searchSuccess) {
-        $("#message").addClass("success");
-      } else if (msgType == msgTypes.searchError) {
-        $("#message").addClass("error");
+    displayPendingUI = function () {
+      $("#user-message").removeClass("success error");
+      $("#user-message").html("Searching.... Please do not refresh or re-submit.");    
+      for (let id of ["message", "data", "raw"]) {
+        $(`#response-${id}`).html("");
       }
+      $("#response").hide();
+    };
+    displayResponseUI = function (isError, response, statusCode, statusText) {      
+      const responseText = {
+        "user-message"    : `Search returned ${statusText} (Status ${statusCode}).`,
+        "response-message": response.message,
+        "response-data"   : JSON.stringify(response.data, null, 2),
+        "response-raw"    : JSON.stringify(response, null, 2)
+      }
+      $("#user-message").addClass(isError ? "error" : "success");
+      Object.keys(responseText).forEach((id) => {
+        $(`#${id}`).html(responseText[id]);
+      });
+      $("#response").show();
+    };
+    toggleViewRawResponse = function () {
+      $("#response-raw-div").toggle();
+      const viewOrHide = $("#response-raw-div").is(":visible") ? "Hide" : "View";
+      $("#toggle-raw").text(`${viewOrHide} raw response`);
     };
     querySubject = function () {
       let subjectID = $("#subject-id").val();
       $.ajax({
-        url: `/subject/${subjectID}`,
+        url: `http://aind-metadata-service-dev/subject/${subjectID}`,
         type: "GET",
         beforeSend: function () {
-          setMessage(msgTypes.searchPending);
-          $("#json").html("");
-          $("#json").hide();
+          displayPendingUI();
         },
-        success: function (data) {
-          setMessage(msgTypes.searchSuccess);
-          $("#json").show();
-          $("#json").html(JSON.stringify(data, null, 2));
+        success: function (data, status, xhr) {
+          displayResponseUI(false, data, xhr.status, xhr.statusText);
         },
         error: function (data) {
-          setMessage(msgTypes.searchError);
-          $("#json").show();
-          $("#json").html(JSON.stringify(data, null, 2));
+          displayResponseUI(true, data.responseJSON, data.status, data.statusText);
         }
       });
     };
