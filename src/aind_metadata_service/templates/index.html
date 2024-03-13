@@ -9,20 +9,22 @@
     body {
       font-family: arial, sans-serif;
       .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 120px;
         background-color: #E8EAF6;
+        padding-left: 40px;
+        overflow: hidden;
+        border-radius: 6px;
+        h1 { color: #3F51B5; }
+      }
+      .main {
+        margin-top: 120px;
         padding: 20px;
-        border-radius: 6px;
+        div, input, button, label { border-radius: 6px; }
       }
-      .header~div, input {
-        margin: 10px;
-      }
-      div, input, button, label, pre, .endpoint {
-        margin: 5px;
-        border-radius: 6px;
-      }
-    }
-    h1 {
-      color: #3F51B5;
     }
     input {
       padding: 8px 20px;
@@ -34,6 +36,7 @@
       }
     }
     button {
+      margin: 20px 0px;
       border: none;
       padding: 8px 20px;
       cursor: pointer;
@@ -58,6 +61,7 @@
       border: 1px solid #dddddd;
       background-color: #f5f5f5;
       font-size: small;
+      border-radius: 6px;
     }
     pre {
       padding: 10px;
@@ -67,10 +71,11 @@
       overflow: auto;
     }
     .path {
-      margin-left: 10px !important;
+      margin-left: 10px;
       padding: 5px;
     }
     .container {
+      margin: 10px 0px;
       padding: 15px;
       border: 1px dashed #dddddd;
       width: fit-content;
@@ -91,27 +96,29 @@
       {% if service_version %} Version {{ service_version }}{% endif %}
     </span>
   </div>
-  {% for e in endpoints if e.endpoint and e.parameter %}
-  <div>
-    <div class="container">
-      <div class="heading">{{ e.endpoint|title }}
-        <span class="path">{{ "/%s/{%s}"|format(e.endpoint, e.parameter) }}</span>
+  <div class="main">
+    {% for e in endpoints if e.endpoint and e.parameter %}
+    <div>
+      <div class="container">
+        <div class="heading">{{ e.endpoint|title }}
+          <span class="path">{{ "/%s/{%s}"|format(e.endpoint, e.parameter) }}</span>
+        </div>
+        <p>{{ e.description }}</p>
+        <label for="param-id-{{ e.endpoint }}">{{ e.parameter_label or e.parameter }}:</label>
+        <input type="text" id="param-id-{{ e.endpoint }}" size="6" placeholder="{{ e.parameter }}" />
       </div>
-      <p>{{ e.description }}</p>
-      <label for="param-id-{{ e.endpoint }}">{{ e.parameter_label or e.parameter }}:</label>
-      <input type="text" id="param-id-{{ e.endpoint }}" size="6" placeholder="{{ e.parameter }}" />
+      <button id="search" type="button" class="primary" onclick="queryEndpoint('{{ e.endpoint }}')">Search</button>
     </div>
-    <button id="search" type="button" class="primary" onclick="queryEndpoint('{{ e.endpoint }}')">Search</button>
-  </div>
-  {% endfor %}
-  <div>
-    <div id="user-message"></div>
-    <div id="response" class="container" hidden>
-      <div class="heading">Response</div>
-      <div>Message:<pre id="response-message"></pre></div>
-      <div>Data:<pre id="response-data"></pre></div>
-      <div id="response-raw-div" hidden>Raw Response:<pre id="response-raw"></pre></div>
-      <button id="toggle-raw" type="button" class="secondary" onclick="toggleViewRawResponse()">View raw response</button>
+    {% endfor %}
+    <div>
+      <div id="user-message"></div>
+      <div id="response" class="container" hidden>
+        <div class="heading">Response</div>
+        <div>Message:<pre id="response-message"></pre></div>
+        <div>Data:<pre id="response-data"></pre></div>
+        <div id="response-raw-div" hidden>Raw Response:<pre id="response-raw"></pre></div>
+        <button id="toggle-raw" type="button" class="secondary" onclick="toggleViewRawResponse()">View raw response</button>
+      </div>
     </div>
   </div>
 
@@ -155,7 +162,7 @@
         },
         error: function (data) {
           displayResponseUI(
-            true, 
+            true,
             data.responseJSON ?? data.responseText ?? data,
             data.status,
             data.statusText
