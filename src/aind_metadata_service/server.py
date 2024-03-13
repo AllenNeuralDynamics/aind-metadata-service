@@ -249,14 +249,24 @@ async def favicon():
 @app.get("/")
 async def index(request: Request):
     """
-    Returns the index page from templates
+    Returns the index page with search UIs for enabled endpoints (provided template context).
     """
     return templates.TemplateResponse(
         name="index.html",
         context=(
             {
                 "request": request,
-                "version": SERVICE_VERSION,
+                "service_name": "AIND Metadata Service",
+                "service_description": "REST service to retrieve metadata from AIND databases.", # optional
+                "service_version": SERVICE_VERSION, # optional
+                "endpoints": [
+                    {
+                        "endpoint": "subject",
+                        "description": "Retrieve subject metadata from Labtracks server", # optional
+                        "parameter": "subject_id",
+                        "parameter_label": "Subject ID" # optional
+                    }
+                ]
             }
         ),
     )

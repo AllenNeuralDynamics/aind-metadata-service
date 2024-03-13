@@ -4,7 +4,7 @@
 <head>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
   <meta charset="UTF-8">
-  <title>AIND Metadata Service</title>
+  <title>{{ service_name }}</title>
   <style>
     body {
       font-family: arial, sans-serif;
@@ -54,7 +54,7 @@
     #user-message.error {
       color: red;
     }
-    .endpoint, pre {
+    .path, pre {
       font-family: monospace;
       border: 1px solid #dddddd;
       background-color: #f5f5f5;
@@ -67,7 +67,7 @@
       min-width: 300px;
       overflow: auto;
     }
-    .endpoint {
+    .path {
       margin-left: 10px !important;
       padding: 5px;
     }
@@ -86,23 +86,25 @@
 
 <body>
   <div class="header">
-    <h1>AIND Metadata Service</h1>
+    <h1>{{ service_name }}</h1>
     <span>
-      REST service to retrieve metadata from AIND databases.
-      {% if version %} Version {{ version }}{% endif %}
+      {{ service_description }}
+      {% if service_version %} Version {{ service_version }}{% endif %}
     </span>
   </div>
+  {% for e in endpoints if e.endpoint and e.parameter %}
   <div>
     <div class="container">
-      <div class="heading">Subject<span class="endpoint">/subject/{subject_id}</span></div>
-      <p>Retrieve subject metadata from Labtracks server</p>
-      <label for="subject-id">Subject ID:</label>
-      <input type="text" id="subject-id" size="6" placeholder="subject_id" />
+      <div class="heading">{{ e.endpoint|title }}
+        <span class="path">{{ "/%s/{%s}"|format(e.endpoint, e.parameter) }}</span>
+      </div>
+      <p>{{ e.description }}</p>
+      <label for="param-id-{{ e.endpoint }}">{{ e.parameter_label or e.parameter }}:</label>
+      <input type="text" id="param-id-{{ e.endpoint }}" size="6" placeholder="{{ e.parameter }}" />
     </div>
+    <button id="search" type="button" class="primary" onclick="queryEndpoint('{{ e.endpoint }}')">Search</button>
   </div>
-  <div>
-    <button id="search" type="button" class="primary" onclick="querySubject()">Search</button>
-  </div>
+  {% endfor %}
   <div>
     <div id="user-message"></div>
     <div id="response" class="container" hidden>
@@ -141,10 +143,10 @@
       const viewOrHide = $("#response-raw-div").is(":visible") ? "Hide" : "View";
       $("#toggle-raw").text(`${viewOrHide} raw response`);
     };
-    querySubject = function () {
-      let subjectID = $("#subject-id").val();
+    queryEndpoint = function (endpoint) {
+      let parameter = $(`#param-id-${endpoint}`).val();
       $.ajax({
-        url: `http://aind-metadata-service-dev/subject/${subjectID}`,
+        url: `/${endpoint}/${parameter}`,
         type: "GET",
         beforeSend: function () {
           displayPendingUI();
