@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal, DecimalException
 from enum import Enum
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Union
 
 from aind_data_schema.core.procedures import (
     Anaesthetic,
@@ -17,6 +17,7 @@ from aind_data_schema.core.procedures import (
     Headframe,
     IontophoresisInjection,
     NanojectInjection,
+    NonViralMaterial,
     OphysProbe,
     Side,
     Surgery,
@@ -89,7 +90,7 @@ class SurgeryDuringInfo:
     """Container for information related to surgeries during initial or
     follow-up sessions"""
 
-    anaesthetic_duration_in_minutes: Optional[int] = None
+    anaesthetic_duration_in_minutes: Optional[Decimal] = None
     anaesthetic_level: Optional[Decimal] = None
     start_date: Optional[datetime] = None
     workstation_id: Optional[str] = None
@@ -97,6 +98,15 @@ class SurgeryDuringInfo:
     weight_prior: Optional[Decimal] = None
     weight_post: Optional[Decimal] = None
     instrument_id: Optional[str] = None
+
+
+@dataclass
+class InjectableMaterial:
+    """Container for injectable material information"""
+
+    material: Optional[str] = None
+    titer: Optional[str] = None
+    concentration: Optional[str] = None
 
 
 @dataclass
@@ -116,6 +126,7 @@ class BurrHoleInfo:
     inj_duration: Optional[Decimal] = None
     inj_volume: Optional[List[Decimal]] = None
     fiber_implant_depth: Optional[Decimal] = None
+    inj_materials: Optional[List[InjectableMaterial]] = None
 
 
 @dataclass
@@ -184,6 +195,10 @@ class MappedNSBList:
     LENGTH_OF_TIME_REGEX = re.compile(
         r"^ *(\d*\.?\d+) *(?:m|min|mins|minute|minutes)+ *$"
     )
+    SCIENTIFIC_NOTATION_REGEX = re.compile(
+        r"^[-+]?\d*\.?\d+[eE][-+]?\d+(?![\d.])"
+    )
+    CONCENTRATION_REGEX = re.compile(r"^\d+(\.\d+)?\s*mg[/]m[lL]$")
 
     def __init__(self, nsb: NSBList):
         """Class constructor"""
@@ -261,6 +276,26 @@ class MappedNSBList:
         """Parse virus strain strings"""
         # TODO: Figure out how to parse virus strain field
         return virus_strain_str
+
+    def _is_titer(self, titer_str: str) -> Optional[re.Match]:
+        """Checks whether titer field is in scientific notation."""
+        return re.search(self.SCIENTIFIC_NOTATION_REGEX, titer_str)
+
+    def _is_concentration(self, titer_str: str) -> Optional[re.Match]:
+        """Checks whether titer field contains concentration."""
+        return re.search(self.CONCENTRATION_REGEX, titer_str)
+
+    @staticmethod
+    def _parse_titer_str(match: Optional[re.Match]) -> Optional[int]:
+        """Parse string representation of titer into int."""
+        return int(float(match.group(0)))
+
+    @staticmethod
+    def _parse_concentration_str(
+        match: Optional[re.Match],
+    ) -> Optional[Decimal]:
+        """Parse string representation of concentration into Decimal."""
+        return Decimal(float(match.group(1)))
 
     @property
     def aind_age_at_injection(self) -> Optional[Decimal]:
@@ -580,7 +615,6 @@ class MappedNSBList:
                 self._nsb.burr4_injection_devi.IONTO_7: None,
                 self._nsb.burr4_injection_devi.NANO_8: None,
                 self._nsb.burr4_injection_devi.IONTO_8: None,
-                self._nsb.burr4_injection_devi.NANO_9: None,
                 self._nsb.burr4_injection_devi.IONTO_9: None,
             }.get(self._nsb.burr4_injection_devi, None)
         )
@@ -3261,6 +3295,20 @@ class MappedNSBList:
                 self.aind_burr_1_d_v_x00,
                 self.aind_burr_1_dv_2,
             )
+            injectable_materials = self._pair_burr_hole_inj_materials(
+                materials=[
+                    self.aind_burr_1_injectable_x0,
+                    self.aind_burr_1_injectable_x00,
+                    self.aind_burr_1_injectable_x01,
+                    self.aind_burr_1_injectable_x02,
+                ],
+                titers=[
+                    self.aind_burr_1_injectable_x03,
+                    self.aind_burr_1_injectable_x04,
+                    self.aind_burr_1_injectable_x05,
+                    self.aind_burr_1_injectable_x06,
+                ],
+            )
             return BurrHoleInfo(
                 hemisphere=self.aind_virus_hemisphere,
                 coordinate_ml=self.aind_virus_m_l,
@@ -3277,12 +3325,27 @@ class MappedNSBList:
                     vol=self.aind_inj1volperdepth, dv=coordinate_depth
                 ),
                 fiber_implant_depth=self.aind_fiber_implant1_dv,
+                inj_materials=injectable_materials,
             )
         elif burr_hole_num == 2:
             coordinate_depth = self._map_burr_hole_dv(
                 self.aind_dv2nd_inj,
                 self.aind_burr_2_d_v_x00,
                 self.aind_burr_2_d_v_x000,
+            )
+            injectable_materials = self._pair_burr_hole_inj_materials(
+                materials=[
+                    self.aind_burr_2_injectable_x0,
+                    self.aind_burr_2_injectable_x00,
+                    self.aind_burr_2_injectable_x01,
+                    self.aind_burr_2_injectable_x02,
+                ],
+                titers=[
+                    self.aind_burr_2_injectable_x03,
+                    self.aind_burr_2_injectable_x04,
+                    self.aind_burr_2_injectable_x05,
+                    self.aind_burr_2_injectable_x06,
+                ],
             )
             return BurrHoleInfo(
                 hemisphere=self.aind_hemisphere2nd_inj,
@@ -3300,12 +3363,27 @@ class MappedNSBList:
                     vol=self.aind_inj2volperdepth, dv=coordinate_depth
                 ),
                 fiber_implant_depth=self.aind_fiber_implant2_dv,
+                inj_materials=injectable_materials,
             )
         elif burr_hole_num == 3:
             coordinate_depth = self._map_burr_hole_dv(
                 self.aind_burr3_d_v,
                 self.aind_burr_3_d_v_x00,
                 self.aind_burr_3_d_v_x000,
+            )
+            injectable_materials = self._pair_burr_hole_inj_materials(
+                materials=[
+                    self.aind_burr_3_injectable_x0,
+                    self.aind_burr_3_injectable_x00,
+                    self.aind_burr_3_injectable_x01,
+                    self.aind_burr_3_injectable_x02,
+                ],
+                titers=[
+                    self.aind_burr_3_injectable_x03,
+                    self.aind_burr_3_injectable_x04,
+                    self.aind_burr_3_injectable_x05,
+                    self.aind_burr_3_injectable_x06,
+                ],
             )
             return BurrHoleInfo(
                 hemisphere=self.aind_burr_3_hemisphere,
@@ -3323,12 +3401,27 @@ class MappedNSBList:
                     vol=self.aind_inj3volperdepth, dv=coordinate_depth
                 ),
                 fiber_implant_depth=self.aind_fiber_implant3_d_x00,
+                inj_materials=injectable_materials,
             )
         elif burr_hole_num == 4:
             coordinate_depth = self._map_burr_hole_dv(
                 self.aind_burr4_d_v,
                 self.aind_burr_4_d_v_x00,
                 self.aind_burr_4_d_v_x000,
+            )
+            injectable_materials = self._pair_burr_hole_inj_materials(
+                materials=[
+                    self.aind_burr_4_injectable_x0,
+                    self.aind_burr_4_injectable_x00,
+                    self.aind_burr_4_injectable_x01,
+                    self.aind_burr_4_injectable_x02,
+                ],
+                titers=[
+                    self.aind_burr_4_injectable_x03,
+                    self.aind_burr_4_injectable_x04,
+                    self.aind_burr_4_injectable_x05,
+                    self.aind_burr_4_injectable_x06,
+                ],
             )
             return BurrHoleInfo(
                 hemisphere=self.aind_burr_4_hemisphere,
@@ -3346,12 +3439,27 @@ class MappedNSBList:
                     vol=self.aind_inj4volperdepth, dv=coordinate_depth
                 ),
                 fiber_implant_depth=self.aind_fiber_implant4_d_x00,
+                inj_materials=injectable_materials,
             )
         elif burr_hole_num == 5:
             coordinate_depth = self._map_burr_hole_dv(
                 self.aind_burr_5_d_v_x00,
                 self.aind_burr_5_d_v_x000,
                 self.aind_burr_5_d_v_x001,
+            )
+            injectable_materials = self._pair_burr_hole_inj_materials(
+                materials=[
+                    self.aind_burr_5_injectable_x0,
+                    self.aind_burr_5_injectable_x00,
+                    self.aind_burr_5_injectable_x01,
+                    self.aind_burr_5_injectable_x02,
+                ],
+                titers=[
+                    self.aind_burr_5_injectable_x03,
+                    self.aind_burr_5_injectable_x04,
+                    self.aind_burr_5_injectable_x05,
+                    self.aind_burr_5_injectable_x06,
+                ],
             )
             return BurrHoleInfo(
                 hemisphere=self.aind_burr_5_hemisphere,
@@ -3369,12 +3477,27 @@ class MappedNSBList:
                     vol=self.aind_inj5volperdepth, dv=coordinate_depth
                 ),
                 fiber_implant_depth=self.aind_fiber_implant5_d_x00,
+                inj_materials=injectable_materials,
             )
         elif burr_hole_num == 6:
             coordinate_depth = self._map_burr_hole_dv(
                 self.aind_burr_6_d_v_x00,
                 self.aind_burr_6_d_v_x000,
                 self.aind_burr_6_d_v_x001,
+            )
+            injectable_materials = self._pair_burr_hole_inj_materials(
+                materials=[
+                    self.aind_burr_6_injectable_x0,
+                    self.aind_burr_6_injectable_x00,
+                    self.aind_burr_6_injectable_x01,
+                    self.aind_burr_6_injectable_x02,
+                ],
+                titers=[
+                    self.aind_burr_6_injectable_x03,
+                    self.aind_burr_6_injectable_x04,
+                    self.aind_burr_6_injectable_x05,
+                    self.aind_burr_6_injectable_x06,
+                ],
             )
             return BurrHoleInfo(
                 hemisphere=self.aind_burr_6_hemisphere,
@@ -3392,6 +3515,7 @@ class MappedNSBList:
                     vol=self.aind_inj6volperdepth, dv=coordinate_depth
                 ),
                 fiber_implant_depth=self.aind_fiber_implant6_d_x00,
+                inj_materials=injectable_materials,
             )
         else:
             return BurrHoleInfo()
@@ -3430,6 +3554,51 @@ class MappedNSBList:
             return None
         else:
             return [vol] * len(dv) if dv is not None else [vol]
+
+    def map_burr_hole_injection_materials(
+        self, injectable_materials: List[InjectableMaterial]
+    ) -> Optional[List[Union[ViralMaterial, NonViralMaterial]]]:
+        """Maps injection materials for burr hole."""
+        injection_materials = []
+        for injectable_material in injectable_materials:
+            if injectable_material.material and injectable_material.titer:
+                viral = ViralMaterial.model_construct(
+                    name=injectable_material.material,
+                    titer=self._parse_titer_str(injectable_material.titer),
+                )
+                injection_materials.append(viral)
+            elif (
+                injectable_material.material
+                and injectable_material.concentration
+            ):
+                non_viral = NonViralMaterial.model_construct(
+                    name=injectable_material.material,
+                    concentration=self._parse_concentration_str(
+                        injectable_material.concentration
+                    ),
+                )
+                injection_materials.append(non_viral)
+        return injection_materials
+
+    def _pair_burr_hole_inj_materials(
+        self, materials: List[str], titers: List[str]
+    ) -> List[InjectableMaterial]:
+        """Creates a list of Injectable Materials.
+        Pairs materials and corresponding titers for each injectable material."""
+        injectable_materials = []
+        for material, titer_str in zip(materials, titers):
+            if titer_str:
+                injectable_material = InjectableMaterial(
+                    material=material,
+                    titer=self._is_titer(titer_str),
+                    concentration=self._is_concentration(titer_str),
+                )
+            else:
+                injectable_material = InjectableMaterial(
+                    material=material,
+                )
+            injectable_materials.append(injectable_material)
+        return injectable_materials
 
     def get_procedure(self) -> List[Surgery]:
         """Get a List of Surgeries"""
@@ -3569,14 +3738,8 @@ class MappedNSBList:
                     during=burr_hole_info.during,
                     inj_type=burr_hole_info.inj_type,
                 )
-                injection_materials = (
-                    []
-                    if burr_hole_info.virus_strain is None
-                    else [
-                        ViralMaterial.model_construct(
-                            name=burr_hole_info.virus_strain
-                        )
-                    ]
+                injection_materials = self.map_burr_hole_injection_materials(
+                    burr_hole_info.inj_materials
                 )
                 if burr_hole_info.inj_type == InjectionType.IONTOPHORESIS:
                     injection_proc = IontophoresisInjection.model_construct(

@@ -22,7 +22,12 @@
         "headframe_material": null
       },
       {
-        "injection_materials": [],
+        "injection_materials": [{"addgene_id": null,
+                                           "material_type": "Virus",
+                                           "name": "220916-4",
+                                           "tars_identifiers": null,
+                                           "titer": 18000000000000,
+                                           "titer_unit": "gc/mL"}],
         "recovery_time": "25.0",
         "injection_duration": null,
         "instrument_id": null,
@@ -69,7 +74,12 @@
     "workstation_id": null,
     "procedures": [
       {
-        "injection_materials": [],
+        "injection_materials": [{"addgene_id": null,
+                                           "material_type": "Virus",
+                                           "name": "221110",
+                                           "tars_identifiers": null,
+                                           "titer": 10700000000,
+                                           "titer_unit": "gc/mL"}],
         "recovery_time": "30.0",
         "injection_duration": null,
         "instrument_id": null,
