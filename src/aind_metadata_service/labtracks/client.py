@@ -93,6 +93,10 @@ class LabTracksClient:
         """Closes a pyodbc session connection"""
         session.close()
 
+    @staticmethod
+    def _validate_subject_id(subject_id: str) -> bool:
+        return subject_id.isnumeric()
+
     def run_query(self, query: str) -> JSONResponse:
         try:
             session = self._create_session()

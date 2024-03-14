@@ -14,8 +14,7 @@ class TestLabTracksQueryBuilder(unittest.TestCase):
 
     def test_subject_from_species(self):
         """Tests sql string is created correctly."""
-        subject_id = "625464"
-        actual_output = LabTracksQueries.subject_from_subject_id(subject_id)
+        actual_output = LabTracksQueries.subject_from_subject_id()
         expected_output = (
             "SELECT"
             f"    AC.ID AS {SubjectQueryColumns.ID.value},"
@@ -45,14 +44,13 @@ class TestLabTracksQueryBuilder(unittest.TestCase):
             "    ON AC.GROUP_ID = G.ID"
             "    LEFT OUTER JOIN GROUPS "
             "    ON MATERNAL.GROUP_ID = GROUPS.ID"
-            f" WHERE AC.ID={subject_id};"
+            " WHERE AC.ID = ?;"
         )
         self.assertEqual(expected_output, actual_output)
 
     def test_procedures_from_id(self):
         """Tests sql string is created correctly."""
-        subject_id = "625464"
-        actual_output = LabTracksQueries.procedures_from_subject_id(subject_id)
+        actual_output = LabTracksQueries.procedures_from_subject_id()
         expected_output = (
             "SELECT"
             f"    TS.ID AS {TaskSetQueryColumns.TASK_ID.value},"
@@ -75,7 +73,7 @@ class TestLabTracksQueryBuilder(unittest.TestCase):
             "    ON TS.TASK_TYPE_ID = TT.ID"
             "    INNER JOIN ACUC_PROTOCOL AP "
             "    ON TS.ACUC_LINK_ID = AP.LINK_INDEX"
-            f" WHERE AC.ID={subject_id};"
+            " WHERE AC.ID = ?;"
         )
         self.assertEqual(expected_output, actual_output)
 
