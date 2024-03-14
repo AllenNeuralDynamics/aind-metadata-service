@@ -2,10 +2,10 @@
 
 import os
 
-# from aind_metadata_mapper.bergamo.session import BergamoEtl
-# from aind_metadata_mapper.bergamo.session import (
-#     JobSettings as BergamoJobSettings,
-# )
+from aind_metadata_mapper.bergamo.session import BergamoEtl
+from aind_metadata_mapper.bergamo.session import (
+    JobSettings as BergamoJobSettings,
+)
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
@@ -16,7 +16,7 @@ from aind_metadata_service.labtracks.client import (
     LabTracksSettings,
 )
 
-# from aind_metadata_service.response_handler import EtlResponse
+from aind_metadata_service.response_handler import EtlResponse
 from aind_metadata_service.sharepoint.client import (
     SharePointClient,
     SharepointSettings,
@@ -89,15 +89,15 @@ tars_client = TarsClient(azure_settings=tars_settings)
 slims_client = SlimsClient(settings=slims_settings)
 
 
-# @app.post("/bergamo_session/")
-# async def retrieve_bergamo_session(job_settings: BergamoJobSettings):
-#     """Builds a bergamo session model from the given job settings"""
-#
-#     etl_job = BergamoEtl(
-#         job_settings=job_settings,
-#     )
-#     response = etl_job.run_job()
-#     return EtlResponse.map_job_response(response)
+@app.post("/bergamo_session/")
+async def retrieve_bergamo_session(job_settings: BergamoJobSettings):
+    """Builds a bergamo session model from the given job settings"""
+
+    etl_job = BergamoEtl(
+        job_settings=job_settings,
+    )
+    response = etl_job.run_job()
+    return EtlResponse.map_job_response(response)
 
 
 @app.get("/instrument/{instrument_id}")
@@ -222,10 +222,10 @@ async def retrieve_procedures(subject_id, pickle: bool = False):
     Returns pickled data if URL parameter pickle=True, else returns json
     """
     sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
-    # lb_client = LabTracksClient.from_settings(labtracks_settings)
-    # lb_response = await run_in_threadpool(
-    #     lb_client.get_procedures_info, subject_id=subject_id
-    # )
+    lb_client = LabTracksClient.from_settings(labtracks_settings)
+    lb_response = await run_in_threadpool(
+        lb_client.get_procedures_info, subject_id=subject_id
+    )
     sp2019_response = await run_in_threadpool(
         sharepoint_client.get_procedure_info,
         subject_id=subject_id,
@@ -237,7 +237,7 @@ async def retrieve_procedures(subject_id, pickle: bool = False):
         list_title=sharepoint_settings.nsb_2023_list,
     )
     merged_response = sharepoint_client.merge_responses(
-        [sp2019_response, sp2023_response]
+        [lb_response, sp2019_response, sp2023_response]
     )
     mapper = TarsResponseHandler()
     viruses = mapper.get_virus_strains(merged_response)
