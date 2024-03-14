@@ -6,11 +6,13 @@ from aind_metadata_mapper.bergamo.session import BergamoEtl
 from aind_metadata_mapper.bergamo.session import (
     JobSettings as BergamoJobSettings,
 )
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
+from fastapi.templating import Jinja2Templates
 from starlette.concurrency import run_in_threadpool
 
+from aind_metadata_service import __version__ as SERVICE_VERSION
 from aind_metadata_service.labtracks.client import (
     LabTracksClient,
     LabTracksSettings,
@@ -86,6 +88,11 @@ protocols_smart_sheet_client = SmartSheetClient(
 
 tars_client = TarsClient(azure_settings=tars_settings)
 slims_client = SlimsClient(settings=slims_settings)
+
+template_directory = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "templates")
+)
+templates = Jinja2Templates(directory=template_directory)
 
 
 @app.post("/bergamo_session/")
@@ -266,3 +273,33 @@ async def favicon():
     Returns the favicon
     """
     return favicon_path
+
+
+@app.get("/")
+async def index(request: Request):
+    """
+    Returns the index page with search UIs for enabled endpoints.
+    """
+    return templates.TemplateResponse(
+        name="index.html",
+        context=(
+            {
+                "request": request,  # required
+                "service_name": "AIND Metadata Service",  # required
+                "service_description": (
+                    "REST service to retrieve metadata from AIND databases."
+                ),
+                "service_version": SERVICE_VERSION,
+                "endpoints": [
+                    {
+                        "endpoint": "subject",  # required
+                        "description": (
+                            "Retrieve subject metadata from Labtracks server"
+                        ),
+                        "parameter": "subject_id",  # required
+                        "parameter_label": "Subject ID",
+                    },
+                ],
+            }
+        ),
+    )
