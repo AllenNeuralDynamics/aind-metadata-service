@@ -105,8 +105,8 @@ class InjectableMaterial:
     """Container for injectable material information"""
 
     material: Optional[str] = None
-    titer: Optional[str] = None
-    concentration: Optional[str] = None
+    titer_str: Optional[str] = None
+    # concentration: Optional[str] = None
 
 
 @dataclass
@@ -225,19 +225,6 @@ class MappedNSBList:
         except ValueError:
             return None
 
-    # def _parse_alt_time_str(
-    #     self, alt_time_str: Optional[str]
-    # ) -> Optional[float]:
-    #     """Parse alternating time strings"""
-    #     if alt_time_str is not None:
-    #         parsed_string = re.search(self.ALT_TIME_REGEX, alt_time_str)
-    #         if parsed_string is not None:
-    #             return self._parse_basic_float_str(parsed_string.group(1))
-    #         else:
-    #             return None
-    #     else:
-    #         return None
-
     def _parse_current_str(self, cur_str: Optional[str]) -> Optional[Decimal]:
         """Parse current strings"""
         if cur_str is not None:
@@ -277,25 +264,27 @@ class MappedNSBList:
         # TODO: Figure out how to parse virus strain field
         return virus_strain_str
 
-    def _is_titer(self, titer_str: str) -> Optional[re.Match]:
+    def _is_titer(self, titer_str: str) -> bool:
         """Checks whether titer field is in scientific notation."""
-        return re.search(self.SCIENTIFIC_NOTATION_REGEX, titer_str)
+        match = re.search(self.SCIENTIFIC_NOTATION_REGEX, titer_str)
+        return True if match else False
 
-    def _is_concentration(self, titer_str: str) -> Optional[re.Match]:
+    def _is_concentration(self, titer_str: str) -> bool:
         """Checks whether titer field contains concentration."""
-        return re.search(self.CONCENTRATION_REGEX, titer_str)
+        match = re.search(self.CONCENTRATION_REGEX, titer_str)
+        return True if match else False
 
     @staticmethod
-    def _parse_titer_str(match: Optional[re.Match]) -> Optional[int]:
+    def _parse_titer_str(titer_str: Optional[str]) -> Optional[int]:
         """Parse string representation of titer into int."""
-        return int(float(match.group(0)))
+        return None if titer_str is None else int(float(titer_str))
 
     @staticmethod
     def _parse_concentration_str(
-        match: Optional[re.Match],
+        con_str: Optional[str],
     ) -> Optional[Decimal]:
         """Parse string representation of concentration into Decimal."""
-        return Decimal(float(match.group(1)))
+        return None if con_str is None else Decimal(float(con_str))
 
     @property
     def aind_age_at_injection(self) -> Optional[Decimal]:
@@ -2881,44 +2870,12 @@ class MappedNSBList:
     @property
     def aind_procedure(self) -> Optional[NSBProcedure]:
         """Maps procedure to aind model"""
-        # TODO: check that this is mapped right
         return self._nsb.procedure
-        # return {
-        #     self._nsb.procedure.SELECT: None,
-        #     self._nsb.procedure.CUSTOM: None,
-        #     self._nsb.procedure.STEREOTAXIC_INJECTION: None,
-        #     self._nsb.procedure.STEREOTAXIC_INJECTION_WIT: None,
-        #     self._nsb.procedure.ISIGUIDED_INJECTION_WITH: None,
-        #     self._nsb.procedure.FIBER_OPTIC_IMPLANT_WITH: None,
-        #     self._nsb.procedure.INJECTION_FIBER_OPTIC_IMP: None,
-        #     self._nsb.procedure.HP_ONLY: None,
-        #     self._nsb.procedure.HP_TRANSCRANIAL: None,
-        #     self._nsb.procedure.VISUAL_CTX_2_P: None,
-        #     self._nsb.procedure.FRONTAL_CTX_2_P: None,
-        #     self._nsb.procedure.WHC_2_P: None,
-        #     self._nsb.procedure.MOTOR_CTX: None,
-        #     self._nsb.procedure.INJ_MOTOR_CTX: None,
-        #     self._nsb.procedure.INJ_VISUAL_CTX_2_P: None,
-        #     self._nsb.procedure.VISUAL_CTX_NP: None,
-        #     self._nsb.procedure.WHC_NP: None,
-        #     self._nsb.procedure.INJ_WHC_NP_1_INJECTION_LO: None,
-        #     self._nsb.procedure.DHC: None,
-        # }.get(self._nsb.procedure, None)
 
     @property
     def aind_procedure_family(self) -> Optional[NSBProcedureCategory]:
         """Maps procedure_family to aind model"""
         return self._nsb.procedure_family
-        # return {
-        #     self._nsb.procedure_family.SELECT: None,
-        #     self._nsb.procedure_family.INJECTION: None,
-        #     self._nsb.procedure_family.FIBER_OPTIC_IMPLANT: None,
-        #     self._nsb.procedure_family.CRANIAL_WINDOW: None,
-        #     self._nsb.procedure_family.HEADPOST_ONLY: None,
-        #     self._nsb.procedure_family.TRAINING: None,
-        #     self._nsb.procedure_family.CUSTOM: None,
-        #     self._nsb.procedure_family.DEVELOPMENT: None,
-        # }.get(self._nsb.procedure_family, None)
 
     @property
     def aind_procedure_slots(self) -> Optional[Any]:
@@ -3561,42 +3518,48 @@ class MappedNSBList:
         """Maps injection materials for burr hole."""
         injection_materials = []
         for injectable_material in injectable_materials:
-            if injectable_material.material and injectable_material.titer:
+            if (
+                injectable_material.material
+                and injectable_material.titer_str
+                and self._is_titer(injectable_material.titer_str)
+            ):
+                titer = re.search(
+                    self.SCIENTIFIC_NOTATION_REGEX,
+                    injectable_material.titer_str,
+                ).group(0)
                 viral = ViralMaterial.model_construct(
                     name=injectable_material.material,
-                    titer=self._parse_titer_str(injectable_material.titer),
+                    titer=self._parse_titer_str(titer),
                 )
                 injection_materials.append(viral)
             elif (
                 injectable_material.material
-                and injectable_material.concentration
+                and injectable_material.titer_str
+                and self._is_concentration(injectable_material.titer_str)
             ):
+                concentration = re.search(
+                    self.CONCENTRATION_REGEX, injectable_material.titer_str
+                ).group(1)
                 non_viral = NonViralMaterial.model_construct(
                     name=injectable_material.material,
-                    concentration=self._parse_concentration_str(
-                        injectable_material.concentration
-                    ),
+                    concentration=self._parse_concentration_str(concentration),
                 )
                 injection_materials.append(non_viral)
         return injection_materials
 
+    @staticmethod
     def _pair_burr_hole_inj_materials(
-        self, materials: List[str], titers: List[str]
-    ) -> List[InjectableMaterial]:
-        """Creates a list of Injectable Materials.
-        Pairs materials and corresponding titers for each injectable material."""
+        materials: List[str], titers: List[str]
+    ) -> Optional[List[InjectableMaterial]]:
+        """Pairs materials and corresponding titers/concentrations."""
         injectable_materials = []
         for material, titer_str in zip(materials, titers):
             if titer_str:
                 injectable_material = InjectableMaterial(
-                    material=material,
-                    titer=self._is_titer(titer_str),
-                    concentration=self._is_concentration(titer_str),
+                    material=material, titer_str=titer_str
                 )
             else:
-                injectable_material = InjectableMaterial(
-                    material=material,
-                )
+                injectable_material = InjectableMaterial(material=material)
             injectable_materials.append(injectable_material)
         return injectable_materials
 
