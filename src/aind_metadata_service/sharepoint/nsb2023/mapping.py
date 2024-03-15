@@ -266,13 +266,11 @@ class MappedNSBList:
 
     def _is_titer(self, titer_str: str) -> bool:
         """Checks whether titer field is in scientific notation."""
-        match = re.search(self.SCIENTIFIC_NOTATION_REGEX, titer_str)
-        return True if match else False
+        return bool(re.search(self.SCIENTIFIC_NOTATION_REGEX, titer_str))
 
     def _is_concentration(self, titer_str: str) -> bool:
         """Checks whether titer field contains concentration."""
-        match = re.search(self.CONCENTRATION_REGEX, titer_str)
-        return True if match else False
+        return bool(re.search(self.CONCENTRATION_REGEX, titer_str))
 
     @staticmethod
     def _parse_titer_str(titer_str: Optional[str]) -> Optional[int]:
