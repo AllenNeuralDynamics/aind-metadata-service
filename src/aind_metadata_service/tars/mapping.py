@@ -212,7 +212,7 @@ class TarsResponseHandler:
         response : ModelResponse
         """
         viruses = []
-        if len(response.aind_models):
+        if len(response.aind_models) > 0:
             procedures = response.aind_models[0]
             for subject_procedure in procedures.subject_procedures:
                 for procedure in subject_procedure.procedures:
@@ -236,7 +236,7 @@ class TarsResponseHandler:
         """
         output_aind_models = []
         status_code = response.status_code
-        if len(response.aind_models):
+        if len(response.aind_models) > 0:
             pre_procedures = response.aind_models[0]
             integrated_subject_procedures = []
             for subject_procedure in pre_procedures.subject_procedures:
