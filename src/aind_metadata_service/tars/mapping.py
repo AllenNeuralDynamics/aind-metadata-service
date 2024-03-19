@@ -212,16 +212,17 @@ class TarsResponseHandler:
         response : ModelResponse
         """
         viruses = []
-        procedures = response.aind_models[0]
-        for subject_procedure in procedures.subject_procedures:
-            for procedure in subject_procedure.procedures:
-                if (
-                    isinstance(procedure, Injection)
-                    and procedure.injection_materials
-                    and procedure.injection_materials[0].name
-                ):
-                    virus_strain = procedure.injection_materials[0].name
-                    viruses.append(virus_strain)
+        if len(response.aind_models):
+            procedures = response.aind_models[0]
+            for subject_procedure in procedures.subject_procedures:
+                for procedure in subject_procedure.procedures:
+                    if (
+                        isinstance(procedure, Injection)
+                        and procedure.injection_materials
+                        and procedure.injection_materials[0].name
+                    ):
+                        virus_strain = procedure.injection_materials[0].name
+                        viruses.append(virus_strain)
         return viruses
 
     @staticmethod
@@ -233,33 +234,38 @@ class TarsResponseHandler:
         Parameters
         ----------
         """
-        pre_procedures = response.aind_models[0]
+        output_aind_models = []
         status_code = response.status_code
-        integrated_subject_procedures = []
-        for subject_procedure in pre_procedures.subject_procedures:
-            integrated_procedures = []
-            for procedure in subject_procedure.procedures:
-                if (
-                    isinstance(procedure, Injection)
-                    and procedure.injection_materials
-                ):
-                    virus_strain = procedure.injection_materials[0].name
-                    tars_response = tars_mapping.get(virus_strain)
+        if len(response.aind_models):
+            pre_procedures = response.aind_models[0]
+            integrated_subject_procedures = []
+            for subject_procedure in pre_procedures.subject_procedures:
+                integrated_procedures = []
+                for procedure in subject_procedure.procedures:
                     if (
-                        tars_response.status_code
-                        == StatusCodes.DB_RESPONDED.value
-                        or tars_response.status_code
-                        == StatusCodes.VALID_DATA.value
+                        isinstance(procedure, Injection)
+                        and procedure.injection_materials
                     ):
-                        data = json.loads(tars_response.body)["data"]
-                        procedure.injection_materials = [ViralMaterial(**data)]
-                    else:
-                        procedure.injection_materials = []
-                        status_code = StatusCodes.MULTI_STATUS
-                integrated_procedures.append(procedure)
-            subject_procedure.procedures = integrated_procedures
-            integrated_subject_procedures.append(subject_procedure)
-        pre_procedures.subject_procedures = integrated_subject_procedures
+                        virus_strain = procedure.injection_materials[0].name
+                        tars_response = tars_mapping.get(virus_strain)
+                        if (
+                            tars_response.status_code
+                            == StatusCodes.DB_RESPONDED.value
+                            or tars_response.status_code
+                            == StatusCodes.VALID_DATA.value
+                        ):
+                            data = json.loads(tars_response.body)["data"]
+                            procedure.injection_materials = [
+                                ViralMaterial(**data)
+                            ]
+                        else:
+                            procedure.injection_materials = []
+                            status_code = StatusCodes.MULTI_STATUS
+                    integrated_procedures.append(procedure)
+                subject_procedure.procedures = integrated_procedures
+                integrated_subject_procedures.append(subject_procedure)
+            pre_procedures.subject_procedures = integrated_subject_procedures
+            output_aind_models = [pre_procedures]
         return ModelResponse(
-            aind_models=[pre_procedures], status_code=status_code
+            aind_models=output_aind_models, status_code=status_code
         )
