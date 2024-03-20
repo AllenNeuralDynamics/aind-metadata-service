@@ -253,11 +253,19 @@ class TarsResponseHandler:
                             == StatusCodes.DB_RESPONDED.value
                             or tars_response.status_code
                             == StatusCodes.VALID_DATA.value
+                            or tars_response.status_code
+                            == StatusCodes.INVALID_DATA.value
                         ):
                             data = json.loads(tars_response.body)["data"]
                             procedure.injection_materials = [
                                 ViralMaterial(**data)
                             ]
+                        elif(
+                            tars_response.status_code
+                            == StatusCodes.NO_DATA_FOUND.value
+                        ):
+                            procedure.injection_materials = []
+                            pass
                         else:
                             procedure.injection_materials = []
                             status_code = StatusCodes.MULTI_STATUS
