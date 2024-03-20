@@ -212,17 +212,17 @@ class TarsResponseHandler:
         response : ModelResponse
         """
         viruses = []
-        procedures = response.aind_models[0]
-        for subject_procedure in procedures.subject_procedures:
-            for procedure in subject_procedure.procedures:
-                if (
-                    isinstance(procedure, Injection)
-                    and procedure.injection_materials
-                ):
-                    for injection_material in procedure.injection_materials:
-                        if isinstance(injection_material, ViralMaterial):
-                            virus_strain = injection_material.name
-                            viruses.append(virus_strain)
+        if len(response.aind_models) > 0:
+            procedures = response.aind_models[0]
+            for subject_procedure in procedures.subject_procedures:
+                for procedure in subject_procedure.procedures:
+                    if (
+                        isinstance(procedure, Injection)
+                        and procedure.injection_materials
+                        and procedure.injection_materials[0].name
+                    ):
+                        virus_strain = procedure.injection_materials[0].name
+                        viruses.append(virus_strain)
         return viruses
 
     @staticmethod
@@ -234,34 +234,37 @@ class TarsResponseHandler:
         Parameters
         ----------
         """
-        pre_procedures = response.aind_models[0]
+        output_aind_models = []
         status_code = response.status_code
-        for subject_procedure in pre_procedures.subject_procedures:
-            for procedure in subject_procedure.procedures:
-                if (
-                    isinstance(procedure, Injection)
-                    and procedure.injection_materials
-                ):
-                    for idx, injection_material in enumerate(
-                        procedure.injection_materials
+        if len(response.aind_models) > 0:
+            pre_procedures = response.aind_models[0]
+            for subject_procedure in pre_procedures.subject_procedures:
+                for procedure in subject_procedure.procedures:
+                    if (
+                        isinstance(procedure, Injection)
+                        and procedure.injection_materials
                     ):
-                        if isinstance(injection_material, ViralMaterial):
-                            virus_strain = injection_material.name
-                            tars_response = tars_mapping.get(virus_strain)
-                            if (
-                                tars_response.status_code
-                                == StatusCodes.DB_RESPONDED.value
-                                or tars_response.status_code
-                                == StatusCodes.VALID_DATA.value
-                            ):
-                                data = json.loads(tars_response.body)["data"]
-                                new_material = ViralMaterial(**data)
-                                new_material.titer = injection_material.titer
-                                procedure.injection_materials[
-                                    idx
-                                ] = new_material
-                            else:
-                                status_code = StatusCodes.MULTI_STATUS
+                        for idx, injection_material in enumerate(
+                            procedure.injection_materials
+                        ):
+                            if isinstance(injection_material, ViralMaterial):
+                                virus_strain = injection_material.name
+                                tars_response = tars_mapping.get(virus_strain)
+                                if (
+                                    tars_response.status_code
+                                    == StatusCodes.DB_RESPONDED.value
+                                    or tars_response.status_code
+                                    == StatusCodes.VALID_DATA.value
+                                ):
+                                    data = json.loads(tars_response.body)["data"]
+                                    new_material = ViralMaterial(**data)
+                                    new_material.titer = injection_material.titer
+                                    procedure.injection_materials[
+                                        idx
+                                    ] = new_material
+                                else:
+                                    status_code = StatusCodes.MULTI_STATUS
+                output_aind_models = [pre_procedures]
         return ModelResponse(
-            aind_models=[pre_procedures], status_code=status_code
+            aind_models=output_aind_models, status_code=status_code
         )
