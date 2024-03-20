@@ -376,6 +376,31 @@ class TestTarsResponseHandler(unittest.TestCase):
         )
         self.assertEqual(merged_response.status_code, StatusCodes.MULTI_STATUS)
 
+    def test_integrate_injection_materials_no_data(self):
+        """Tests that injection materials are integrated into
+        procedures response as expected"""
+        tars_response = ModelResponse(
+            aind_models=[],
+            status_code=StatusCodes.NO_DATA_FOUND,
+        )
+        tars_mapping = {
+            "12345": tars_response.map_to_json_response(),
+        }
+        inj1 = NanojectInjection.model_construct(
+            injection_materials=[ViralMaterial.model_construct(name="12345")]
+        )
+        surgery = Surgery.model_construct(procedures=[inj1])
+        procedures_response = ModelResponse(
+            aind_models=[
+                Procedures(subject_id="12345", subject_procedures=[surgery])
+            ],
+            status_code=StatusCodes.DB_RESPONDED,
+        )
+        merged_response = self.handler.integrate_injection_materials(
+            response=procedures_response, tars_mapping=tars_mapping
+        )
+        self.assertEqual(merged_response.status_code, StatusCodes.DB_RESPONDED)
+
 
 if __name__ == "__main__":
     unittest.main()
