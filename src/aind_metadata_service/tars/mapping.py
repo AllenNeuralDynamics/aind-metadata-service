@@ -256,7 +256,7 @@ class TarsResponseHandler:
                                     or tars_response.status_code
                                     == StatusCodes.VALID_DATA.value
                                     or tars_response.status_code
-                                    == StatusCodes.INVALID_DATA
+                                    == StatusCodes.INVALID_DATA.value
                                 ):
                                     data = json.loads(tars_response.body)["data"]
                                     new_material = ViralMaterial(**data)
@@ -266,7 +266,7 @@ class TarsResponseHandler:
                                     ] = new_material
                                 elif (
                                     tars_response.status_code
-                                    == StatusCodes.NO_DATA_FOUND
+                                    == StatusCodes.NO_DATA_FOUND.value
                                 ):
                                     pass
                                 else:
