@@ -258,12 +258,16 @@ class TarsResponseHandler:
                                     or tars_response.status_code
                                     == StatusCodes.INVALID_DATA.value
                                 ):
-                                    data = json.loads(tars_response.body)["data"]
+                                    data = json.loads(tars_response.body)[
+                                        "data"
+                                    ]
                                     new_material = ViralMaterial(**data)
-                                    new_material.titer = injection_material.titer
-                                    procedure.injection_materials[
-                                        idx
-                                    ] = new_material
+                                    new_material.titer = (
+                                        injection_material.titer
+                                    )
+                                    procedure.injection_materials[idx] = (
+                                        new_material
+                                    )
                                 elif (
                                     tars_response.status_code
                                     == StatusCodes.NO_DATA_FOUND.value
