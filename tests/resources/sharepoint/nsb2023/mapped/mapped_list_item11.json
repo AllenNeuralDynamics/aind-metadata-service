@@ -67,7 +67,7 @@
     "animal_weight_post": null,
     "anaesthesia": {
       "type": "isoflurane",
-      "duration": "120",
+      "duration": "120.0",
       "level": "2.5",
       "duration_unit": "minute"
     },

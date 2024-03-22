@@ -1741,11 +1741,10 @@ class MappedNSBList:
     @property
     def aind_first_injection_iso_durat(self) -> Optional[Decimal]:
         """Maps first_injection_iso_durat to aind model"""
-        return (
-            None
-            if self._nsb.first_injection_iso_durat is None
-            else Decimal(self._nsb.first_injection_iso_durat) * 60
+        optional_decimal = self._map_float_to_decimal(
+            self._nsb.first_injection_iso_durat
         )
+        return None if optional_decimal is None else optional_decimal * 60
 
     @property
     def aind_first_injection_weight_af(self) -> Optional[Decimal]:
@@ -2412,11 +2411,8 @@ class MappedNSBList:
     @property
     def aind_iso_on(self) -> Optional[Decimal]:
         """Maps iso_on to aind model"""
-        return (
-            None
-            if self._nsb.iso_on is None
-            else Decimal(self._nsb.iso_on) * 60
-        )
+        optional_decimal = self._map_float_to_decimal(self._nsb.iso_on)
+        return None if optional_decimal is None else optional_decimal * 60
 
     @property
     def aind_lab_tracks_group(self) -> Optional[str]:
