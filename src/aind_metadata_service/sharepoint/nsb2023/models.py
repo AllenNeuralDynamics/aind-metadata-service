@@ -571,6 +571,7 @@ class EdemaSwelling(Enum, metaclass=OptionalEnumMeta):
 class FiberImplant1Length(Enum, metaclass=OptionalEnumMeta):
     """Enum class for FiberImplant1Length"""
 
+    N_15_MM = "1.5 mm"
     N_20_MM = "2.0 mm"
     N_25_MM = "2.5 mm"
     N_30_MM = "3.0 mm"
@@ -584,6 +585,7 @@ class FiberImplant1Length(Enum, metaclass=OptionalEnumMeta):
 class FiberImplant2Length(Enum, metaclass=OptionalEnumMeta):
     """Enum class for FiberImplant2Length"""
 
+    N_15_MM = "1.5 mm"
     N_20_MM = "2.0 mm"
     N_25_MM = "2.5 mm"
     N_30_MM = "3.0 mm"
@@ -597,6 +599,7 @@ class FiberImplant2Length(Enum, metaclass=OptionalEnumMeta):
 class FiberImplant3Length(Enum, metaclass=OptionalEnumMeta):
     """Enum class for FiberImplant3Length"""
 
+    N_15_MM = "1.5 mm"
     N_20_MM = "2.0 mm"
     N_25_MM = "2.5 mm"
     N_30_MM = "3.0 mm"
@@ -610,6 +613,7 @@ class FiberImplant3Length(Enum, metaclass=OptionalEnumMeta):
 class FiberImplant4Length(Enum, metaclass=OptionalEnumMeta):
     """Enum class for FiberImplant4Length"""
 
+    N_15_MM = "1.5 mm"
     N_20_MM = "2.0 mm"
     N_25_MM = "2.5 mm"
     N_30_MM = "3.0 mm"
@@ -623,6 +627,7 @@ class FiberImplant4Length(Enum, metaclass=OptionalEnumMeta):
 class FiberImplant5Length(Enum, metaclass=OptionalEnumMeta):
     """Enum class for FiberImplant5Length"""
 
+    N_15_MM = "1.5 mm"
     N_20_MM = "2.0 mm"
     N_25_MM = "2.5 mm"
     N_30_MM = "3.0 mm"
@@ -636,6 +641,7 @@ class FiberImplant5Length(Enum, metaclass=OptionalEnumMeta):
 class FiberImplant6Length(Enum, metaclass=OptionalEnumMeta):
     """Enum class for FiberImplant6Length"""
 
+    N_15_MM = "1.5 mm"
     N_20_MM = "2.0 mm"
     N_25_MM = "2.5 mm"
     N_30_MM = "3.0 mm"
@@ -699,6 +705,7 @@ class Headpost(Enum, metaclass=OptionalEnumMeta):
 
     AI_STRAIGHT_BAR = "AI Straight bar"
     FRONTAL_CTX = "Frontal Ctx"
+    LC = "LC"
     LSHAPED = "L-shaped"
     MOTOR_CTX = "Motor Ctx"
     OTHER_ADD_DETAILS_IN_REQU = "Other (add details in requestor comments)"
@@ -758,6 +765,7 @@ class IacucProtocol(Enum, metaclass=OptionalEnumMeta):
     N_2304 = "2304"
     N_2305 = "2305"
     N_2306 = "2306"
+    N_2010 = "2010"
     SELECT = "Select..."
 
 
@@ -769,13 +777,13 @@ class ImplantIdCoverslipType(Enum, metaclass=OptionalEnumMeta):
     N_2004 = "2004"
     N_2005 = "2005"
     N_2006 = "2006"
-    N_2007 = "2007"
-    N_2008 = "2008"
-    N_2009 = "2009"
+    N_2010 = "2010"
+    N_2011 = "2011"
     N_3001 = "3001"
-    N_3002 = "3002"
-    N_3002_25_PURALUBESYSTANE = "3002 (25% puralube/systane)"
     N_3003 = "3003"
+    N_3004 = "3004"
+    N_3004_25_PURALUBESYSTANE = "3004 (25% puralube/systane)"
+    N_3005 = "3005"
     N_3MM_STACKED_COVERSLIP = "3mm stacked coverslip"
     N_5MM_STACKED_COVERSLIP = "5mm stacked coverslip"
     N_5MM_STACKED_COVERSLIP_W = (
@@ -783,6 +791,12 @@ class ImplantIdCoverslipType(Enum, metaclass=OptionalEnumMeta):
     )
     SELECT = "Select..."
     WHC_2_P_CURVED_GLASS_WITH = "WHC 2P curved glass (with window frame)"
+    # note: options that were removed
+    N_2007 = "2007"
+    N_2008 = "2008"
+    N_2009 = "2009"
+    N_3002 = "3002"
+    N_3002_25_PURALUBESYSTANE = "3002 (25% puralube/systane)"
 
 
 class InitialIontoNumber(Enum, metaclass=OptionalEnumMeta):
@@ -957,6 +971,7 @@ class Limsproject(Enum, metaclass=OptionalEnumMeta):
     AINDOPHYS = "aind-ophys"
     APR_OX = "APROx"
     A_XL_OX = "AXlOx"
+    BA_RSEQ_GENETIC_TOOLS = "BARseq_GeneticTools"
     BRAINTV_VIRAL_STRATEGIES = "BraintvViralStrategies"
     BRAIN_STIM = "BrainStim"
     C200 = "C200"
@@ -1099,7 +1114,6 @@ class Limsproject(Enum, metaclass=OptionalEnumMeta):
     OPEN_SCOPE_TEMPORAL_BARCO = "OpenScopeTemporalBarcode"
     OPEN_SCOPE_VISION2_HIPPOC = "OpenScopeVision2Hippocampus"
     OPH5_X = "OPH5X"
-    S200_C = "S200C"
     SLC6_A1_NEUROPIXEL = "SLC6A1Neuropixel"
     SMART_SPIM_GENETIC_TOOLS = "SmartSPIM_GeneticTools"
     SURGERY_X = "SurgeryX"
@@ -1135,6 +1149,7 @@ class Limsproject(Enum, metaclass=OptionalEnumMeta):
     VISUAL_BEHAV_IOR_MULTISCO = "VisualBehavIorMultiscopeTask1G"
     VI_DEEPDLVE_DEEPSCOPE_PIE = "VIDeepdlveDeepscopePiezo"
     VI_DEEP_DIVE_EM_VOLUME = "VIDeepDiveEMVolume"
+    S200_C = "S200C"
 
 
 class Limstaskflow(Enum, metaclass=OptionalEnumMeta):
@@ -1182,17 +1197,20 @@ class Limstaskflow(Enum, metaclass=OptionalEnumMeta):
         "MSP Dynamic Routing Ultra Optotagging Behavior"
     )
     MSP_G_CA_MP8_TESTING = "MSP GCaMP8 Testing"
+    MSP_G_CA_MP8_TESTING_RO = "MSP GCaMP8 Testing (RO)"
     MSP_LEARNING_M_FISH_DEVEL = "MSP Learning & mFISH Development"
     MSP_LEARNING_M_FISH_D_001 = "MSP Learning & mFISH Development (Dox)"
     MSP_LEARNING_M_FISH_FRONT = "MSP Learning & mFISH Frontal Window Dev"
     MSP_LEARNING_M_FISH_VIRUS = "MSP Learning & mFISH Virus Testing"
     MSP_OM_FISH_COREGISTRATIO = "MSP omFISH Co-registration Pilot"
     MSP_OM_FISH_CUX2_PILOT = "MSP omFISH Cux2 Pilot"
+    MSP_OM_FISH_GAD2_MESO = "MSP omFISH Gad2 Meso"
     MSP_OM_FISH_GAD2_PILOT = "MSP omFISH Gad2 Pilot"
     MSP_OM_FISH_RBP4_MESO = "MSP omFISH Rbp4 Meso"
     MSP_OM_FISH_ROB_INJECTION = "MSP omFISH ROB Injection Virus Pilot"
     MSP_OM_FISH_RORB_PILOT = "MSP omFISH Rorb Pilot"
     MSP_OM_FISH_SST_MESO_GAMM = "MSP omFISH Sst Meso (GammaStim)"
+    MSP_OM_FISH_VIP_MESO_GAMM = "MSP omFISH Vip Meso (GammaStim)"
     MSP_OPEN_SCOPE_DENDRITE_C = "MSP OpenScope Dendrite Coupling"
     MSP_OPEN_SCOPE_GLOBAL_001 = (
         "MSP OpenScope Global Local Oddballs (Cohort 2)"
@@ -1260,6 +1278,7 @@ class Procedure(Enum, metaclass=OptionalEnumMeta):
     """Enum class for Procedure"""
 
     CUSTOM = "Custom"
+    DHC = "DHC"
     FIBER_OPTIC_IMPLANT_WITH = "Fiber Optic Implant (with Headpost)"
     FRONTAL_CTX_2_P = "Frontal Ctx 2P"
     HP_ONLY = "HP Only"
@@ -1304,7 +1323,6 @@ class Projectid(Enum, metaclass=OptionalEnumMeta):
     """Enum class for Projectid"""
 
     AAV_PRODUCTION_1028800410 = "AAV production 102-88-004-10"
-    CVS_PRODUCTION_1028800410 = "CVS production 102-88-004-10"
     N_1010300110_COSTA_PGA_LA = "101-03-001-10 Costa PGA Lab Research (Direct)"
     N_1020100710_CTY_M_FISH = "102-01-007-10 CTY mFISH"
     N_1020100910_CTY_MORPHOLO = "102-01-009-10 CTY Morphology"
@@ -1340,11 +1358,12 @@ class Projectid(Enum, metaclass=OptionalEnumMeta):
     N_1020105720_CTY_BRAIN_BG = "102-01-057-20 CTY BRAIN BG AAV Toolbox"
     N_1020105920_CTY_SCORCH = "102-01-059-20 CTY SCORCH"
     N_1020106020_CTY_BRAIN_DR = "102-01-060-20 CTY Brain Drain"
+    N_1020106120_CTY_BICAN_HU = "102-01-061-20 CTY BICAN Human and NHP Atlas"
     N_1020106220_CTY_BICAN_MO = (
         "102-01-062-20 CTY BICAN Mouse Developmental Atlas"
     )
     N_1020106410_CTY_GENETIC = "102-01-064-10 CTY Genetic Tools"
-    N_1020106620_CTY_CONNECTS = "102-01-066-20 CTY Connects Hive"
+    N_1020106620_CTY_CONNECTS = "102-01-066-20 CTY CONNECTS HIVE"
     N_1020106820_CTY_CONNECTS = "102-01-068-20 CTY CONNECTS Patchlink"
     N_1020106920_PRE_SPEND = "102-01-069-20 Pre-Spend"
     N_1020199910_CTY_PROGRAM = "102-01-999-10 CTY Program Admin"
@@ -1361,8 +1380,6 @@ class Projectid(Enum, metaclass=OptionalEnumMeta):
         "102-04-006-20 OTH Measuring Consciousness Ph2 (TBD)"
     )
     N_1020400710_APLD_TARGETE = "102-04-007-10 APLD Targeted CNS Gene Therapy"
-    N_1020400910_CAPSID_SCREE = "102-04-009-10  Capsid Screening"
-    N_1020400910_DRAVET_SYNDR = "102-04-009-10 Dravet Syndrome"
     N_1020401010_CTY_SR_SLC6 = "102-04-010-10 CTY SR: SLC6A1"
     N_1020401110_CTY_SR_SYNGA = "102-04-011-10 CTY SR: SYNGAP1"
     N_1020401210_CTY_SR_FRIED = "102-04-012-10 : CTY SR: Friedreich Ataxia"
@@ -1371,6 +1388,39 @@ class Projectid(Enum, metaclass=OptionalEnumMeta):
     N_1028800510_TRANSGENIC_C = "102-88-005-10 Transgenic Colony Management"
     N_1028800810_LAB_ANIMAL_S = "102-88-008-10 Lab Animal Services"
     N_1060100110_IMMUNOLOGY_D = "106-01-001-10 Immunology (Direct)"
+    N_1210101620_MSP_BRAIN_OP = "121-01-016-20 MSP BRAIN OpenScope"
+    N_1210101820_MSP_EPHAPTIC = "121-01-018-20 MSP Ephaptic Cell Typ"
+    N_1210102320_MSP_TEMPLETO = (
+        "121-01-023-20 MSP Templeton - Testing Theories of Consciousness"
+    )
+    N_1210102520_MSP_U01_BRID = (
+        "121-01-025-20 MSP U01 Bridging Function,"
+        " Connectivity, & Transcriptomics"
+    )
+    N_1210102620_MSP_TEMPLETO = (
+        "121-01-026-20 MSP Templeton Measuring Distinct Conscious State"
+    )
+    N_1220100110_AIND_SCIENTI = "122-01-001-10 AIND Scientific Activities"
+    N_1220100220_MOLECULAR_CO = "122-01-002-20 Molecular Core"
+    N_1220100220_PROJECT_1 = "122-01-002-20 Project 1"
+    N_1220100220_PROJECT_2 = "122-01-002-20 Project 2"
+    N_1220100220_PROJECT_4 = "122-01-002-20 Project 4"
+    N_1220100420_AIND_BRAINST = "122-01-004-20 AIND Brainstem RF1"
+    N_1220101020_AIND_POO_SIM = "122-01-010-20 - AIND Poo Simons BTI"
+    N_1220101120_AIND_COHEN_J = (
+        "122-01-011-20 - AIND Cohen JHU R01 Transferred Subaward"
+    )
+    N_1220101220_AIND_RF1_FUN = (
+        "122-01-012-20 - AIND RF1 Functions of locus coeruleus"
+    )
+    N_1220101310_MSP_SCIENTIF = "122-01-013-10 MSP Scientific Activities"
+    N_1220101420_AIND_SIEGLE = "122-01-014-20 - AIND Siegle U01 NPOpto"
+    N_1229999910_NEURAL_DYNAM = "122-99-999-10 Neural Dynamics Admin (Direct)"
+    RD_1028800410 = "R&D 102-88-004-10"
+    # note: options that were removed
+    N_1020400910_CAPSID_SCREE = "102-04-009-10  Capsid Screening"
+    N_1020400910_DRAVET_SYNDR = "102-04-009-10 Dravet Syndrome"
+    CVS_PRODUCTION_1028800410 = "CVS production 102-88-004-10"
     N_1210100110_MSP_DEEP_INT = "121-01-001-10 MSP Deep Interpolation"
     N_1210100210_MSP_BEHAVIOR = "121-01-002-10 MSP Behavioral Dynamics"
     N_1210100310_MSP_X_AREA_F = (
@@ -1393,36 +1443,8 @@ class Projectid(Enum, metaclass=OptionalEnumMeta):
         "121-01-014-20 MSP BRAIN Model Structure Function"
     )
     N_1210101510_MSP_FALCONWO = "121-01-015-10 MSP Falconwood"
-    N_1210101620_MSP_BRAIN_OP = "121-01-016-20 MSP BRAIN OpenScope"
-    N_1210101820_MSP_EPHAPTIC = "121-01-018-20 MSP Ephaptic Cell Typ"
-    N_1210102320_MSP_TEMPLETO = (
-        "121-01-023-20 MSP Templeton - Testing Theories of Consciousness"
-    )
-    N_1210102520_MSP_U01_BRID = (
-        "121-01-025-20 MSP U01 Bridging Function,"
-        " Connectivity, & Transcriptomics"
-    )
-    N_1210102620_MSP_TEMPLETO = (
-        "121-01-026-20 MSP Templeton Measuring Distinct Conscious State"
-    )
     N_1210199910_MSP_CROSS_PR = "121-01-999-10 MSP Cross Program 10YP"
     N_1210199910_MSP_CROS_001 = "121-01-999-10 MSP Cross Program  Scientific"
-    N_1220100110_AIND_SCIENTI = "122-01-001-10 AIND Scientific Activities"
-    N_1220100220_MOLECULAR_CO = "122-01-002-20 Molecular Core"
-    N_1220100220_PROJECT_1 = "122-01-002-20 Project 1"
-    N_1220100220_PROJECT_2 = "122-01-002-20 Project 2"
-    N_1220100220_PROJECT_4 = "122-01-002-20 Project 4"
-    N_1220100420_AIND_BRAINST = "122-01-004-20 AIND Brainstem RF1"
-    N_1220101020_AIND_POO_SIM = "122-01-010-20 - AIND Poo Simons BTI"
-    N_1220101120_AIND_COHEN_J = (
-        "122-01-011-20 - AIND Cohen JHU R01 Transferred Subaward"
-    )
-    N_1220101220_AIND_RF1_FUN = (
-        "122-01-012-20 - AIND RF1 Functions of locus coeruleus"
-    )
-    N_1220101420_AIND_SIEGLE = "122-01-014-20 - AIND Siegle U01 NPOpto"
-    N_1229999910_NEURAL_DYNAM = "122-99-999-10 Neural Dynamics Admin (Direct)"
-    RD_1028800410 = "R&D 102-88-004-10"
 
 
 class Sex(Enum, metaclass=OptionalEnumMeta):
@@ -1640,7 +1662,6 @@ class NSBList(BaseModel, extra=Extra.allow):
         default=None,
         alias="Burr6_x0020_Perform_x0020_During",
         title="Burr6 Perform During",
-        description="",
     )
     burr6_status: Optional[Burr6Status] = Field(
         default=None, alias="Burr6_x0020_Status", title="Burr6 Status"
@@ -1665,6 +1686,46 @@ class NSBList(BaseModel, extra=Extra.allow):
         alias="Burr_x0020_1_x0020_Fiber_x0020_t",
         title="Burr 1 Fiber type",
     )
+    burr_1_injectable_x00: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_Injectable_x00",
+        title="Burr 1 Injectable Material 2",
+    )
+    burr_1_injectable_x01: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_Injectable_x01",
+        title="Burr 1 Injectable Material 3",
+    )
+    burr_1_injectable_x02: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_Injectable_x02",
+        title="Burr 1 Injectable Material 4",
+    )
+    burr_1_injectable_x03: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_Injectable_x03",
+        title="Burr 1 Injectable Material 1 Titer",
+    )
+    burr_1_injectable_x04: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_Injectable_x04",
+        title="Burr 1 Injectable Material 2 Titer",
+    )
+    burr_1_injectable_x05: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_Injectable_x05",
+        title="Burr 1 Injectable Material 3 Titer",
+    )
+    burr_1_injectable_x06: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_Injectable_x06",
+        title="Burr 1 Injectable Material 4 Titer",
+    )
+    burr_1_injectable_x0: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_Injectable_x0",
+        title="Burr 1 Injectable Material 1",
+    )
     burr_2_d_v_x000: Optional[float] = Field(
         default=None,
         alias="Burr_x0020_2_x0020_D_x002f_V_x000",
@@ -1679,6 +1740,46 @@ class NSBList(BaseModel, extra=Extra.allow):
         default=None,
         alias="Burr_x0020_2_x0020_Fiber_x0020_T",
         title="Burr 2 Fiber Type",
+    )
+    burr_2_injectable_x00: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_Injectable_x00",
+        title="Burr 2 Injectable Material 2",
+    )
+    burr_2_injectable_x01: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_Injectable_x01",
+        title="Burr 2 Injectable Material 3",
+    )
+    burr_2_injectable_x02: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_Injectable_x02",
+        title="Burr 2 Injectable Material 4",
+    )
+    burr_2_injectable_x03: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_Injectable_x03",
+        title="Burr 2 Injectable Material 1 Titer",
+    )
+    burr_2_injectable_x04: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_Injectable_x04",
+        title="Burr 2 Injectable Material 2 Titer",
+    )
+    burr_2_injectable_x05: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_Injectable_x05",
+        title="Burr 2 Injectable Material 3 Titer",
+    )
+    burr_2_injectable_x06: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_Injectable_x06",
+        title="Burr 2 Injectable Material 4 Titer",
+    )
+    burr_2_injectable_x0: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_Injectable_x0",
+        title="Burr 2 Injectable Material 1",
     )
     burr_3_angle: Optional[float] = Field(
         default=None, alias="Burr_x0020_3_x0020_Angle", title="Burr 3 Angle"
@@ -1703,6 +1804,46 @@ class NSBList(BaseModel, extra=Extra.allow):
         alias="Burr_x0020_3_x0020_Hemisphere",
         title="Burr 3 Hemisphere",
     )
+    burr_3_injectable_x00: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_Injectable_x00",
+        title="Burr 3 Injectable Material 2",
+    )
+    burr_3_injectable_x01: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_Injectable_x01",
+        title="Burr 3 Injectable Material 3",
+    )
+    burr_3_injectable_x02: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_Injectable_x02",
+        title="Burr 3 Injectable Material 4",
+    )
+    burr_3_injectable_x03: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_Injectable_x03",
+        title="Burr 3 Injectable Material 1 Titer",
+    )
+    burr_3_injectable_x04: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_Injectable_x04",
+        title="Burr 3 Injectable Material 2 Titer",
+    )
+    burr_3_injectable_x05: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_Injectable_x05",
+        title="Burr 3 Injectable Material 4 Titer",
+    )
+    burr_3_injectable_x06: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_Injectable_x06",
+        title="Burr 3 Injectable Material 3 Titer",
+    )
+    burr_3_injectable_x0: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_Injectable_x0",
+        title="Burr 3 Injectable Material 1",
+    )
     burr_4_angle: Optional[float] = Field(
         default=None, alias="Burr_x0020_4_x0020_Angle", title="Burr 4 Angle"
     )
@@ -1725,6 +1866,46 @@ class NSBList(BaseModel, extra=Extra.allow):
         default=None,
         alias="Burr_x0020_4_x0020_Hemisphere",
         title="Burr 4 Hemisphere",
+    )
+    burr_4_injectable_x00: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_Injectable_x00",
+        title="Burr 4 Injectable Material 2",
+    )
+    burr_4_injectable_x01: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_Injectable_x01",
+        title="Burr 4 Injectable Material 3",
+    )
+    burr_4_injectable_x02: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_Injectable_x02",
+        title="Burr 4 Injectable Material 4",
+    )
+    burr_4_injectable_x03: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_Injectable_x03",
+        title="Burr 4 Injectable Material 1 Titer",
+    )
+    burr_4_injectable_x04: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_Injectable_x04",
+        title="Burr 4 Injectable Material 2 Titer",
+    )
+    burr_4_injectable_x05: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_Injectable_x05",
+        title="Burr 4 Injectable Material 3 Titer",
+    )
+    burr_4_injectable_x06: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_Injectable_x06",
+        title="Burr 4 Injectable Material 4 Titer",
+    )
+    burr_4_injectable_x0: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_Injectable_x0",
+        title="Burr 4 Injectable Material 1",
     )
     burr_5_a_p: Optional[float] = Field(
         default=None, alias="Burr_x0020_5_x0020_A_x002f_P", title="Burr 5 A/P"
@@ -1756,6 +1937,46 @@ class NSBList(BaseModel, extra=Extra.allow):
         default=None,
         alias="Burr_x0020_5_x0020_Hemisphere",
         title="Burr 5 Hemisphere",
+    )
+    burr_5_injectable_x00: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_Injectable_x00",
+        title="Burr 5 Injectable Material 2",
+    )
+    burr_5_injectable_x01: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_Injectable_x01",
+        title="Burr 5 Injectable Material 3",
+    )
+    burr_5_injectable_x02: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_Injectable_x02",
+        title="Burr 5 Injectable Material 4",
+    )
+    burr_5_injectable_x03: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_Injectable_x03",
+        title="Burr 5 Injectable Material 1 Titer",
+    )
+    burr_5_injectable_x04: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_Injectable_x04",
+        title="Burr 5 Injectable Material 2 Titer",
+    )
+    burr_5_injectable_x05: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_Injectable_x05",
+        title="Burr 5 Injectable Material 3 Titer",
+    )
+    burr_5_injectable_x06: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_Injectable_x06",
+        title="Burr 5 Injectable Material 4 Titer",
+    )
+    burr_5_injectable_x0: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_Injectable_x0",
+        title="Burr 5 Injectable Material 1",
     )
     burr_5_m_l: Optional[float] = Field(
         default=None, alias="Burr_x0020_5_x0020_M_x002f_L", title="Burr 5 M/L"
@@ -1790,6 +2011,46 @@ class NSBList(BaseModel, extra=Extra.allow):
         default=None,
         alias="Burr_x0020_6_x0020_Hemisphere",
         title="Burr 6 Hemisphere",
+    )
+    burr_6_injectable_x00: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_Injectable_x00",
+        title="Burr 6 Injectable Material 2",
+    )
+    burr_6_injectable_x01: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_Injectable_x01",
+        title="Burr 6 Injectable Material 3",
+    )
+    burr_6_injectable_x02: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_Injectable_x02",
+        title="Burr 6 Injectable Material 4",
+    )
+    burr_6_injectable_x03: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_Injectable_x03",
+        title="Burr 6 Injectable Material 1 Titer",
+    )
+    burr_6_injectable_x04: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_Injectable_x04",
+        title="Burr 6 Injectable Material 2 Titer",
+    )
+    burr_6_injectable_x05: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_Injectable_x05",
+        title="Burr 6 Injectable Material 3 Titer",
+    )
+    burr_6_injectable_x06: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_Injectable_x06",
+        title="Burr 6 Injectable Material 4 Titer",
+    )
+    burr_6_injectable_x0: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_Injectable_x0",
+        title="Burr 6 Injectable Material 1",
     )
     burr_6_m_l: Optional[float] = Field(
         default=None, alias="Burr_x0020_6_x0020_M_x002f_L", title="Burr 6 M/L"
@@ -2185,6 +2446,13 @@ class NSBList(BaseModel, extra=Extra.allow):
         default=None,
         alias="NanojectNumberInj2",
         title="Follow up Nanoject Number",
+    )
+    non_x002d_nsb_surgeon: Optional[bool] = Field(
+        default=None,
+        alias="Non_x002d_NSB_x0020_Surgeon",
+        title="Non-NSB Surgeon",
+        description="Is this surgery going to be performed by NSB"
+        " or someone else?",
     )
     of_burr: Optional[OfBurrHoles] = Field(
         default=None,
