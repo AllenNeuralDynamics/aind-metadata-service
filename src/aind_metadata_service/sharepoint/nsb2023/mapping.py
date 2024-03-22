@@ -282,7 +282,7 @@ class MappedNSBList:
         con_str: Optional[str],
     ) -> Optional[Decimal]:
         """Parse string representation of concentration into Decimal."""
-        return None if con_str is None else Decimal(float(con_str))
+        return None if con_str is None else Decimal(str(float(con_str)))
 
     @property
     def aind_age_at_injection(self) -> Optional[Decimal]:
