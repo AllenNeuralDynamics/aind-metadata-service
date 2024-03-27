@@ -37,13 +37,13 @@ from aind_metadata_service.tars.client import AzureSettings, TarsClient
 from aind_metadata_service.tars.mapping import TarsResponseHandler
 
 SMARTSHEET_FUNDING_ID = os.getenv("SMARTSHEET_FUNDING_ID")
-SMARTSHEET_FUNDING_TOKEN = os.getenv("SMARTSHEET_FUNDING_TOKEN")
+SMARTSHEET_FUNDING_TOKEN = os.getenv("SMARTSHEET_API_TOKEN")
 
 SMARTSHEET_PERFUSIONS_ID = os.getenv("SMARTSHEET_PERFUSIONS_ID")
-SMARTSHEET_PERFUSIONS_TOKEN = os.getenv("SMARTSHEET_PERFUSIONS_TOKEN")
+SMARTSHEET_PERFUSIONS_TOKEN = os.getenv("SMARTSHEET_API_TOKEN")
 
 SMARTSHEET_PROTOCOLS_ID = os.getenv("SMARTSHEET_PROTOCOLS_ID")
-SMARTSHEET_PROTOCOLS_TOKEN = os.getenv("SMARTSHEET_PROTOCOLS_TOKEN")
+SMARTSHEET_PROTOCOLS_TOKEN = os.getenv("SMARTSHEET_API_TOKEN")
 
 # TODO: Move client instantiation when the server starts instead of creating
 #  one for each request?
