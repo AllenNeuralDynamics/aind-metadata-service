@@ -156,7 +156,7 @@
     queryEndpoint = function (endpoint) {
         let parameter = $(`#param-id-${endpoint}`).val();
         $.ajax({
-        url: `/${endpoint}/${parameter}`,  //REMOVE WHEN COMMITING
+        url: `/${endpoint}/${parameter}`,
         type: "GET",
         beforeSend: function () {
           displayPendingUI();
