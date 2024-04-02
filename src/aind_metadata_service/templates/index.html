@@ -151,8 +151,9 @@
     };
     queryEndpoint = function (endpoint) {
       let parameter = $(`#param-id-${endpoint}`).val();
+      let devURL = 'http://aind-metadata-service-dev';
       $.ajax({
-        url: `/${endpoint}/${parameter}`,
+        url: `${devURL}/${endpoint}/${parameter}`,  //REMOVE WHEN COMMITING
         type: "GET",
         beforeSend: function () {
           displayPendingUI();

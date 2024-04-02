@@ -1,5 +1,30 @@
 # aind-metadata-service
 
+export NSB_SHAREPOINT_URL='https://alleninstitute.sharepoint.com/BrainScience/IVS/Neurosurgery-Behavior/'
+export NSB_SHAREPOINT_USER='*****'
+export NSB_SHAREPOINT_PASSWORD='*****'
+export ODBC_DRIVER='*****'
+export LABTRACKS_SERVER='******'
+export LABTRACKS_PORT='58350'
+export LABTRACKS_DATABASE='LabTracks_AIBS'
+export LABTRACKS_USER='******'
+export LABTRACKS_PASSWORD='*****'
+export SMARTSHEET_API_TOKEN='******'
+export SMARTSHEET_FUNDING_ID='0'
+export SMARTSHEET_PERFUSIONS_ID='0'
+export SMARTSHEET_PROTOCOLS_ID='0'
+export TARS_TENANT_ID='0'
+export TARS_CLIENT_ID='*****'
+export TARS_CLIENT_SECRET='******'
+export TARS_SCOPE='*****'
+export TARS_RESOURCE='https://api-tar.brain.allentech.org'
+export SLIMS_USERNAME='general_aind'
+export SLIMS_PASSWORD='*****'
+export SLIMS_HOST='*****'
+export SLIMS_DB='test'
+uvicorn aind_metadata_service.server:app --reload
+has context menu
+
 [![License](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE)
 ![Code Style](https://img.shields.io/badge/code%20style-black-black)
 

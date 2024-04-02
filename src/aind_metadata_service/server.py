@@ -300,6 +300,14 @@ async def index(request: Request):
                         "parameter": "subject_id",  # required
                         "parameter_label": "Subject ID",
                     },
+                    {
+                        "endpoint": "procedures",  # required
+                        "description": (
+                            "Retrieve procedures metadata from Labtracks and SharePoint servers"
+                        ),
+                        "parameter": "subject_id",  # required
+                        "parameter_label": "Subject ID",
+                    },
                 ],
             }
         ),
