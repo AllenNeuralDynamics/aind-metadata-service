@@ -101,11 +101,10 @@
     <div>
       <div class="container">
         <div class="heading">{{ e.endpoint|title }}
-          <span class="path">{{ "/%s/{%s}"|format(e.endpoint, e.parameter) }}</span>
         </div>
         <p>{{ e.description }}</p>
         <label for="param-id-{{ e.endpoint }}">{{ e.parameter_label or e.parameter }}:</label>
-        <input type="text" id="param-id-{{ e.endpoint }}" size="6" placeholder="{{ e.parameter }}" />
+        <input type="text" id="param-id-{{ e.endpoint }}" size="6" placeholder="{{ e.parameter }}" onkeydown="searchWithEnter('{{ e.endpoint }}')" />
       </div>
       <button id="search" type="button" class="primary" onclick="queryEndpoint('{{ e.endpoint }}')">Search</button>
     </div>
@@ -123,6 +122,11 @@
   </div>
 
   <script>
+    searchWithEnter = function (endpoint) {
+    if(event.key === 'Enter') {
+        queryEndpoint(endpoint);
+    }
+    }
     displayPendingUI = function () {
       $("#user-message").removeClass("success error").addClass("pending");
       $("#user-message").html("Searching.... Please do not refresh or re-submit.");
