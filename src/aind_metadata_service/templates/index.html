@@ -98,15 +98,13 @@
   </div>
   <div class="main">
     {% for e in endpoints if e.endpoint and e.parameter %}
-    <div>
-      <div class="container">
-        <div class="heading">{{ e.endpoint|title }}
-          <span class="path">{{ "/%s/{%s}"|format(e.endpoint, e.parameter) }}</span>
-        </div>
-        <p>{{ e.description }}</p>
-        <label for="param-id-{{ e.endpoint }}">{{ e.parameter_label or e.parameter }}:</label>
-        <input type="text" id="param-id-{{ e.endpoint }}" size="6" placeholder="{{ e.parameter }}" />
+    <div class="container">
+      <div class="heading">{{ e.endpoint|title }}
+        <span class="path">{{ "/%s/{%s}"|format(e.endpoint, e.parameter) }}</span>
       </div>
+      <p>{{ e.description }}</p>
+      <label for="param-id-{{ e.endpoint }}">{{ e.parameter_label or e.parameter }}:</label>
+      <input type="text" id="param-id-{{ e.endpoint }}" size="6" placeholder="{{ e.parameter }}" />
       <button id="search" type="button" class="primary" onclick="queryEndpoint('{{ e.endpoint }}')">Search</button>
     </div>
     {% endfor %}
@@ -150,8 +148,8 @@
       $("#toggle-raw").text(`${viewOrHide} raw response`);
     };
     queryEndpoint = function (endpoint) {
-      let parameter = $(`#param-id-${endpoint}`).val();
-      $.ajax({
+        let parameter = $(`#param-id-${endpoint}`).val();
+        $.ajax({
         url: `/${endpoint}/${parameter}`,
         type: "GET",
         beforeSend: function () {
