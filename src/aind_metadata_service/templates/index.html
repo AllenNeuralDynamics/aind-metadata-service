@@ -113,8 +113,8 @@
       <div id="user-message"></div>
       <div id="response" class="container" hidden>
         <div class="heading">Response</div>
-        <div>Message:<pre id="response-message"></pre></div>
         <div>Data:<pre id="response-data"></pre></div>
+        <div>Message:<pre id="response-message"></pre></div>
         <div id="response-raw-div" hidden>Raw Response:<pre id="response-raw"></pre></div>
         <button id="toggle-raw" type="button" class="secondary" onclick="toggleViewRawResponse()">View raw response</button>
       </div>
@@ -154,9 +154,9 @@
       $("#toggle-raw").text(`${viewOrHide} raw response`);
     };
     queryEndpoint = function (endpoint) {
-      let parameter = $(`#param-id-${endpoint}`).val();
-      $.ajax({
-        url: `/${endpoint}/${parameter}`,
+        let parameter = $(`#param-id-${endpoint}`).val();
+        $.ajax({
+        url: `/${endpoint}/${parameter}`,  //REMOVE WHEN COMMITING
         type: "GET",
         beforeSend: function () {
           displayPendingUI();
