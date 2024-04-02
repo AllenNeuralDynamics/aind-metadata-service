@@ -123,10 +123,10 @@
 
   <script>
     searchWithEnter = function (endpoint) {
-    if(event.key === 'Enter') {
+      if(event.key === 'Enter') {
         queryEndpoint(endpoint);
-    }
-    }
+      }
+    };
     displayPendingUI = function () {
       $("#user-message").removeClass("success error").addClass("pending");
       $("#user-message").html("Searching.... Please do not refresh or re-submit.");
