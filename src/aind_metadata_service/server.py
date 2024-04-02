@@ -17,7 +17,6 @@ from aind_metadata_service.labtracks.client import (
     LabTracksClient,
     LabTracksSettings,
 )
-
 from aind_metadata_service.response_handler import EtlResponse
 from aind_metadata_service.sharepoint.client import (
     SharePointClient,
@@ -303,7 +302,8 @@ async def index(request: Request):
                     {
                         "endpoint": "procedures",  # required
                         "description": (
-                            "Retrieve procedures metadata from Labtracks and SharePoint servers"
+                            "Retrieve procedures metadata from Labtracks and"
+                            " SharePoint servers"
                         ),
                         "parameter": "subject_id",  # required
                         "parameter_label": "Subject ID",
