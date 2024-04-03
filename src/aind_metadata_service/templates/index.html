@@ -55,6 +55,7 @@
       &.pending { color: darkorange; }
       &.success { color: green; }
       &.error { color: red; }
+      &.partialError { color: black; }
     }
     .path, pre {
       font-family: monospace;
@@ -128,7 +129,7 @@
       }
     };
     displayPendingUI = function () {
-      $("#user-message").removeClass("success error").addClass("pending");
+      $("#user-message").removeClass("success error partialError").addClass("pending");
       $("#user-message").html("Searching.... Please do not refresh or re-submit.");
       for (let id of ["message", "data", "raw"]) {
         $(`#response-${id}`).html("");
@@ -142,7 +143,11 @@
         "response-data"   : JSON.stringify(response?.data, null, 2),
         "response-raw"    : JSON.stringify(response, null, 2)
       }
-      $("#user-message").removeClass("pending").addClass(isError ? "error" : "success");
+      if (statusCode === 406 || statusCode === 300){
+        $("#user-message").removeClass("pending error success").addClass("partialError")
+      } else{
+        $("#user-message").removeClass("pending").addClass(isError ? "error" : "success");
+      }
       Object.keys(responseText).forEach((id) => {
         $(`#${id}`).html(responseText[id]);
       });
@@ -153,7 +158,7 @@
       const viewOrHide = $("#response-raw-div").is(":visible") ? "Hide" : "View";
       $("#toggle-raw").text(`${viewOrHide} raw response`);
     };
-    queryEndpoint = function (endpoint) {
+   queryEndpoint = function (endpoint) {
         let parameter = $(`#param-id-${endpoint}`).val();
         $.ajax({
         url: `/${endpoint}/${parameter}`,
