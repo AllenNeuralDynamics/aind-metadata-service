@@ -99,14 +99,12 @@
   </div>
   <div class="main">
     {% for e in endpoints if e.endpoint and e.parameter %}
-    <div>
       <div class="container">
         <div class="heading">{{ e.endpoint|title }}
         </div>
         <p>{{ e.description }}</p>
         <label for="param-id-{{ e.endpoint }}">{{ e.parameter_label or e.parameter }}:</label>
         <input type="text" id="param-id-{{ e.endpoint }}" size="6" placeholder="{{ e.parameter }}" onkeydown="searchWithEnter('{{ e.endpoint }}')" />
-      </div>
       <button id="search" type="button" class="primary" onclick="queryEndpoint('{{ e.endpoint }}')">Search</button>
     </div>
     {% endfor %}
@@ -158,7 +156,7 @@
       const viewOrHide = $("#response-raw-div").is(":visible") ? "Hide" : "View";
       $("#toggle-raw").text(`${viewOrHide} raw response`);
     };
-   queryEndpoint = function (endpoint) {
+    queryEndpoint = function (endpoint) {
         let parameter = $(`#param-id-${endpoint}`).val();
         $.ajax({
         url: `/${endpoint}/${parameter}`,
