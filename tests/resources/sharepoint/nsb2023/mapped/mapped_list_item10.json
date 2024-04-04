@@ -26,7 +26,7 @@
         "craniotomy_coordinates_unit": "millimeter",
         "bregma_to_lambda_unit": "millimeter",
         "craniotomy_size_unit": "millimeter",
-        "implant_part_number": null,
+        "implant_part_number": "3mm stacked coverslip",
         "dura_removed": null,
         "protective_material": null,
         "recovery_time_unit": "minute"
