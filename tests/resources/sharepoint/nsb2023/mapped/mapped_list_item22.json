@@ -15,7 +15,7 @@
         "procedure_type": "Craniotomy",
         "craniotomy_hemisphere": null,
         "bregma_to_lambda_unit": "millimeter",
-        "implant_part_number": null,
+        "implant_part_number": "2006",
         "dura_removed": null,
         "protective_material": null,
         "recovery_time_unit": "minute"

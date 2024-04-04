@@ -1983,29 +1983,7 @@ class MappedNSBList:
         return (
             None
             if self._nsb.implant_id_coverslip_type is None
-            else {
-                self._nsb.implant_id_coverslip_type.SELECT: None,
-                self._nsb.implant_id_coverslip_type.N_2001: None,
-                self._nsb.implant_id_coverslip_type.N_2002: None,
-                self._nsb.implant_id_coverslip_type.N_2004: None,
-                self._nsb.implant_id_coverslip_type.N_2005: None,
-                self._nsb.implant_id_coverslip_type.N_2006: None,
-                self._nsb.implant_id_coverslip_type.N_2007: None,
-                self._nsb.implant_id_coverslip_type.N_2008: None,
-                self._nsb.implant_id_coverslip_type.N_2009: None,
-                self._nsb.implant_id_coverslip_type.N_2010: None,
-                self._nsb.implant_id_coverslip_type.N_2011: None,
-                self._nsb.implant_id_coverslip_type.N_3001: None,
-                self._nsb.implant_id_coverslip_type.N_3002: None,
-                self._nsb.implant_id_coverslip_type.N_3003: None,
-                self._nsb.implant_id_coverslip_type.N_3004: None,
-                self._nsb.implant_id_coverslip_type.N_3004_25_PURALUBESYSTANE: None,
-                self._nsb.implant_id_coverslip_type.N_3005: None,
-                self._nsb.implant_id_coverslip_type.WHC_2_P_CURVED_GLASS_WITH: None,
-                self._nsb.implant_id_coverslip_type.N_3MM_STACKED_COVERSLIP: None,
-                self._nsb.implant_id_coverslip_type.N_5MM_STACKED_COVERSLIP: None,
-                self._nsb.implant_id_coverslip_type.N_5MM_STACKED_COVERSLIP_W: None,
-            }.get(self._nsb.implant_id_coverslip_type, None)
+            else self._nsb.implant_id_coverslip_type
         )
 
     @property
@@ -3627,6 +3605,7 @@ class MappedNSBList:
             cran_during = self.aind_craniotomy_perform_d
             cran_during_info = self.surgery_during_info(cran_during)
             bregma_to_lambda_distance = self.aind_breg2_lamb
+            implant_part_number = self.aind_implant_id_coverslip_type
             if craniotomy_type == CraniotomyType.FIVE_MM:
                 craniotomy_coordinates_reference = (
                     CoordinateReferenceLocation.LAMBDA
@@ -3647,6 +3626,7 @@ class MappedNSBList:
                 craniotomy_coordinates_reference=(
                     craniotomy_coordinates_reference
                 ),
+                implant_part_number=implant_part_number,
             )
             headpost_info = HeadPostInfo.from_hp_and_hp_type(
                 hp=self.aind_headpost, hp_type=self.aind_headpost_type
