@@ -38,8 +38,9 @@ class TestSmartsheetPerfusionsClient(unittest.TestCase):
             contents = json.load(f)
         cls.example_sheet_contents = contents
         cls.example_sheet = json.dumps(contents)
+        # TODO: Add protocol id
         cls.expected_model = [
-            Surgery(
+            Surgery.model_construct(
                 start_date=date(2023, 10, 2),
                 experimenter_full_name="Jane Smith",
                 iacuc_protocol="2109",

@@ -345,7 +345,10 @@ class TestSlimsClient(unittest.IsolatedAsyncioTestCase):
     @patch(
         "aind_metadata_service.slims.client.SlimsClient.get_record_response"
     )
-    def test_get_model_response_exception(self, mock_get_record_response):
+    @patch("logging.error")
+    def test_get_model_response_exception(
+        self, mock_log_error: MagicMock, mock_get_record_response: MagicMock
+    ):
         """Test case: Exception during execution"""
         mock_get_record_response.side_effect = Exception("Some error")
         self.assertEqual(
@@ -356,6 +359,7 @@ class TestSlimsClient(unittest.IsolatedAsyncioTestCase):
             self.client.get_rig_model_response("12345").status_code,
             StatusCodes.INTERNAL_SERVER_ERROR,
         )
+        mock_log_error.assert_called()
 
     @patch("aind_metadata_service.slims.client.requests.get")
     def test_get_response_with_oauth(self, mock_requests_get):
