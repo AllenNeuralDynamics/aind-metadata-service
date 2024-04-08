@@ -81,10 +81,10 @@ class ProtocolsMapper(SmartSheetMapper):
         """
         rows_associated_with_protocol_name: List[ProtocolInformation] = []
         for row in self.model.rows:
-            opt_protocol: Optional[
-                ProtocolInformation
-            ] = self._map_row_to_protocol(
-                row=row, input_protocol_name=protocol_name
+            opt_protocol: Optional[ProtocolInformation] = (
+                self._map_row_to_protocol(
+                    row=row, input_protocol_name=protocol_name
+                )
             )
             if opt_protocol is not None:
                 rows_associated_with_protocol_name.append(opt_protocol)

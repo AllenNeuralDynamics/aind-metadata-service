@@ -1423,13 +1423,7 @@ class MappedNSBList:
         return Craniotomy.model_construct(
             craniotomy_type=self.aind_craniotomy_type,
             craniotomy_hemisphere=self.aind_hp_loc,
-            craniotomy_coordinates_ml=self.aind_hp_m_l,
-            craniotomy_coordinates_ap=self.aind_hp_a_p,
-            craniotomy_coordinates_reference=(
-                self.aind_craniotomy_coordinates_reference
-            ),
             bregma_to_lambda_distance=self.aind_breg2_lamb,
-            craniotomy_size=self.aind_craniotomy_size,
             dura_removed=self.aind_hp_durotomy,
         )
 

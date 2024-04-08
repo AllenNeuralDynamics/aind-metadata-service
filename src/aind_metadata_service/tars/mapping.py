@@ -265,9 +265,9 @@ class TarsResponseHandler:
                                     new_material.titer = (
                                         injection_material.titer
                                     )
-                                    procedure.injection_materials[
-                                        idx
-                                    ] = new_material
+                                    procedure.injection_materials[idx] = (
+                                        new_material
+                                    )
                                 elif (
                                     tars_response.status_code
                                     == StatusCodes.NO_DATA_FOUND.value

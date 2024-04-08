@@ -17,7 +17,8 @@ readme = "README.md"
 dynamic = ["version"]
 
 dependencies = [
-    'aind-metadata-mapper==0.5.0'
+    'aind-metadata-mapper==0.6.1',
+    'pydantic-settings>=2.0'
 ]
 
 [project.optional-dependencies]
