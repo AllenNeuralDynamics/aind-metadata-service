@@ -1,9 +1,9 @@
 """Module that handles the methods to map the SmartSheet response to a
 protocol_id."""
 
+import json
 import logging
-from typing import List, Optional
-
+from typing import List, Optional, Dict
 from pydantic import ValidationError
 
 from aind_metadata_service.client import StatusCodes
@@ -13,6 +13,15 @@ from aind_metadata_service.smartsheet.mapper import SmartSheetMapper
 from aind_metadata_service.smartsheet.models import SheetRow
 from aind_metadata_service.smartsheet.protocols.models import (
     ProtocolsColumnNames,
+    ProtocolNames
+)
+from aind_data_schema.core.procedures import (
+    NanojectInjection,
+    IontophoresisInjection,
+    Perfusion,
+    Craniotomy,
+    ProtectiveMaterial,
+    Surgery
 )
 
 
@@ -110,3 +119,55 @@ class ProtocolsMapper(SmartSheetMapper):
         except Exception as e:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
+
+    @staticmethod
+    def get_protocols_mapping(response: ModelResponse) -> Dict:
+        """Creates a dictionary mapping procedure models to protocols"""
+        surgery_dict = {}
+        if len(response.aind_models) > 0:
+            procedures = response.aind_models[0]
+            if isinstance(procedures, Surgery):
+                surgery_dict[procedures] = ProtocolNames.SURGERY
+            for subject_procedure in procedures.subject_procedures:
+                # TODO: handle Surgery one maybe another way
+                for procedure in subject_procedure.procedures:
+                    if isinstance(procedure, NanojectInjection):
+                        surgery_dict[procedure] = ProtocolNames.INJECTION_NANOJECT
+                    elif isinstance(procedure, IontophoresisInjection):
+                        surgery_dict[procedure] = ProtocolNames.INJECTION_IONTOPHORESIS
+                    elif isinstance(procedure, Perfusion):
+                        surgery_dict[procedure] = ProtocolNames.PERFUSION
+                    elif isinstance(procedure, Craniotomy):
+                        if procedure.protective_material == ProtectiveMaterial.DURAGEL:
+                            surgery_dict[procedure] = ProtocolNames.DURAGEL_APPLICATION
+        return surgery_dict
+
+    @staticmethod
+    def integrate_protocols(response: ModelResponse, protocols_mapping: Dict) -> ModelResponse:
+        """Merges protocols_response with procedures_response"""
+        output_aind_models = []
+        status_code = response.status_code
+        if len(response.aind_models) > 0:
+            pre_procedures = response.aind_models[0]
+            if isinstance(pre_procedures, Surgery):
+                pre_procedures.protocol_id = protocols_mapping[pre_procedures]
+            for subject_procedure in pre_procedures.subject_procedures:
+                for procedure in subject_procedure.procedures:
+                    smartsheet_response = protocols_mapping.get(subject_procedure)
+                    if (
+                            smartsheet_response.status_code == StatusCodes.DB_RESPONDED.value
+                            or smartsheet_response.status_code == StatusCodes.VALID_DATA.value
+                            or smartsheet_response.status_code == StatusCodes.INVALID_DATA.value
+                    ):
+                        data = json.loads(smartsheet_response.body)["data"]
+                        procedure.protocol_id = data["doi"]
+                    elif (
+                            smartsheet_response.status_code == StatusCodes.NO_DATA_FOUND.value
+                    ):
+                        pass
+                    else:
+                        status_code = StatusCodes.MULTI_STATUS
+                output_aind_models = [pre_procedures]
+        return ModelResponse(
+            aind_models=output_aind_models, status_code=status_code
+        )
