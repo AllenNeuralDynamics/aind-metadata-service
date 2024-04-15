@@ -29,7 +29,7 @@ class ProtocolsMapper(SmartSheetMapper):
     """Primary class to handle mapping data models and returning a response"""
 
     def _map_row_to_protocol(
-        self, row: SheetRow, input_protocol_name: str
+        self, row: SheetRow, input_protocol_name: Optional[str]
     ) -> Optional[ProtocolInformation]:
         """
         Map a row to an optional funding model.
@@ -120,30 +120,38 @@ class ProtocolsMapper(SmartSheetMapper):
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
 
+
+class ProtocolsIntegrator:
+    """Methods to integrate Protocols into Procedures"""
     @staticmethod
-    def get_protocols_mapping(response: ModelResponse) -> Dict:
+    def _get_protocol_name(procedure):
+        """Gets protocol name based on procedure type"""
+        if isinstance(procedure, NanojectInjection):
+            return ProtocolNames.INJECTION_NANOJECT.value
+        elif isinstance(procedure, IontophoresisInjection):
+            return ProtocolNames.INJECTION_IONTOPHORESIS.value
+        elif isinstance(procedure, Perfusion):
+            return ProtocolNames.PERFUSION.value
+        elif isinstance(procedure, Craniotomy):
+            if procedure.protective_material == ProtectiveMaterial.DURAGEL:
+                return ProtocolNames.DURAGEL_APPLICATION.value
+        else:
+            return None
+
+    def get_protocols_mapping(self, response: ModelResponse) -> List:
         """Creates a dictionary mapping procedure models to protocols"""
-        surgery_dict = {}
+        protocol_list = []
         if len(response.aind_models) > 0:
             procedures = response.aind_models[0]
             if isinstance(procedures, Surgery):
-                surgery_dict[procedures] = ProtocolNames.SURGERY
+                protocol_list.append(ProtocolNames.SURGERY.value)
             for subject_procedure in procedures.subject_procedures:
-                # TODO: handle Surgery one maybe another way
                 for procedure in subject_procedure.procedures:
-                    if isinstance(procedure, NanojectInjection):
-                        surgery_dict[procedure] = ProtocolNames.INJECTION_NANOJECT
-                    elif isinstance(procedure, IontophoresisInjection):
-                        surgery_dict[procedure] = ProtocolNames.INJECTION_IONTOPHORESIS
-                    elif isinstance(procedure, Perfusion):
-                        surgery_dict[procedure] = ProtocolNames.PERFUSION
-                    elif isinstance(procedure, Craniotomy):
-                        if procedure.protective_material == ProtectiveMaterial.DURAGEL:
-                            surgery_dict[procedure] = ProtocolNames.DURAGEL_APPLICATION
-        return surgery_dict
+                    protocol_name = self._get_protocol_name(procedure=procedure)
+                    protocol_list.append(protocol_name)
+        return protocol_list
 
-    @staticmethod
-    def integrate_protocols(response: ModelResponse, protocols_mapping: Dict) -> ModelResponse:
+    def integrate_protocols(self, response: ModelResponse, protocols_mapping: Dict) -> ModelResponse:
         """Merges protocols_response with procedures_response"""
         output_aind_models = []
         status_code = response.status_code
@@ -153,7 +161,8 @@ class ProtocolsMapper(SmartSheetMapper):
                 pre_procedures.protocol_id = protocols_mapping[pre_procedures]
             for subject_procedure in pre_procedures.subject_procedures:
                 for procedure in subject_procedure.procedures:
-                    smartsheet_response = protocols_mapping.get(subject_procedure)
+                    protocol_name = self._get_protocol_name(procedure)
+                    smartsheet_response = protocols_mapping.get(protocol_name)
                     if (
                             smartsheet_response.status_code == StatusCodes.DB_RESPONDED.value
                             or smartsheet_response.status_code == StatusCodes.VALID_DATA.value
