@@ -2,24 +2,21 @@
 
 import os
 
+from aind_metadata_mapper.bergamo.session import BergamoEtl
+from aind_metadata_mapper.bergamo.session import (
+    JobSettings as BergamoJobSettings,
+)
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from starlette.concurrency import run_in_threadpool
 
-from aind_metadata_mapper.bergamo.session import BergamoEtl
-from aind_metadata_mapper.bergamo.session import (
-    JobSettings as BergamoJobSettings,
-)
-from starlette.responses import JSONResponse
-
 from aind_metadata_service import __version__ as SERVICE_VERSION
 from aind_metadata_service.labtracks.client import (
     LabTracksClient,
     LabTracksSettings,
 )
-
 from aind_metadata_service.response_handler import EtlResponse
 from aind_metadata_service.sharepoint.client import (
     SharePointClient,
@@ -141,16 +138,14 @@ async def retrieve_rig(rig_id, pickle: bool = False):
 @app.get("/protocols/{protocol_name}")
 async def retrieve_protocols(
     protocol_name,
-    smart_sheet_response: JSONResponse = None,
     pickle: bool = False,
 ):
     """Retrieves perfusion information from smartsheet"""
 
     # TODO: We can probably cache the response if it's 200
-    if smart_sheet_response is None:
-        smart_sheet_response = await run_in_threadpool(
-            protocols_smart_sheet_client.get_sheet
-        )
+    smart_sheet_response = await run_in_threadpool(
+        protocols_smart_sheet_client.get_sheet
+    )
     mapper = ProtocolsMapper(
         smart_sheet_response=smart_sheet_response, input_id=protocol_name
     )
@@ -269,17 +264,25 @@ async def retrieve_procedures(subject_id, pickle: bool = False):
         response=merged_response, tars_mapping=tars_mapping
     )
     # integrate protocols from smartsheet
-    sheet = await run_in_threadpool(protocols_smart_sheet_client.get_sheet)
+    smart_sheet_response = await run_in_threadpool(
+        protocols_smart_sheet_client.get_sheet
+    )
     protocols_integrator = ProtocolsIntegrator()
     protocols_list = protocols_integrator.get_protocols_list(
         integrated_response
     )
     protocols_mapping = {}
     for protocol_name in protocols_list:
-        smartsheet_response = await retrieve_protocols(
-            protocol_name=protocol_name, smart_sheet_response=sheet
+        mapper = ProtocolsMapper(
+            smart_sheet_response=smart_sheet_response, input_id=protocol_name
         )
-        protocols_mapping[protocol_name] = smartsheet_response
+        model_response = mapper.get_model_response()
+        # smartsheet_response = await retrieve_protocols(
+        #     protocol_name=protocol_name
+        # )
+        protocols_mapping[protocol_name] = (
+            model_response.map_to_json_response()
+        )
     integrated_response = protocols_integrator.integrate_protocols(
         response=integrated_response, protocols_mapping=protocols_mapping
     )
