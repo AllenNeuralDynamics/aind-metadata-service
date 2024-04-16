@@ -264,7 +264,7 @@ async def retrieve_procedures(subject_id, pickle: bool = False):
         protocols_smart_sheet_client.get_sheet
     )
     protocols_integrator = ProtocolsIntegration()
-    protocols_list = protocols_integrator.get_protocols_mapping(integrated_response)
+    protocols_list = protocols_integrator.get_protocols_list(integrated_response)
     protocols_mapping = {}
     for protocol_name in protocols_list:
         smartsheet_response = await retrieve_protocols(

@@ -15,7 +15,18 @@ from aind_metadata_service.smartsheet.client import (
     SmartSheetClient,
     SmartsheetSettings,
 )
-from aind_metadata_service.smartsheet.protocols.mapping import ProtocolsMapper
+from aind_metadata_service.smartsheet.protocols.mapping import ProtocolsMapper, ProtocolsIntegrator
+from aind_metadata_service.smartsheet.protocols.models import ProtocolNames
+from aind_data_schema.core.procedures import (
+    Surgery,
+    NanojectInjection,
+    IontophoresisInjection,
+    Perfusion,
+    Craniotomy,
+    ProtectiveMaterial,
+    Headframe,
+    Procedures
+)
 
 TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / ".."
 EXAMPLE_PATH = (
@@ -32,6 +43,7 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
         with open(EXAMPLE_PATH, "r") as f:
             contents = json.load(f)
         cls.example_sheet = json.dumps(contents)
+        cls.protocols_integrator = ProtocolsIntegrator()
 
     @patch("smartsheet.sheets.Sheets.get_sheet")
     def test_get_sheet_success(self, mock_get_sheet: MagicMock):
@@ -192,6 +204,107 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
                 call("Exception('Mapping Error')"),
             ]
         )
+
+    def test_get_protocol_name(self):
+        """Tests that protocol name is found from procedure type as expected"""
+        nanoject_inj = NanojectInjection.model_construct()
+        ionto_inj = IontophoresisInjection.model_construct()
+        cran = Craniotomy.model_construct(protective_material=ProtectiveMaterial.DURAGEL)
+        perfusion = Perfusion.model_construct()
+        hf = Headframe.model_construct()
+        self.assertEqual(self.protocols_integrator._get_protocol_name(nanoject_inj),
+                         ProtocolNames.INJECTION_NANOJECT.value)
+        self.assertEqual(self.protocols_integrator._get_protocol_name(ionto_inj),
+                         ProtocolNames.INJECTION_IONTOPHORESIS.value)
+        self.assertEqual(self.protocols_integrator._get_protocol_name(cran),
+                         ProtocolNames.DURAGEL_APPLICATION.value)
+        self.assertEqual(self.protocols_integrator._get_protocol_name(perfusion),
+                         ProtocolNames.PERFUSION.value)
+        self.assertIsNone(self.protocols_integrator._get_protocol_name(hf))
+
+    def test_get_protocols_list(self):
+        """Tests that protocols mapping is crated as expected"""
+        nanoject_inj = NanojectInjection.model_construct()
+        surgery = Surgery.model_construct(procedures=[nanoject_inj])
+        procedures = Procedures.model_construct(subject_procedures=[surgery])
+        response = ModelResponse(aind_models=[procedures], status_code=StatusCodes.DB_RESPONDED)
+        protocols_list = self.protocols_integrator.get_protocols_list(response)
+        expected_list = [ProtocolNames.SURGERY.value, ProtocolNames.INJECTION_NANOJECT.value]
+        self.assertEqual(expected_list, protocols_list)
+
+    def test_integrate_protocols(self):
+        """Tests that protocols are integrated into procedures response as expected"""
+        # Mocking objects for testing
+        nano_protocol = ProtocolInformation.model_construct(
+            protocol_type="Surgical Procedures",
+            procedure_name="Injection Nanoject",
+            protocol_name="Injection of Viral Tracers by Nanoject V.4",
+            doi="dx.doi.org/some/doi/1",
+            version="1.0",
+            protocol_collection=None
+        )
+        surgery_protocol = ProtocolInformation.model_construct(
+            protocol_type="Surgical Procedures",
+            procedure_name="Surgery",
+            protocol_name="General Set-Up and Take-Down for Rodent Neurosurgery",
+            doi="dx.doi.org/some/doi/2",
+            version="1.0",
+            protocol_collection=None
+        )
+        protocols_response1 = ModelResponse(
+            aind_models=[nano_protocol],
+            status_code=StatusCodes.DB_RESPONDED
+        )
+        protocols_response2 = ModelResponse(
+            aind_models=[surgery_protocol],
+            status_code=StatusCodes.DB_RESPONDED
+        )
+        protocols_mapping = {
+            "Injection of Viral Tracers by Nanoject V.4": protocols_response1.map_to_json_response(),
+            "General Set-Up and Take-Down for Rodent Neurosurgery": protocols_response2.map_to_json_response()
+        }
+        nanoject_inj = NanojectInjection.model_construct()
+        surgery = Surgery.model_construct(procedures=[nanoject_inj])
+        procedures_response = ModelResponse(
+            aind_models=[
+                Procedures(subject_id="12345", subject_procedures=[surgery])
+            ],
+            status_code=StatusCodes.DB_RESPONDED
+        )
+        merged_response = self.protocols_integrator.integrate_protocols(response=procedures_response, protocols_mapping=protocols_mapping)
+        expected_surgery = Surgery.model_construct(protocol_id="dx.doi.org/some/doi/2", procedures=[NanojectInjection.model_construct(protocol_id="dx.doi.org/some/doi/1")])
+        expected_response = ModelResponse(
+            aind_models=[
+                Procedures(subject_id="12345", subject_procedures=[expected_surgery])
+            ],
+            status_code=StatusCodes.DB_RESPONDED
+        )
+        self.assertEqual(expected_response.aind_models, merged_response.aind_models)
+        self.assertEqual(expected_response.status_code, merged_response.status_code)
+
+    def test_integrate_protocols_error(self):
+        """Tests that injection materials are integrated into
+                procedures response as expected"""
+        protocols_response = ModelResponse(
+            aind_models=[],
+            status_code=StatusCodes.CONNECTION_ERROR,
+        )
+        protocols_mapping = {
+            "Injection of Viral Tracers by Nanoject V.4": protocols_response.map_to_json_response(),
+            "General Set-Up and Take-Down for Rodent Neurosurgery": protocols_response.map_to_json_response(),
+        }
+        nanoject_inj = NanojectInjection.model_construct()
+        surgery = Surgery.model_construct(procedures=[nanoject_inj])
+        procedures_response = ModelResponse(
+            aind_models=[
+                Procedures(subject_id="12345", subject_procedures=[surgery])
+            ],
+            status_code=StatusCodes.DB_RESPONDED,
+        )
+        merged_response = self.protocols_integrator.integrate_protocols(
+            response=procedures_response, protocols_mapping=protocols_mapping
+        )
+        self.assertEqual(merged_response.status_code, StatusCodes.MULTI_STATUS)
 
 
 if __name__ == "__main__":

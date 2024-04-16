@@ -138,28 +138,42 @@ class ProtocolsIntegrator:
         else:
             return None
 
-    def get_protocols_mapping(self, response: ModelResponse) -> List:
-        """Creates a dictionary mapping procedure models to protocols"""
+    def get_protocols_list(self, response: ModelResponse) -> List:
+        """Creates a list of protocol names from procedures list"""
         protocol_list = []
         if len(response.aind_models) > 0:
             procedures = response.aind_models[0]
-            if isinstance(procedures, Surgery):
-                protocol_list.append(ProtocolNames.SURGERY.value)
             for subject_procedure in procedures.subject_procedures:
+                if isinstance(subject_procedure, Surgery):
+                    protocol_list.append(ProtocolNames.SURGERY.value)
                 for procedure in subject_procedure.procedures:
                     protocol_name = self._get_protocol_name(procedure=procedure)
                     protocol_list.append(protocol_name)
         return protocol_list
 
     def integrate_protocols(self, response: ModelResponse, protocols_mapping: Dict) -> ModelResponse:
-        """Merges protocols_response with procedures_response"""
+        """Merges protocols responses with procedures response"""
         output_aind_models = []
         status_code = response.status_code
         if len(response.aind_models) > 0:
             pre_procedures = response.aind_models[0]
-            if isinstance(pre_procedures, Surgery):
-                pre_procedures.protocol_id = protocols_mapping[pre_procedures]
             for subject_procedure in pre_procedures.subject_procedures:
+                if isinstance(subject_procedure, Surgery):
+                    protocol_name = ProtocolNames.SURGERY.value
+                    smartsheet_response = protocols_mapping.get(protocol_name)
+                    if (
+                            smartsheet_response.status_code == StatusCodes.DB_RESPONDED.value
+                            or smartsheet_response.status_code == StatusCodes.VALID_DATA.value
+                            or smartsheet_response.status_code == StatusCodes.INVALID_DATA.value
+                    ):
+                        data = json.loads(smartsheet_response.body)["data"]
+                        subject_procedure.protocol_id = data["doi"]
+                    elif (
+                            smartsheet_response.status_code == StatusCodes.NO_DATA_FOUND.value
+                    ):
+                        pass
+                    else:
+                        status_code = StatusCodes.MULTI_STATUS
                 for procedure in subject_procedure.procedures:
                     protocol_name = self._get_protocol_name(procedure)
                     smartsheet_response = protocols_mapping.get(protocol_name)
