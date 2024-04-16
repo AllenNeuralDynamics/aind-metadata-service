@@ -18,7 +18,7 @@ dynamic = ["version"]
 
 dependencies = [
     'aind-metadata-mapper==0.6.1',
-    'pydantic-settings>=2.0, <2.7'
+    'pydantic-settings>=2.0, <=2.6.4'
 ]
 
 [project.optional-dependencies]
