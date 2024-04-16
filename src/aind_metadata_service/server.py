@@ -2,23 +2,25 @@
 
 import os
 
-# from aind_metadata_mapper.bergamo.session import BergamoEtl
-# from aind_metadata_mapper.bergamo.session import (
-#     JobSettings as BergamoJobSettings,
-# )
-from starlette.responses import JSONResponse
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from starlette.concurrency import run_in_threadpool
 
+from aind_metadata_mapper.bergamo.session import BergamoEtl
+from aind_metadata_mapper.bergamo.session import (
+    JobSettings as BergamoJobSettings,
+)
+from starlette.responses import JSONResponse
+
 from aind_metadata_service import __version__ as SERVICE_VERSION
 from aind_metadata_service.labtracks.client import (
     LabTracksClient,
     LabTracksSettings,
 )
-# from aind_metadata_service.response_handler import EtlResponse
+
+from aind_metadata_service.response_handler import EtlResponse
 from aind_metadata_service.sharepoint.client import (
     SharePointClient,
     SharepointSettings,
@@ -32,7 +34,10 @@ from aind_metadata_service.smartsheet.funding.mapping import FundingMapper
 from aind_metadata_service.smartsheet.perfusions.mapping import (
     PerfusionsMapper,
 )
-from aind_metadata_service.smartsheet.protocols.mapping import ProtocolsMapper, ProtocolsIntegration
+from aind_metadata_service.smartsheet.protocols.mapping import (
+    ProtocolsIntegrator,
+    ProtocolsMapper,
+)
 from aind_metadata_service.tars.client import AzureSettings, TarsClient
 from aind_metadata_service.tars.mapping import TarsResponseHandler
 
@@ -96,15 +101,15 @@ template_directory = os.path.abspath(
 templates = Jinja2Templates(directory=template_directory)
 
 
-# @app.post("/bergamo_session/")
-# async def retrieve_bergamo_session(job_settings: BergamoJobSettings):
-#     """Builds a bergamo session model from the given job settings"""
-#
-#     etl_job = BergamoEtl(
-#         job_settings=job_settings,
-#     )
-#     response = etl_job.run_job()
-#     return EtlResponse.map_job_response(response)
+@app.post("/bergamo_session/")
+async def retrieve_bergamo_session(job_settings: BergamoJobSettings):
+    """Builds a bergamo session model from the given job settings"""
+
+    etl_job = BergamoEtl(
+        job_settings=job_settings,
+    )
+    response = etl_job.run_job()
+    return EtlResponse.map_job_response(response)
 
 
 @app.get("/instrument/{instrument_id}")
@@ -134,7 +139,11 @@ async def retrieve_rig(rig_id, pickle: bool = False):
 
 
 @app.get("/protocols/{protocol_name}")
-async def retrieve_protocols(protocol_name, smart_sheet_response: JSONResponse = None, pickle: bool = False):
+async def retrieve_protocols(
+    protocol_name,
+    smart_sheet_response: JSONResponse = None,
+    pickle: bool = False,
+):
     """Retrieves perfusion information from smartsheet"""
 
     # TODO: We can probably cache the response if it's 200
@@ -260,11 +269,11 @@ async def retrieve_procedures(subject_id, pickle: bool = False):
         response=merged_response, tars_mapping=tars_mapping
     )
     # integrate protocols from smartsheet
-    sheet = await run_in_threadpool(
-        protocols_smart_sheet_client.get_sheet
+    sheet = await run_in_threadpool(protocols_smart_sheet_client.get_sheet)
+    protocols_integrator = ProtocolsIntegrator()
+    protocols_list = protocols_integrator.get_protocols_list(
+        integrated_response
     )
-    protocols_integrator = ProtocolsIntegration()
-    protocols_list = protocols_integrator.get_protocols_list(integrated_response)
     protocols_mapping = {}
     for protocol_name in protocols_list:
         smartsheet_response = await retrieve_protocols(
@@ -272,7 +281,8 @@ async def retrieve_procedures(subject_id, pickle: bool = False):
         )
         protocols_mapping[protocol_name] = smartsheet_response
     integrated_response = protocols_integrator.integrate_protocols(
-        response=integrated_response, protocols_mapping=protocols_mapping)
+        response=integrated_response, protocols_mapping=protocols_mapping
+    )
     if pickle:
         return integrated_response.map_to_pickled_response()
     else:

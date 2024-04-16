@@ -3,7 +3,16 @@ protocol_id."""
 
 import json
 import logging
-from typing import List, Optional, Dict
+from typing import Dict, List, Optional
+
+from aind_data_schema.core.procedures import (
+    Craniotomy,
+    IontophoresisInjection,
+    NanojectInjection,
+    Perfusion,
+    ProtectiveMaterial,
+    Surgery,
+)
 from pydantic import ValidationError
 
 from aind_metadata_service.client import StatusCodes
@@ -12,16 +21,8 @@ from aind_metadata_service.response_handler import ModelResponse
 from aind_metadata_service.smartsheet.mapper import SmartSheetMapper
 from aind_metadata_service.smartsheet.models import SheetRow
 from aind_metadata_service.smartsheet.protocols.models import (
+    ProtocolNames,
     ProtocolsColumnNames,
-    ProtocolNames
-)
-from aind_data_schema.core.procedures import (
-    NanojectInjection,
-    IontophoresisInjection,
-    Perfusion,
-    Craniotomy,
-    ProtectiveMaterial,
-    Surgery
 )
 
 
@@ -90,10 +91,10 @@ class ProtocolsMapper(SmartSheetMapper):
         """
         rows_associated_with_protocol_name: List[ProtocolInformation] = []
         for row in self.model.rows:
-            opt_protocol: Optional[ProtocolInformation] = (
-                self._map_row_to_protocol(
-                    row=row, input_protocol_name=protocol_name
-                )
+            opt_protocol: Optional[
+                ProtocolInformation
+            ] = self._map_row_to_protocol(
+                row=row, input_protocol_name=protocol_name
             )
             if opt_protocol is not None:
                 rows_associated_with_protocol_name.append(opt_protocol)
@@ -123,6 +124,7 @@ class ProtocolsMapper(SmartSheetMapper):
 
 class ProtocolsIntegrator:
     """Methods to integrate Protocols into Procedures"""
+
     @staticmethod
     def _get_protocol_name(procedure):
         """Gets protocol name based on procedure type"""
@@ -147,11 +149,15 @@ class ProtocolsIntegrator:
                 if isinstance(subject_procedure, Surgery):
                     protocol_list.append(ProtocolNames.SURGERY.value)
                 for procedure in subject_procedure.procedures:
-                    protocol_name = self._get_protocol_name(procedure=procedure)
+                    protocol_name = self._get_protocol_name(
+                        procedure=procedure
+                    )
                     protocol_list.append(protocol_name)
         return protocol_list
 
-    def integrate_protocols(self, response: ModelResponse, protocols_mapping: Dict) -> ModelResponse:
+    def integrate_protocols(
+        self, response: ModelResponse, protocols_mapping: Dict
+    ) -> ModelResponse:
         """Merges protocols responses with procedures response"""
         output_aind_models = []
         status_code = response.status_code
@@ -162,14 +168,18 @@ class ProtocolsIntegrator:
                     protocol_name = ProtocolNames.SURGERY.value
                     smartsheet_response = protocols_mapping.get(protocol_name)
                     if (
-                            smartsheet_response.status_code == StatusCodes.DB_RESPONDED.value
-                            or smartsheet_response.status_code == StatusCodes.VALID_DATA.value
-                            or smartsheet_response.status_code == StatusCodes.INVALID_DATA.value
+                        smartsheet_response.status_code
+                        == StatusCodes.DB_RESPONDED.value
+                        or smartsheet_response.status_code
+                        == StatusCodes.VALID_DATA.value
+                        or smartsheet_response.status_code
+                        == StatusCodes.INVALID_DATA.value
                     ):
                         data = json.loads(smartsheet_response.body)["data"]
                         subject_procedure.protocol_id = data["doi"]
                     elif (
-                            smartsheet_response.status_code == StatusCodes.NO_DATA_FOUND.value
+                        smartsheet_response.status_code
+                        == StatusCodes.NO_DATA_FOUND.value
                     ):
                         pass
                     else:
@@ -178,14 +188,18 @@ class ProtocolsIntegrator:
                     protocol_name = self._get_protocol_name(procedure)
                     smartsheet_response = protocols_mapping.get(protocol_name)
                     if (
-                            smartsheet_response.status_code == StatusCodes.DB_RESPONDED.value
-                            or smartsheet_response.status_code == StatusCodes.VALID_DATA.value
-                            or smartsheet_response.status_code == StatusCodes.INVALID_DATA.value
+                        smartsheet_response.status_code
+                        == StatusCodes.DB_RESPONDED.value
+                        or smartsheet_response.status_code
+                        == StatusCodes.VALID_DATA.value
+                        or smartsheet_response.status_code
+                        == StatusCodes.INVALID_DATA.value
                     ):
                         data = json.loads(smartsheet_response.body)["data"]
                         procedure.protocol_id = data["doi"]
                     elif (
-                            smartsheet_response.status_code == StatusCodes.NO_DATA_FOUND.value
+                        smartsheet_response.status_code
+                        == StatusCodes.NO_DATA_FOUND.value
                     ):
                         pass
                     else:
