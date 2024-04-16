@@ -47,6 +47,10 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
             contents = json.load(f)
         cls.example_sheet = json.dumps(contents)
         cls.protocols_integrator = ProtocolsIntegrator()
+        cls.nano_name = "Injection of Viral Tracers by Nanoject V.4"
+        cls.surgery_name = (
+            "General Set-Up and Take-Down for Rodent Neurosurgery"
+        )
 
     @patch("smartsheet.sheets.Sheets.get_sheet")
     def test_get_sheet_success(self, mock_get_sheet: MagicMock):
@@ -154,14 +158,14 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
         smart_sheet_response = client.get_sheet()
         mapper = ProtocolsMapper(
             smart_sheet_response=smart_sheet_response,
-            input_id="Injection of Viral Tracers by Nanoject V.4",
+            input_id=self.nano_name,
         )
         model_response = mapper.get_model_response()
         expected_models = [
             ProtocolInformation.model_construct(
                 protocol_type="Surgical Procedures",
                 procedure_name="Injection Nanoject",
-                protocol_name="Injection of Viral Tracers by Nanoject V.4",
+                protocol_name=self.nano_name,
                 doi="dx.doi.org/10.17504/protocols.io.bp2l6nr7kgqe/v4",
                 version=4.0,
             )
@@ -252,11 +256,11 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
 
     def test_integrate_protocols(self):
         """Tests that protocols are integrated into procedures
-         response as expected"""
+        response as expected"""
         nano_protocol = ProtocolInformation.model_construct(
             protocol_type="Surgical Procedures",
             procedure_name="Injection Nanoject",
-            protocol_name="Injection of Viral Tracers by Nanoject V.4",
+            protocol_name=self.nano_name,
             doi="dx.doi.org/some/doi/1",
             version="1.0",
             protocol_collection=None,
@@ -264,8 +268,7 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
         surgery_protocol = ProtocolInformation.model_construct(
             protocol_type="Surgical Procedures",
             procedure_name="Surgery",
-            protocol_name="General Set-Up and Take-Down for Rodent"
-                          " Neurosurgery",
+            protocol_name=self.surgery_name,
             doi="dx.doi.org/some/doi/2",
             version="1.0",
             protocol_collection=None,
@@ -278,10 +281,8 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
             status_code=StatusCodes.DB_RESPONDED,
         )
         protocols_mapping = {
-            "Injection of Viral Tracers by Nanoject V.4":
-                protocols_response1.map_to_json_response(),
-            "General Set-Up and Take-Down for Rodent Neurosurgery":
-                protocols_response2.map_to_json_response(),
+            self.nano_name: protocols_response1.map_to_json_response(),
+            self.surgery_name: protocols_response2.map_to_json_response(),
         }
         nanoject_inj = NanojectInjection.model_construct()
         surgery = Surgery.model_construct(procedures=[nanoject_inj])
@@ -325,10 +326,8 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
             status_code=StatusCodes.CONNECTION_ERROR,
         )
         protocols_mapping = {
-            "Injection of Viral Tracers by Nanoject V.4":
-                protocols_response.map_to_json_response(),
-            "General Set-Up and Take-Down for Rodent Neurosurgery":
-                protocols_response.map_to_json_response(),
+            self.nano_name: protocols_response.map_to_json_response(),
+            self.surgery_name: protocols_response.map_to_json_response(),
         }
         nanoject_inj = NanojectInjection.model_construct()
         surgery = Surgery.model_construct(procedures=[nanoject_inj])
@@ -351,10 +350,8 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
             status_code=StatusCodes.NO_DATA_FOUND,
         )
         protocols_mapping = {
-            "Injection of Viral Tracers by Nanoject V.4":
-                protocols_response.map_to_json_response(),
-            "General Set-Up and Take-Down for Rodent Neurosurgery":
-                protocols_response.map_to_json_response(),
+            self.nano_name: protocols_response.map_to_json_response(),
+            self.surgery_name: protocols_response.map_to_json_response(),
         }
         nanoject_inj = NanojectInjection.model_construct()
         surgery = Surgery.model_construct(procedures=[nanoject_inj])

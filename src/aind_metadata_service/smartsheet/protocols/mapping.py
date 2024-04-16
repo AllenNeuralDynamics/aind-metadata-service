@@ -158,7 +158,18 @@ class ProtocolsIntegrator:
     def integrate_protocols(
         self, response: ModelResponse, protocols_mapping: Dict
     ) -> ModelResponse:
-        """Merges protocols responses with procedures response"""
+        """
+        Merges protocols responses with procedures response
+        Parameters
+        ----------
+        response: ModelResponse
+             Merged response from procedures endpoints
+        protocols_mapping: dict
+             Dictionary mapping protocol names to info from smartsheet
+        Returns
+        -------
+        Procedures response with protocols
+        """
         output_aind_models = []
         status_code = response.status_code
         if len(response.aind_models) > 0:
