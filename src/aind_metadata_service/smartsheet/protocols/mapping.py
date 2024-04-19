@@ -1,9 +1,18 @@
 """Module that handles the methods to map the SmartSheet response to a
 protocol_id."""
 
+import json
 import logging
-from typing import List, Optional
+from typing import Dict, List, Optional
 
+from aind_data_schema.core.procedures import (
+    Craniotomy,
+    IontophoresisInjection,
+    NanojectInjection,
+    Perfusion,
+    ProtectiveMaterial,
+    Surgery,
+)
 from pydantic import ValidationError
 
 from aind_metadata_service.client import StatusCodes
@@ -12,6 +21,7 @@ from aind_metadata_service.response_handler import ModelResponse
 from aind_metadata_service.smartsheet.mapper import SmartSheetMapper
 from aind_metadata_service.smartsheet.models import SheetRow
 from aind_metadata_service.smartsheet.protocols.models import (
+    ProtocolNames,
     ProtocolsColumnNames,
 )
 
@@ -20,7 +30,7 @@ class ProtocolsMapper(SmartSheetMapper):
     """Primary class to handle mapping data models and returning a response"""
 
     def _map_row_to_protocol(
-        self, row: SheetRow, input_protocol_name: str
+        self, row: SheetRow, input_protocol_name: Optional[str]
     ) -> Optional[ProtocolInformation]:
         """
         Map a row to an optional funding model.
@@ -110,3 +120,102 @@ class ProtocolsMapper(SmartSheetMapper):
         except Exception as e:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
+
+
+class ProtocolsIntegrator:
+    """Methods to integrate Protocols into Procedures"""
+
+    @staticmethod
+    def _get_protocol_name(procedure):
+        """Gets protocol name based on procedure type"""
+        if isinstance(procedure, NanojectInjection):
+            return ProtocolNames.INJECTION_NANOJECT.value
+        elif isinstance(procedure, IontophoresisInjection):
+            return ProtocolNames.INJECTION_IONTOPHORESIS.value
+        elif isinstance(procedure, Perfusion):
+            return ProtocolNames.PERFUSION.value
+        elif isinstance(procedure, Craniotomy):
+            if procedure.protective_material == ProtectiveMaterial.DURAGEL:
+                return ProtocolNames.DURAGEL_APPLICATION.value
+        else:
+            return None
+
+    def get_protocols_list(self, response: ModelResponse) -> List:
+        """Creates a list of protocol names from procedures list"""
+        protocol_list = []
+        if len(response.aind_models) > 0:
+            procedures = response.aind_models[0]
+            for subject_procedure in procedures.subject_procedures:
+                if isinstance(subject_procedure, Surgery):
+                    protocol_list.append(ProtocolNames.SURGERY.value)
+                for procedure in subject_procedure.procedures:
+                    protocol_name = self._get_protocol_name(
+                        procedure=procedure
+                    )
+                    protocol_list.append(protocol_name)
+        return protocol_list
+
+    def integrate_protocols(
+        self, response: ModelResponse, protocols_mapping: Dict
+    ) -> ModelResponse:
+        """
+        Merges protocols responses with procedures response
+        Parameters
+        ----------
+        response: ModelResponse
+             Merged response from procedures endpoints
+        protocols_mapping: dict
+             Dictionary mapping protocol names to info from smartsheet
+        Returns
+        -------
+        Procedures response with protocols
+        """
+        output_aind_models = []
+        status_code = response.status_code
+        if len(response.aind_models) > 0:
+            pre_procedures = response.aind_models[0]
+            for subject_procedure in pre_procedures.subject_procedures:
+                if isinstance(subject_procedure, Surgery):
+                    protocol_name = ProtocolNames.SURGERY.value
+                    smartsheet_response = protocols_mapping.get(protocol_name)
+                    if (
+                        smartsheet_response.status_code
+                        == StatusCodes.DB_RESPONDED.value
+                        or smartsheet_response.status_code
+                        == StatusCodes.VALID_DATA.value
+                        or smartsheet_response.status_code
+                        == StatusCodes.INVALID_DATA.value
+                    ):
+                        data = json.loads(smartsheet_response.body)["data"]
+                        subject_procedure.protocol_id = data["doi"]
+                    elif (
+                        smartsheet_response.status_code
+                        == StatusCodes.NO_DATA_FOUND.value
+                    ):
+                        pass
+                    else:
+                        status_code = StatusCodes.MULTI_STATUS
+                for procedure in subject_procedure.procedures:
+                    protocol_name = self._get_protocol_name(procedure)
+                    smartsheet_response = protocols_mapping.get(protocol_name)
+                    if (
+                        smartsheet_response.status_code
+                        == StatusCodes.DB_RESPONDED.value
+                        or smartsheet_response.status_code
+                        == StatusCodes.VALID_DATA.value
+                        or smartsheet_response.status_code
+                        == StatusCodes.INVALID_DATA.value
+                    ):
+                        data = json.loads(smartsheet_response.body)["data"]
+                        procedure.protocol_id = data["doi"]
+                    elif (
+                        smartsheet_response.status_code
+                        == StatusCodes.NO_DATA_FOUND.value
+                    ):
+                        pass
+                    else:
+                        status_code = StatusCodes.MULTI_STATUS
+                output_aind_models = [pre_procedures]
+        return ModelResponse(
+            aind_models=output_aind_models, status_code=status_code
+        )

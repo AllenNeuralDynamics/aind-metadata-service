@@ -31,7 +31,10 @@ from aind_metadata_service.smartsheet.funding.mapping import FundingMapper
 from aind_metadata_service.smartsheet.perfusions.mapping import (
     PerfusionsMapper,
 )
-from aind_metadata_service.smartsheet.protocols.mapping import ProtocolsMapper
+from aind_metadata_service.smartsheet.protocols.mapping import (
+    ProtocolsIntegrator,
+    ProtocolsMapper,
+)
 from aind_metadata_service.tars.client import AzureSettings, TarsClient
 from aind_metadata_service.tars.mapping import TarsResponseHandler
 
@@ -133,7 +136,10 @@ async def retrieve_rig(rig_id, pickle: bool = False):
 
 
 @app.get("/protocols/{protocol_name}")
-async def retrieve_protocols(protocol_name, pickle: bool = False):
+async def retrieve_protocols(
+    protocol_name,
+    pickle: bool = False,
+):
     """Retrieves perfusion information from smartsheet"""
 
     # TODO: We can probably cache the response if it's 200
@@ -245,6 +251,7 @@ async def retrieve_procedures(subject_id, pickle: bool = False):
     merged_response = sharepoint_client.merge_responses(
         [lb_response, sp2019_response, sp2023_response]
     )
+    # integrate TARS response
     mapper = TarsResponseHandler()
     viruses = mapper.get_virus_strains(merged_response)
     tars_mapping = {}
@@ -255,6 +262,29 @@ async def retrieve_procedures(subject_id, pickle: bool = False):
         tars_mapping[virus_strain] = tars_response
     integrated_response = mapper.integrate_injection_materials(
         response=merged_response, tars_mapping=tars_mapping
+    )
+    # integrate protocols from smartsheet
+    smart_sheet_response = await run_in_threadpool(
+        protocols_smart_sheet_client.get_sheet
+    )
+    protocols_integrator = ProtocolsIntegrator()
+    protocols_list = protocols_integrator.get_protocols_list(
+        integrated_response
+    )
+    protocols_mapping = {}
+    for protocol_name in protocols_list:
+        mapper = ProtocolsMapper(
+            smart_sheet_response=smart_sheet_response, input_id=protocol_name
+        )
+        model_response = mapper.get_model_response()
+        # smartsheet_response = await retrieve_protocols(
+        #     protocol_name=protocol_name
+        # )
+        protocols_mapping[protocol_name] = (
+            model_response.map_to_json_response()
+        )
+    integrated_response = protocols_integrator.integrate_protocols(
+        response=integrated_response, protocols_mapping=protocols_mapping
     )
     if pickle:
         return integrated_response.map_to_pickled_response()
