@@ -7,6 +7,7 @@ from typing import List, Optional, Union
 from aind_data_schema.core.data_description import Funding
 from aind_data_schema.models.organizations import Organization
 from pydantic import ValidationError
+from starlette.responses import JSONResponse
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
@@ -128,3 +129,22 @@ class FundingMapper(SmartSheetMapper):
         except Exception as e:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
+
+    def get_project_names(self) -> JSONResponse:
+        """Get list of project names from funding sheet"""
+        try:
+            project_names = []
+            for row in self.model.rows:
+                row_dict = self.map_row_to_dict(row)
+                project_name = row_dict.get(FundingColumnNames.PROJECT_NAME)
+                if project_name is not None:
+                    project_names.append(project_name)
+            return JSONResponse(
+                status_code=200,
+                content=({"message": "Success", "data": project_names}),
+            )
+        except Exception as e:
+            return JSONResponse(
+                status_code=500,
+                content=({"message": f"Error: {e}", "data": None}),
+            )
