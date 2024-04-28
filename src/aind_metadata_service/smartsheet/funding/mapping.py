@@ -133,15 +133,17 @@ class FundingMapper(SmartSheetMapper):
     def get_project_names(self) -> JSONResponse:
         """Get list of project names from funding sheet"""
         try:
-            project_names = []
+            project_names = set()
             for row in self.model.rows:
                 row_dict = self.map_row_to_dict(row)
                 project_name = row_dict.get(FundingColumnNames.PROJECT_NAME)
                 if project_name is not None:
-                    project_names.append(project_name)
+                    project_names.add(project_name)
             return JSONResponse(
                 status_code=200,
-                content=({"message": "Success", "data": project_names}),
+                content=(
+                    {"message": "Success", "data": sorted(list(project_names))}
+                ),
             )
         except Exception as e:
             return JSONResponse(
