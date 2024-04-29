@@ -175,6 +175,57 @@ class TestSmartsheetFundingClient(unittest.TestCase):
             ]
         )
 
+    @patch("smartsheet.sheets.Sheets.get_sheet")
+    def test_get_project_names_success(self, mock_get_sheet: MagicMock):
+        """Tests successful sheet return response of project names"""
+        mock_get_sheet.return_value.to_json.return_value = self.example_sheet
+        settings = SmartsheetSettings(
+            access_token="abc-123", sheet_id=7478444220698500
+        )
+        client = SmartSheetClient(smartsheet_settings=settings)
+        smart_sheet_response = client.get_sheet()
+        mapper = FundingMapper(
+            smart_sheet_response=smart_sheet_response,
+            input_id="",
+        )
+        json_response = mapper.get_project_names()
+        expected_response = {
+            "message": "Success",
+            "data": ["AIND Scientific Activities", "v1omFISH"],
+        }
+        self.assertEqual(
+            json.loads(json_response.body.decode("utf-8")), expected_response
+        )
+
+    @patch("smartsheet.sheets.Sheets.get_sheet")
+    @patch("logging.error")
+    def test_get_project_names_failure(
+        self, mock_log_error: MagicMock, mock_get_sheet: MagicMock
+    ):
+        """Tests failure of sheet return response of project names"""
+
+        def mock_get_sheet_error(_):
+            """Mock the get_sheet so that it returns an error."""
+            raise Exception("Something went wrong")
+
+        type(mock_get_sheet.return_value).to_json = mock_get_sheet_error
+        settings = SmartsheetSettings(
+            access_token="abc-123", sheet_id=7478444220698500
+        )
+        client = SmartSheetClient(smartsheet_settings=settings)
+        smart_sheet_response = client.get_sheet()
+        mapper = FundingMapper(
+            smart_sheet_response=smart_sheet_response,
+            input_id="",
+        )
+        json_response = mapper.get_project_names()
+        self.assertEqual(500, json_response.status_code)
+        mock_log_error.assert_has_calls(
+            [
+                call("Exception('Something went wrong',)"),
+            ]
+        )
+
 
 class TestFundingModels(unittest.TestCase):
     """Test methods in models package"""

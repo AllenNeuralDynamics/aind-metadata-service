@@ -194,6 +194,21 @@ async def retrieve_funding(project_name, pickle: bool = False):
         return model_response.map_to_json_response()
 
 
+@app.get("/project_names")
+async def retrieve_project_names():
+    """Retrieves funding information from smartsheet"""
+
+    # TODO: We can probably cache the response if it's 200
+    smart_sheet_response = await run_in_threadpool(
+        funding_smart_sheet_client.get_sheet
+    )
+    mapper = FundingMapper(
+        smart_sheet_response=smart_sheet_response, input_id=""
+    )
+    json_response = mapper.get_project_names()
+    return json_response
+
+
 @app.get("/subject/{subject_id}")
 async def retrieve_subject(subject_id, pickle: bool = False):
     """
