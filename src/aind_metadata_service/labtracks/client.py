@@ -435,7 +435,7 @@ class LabTracksResponseHandler:
                 source = Organization.AI
             else:
                 breeding_info = None
-                source = None
+                source = Organization.OTHER
             subject = Subject.model_construct(
                 source=source,
                 subject_id=subject_id_str,
