@@ -285,7 +285,23 @@ class TestLabTracksClient(unittest.TestCase):
                         "C57BL/6J",
                         "1234",
                         "000",
-                    ]
+                    ],
+                    [
+                        decimal.Decimal("115977"),
+                        TestResponseExamples.class_values_str,
+                        "M",
+                        datetime.datetime(2012, 5, 13, 0, 0),
+                        None,
+                        None,
+                        None,
+                        None,
+                        None,
+                        "mouse",
+                        None,
+                        "C57BL/6J",
+                        "1234",
+                        "000",
+                    ],
                 ]
 
             @staticmethod
@@ -299,7 +315,10 @@ class TestLabTracksClient(unittest.TestCase):
 
         subject_response = self.lb_client.get_subject_info(subject_id)
         expected_response = ModelResponse(
-            aind_models=[TestResponseExamples.expected_subject],
+            aind_models=[
+                TestResponseExamples.expected_subject,
+                TestResponseExamples.expected_subject_2,
+            ],
             status_code=StatusCodes.DB_RESPONDED,
         )
         self.assertEqual(
