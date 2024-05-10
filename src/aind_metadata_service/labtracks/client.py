@@ -416,15 +416,26 @@ class LabTracksResponseHandler:
                 room_id=result.get(SubjectQueryColumns.ROOM_ID.value),
                 cage_id=result.get(SubjectQueryColumns.CAGE_ID.value),
             )
-            breeding_info = BreedingInfo.model_construct(
-                breeding_group=breeding_group,
-                paternal_genotype=paternal_genotype,
-                paternal_id=paternal_id_str,
-                maternal_genotype=maternal_genotype,
-                maternal_id=maternal_id_str,
-            )
-            # Assume all mice from LabTracks is AI?
-            source = Organization.AI
+            breeding_values = [
+                breeding_group,
+                paternal_genotype,
+                paternal_id_str,
+                maternal_genotype,
+                maternal_id_str,
+            ]
+            if any(value is not None for value in breeding_values):
+                breeding_info = BreedingInfo.model_construct(
+                    breeding_group=breeding_group,
+                    paternal_genotype=paternal_genotype,
+                    paternal_id=paternal_id_str,
+                    maternal_genotype=maternal_genotype,
+                    maternal_id=maternal_id_str,
+                )
+                # If breeding info, subject is from AI
+                source = Organization.AI
+            else:
+                breeding_info = None
+                source = Organization.OTHER
             subject = Subject.model_construct(
                 source=source,
                 subject_id=subject_id_str,

@@ -102,6 +102,23 @@ class TestResponseExamples:
         notes=None,
     )
 
+    expected_subject_2 = Subject(
+        species=Species.MUS_MUSCULUS,
+        breeding_info=None,
+        subject_id="115977",
+        sex=Sex.MALE,
+        source=Organization.OTHER,
+        date_of_birth=date(2012, 5, 13),
+        genotype="Adora2a-Cre/wt",
+        alleles=[],
+        background_strain=BackgroundStrain.C57BL_6J,
+        housing=expected_housing,
+        rrid=None,
+        restrictions=None,
+        wellness_reports=[],
+        notes=None,
+    )
+
     test_procedures_response = [
         {
             "id": Decimal(00000),
