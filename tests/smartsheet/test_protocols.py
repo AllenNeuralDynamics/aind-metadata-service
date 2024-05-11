@@ -285,7 +285,9 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
             self.surgery_name: protocols_response2.map_to_json_response(),
         }
         nanoject_inj = NanojectInjection.model_construct()
-        surgery = Surgery.model_construct(experimenter_full_name="NSB-123", procedures=[nanoject_inj])
+        surgery = Surgery.model_construct(
+            experimenter_full_name="NSB-123", procedures=[nanoject_inj]
+        )
         procedures_response = ModelResponse(
             aind_models=[
                 Procedures(subject_id="12345", subject_procedures=[surgery])
@@ -331,7 +333,9 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
             self.surgery_name: protocols_response.map_to_json_response(),
         }
         nanoject_inj = NanojectInjection.model_construct()
-        surgery = Surgery.model_construct(procedures=[nanoject_inj])
+        surgery = Surgery.model_construct(
+            experimenter_full_name="NSB-123", procedures=[nanoject_inj]
+        )
         procedures_response = ModelResponse(
             aind_models=[
                 Procedures(subject_id="12345", subject_procedures=[surgery])
@@ -355,7 +359,9 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
             self.surgery_name: protocols_response.map_to_json_response(),
         }
         nanoject_inj = NanojectInjection.model_construct()
-        surgery = Surgery.model_construct(procedures=[nanoject_inj])
+        surgery = Surgery.model_construct(
+            experimenter_full_name="NSB-123", procedures=[nanoject_inj]
+        )
         procedures_response = ModelResponse(
             aind_models=[
                 Procedures(subject_id="12345", subject_procedures=[surgery])
