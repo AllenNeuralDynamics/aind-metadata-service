@@ -175,7 +175,9 @@ class ProtocolsIntegrator:
         if len(response.aind_models) > 0:
             pre_procedures = response.aind_models[0]
             for subject_procedure in pre_procedures.subject_procedures:
-                if isinstance(subject_procedure, Surgery):
+                if isinstance(subject_procedure, Surgery)\
+                        and hasattr(subject_procedure, "experimenter_full_name")\
+                        and "NSB" in subject_procedure.experimenter_full_name:
                     protocol_name = ProtocolNames.SURGERY.value
                     smartsheet_response = protocols_mapping.get(protocol_name)
                     if (
