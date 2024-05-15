@@ -422,3 +422,34 @@ class AttachmentTableRow(SlimsTableRow):
     attm_file_filesize: Optional[int] = Field(None, title="File size")
     grps_groupName: Optional[str] = Field(None, title="Group name")
     attm_createdBy: Optional[str] = Field(None, title="Created by")
+
+
+class ReferenceDataTableRow(SlimsTableRow):
+    """A record pulled from slims Reference Data"""
+    rdty_name: Optional[str] = Field(None, title="Name")
+    rdty_uniqueIdentifier: Optional[str] = Field(None, title="Unique identifier")
+    rdty_description: Optional[str] = Field(None, title="Description")
+    rdty_active: Optional[bool] = Field(None, title="Active")
+    rdty_fk_functionality: Optional[str] = Field(None, title="Submodule")
+    rdty_createdBy: Optional[str] = Field(None, title="Created by")
+    rdty_createdOn: Optional[int] = Field(None, title="Created on", description="Timestamp in millis")
+    rdty_modifiedBy: Optional[int] = Field(None, title="Modified by", description="Timestamp in millis")
+    attachmentCount: Optional[int] = Field(None, title="attachmentCount")
+    rdty_pk: Optional[int] = Field(None, title="rdty_pk")
+
+
+class ReferenceDataRecordTableRow(SlimsTableRow):
+    """A record pulled from slims Reference Data Record"""
+    rdrc_name: Optional[str] = Field(None, title="Name")
+    rdrc_uniqueIdentifier: Optional[str] = Field(None, title="Unique Identifier")
+    rdrc_active: Optional[bool] = Field(None, title="Active")
+    rdrc_fk_user: Optional[str] = Field(None, title="User")
+    rdrc_fk_group: Optional[str] = Field(None, title="Group")
+    rdrc_cf_fk_rigInstrument: Optional[str] = Field(None, title="Instrument")
+    rdrc_cf_jsonAttachment: Optional[str] = Field(None, title="JSON Attachment")
+    rdrc_fk_referenceDataType: Optional[str] = Field(None, title="Reference Data Type")
+    rdrc_createdOn: Optional[int] = Field(None, title="Created on", description="Timestamp in millis")
+    rdrc_modifiedBy: Optional[str] = Field(None, title="Modified by")
+    rdrc_modifiedOn: Optional[int] = Field(None, title="Modified On", description="Timestamp in millis")
+    attachmentCount: Optional[int] = Field(None, title="attachmentCount")
+    rdrc_pk: Optional[int] = Field(None, title="rdrc_pk")

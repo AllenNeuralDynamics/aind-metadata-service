@@ -15,7 +15,7 @@ from slims.slims import Slims
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
-from aind_metadata_service.slims.models import ContentsTableRow
+from aind_metadata_service.slims.models import ContentsTableRow, ReferenceDataRecordTableRow
 
 
 class SlimsSettings(BaseSettings):
@@ -183,48 +183,60 @@ class SlimsClient:
                         models.append(rig)
         return models
 
-    def get_instrument_model_response(self, input_id) -> ModelResponse:
-        """
-        Fetches a response from SLIMS, extracts Instrument models from the
-        response and creates a ModelResponse with said models.
-        """
-        try:
-            response = self.get_record_response(
-                "Instrument", equals("nstr_name", input_id)
-            )
-            if response.status_code == 200:
-                models = self.extract_instrument_models_from_response(response)
-                return ModelResponse(
-                    aind_models=models, status_code=StatusCodes.DB_RESPONDED
-                )
-            elif response.status_code == 401:
-                return ModelResponse.connection_error_response()
-            else:
-                return ModelResponse.internal_server_error_response()
-        # Handles case where we might gt an exception from GET request
-        except Exception as e:
-            logging.error(repr(e))
-            return ModelResponse.internal_server_error_response()
+    # def get_instrument_model_response(self, input_id) -> ModelResponse:
+    #     """
+    #     Fetches a response from SLIMS, extracts Instrument models from the
+    #     response and creates a ModelResponse with said models.
+    #     """
+    #     try:
+    #         response = self.get_record_response(
+    #             "Instrument", equals("nstr_name", input_id)
+    #         )
+    #         if response.status_code == 200:
+    #             models = self.extract_instrument_models_from_response(response)
+    #             return ModelResponse(
+    #                 aind_models=models, status_code=StatusCodes.DB_RESPONDED
+    #             )
+    #         elif response.status_code == 401:
+    #             return ModelResponse.connection_error_response()
+    #         else:
+    #             return ModelResponse.internal_server_error_response()
+    #     # Handles case where we might gt an exception from GET request
+    #     except Exception as e:
+    #         logging.error(repr(e))
+    #         return ModelResponse.internal_server_error_response()
+    #
+    # def get_rig_model_response(self, input_id) -> ModelResponse:
+    #     """
+    #     Fetches a response from SLIMS, extracts Rig models from the
+    #     response and creates a ModelResponse with said models.
+    #     """
+    #     try:
+    #         response = self.get_record_response(
+    #             "Instrument", equals("nstr_name", input_id)
+    #         )
+    #         if response.status_code == 200:
+    #             models = self.extract_rig_models_from_response(response)
+    #             return ModelResponse(
+    #                 aind_models=models, status_code=StatusCodes.DB_RESPONDED
+    #             )
+    #         elif response.status_code == 401:
+    #             return ModelResponse.connection_error_response()
+    #         else:
+    #             return ModelResponse.internal_server_error_response()
+    #     # Handles case where we might gt an exception from GET request
+    #     except Exception as e:
+    #         logging.error(repr(e))
+    #         return ModelResponse.internal_server_error_response()
 
-    def get_rig_model_response(self, input_id) -> ModelResponse:
+
+    def get_reference_data_record_model_response(self, input_id):
         """
-        Fetches a response from SLIMS, extracts Rig models from the
-        response and creates a ModelResponse with said models.
+        Fetches a response from SLIMS from Reference Data Record table
         """
         try:
             response = self.get_record_response(
-                "Instrument", equals("nstr_name", input_id)
+                "ReferenceDataRecord", equals(ReferenceDataRecordTableRow.model_fields["rdrc_name"].title, input_id)
             )
             if response.status_code == 200:
-                models = self.extract_rig_models_from_response(response)
-                return ModelResponse(
-                    aind_models=models, status_code=StatusCodes.DB_RESPONDED
-                )
-            elif response.status_code == 401:
-                return ModelResponse.connection_error_response()
-            else:
-                return ModelResponse.internal_server_error_response()
-        # Handles case where we might gt an exception from GET request
-        except Exception as e:
-            logging.error(repr(e))
-            return ModelResponse.internal_server_error_response()
+                # extract attachment
