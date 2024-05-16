@@ -277,6 +277,7 @@ class TestLabTracksResponseHandler(unittest.TestCase):
         housing2 = Housing.model_construct(room_id="000")
         housing3 = Housing.model_construct(cage_id="1234")
         housing4 = Housing.model_construct(room_id="000", cage_id="1234")
+        housing5 = Housing.model_construct(room_id="123", cage_id="456")
 
         subject_housing1 = self.rh._map_housing(
             room_id="-99999999999", cage_id=None
@@ -284,11 +285,13 @@ class TestLabTracksResponseHandler(unittest.TestCase):
         subject_housing2 = self.rh._map_housing(room_id="000", cage_id=None)
         subject_housing3 = self.rh._map_housing(room_id=None, cage_id="1234")
         subject_housing4 = self.rh._map_housing(room_id="000", cage_id="1234")
+        subject_housing5 = self.rh._map_housing(room_id=123, cage_id=456)
 
         self.assertIsNone(subject_housing1)
         self.assertEqual(subject_housing2, housing2)
         self.assertEqual(subject_housing3, housing3)
         self.assertEqual(subject_housing4, housing4)
+        self.assertEqual(subject_housing5, housing5)
 
 
 if __name__ == "__main__":

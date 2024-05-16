@@ -358,8 +358,8 @@ class LabTracksResponseHandler:
         -------
         Optional[Housing]
         """
-        room_id = None if room_id is None or int(room_id) < 0 else room_id
-        cage_id = None if cage_id is None or int(cage_id) < 0 else cage_id
+        room_id = None if room_id is None or int(room_id) < 0 else str(room_id)
+        cage_id = None if cage_id is None or int(cage_id) < 0 else str(cage_id)
 
         return (
             Housing.model_construct(room_id=room_id, cage_id=cage_id)
