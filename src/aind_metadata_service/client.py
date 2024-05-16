@@ -16,6 +16,7 @@ class StatusCodes(Enum):
     INVALID_DATA = 406
     NO_DATA_FOUND = 404
     MULTI_STATUS = 207
+    UNPROCESSIBLE_ENTITY = 422
 
 
 class AindMetadataServiceClient:
