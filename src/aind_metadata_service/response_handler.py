@@ -90,42 +90,52 @@ class ModelResponse(Generic[T]):
             message="No Data Found.",
         )
 
-    def _map_data_response(
-        self, pickled: bool = False
+    def _map_data_response(  # noqa: C901
+        self, pickled: bool = False, validate: bool = True
     ) -> Union[Response, JSONResponse]:
         """Map ModelResponse with StatusCodes.DB_RESPONDED to a JSONResponse.
-        Perform validations."""
+        Perform validations, bypasses validation if flag is set to False."""
         if len(self.aind_models) == 0:
             status_code = StatusCodes.NO_DATA_FOUND.value
             content_data = None
             message = "No Data Found."
         elif len(self.aind_models) == 1:
             aind_model = self.aind_models[0]
-            # TODO: fix validation error catching
-            validation_error = None
-            try:
-                aind_model.__class__.model_validate(aind_model.model_dump())
-            except ValidationError as e:
-                validation_error = repr(e)
             if pickled:
                 content_data = aind_model
             else:
                 content_data = jsonable_encoder(
                     json.loads(aind_model.model_dump_json())
                 )
-            if validation_error:
-                status_code = StatusCodes.INVALID_DATA.value
-                message = f"Validation Errors: {validation_error}"
+            if validate:
+                validation_error = None
+                try:
+                    aind_model.__class__.model_validate(
+                        aind_model.model_dump()
+                    )
+                except ValidationError as e:
+                    validation_error = repr(e)
+                except (AttributeError, ValueError, KeyError) as oe:
+                    validation_error = repr(oe)
+                if validation_error:
+                    status_code = StatusCodes.INVALID_DATA.value
+                    message = f"Validation Errors: {validation_error}"
+                else:
+                    status_code = StatusCodes.VALID_DATA.value
+                    message = "Valid Model."
+            # if validate flag is False
             else:
-                status_code = StatusCodes.VALID_DATA.value
-                message = "Valid Model."
+                status_code = StatusCodes.UNPROCESSIBLE_ENTITY.value
+                message = (
+                    "Valid Request Format. Models have not been validated."
+                )
+
             if self.status_code == StatusCodes.MULTI_STATUS:
                 status_code = self.status_code.value
                 message = (
                     "There was an error retrieving records from one or more of"
                     " the databases."
                 )
-
         else:
             status_code = StatusCodes.MULTIPLE_RESPONSES.value
             message = "Multiple Items Found."
@@ -148,7 +158,7 @@ class ModelResponse(Generic[T]):
                 content=({"message": message, "data": content_data}),
             )
 
-    def map_to_json_response(self) -> JSONResponse:
+    def map_to_json_response(self, validate: bool = True) -> JSONResponse:
         """Map a ModelResponse to a JSONResponse."""
         if self.status_code == StatusCodes.CONNECTION_ERROR:
             response = JSONResponse(
@@ -161,7 +171,7 @@ class ModelResponse(Generic[T]):
                 content=({"message": self.message, "data": None}),
             )
         else:
-            response = self._map_data_response()
+            response = self._map_data_response(validate=validate)
         return response
 
     def map_to_pickled_response(self) -> Response:

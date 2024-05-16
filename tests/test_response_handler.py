@@ -5,6 +5,7 @@ import os
 import pickle
 import unittest
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 from aind_data_schema.core.procedures import Procedures
 from aind_data_schema.core.subject import BreedingInfo, Species, Subject
@@ -152,6 +153,70 @@ class TestResponseHandler(unittest.TestCase):
             content=(
                 {
                     "message": f"Validation Errors: {validation_error}",
+                    "data": model_json,
+                }
+            ),
+        )
+        expected_pickled = Response(
+            status_code=406,
+            content=pickle.dumps(model),
+            media_type="application/octet-stream",
+        )
+
+        self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
+        self.assertEqual(expected_json.status_code, actual_json.status_code)
+        self.assertEqual(expected_json.body, actual_json.body)
+
+        self.assertEqual(
+            expected_pickled.status_code, actual_pickled.status_code
+        )
+        self.assertEqual(
+            pickle.loads(expected_pickled.body),
+            pickle.loads(actual_pickled.body),
+        )
+
+    @patch("aind_metadata_service.response_handler.json.loads")
+    @patch("aind_metadata_service.response_handler.Subject.model_validate")
+    def test_key_error(self, mock_model_validate, mock_json_loads):
+        """Test model_response with valid model."""
+        key_error = KeyError("Mocked Key Error")
+        mock_model_validate.side_effect = key_error
+        mock_json_loads.return_value = {"invalid_key": "value"}
+        aind_model = MagicMock(spec=Subject)
+        aind_model.model_dump.return_value = "{}"
+        model_response = ModelResponse(
+            status_code=StatusCodes.DB_RESPONDED, aind_models=[aind_model]
+        )
+        actual_json = model_response.map_to_json_response()
+        expected_json = JSONResponse(
+            status_code=406,
+            content=(
+                {
+                    "message": f"Validation Errors: KeyError({key_error})",
+                    "data": {"invalid_key": "value"},
+                }
+            ),
+        )
+        self.assertEqual(
+            actual_json.status_code, StatusCodes.INVALID_DATA.value
+        )
+        self.assertEqual(actual_json.body, expected_json.body)
+
+    def test_no_validation(self):
+        """Test model_response when validation is turned off."""
+        model = Subject.model_construct()
+        model_response = ModelResponse(
+            status_code=StatusCodes.DB_RESPONDED, aind_models=[model]
+        )
+        actual_json = model_response.map_to_json_response(validate=False)
+        actual_pickled = model_response.map_to_pickled_response()
+        model_json = jsonable_encoder(model)
+        expected_json = JSONResponse(
+            status_code=422,
+            content=(
+                {
+                    "message": "Valid Request Format. "
+                               "Models have not been validated.",
                     "data": model_json,
                 }
             ),

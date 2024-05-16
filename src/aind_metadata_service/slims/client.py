@@ -190,7 +190,7 @@ class SlimsClient:
         """
         try:
             response = self.get_record_response(
-                "Instrument", equals("nstr_name", input_id)
+                "ReferenceDataRecord", equals("rdrc_name", input_id)
             )
             if response.status_code == 200:
                 models = self.extract_instrument_models_from_response(response)
@@ -213,7 +213,7 @@ class SlimsClient:
         """
         try:
             response = self.get_record_response(
-                "Instrument", equals("nstr_name", input_id)
+                "ReferenceDataRecord", equals("rdrc_name", input_id)
             )
             if response.status_code == 200:
                 models = self.extract_rig_models_from_response(response)
