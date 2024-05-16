@@ -119,7 +119,7 @@ async def retrieve_instrument(instrument_id, pickle: bool = False):
     if pickle:
         return model_response.map_to_pickled_response()
     else:
-        return model_response.map_to_json_response()
+        return model_response.map_to_json_response(validate=False)
 
 
 @app.get("/rig/{rig_id}")
@@ -132,7 +132,7 @@ async def retrieve_rig(rig_id, pickle: bool = False):
     if pickle:
         return model_response.map_to_pickled_response()
     else:
-        return model_response.map_to_json_response()
+        return model_response.map_to_json_response(validate=False)
 
 
 @app.get("/protocols/{protocol_name}")
