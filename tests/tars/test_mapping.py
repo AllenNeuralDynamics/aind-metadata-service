@@ -41,6 +41,16 @@ class TestTarsResponseHandler(unittest.TestCase):
         status_code=StatusCodes.DB_RESPONDED,
     )
 
+    surgery1 = Surgery.model_construct(
+        procedures=[NanojectInjection.model_construct()]
+    )
+    procedures_response1 = ModelResponse(
+        aind_models=[
+            Procedures(subject_id="12345", subject_procedures=[surgery1])
+        ],
+        status_code=StatusCodes.DB_RESPONDED,
+    )
+
     def test_map_prep_type_and_protocol(self):
         """Tests that prep_type and protocol are mapped as expected."""
         (
@@ -282,6 +292,11 @@ class TestTarsResponseHandler(unittest.TestCase):
         expected_virus_strains = ["12345", "67890"]
 
         self.assertEqual(virus_strains, expected_virus_strains)
+
+        no_virus_strains = self.handler.get_virus_strains(
+            self.procedures_response1
+        )
+        self.assertEqual(no_virus_strains, [])
 
     def test_integrate_injection_materials(self):
         """Tests that injection materials are integrated into

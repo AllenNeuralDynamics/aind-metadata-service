@@ -218,8 +218,8 @@ class TarsResponseHandler:
                 for procedure in subject_procedure.procedures:
                     if (
                         isinstance(procedure, Injection)
-                        and procedure.injection_materials
-                        and procedure.injection_materials[0].name
+                        and hasattr(procedure, "injection_materials")
+                        and hasattr(procedure.injection_materials[0], "name")
                     ):
                         virus_strain = procedure.injection_materials[0].name
                         viruses.append(virus_strain)
@@ -240,14 +240,15 @@ class TarsResponseHandler:
             pre_procedures = response.aind_models[0]
             for subject_procedure in pre_procedures.subject_procedures:
                 for procedure in subject_procedure.procedures:
-                    if (
-                        isinstance(procedure, Injection)
-                        and procedure.injection_materials
+                    if isinstance(procedure, Injection) and hasattr(
+                        procedure, "injection_materials"
                     ):
                         for idx, injection_material in enumerate(
                             procedure.injection_materials
                         ):
-                            if isinstance(injection_material, ViralMaterial):
+                            if isinstance(
+                                injection_material, ViralMaterial
+                            ) and hasattr(injection_material, "name"):
                                 virus_strain = injection_material.name
                                 tars_response = tars_mapping.get(virus_strain)
                                 if (
