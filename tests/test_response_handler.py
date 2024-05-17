@@ -216,7 +216,7 @@ class TestResponseHandler(unittest.TestCase):
             content=(
                 {
                     "message": "Valid Request Format. "
-                               "Models have not been validated.",
+                    "Models have not been validated.",
                     "data": model_json,
                 }
             ),
