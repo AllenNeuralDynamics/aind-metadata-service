@@ -219,6 +219,8 @@ class TarsResponseHandler:
                     if (
                         isinstance(procedure, Injection)
                         and hasattr(procedure, "injection_materials")
+                        and isinstance(procedure.injection_materials, list)
+                        and procedure.injection_materials
                         and hasattr(procedure.injection_materials[0], "name")
                     ):
                         virus_strain = procedure.injection_materials[0].name
