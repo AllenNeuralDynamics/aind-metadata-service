@@ -27,15 +27,28 @@ class SharepointSettings(BaseSettings):
     nsb_2019_list: str = Field(
         default="SWR 2019-2022",
         title="NSB 2019 List",
-        description="List name for 2019 database.",
+        description="List name for Neurosurgery & Behavior 2019 database.",
     )
     nsb_2023_list: str = Field(
         default="SWR 2023-Present",
         title="NSB 2023 List",
-        description="List name for 2023 database.",
+        description="List name for Neurosurgery & Behavior 2023 database.",
     )
-    nsb_sharepoint_user: str = Field(title="User", description="Username.")
+    nsp_list: str = Field(
+        default="NSPRequest2020",
+        title="NSP List",
+        description="List name for Non-Surgical Procedures database",
+    )
+    nsb_sharepoint_user: str = Field(
+        title="NSB User", description="NSB Username."
+    )
     nsb_sharepoint_password: SecretStr = Field(
+        title="Password", description="Password."
+    )
+    nsp_sharepoint_user: str = Field(
+        title="NSP User", description="NSP Username"
+    )
+    nsp_sharepoint_password: SecretStr = Field(
         title="Password", description="Password."
     )
 
