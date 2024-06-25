@@ -4,7 +4,7 @@ from datetime import datetime, date
 from decimal import Decimal, DecimalException
 from enum import Enum
 from typing import Optional, Any
-from aind_metadata_service.sharepoint.las.models import LASList
+from aind_metadata_service.sharepoint.las2020.models import LASList
 from aind_data_schema.core.procedures import Surgery
 
 
@@ -50,11 +50,6 @@ class MappedLASList:
     def __init__(self, las: LASList):
         """Class constructor"""
         self._las = las
-
-    @staticmethod
-    def _map_float_to_decimal(value: Optional[float]) -> Optional[Decimal]:
-        """Parse string representation of float such as '0.25'."""
-        return None if value is None else Decimal(str(value))
 
     @staticmethod
     def _parse_basic_decimal_str(value: Optional[str]) -> Optional[Decimal]:
@@ -132,7 +127,11 @@ class MappedLASList:
     @property
     def aind_author_id(self) -> Optional[str]:
         """Maps author_id to aind model"""
-        return None if self._las.author_id is None else f"LAS-{str(self._las.author_id)}"
+        return (
+            None
+            if self._las.author_id is None
+            else f"LAS-{str(self._las.author_id)}"
+        )
 
     @property
     def aind_bc_age(self) -> Optional[str]:
@@ -213,8 +212,7 @@ class MappedLASList:
         return (
             None
             if self._las.dose_route is None
-            else
-            {
+            else {
                 self._las.dose_route.INTRAMUSCULAR_IM: None,
                 self._las.dose_route.INTRAPERITONEAL_IP: None,
                 self._las.dose_route.INTRAVENOUS_IV: None,
@@ -286,60 +284,84 @@ class MappedLASList:
     @property
     def aind_icv_lims(self) -> Optional[Any]:
         """Maps icv_lims to aind model"""
-        return {
-            self._las.icv_lims.STEREOTAXIC_INJECTIONS: None,
-            self._las.icv_lims.NEW_STEREOTAXIC_INJECTION: None,
-        }.get(self._las.icv_lims, None)
+        return (
+            None
+            if self._las.icv_lims is None
+            else {
+                self._las.icv_lims.STEREOTAXIC_INJECTIONS: None,
+                self._las.icv_lims.NEW_STEREOTAXIC_INJECTION: None,
+            }.get(self._las.icv_lims, None)
+        )
 
     @property
     def aind_icv_route1(self) -> Optional[Any]:
         """Maps icv_route1 to aind model"""
-        return {
-            self._las.icv_route1.BILATERAL: None,
-            self._las.icv_route1.ANY_UNILATERAL: None,
-            self._las.icv_route1.LEFT_UNILATERAL: None,
-            self._las.icv_route1.RIGHT_UNILATERAL: None,
-        }.get(self._las.icv_route1, None)
+        return (
+            None
+            if self._las.icv_route1 is None
+            else {
+                self._las.icv_route1.BILATERAL: None,
+                self._las.icv_route1.ANY_UNILATERAL: None,
+                self._las.icv_route1.LEFT_UNILATERAL: None,
+                self._las.icv_route1.RIGHT_UNILATERAL: None,
+            }.get(self._las.icv_route1, None)
+        )
 
     @property
     def aind_icv_route2(self) -> Optional[Any]:
         """Maps icv_route2 to aind model"""
-        return {
-            self._las.icv_route2.BILATERAL: None,
-            self._las.icv_route2.ANY_UNILATERAL: None,
-            self._las.icv_route2.LEFT_UNILATERAL: None,
-            self._las.icv_route2.RIGHT_UNILATERAL: None,
-        }.get(self._las.icv_route2, None)
+        return (
+            None
+            if self._las.icv_route2 is None
+            else {
+                self._las.icv_route2.BILATERAL: None,
+                self._las.icv_route2.ANY_UNILATERAL: None,
+                self._las.icv_route2.LEFT_UNILATERAL: None,
+                self._las.icv_route2.RIGHT_UNILATERAL: None,
+            }.get(self._las.icv_route2, None)
+        )
 
     @property
     def aind_icv_route3(self) -> Optional[Any]:
         """Maps icv_route3 to aind model"""
-        return {
-            self._las.icv_route3.BILATERAL: None,
-            self._las.icv_route3.ANY_UNILATERAL: None,
-            self._las.icv_route3.LEFT_UNILATERAL: None,
-            self._las.icv_route3.RIGHT_UNILATERAL: None,
-        }.get(self._las.icv_route3, None)
+        return (
+            None
+            if self._las.icv_route3 is None
+            else {
+                self._las.icv_route3.BILATERAL: None,
+                self._las.icv_route3.ANY_UNILATERAL: None,
+                self._las.icv_route3.LEFT_UNILATERAL: None,
+                self._las.icv_route3.RIGHT_UNILATERAL: None,
+            }.get(self._las.icv_route3, None)
+        )
 
     @property
     def aind_icv_route4(self) -> Optional[Any]:
         """Maps icv_route4 to aind model"""
-        return {
-            self._las.icv_route4.BILATERAL: None,
-            self._las.icv_route4.ANY_UNILATERAL: None,
-            self._las.icv_route4.LEFT_UNILATERAL: None,
-            self._las.icv_route4.RIGHT_UNILATERAL: None,
-        }.get(self._las.icv_route4, None)
+        return (
+            None
+            if self._las.icv_route4 is None
+            else {
+                self._las.icv_route4.BILATERAL: None,
+                self._las.icv_route4.ANY_UNILATERAL: None,
+                self._las.icv_route4.LEFT_UNILATERAL: None,
+                self._las.icv_route4.RIGHT_UNILATERAL: None,
+            }.get(self._las.icv_route4, None)
+        )
 
     @property
     def aind_icv_route5(self) -> Optional[Any]:
         """Maps icv_route5 to aind model"""
-        return {
-            self._las.icv_route5.BILATERAL: None,
-            self._las.icv_route5.ANY_UNILATERAL: None,
-            self._las.icv_route5.LEFT_UNILATERAL: None,
-            self._las.icv_route5.RIGHT_UNILATERAL: None,
-        }.get(self._las.icv_route5, None)
+        return (
+            None
+            if self._las.icv_route5 is None
+            else {
+                self._las.icv_route5.BILATERAL: None,
+                self._las.icv_route5.ANY_UNILATERAL: None,
+                self._las.icv_route5.LEFT_UNILATERAL: None,
+                self._las.icv_route5.RIGHT_UNILATERAL: None,
+            }.get(self._las.icv_route5, None)
+        )
 
     @property
     def aind_icv_sub1(self) -> Optional[str]:
@@ -434,241 +456,253 @@ class MappedLASList:
     @property
     def aind_lims_project(self) -> Optional[Any]:
         """Maps lims_project to aind model"""
-        return {
-            self._las.lims_project.N_0200: None,
-            self._las.lims_project.N_0309: None,
-            self._las.lims_project.N_0310: None,
-            self._las.lims_project.N_0311: None,
-            self._las.lims_project.N_0312: None,
-            self._las.lims_project.N_0314: None,
-            self._las.lims_project.N_0316: None,
-            self._las.lims_project.N_0319: None,
-            self._las.lims_project.N_0320: None,
-            self._las.lims_project.N_0321: None,
-            self._las.lims_project.N_03212: None,
-            self._las.lims_project.N_03213: None,
-            self._las.lims_project.N_03214: None,
-            self._las.lims_project.N_0322: None,
-            self._las.lims_project.N_0324: None,
-            self._las.lims_project.N_0325: None,
-            self._las.lims_project.N_0326: None,
-            self._las.lims_project.N_0327: None,
-            self._las.lims_project.N_03272: None,
-            self._las.lims_project.N_0328: None,
-            self._las.lims_project.N_0329: None,
-            self._las.lims_project.N_0331: None,
-            self._las.lims_project.N_0334: None,
-            self._las.lims_project.N_03342: None,
-            self._las.lims_project.N_0335: None,
-            self._las.lims_project.N_0336: None,
-            self._las.lims_project.N_0338: None,
-            self._las.lims_project.N_0339: None,
-            self._las.lims_project.N_03392: None,
-            self._las.lims_project.N_0340: None,
-            self._las.lims_project.N_0342: None,
-            self._las.lims_project.N_03422: None,
-            self._las.lims_project.N_0343: None,
-            self._las.lims_project.N_0344: None,
-            self._las.lims_project.N_0345: None,
-            self._las.lims_project.N_0346: None,
-            self._las.lims_project.N_0350: None,
-            self._las.lims_project.N_0350X: None,
-            self._las.lims_project.N_0351: None,
-            self._las.lims_project.N_0351X: None,
-            self._las.lims_project.N_0354: None,
-            self._las.lims_project.N_0355: None,
-            self._las.lims_project.N_0357: None,
-            self._las.lims_project.N_0358: None,
-            self._las.lims_project.N_0359: None,
-            self._las.lims_project.N_0360: None,
-            self._las.lims_project.N_03602: None,
-            self._las.lims_project.N_0362: None,
-            self._las.lims_project.N_0363: None,
-            self._las.lims_project.N_0364: None,
-            self._las.lims_project.N_0365: None,
-            self._las.lims_project.N_0365X: None,
-            self._las.lims_project.N_0366: None,
-            self._las.lims_project.N_0366X: None,
-            self._las.lims_project.N_0367: None,
-            self._las.lims_project.N_0369: None,
-            self._las.lims_project.N_0371: None,
-            self._las.lims_project.N_0372: None,
-            self._las.lims_project.N_0372X: None,
-            self._las.lims_project.N_0374: None,
-            self._las.lims_project.N_0376: None,
-            self._las.lims_project.N_0376A: None,
-            self._las.lims_project.N_0376X: None,
-            self._las.lims_project.N_0378: None,
-            self._las.lims_project.N_0378X: None,
-            self._las.lims_project.N_0380: None,
-            self._las.lims_project.N_0384: None,
-            self._las.lims_project.N_0386: None,
-            self._las.lims_project.N_0388: None,
-            self._las.lims_project.AINDMSMA: None,
-            self._las.lims_project.AINDDISCOVERY: None,
-            self._las.lims_project.AINDEPHYS: None,
-            self._las.lims_project.AINDOPHYS: None,
-            self._las.lims_project.APR_OX: None,
-            self._las.lims_project.A_XL_OX: None,
-            self._las.lims_project.BA_RSEQ_GENETIC_TOOLS: None,
-            self._las.lims_project.BRAIN_STIM: None,
-            self._las.lims_project.BRAINTV_VIRAL_STRATEGIES: None,
-            self._las.lims_project.C200: None,
-            self._las.lims_project.C600: None,
-            self._las.lims_project.C600_LATERAL: None,
-            self._las.lims_project.C600X: None,
-            self._las.lims_project.CELLTYPES_TRANSGENIC_CHAR: None,
-            self._las.lims_project.CITRICACIDPILOT: None,
-            self._las.lims_project.CON9999: None,
-            self._las.lims_project.CONC505: None,
-            self._las.lims_project.CONCS04: None,
-            self._las.lims_project.DEEPSCOPE_SLM_DEVELOPMENT: None,
-            self._las.lims_project.DYNAMIC_ROUTING_BEHAVIOR: None,
-            self._las.lims_project.DYNAMIC_ROUTING_OPTO_DEV: None,
-            self._las.lims_project.DYNAMIC_ROUTING_SURGICAL: None,
-            self._las.lims_project.DYNAMIC_ROUTING_TASK1_PRO: None,
-            self._las.lims_project.DYNAMIC_ROUTING_TASK2_PRO: None,
-            self._las.lims_project.DYNAMIC_ROUTING_ULTRA_OPT: None,
-            self._las.lims_project.H120: None,
-            self._las.lims_project.H200: None,
-            self._las.lims_project.H301: None,
-            self._las.lims_project.H301T: None,
-            self._las.lims_project.H301_X: None,
-            self._las.lims_project.H501_X: None,
-            self._las.lims_project.H504: None,
-            self._las.lims_project.IS_IX: None,
-            self._las.lims_project.LARGE_SCALE_VOLTAGE: None,
-            self._las.lims_project.LEARNINGM_FISH_DEVELOPMEN: None,
-            self._las.lims_project.LEARNINGM_FISH_TASK1_A: None,
-            self._las.lims_project.M301T: None,
-            self._las.lims_project.MESOSCOPE_DEVELOPMENT: None,
-            self._las.lims_project.M_FISH_PLATFORM_DEVELOPME: None,
-            self._las.lims_project.MINDSCOPE_TRANSGENIC_CHAR: None,
-            self._las.lims_project.M_IVSCCMET: None,
-            self._las.lims_project.M_IVSCCME_TX: None,
-            self._las.lims_project.M_M_PATCHX: None,
-            self._las.lims_project.M_MPATC_HX: None,
-            self._las.lims_project.MOUSE_BRAIN_CELL_ATLAS_CH: None,
-            self._las.lims_project.MOUSE_BRAIN_CELL_ATLA_001: None,
-            self._las.lims_project.MOUSE_BRAIN_CELL_ATLAS_TR: None,
-            self._las.lims_project.MOUSE_FULL_MORPHOLOGY_FMO: None,
-            self._las.lims_project.MOUSE_GENETIC_TOOLS_PROJE: None,
-            self._las.lims_project.M_VISPTAXLO: None,
-            self._las.lims_project.MULTISCOPE_SIGNAL_NOISE: None,
-            self._las.lims_project.N200: None,
-            self._las.lims_project.N310: None,
-            self._las.lims_project.NEUROPIXEL_VISUAL_BEHAVIO: None,
-            self._las.lims_project.NEUROPIXEL_VISUAL_BEH_001: None,
-            self._las.lims_project.NEUROPIXEL_VISUAL_CODING: None,
-            self._las.lims_project.OLVSX: None,
-            self._las.lims_project.OM_FIS_HCOREGISTRATIONPIL: None,
-            self._las.lims_project.OM_FISH_CUX2_MESO: None,
-            self._las.lims_project.OM_FISH_GAD2_MESO: None,
-            self._las.lims_project.OM_FISH_GAD2_PILOT: None,
-            self._las.lims_project.OM_FISH_RBP4_MESO: None,
-            self._las.lims_project.OM_FISH_RORB_PILOT: None,
-            self._las.lims_project.OM_FISHRO_BINJECTIONVIRUS: None,
-            self._las.lims_project.OM_FISH_SST_MESO: None,
-            self._las.lims_project.OM_FISH_VIP_MESO: None,
-            self._las.lims_project.OPEN_SCOPE_DENDRITE_COUPL: None,
-            self._las.lims_project.OPENSCOPE_DEVELOPMENT: None,
-            self._las.lims_project.OPEN_SCOPE_ILLUSION: None,
-            self._las.lims_project.OPEN_SCOPE_GLOBAL_LOCAL_O: None,
-            self._las.lims_project.OPENSCOPE_GAMMA_PILOT: None,
-            self._las.lims_project.OPENSCOPE_GAMMA_PRODUCTLO: None,
-            self._las.lims_project.OPENSCOPELNJECTION_PILOT: None,
-            self._las.lims_project.OPEN_SCOPE_LOOP: None,
-            self._las.lims_project.OPENSCOPE_MOTION_PLLOT: None,
-            self._las.lims_project.OPENSCOPE_MOTION_PRODUCTI: None,
-            self._las.lims_project.OPENSCOPE_MULTIPLEX_PILOT: None,
-            self._las.lims_project.OPENSCOPE_MULTIPLEX_PRODU: None,
-            self._las.lims_project.OPEN_SCOPE_PSYCODE: None,
-            self._las.lims_project.OPEN_SCOPE_SEQUENCE_LEARN: None,
-            self._las.lims_project.OPEN_SCOPE_TEMPORAL_BARCO: None,
-            self._las.lims_project.OPEN_SCOPE_TEXTURE: None,
-            self._las.lims_project.OPEN_SCOPE_VISION2_HIPPOC: None,
-            self._las.lims_project.OPEN_SCOPE_VISMO: None,
-            self._las.lims_project.OPH5_X: None,
-            self._las.lims_project.SLC6_A1_NEUROPIXEL: None,
-            self._las.lims_project.SMART_SPIM_GENETIC_TOOLS: None,
-            self._las.lims_project.SURGERY_X: None,
-            self._las.lims_project.T301: None,
-            self._las.lims_project.T301T: None,
-            self._las.lims_project.T301_X: None,
-            self._las.lims_project.T503: None,
-            self._las.lims_project.T503_X: None,
-            self._las.lims_project.T504: None,
-            self._las.lims_project.T504_X: None,
-            self._las.lims_project.T600: None,
-            self._las.lims_project.T601: None,
-            self._las.lims_project.T601_X: None,
-            self._las.lims_project.TCYTX: None,
-            self._las.lims_project.TASK_TRAINED_NETWORKS_MUL: None,
-            self._las.lims_project.TASK_TRAINED_NETWORKS_NEU: None,
-            self._las.lims_project.TEMPLETON_PSYCHEDELICS: None,
-            self._las.lims_project.TEMPLETON_TTOC: None,
-            self._las.lims_project.TINY_BLUE_DOT_BEHAVIOR: None,
-            self._las.lims_project.U01_BFCT: None,
-            self._las.lims_project.VARIABILITY_AIM1: None,
-            self._las.lims_project.VARIABILITY_AIM1_PILOT: None,
-            self._las.lims_project.VARIABILITY_SPONTANEOUS: None,
-            self._las.lims_project.VI_DEEP_DIVE_EM_VOLUME: None,
-            self._las.lims_project.VI_DEEPDLVE_DEEPSCOPE_PIE: None,
-            self._las.lims_project.VIP_AXONAL_V1_PHASE1: None,
-            self._las.lims_project.VIP_SOMATIC_V1_MESO: None,
-            self._las.lims_project.VIP_SOMATIC_V1_PHASE1: None,
-            self._las.lims_project.VIP_SOMATIC_V1_PHASE2: None,
-            self._las.lims_project.VISUAL_BEHAVIOR: None,
-            self._las.lims_project.VISUAL_BEHAVIOR_DEVELOPME: None,
-            self._las.lims_project.VISUAL_BEHAVIOR_MULTISCOP: None,
-            self._las.lims_project.VISUAL_BEHAVIOR_MULTI_001: None,
-            self._las.lims_project.VISUAL_BEHAV_IOR_MULTISCO: None,
-            self._las.lims_project.VISUAL_BEHAVIOR_TASK1_B: None,
-        }.get(self._las.lims_project, None)
+        return (
+            None
+            if self._las.lims_project is None
+            else {
+                self._las.lims_project.N_0200: None,
+                self._las.lims_project.N_0309: None,
+                self._las.lims_project.N_0310: None,
+                self._las.lims_project.N_0311: None,
+                self._las.lims_project.N_0312: None,
+                self._las.lims_project.N_0314: None,
+                self._las.lims_project.N_0316: None,
+                self._las.lims_project.N_0319: None,
+                self._las.lims_project.N_0320: None,
+                self._las.lims_project.N_0321: None,
+                self._las.lims_project.N_03212: None,
+                self._las.lims_project.N_03213: None,
+                self._las.lims_project.N_03214: None,
+                self._las.lims_project.N_0322: None,
+                self._las.lims_project.N_0324: None,
+                self._las.lims_project.N_0325: None,
+                self._las.lims_project.N_0326: None,
+                self._las.lims_project.N_0327: None,
+                self._las.lims_project.N_03272: None,
+                self._las.lims_project.N_0328: None,
+                self._las.lims_project.N_0329: None,
+                self._las.lims_project.N_0331: None,
+                self._las.lims_project.N_0334: None,
+                self._las.lims_project.N_03342: None,
+                self._las.lims_project.N_0335: None,
+                self._las.lims_project.N_0336: None,
+                self._las.lims_project.N_0338: None,
+                self._las.lims_project.N_0339: None,
+                self._las.lims_project.N_03392: None,
+                self._las.lims_project.N_0340: None,
+                self._las.lims_project.N_0342: None,
+                self._las.lims_project.N_03422: None,
+                self._las.lims_project.N_0343: None,
+                self._las.lims_project.N_0344: None,
+                self._las.lims_project.N_0345: None,
+                self._las.lims_project.N_0346: None,
+                self._las.lims_project.N_0350: None,
+                self._las.lims_project.N_0350X: None,
+                self._las.lims_project.N_0351: None,
+                self._las.lims_project.N_0351X: None,
+                self._las.lims_project.N_0354: None,
+                self._las.lims_project.N_0355: None,
+                self._las.lims_project.N_0357: None,
+                self._las.lims_project.N_0358: None,
+                self._las.lims_project.N_0359: None,
+                self._las.lims_project.N_0360: None,
+                self._las.lims_project.N_03602: None,
+                self._las.lims_project.N_0362: None,
+                self._las.lims_project.N_0363: None,
+                self._las.lims_project.N_0364: None,
+                self._las.lims_project.N_0365: None,
+                self._las.lims_project.N_0365X: None,
+                self._las.lims_project.N_0366: None,
+                self._las.lims_project.N_0366X: None,
+                self._las.lims_project.N_0367: None,
+                self._las.lims_project.N_0369: None,
+                self._las.lims_project.N_0371: None,
+                self._las.lims_project.N_0372: None,
+                self._las.lims_project.N_0372X: None,
+                self._las.lims_project.N_0374: None,
+                self._las.lims_project.N_0376: None,
+                self._las.lims_project.N_0376A: None,
+                self._las.lims_project.N_0376X: None,
+                self._las.lims_project.N_0378: None,
+                self._las.lims_project.N_0378X: None,
+                self._las.lims_project.N_0380: None,
+                self._las.lims_project.N_0384: None,
+                self._las.lims_project.N_0386: None,
+                self._las.lims_project.N_0388: None,
+                self._las.lims_project.AINDMSMA: None,
+                self._las.lims_project.AINDDISCOVERY: None,
+                self._las.lims_project.AINDEPHYS: None,
+                self._las.lims_project.AINDOPHYS: None,
+                self._las.lims_project.APR_OX: None,
+                self._las.lims_project.A_XL_OX: None,
+                self._las.lims_project.BA_RSEQ_GENETIC_TOOLS: None,
+                self._las.lims_project.BRAIN_STIM: None,
+                self._las.lims_project.BRAINTV_VIRAL_STRATEGIES: None,
+                self._las.lims_project.C200: None,
+                self._las.lims_project.C600: None,
+                self._las.lims_project.C600_LATERAL: None,
+                self._las.lims_project.C600X: None,
+                self._las.lims_project.CELLTYPES_TRANSGENIC_CHAR: None,
+                self._las.lims_project.CITRICACIDPILOT: None,
+                self._las.lims_project.CON9999: None,
+                self._las.lims_project.CONC505: None,
+                self._las.lims_project.CONCS04: None,
+                self._las.lims_project.DEEPSCOPE_SLM_DEVELOPMENT: None,
+                self._las.lims_project.DYNAMIC_ROUTING_BEHAVIOR: None,
+                self._las.lims_project.DYNAMIC_ROUTING_OPTO_DEV: None,
+                self._las.lims_project.DYNAMIC_ROUTING_SURGICAL: None,
+                self._las.lims_project.DYNAMIC_ROUTING_TASK1_PRO: None,
+                self._las.lims_project.DYNAMIC_ROUTING_TASK2_PRO: None,
+                self._las.lims_project.DYNAMIC_ROUTING_ULTRA_OPT: None,
+                self._las.lims_project.H120: None,
+                self._las.lims_project.H200: None,
+                self._las.lims_project.H301: None,
+                self._las.lims_project.H301T: None,
+                self._las.lims_project.H301_X: None,
+                self._las.lims_project.H501_X: None,
+                self._las.lims_project.H504: None,
+                self._las.lims_project.IS_IX: None,
+                self._las.lims_project.LARGE_SCALE_VOLTAGE: None,
+                self._las.lims_project.LEARNINGM_FISH_DEVELOPMEN: None,
+                self._las.lims_project.LEARNINGM_FISH_TASK1_A: None,
+                self._las.lims_project.M301T: None,
+                self._las.lims_project.MESOSCOPE_DEVELOPMENT: None,
+                self._las.lims_project.M_FISH_PLATFORM_DEVELOPME: None,
+                self._las.lims_project.MINDSCOPE_TRANSGENIC_CHAR: None,
+                self._las.lims_project.M_IVSCCMET: None,
+                self._las.lims_project.M_IVSCCME_TX: None,
+                self._las.lims_project.M_M_PATCHX: None,
+                self._las.lims_project.M_MPATC_HX: None,
+                self._las.lims_project.MOUSE_BRAIN_CELL_ATLAS_CH: None,
+                self._las.lims_project.MOUSE_BRAIN_CELL_ATLA_001: None,
+                self._las.lims_project.MOUSE_BRAIN_CELL_ATLAS_TR: None,
+                self._las.lims_project.MOUSE_FULL_MORPHOLOGY_FMO: None,
+                self._las.lims_project.MOUSE_GENETIC_TOOLS_PROJE: None,
+                self._las.lims_project.M_VISPTAXLO: None,
+                self._las.lims_project.MULTISCOPE_SIGNAL_NOISE: None,
+                self._las.lims_project.N200: None,
+                self._las.lims_project.N310: None,
+                self._las.lims_project.NEUROPIXEL_VISUAL_BEHAVIO: None,
+                self._las.lims_project.NEUROPIXEL_VISUAL_BEH_001: None,
+                self._las.lims_project.NEUROPIXEL_VISUAL_CODING: None,
+                self._las.lims_project.OLVSX: None,
+                self._las.lims_project.OM_FIS_HCOREGISTRATIONPIL: None,
+                self._las.lims_project.OM_FISH_CUX2_MESO: None,
+                self._las.lims_project.OM_FISH_GAD2_MESO: None,
+                self._las.lims_project.OM_FISH_GAD2_PILOT: None,
+                self._las.lims_project.OM_FISH_RBP4_MESO: None,
+                self._las.lims_project.OM_FISH_RORB_PILOT: None,
+                self._las.lims_project.OM_FISHRO_BINJECTIONVIRUS: None,
+                self._las.lims_project.OM_FISH_SST_MESO: None,
+                self._las.lims_project.OM_FISH_VIP_MESO: None,
+                self._las.lims_project.OPEN_SCOPE_DENDRITE_COUPL: None,
+                self._las.lims_project.OPENSCOPE_DEVELOPMENT: None,
+                self._las.lims_project.OPEN_SCOPE_ILLUSION: None,
+                self._las.lims_project.OPEN_SCOPE_GLOBAL_LOCAL_O: None,
+                self._las.lims_project.OPENSCOPE_GAMMA_PILOT: None,
+                self._las.lims_project.OPENSCOPE_GAMMA_PRODUCTLO: None,
+                self._las.lims_project.OPENSCOPELNJECTION_PILOT: None,
+                self._las.lims_project.OPEN_SCOPE_LOOP: None,
+                self._las.lims_project.OPENSCOPE_MOTION_PLLOT: None,
+                self._las.lims_project.OPENSCOPE_MOTION_PRODUCTI: None,
+                self._las.lims_project.OPENSCOPE_MULTIPLEX_PILOT: None,
+                self._las.lims_project.OPENSCOPE_MULTIPLEX_PRODU: None,
+                self._las.lims_project.OPEN_SCOPE_PSYCODE: None,
+                self._las.lims_project.OPEN_SCOPE_SEQUENCE_LEARN: None,
+                self._las.lims_project.OPEN_SCOPE_TEMPORAL_BARCO: None,
+                self._las.lims_project.OPEN_SCOPE_TEXTURE: None,
+                self._las.lims_project.OPEN_SCOPE_VISION2_HIPPOC: None,
+                self._las.lims_project.OPEN_SCOPE_VISMO: None,
+                self._las.lims_project.OPH5_X: None,
+                self._las.lims_project.SLC6_A1_NEUROPIXEL: None,
+                self._las.lims_project.SMART_SPIM_GENETIC_TOOLS: None,
+                self._las.lims_project.SURGERY_X: None,
+                self._las.lims_project.T301: None,
+                self._las.lims_project.T301T: None,
+                self._las.lims_project.T301_X: None,
+                self._las.lims_project.T503: None,
+                self._las.lims_project.T503_X: None,
+                self._las.lims_project.T504: None,
+                self._las.lims_project.T504_X: None,
+                self._las.lims_project.T600: None,
+                self._las.lims_project.T601: None,
+                self._las.lims_project.T601_X: None,
+                self._las.lims_project.TCYTX: None,
+                self._las.lims_project.TASK_TRAINED_NETWORKS_MUL: None,
+                self._las.lims_project.TASK_TRAINED_NETWORKS_NEU: None,
+                self._las.lims_project.TEMPLETON_PSYCHEDELICS: None,
+                self._las.lims_project.TEMPLETON_TTOC: None,
+                self._las.lims_project.TINY_BLUE_DOT_BEHAVIOR: None,
+                self._las.lims_project.U01_BFCT: None,
+                self._las.lims_project.VARIABILITY_AIM1: None,
+                self._las.lims_project.VARIABILITY_AIM1_PILOT: None,
+                self._las.lims_project.VARIABILITY_SPONTANEOUS: None,
+                self._las.lims_project.VI_DEEP_DIVE_EM_VOLUME: None,
+                self._las.lims_project.VI_DEEPDLVE_DEEPSCOPE_PIE: None,
+                self._las.lims_project.VIP_AXONAL_V1_PHASE1: None,
+                self._las.lims_project.VIP_SOMATIC_V1_MESO: None,
+                self._las.lims_project.VIP_SOMATIC_V1_PHASE1: None,
+                self._las.lims_project.VIP_SOMATIC_V1_PHASE2: None,
+                self._las.lims_project.VISUAL_BEHAVIOR: None,
+                self._las.lims_project.VISUAL_BEHAVIOR_DEVELOPME: None,
+                self._las.lims_project.VISUAL_BEHAVIOR_MULTISCOP: None,
+                self._las.lims_project.VISUAL_BEHAVIOR_MULTI_001: None,
+                self._las.lims_project.VISUAL_BEHAV_IOR_MULTISCO: None,
+                self._las.lims_project.VISUAL_BEHAVIOR_TASK1_B: None,
+            }.get(self._las.lims_project, None)
+        )
 
     @property
     def aind_lims_workflow(self) -> Optional[Any]:
         """Maps lims_workflow to aind model"""
-        return {
-            self._las.lims_workflow.N_2P_SERIAL_IMAGING: None,
-            self._las.lims_workflow.T6011_RETINA: None,
-            self._las.lims_workflow.T6012A_RETROGRADE_CAV2_CR: None,
-            self._las.lims_workflow.T6012B_RETROGRADE_RABIESG: None,
-            self._las.lims_workflow.T6012C_RETROGRADE_FLUOROG: None,
-            self._las.lims_workflow.T6013A_ANTEROGRADE_CRE_DE: None,
-            self._las.lims_workflow.T6013B_ANTEROGRADE_CRE_DE: None,
-            self._las.lims_workflow.T6014_ANTEROGRADE_TARGET: None,
-            self._las.lims_workflow.T6015_TRANSSYNAPTIC: None,
-            self._las.lims_workflow.SCREENING: None,
-            self._las.lims_workflow.CHARACTERIZATION: None,
-            self._las.lims_workflow.T5032_ANTEROGRADE_TARGET: None,
-            self._las.lims_workflow.T5033_ALZHEIMERS_PLAQUE: None,
-            self._las.lims_workflow.T5033_CONTROL: None,
-            self._las.lims_workflow.T503_ANTEROGRADE_CREDEFIN: None,
-            self._las.lims_workflow.MGT_ANTEROGRADE_PROJECTIO: None,
-        }.get(self._las.lims_workflow, None)
+        return (
+            None
+            if self._las.lims_workflow is None
+            else {
+                self._las.lims_workflow.N_2P_SERIAL_IMAGING: None,
+                self._las.lims_workflow.T6011_RETINA: None,
+                self._las.lims_workflow.T6012A_RETROGRADE_CAV2_CR: None,
+                self._las.lims_workflow.T6012B_RETROGRADE_RABIESG: None,
+                self._las.lims_workflow.T6012C_RETROGRADE_FLUOROG: None,
+                self._las.lims_workflow.T6013A_ANTEROGRADE_CRE_DE: None,
+                self._las.lims_workflow.T6013B_ANTEROGRADE_CRE_DE: None,
+                self._las.lims_workflow.T6014_ANTEROGRADE_TARGET: None,
+                self._las.lims_workflow.T6015_TRANSSYNAPTIC: None,
+                self._las.lims_workflow.SCREENING: None,
+                self._las.lims_workflow.CHARACTERIZATION: None,
+                self._las.lims_workflow.T5032_ANTEROGRADE_TARGET: None,
+                self._las.lims_workflow.T5033_ALZHEIMERS_PLAQUE: None,
+                self._las.lims_workflow.T5033_CONTROL: None,
+                self._las.lims_workflow.T503_ANTEROGRADE_CREDEFIN: None,
+                self._las.lims_workflow.MGT_ANTEROGRADE_PROJECTIO: None,
+            }.get(self._las.lims_workflow, None)
+        )
 
     @property
     def aind_lims_workflow_2(self) -> Optional[Any]:
         """Maps lims_workflow_2 to aind model"""
-        return {
-            self._las.lims_workflow_2.N_2P_SERIAL_IMAGING: None,
-            self._las.lims_workflow_2.T6011_RETINA: None,
-            self._las.lims_workflow_2.T6012A_RETROGRADE_CAV2_CR: None,
-            self._las.lims_workflow_2.T6012B_RETROGRADE_RABIESG: None,
-            self._las.lims_workflow_2.T6012C_RETROGRADE_FLUOROG: None,
-            self._las.lims_workflow_2.T6013A_ANTEROGRADE_CRE_DE: None,
-            self._las.lims_workflow_2.T6013B_ANTEROGRADE_CRE_DE: None,
-            self._las.lims_workflow_2.T6014_ANTEROGRADE_TARGET: None,
-            self._las.lims_workflow_2.T6015_TRANSSYNAPTIC: None,
-            self._las.lims_workflow_2.SCREENING: None,
-            self._las.lims_workflow_2.CHARACTERIZATION: None,
-            self._las.lims_workflow_2.T5032_ANTEROGRADE_TARGET: None,
-            self._las.lims_workflow_2.T5033_ALZHEIMERS_PLAQUE: None,
-            self._las.lims_workflow_2.T5033_CONTROL: None,
-            self._las.lims_workflow_2.T503_ANTEROGRADE_CREDEFIN: None,
-            self._las.lims_workflow_2.MGT_ANTEROGRADE_PROJECTIO: None,
-        }.get(self._las.lims_workflow_2, None)
+        return (
+            None
+            if self._las.lims_workflow_2 is None
+            else {
+                self._las.lims_workflow_2.N_2P_SERIAL_IMAGING: None,
+                self._las.lims_workflow_2.T6011_RETINA: None,
+                self._las.lims_workflow_2.T6012A_RETROGRADE_CAV2_CR: None,
+                self._las.lims_workflow_2.T6012B_RETROGRADE_RABIESG: None,
+                self._las.lims_workflow_2.T6012C_RETROGRADE_FLUOROG: None,
+                self._las.lims_workflow_2.T6013A_ANTEROGRADE_CRE_DE: None,
+                self._las.lims_workflow_2.T6013B_ANTEROGRADE_CRE_DE: None,
+                self._las.lims_workflow_2.T6014_ANTEROGRADE_TARGET: None,
+                self._las.lims_workflow_2.T6015_TRANSSYNAPTIC: None,
+                self._las.lims_workflow_2.SCREENING: None,
+                self._las.lims_workflow_2.CHARACTERIZATION: None,
+                self._las.lims_workflow_2.T5032_ANTEROGRADE_TARGET: None,
+                self._las.lims_workflow_2.T5033_ALZHEIMERS_PLAQUE: None,
+                self._las.lims_workflow_2.T5033_CONTROL: None,
+                self._las.lims_workflow_2.T503_ANTEROGRADE_CREDEFIN: None,
+                self._las.lims_workflow_2.MGT_ANTEROGRADE_PROJECTIO: None,
+            }.get(self._las.lims_workflow_2, None)
+        )
 
     @property
     def aind_lt_task1(self) -> Optional[str]:
@@ -743,97 +777,105 @@ class MappedLASList:
     @property
     def aind_post_fix(self) -> Optional[Any]:
         """Maps post_fix to aind model"""
-        return {
-            self._las.post_fix.N_10_SUCROSE: None,
-            self._las.post_fix.N_10_SUCROSE_TO_30_SUCROS: None,
-            self._las.post_fix.N_30_SUCROSE: None,
-            self._las.post_fix.N_30_SUCROSE_FOILWRAPPED: None,
-            self._las.post_fix.N_1X_PBS: None,
-            self._las.post_fix.N_1X_PBS_FOILWRAPPED_TUBE: None,
-            self._las.post_fix.N_1X_PBS_001_AZIDE: None,
-            self._las.post_fix.N_1X_PBS_001_AZIDE_5M_L_T: None,
-            self._las.post_fix.N_1X_PBS_001_AZIDE_FOILWR: None,
-            self._las.post_fix.N_4PFA_TO_1X_PBS: None,
-            self._las.post_fix.NUCLEASEFREE_1X_PBS_OM_FI: None,
-            self._las.post_fix.NUCLEASEFREE_30_SUCROSE: None,
-            self._las.post_fix.NUCLEASEFREE_30_SUCROSEFO: None,
-            self._las.post_fix.OTHER_SPECIFY_BELOW: None,
-        }.get(self._las.post_fix, None)
+        return (
+            None
+            if self._las.post_fix is None
+            else {
+                self._las.post_fix.N_10_SUCROSE: None,
+                self._las.post_fix.N_10_SUCROSE_TO_30_SUCROS: None,
+                self._las.post_fix.N_30_SUCROSE: None,
+                self._las.post_fix.N_30_SUCROSE_FOILWRAPPED: None,
+                self._las.post_fix.N_1X_PBS: None,
+                self._las.post_fix.N_1X_PBS_FOILWRAPPED_TUBE: None,
+                self._las.post_fix.N_1X_PBS_001_AZIDE: None,
+                self._las.post_fix.N_1X_PBS_001_AZIDE_5M_L_T: None,
+                self._las.post_fix.N_1X_PBS_001_AZIDE_FOILWR: None,
+                self._las.post_fix.N_4PFA_TO_1X_PBS: None,
+                self._las.post_fix.NUCLEASEFREE_1X_PBS_OM_FI: None,
+                self._las.post_fix.NUCLEASEFREE_30_SUCROSE: None,
+                self._las.post_fix.NUCLEASEFREE_30_SUCROSEFO: None,
+                self._las.post_fix.OTHER_SPECIFY_BELOW: None,
+            }.get(self._las.post_fix, None)
+        )
 
     @property
     def aind_project_id(self) -> Optional[Any]:
         """Maps project_id to aind model"""
-        return {
-            self._las.project_id.N_1010300110_COSTA_PGA_LA: None,
-            self._las.project_id.N_1020100710_CTY_M_FISH: None,
-            self._las.project_id.N_1020100910_CTY_MORPHOLO: None,
-            self._las.project_id.N_1020101110_CTY_CONNECTO: None,
-            self._las.project_id.N_1020101210_CTY_CONNECTO: None,
-            self._las.project_id.N_1020101610_CTY_TAXONOMY: None,
-            self._las.project_id.N_1020102720_CTY_BRAIN_AX: None,
-            self._las.project_id.N_1020102920_CTY_BRAIN_CE: None,
-            self._las.project_id.N_1020103120_W4_CTY_EU_HO: None,
-            self._las.project_id.N_1020103120_W5_CTY_EU_HO: None,
-            self._las.project_id.N_1020103220_CTY_MOUSE_AG: None,
-            self._las.project_id.N_1020103620_CTY_DISSEMIN: None,
-            self._las.project_id.N_1020104020_CTY_BRAIN_UG: None,
-            self._las.project_id.N_1020104320_CTY_OPTICAL: None,
-            self._las.project_id.N_1020104410_CTY_GENOMICS: None,
-            self._las.project_id.N_1020104510_CTY_IVSCC: None,
-            self._las.project_id.N_1020104620_CTY_WEILL_NE: None,
-            self._las.project_id.N_1020104810_CTY_BARCODED: None,
-            self._las.project_id.N_1020104920_CTY_OPIOID_T: None,
-            self._las.project_id.N_1020105520_CTY_EM_MOTOR: None,
-            self._las.project_id.N_1020105720_CTY_BRAIN_BG: None,
-            self._las.project_id.N_1020105920_CTY_SCORCH: None,
-            self._las.project_id.N_1020106020_CTY_BRAIN_DR: None,
-            self._las.project_id.N_1020106120_CTY_BICAN_HU: None,
-            self._las.project_id.N_1020106220_CTY_BICAN_MO: None,
-            self._las.project_id.N_1020106410_CTY_GENETIC: None,
-            self._las.project_id.N_1020106620_CTY_CONNECTS: None,
-            self._las.project_id.N_1020106820_CTY_CONNECTS: None,
-            self._las.project_id.N_1020106920_PRE_SPEND: None,
-            self._las.project_id.N_1020107020_CTY_CONNECTS: None,
-            self._las.project_id.N_1020199910_CTY_PROGRAM: None,
-            self._las.project_id.N_1020200410_BTV_VISUAL_B: None,
-            self._las.project_id.N_1020201220_BTV_BRAIN_VI: None,
-            self._las.project_id.N_1020201620_MSP_BRAIN_MO: None,
-            self._las.project_id.N_1020201720_BTV_BRAIN_NE: None,
-            self._las.project_id.N_1020400410_OTH_MERITORI: None,
-            self._las.project_id.N_1020400620_OTH_MEASURIN: None,
-            self._las.project_id.N_1020400710_APLD_TARGETE: None,
-            self._las.project_id.N_1020401010_CTY_SR_SLC6: None,
-            self._las.project_id.N_1020401110_CTY_SR_SYNGA: None,
-            self._las.project_id.N_1020401210_CTY_SR_FRIED: None,
-            self._las.project_id.N_1020401410_CTY_PARKINSO: None,
-            self._las.project_id.N_1028800310_ANIMAL_CARE: None,
-            self._las.project_id.N_1028800510_TRANSGENIC_C: None,
-            self._las.project_id.N_1028800810_LAB_ANIMAL_S: None,
-            self._las.project_id.N_1060100110_IMMUNOLOGY_D: None,
-            self._las.project_id.N_1210101620_MSP_BRAIN_OP: None,
-            self._las.project_id.N_1210101820_MSP_EPHAPTIC: None,
-            self._las.project_id.N_1210102320_MSP_TEMPLETO: None,
-            self._las.project_id.N_1210102520_MSP_U01_BRID: None,
-            self._las.project_id.N_1210102620_MSP_TEMPLETO: None,
-            self._las.project_id.N_1220100110_AIND_SCIENTI: None,
-            self._las.project_id.N_1220100220_MOLECULAR_CO: None,
-            self._las.project_id.N_1220100220_PROJECT_1: None,
-            self._las.project_id.N_1220100220_PROJECT_2: None,
-            self._las.project_id.N_1220100220_PROJECT_4: None,
-            self._las.project_id.N_1220100420_AIND_BRAINST: None,
-            self._las.project_id.N_1220101020_AIND_POO_SIM: None,
-            self._las.project_id.N_1220101120_AIND_COHEN_J: None,
-            self._las.project_id.N_1220101220_AIND_RF1_FUN: None,
-            self._las.project_id.N_1220101420_AIND_SIEGLE: None,
-            self._las.project_id.N_1220101310_MSP_SCIENTIF: None,
-            self._las.project_id.N_1220101920_AIND_CZI_COL: None,
-            self._las.project_id.N_1220102020_AIND_COHEN_B: None,
-            self._las.project_id.N_1220102020_AIBS_COHEN_B: None,
-            self._las.project_id.N_1229999910_NEURAL_DYNAM: None,
-            self._las.project_id.N_1250100110_SEA_HUB_SCIE: None,
-            self._las.project_id.AAV_PRODUCTION_1028800410: None,
-            self._las.project_id.RD_1028800410: None,
-        }.get(self._las.project_id, None)
+        return (
+            None
+            if self._las.project_id is None
+            else {
+                self._las.project_id.N_1010300110_COSTA_PGA_LA: None,
+                self._las.project_id.N_1020100710_CTY_M_FISH: None,
+                self._las.project_id.N_1020100910_CTY_MORPHOLO: None,
+                self._las.project_id.N_1020101110_CTY_CONNECTO: None,
+                self._las.project_id.N_1020101210_CTY_CONNECTO: None,
+                self._las.project_id.N_1020101610_CTY_TAXONOMY: None,
+                self._las.project_id.N_1020102720_CTY_BRAIN_AX: None,
+                self._las.project_id.N_1020102920_CTY_BRAIN_CE: None,
+                self._las.project_id.N_1020103120_W4_CTY_EU_HO: None,
+                self._las.project_id.N_1020103120_W5_CTY_EU_HO: None,
+                self._las.project_id.N_1020103220_CTY_MOUSE_AG: None,
+                self._las.project_id.N_1020103620_CTY_DISSEMIN: None,
+                self._las.project_id.N_1020104020_CTY_BRAIN_UG: None,
+                self._las.project_id.N_1020104320_CTY_OPTICAL: None,
+                self._las.project_id.N_1020104410_CTY_GENOMICS: None,
+                self._las.project_id.N_1020104510_CTY_IVSCC: None,
+                self._las.project_id.N_1020104620_CTY_WEILL_NE: None,
+                self._las.project_id.N_1020104810_CTY_BARCODED: None,
+                self._las.project_id.N_1020104920_CTY_OPIOID_T: None,
+                self._las.project_id.N_1020105520_CTY_EM_MOTOR: None,
+                self._las.project_id.N_1020105720_CTY_BRAIN_BG: None,
+                self._las.project_id.N_1020105920_CTY_SCORCH: None,
+                self._las.project_id.N_1020106020_CTY_BRAIN_DR: None,
+                self._las.project_id.N_1020106120_CTY_BICAN_HU: None,
+                self._las.project_id.N_1020106220_CTY_BICAN_MO: None,
+                self._las.project_id.N_1020106410_CTY_GENETIC: None,
+                self._las.project_id.N_1020106620_CTY_CONNECTS: None,
+                self._las.project_id.N_1020106820_CTY_CONNECTS: None,
+                self._las.project_id.N_1020106920_PRE_SPEND: None,
+                self._las.project_id.N_1020107020_CTY_CONNECTS: None,
+                self._las.project_id.N_1020199910_CTY_PROGRAM: None,
+                self._las.project_id.N_1020200410_BTV_VISUAL_B: None,
+                self._las.project_id.N_1020201220_BTV_BRAIN_VI: None,
+                self._las.project_id.N_1020201620_MSP_BRAIN_MO: None,
+                self._las.project_id.N_1020201720_BTV_BRAIN_NE: None,
+                self._las.project_id.N_1020400410_OTH_MERITORI: None,
+                self._las.project_id.N_1020400620_OTH_MEASURIN: None,
+                self._las.project_id.N_1020400710_APLD_TARGETE: None,
+                self._las.project_id.N_1020401010_CTY_SR_SLC6: None,
+                self._las.project_id.N_1020401110_CTY_SR_SYNGA: None,
+                self._las.project_id.N_1020401210_CTY_SR_FRIED: None,
+                self._las.project_id.N_1020401410_CTY_PARKINSO: None,
+                self._las.project_id.N_1028800310_ANIMAL_CARE: None,
+                self._las.project_id.N_1028800510_TRANSGENIC_C: None,
+                self._las.project_id.N_1028800810_LAB_ANIMAL_S: None,
+                self._las.project_id.N_1060100110_IMMUNOLOGY_D: None,
+                self._las.project_id.N_1210101620_MSP_BRAIN_OP: None,
+                self._las.project_id.N_1210101820_MSP_EPHAPTIC: None,
+                self._las.project_id.N_1210102320_MSP_TEMPLETO: None,
+                self._las.project_id.N_1210102520_MSP_U01_BRID: None,
+                self._las.project_id.N_1210102620_MSP_TEMPLETO: None,
+                self._las.project_id.N_1220100110_AIND_SCIENTI: None,
+                self._las.project_id.N_1220100220_MOLECULAR_CO: None,
+                self._las.project_id.N_1220100220_PROJECT_1: None,
+                self._las.project_id.N_1220100220_PROJECT_2: None,
+                self._las.project_id.N_1220100220_PROJECT_4: None,
+                self._las.project_id.N_1220100420_AIND_BRAINST: None,
+                self._las.project_id.N_1220101020_AIND_POO_SIM: None,
+                self._las.project_id.N_1220101120_AIND_COHEN_J: None,
+                self._las.project_id.N_1220101220_AIND_RF1_FUN: None,
+                self._las.project_id.N_1220101420_AIND_SIEGLE: None,
+                self._las.project_id.N_1220101310_MSP_SCIENTIF: None,
+                self._las.project_id.N_1220101920_AIND_CZI_COL: None,
+                self._las.project_id.N_1220102020_AIND_COHEN_B: None,
+                self._las.project_id.N_1220102020_AIBS_COHEN_B: None,
+                self._las.project_id.N_1229999910_NEURAL_DYNAM: None,
+                self._las.project_id.N_1250100110_SEA_HUB_SCIE: None,
+                self._las.project_id.AAV_PRODUCTION_1028800410: None,
+                self._las.project_id.RD_1028800410: None,
+            }.get(self._las.project_id, None)
+        )
 
     @property
     def aind_protocol(self) -> Optional[str]:
@@ -899,44 +941,56 @@ class MappedLASList:
     @property
     def aind_req_pro1(self) -> Optional[Any]:
         """Maps req_pro1 to aind model"""
-        return {
-            self._las.req_pro1.TISSUE_COLLECTION: None,
-            self._las.req_pro1.INDUCTION: None,
-            self._las.req_pro1.DOSING: None,
-            self._las.req_pro1.RETRO_ORBITAL_INJECTION: None,
-            self._las.req_pro1.INTRACEREBROVENTRICULAR_I: None,
-            self._las.req_pro1.BLOOD_COLLECTION: None,
-            self._las.req_pro1.CEREBROSPINAL_FLUID_COLLE: None,
-            self._las.req_pro1.OTHER: None,
-        }.get(self._las.req_pro1, None)
+        return (
+            None
+            if self._las.req_pro1 is None
+            else {
+                self._las.req_pro1.TISSUE_COLLECTION: None,
+                self._las.req_pro1.INDUCTION: None,
+                self._las.req_pro1.DOSING: None,
+                self._las.req_pro1.RETRO_ORBITAL_INJECTION: None,
+                self._las.req_pro1.INTRACEREBROVENTRICULAR_I: None,
+                self._las.req_pro1.BLOOD_COLLECTION: None,
+                self._las.req_pro1.CEREBROSPINAL_FLUID_COLLE: None,
+                self._las.req_pro1.OTHER: None,
+            }.get(self._las.req_pro1, None)
+        )
 
     @property
     def aind_req_pro2(self) -> Optional[Any]:
         """Maps req_pro2 to aind model"""
-        return {
-            self._las.req_pro2.TISSUE_COLLECTION: None,
-            self._las.req_pro2.INDUCTION: None,
-            self._las.req_pro2.DOSING: None,
-            self._las.req_pro2.RETRO_ORBITAL_INJECTION: None,
-            self._las.req_pro2.INTRACEREBROVENTRICULAR_I: None,
-            self._las.req_pro2.BLOOD_COLLECTION: None,
-            self._las.req_pro2.CEREBROSPINAL_FLUID_COLLE: None,
-            self._las.req_pro2.OTHER: None,
-        }.get(self._las.req_pro2, None)
+        return (
+            None
+            if self._las.req_pro2 is None
+            else {
+                self._las.req_pro2.TISSUE_COLLECTION: None,
+                self._las.req_pro2.INDUCTION: None,
+                self._las.req_pro2.DOSING: None,
+                self._las.req_pro2.RETRO_ORBITAL_INJECTION: None,
+                self._las.req_pro2.INTRACEREBROVENTRICULAR_I: None,
+                self._las.req_pro2.BLOOD_COLLECTION: None,
+                self._las.req_pro2.CEREBROSPINAL_FLUID_COLLE: None,
+                self._las.req_pro2.OTHER: None,
+            }.get(self._las.req_pro2, None)
+        )
 
     @property
     def aind_req_pro3(self) -> Optional[Any]:
         """Maps req_pro3 to aind model"""
-        return {
-            self._las.req_pro3.TISSUE_COLLECTION: None,
-            self._las.req_pro3.INDUCTION: None,
-            self._las.req_pro3.DOSING: None,
-            self._las.req_pro3.RETRO_ORBITAL_INJECTION: None,
-            self._las.req_pro3.INTRACEREBROVENTRICULAR_I: None,
-            self._las.req_pro3.BLOOD_COLLECTION: None,
-            self._las.req_pro3.CEREBROSPINAL_FLUID_COLLE: None,
-            self._las.req_pro3.OTHER: None,
-        }.get(self._las.req_pro3, None)
+        return (
+            None
+            if self._las.req_pro3 is None
+            else {
+                self._las.req_pro3.TISSUE_COLLECTION: None,
+                self._las.req_pro3.INDUCTION: None,
+                self._las.req_pro3.DOSING: None,
+                self._las.req_pro3.RETRO_ORBITAL_INJECTION: None,
+                self._las.req_pro3.INTRACEREBROVENTRICULAR_I: None,
+                self._las.req_pro3.BLOOD_COLLECTION: None,
+                self._las.req_pro3.CEREBROSPINAL_FLUID_COLLE: None,
+                self._las.req_pro3.OTHER: None,
+            }.get(self._las.req_pro3, None)
+        )
 
     @property
     def aind_reqdate1(self) -> Optional[datetime]:
@@ -956,12 +1010,16 @@ class MappedLASList:
     @property
     def aind_request_status2(self) -> Optional[Any]:
         """Maps request_status2 to aind model"""
-        return {
-            self._las.request_status2.NEW: None,
-            self._las.request_status2.IN_PROGRESS: None,
-            self._las.request_status2.COMPLETE: None,
-            self._las.request_status2.CANCELLED: None,
-        }.get(self._las.request_status2, None)
+        return (
+            None
+            if self._las.request_status2 is None
+            else {
+                self._las.request_status2.NEW: None,
+                self._las.request_status2.IN_PROGRESS: None,
+                self._las.request_status2.COMPLETE: None,
+                self._las.request_status2.CANCELLED: None,
+            }.get(self._las.request_status2, None)
+        )
 
     @property
     def aind_ro_box1(self) -> Optional[str]:
@@ -1001,47 +1059,67 @@ class MappedLASList:
     @property
     def aind_ro_eye1(self) -> Optional[Any]:
         """Maps ro_eye1 to aind model"""
-        return {
-            self._las.ro_eye1.BEHIND_EITHER: None,
-            self._las.ro_eye1.BEHIND_RIGHT: None,
-            self._las.ro_eye1.BEHIND_LEFT: None,
-        }.get(self._las.ro_eye1, None)
+        return (
+            None
+            if self._las.ro_eye1 is None
+            else {
+                self._las.ro_eye1.BEHIND_EITHER: None,
+                self._las.ro_eye1.BEHIND_RIGHT: None,
+                self._las.ro_eye1.BEHIND_LEFT: None,
+            }.get(self._las.ro_eye1, None)
+        )
 
     @property
     def aind_ro_eye2(self) -> Optional[Any]:
         """Maps ro_eye2 to aind model"""
-        return {
-            self._las.ro_eye2.BEHIND_EITHER: None,
-            self._las.ro_eye2.BEHIND_RIGHT: None,
-            self._las.ro_eye2.BEHIND_LEFT: None,
-        }.get(self._las.ro_eye2, None)
+        return (
+            None
+            if self._las.ro_eye2 is None
+            else {
+                self._las.ro_eye2.BEHIND_EITHER: None,
+                self._las.ro_eye2.BEHIND_RIGHT: None,
+                self._las.ro_eye2.BEHIND_LEFT: None,
+            }.get(self._las.ro_eye2, None)
+        )
 
     @property
     def aind_ro_eye3(self) -> Optional[Any]:
         """Maps ro_eye3 to aind model"""
-        return {
-            self._las.ro_eye3.BEHIND_EITHER: None,
-            self._las.ro_eye3.BEHIND_RIGHT: None,
-            self._las.ro_eye3.BEHIND_LEFT: None,
-        }.get(self._las.ro_eye3, None)
+        return (
+            None
+            if self._las.ro_eye3 is None
+            else {
+                self._las.ro_eye3.BEHIND_EITHER: None,
+                self._las.ro_eye3.BEHIND_RIGHT: None,
+                self._las.ro_eye3.BEHIND_LEFT: None,
+            }.get(self._las.ro_eye3, None)
+        )
 
     @property
     def aind_ro_eye4(self) -> Optional[Any]:
         """Maps ro_eye4 to aind model"""
-        return {
-            self._las.ro_eye4.BEHIND_EITHER: None,
-            self._las.ro_eye4.BEHIND_RIGHT: None,
-            self._las.ro_eye4.BEHIND_LEFT: None,
-        }.get(self._las.ro_eye4, None)
+        return (
+            None
+            if self._las.ro_eye4 is None
+            else {
+                self._las.ro_eye4.BEHIND_EITHER: None,
+                self._las.ro_eye4.BEHIND_RIGHT: None,
+                self._las.ro_eye4.BEHIND_LEFT: None,
+            }.get(self._las.ro_eye4, None)
+        )
 
     @property
     def aind_ro_eye5(self) -> Optional[Any]:
         """Maps ro_eye5 to aind model"""
-        return {
-            self._las.ro_eye5.BEHIND_EITHER: None,
-            self._las.ro_eye5.BEHIND_RIGHT: None,
-            self._las.ro_eye5.BEHIND_LEFT: None,
-        }.get(self._las.ro_eye5, None)
+        return (
+            None
+            if self._las.ro_eye5 is None
+            else {
+                self._las.ro_eye5.BEHIND_EITHER: None,
+                self._las.ro_eye5.BEHIND_RIGHT: None,
+                self._las.ro_eye5.BEHIND_LEFT: None,
+            }.get(self._las.ro_eye5, None)
+        )
 
     @property
     def aind_ro_gc1(self) -> Optional[str]:
@@ -1151,10 +1229,14 @@ class MappedLASList:
     @property
     def aind_ro_lims(self) -> Optional[Any]:
         """Maps ro_lims to aind model"""
-        return {
-            self._las.ro_lims.STEREOTAXIC_INJECTIONS: None,
-            self._las.ro_lims.NEW_STEREOTAXIC_INJECTION: None,
-        }.get(self._las.ro_lims, None)
+        return (
+            None
+            if self._las.ro_lims is None
+            else {
+                self._las.ro_lims.STEREOTAXIC_INJECTIONS: None,
+                self._las.ro_lims.NEW_STEREOTAXIC_INJECTION: None,
+            }.get(self._las.ro_lims, None)
+        )
 
     @property
     def aind_ro_lot1(self) -> Optional[str]:
@@ -1259,10 +1341,14 @@ class MappedLASList:
     @property
     def aind_ro_sop(self) -> Optional[Any]:
         """Maps ro_sop to aind model"""
-        return {
-            self._las.ro_sop.AF0131_RETROORBITAL_INJEC: None,
-            self._las.ro_sop.AF0139_RETROORBITAL_INJEC: None,
-        }.get(self._las.ro_sop, None)
+        return (
+            None
+            if self._las.ro_sop is None
+            else {
+                self._las.ro_sop.AF0131_RETROORBITAL_INJEC: None,
+                self._las.ro_sop.AF0139_RETROORBITAL_INJEC: None,
+            }.get(self._las.ro_sop, None)
+        )
 
     @property
     def aind_ro_spin_down(self) -> Optional[bool]:
@@ -1622,10 +1708,14 @@ class MappedLASList:
     @property
     def aind_ro_where(self) -> Optional[Any]:
         """Maps ro_where to aind model"""
-        return {
-            self._las.ro_where.LAS_BLUE_BIN_IN_VIVARIUM: None,
-            self._las.ro_where.OTHER_TYPE_IN: None,
-        }.get(self._las.ro_where, None)
+        return (
+            None
+            if self._las.ro_where is None
+            else {
+                self._las.ro_where.LAS_BLUE_BIN_IN_VIVARIUM: None,
+                self._las.ro_where.OTHER_TYPE_IN: None,
+            }.get(self._las.ro_where, None)
+        )
 
     @property
     def aind_spec_deli_loc(self) -> Optional[str]:
@@ -1635,10 +1725,14 @@ class MappedLASList:
     @property
     def aind_species(self) -> Optional[Any]:
         """Maps species to aind model"""
-        return {
-            self._las.species.MOUSE: None,
-            self._las.species.RAT: None,
-        }.get(self._las.species, None)
+        return (
+            None
+            if self._las.species is None
+            else {
+                self._las.species.MOUSE: None,
+                self._las.species.RAT: None,
+            }.get(self._las.species, None)
+        )
 
     @property
     def aind_tam(self) -> Optional[bool]:
@@ -1653,11 +1747,15 @@ class MappedLASList:
     @property
     def aind_tam_freq(self) -> Optional[Any]:
         """Maps tam_freq to aind model"""
-        return {
-            self._las.tam_freq.STANDARD_5_DAY_DOSE: None,
-            self._las.tam_freq.SINGLE_DOSE: None,
-            self._las.tam_freq.OTHER_TYPE_IN: None,
-        }.get(self._las.tam_freq, None)
+        return (
+            None
+            if self._las.tam_freq is None
+            else {
+                self._las.tam_freq.STANDARD_5_DAY_DOSE: None,
+                self._las.tam_freq.SINGLE_DOSE: None,
+                self._las.tam_freq.OTHER_TYPE_IN: None,
+            }.get(self._las.tam_freq, None)
+        )
 
     @property
     def aind_title(self) -> Optional[str]:
@@ -1677,11 +1775,15 @@ class MappedLASList:
     @property
     def aind_tmp_freq(self) -> Optional[Any]:
         """Maps tmp_freq to aind model"""
-        return {
-            self._las.tmp_freq.STANDARD_3_DAY_DOSE: None,
-            self._las.tmp_freq.SINGLE_DOSE: None,
-            self._las.tmp_freq.OTHER_TYPEIN: None,
-        }.get(self._las.tmp_freq, None)
+        return (
+            None
+            if self._las.tmp_freq is None
+            else {
+                self._las.tmp_freq.STANDARD_3_DAY_DOSE: None,
+                self._las.tmp_freq.SINGLE_DOSE: None,
+                self._las.tmp_freq.OTHER_TYPEIN: None,
+            }.get(self._las.tmp_freq, None)
+        )
 
     @property
     def aind_ui_version_string(self) -> Optional[str]:
@@ -1696,10 +1798,14 @@ class MappedLASList:
     @property
     def aind_whereto_obtainsubstance_i(self) -> Optional[Any]:
         """Maps whereto_obtainsubstance_i to aind model"""
-        return {
-            self._las.whereto_obtainsubstance_i.LAS_BLUE_BIN_IN_VIVARIUM: None,
-            self._las.whereto_obtainsubstance_i.OTHER_SPECIFY_BELOW: None,
-        }.get(self._las.whereto_obtainsubstance_i, None)
+        return (
+            None
+            if self._las.whereto_obtainsubstance_i is None
+            else {
+                self._las.whereto_obtainsubstance_i.LAS_BLUE_BIN_IN_VIVARIUM: None,
+                self._las.whereto_obtainsubstance_i.OTHER_SPECIFY_BELOW: None,
+            }.get(self._las.whereto_obtainsubstance_i, None)
+        )
 
     def get_procedure(self) -> Surgery:
         """Return Surgery as best as possible from a record."""

@@ -1,23 +1,22 @@
-"""Maps client objects from NSB Sharepoint database to internal AIND models."""
+"""Maps client objects from LAS Sharepoint database to internal AIND models."""
 
 from typing import List
 
 from aind_data_schema.core.procedures import Surgery
 from office365.sharepoint.client_context import ClientContext
 
-from aind_metadata_service.sharepoint.las.mapping import MappedNSPList
-from aind_metadata_service.sharepoint.las.models import NSPList
+from aind_metadata_service.sharepoint.las2020.mapping import MappedLASList
+from aind_metadata_service.sharepoint.las2020.models import LASList
 
 
-class NSPProcedures:
+class LAS2020Procedures:
     """Provides methods to retrieve procedure information from sharepoint,
     parses the response into an intermediate data model, and maps that model
     into AIND Procedures model."""
 
-    _view_title = "New Request"
-
+    @staticmethod
     def get_procedures_from_sharepoint(
-        self, subject_id: str, client_context: ClientContext, list_title: str
+        subject_id: str, client_context: ClientContext, list_title: str
     ) -> List[Surgery]:
         """
         Get list of Procedures from NSP database.
@@ -33,12 +32,9 @@ class NSPProcedures:
         -------
         List[SubjectProcedure]
         """
-
-        labtrack_alias = NSPList.model_fields.get("title").alias
-        filter_string = f"{labtrack_alias} eq '{subject_id}'"
-        list_view = client_context.web.lists.get_by_title(
-            list_title
-        ).views.get_by_title(self._view_title)
+        labtrack_alias = LASList.model_fields.get("title").alias
+        filter_string = f"substringof('{subject_id}', {labtrack_alias})"
+        list_view = client_context.web.lists.get_by_title(list_title)
         client_context.load(list_view)
         client_context.execute_query()
         list_items = list_view.get_items().filter(filter_string)
@@ -46,8 +42,8 @@ class NSPProcedures:
         client_context.execute_query()
         list_of_procedures = []
         for list_item in list_items:
-            nsb_model = NSPList.model_validate(list_item.to_json())
-            mapped_model = MappedNSPList(nsb=nsb_model)
+            las_model = LASList.model_validate(list_item.to_json())
+            mapped_model = MappedLASList(las=las_model)
             procedure = mapped_model.get_procedure()
-            list_of_procedures.extend(procedure)
+            list_of_procedures.append(procedure)
         return list_of_procedures

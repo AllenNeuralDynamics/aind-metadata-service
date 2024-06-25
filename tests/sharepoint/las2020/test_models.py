@@ -8,19 +8,19 @@ from typing import List
 from unittest import TestCase
 from unittest import main as unittest_main
 
-from aind_metadata_service.sharepoint.las.models import NSPList
+from aind_metadata_service.sharepoint.las2020.models import LASList
 
 if os.getenv("LOG_LEVEL"):  # pragma: no cover
     logging.basicConfig(level=os.getenv("LOG_LEVEL"))
 
 TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / ".." / ".."
-SHAREPOINT_DIR = TEST_DIR / "resources" / "sharepoint" / "las" / "raw"
+SHAREPOINT_DIR = TEST_DIR / "resources" / "sharepoint" / "las2020" / "raw"
 LIST_ITEM_FILE_NAMES = os.listdir(SHAREPOINT_DIR)
 LIST_ITEM_FILE_PATHS = [SHAREPOINT_DIR / str(f) for f in LIST_ITEM_FILE_NAMES]
 LIST_ITEM_FILE_PATHS.sort()
 
 
-class TestNSPModels(TestCase):
+class TestLASModels(TestCase):
     """Tests methods in NSPList class"""
 
     @classmethod
@@ -43,9 +43,9 @@ class TestNSPModels(TestCase):
         for index in range(len(self.list_items)):
             list_item = self.list_items[index]
             logging.debug(f"Processing file: {LIST_ITEM_FILE_NAMES[index]}")
-            nsp_model = NSPList.model_validate(list_item)
+            las_model = LASList.model_validate(list_item)
             self.assertEqual(
-                nsp_model.author_id, int(list_item.get("AuthorId"))
+                las_model.author_id, int(list_item.get("AuthorId"))
             )
 
 

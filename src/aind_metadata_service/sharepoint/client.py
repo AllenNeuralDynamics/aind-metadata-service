@@ -16,13 +16,21 @@ from aind_metadata_service.sharepoint.nsb2019.procedures import (
 from aind_metadata_service.sharepoint.nsb2023.procedures import (
     NSB2023Procedures,
 )
+from aind_metadata_service.sharepoint.las2020.procedures import (
+    LAS2020Procedures,
+)
 
 
 class SharepointSettings(BaseSettings):
     """Settings needed to connect to Sharepoint database"""
 
     nsb_sharepoint_url: str = Field(
-        title="Sharepoint URL", description="URL of the sharepoint lists."
+        title="NSB Sharepoint URL",
+        description="URL of the NSB sharepoint lists.",
+    )
+    las_sharepoint_url: str = Field(
+        title="LAS Sharepoint URL",
+        description="URL of the LAS sharepoint lists.",
     )
     nsb_2019_list: str = Field(
         default="SWR 2019-2022",
@@ -34,22 +42,14 @@ class SharepointSettings(BaseSettings):
         title="NSB 2023 List",
         description="List name for Neurosurgery & Behavior 2023 database.",
     )
-    nsp_list: str = Field(
+    las_2020_list: str = Field(
         default="NSPRequest2020",
-        title="NSP List",
-        description="List name for Non-Surgical Procedures database",
+        title="LAS 2020 List",
+        description="List name for LAS Non-surgical Procedures 2020 database.",
     )
-    nsb_sharepoint_user: str = Field(
-        title="NSB User", description="NSB Username."
-    )
-    nsb_sharepoint_password: SecretStr = Field(
-        title="Password", description="Password."
-    )
-    nsp_sharepoint_user: str = Field(
-        title="NSP User", description="NSP Username"
-    )
-    nsp_sharepoint_password: SecretStr = Field(
-        title="Password", description="Password."
+    sharepoint_user: str = Field(title="NSB User", description="NSB Username.")
+    sharepoint_password: SecretStr = Field(
+        title="NSB Password", description="Password."
     )
 
 
@@ -59,10 +59,12 @@ class SharePointClient:
     def __init__(
         self,
         nsb_site_url: str,
+        las_site_url: str,
         client_id: str,
         client_secret: str,
         nsb_2019_list_title: str,
         nsb_2023_list_title: str,
+        las_2020_list_title: str,
     ) -> None:
         """
         Initialize a client
@@ -79,25 +81,29 @@ class SharePointClient:
         nsb_2023_list_title : str
             Title for 2023 list
         """
-        self.nsb_site_url = nsb_site_url
         self.client_id = client_id
         self.client_secret = client_secret
         self.credentials = ClientCredential(self.client_id, self.client_secret)
-        self.nsb_client_context = ClientContext(
-            self.nsb_site_url
-        ).with_credentials(self.credentials)
+        self.nsb_site_url = nsb_site_url
+        self.las_site_url = las_site_url
         self.nsb_2019_list_title = nsb_2019_list_title
         self.nsb_2023_list_title = nsb_2023_list_title
+        self.las_2020_list_title = las_2020_list_title
+
+    def get_client_context(self, site_url):
+        return ClientContext(site_url).with_credentials(self.credentials)
 
     @classmethod
     def from_settings(cls, settings: SharepointSettings):
         """Construct client from settings object."""
         return cls(
             nsb_site_url=settings.nsb_sharepoint_url,
-            client_id=settings.nsb_sharepoint_user,
-            client_secret=settings.nsb_sharepoint_password.get_secret_value(),
+            las_site_url=settings.las_sharepoint_url,
+            client_id=settings.sharepoint_user,
+            client_secret=settings.sharepoint_password.get_secret_value(),
             nsb_2019_list_title=settings.nsb_2019_list,
             nsb_2023_list_title=settings.nsb_2023_list,
+            las_2020_list_title=settings.las_2020_list,
         )
 
     def get_procedure_info(
@@ -120,16 +126,20 @@ class SharePointClient:
 
         """
         try:
-            nsb_ctx = self.nsb_client_context
             if list_title == self.nsb_2019_list_title:
+                ctx = self.get_client_context(site_url=self.nsb_site_url)
                 mapper = NSB2019Procedures()
             elif list_title == self.nsb_2023_list_title:
+                ctx = self.get_client_context(site_url=self.nsb_site_url)
                 mapper = NSB2023Procedures()
+            elif list_title == self.las_2020_list_title:
+                ctx = self.get_client_context(site_url=self.las_site_url)
+                mapper = LAS2020Procedures()
             else:
                 raise Exception(f"Unknown NSB Sharepoint List: {list_title}")
             subj_procedures = mapper.get_procedures_from_sharepoint(
                 subject_id=subject_id,
-                client_context=nsb_ctx,
+                client_context=ctx,
                 list_title=list_title,
             )
             procedures = self._handle_response_from_sharepoint(
