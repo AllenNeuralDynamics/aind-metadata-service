@@ -10,14 +10,14 @@ from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings
 
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
+from aind_metadata_service.sharepoint.las2020.procedures import (
+    LAS2020Procedures,
+)
 from aind_metadata_service.sharepoint.nsb2019.procedures import (
     NSB2019Procedures,
 )
 from aind_metadata_service.sharepoint.nsb2023.procedures import (
     NSB2023Procedures,
-)
-from aind_metadata_service.sharepoint.las2020.procedures import (
-    LAS2020Procedures,
 )
 
 
@@ -71,15 +71,19 @@ class SharePointClient:
         Parameters
         ----------
         nsb_site_url : str
-           sharepoint site url
+           sharepoint site url for nsb procedures
+        las_site_url : str
+           sharepoint site url for las procedures
         client_id : str
             username for principal account to access sharepoint
         client_secret : str
             password for principal account to access sharepoint
         nsb_2019_list_title : str
-            Title for 2019 list
+            Title for nsb 2019 list
         nsb_2023_list_title : str
-            Title for 2023 list
+            Title for nsb 2023 list
+        las_2020_list_title : str
+            Title for las 2020 list
         """
         self.client_id = client_id
         self.client_secret = client_secret
@@ -91,6 +95,7 @@ class SharePointClient:
         self.las_2020_list_title = las_2020_list_title
 
     def get_client_context(self, site_url):
+        """Construct client context with principal account"""
         return ClientContext(site_url).with_credentials(self.credentials)
 
     @classmethod
