@@ -8,5 +8,6 @@
   "weight_unit": "gram",
   "anaesthesia": null,
   "workstation_id": null,
+  "procedures": [],
   "notes": null
   }

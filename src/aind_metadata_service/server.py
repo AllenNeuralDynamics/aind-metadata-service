@@ -17,6 +17,7 @@ from aind_metadata_service.labtracks.client import (
     LabTracksClient,
     LabTracksSettings,
 )
+
 from aind_metadata_service.response_handler import EtlResponse
 from aind_metadata_service.sharepoint.client import (
     SharePointClient,
@@ -263,8 +264,13 @@ async def retrieve_procedures(subject_id, pickle: bool = False):
         subject_id=subject_id,
         list_title=sharepoint_settings.nsb_2023_list,
     )
+    las2020_response = await run_in_threadpool(
+        sharepoint_client.get_procedure_info,
+        subject_id=subject_id,
+        list_title=sharepoint_settings.las_2020_list,
+    )
     merged_response = sharepoint_client.merge_responses(
-        [lb_response, sp2019_response, sp2023_response]
+        [lb_response, sp2019_response, sp2023_response, las2020_response]
     )
     # integrate TARS response
     mapper = TarsResponseHandler()

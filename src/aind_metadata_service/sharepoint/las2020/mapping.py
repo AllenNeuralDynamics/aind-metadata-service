@@ -1812,9 +1812,12 @@ class MappedLASList:
 
     def get_procedure(self) -> Surgery:
         """Return Surgery as best as possible from a record."""
+        # TODO: add RO Injection and IP Injections to procedures
+        subject_procedures = []
         return Surgery.model_construct(
             experimenter_full_name=self.aind_author_id,
             iacuc_protocol=self.aind_protocol,
             start_date=self.aind_n_start_date,
             end_date=self.aind_n_end_date,
+            procedures=subject_procedures,
         )
