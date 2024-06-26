@@ -46,6 +46,20 @@ sorted(MAPPED_ITEM_FILE_NAMES_2023)
 MAPPED_FILE_PATHS_2023 = [
     DIR_MAP_2023 / str(f) for f in MAPPED_ITEM_FILE_NAMES_2023
 ]
+
+DIR_RAW_2020 = TEST_DIR / "resources" / "sharepoint" / "las2020" / "raw"
+DIR_MAP_2020 = TEST_DIR / "resources" / "sharepoint" / "las2020" / "mapped"
+LIST_ITEM_FILE_NAMES_2020 = os.listdir(DIR_RAW_2020)
+sorted(LIST_ITEM_FILE_NAMES_2020)
+LIST_ITEM_FILE_PATHS_2020 = [
+    DIR_RAW_2020 / str(f) for f in LIST_ITEM_FILE_NAMES_2020
+]
+MAPPED_ITEM_FILE_NAMES_2020 = os.listdir(DIR_MAP_2020)
+sorted(MAPPED_ITEM_FILE_NAMES_2020)
+MAPPED_FILE_PATHS_2020 = [
+    DIR_MAP_2020 / str(f) for f in MAPPED_ITEM_FILE_NAMES_2020
+]
+
 INJECTION_MATERIALS_PATH = (
     TEST_DIR / "resources" / "tars" / "mapped_materials.json"
 )
@@ -56,10 +70,12 @@ class TestSharepointSettings(unittest.TestCase):
 
     EXAMPLE_ENV_VAR1 = {
         "NSB_SHAREPOINT_URL": "some_url",
+        "LAS_SHAREPOINT_URL": "some_other_url",
         "NSB_2019_LIST": "some_list_2019",
         "NSB_2023_LIST": "some_list_2023",
-        "NSB_SHAREPOINT_USER": "some_user",
-        "NSB_SHAREPOINT_PASSWORD": "some_password",
+        "LAS_2020_LIST": "some_list_2020",
+        "SHAREPOINT_USER": "some_user",
+        "SHAREPOINT_PASSWORD": "some_password",
     }
 
     @patch.dict(os.environ, EXAMPLE_ENV_VAR1, clear=True)
@@ -69,20 +85,22 @@ class TestSharepointSettings(unittest.TestCase):
         settings2 = SharepointSettings(nsb_sharepoint_url="some_other_url")
 
         self.assertEqual("some_url", settings1.nsb_sharepoint_url)
+        self.assertEqual("some_other_url", settings1.las_sharepoint_url)
         self.assertEqual("some_list_2019", settings1.nsb_2019_list)
         self.assertEqual("some_list_2023", settings1.nsb_2023_list)
-        self.assertEqual("some_user", settings1.nsb_sharepoint_user)
+        self.assertEqual("some_list_2020", settings1.las_2020_list)
+        self.assertEqual("some_user", settings1.sharepoint_user)
         self.assertEqual(
             "some_password",
-            settings1.nsb_sharepoint_password.get_secret_value(),
+            settings1.sharepoint_password.get_secret_value(),
         )
         self.assertEqual("some_other_url", settings2.nsb_sharepoint_url)
         self.assertEqual("some_list_2019", settings2.nsb_2019_list)
         self.assertEqual("some_list_2023", settings2.nsb_2023_list)
-        self.assertEqual("some_user", settings2.nsb_sharepoint_user)
+        self.assertEqual("some_user", settings2.sharepoint_user)
         self.assertEqual(
             "some_password",
-            settings2.nsb_sharepoint_password.get_secret_value(),
+            settings2.sharepoint_password.get_secret_value(),
         )
 
     @patch.dict(os.environ, {}, clear=True)
@@ -93,14 +111,20 @@ class TestSharepointSettings(unittest.TestCase):
             SharepointSettings(nsb_sharepoint_url="some_url")
 
         expected_error_message = (
-            "2 validation errors for SharepointSettings\n"
-            "nsb_sharepoint_user\n"
+            "3 validation errors for SharepointSettings\n"
+            "las_sharepoint_url\n"
             "  Field required [type=missing,"
             " input_value={'nsb_sharepoint_url': 'some_url'},"
             " input_type=dict]\n"
             "    For further information visit"
             f" https://errors.pydantic.dev/{PYD_VERSION}/v/missing\n"
-            "nsb_sharepoint_password\n"
+            "sharepoint_user\n"
+            "  Field required [type=missing,"
+            " input_value={'nsb_sharepoint_url': 'some_url'},"
+            " input_type=dict]\n"
+            "    For further information visit"
+            f" https://errors.pydantic.dev/{PYD_VERSION}/v/missing\n"
+            "sharepoint_password\n"
             "  Field required"
             " [type=missing, input_value={'nsb_sharepoint_url': 'some_url'},"
             " input_type=dict]\n"
@@ -119,6 +143,7 @@ class TestSharepointClient(unittest.TestCase):
         """Load json files before running tests."""
         cls.list_items_2019 = cls._load_json_files(year="2019")
         cls.list_items_2023 = cls._load_json_files(year="2023")
+        cls.list_items_2020 = cls._load_json_files(year="2020")
 
     @staticmethod
     def _load_json_files(year: str) -> List[Tuple[dict, dict, str]]:
@@ -126,8 +151,10 @@ class TestSharepointClient(unittest.TestCase):
         list_items = []
         if year == "2019":
             list_item_file_paths = LIST_ITEM_FILE_PATHS_2019
-        else:
+        elif year == "2023":
             list_item_file_paths = LIST_ITEM_FILE_PATHS_2023
+        else:
+            list_item_file_paths = LIST_ITEM_FILE_PATHS_2020
         for file_path in list_item_file_paths:
             mapped_file_path = (
                 file_path.parent.parent
@@ -148,10 +175,12 @@ class TestSharepointClient(unittest.TestCase):
         from NSB datatbases"""
         client = SharePointClient(
             nsb_site_url="some_url",
+            las_site_url="some_other_url",
             client_id="some_client_id",
             client_secret="some_client_secret",
             nsb_2019_list_title="some_list_title2019",
             nsb_2023_list_title="some_list_title2023",
+            las_2020_list_title="some_list_title2020",
         )
         model_response = client.get_procedure_info(
             subject_id="12345", list_title="some_list_title2019"
@@ -190,16 +219,17 @@ class TestSharepointClient(unittest.TestCase):
 
         client = SharePointClient(
             nsb_site_url="some_url",
+            las_site_url="some_other_url",
             client_id="some_client_id",
             client_secret="some_client_secret",
             nsb_2019_list_title="some_list_title2019",
             nsb_2023_list_title="some_list_title2023",
+            las_2020_list_title="some_list_title2020",
         )
 
         expected_subject_procedures = []
         expected_subject_procedures.extend(self.list_items_2019[0][1])
         expected_subject_procedures.extend(self.list_items_2023[0][1])
-
         response2019 = client.get_procedure_info(
             subject_id="12345", list_title="some_list_title2019"
         )
@@ -218,6 +248,50 @@ class TestSharepointClient(unittest.TestCase):
             StatusCodes.DB_RESPONDED, merged_responses.status_code
         )
         # Most of the models are missing required fields not in NSB
+        self.assertEqual(406, json_response.status_code)
+        self.assertEqual(
+            expected_subject_procedures, actual_subject_procedures
+        )
+
+    @patch("aind_metadata_service.sharepoint.client.ClientContext")
+    def test_las_data_mapped(self, mock_sharepoint_client: MagicMock):
+        """Tests that 200 response returned correctly."""
+        inner_mock = MagicMock()
+        mock_sharepoint_client.return_value.with_credentials.return_value = (
+            inner_mock
+        )
+        mock_list_view = MagicMock()
+        inner_mock.web.lists.get_by_title.return_value = mock_list_view
+        mock_list_items = MagicMock()
+        mock_list_view.get_items.return_value = mock_list_items
+        list_item_2020_1 = self.list_items_2020[0][0]
+        mock_list_item2020 = MagicMock()
+        mock_list_item2020.to_json.return_value = list_item_2020_1
+        mock_list_items.filter.side_effect = [
+            [mock_list_item2020],
+        ]
+
+        client = SharePointClient(
+            nsb_site_url="some_url",
+            las_site_url="some_other_url",
+            client_id="some_client_id",
+            client_secret="some_client_secret",
+            nsb_2019_list_title="some_list_title2019",
+            nsb_2023_list_title="some_list_title2023",
+            las_2020_list_title="some_list_title2020",
+        )
+        expected_subject_procedures = [self.list_items_2020[0][1]]
+        response2020 = client.get_procedure_info(
+            subject_id="12345", list_title="some_list_title2020"
+        )
+        json_response = response2020.map_to_json_response()
+        actual_content = json.loads(json_response.body.decode("utf-8"))
+        actual_subject_procedures = actual_content["data"][
+            "subject_procedures"
+        ]
+        expected_subject_procedures.sort(key=lambda x: str(x))
+        actual_subject_procedures.sort(key=lambda x: str(x))
+        self.assertEqual(StatusCodes.DB_RESPONDED, response2020.status_code)
         self.assertEqual(406, json_response.status_code)
         self.assertEqual(
             expected_subject_procedures, actual_subject_procedures
@@ -253,10 +327,12 @@ class TestSharepointClient(unittest.TestCase):
 
         client = SharePointClient(
             nsb_site_url="some_url",
+            las_site_url="some_other_url",
             client_id="some_client_id",
             client_secret="some_client_secret",
             nsb_2019_list_title="some_list_title2019",
             nsb_2023_list_title="some_list_title2023",
+            las_2020_list_title="some_list_title2020",
         )
 
         response2019 = client.get_procedure_info(
@@ -350,10 +426,12 @@ class TestSharepointClient(unittest.TestCase):
 
         client = SharePointClient(
             nsb_site_url="some_url",
+            las_site_url="some_other_url",
             client_id="some_client_id",
             client_secret="some_client_secret",
             nsb_2019_list_title="some_list_title2019",
             nsb_2023_list_title="some_list_title2023",
+            las_2020_list_title="some_list_title2020",
         )
 
         response2019 = client.get_procedure_info(
@@ -407,10 +485,12 @@ class TestSharepointClient(unittest.TestCase):
         ]
         client = SharePointClient(
             nsb_site_url="some_url",
+            las_site_url="some_other_url",
             client_id="some_client_id",
             client_secret="some_client_secret",
             nsb_2019_list_title="some_list_title2019",
             nsb_2023_list_title="some_list_title2023",
+            las_2020_list_title="some_list_title2020",
         )
 
         response1 = ModelResponse.internal_server_error_response()
@@ -449,10 +529,12 @@ class TestSharepointClient(unittest.TestCase):
 
         client = SharePointClient(
             nsb_site_url="some_url",
+            las_site_url="some_other_url",
             client_id="some_client_id",
             client_secret="some_client_secret",
             nsb_2019_list_title="some_list_title2019",
             nsb_2023_list_title="some_list_title2023",
+            las_2020_list_title="some_list_title2020",
         )
 
         merged_responses = client.merge_responses([])
@@ -478,10 +560,12 @@ class TestSharepointClient(unittest.TestCase):
 
         client = SharePointClient(
             nsb_site_url="some_url",
+            las_site_url="some_other_url",
             client_id="some_client_id",
             client_secret="some_client_secret",
             nsb_2019_list_title="some_list_title2019",
             nsb_2023_list_title="some_list_title2023",
+            las_2020_list_title="some_list_title2020",
         )
 
         response1 = ModelResponse.internal_server_error_response()
@@ -504,7 +588,6 @@ class TestSharepointClient(unittest.TestCase):
         self.assertEqual(expected_json.status_code, actual_json.status_code)
         self.assertEqual(expected_json.body, actual_json.body)
 
-    @patch("aind_metadata_service.sharepoint.client.ClientContext")
     @patch(
         "aind_metadata_service.sharepoint.nsb2023.procedures."
         "NSB2023Procedures.get_procedures_from_sharepoint"
@@ -514,25 +597,25 @@ class TestSharepointClient(unittest.TestCase):
         self,
         mock_log: MagicMock,
         mock_error: MagicMock,
-        mock_sharepoint_client: MagicMock,
     ):
         """Tests internal server error response caught correctly."""
 
         client = SharePointClient(
             nsb_site_url="some_url",
+            las_site_url="some_other_url",
             client_id="some_client_id",
             client_secret="some_client_secret",
             nsb_2019_list_title="some_list_title2019",
-            nsb_2023_list_title="some_list_title_2023",
+            nsb_2023_list_title="some_list_title2023",
+            las_2020_list_title="some_list_title2020",
         )
 
         mock_error.side_effect = Mock(side_effect=BrokenPipeError)
 
         model_response = client.get_procedure_info(
-            subject_id="12345", list_title="some_list_title_2023"
+            subject_id="12345", list_title="some_list_title2023"
         )
         json_response = model_response.map_to_json_response()
-        mock_sharepoint_client.assert_called_once()
         mock_log.assert_called_once_with("BrokenPipeError()")
         self.assertEqual(
             StatusCodes.INTERNAL_SERVER_ERROR, model_response.status_code
@@ -551,10 +634,12 @@ class TestSharepointClient(unittest.TestCase):
 
         client = SharePointClient(
             nsb_site_url="some_url",
+            las_site_url="some_other_url",
             client_id="some_client_id",
             client_secret="some_client_secret",
             nsb_2019_list_title="some_list_title2019",
-            nsb_2023_list_title="some_list_title_2023",
+            nsb_2023_list_title="some_list_title2023",
+            las_2020_list_title="some_list_title2020",
         )
 
         model_response = client.get_procedure_info(
