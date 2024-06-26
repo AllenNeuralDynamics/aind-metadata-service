@@ -35,12 +35,12 @@ class SharepointSettings(BaseSettings):
     nsb_2019_list: str = Field(
         default="SWR 2019-2022",
         title="NSB 2019 List",
-        description="List name for Neurosurgery & Behavior 2019 database.",
+        description="List name for Neurosurgery and Behavior 2019 database.",
     )
     nsb_2023_list: str = Field(
         default="SWR 2023-Present",
         title="NSB 2023 List",
-        description="List name for Neurosurgery & Behavior 2023 database.",
+        description="List name for Neurosurgery and Behavior 2023 database.",
     )
     las_2020_list: str = Field(
         default="NSPRequest2020",
