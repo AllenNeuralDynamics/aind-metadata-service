@@ -1,0 +1,13 @@
+{
+  "procedure_type": "Surgery",
+  "start_date": "2024-06-21",
+  "experimenter_full_name": "LAS-5358",
+  "iacuc_protocol": "2212",
+  "animal_weight_prior": null,
+  "animal_weight_post": null,
+  "weight_unit": "gram",
+  "anaesthesia": null,
+  "workstation_id": null,
+  "procedures": [],
+  "notes": null
+  }
