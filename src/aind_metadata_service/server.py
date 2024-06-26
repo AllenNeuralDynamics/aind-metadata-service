@@ -17,7 +17,6 @@ from aind_metadata_service.labtracks.client import (
     LabTracksClient,
     LabTracksSettings,
 )
-
 from aind_metadata_service.response_handler import EtlResponse
 from aind_metadata_service.sharepoint.client import (
     SharePointClient,
@@ -301,9 +300,9 @@ async def retrieve_procedures(subject_id, pickle: bool = False):
         # smartsheet_response = await retrieve_protocols(
         #     protocol_name=protocol_name
         # )
-        protocols_mapping[
-            protocol_name
-        ] = model_response.map_to_json_response()
+        protocols_mapping[protocol_name] = (
+            model_response.map_to_json_response()
+        )
     integrated_response = protocols_integrator.integrate_protocols(
         response=integrated_response, protocols_mapping=protocols_mapping
     )

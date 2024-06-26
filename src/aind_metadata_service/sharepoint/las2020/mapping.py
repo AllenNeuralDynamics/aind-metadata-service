@@ -886,37 +886,99 @@ class MappedLASList:
             None
             if self._las.protocol is None
             else {
-                self._las.protocol.N_2103_OPTICAL_PHYSIOLOGY: IacucProtocol.N_2103.value,
-                self._las.protocol.N_2104_ELECTROPHYSIOLOGY: IacucProtocol.N_2104.value,
-                self._las.protocol.N_2105_CHARACTERIZATION_O: IacucProtocol.N_2105.value,
-                self._las.protocol.N_2106_ANALYSIS_OF_INTEGR: IacucProtocol.N_2106.value,
-                self._las.protocol.N_2107_CIRCUIT_TRACING_AN: IacucProtocol.N_2107.value,
-                self._las.protocol.N_2109_ANALYSIS_OF_BRAIN: IacucProtocol.N_2109.value,
-                self._las.protocol.N_2110_SPECIFICITY_AND_ST: IacucProtocol.N_2110.value,
-                self._las.protocol.N_2112_CHARACTERIZATION_O: IacucProtocol.N_2112.value,
-                self._las.protocol.N_2113_IN_VITRO_SINGLE_CE: IacucProtocol.N_2113.value,
-                self._las.protocol.N_2114_CHARACTERIZATION_O: IacucProtocol.N_2114.value,
-                self._las.protocol.N_2115_OPTICAL_PHYSIOLOGY: IacucProtocol.N_2115.value,
-                self._las.protocol.N_2116_MOUSE_BREEDING: IacucProtocol.N_2116.value,
-                self._las.protocol.N_2117_OPEN_SCOPE_MINDSCO: IacucProtocol.N_2117.value,
-                self._las.protocol.N_2118_ANIMAL_HOLDING_AND: IacucProtocol.N_2118.value,
-                self._las.protocol.N_2119_TRAINING_AND_QUALI: IacucProtocol.N_2119.value,
-                self._las.protocol.N_2120_ANALYSIS_OF_GENE_E: IacucProtocol.N_2120.value,
-                self._las.protocol.N_2201_INTERROGATING_PROJ: IacucProtocol.N_2201.value,
-                self._las.protocol.N_2202_TESTING_AA_VS_IN_P: IacucProtocol.N_2202.value,
-                self._las.protocol.N_2204_PRIMARY_NEURON_AND: IacucProtocol.N_2204.value,
-                self._las.protocol.N_2205_OPTIMIZATION_AND_V: IacucProtocol.N_2205.value,
-                self._las.protocol.N_2207_IN_VITRO_BRAIN_STI: IacucProtocol.N_2207.value,
-                self._las.protocol.N_2212_INVESTIGATING_BRAI: IacucProtocol.N_2212.value,
-                self._las.protocol.N_2301_TESTING_OF_ENHANCE: IacucProtocol.N_2301.value,
-                self._las.protocol.N_2304_NEUROSURGERY_BEHAV: IacucProtocol.N_2304.value,
-                self._las.protocol.N_2305_IN_VIVO_BRAIN_STIM: IacucProtocol.N_2305.value,
-                self._las.protocol.N_2306_PATCHSEQ_CHARACTER: IacucProtocol.N_2306.value,
-                self._las.protocol.N_2307_DISSECTING_THE_NEU: IacucProtocol.N_2307.value,
-                self._las.protocol.N_2308_INDUCTION_OF_IMMUN: IacucProtocol.N_2308.value,
-                self._las.protocol.N_2401_THE_USE_OF_MICE_FO: IacucProtocol.N_2401.value,
-                self._las.protocol.N_2402_BRAIN_OBSERVATORY: IacucProtocol.N_2402.value,
-                self._las.protocol.N_2405_ANALYSIS_OF_INTEGR: IacucProtocol.N_2405.value,
+                self._las.protocol.N_2103_OPTICAL_PHYSIOLOGY: (
+                    IacucProtocol.N_2103.value
+                ),
+                self._las.protocol.N_2104_ELECTROPHYSIOLOGY: (
+                    IacucProtocol.N_2104.value
+                ),
+                self._las.protocol.N_2105_CHARACTERIZATION_O: (
+                    IacucProtocol.N_2105.value
+                ),
+                self._las.protocol.N_2106_ANALYSIS_OF_INTEGR: (
+                    IacucProtocol.N_2106.value
+                ),
+                self._las.protocol.N_2107_CIRCUIT_TRACING_AN: (
+                    IacucProtocol.N_2107.value
+                ),
+                self._las.protocol.N_2109_ANALYSIS_OF_BRAIN: (
+                    IacucProtocol.N_2109.value
+                ),
+                self._las.protocol.N_2110_SPECIFICITY_AND_ST: (
+                    IacucProtocol.N_2110.value
+                ),
+                self._las.protocol.N_2112_CHARACTERIZATION_O: (
+                    IacucProtocol.N_2112.value
+                ),
+                self._las.protocol.N_2113_IN_VITRO_SINGLE_CE: (
+                    IacucProtocol.N_2113.value
+                ),
+                self._las.protocol.N_2114_CHARACTERIZATION_O: (
+                    IacucProtocol.N_2114.value
+                ),
+                self._las.protocol.N_2115_OPTICAL_PHYSIOLOGY: (
+                    IacucProtocol.N_2115.value
+                ),
+                self._las.protocol.N_2116_MOUSE_BREEDING: (
+                    IacucProtocol.N_2116.value
+                ),
+                self._las.protocol.N_2117_OPEN_SCOPE_MINDSCO: (
+                    IacucProtocol.N_2117.value
+                ),
+                self._las.protocol.N_2118_ANIMAL_HOLDING_AND: (
+                    IacucProtocol.N_2118.value
+                ),
+                self._las.protocol.N_2119_TRAINING_AND_QUALI: (
+                    IacucProtocol.N_2119.value
+                ),
+                self._las.protocol.N_2120_ANALYSIS_OF_GENE_E: (
+                    IacucProtocol.N_2120.value
+                ),
+                self._las.protocol.N_2201_INTERROGATING_PROJ: (
+                    IacucProtocol.N_2201.value
+                ),
+                self._las.protocol.N_2202_TESTING_AA_VS_IN_P: (
+                    IacucProtocol.N_2202.value
+                ),
+                self._las.protocol.N_2204_PRIMARY_NEURON_AND: (
+                    IacucProtocol.N_2204.value
+                ),
+                self._las.protocol.N_2205_OPTIMIZATION_AND_V: (
+                    IacucProtocol.N_2205.value
+                ),
+                self._las.protocol.N_2207_IN_VITRO_BRAIN_STI: (
+                    IacucProtocol.N_2207.value
+                ),
+                self._las.protocol.N_2212_INVESTIGATING_BRAI: (
+                    IacucProtocol.N_2212.value
+                ),
+                self._las.protocol.N_2301_TESTING_OF_ENHANCE: (
+                    IacucProtocol.N_2301.value
+                ),
+                self._las.protocol.N_2304_NEUROSURGERY_BEHAV: (
+                    IacucProtocol.N_2304.value
+                ),
+                self._las.protocol.N_2305_IN_VIVO_BRAIN_STIM: (
+                    IacucProtocol.N_2305.value
+                ),
+                self._las.protocol.N_2306_PATCHSEQ_CHARACTER: (
+                    IacucProtocol.N_2306.value
+                ),
+                self._las.protocol.N_2307_DISSECTING_THE_NEU: (
+                    IacucProtocol.N_2307.value
+                ),
+                self._las.protocol.N_2308_INDUCTION_OF_IMMUN: (
+                    IacucProtocol.N_2308.value
+                ),
+                self._las.protocol.N_2401_THE_USE_OF_MICE_FO: (
+                    IacucProtocol.N_2401.value
+                ),
+                self._las.protocol.N_2402_BRAIN_OBSERVATORY: (
+                    IacucProtocol.N_2402.value
+                ),
+                self._las.protocol.N_2405_ANALYSIS_OF_INTEGR: (
+                    IacucProtocol.N_2405.value
+                ),
             }.get(self._las.protocol, None)
         )
 
@@ -1797,7 +1859,6 @@ class MappedLASList:
         """Maps wellness_report_no_x002_f to aind model"""
         return self._las.wellness_report_no_x002_f
 
-    # flake8: noqa: C901
     @property
     def aind_whereto_obtainsubstance_i(self) -> Optional[Any]:
         """Maps whereto_obtainsubstance_i to aind model"""
@@ -1805,7 +1866,9 @@ class MappedLASList:
             None
             if self._las.whereto_obtainsubstance_i is None
             else {
-                self._las.whereto_obtainsubstance_i.LAS_BLUE_BIN_IN_VIVARIUM: None,
+                self._las.whereto_obtainsubstance_i.LAS_BLUE_BIN_IN_VIVARIUM: (
+                    None
+                ),
                 self._las.whereto_obtainsubstance_i.OTHER_SPECIFY_BELOW: None,
             }.get(self._las.whereto_obtainsubstance_i, None)
         )
