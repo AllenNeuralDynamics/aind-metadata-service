@@ -8,6 +8,17 @@
   "weight_unit": "gram",
   "anaesthesia": null,
   "workstation_id": null,
-  "procedures": [],
+  "procedures": [
+    {
+      "injection_duration": "30",
+      "injection_duration_unit": "minute",
+      "injection_volume": "70.4",
+      "injection_volume_unit": "microliter",
+      "instrument_id": null,
+      "procedure_type": "Intraperitoneal injection",
+      "recovery_time": null,
+      "recovery_time_unit": "minute"
+    }
+  ],
   "notes": null
-  }
+}
