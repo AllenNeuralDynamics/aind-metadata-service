@@ -221,10 +221,12 @@ class TarsResponseHandler:
                         and hasattr(procedure, "injection_materials")
                         and isinstance(procedure.injection_materials, list)
                         and procedure.injection_materials
-                        and hasattr(procedure.injection_materials[0], "name")
                     ):
-                        virus_strain = procedure.injection_materials[0].name
-                        viruses.append(virus_strain)
+                        virus_strains = [
+                            getattr(material, "name")
+                            for material in procedure.injection_materials
+                        ]
+                        viruses.extend(virus_strains)
         return viruses
 
     @staticmethod
@@ -268,9 +270,9 @@ class TarsResponseHandler:
                                     new_material.titer = (
                                         injection_material.titer
                                     )
-                                    procedure.injection_materials[idx] = (
-                                        new_material
-                                    )
+                                    procedure.injection_materials[
+                                        idx
+                                    ] = new_material
                                 elif (
                                     tars_response.status_code
                                     == StatusCodes.NO_DATA_FOUND.value
