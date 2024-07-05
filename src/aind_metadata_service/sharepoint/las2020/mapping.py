@@ -5,9 +5,9 @@ from decimal import Decimal, DecimalException
 from enum import Enum
 from typing import Any, Optional
 
-from aind_data_schema.core.procedures import Surgery, IntraperitonealInjection
+from aind_data_schema.core.procedures import Surgery, Side, IntraperitonealInjection
 
-from aind_metadata_service.sharepoint.las2020.models import LASList, Doseroute
+from aind_metadata_service.sharepoint.las2020.models import LASList, Doseroute, Rosop
 
 
 class IacucProtocol(Enum):
@@ -53,6 +53,24 @@ class RequestedProcedureInfo:
     procedure: Optional[str] = None
     preferred_age: Optional[Decimal] = None
     preferred_date: Optional[date] = None
+
+
+@dataclass
+class RetroOrbitalInjectionInfo:
+    """Container for ro injection information"""
+    # TODO: support "either for eye"
+    ro_sop: Optional[Rosop] = None
+    animal_id: Optional[str] = None
+    injection_eye: Optional[Side] = None
+    injection_volume: Optional[Decimal] = None
+    tube_label: Optional[str] = None
+    box_label: Optional[str] = None
+    substance: Optional[str] = None
+    prep_lot_id: Optional[str] = None
+    genome_copy: Optional[str] = None
+    virus_volume: Optional[Decimal] = None
+    titer: Optional[Decimal] = None
+    additional_substance: Optional[bool] = None
 
 
 class LASProcedure(Enum):
@@ -1916,11 +1934,18 @@ class MappedLASList:
         )
 
     def has_ip_injection(self) -> bool:
-        """Is there a IP injection procedure?"""
+        """Is there an IP injection procedure?"""
         return (
             LASProcedure.DOSING
             in [self.aind_req_pro1, self.aind_req_pro2, self.aind_req_pro3]
             and self.aind_dose_route == Doseroute.INTRAPERITONEAL_IP
+        )
+
+    def has_ro_injection(self) -> bool:
+        """Is there a retro-orbital injection?"""
+        return (
+            LASProcedure.RETRO_ORBITAL_INJECTION
+            in [self.aind_req_pro1, self.aind_req_pro2, self.aind_req_pro3]
         )
 
     def get_procedure(self) -> Surgery:
