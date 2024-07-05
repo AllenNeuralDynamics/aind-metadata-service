@@ -1916,7 +1916,7 @@ class MappedLASList:
         )
 
     def has_ip_injection(self) -> bool:
-        """Is there a headpost procedure?"""
+        """Is there a IP injection procedure?"""
         return (
             LASProcedure.DOSING
             in [self.aind_req_pro1, self.aind_req_pro2, self.aind_req_pro3]
