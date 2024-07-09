@@ -44,6 +44,6 @@ class LAS2020Procedures:
         for list_item in list_items:
             las_model = LASList.model_validate(list_item.to_json())
             mapped_model = MappedLASList(las=las_model)
-            procedure = mapped_model.get_procedure()
+            procedure = mapped_model.get_procedure(subject_id=subject_id)
             list_of_procedures.append(procedure)
         return list_of_procedures
