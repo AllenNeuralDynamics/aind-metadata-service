@@ -63,7 +63,7 @@ class TestLASParsers(TestCase):
             logging.debug(f"Processing file: {raw_file_name}")
             las_model = LASList.model_validate(raw_data)
             mapper = MappedLASList(las=las_model)
-            mapped_procedure = mapper.get_procedure()
+            mapped_procedure = mapper.get_procedure(subject_id="000000")
             mapped_procedure_json = mapped_procedure.model_dump_json()
             mapped_procedure_json_parsed = json.loads(mapped_procedure_json)
             self.assertEqual(

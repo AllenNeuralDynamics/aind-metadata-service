@@ -5,9 +5,19 @@ from decimal import Decimal, DecimalException
 from enum import Enum
 from typing import Any, Optional, List
 
-from aind_data_schema.core.procedures import Surgery, Side, IntraperitonealInjection, RetroOrbitalInjection, ViralMaterial
+from aind_data_schema.core.procedures import (
+    Surgery,
+    Side,
+    IntraperitonealInjection,
+    RetroOrbitalInjection,
+    ViralMaterial,
+)
 
-from aind_metadata_service.sharepoint.las2020.models import LASList, Doseroute, Rosop
+from aind_metadata_service.sharepoint.las2020.models import (
+    LASList,
+    Doseroute,
+    Rosop,
+)
 
 
 class IacucProtocol(Enum):
@@ -71,6 +81,7 @@ class InjectableMaterial:
 @dataclass
 class RetroOrbitalInjectionInfo:
     """Container for ro injection information"""
+
     # TODO: support "either for eye"
     ro_sop: Optional[Rosop] = None
     animal_id: Optional[str] = None
@@ -1022,7 +1033,7 @@ class MappedLASList:
                 ),
                 self._las.protocol.N_2412_CIRCUIT_TRACING_AND_OPT: (
                     IacucProtocol.N_2412.value
-                )
+                ),
             }.get(self._las.protocol, None)
         )
 
@@ -1957,12 +1968,15 @@ class MappedLASList:
 
     def has_ro_injection(self) -> bool:
         """Is there a retro-orbital injection?"""
-        return (
-            LASProcedure.RETRO_ORBITAL_INJECTION
-            in [self.aind_req_pro1, self.aind_req_pro2, self.aind_req_pro3]
-        )
+        return LASProcedure.RETRO_ORBITAL_INJECTION in [
+            self.aind_req_pro1,
+            self.aind_req_pro2,
+            self.aind_req_pro3,
+        ]
 
-    def _map_injectable_materials(self, material_num: int) -> List[InjectableMaterial]:
+    def _map_injectable_materials(
+        self, material_num: int
+    ) -> List[InjectableMaterial]:
         """
         Maps injectable materials based on the material_num.
         Parameters
@@ -1974,17 +1988,25 @@ class MappedLASList:
             List[InjectableMaterial]
         """
         materials = []
-        suffixes = ['', 'b', 'c', 'd']
+        suffixes = ["", "b", "c", "d"]
         for suffix in suffixes:
             material_attr = f"aind_ro_sub{material_num}{suffix}"
             if getattr(self, material_attr, None):
                 materials.append(
                     InjectableMaterial(
                         substance=getattr(self, material_attr),
-                        prep_lot_id=getattr(self, f'aind_ro_lot{material_num}{suffix}', None),
-                        genome_copy=getattr(self, f'aind_ro_gc{material_num}{suffix}', None),
-                        titer=getattr(self, f'aind_ro_tite{material_num}{suffix}', None),
-                        virus_volume=getattr(self, f'aind_ro_vol_v{material_num}{suffix}', None),
+                        prep_lot_id=getattr(
+                            self, f"aind_ro_lot{material_num}{suffix}", None
+                        ),
+                        genome_copy=getattr(
+                            self, f"aind_ro_gc{material_num}{suffix}", None
+                        ),
+                        titer=getattr(
+                            self, f"aind_ro_tite{material_num}{suffix}", None
+                        ),
+                        virus_volume=getattr(
+                            self, f"aind_ro_vol_v{material_num}{suffix}", None
+                        ),
                     )
                 )
         return materials
@@ -2008,7 +2030,9 @@ class MappedLASList:
                 injection_volume=self.aind_ro_vol1,
                 tube_label=self.aind_ro_tube1,
                 box_label=self.aind_ro_box1,
-                injectable_materials=self._map_injectable_materials(material_num=1)
+                injectable_materials=self._map_injectable_materials(
+                    material_num=1
+                ),
             )
         elif ro_num == 2:
             return RetroOrbitalInjectionInfo(
@@ -2017,7 +2041,9 @@ class MappedLASList:
                 injection_volume=self.aind_ro_vol2,
                 tube_label=self.aind_ro_tube2,
                 box_label=self.aind_ro_box2,
-                injectable_materials=self._map_injectable_materials(material_num=2)
+                injectable_materials=self._map_injectable_materials(
+                    material_num=2
+                ),
             )
         elif ro_num == 3:
             return RetroOrbitalInjectionInfo(
@@ -2026,7 +2052,9 @@ class MappedLASList:
                 injection_volume=self.aind_ro_vol3,
                 tube_label=self.aind_ro_tube3,
                 box_label=self.aind_ro_box3,
-                injectable_materials=self._map_injectable_materials(material_num=3)
+                injectable_materials=self._map_injectable_materials(
+                    material_num=3
+                ),
             )
         elif ro_num == 4:
             return RetroOrbitalInjectionInfo(
@@ -2035,7 +2063,9 @@ class MappedLASList:
                 injection_volume=self.aind_ro_vol4,
                 tube_label=self.aind_ro_tube4,
                 box_label=self.aind_ro_box4,
-                injectable_materials=self._map_injectable_materials(material_num=4)
+                injectable_materials=self._map_injectable_materials(
+                    material_num=4
+                ),
             )
         elif ro_num == 5:
             return RetroOrbitalInjectionInfo(
@@ -2044,20 +2074,21 @@ class MappedLASList:
                 injection_volume=self.aind_ro_vol5,
                 tube_label=self.aind_ro_tube5,
                 box_label=self.aind_ro_box5,
-                injectable_materials=self._map_injectable_materials(material_num=5)
+                injectable_materials=self._map_injectable_materials(
+                    material_num=5
+                ),
             )
 
     @staticmethod
     def map_viral_materials(injectable_materials: List[InjectableMaterial]):
         """Maps injectable material to viral material"""
-        # TODO: map rest of injectable material info in case tars gets no response?
+        # TODO: map injectable material info in case tars gets no response
         viral_materials = []
         for material in injectable_materials:
             # Use prep_lot_id in name for tars query
             viral_materials.append(
                 ViralMaterial.model_construct(
-                    name=material.prep_lot_id,
-                    titer=material.titer
+                    name=material.prep_lot_id, titer=material.titer
                 )
             )
         return viral_materials
@@ -2075,16 +2106,15 @@ class MappedLASList:
         if self.has_ro_injection():
             # Check if there are ro injections in 1 thorugh 5
             for ro_num in range(1, 6):
-                ro_injection_info = self.map_ro_injection_info(ro_num=ro_num)
-                if ro_injection_info.animal_id == subject_id:
+                ro_info = self.map_ro_injection_info(ro_num=ro_num)
+                if ro_info.animal_id == subject_id:
                     injection_materials = self.map_viral_materials(
-                        injectable_materials=ro_injection_info.injectable_materials
+                        injectable_materials=ro_info.injectable_materials
                     )
                     ro_injection = RetroOrbitalInjection.model_construct(
-                        injection_volume=ro_injection_info.injection_volume,
-                        injection_eye=ro_injection_info.injection_eye,
-                        injection_materials=injection_materials
-
+                        injection_volume=ro_info.injection_volume,
+                        injection_eye=ro_info.injection_eye,
+                        injection_materials=injection_materials,
                     )
                     subject_procedures.append(ro_injection)
         return Surgery.model_construct(
