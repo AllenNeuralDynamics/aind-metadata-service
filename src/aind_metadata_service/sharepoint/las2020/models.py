@@ -535,6 +535,13 @@ class Protocol(Enum, metaclass=OptionalEnumMeta):
     N_2405_ANALYSIS_OF_INTEGR = (
         "2405 - Analysis of Integrated Neuronal Phenotypes"
     )
+    # Adding these manually because they were not generated correctly
+    N_2406_CHARACTERIZATION_OF_MOUS = (
+        "2406 - Characterization of mouse and viral genetic tools"
+    )
+    N_2412_CIRCUIT_TRACING_AND_OPT = (
+        "2412 - Circuit tracing and optical physiology of mouse cortex"
+    )
 
 
 class Reqpro1(Enum, metaclass=OptionalEnumMeta):
