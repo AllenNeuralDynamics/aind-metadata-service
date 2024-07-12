@@ -3,11 +3,21 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal, DecimalException
 from enum import Enum
-from typing import Any, Optional
+from typing import Any, Optional, List
 
-from aind_data_schema.core.procedures import Surgery, IntraperitonealInjection
+from aind_data_schema.core.procedures import (
+    Surgery,
+    Side,
+    IntraperitonealInjection,
+    RetroOrbitalInjection,
+    ViralMaterial,
+)
 
-from aind_metadata_service.sharepoint.las2020.models import LASList, Doseroute
+from aind_metadata_service.sharepoint.las2020.models import (
+    LASList,
+    Doseroute,
+    Rosop,
+)
 
 
 class IacucProtocol(Enum):
@@ -44,6 +54,8 @@ class IacucProtocol(Enum):
     N_2401 = "2401"
     N_2402 = "2402"
     N_2405 = "2405"
+    N_2406 = "2406"
+    N_2412 = "2412"
 
 
 @dataclass
@@ -53,6 +65,31 @@ class RequestedProcedureInfo:
     procedure: Optional[str] = None
     preferred_age: Optional[Decimal] = None
     preferred_date: Optional[date] = None
+
+
+@dataclass
+class InjectableMaterial:
+    """Container for injectable material information"""
+
+    substance: Optional[str] = None
+    prep_lot_id: Optional[str] = None
+    genome_copy: Optional[str] = None
+    virus_volume: Optional[Decimal] = None
+    titer: Optional[Decimal] = None
+
+
+@dataclass
+class RetroOrbitalInjectionInfo:
+    """Container for ro injection information"""
+
+    # TODO: support "either for eye"
+    ro_sop: Optional[Rosop] = None
+    animal_id: Optional[str] = None
+    injection_eye: Optional[Side] = None
+    injection_volume: Optional[Decimal] = None
+    tube_label: Optional[str] = None
+    box_label: Optional[str] = None
+    injectable_materials: Optional[List[InjectableMaterial]] = None
 
 
 class LASProcedure(Enum):
@@ -991,6 +1028,12 @@ class MappedLASList:
                 self._las.protocol.N_2405_ANALYSIS_OF_INTEGR: (
                     IacucProtocol.N_2405.value
                 ),
+                self._las.protocol.N_2406_CHARACTERIZATION_OF_MOUS: (
+                    IacucProtocol.N_2406.value
+                ),
+                self._las.protocol.N_2412_CIRCUIT_TRACING_AND_OPT: (
+                    IacucProtocol.N_2412.value
+                ),
             }.get(self._las.protocol, None)
         )
 
@@ -1170,8 +1213,8 @@ class MappedLASList:
             if self._las.ro_eye1 is None
             else {
                 self._las.ro_eye1.BEHIND_EITHER: None,
-                self._las.ro_eye1.BEHIND_RIGHT: None,
-                self._las.ro_eye1.BEHIND_LEFT: None,
+                self._las.ro_eye1.BEHIND_RIGHT: Side.RIGHT,
+                self._las.ro_eye1.BEHIND_LEFT: Side.LEFT,
             }.get(self._las.ro_eye1, None)
         )
 
@@ -1183,8 +1226,8 @@ class MappedLASList:
             if self._las.ro_eye2 is None
             else {
                 self._las.ro_eye2.BEHIND_EITHER: None,
-                self._las.ro_eye2.BEHIND_RIGHT: None,
-                self._las.ro_eye2.BEHIND_LEFT: None,
+                self._las.ro_eye2.BEHIND_RIGHT: Side.RIGHT,
+                self._las.ro_eye2.BEHIND_LEFT: Side.LEFT,
             }.get(self._las.ro_eye2, None)
         )
 
@@ -1196,8 +1239,8 @@ class MappedLASList:
             if self._las.ro_eye3 is None
             else {
                 self._las.ro_eye3.BEHIND_EITHER: None,
-                self._las.ro_eye3.BEHIND_RIGHT: None,
-                self._las.ro_eye3.BEHIND_LEFT: None,
+                self._las.ro_eye3.BEHIND_RIGHT: Side.RIGHT,
+                self._las.ro_eye3.BEHIND_LEFT: Side.LEFT,
             }.get(self._las.ro_eye3, None)
         )
 
@@ -1209,8 +1252,8 @@ class MappedLASList:
             if self._las.ro_eye4 is None
             else {
                 self._las.ro_eye4.BEHIND_EITHER: None,
-                self._las.ro_eye4.BEHIND_RIGHT: None,
-                self._las.ro_eye4.BEHIND_LEFT: None,
+                self._las.ro_eye4.BEHIND_RIGHT: Side.RIGHT,
+                self._las.ro_eye4.BEHIND_LEFT: Side.LEFT,
             }.get(self._las.ro_eye4, None)
         )
 
@@ -1222,8 +1265,8 @@ class MappedLASList:
             if self._las.ro_eye5 is None
             else {
                 self._las.ro_eye5.BEHIND_EITHER: None,
-                self._las.ro_eye5.BEHIND_RIGHT: None,
-                self._las.ro_eye5.BEHIND_LEFT: None,
+                self._las.ro_eye5.BEHIND_RIGHT: Side.RIGHT,
+                self._las.ro_eye5.BEHIND_LEFT: Side.LEFT,
             }.get(self._las.ro_eye5, None)
         )
 
@@ -1687,39 +1730,39 @@ class MappedLASList:
         return self._las.ro_tube5
 
     @property
-    def aind_ro_vol1(self) -> Optional[str]:
+    def aind_ro_vol1(self) -> Optional[Decimal]:
         """Maps ro_vol1 to aind model"""
-        return self._las.ro_vol1
+        return self._parse_basic_decimal_str(self._las.ro_vol1)
 
     @property
-    def aind_ro_vol2(self) -> Optional[str]:
+    def aind_ro_vol2(self) -> Optional[Decimal]:
         """Maps ro_vol2 to aind model"""
-        return self._las.ro_vol2
+        return self._parse_basic_decimal_str(self._las.ro_vol2)
 
     @property
-    def aind_ro_vol3(self) -> Optional[str]:
+    def aind_ro_vol3(self) -> Optional[Decimal]:
         """Maps ro_vol3 to aind model"""
-        return self._las.ro_vol3
+        return self._parse_basic_decimal_str(self._las.ro_vol3)
 
     @property
-    def aind_ro_vol4(self) -> Optional[str]:
+    def aind_ro_vol4(self) -> Optional[Decimal]:
         """Maps ro_vol4 to aind model"""
-        return self._las.ro_vol4
+        return self._parse_basic_decimal_str(self._las.ro_vol4)
 
     @property
-    def aind_ro_vol5(self) -> Optional[str]:
+    def aind_ro_vol5(self) -> Optional[Decimal]:
         """Maps ro_vol5 to aind model"""
-        return self._las.ro_vol5
+        return self._parse_basic_decimal_str(self._las.ro_vol5)
 
     @property
-    def aind_ro_vol_v1(self) -> Optional[str]:
+    def aind_ro_vol_v1(self) -> Optional[Decimal]:
         """Maps ro_vol_v1 to aind model"""
-        return self._las.ro_vol_v1
+        return self._parse_basic_decimal_str(self._las.ro_vol_v1)
 
     @property
     def aind_ro_vol_v1b(self) -> Optional[str]:
         """Maps ro_vol_v1b to aind model"""
-        return self._las.ro_vol_v1b
+        return self._parse_basic_decimal_str(self._las.ro_vol_v1b)
 
     @property
     def aind_ro_vol_v1c(self) -> Optional[str]:
@@ -1916,16 +1959,142 @@ class MappedLASList:
         )
 
     def has_ip_injection(self) -> bool:
-        """Is there a IP injection procedure?"""
+        """Is there an IP injection procedure?"""
         return (
             LASProcedure.DOSING
             in [self.aind_req_pro1, self.aind_req_pro2, self.aind_req_pro3]
             and self.aind_dose_route == Doseroute.INTRAPERITONEAL_IP
         )
 
-    def get_procedure(self) -> Surgery:
+    def has_ro_injection(self) -> bool:
+        """Is there a retro-orbital injection?"""
+        return LASProcedure.RETRO_ORBITAL_INJECTION in [
+            self.aind_req_pro1,
+            self.aind_req_pro2,
+            self.aind_req_pro3,
+        ]
+
+    def _map_injectable_materials(
+        self, material_num: int
+    ) -> List[InjectableMaterial]:
+        """
+        Maps injectable materials based on the material_num.
+        Parameters
+        ----------
+        material_num : int
+            The ro injection substance number
+        Returns
+        -------
+            List[InjectableMaterial]
+        """
+        materials = []
+        suffixes = ["", "b", "c", "d"]
+        for suffix in suffixes:
+            material_attr = f"aind_ro_sub{material_num}{suffix}"
+            if getattr(self, material_attr, None):
+                materials.append(
+                    InjectableMaterial(
+                        substance=getattr(self, material_attr),
+                        prep_lot_id=getattr(
+                            self, f"aind_ro_lot{material_num}{suffix}", None
+                        ),
+                        genome_copy=getattr(
+                            self, f"aind_ro_gc{material_num}{suffix}", None
+                        ),
+                        titer=getattr(
+                            self, f"aind_ro_tite{material_num}{suffix}", None
+                        ),
+                        virus_volume=getattr(
+                            self, f"aind_ro_vol_v{material_num}{suffix}", None
+                        ),
+                    )
+                )
+        return materials
+
+    def map_ro_injection_info(self, ro_num: int) -> RetroOrbitalInjectionInfo:
+        """
+        Compiles retro-orbital injection information from LAS data
+        Parameters
+        ----------
+        ro_num : int
+             Retro orbital injection number
+        Returns
+        -------
+        RetroOrbitalInjectionInfo
+        class RetroOrbitalInjectionInfo:
+        """
+        if ro_num == 1:
+            return RetroOrbitalInjectionInfo(
+                animal_id=self.aind_n_roid1,
+                injection_eye=self.aind_ro_eye1,
+                injection_volume=self.aind_ro_vol1,
+                tube_label=self.aind_ro_tube1,
+                box_label=self.aind_ro_box1,
+                injectable_materials=self._map_injectable_materials(
+                    material_num=1
+                ),
+            )
+        elif ro_num == 2:
+            return RetroOrbitalInjectionInfo(
+                animal_id=self.aind_n_roid2,
+                injection_eye=self.aind_ro_eye2,
+                injection_volume=self.aind_ro_vol2,
+                tube_label=self.aind_ro_tube2,
+                box_label=self.aind_ro_box2,
+                injectable_materials=self._map_injectable_materials(
+                    material_num=2
+                ),
+            )
+        elif ro_num == 3:
+            return RetroOrbitalInjectionInfo(
+                animal_id=self.aind_n_roid3,
+                injection_eye=self.aind_ro_eye3,
+                injection_volume=self.aind_ro_vol3,
+                tube_label=self.aind_ro_tube3,
+                box_label=self.aind_ro_box3,
+                injectable_materials=self._map_injectable_materials(
+                    material_num=3
+                ),
+            )
+        elif ro_num == 4:
+            return RetroOrbitalInjectionInfo(
+                animal_id=self.aind_n_roid4,
+                injection_eye=self.aind_ro_eye4,
+                injection_volume=self.aind_ro_vol4,
+                tube_label=self.aind_ro_tube4,
+                box_label=self.aind_ro_box4,
+                injectable_materials=self._map_injectable_materials(
+                    material_num=4
+                ),
+            )
+        elif ro_num == 5:
+            return RetroOrbitalInjectionInfo(
+                animal_id=self.aind_n_roid5,
+                injection_eye=self.aind_ro_eye5,
+                injection_volume=self.aind_ro_vol5,
+                tube_label=self.aind_ro_tube5,
+                box_label=self.aind_ro_box5,
+                injectable_materials=self._map_injectable_materials(
+                    material_num=5
+                ),
+            )
+
+    @staticmethod
+    def map_viral_materials(injectable_materials: List[InjectableMaterial]):
+        """Maps injectable material to viral material"""
+        # TODO: map injectable material info in case tars gets no response
+        viral_materials = []
+        for material in injectable_materials:
+            # Use prep_lot_id in name for tars query
+            viral_materials.append(
+                ViralMaterial.model_construct(
+                    name=material.prep_lot_id, titer=material.titer
+                )
+            )
+        return viral_materials
+
+    def get_procedure(self, subject_id) -> Surgery:
         """Return Surgery as best as possible from a record."""
-        # TODO: add RO Injection to procedures
         subject_procedures = []
         if self.has_ip_injection():
             # TODO: map injection_materials, protocol_id
@@ -1934,6 +2103,20 @@ class MappedLASList:
                 injection_duration=self.aind_doseduration,
             )
             subject_procedures.append(ip_injection)
+        if self.has_ro_injection():
+            # Check if there are ro injections in 1 thorugh 5
+            for ro_num in range(1, 6):
+                ro_info = self.map_ro_injection_info(ro_num=ro_num)
+                if ro_info.animal_id == subject_id:
+                    injection_materials = self.map_viral_materials(
+                        injectable_materials=ro_info.injectable_materials
+                    )
+                    ro_injection = RetroOrbitalInjection.model_construct(
+                        injection_volume=ro_info.injection_volume,
+                        injection_eye=ro_info.injection_eye,
+                        injection_materials=injection_materials,
+                    )
+                    subject_procedures.append(ro_injection)
         return Surgery.model_construct(
             experimenter_full_name=self.aind_author_id,
             iacuc_protocol=self.aind_protocol,

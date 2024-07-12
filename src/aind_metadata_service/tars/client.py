@@ -75,7 +75,7 @@ class TarsClient:
            Prep lot number used to query ViralPrepLot endpoint.
         """
         headers = self._headers
-        if len(prep_lot_number) > 0:
+        if prep_lot_number and len(prep_lot_number) > 0:
             query = (
                 f"{self.resource}/api/v1/ViralPrepLots"
                 f"?order=1&orderBy=id"
