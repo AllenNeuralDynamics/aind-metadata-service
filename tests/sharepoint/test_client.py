@@ -262,14 +262,21 @@ class TestSharepointClient(unittest.TestCase):
         )
         mock_list_view = MagicMock()
         inner_mock.web.lists.get_by_title.return_value = mock_list_view
-        mock_list_items = MagicMock()
-        mock_list_view.get_items.return_value = mock_list_items
+        mock_l_items = MagicMock()
+
         list_item_2020_1 = self.list_items_2020[0][0]
         mock_list_item2020 = MagicMock()
         mock_list_item2020.to_json.return_value = list_item_2020_1
-        mock_list_items.filter.side_effect = [
+
+        mock_get = MagicMock()
+        mock_l_items.paged.return_value.top.return_value.get.return_value = (
+            mock_get
+        )
+
+        mock_get.filter.return_value.execute_query.side_effect = [
             [mock_list_item2020],
         ]
+        mock_list_view.items = mock_l_items
 
         client = SharePointClient(
             nsb_site_url="some_url",
@@ -282,7 +289,7 @@ class TestSharepointClient(unittest.TestCase):
         )
         expected_subject_procedures = [self.list_items_2020[0][1]]
         response2020 = client.get_procedure_info(
-            subject_id="12345", list_title="some_list_title2020"
+            subject_id="000000", list_title="some_list_title2020"
         )
         json_response = response2020.map_to_json_response()
         actual_content = json.loads(json_response.body.decode("utf-8"))
