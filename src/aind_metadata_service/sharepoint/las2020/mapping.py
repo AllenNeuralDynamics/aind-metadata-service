@@ -3,19 +3,19 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal, DecimalException
 from enum import Enum
-from typing import Any, Optional, List
+from typing import Any, List, Optional
 
 from aind_data_schema.core.procedures import (
-    Surgery,
-    Side,
     IntraperitonealInjection,
     RetroOrbitalInjection,
+    Side,
+    Surgery,
     ViralMaterial,
 )
 
 from aind_metadata_service.sharepoint.las2020.models import (
-    LASList,
     Doseroute,
+    LASList,
     Rosop,
 )
 
