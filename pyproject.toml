@@ -17,15 +17,13 @@ readme = "README.md"
 dynamic = ["version"]
 
 dependencies = [
-    'aind-metadata-mapper==0.6.1',
     'pydantic-settings>=2.0',
-    'pydantic<=2.6.4'
+    'pydantic>=2.7'
 ]
 
 [project.optional-dependencies]
 dev = [
     'aind-metadata-service[server]',
-    'aind-metadata-service[client]',
     'black',
     'coverage',
     'flake8',
@@ -35,18 +33,10 @@ dev = [
 ]
 
 server = [
+    'boto3',
     'pyodbc',
-    'office365-rest-python-client==2.4.1',
-    'smartsheet-python-sdk==3.0.2',
     'fastapi',
     'uvicorn[standard]',
-    'python-dateutil',
-    'slims-python-api==6.8.0',
-    'azure-identity==1.15.0'
-]
-
-client = [
-    'requests'
 ]
 
 [tool.setuptools.packages.find]

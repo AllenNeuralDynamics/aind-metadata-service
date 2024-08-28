@@ -118,5 +118,5 @@ class LabTracksQueries:
             "    ON AC.GROUP_ID = G.ID"
             "    LEFT OUTER JOIN GROUPS "
             "    ON MATERNAL.GROUP_ID = GROUPS.ID"
-            " WHERE AC.ID = ?;"
+            " WHERE AC.ID = %s;"
         )

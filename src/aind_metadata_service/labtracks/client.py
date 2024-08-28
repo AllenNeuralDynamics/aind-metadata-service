@@ -29,7 +29,6 @@ from aind_metadata_service.labtracks.query_builder import (
     SubjectQueryColumns,
     TaskSetQueryColumns,
 )
-from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 
 
 class LabTracksSettings(BaseSettings):
