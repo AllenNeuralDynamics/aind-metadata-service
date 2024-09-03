@@ -23,7 +23,7 @@ from aind_data_schema.core.procedures import (
     ViralMaterial,
 )
 from aind_data_schema.core.subject import Sex
-from aind_data_schema.models.devices import FiberProbe
+from aind_data_schema.components.devices import FiberProbe
 
 from aind_metadata_service.sharepoint.nsb2019.models import NSBList
 from aind_metadata_service.sharepoint.nsb2019.models import (

@@ -5,7 +5,7 @@ import logging
 from typing import List, Optional, Union
 
 from aind_data_schema.core.data_description import Funding
-from aind_data_schema.models.organizations import Organization
+from aind_data_schema_models.organizations import Organization
 from pydantic import ValidationError
 from starlette.responses import JSONResponse
 

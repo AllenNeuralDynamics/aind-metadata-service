@@ -952,6 +952,9 @@ class Lightcycle(Enum, metaclass=OptionalEnumMeta):
 
     REVERSE_LIGHT_CYCLE_9PM_T = "Reverse Light Cycle (9pm to 9am light)"
     STANDARD_LIGHT_CYCLE_6AM = "Standard Light Cycle (6am to 8pm light)"
+    # ADDED FIELDS FROM OLDER ENTRIES
+    REVERSE_9PM_TO_9AM = "Reverse (9pm to 9am)"
+    STANDARD_6AM_TO_8PM = "Standard (6am to 8pm)"
 
 
 class LimsRequired(Enum, metaclass=OptionalEnumMeta):
@@ -1445,6 +1448,7 @@ class Projectid(Enum, metaclass=OptionalEnumMeta):
     N_1210101510_MSP_FALCONWO = "121-01-015-10 MSP Falconwood"
     N_1210199910_MSP_CROSS_PR = "121-01-999-10 MSP Cross Program 10YP"
     N_1210199910_MSP_CROS_001 = "121-01-999-10 MSP Cross Program  Scientific"
+    N_1210101210_LEARNING_MFISH = "121-01-012-10 Learning mFISH"
 
 
 class Sex(Enum, metaclass=OptionalEnumMeta):

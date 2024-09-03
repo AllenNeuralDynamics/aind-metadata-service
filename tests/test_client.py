@@ -16,7 +16,7 @@ from aind_data_schema.core.subject import (
     Species,
     Subject,
 )
-from aind_data_schema.models.organizations import Organization
+from aind_data_schema_models.organizations import Organization
 
 from aind_metadata_service.client import AindMetadataServiceClient
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
