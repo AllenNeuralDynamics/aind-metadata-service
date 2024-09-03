@@ -3,9 +3,9 @@ careful modifying the contents."""
 
 from datetime import datetime
 from enum import Enum, EnumMeta
-from typing import Optional
+from typing import Optional, get_origin, get_args, Union
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Extra, Field, model_validator
 
 
 class OptionalEnumMeta(EnumMeta):
@@ -349,6 +349,9 @@ class ImplantIdCoverslipType(Enum, metaclass=OptionalEnumMeta):
         "5mm stacked coverslip (with silicone coating for Neuropixel)"
     )
     SELECT = "Select..."
+    # note: added removed options
+    TS_04 = "TS-04"
+    TS_05 = "TS-05"
 
 
 class Inj1Angle(Enum, metaclass=OptionalEnumMeta):

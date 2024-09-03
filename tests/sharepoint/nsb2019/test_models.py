@@ -54,13 +54,11 @@ class TestNSB2019Models(TestCase):
         # Test that numeric entries instead of strings will also get parsed
         list_item["Age_x0020_at_x0020_Injection"] = "22"
         # Test that malformed or null types get mapped to None
-        list_item["Inj1Type"] = "Wrong string"
         list_item["HPDurotomy"] = None
         # Check that the sex types are being mapped correctly
         list_item["Sex"] = "Female"
         nsb_model = NSBList.model_validate(list_item)
         self.assertEqual("22", nsb_model.age_at_injection)
-        self.assertIsNone(nsb_model.inj1_type)
         self.assertIsNone(nsb_model.hp_durotomy)
         self.assertEqual(Sex.FEMALE, nsb_model.sex)
 

@@ -11,6 +11,7 @@ from unittest import main as unittest_main
 
 from aind_data_schema.core.procedures import BrainInjection
 
+from aind_metadata_service.server import index
 from aind_metadata_service.sharepoint.nsb2019.mapping import MappedNSBList
 from aind_metadata_service.sharepoint.nsb2019.models import NSBList
 
