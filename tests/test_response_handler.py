@@ -2,7 +2,6 @@
 
 import json
 import os
-import pickle
 import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -11,7 +10,6 @@ from aind_data_schema.core.procedures import Procedures
 from aind_data_schema.core.subject import BreedingInfo, Species, Subject
 from aind_data_schema.models.organizations import Organization
 from aind_metadata_mapper.core import JobResponse
-from fastapi import Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
@@ -102,7 +100,6 @@ class TestResponseHandler(unittest.TestCase):
             status_code=StatusCodes.DB_RESPONDED, aind_models=[model]
         )
         actual_json = model_response.map_to_json_response()
-        actual_pickled = model_response.map_to_pickled_response()
 
         model_json = jsonable_encoder(json.loads(model.model_dump_json()))
         expected_json = JSONResponse(
@@ -115,22 +112,9 @@ class TestResponseHandler(unittest.TestCase):
             ),
         )
 
-        expected_pickled = Response(
-            status_code=200,
-            content=pickle.dumps(model),
-            media_type="application/octet-stream",
-        )
-
         self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
         self.assertEqual(expected_json.status_code, actual_json.status_code)
         self.assertEqual(expected_json.body, actual_json.body)
-        self.assertEqual(
-            expected_pickled.status_code, actual_pickled.status_code
-        )
-        self.assertEqual(
-            pickle.loads(expected_pickled.body),
-            pickle.loads(actual_pickled.body),
-        )
 
     def test_invalid_model(self):
         """Test model_response with invalid model."""
@@ -139,7 +123,6 @@ class TestResponseHandler(unittest.TestCase):
             status_code=StatusCodes.DB_RESPONDED, aind_models=[model]
         )
         actual_json = model_response.map_to_json_response()
-        actual_pickled = model_response.map_to_pickled_response()
 
         validation_error = None
         try:
@@ -157,23 +140,9 @@ class TestResponseHandler(unittest.TestCase):
                 }
             ),
         )
-        expected_pickled = Response(
-            status_code=406,
-            content=pickle.dumps(model),
-            media_type="application/octet-stream",
-        )
-
         self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
         self.assertEqual(expected_json.status_code, actual_json.status_code)
         self.assertEqual(expected_json.body, actual_json.body)
-
-        self.assertEqual(
-            expected_pickled.status_code, actual_pickled.status_code
-        )
-        self.assertEqual(
-            pickle.loads(expected_pickled.body),
-            pickle.loads(actual_pickled.body),
-        )
 
     @patch("aind_metadata_service.response_handler.json.loads")
     @patch("aind_metadata_service.response_handler.Subject.model_validate")
@@ -209,7 +178,6 @@ class TestResponseHandler(unittest.TestCase):
             status_code=StatusCodes.DB_RESPONDED, aind_models=[model]
         )
         actual_json = model_response.map_to_json_response(validate=False)
-        actual_pickled = model_response.map_to_pickled_response()
         model_json = jsonable_encoder(model)
         expected_json = JSONResponse(
             status_code=422,
@@ -221,23 +189,10 @@ class TestResponseHandler(unittest.TestCase):
                 }
             ),
         )
-        expected_pickled = Response(
-            status_code=406,
-            content=pickle.dumps(model),
-            media_type="application/octet-stream",
-        )
 
         self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
         self.assertEqual(expected_json.status_code, actual_json.status_code)
         self.assertEqual(expected_json.body, actual_json.body)
-
-        self.assertEqual(
-            expected_pickled.status_code, actual_pickled.status_code
-        )
-        self.assertEqual(
-            pickle.loads(expected_pickled.body),
-            pickle.loads(actual_pickled.body),
-        )
 
     def test_multiple_items_response(self):
         """Test multiple item response"""
@@ -246,7 +201,6 @@ class TestResponseHandler(unittest.TestCase):
             status_code=StatusCodes.DB_RESPONDED, aind_models=models
         )
         actual_json = model_response.map_to_json_response()
-        actual_pickled = model_response.map_to_pickled_response()
 
         models_json = [
             jsonable_encoder(json.loads(model.model_dump_json()))
@@ -261,23 +215,10 @@ class TestResponseHandler(unittest.TestCase):
                 }
             ),
         )
-        expected_pickled = Response(
-            status_code=300,
-            content=pickle.dumps(models),
-            media_type="application/octet-stream",
-        )
 
         self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
         self.assertEqual(expected_json.status_code, actual_json.status_code)
         self.assertEqual(expected_json.body, actual_json.body)
-
-        self.assertEqual(
-            expected_pickled.status_code, actual_pickled.status_code
-        )
-        self.assertEqual(
-            pickle.loads(expected_pickled.body),
-            pickle.loads(actual_pickled.body),
-        )
 
     def test_nodata_error(self):
         """Test no data error response"""
@@ -285,7 +226,6 @@ class TestResponseHandler(unittest.TestCase):
             status_code=StatusCodes.DB_RESPONDED, aind_models=[]
         )
         actual_json = model_response.map_to_json_response()
-        actual_pickled = model_response.map_to_pickled_response()
 
         expected_json = JSONResponse(
             status_code=404,
@@ -296,28 +236,14 @@ class TestResponseHandler(unittest.TestCase):
                 }
             ),
         )
-        expected_pickled = Response(
-            status_code=404,
-            content=pickle.dumps(None),
-            media_type="application/octet-stream",
-        )
         self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
         self.assertEqual(expected_json.status_code, actual_json.status_code)
         self.assertEqual(expected_json.body, actual_json.body)
-
-        self.assertEqual(
-            expected_pickled.status_code, actual_pickled.status_code
-        )
-        self.assertEqual(
-            pickle.loads(expected_pickled.body),
-            pickle.loads(actual_pickled.body),
-        )
 
     def test_connection_error(self):
         """Test connection error response"""
         model_response = ModelResponse.connection_error_response()
         actual_json = model_response.map_to_json_response()
-        actual_pickled = model_response.map_to_pickled_response()
 
         expected_json = JSONResponse(
             status_code=503,
@@ -328,30 +254,16 @@ class TestResponseHandler(unittest.TestCase):
                 }
             ),
         )
-        expected_pickled = Response(
-            status_code=503,
-            content=pickle.dumps(None),
-            media_type="application/octet-stream",
-        )
         self.assertEqual(
             StatusCodes.CONNECTION_ERROR, model_response.status_code
         )
         self.assertEqual(expected_json.status_code, actual_json.status_code)
         self.assertEqual(expected_json.body, actual_json.body)
 
-        self.assertEqual(
-            expected_pickled.status_code, actual_pickled.status_code
-        )
-        self.assertEqual(
-            pickle.loads(expected_pickled.body),
-            pickle.loads(actual_pickled.body),
-        )
-
     def test_internal_error(self):
         """Test internal error response"""
         model_response = ModelResponse.internal_server_error_response()
         actual_json = model_response.map_to_json_response()
-        actual_pickled = model_response.map_to_pickled_response()
 
         expected_json = JSONResponse(
             status_code=500,
@@ -362,24 +274,11 @@ class TestResponseHandler(unittest.TestCase):
                 }
             ),
         )
-        expected_pickled = Response(
-            status_code=500,
-            content=pickle.dumps(None),
-            media_type="application/octet-stream",
-        )
         self.assertEqual(
             StatusCodes.INTERNAL_SERVER_ERROR, model_response.status_code
         )
         self.assertEqual(expected_json.status_code, actual_json.status_code)
         self.assertEqual(expected_json.body, actual_json.body)
-
-        self.assertEqual(
-            expected_pickled.status_code, actual_pickled.status_code
-        )
-        self.assertEqual(
-            pickle.loads(expected_pickled.body),
-            pickle.loads(actual_pickled.body),
-        )
 
 
 class TestEtlResponse(unittest.TestCase):
