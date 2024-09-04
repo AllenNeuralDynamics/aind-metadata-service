@@ -99,7 +99,7 @@ class TestSmartsheetFundingClient(unittest.TestCase):
         model_response = mapper.get_model_response()
         expected_models = [
             Funding.model_construct(
-                funder=None,
+                funder="Some Institute",
                 grant_number=None,
                 fundee=("person.two@acme.org, J Smith, John Doe II"),
             )
