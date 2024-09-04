@@ -3,9 +3,9 @@ careful modifying the contents."""
 
 from datetime import datetime
 from enum import Enum, EnumMeta
-from typing import Optional, get_origin, get_args, Union
+from typing import Optional
 
-from pydantic import BaseModel, Extra, Field, model_validator
+from pydantic import BaseModel, Extra, Field
 
 
 class OptionalEnumMeta(EnumMeta):

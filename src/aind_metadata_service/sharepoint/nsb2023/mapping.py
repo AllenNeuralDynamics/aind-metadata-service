@@ -26,7 +26,10 @@ from aind_data_schema.core.procedures import (
 from aind_data_schema.core.subject import Sex
 from aind_data_schema.components.devices import FiberProbe
 
-from aind_metadata_service.sharepoint.nsb2023.models import NSBList, WindowPlacment
+from aind_metadata_service.sharepoint.nsb2023.models import (
+    NSBList,
+    WindowPlacment,
+)
 from aind_metadata_service.sharepoint.nsb2023.models import (
     Procedure as NSBProcedure,
 )
