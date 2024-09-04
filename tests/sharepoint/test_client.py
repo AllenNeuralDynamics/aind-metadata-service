@@ -345,10 +345,10 @@ class TestSharepointClient(unittest.TestCase):
         response2019 = client.get_procedure_info(
             subject_id="12345", list_title="some_list_title2019"
         )
-        response2019_empty = client.get_procedure_info(
-            subject_id="12345", list_title="some_list_title2019"
+        response2019_empty = ModelResponse(
+            aind_models=[],
+            status_code=StatusCodes.DB_RESPONDED
         )
-        response2019_empty.aind_models = []
 
         expected_subject_procedures_left = self.list_items_2019[0][1]
 
