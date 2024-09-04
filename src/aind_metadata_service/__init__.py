@@ -1,3 +1,3 @@
 """REST service to retrieve metadata from databases."""
 
-__version__ = "0.14.12"
+__version__ = "0.14.13"
