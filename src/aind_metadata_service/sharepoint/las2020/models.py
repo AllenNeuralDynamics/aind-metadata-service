@@ -11,12 +11,14 @@ from pydantic import BaseModel, Extra, Field
 class OptionalEnumMeta(EnumMeta):
     """Return None if constructing from a value not in members."""
 
-    def __call__(cls, value, *args, **kw):
-        """Return none if value not in members. Else return enum."""
-        if value in [m.value for m in cls.__members__.values()]:
-            return super().__call__(value, *args, **kw)
-        else:
-            return None
+    # TODO: No longer works bc pydantic 2.7 stricter validation.
+    #  Handle when enum value not in members.
+    # def __call__(cls, value, *args, **kw):
+    #     """Return none if value not in members. Else return enum."""
+    #     if value in [m.value for m in cls.__members__.values()]:
+    #         return super().__call__(value, *args, **kw)
+    #     else:
+    #         return None
 
 
 class Bctype(Enum, metaclass=OptionalEnumMeta):
