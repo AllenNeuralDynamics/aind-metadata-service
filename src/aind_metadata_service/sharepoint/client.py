@@ -268,9 +268,9 @@ class SharePointClient:
             )
         else:
             left_procedures: List[Procedures] = left_model_response.aind_models
-            right_procedures: List[
-                Procedures
-            ] = right_model_response.aind_models
+            right_procedures: List[Procedures] = (
+                right_model_response.aind_models
+            )
             procedures = self._merge_procedures(
                 left_procedures=left_procedures,
                 right_procedures=right_procedures,
