@@ -1,7 +1,6 @@
 """Module to handle responses"""
 
 import json
-import pickle
 from typing import Generic, List, Optional, TypeVar, Union
 
 from aind_data_schema.core.data_description import Funding
@@ -91,7 +90,7 @@ class ModelResponse(Generic[T]):
         )
 
     def _map_data_response(  # noqa: C901
-        self, pickled: bool = False, validate: bool = True
+        self, validate: bool = True
     ) -> Union[Response, JSONResponse]:
         """Map ModelResponse with StatusCodes.DB_RESPONDED to a JSONResponse.
         Perform validations, bypasses validation if flag is set to False."""
@@ -101,12 +100,9 @@ class ModelResponse(Generic[T]):
             message = "No Data Found."
         elif len(self.aind_models) == 1:
             aind_model = self.aind_models[0]
-            if pickled:
-                content_data = aind_model
-            else:
-                content_data = jsonable_encoder(
-                    json.loads(aind_model.model_dump_json())
-                )
+            content_data = jsonable_encoder(
+                json.loads(aind_model.model_dump_json())
+            )
             if validate:
                 validation_error = None
                 try:
@@ -139,24 +135,14 @@ class ModelResponse(Generic[T]):
         else:
             status_code = StatusCodes.MULTIPLE_RESPONSES.value
             message = "Multiple Items Found."
-            if pickled:
-                content_data = self.aind_models
-            else:
-                content_data = [
-                    jsonable_encoder(json.loads(model.model_dump_json()))
-                    for model in self.aind_models
-                ]
-        if pickled:
-            return Response(
-                status_code=status_code,
-                content=pickle.dumps(content_data),
-                media_type="application/octet-stream",
-            )
-        else:
-            return JSONResponse(
-                status_code=status_code,
-                content=({"message": message, "data": content_data}),
-            )
+            content_data = [
+                jsonable_encoder(json.loads(model.model_dump_json()))
+                for model in self.aind_models
+            ]
+        return JSONResponse(
+            status_code=status_code,
+            content=({"message": message, "data": content_data}),
+        )
 
     def map_to_json_response(self, validate: bool = True) -> JSONResponse:
         """Map a ModelResponse to a JSONResponse."""
@@ -172,19 +158,6 @@ class ModelResponse(Generic[T]):
             )
         else:
             response = self._map_data_response(validate=validate)
-        return response
-
-    def map_to_pickled_response(self) -> Response:
-        """Map a ModelResponse to a pickled response."""
-
-        if self.status_code != StatusCodes.DB_RESPONDED:
-            response = Response(
-                status_code=self.status_code.value,
-                content=pickle.dumps(None),
-                media_type="application/octet-stream",
-            )
-        else:
-            response = self._map_data_response(pickled=True)
         return response
 
 
