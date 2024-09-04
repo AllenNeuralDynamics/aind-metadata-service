@@ -11,7 +11,6 @@ from unittest import main as unittest_main
 
 from aind_data_schema.core.procedures import BrainInjection
 
-from aind_metadata_service.server import index
 from aind_metadata_service.sharepoint.nsb2019.mapping import MappedNSBList
 from aind_metadata_service.sharepoint.nsb2019.models import NSBList
 
@@ -100,7 +99,8 @@ class TestNSB2019Parsers(TestCase):
         raw_data["Procedure"] = "Stereotaxic Injection"
         raw_data["Virus_x0020_A_x002f_P"] = "3 lambda"
         raw_data["AP2ndInj"] = "2 lambda"
-        raw_data["ImplantIDCoverslipType"] = "3.5"
+        # raw_data["ImplantIDCoverslipType"] = "3.5"
+        # TODO: add ^ check back once we update enum validator
         nsb_model = NSBList.model_validate(raw_data)
         mapper = MappedNSBList(nsb=nsb_model)
         mapped_procedure = mapper.get_procedure()

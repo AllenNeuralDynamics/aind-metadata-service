@@ -9,7 +9,7 @@
   "AuthorId": 5358,
   "RequestStatus2": "New",
   "Protocol": "2212 - Investigating Brain States",
-  "ProjectID": "Some_Project_ID",
+  "ProjectID": null,
   "AccommodationComment": "This animal will be used for an acute ephys experiment on Friday morning.",
   "ACSFID1": null,
   "ACSFID2": null,

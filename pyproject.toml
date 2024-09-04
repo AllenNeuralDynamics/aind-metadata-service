@@ -19,7 +19,7 @@ dynamic = ["version"]
 dependencies = [
     'pydantic-settings>=2.0',
     'pydantic>=2.7',
-    'aind-metadata-mapper @ git+https://github.com/AllenNeuralDynamics/aind-metadata-mapper@feat-121-upgrade-schema'
+    'aind-metadata-mapper==0.16.1'
 ]
 
 [project.optional-dependencies]
