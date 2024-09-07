@@ -5,7 +5,7 @@ import logging
 from typing import List, Optional, Union
 
 from aind_data_schema.core.data_description import Funding
-from aind_data_schema.models.organizations import Organization
+from aind_data_schema_models.organizations import Organization
 from pydantic import ValidationError
 from starlette.responses import JSONResponse
 
@@ -38,10 +38,7 @@ class FundingMapper(SmartSheetMapper):
         if Organization().name_map.get(input_name) is not None:
             return Organization().name_map.get(input_name)
         else:
-            try:
-                return Organization.from_abbreviation(input_name)
-            except KeyError:
-                return input_name
+            return input_name
 
     def _map_row_to_funding(
         self, row: SheetRow, input_project_name: str

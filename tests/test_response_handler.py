@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 
 from aind_data_schema.core.procedures import Procedures
 from aind_data_schema.core.subject import BreedingInfo, Species, Subject
-from aind_data_schema.models.organizations import Organization
+from aind_data_schema_models.organizations import Organization
 from aind_metadata_mapper.core import JobResponse
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse

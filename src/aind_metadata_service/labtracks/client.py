@@ -20,7 +20,7 @@ from aind_data_schema.core.subject import (
     Species,
     Subject,
 )
-from aind_data_schema.models.organizations import Organization
+from aind_data_schema_models.organizations import Organization
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings
 
