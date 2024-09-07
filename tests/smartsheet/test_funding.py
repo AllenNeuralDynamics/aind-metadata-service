@@ -9,7 +9,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, call, patch
 
 from aind_data_schema.core.data_description import Funding
-from aind_data_schema.models.organizations import Organization
+from aind_data_schema_models.organizations import Organization
 from dateutil import tz
 
 from aind_metadata_service.client import StatusCodes

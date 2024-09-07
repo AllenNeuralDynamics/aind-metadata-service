@@ -10,7 +10,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, call, patch
 
 from aind_data_schema.core.procedures import Perfusion, Surgery
-from aind_data_schema.models.units import MassUnit
+from aind_data_schema_models.units import MassUnit
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
