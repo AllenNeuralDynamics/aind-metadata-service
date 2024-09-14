@@ -2,33 +2,22 @@
 Please be careful modifying the contents."""
 
 from datetime import datetime
-from enum import Enum, EnumMeta
-from typing import Optional
+from enum import Enum
+from typing import Annotated, Optional
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Field, WrapValidator
 
-
-class OptionalEnumMeta(EnumMeta):
-    """Return None if constructing from a value not in members."""
-
-    # TODO: No longer works bc pydantic 2.7 stricter validation.
-    #  Handle when enum value not in members.
-    # def __call__(cls, value, *args, **kw):
-    #     """Return none if value not in members. Else return enum."""
-    #     if value in [m.value for m in cls.__members__.values()]:
-    #         return super().__call__(value, *args, **kw)
-    #     else:
-    #         return None
+from aind_metadata_service.sharepoint.utils import optional_enum
 
 
-class Behavior(Enum, metaclass=OptionalEnumMeta):
+class Behavior(str, Enum):
     """Enum class for Behavior"""
 
     NO = "No"
     YES = "Yes"
 
 
-class BehaviorType(Enum, metaclass=OptionalEnumMeta):
+class BehaviorType(str, Enum):
     """Enum class for BehaviorType"""
 
     AIBS_CHARACTERIZATION_ROT = "AIBS Characterization (Rotarod & Open Field)"
@@ -45,14 +34,14 @@ class BehaviorType(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Burr1FiberType(Enum, metaclass=OptionalEnumMeta):
+class Burr1FiberType(str, Enum):
     """Enum class for Burr1FiberType"""
 
     CUSTOM = "Custom"
     STANDARD_PROVIDED_BY_NSB = "Standard (provided by NSB)"
 
 
-class Burr1Hemisphere(Enum, metaclass=OptionalEnumMeta):
+class Burr1Hemisphere(str, Enum):
     """Enum class for Burr1Hemisphere"""
 
     LEFT = "Left"
@@ -60,7 +49,7 @@ class Burr1Hemisphere(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Burr1InjectionDevice(Enum, metaclass=OptionalEnumMeta):
+class Burr1InjectionDevice(str, Enum):
     """Enum class for Burr1InjectionDevice"""
 
     IONTO_1 = "Ionto #1"
@@ -84,20 +73,20 @@ class Burr1InjectionDevice(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Burr1PerformDuring(Enum, metaclass=OptionalEnumMeta):
+class Burr1PerformDuring(str, Enum):
     """Enum class for Burr1PerformDuring"""
 
     FOLLOW_UP_SURGERY = "Follow up Surgery"
     INITIAL_SURGERY = "Initial Surgery"
 
 
-class Burr1Status(Enum, metaclass=OptionalEnumMeta):
+class Burr1Status(str, Enum):
     """Enum class for Burr1Status"""
 
     COMPLETE = "Complete"
 
 
-class Burr1VirusBiosafteyLevelBsl(Enum, metaclass=OptionalEnumMeta):
+class Burr1VirusBiosafteyLevelBsl(str, Enum):
     """Enum class for Burr1VirusBiosafteyLevelBsl"""
 
     BSL_1_AAV = "BSL 1 - AAV"
@@ -115,14 +104,14 @@ class Burr1VirusBiosafteyLevelBsl(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Burr2FiberType(Enum, metaclass=OptionalEnumMeta):
+class Burr2FiberType(str, Enum):
     """Enum class for Burr2FiberType"""
 
     CUSTOM = "Custom"
     STANDARD_PROVIDED_BY_NSB = "Standard (Provided by NSB)"
 
 
-class Burr2Hemisphere(Enum, metaclass=OptionalEnumMeta):
+class Burr2Hemisphere(str, Enum):
     """Enum class for Burr2Hemisphere"""
 
     LEFT = "Left"
@@ -130,7 +119,7 @@ class Burr2Hemisphere(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Burr2InjectionDevice(Enum, metaclass=OptionalEnumMeta):
+class Burr2InjectionDevice(str, Enum):
     """Enum class for Burr2InjectionDevice"""
 
     IONTO_1 = "Ionto #1"
@@ -154,20 +143,20 @@ class Burr2InjectionDevice(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Burr2PerformDuring(Enum, metaclass=OptionalEnumMeta):
+class Burr2PerformDuring(str, Enum):
     """Enum class for Burr2PerformDuring"""
 
     FOLLOW_UP_SURGERY = "Follow up Surgery"
     INITIAL_SURGERY = "Initial Surgery"
 
 
-class Burr2Status(Enum, metaclass=OptionalEnumMeta):
+class Burr2Status(str, Enum):
     """Enum class for Burr2Status"""
 
     COMPLETE = "Complete"
 
 
-class Burr2VirusBiosafteyLevelBsl(Enum, metaclass=OptionalEnumMeta):
+class Burr2VirusBiosafteyLevelBsl(str, Enum):
     """Enum class for Burr2VirusBiosafteyLevelBsl"""
 
     BSL_1_AAV = "BSL 1 - AAV"
@@ -185,14 +174,14 @@ class Burr2VirusBiosafteyLevelBsl(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Burr3FiberType(Enum, metaclass=OptionalEnumMeta):
+class Burr3FiberType(str, Enum):
     """Enum class for Burr3FiberType"""
 
     CUSTOM = "Custom"
     STANDARD_PROVIDED_BY_NSB = "Standard (Provided by NSB)"
 
 
-class Burr3Hemisphere(Enum, metaclass=OptionalEnumMeta):
+class Burr3Hemisphere(str, Enum):
     """Enum class for Burr3Hemisphere"""
 
     LEFT = "Left"
@@ -200,7 +189,7 @@ class Burr3Hemisphere(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Burr3InjectionDevice(Enum, metaclass=OptionalEnumMeta):
+class Burr3InjectionDevice(str, Enum):
     """Enum class for Burr3InjectionDevice"""
 
     IONTO_1 = "Ionto #1"
@@ -224,20 +213,20 @@ class Burr3InjectionDevice(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Burr3PerformDuring(Enum, metaclass=OptionalEnumMeta):
+class Burr3PerformDuring(str, Enum):
     """Enum class for Burr3PerformDuring"""
 
     FOLLOW_UP_SURGERY = "Follow up Surgery"
     INITIAL_SURGERY = "Initial Surgery"
 
 
-class Burr3Status(Enum, metaclass=OptionalEnumMeta):
+class Burr3Status(str, Enum):
     """Enum class for Burr3Status"""
 
     COMPLETE = "Complete"
 
 
-class Burr3VirusBiosafetyLevelBsl(Enum, metaclass=OptionalEnumMeta):
+class Burr3VirusBiosafetyLevelBsl(str, Enum):
     """Enum class for Burr3VirusBiosafetyLevelBsl"""
 
     BSL_1_AAV = "BSL 1 - AAV"
@@ -255,14 +244,14 @@ class Burr3VirusBiosafetyLevelBsl(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Burr4FiberType(Enum, metaclass=OptionalEnumMeta):
+class Burr4FiberType(str, Enum):
     """Enum class for Burr4FiberType"""
 
     CUSTOM = "Custom"
     STANDARD_PROVIDED_BY_NSB = "Standard (Provided by NSB)"
 
 
-class Burr4Hemisphere(Enum, metaclass=OptionalEnumMeta):
+class Burr4Hemisphere(str, Enum):
     """Enum class for Burr4Hemisphere"""
 
     LEFT = "Left"
@@ -270,7 +259,7 @@ class Burr4Hemisphere(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Burr4InjectionDevice(Enum, metaclass=OptionalEnumMeta):
+class Burr4InjectionDevice(str, Enum):
     """Enum class for Burr4InjectionDevice"""
 
     IONTO_1 = "Ionto #1"
@@ -294,20 +283,20 @@ class Burr4InjectionDevice(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Burr4PerformDuring(Enum, metaclass=OptionalEnumMeta):
+class Burr4PerformDuring(str, Enum):
     """Enum class for Burr4PerformDuring"""
 
     FOLLOW_UP_SURGERY = "Follow up Surgery"
     INITIAL_SURGERY = "Initial Surgery"
 
 
-class Burr4Status(Enum, metaclass=OptionalEnumMeta):
+class Burr4Status(str, Enum):
     """Enum class for Burr4Status"""
 
     COMPLETE = "Complete"
 
 
-class Burr4VirusBiosafteyLevelBsl(Enum, metaclass=OptionalEnumMeta):
+class Burr4VirusBiosafteyLevelBsl(str, Enum):
     """Enum class for Burr4VirusBiosafteyLevelBsl"""
 
     BSL_1_AAV = "BSL 1 - AAV"
@@ -325,14 +314,14 @@ class Burr4VirusBiosafteyLevelBsl(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Burr5FiberType(Enum, metaclass=OptionalEnumMeta):
+class Burr5FiberType(str, Enum):
     """Enum class for Burr5FiberType"""
 
     CUSTOM = "Custom"
     STANDARD_PROVIDED_BY_NSB = "Standard (provided by NSB)"
 
 
-class Burr5Hemisphere(Enum, metaclass=OptionalEnumMeta):
+class Burr5Hemisphere(str, Enum):
     """Enum class for Burr5Hemisphere"""
 
     LEFT = "Left"
@@ -340,7 +329,7 @@ class Burr5Hemisphere(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Burr5InjectionDevice(Enum, metaclass=OptionalEnumMeta):
+class Burr5InjectionDevice(str, Enum):
     """Enum class for Burr5InjectionDevice"""
 
     IONTO_1 = "Ionto #1"
@@ -364,20 +353,20 @@ class Burr5InjectionDevice(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Burr5PerformDuring(Enum, metaclass=OptionalEnumMeta):
+class Burr5PerformDuring(str, Enum):
     """Enum class for Burr5PerformDuring"""
 
     FOLLOW_UP_SURGERY = "Follow up Surgery"
     INITIAL_SURGERY = "Initial Surgery"
 
 
-class Burr5Status(Enum, metaclass=OptionalEnumMeta):
+class Burr5Status(str, Enum):
     """Enum class for Burr5Status"""
 
     COMPLETE = "Complete"
 
 
-class Burr5VirusBiosafteyLevelBsl(Enum, metaclass=OptionalEnumMeta):
+class Burr5VirusBiosafteyLevelBsl(str, Enum):
     """Enum class for Burr5VirusBiosafteyLevelBsl"""
 
     BSL_1_AAV = "BSL 1 - AAV"
@@ -395,14 +384,14 @@ class Burr5VirusBiosafteyLevelBsl(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Burr6FiberType(Enum, metaclass=OptionalEnumMeta):
+class Burr6FiberType(str, Enum):
     """Enum class for Burr6FiberType"""
 
     CUSTOM = "Custom"
     STANDARD_PROVIDED_BY_NSB = "Standard (provided by NSB)"
 
 
-class Burr6Hemisphere(Enum, metaclass=OptionalEnumMeta):
+class Burr6Hemisphere(str, Enum):
     """Enum class for Burr6Hemisphere"""
 
     LEFT = "Left"
@@ -410,7 +399,7 @@ class Burr6Hemisphere(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Burr6InjectionDevice(Enum, metaclass=OptionalEnumMeta):
+class Burr6InjectionDevice(str, Enum):
     """Enum class for Burr6InjectionDevice"""
 
     IONTO_1 = "Ionto #1"
@@ -434,20 +423,20 @@ class Burr6InjectionDevice(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Burr6PerformDuring(Enum, metaclass=OptionalEnumMeta):
+class Burr6PerformDuring(str, Enum):
     """Enum class for Burr6PerformDuring"""
 
     FOLLOW_UP_SURGERY = "Follow up Surgery"
     INITIAL_SURGERY = "Initial Surgery"
 
 
-class Burr6Status(Enum, metaclass=OptionalEnumMeta):
+class Burr6Status(str, Enum):
     """Enum class for Burr6Status"""
 
     COMPLETE = "Complete"
 
 
-class Burr6VirusBiosafteyLevelBsl(Enum, metaclass=OptionalEnumMeta):
+class Burr6VirusBiosafteyLevelBsl(str, Enum):
     """Enum class for Burr6VirusBiosafteyLevelBsl"""
 
     BSL_1_AAV = "BSL 1 - AAV"
@@ -465,7 +454,7 @@ class Burr6VirusBiosafteyLevelBsl(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class BurrHole1(Enum, metaclass=OptionalEnumMeta):
+class BurrHole1(str, Enum):
     """Enum class for BurrHole1"""
 
     FIBER_IMPLANT = "Fiber Implant"
@@ -474,7 +463,7 @@ class BurrHole1(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class BurrHole2(Enum, metaclass=OptionalEnumMeta):
+class BurrHole2(str, Enum):
     """Enum class for BurrHole2"""
 
     FIBER_IMPLANT = "Fiber Implant"
@@ -483,7 +472,7 @@ class BurrHole2(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class BurrHole3(Enum, metaclass=OptionalEnumMeta):
+class BurrHole3(str, Enum):
     """Enum class for BurrHole3"""
 
     FIBER_IMPLANT = "Fiber Implant"
@@ -492,7 +481,7 @@ class BurrHole3(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class BurrHole4(Enum, metaclass=OptionalEnumMeta):
+class BurrHole4(str, Enum):
     """Enum class for BurrHole4"""
 
     FIBER_IMPLANT = "Fiber Implant"
@@ -501,7 +490,7 @@ class BurrHole4(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class BurrHole5(Enum, metaclass=OptionalEnumMeta):
+class BurrHole5(str, Enum):
     """Enum class for BurrHole5"""
 
     FIBER_IMPLANT = "Fiber Implant"
@@ -510,7 +499,7 @@ class BurrHole5(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class BurrHole6(Enum, metaclass=OptionalEnumMeta):
+class BurrHole6(str, Enum):
     """Enum class for BurrHole6"""
 
     FIBER_IMPLANT = "Fiber Implant"
@@ -519,7 +508,7 @@ class BurrHole6(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Contusion(Enum, metaclass=OptionalEnumMeta):
+class Contusion(str, Enum):
     """Enum class for Contusion"""
 
     MILD = "Mild"
@@ -530,14 +519,14 @@ class Contusion(Enum, metaclass=OptionalEnumMeta):
     SEVERE = "Severe"
 
 
-class CraniotomyPerformDuring(Enum, metaclass=OptionalEnumMeta):
+class CraniotomyPerformDuring(str, Enum):
     """Enum class for CraniotomyPerformDuring"""
 
     FOLLOW_UP_SURGERY = "Follow up Surgery"
     INITIAL_SURGERY = "Initial Surgery"
 
 
-class CraniotomyType(Enum, metaclass=OptionalEnumMeta):
+class CraniotomyType(str, Enum):
     """Enum class for CraniotomyType"""
 
     N_3MM = "3mm"
@@ -547,7 +536,7 @@ class CraniotomyType(Enum, metaclass=OptionalEnumMeta):
     WHC_NP = "WHC NP"
 
 
-class Durotomy(Enum, metaclass=OptionalEnumMeta):
+class Durotomy(str, Enum):
     """Enum class for Durotomy"""
 
     COMPLETE = "Complete"
@@ -559,7 +548,7 @@ class Durotomy(Enum, metaclass=OptionalEnumMeta):
     UNINTENTIONAL = "Unintentional"
 
 
-class EdemaSwelling(Enum, metaclass=OptionalEnumMeta):
+class EdemaSwelling(str, Enum):
     """Enum class for EdemaSwelling"""
 
     MILD = "Mild"
@@ -570,7 +559,7 @@ class EdemaSwelling(Enum, metaclass=OptionalEnumMeta):
     SEVERE = "Severe"
 
 
-class FiberImplant1Length(Enum, metaclass=OptionalEnumMeta):
+class FiberImplant1Length(str, Enum):
     """Enum class for FiberImplant1Length"""
 
     N_15_MM = "1.5 mm"
@@ -584,7 +573,7 @@ class FiberImplant1Length(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class FiberImplant2Length(Enum, metaclass=OptionalEnumMeta):
+class FiberImplant2Length(str, Enum):
     """Enum class for FiberImplant2Length"""
 
     N_15_MM = "1.5 mm"
@@ -598,7 +587,7 @@ class FiberImplant2Length(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class FiberImplant3Length(Enum, metaclass=OptionalEnumMeta):
+class FiberImplant3Length(str, Enum):
     """Enum class for FiberImplant3Length"""
 
     N_15_MM = "1.5 mm"
@@ -612,7 +601,7 @@ class FiberImplant3Length(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class FiberImplant4Length(Enum, metaclass=OptionalEnumMeta):
+class FiberImplant4Length(str, Enum):
     """Enum class for FiberImplant4Length"""
 
     N_15_MM = "1.5 mm"
@@ -626,7 +615,7 @@ class FiberImplant4Length(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class FiberImplant5Length(Enum, metaclass=OptionalEnumMeta):
+class FiberImplant5Length(str, Enum):
     """Enum class for FiberImplant5Length"""
 
     N_15_MM = "1.5 mm"
@@ -640,7 +629,7 @@ class FiberImplant5Length(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class FiberImplant6Length(Enum, metaclass=OptionalEnumMeta):
+class FiberImplant6Length(str, Enum):
     """Enum class for FiberImplant6Length"""
 
     N_15_MM = "1.5 mm"
@@ -654,7 +643,7 @@ class FiberImplant6Length(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class FollowUpNanojectNumber(Enum, metaclass=OptionalEnumMeta):
+class FollowUpNanojectNumber(str, Enum):
     """Enum class for FollowUpNanojectNumber"""
 
     NA = "N/A"
@@ -669,7 +658,7 @@ class FollowUpNanojectNumber(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class FollowUpWorkstation(Enum, metaclass=OptionalEnumMeta):
+class FollowUpWorkstation(str, Enum):
     """Enum class for FollowUpWorkstation"""
 
     SELECT = "Select..."
@@ -684,7 +673,7 @@ class FollowUpWorkstation(Enum, metaclass=OptionalEnumMeta):
     SWS_9 = "SWS 9"
 
 
-class FolowUpIontoNumber(Enum, metaclass=OptionalEnumMeta):
+class FolowUpIontoNumber(str, Enum):
     """Enum class for FolowUpIontoNumber"""
 
     IONTO_1 = "Ionto #1"
@@ -702,7 +691,7 @@ class FolowUpIontoNumber(Enum, metaclass=OptionalEnumMeta):
 
 
 # note: had to manually add WHC_NP and WHC_2P for entries pre 6/29/23
-class Headpost(Enum, metaclass=OptionalEnumMeta):
+class Headpost(str, Enum):
     """Enum class for Headpost"""
 
     AI_STRAIGHT_BAR = "AI Straight bar"
@@ -719,14 +708,14 @@ class Headpost(Enum, metaclass=OptionalEnumMeta):
     WHC_2P = "WHC 2P"
 
 
-class HeadpostPerformDuring(Enum, metaclass=OptionalEnumMeta):
+class HeadpostPerformDuring(str, Enum):
     """Enum class for HeadpostPerformDuring"""
 
     FOLLOW_UP_SURGERY = "Follow up Surgery"
     INITIAL_SURGERY = "Initial Surgery"
 
 
-class Hematoma(Enum, metaclass=OptionalEnumMeta):
+class Hematoma(str, Enum):
     """Enum class for Hematoma"""
 
     MILD = "Mild"
@@ -737,7 +726,7 @@ class Hematoma(Enum, metaclass=OptionalEnumMeta):
     SEVERE = "Severe"
 
 
-class IacucProtocol(Enum, metaclass=OptionalEnumMeta):
+class IacucProtocol(str, Enum):
     """Enum class for IacucProtocol"""
 
     N_1906 = "1906"
@@ -771,7 +760,7 @@ class IacucProtocol(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class ImplantIdCoverslipType(Enum, metaclass=OptionalEnumMeta):
+class ImplantIdCoverslipType(str, Enum):
     """Enum class for ImplantIdCoverslipType"""
 
     N_2001 = "2001"
@@ -801,7 +790,7 @@ class ImplantIdCoverslipType(Enum, metaclass=OptionalEnumMeta):
     N_3002_25_PURALUBESYSTANE = "3002 (25% puralube/systane)"
 
 
-class InitialIontoNumber(Enum, metaclass=OptionalEnumMeta):
+class InitialIontoNumber(str, Enum):
     """Enum class for InitialIontoNumber"""
 
     IONTO_1 = "Ionto #1"
@@ -818,7 +807,7 @@ class InitialIontoNumber(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class InitialNanojectNumber(Enum, metaclass=OptionalEnumMeta):
+class InitialNanojectNumber(str, Enum):
     """Enum class for InitialNanojectNumber"""
 
     NA = "N/A"
@@ -833,7 +822,7 @@ class InitialNanojectNumber(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class InitialWorkStation(Enum, metaclass=OptionalEnumMeta):
+class InitialWorkStation(str, Enum):
     """Enum class for InitialWorkStation"""
 
     SELECT = "Select..."
@@ -848,14 +837,14 @@ class InitialWorkStation(Enum, metaclass=OptionalEnumMeta):
     SWS_9 = "SWS 9"
 
 
-class Inj1Retsetting(Enum, metaclass=OptionalEnumMeta):
+class Inj1Retsetting(str, Enum):
     """Enum class for Inj1Retsetting"""
 
     OFF = "Off"
     ON = "On"
 
 
-class Inj1Type(Enum, metaclass=OptionalEnumMeta):
+class Inj1Type(str, Enum):
     """Enum class for Inj1Type"""
 
     IONTOPHORESIS = "Iontophoresis"
@@ -863,14 +852,14 @@ class Inj1Type(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Inj2Retsetting(Enum, metaclass=OptionalEnumMeta):
+class Inj2Retsetting(str, Enum):
     """Enum class for Inj2Retsetting"""
 
     OFF = "Off"
     ON = "On"
 
 
-class Inj2Type(Enum, metaclass=OptionalEnumMeta):
+class Inj2Type(str, Enum):
     """Enum class for Inj2Type"""
 
     IONTOPHORESIS = "Iontophoresis"
@@ -878,14 +867,14 @@ class Inj2Type(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Inj3Retsetting(Enum, metaclass=OptionalEnumMeta):
+class Inj3Retsetting(str, Enum):
     """Enum class for Inj3Retsetting"""
 
     OFF = "Off"
     ON = "On"
 
 
-class Inj3Type(Enum, metaclass=OptionalEnumMeta):
+class Inj3Type(str, Enum):
     """Enum class for Inj3Type"""
 
     IONTOPHORESIS = "Iontophoresis"
@@ -893,14 +882,14 @@ class Inj3Type(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Inj4Retsetting(Enum, metaclass=OptionalEnumMeta):
+class Inj4Retsetting(str, Enum):
     """Enum class for Inj4Retsetting"""
 
     OFF = "Off"
     ON = "On"
 
 
-class Inj4Type(Enum, metaclass=OptionalEnumMeta):
+class Inj4Type(str, Enum):
     """Enum class for Inj4Type"""
 
     IONTOPHORESIS = "Iontophoresis"
@@ -908,14 +897,14 @@ class Inj4Type(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Inj5Retsetting(Enum, metaclass=OptionalEnumMeta):
+class Inj5Retsetting(str, Enum):
     """Enum class for Inj5Retsetting"""
 
     OFF = "Off"
     ON = "On"
 
 
-class Inj5Type(Enum, metaclass=OptionalEnumMeta):
+class Inj5Type(str, Enum):
     """Enum class for Inj5Type"""
 
     IONTOPHORESIS = "Iontophoresis"
@@ -923,14 +912,14 @@ class Inj5Type(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Inj6Retsetting(Enum, metaclass=OptionalEnumMeta):
+class Inj6Retsetting(str, Enum):
     """Enum class for Inj6Retsetting"""
 
     OFF = "Off"
     ON = "On"
 
 
-class Inj6Type(Enum, metaclass=OptionalEnumMeta):
+class Inj6Type(str, Enum):
     """Enum class for Inj6Type"""
 
     IONTOPHORESIS = "Iontophoresis"
@@ -938,7 +927,7 @@ class Inj6Type(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Laceration(Enum, metaclass=OptionalEnumMeta):
+class Laceration(str, Enum):
     """Enum class for Laceration"""
 
     MILD = "Mild"
@@ -949,7 +938,7 @@ class Laceration(Enum, metaclass=OptionalEnumMeta):
     SEVERE = "Severe"
 
 
-class Lightcycle(Enum, metaclass=OptionalEnumMeta):
+class Lightcycle(str, Enum):
     """Enum class for Lightcycle"""
 
     REVERSE_LIGHT_CYCLE_9PM_T = "Reverse Light Cycle (9pm to 9am light)"
@@ -959,7 +948,7 @@ class Lightcycle(Enum, metaclass=OptionalEnumMeta):
     STANDARD_6AM_TO_8PM = "Standard (6am to 8pm)"
 
 
-class LimsRequired(Enum, metaclass=OptionalEnumMeta):
+class LimsRequired(str, Enum):
     """Enum class for LimsRequired"""
 
     NO = "No"
@@ -967,7 +956,7 @@ class LimsRequired(Enum, metaclass=OptionalEnumMeta):
     YES = "Yes"
 
 
-class Limsproject(Enum, metaclass=OptionalEnumMeta):
+class Limsproject(str, Enum):
     """Enum class for Limsproject"""
 
     AINDDISCOVERY = "aind-discovery"
@@ -1157,7 +1146,7 @@ class Limsproject(Enum, metaclass=OptionalEnumMeta):
     S200_C = "S200C"
 
 
-class Limstaskflow(Enum, metaclass=OptionalEnumMeta):
+class Limstaskflow(str, Enum):
     """Enum class for Limstaskflow"""
 
     AIND_EPHYS_PASSIVE_BEHAVI = "AIND Ephys (Passive Behavior)"
@@ -1258,7 +1247,7 @@ class Limstaskflow(Enum, metaclass=OptionalEnumMeta):
     VIS_B_TASK_2_DEVELOPMENT = "VisB Task 2 Development"
 
 
-class OfBurrHoles(Enum, metaclass=OptionalEnumMeta):
+class OfBurrHoles(str, Enum):
     """Enum class for OfBurrHoles"""
 
     N_1 = "1"
@@ -1270,7 +1259,7 @@ class OfBurrHoles(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class PhysiologyType(Enum, metaclass=OptionalEnumMeta):
+class PhysiologyType(str, Enum):
     """Enum class for PhysiologyType"""
 
     NA = "N/A"
@@ -1279,7 +1268,7 @@ class PhysiologyType(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Procedure(Enum, metaclass=OptionalEnumMeta):
+class Procedure(str, Enum):
     """Enum class for Procedure"""
 
     CUSTOM = "Custom"
@@ -1303,7 +1292,7 @@ class Procedure(Enum, metaclass=OptionalEnumMeta):
     WHC_NP = "WHC NP"
 
 
-class ProcedureCategory(Enum, metaclass=OptionalEnumMeta):
+class ProcedureCategory(str, Enum):
     """Enum class for ProcedureCategory"""
 
     CRANIAL_WINDOW = "Cranial Window"
@@ -1316,7 +1305,7 @@ class ProcedureCategory(Enum, metaclass=OptionalEnumMeta):
     TRAINING = "Training"
 
 
-class ProcedureSlots(Enum, metaclass=OptionalEnumMeta):
+class ProcedureSlots(str, Enum):
     """Enum class for ProcedureSlots"""
 
     INITIAL_SURGERY_WITH_FOLL = "Initial surgery with follow up session"
@@ -1324,7 +1313,7 @@ class ProcedureSlots(Enum, metaclass=OptionalEnumMeta):
     SINGLE_SURGICAL_SESSION = "Single surgical session"
 
 
-class Projectid(Enum, metaclass=OptionalEnumMeta):
+class Projectid(str, Enum):
     """Enum class for Projectid"""
 
     AAV_PRODUCTION_1028800410 = "AAV production 102-88-004-10"
@@ -1453,7 +1442,7 @@ class Projectid(Enum, metaclass=OptionalEnumMeta):
     N_1210101210_LEARNING_MFISH = "121-01-012-10 Learning mFISH"
 
 
-class Sex(Enum, metaclass=OptionalEnumMeta):
+class Sex(str, Enum):
     """Enum class for Sex"""
 
     FEMALE = "Female"
@@ -1461,7 +1450,7 @@ class Sex(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class SinusBleed(Enum, metaclass=OptionalEnumMeta):
+class SinusBleed(str, Enum):
     """Enum class for SinusBleed"""
 
     MILD = "Mild"
@@ -1472,7 +1461,7 @@ class SinusBleed(Enum, metaclass=OptionalEnumMeta):
     SEVERE = "Severe"
 
 
-class SurgeryStatus(Enum, metaclass=OptionalEnumMeta):
+class SurgeryStatus(str, Enum):
     """Enum class for SurgeryStatus"""
 
     INJECTION_PENDING = "Injection Pending"
@@ -1484,7 +1473,7 @@ class SurgeryStatus(Enum, metaclass=OptionalEnumMeta):
     UNPLANNED_ACUTE = "Unplanned Acute"
 
 
-class Well(Enum, metaclass=OptionalEnumMeta):
+class Well(str, Enum):
     """Enum class for Well"""
 
     AI_STRAIGHT_BAR_WELL = "AI Straight bar well"
@@ -1499,7 +1488,7 @@ class Well(Enum, metaclass=OptionalEnumMeta):
     WHC_NP_ZIRCONIA = "WHC NP (Zirconia)"
 
 
-class WindowPlacment(Enum, metaclass=OptionalEnumMeta):
+class WindowPlacment(str, Enum):
     """Enum class for WindowPlacment"""
 
     ANTERIOR = "Anterior"
@@ -1512,7 +1501,7 @@ class WindowPlacment(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class NSBList(BaseModel, extra=Extra.allow):
+class NSBList(BaseModel, extra="allow"):
     """Fields in Sharepoint list"""
 
     age_at_injection: Optional[str] = Field(
@@ -1524,7 +1513,7 @@ class NSBList(BaseModel, extra=Extra.allow):
         default=None, alias="AP2ndInj", title="Burr 2 A/P"
     )
     author_id: Optional[int] = Field(default=None, alias="AuthorId")
-    behavior: Optional[Behavior] = Field(
+    behavior: Annotated[Behavior, WrapValidator(optional_enum)] = Field(
         default=None, alias="Behavior", title="Behavior"
     )
     behavior_complete: Optional[datetime] = Field(
@@ -1532,23 +1521,29 @@ class NSBList(BaseModel, extra=Extra.allow):
         alias="Behavior_x0020_Complete",
         title="Behavior Complete",
     )
-    behavior_type: Optional[BehaviorType] = Field(
-        default=None, alias="Behavior_x0020_Type", title="Behavior Type"
+    behavior_type: Annotated[BehaviorType, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="Behavior_x0020_Type", title="Behavior Type")
     )
     breg2_lamb: Optional[float] = Field(
         default=None, alias="Breg2Lamb", title="Bregma to Lambda"
     )
-    burr1_injection_devi: Optional[Burr1InjectionDevice] = Field(
+    burr1_injection_devi: Annotated[
+        Burr1InjectionDevice, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr1_x0020_Injection_x0020_Devi",
         title="Burr1 Injection Device",
     )
-    burr1_perform_during: Optional[Burr1PerformDuring] = Field(
+    burr1_perform_during: Annotated[
+        Burr1PerformDuring, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr1_x0020_Perform_x0020_During",
         title="Burr1 Perform During",
     )
-    burr1_virus_biosafte: Optional[Burr1VirusBiosafteyLevelBsl] = Field(
+    burr1_virus_biosafte: Annotated[
+        Burr1VirusBiosafteyLevelBsl, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr1_x0020_Virus_x0020_Biosafte",
         title="Burr1 Virus Biosaftey Level (BSL)",
@@ -1557,20 +1552,26 @@ class NSBList(BaseModel, extra=Extra.allow):
             " If other PI must provide material in requestor comments."
         ),
     )
-    burr2_injection_devi: Optional[Burr2InjectionDevice] = Field(
+    burr2_injection_devi: Annotated[
+        Burr2InjectionDevice, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr2_x0020_Injection_x0020_Devi",
         title="Burr2 Injection Device",
     )
-    burr2_perform_during: Optional[Burr2PerformDuring] = Field(
+    burr2_perform_during: Annotated[
+        Burr2PerformDuring, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr2_x0020_Perform_x0020_During",
         title="Burr2 Perform During",
     )
-    burr2_status: Optional[Burr2Status] = Field(
+    burr2_status: Annotated[Burr2Status, WrapValidator(optional_enum)] = Field(
         default=None, alias="Burr2_x0020_Status", title="Burr2 Status"
     )
-    burr2_virus_biosafte: Optional[Burr2VirusBiosafteyLevelBsl] = Field(
+    burr2_virus_biosafte: Annotated[
+        Burr2VirusBiosafteyLevelBsl, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr2_x0020_Virus_x0020_Biosafte",
         title="Burr2 Virus Biosaftey Level (BSL)",
@@ -1585,7 +1586,9 @@ class NSBList(BaseModel, extra=Extra.allow):
     burr3_d_v: Optional[float] = Field(
         default=None, alias="Burr3_x0020_D_x002f_V", title="Burr3 D/V 1"
     )
-    burr3_injection_devi: Optional[Burr3InjectionDevice] = Field(
+    burr3_injection_devi: Annotated[
+        Burr3InjectionDevice, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr3_x0020_Injection_x0020_Devi",
         title="Burr3 Injection Device",
@@ -1593,15 +1596,19 @@ class NSBList(BaseModel, extra=Extra.allow):
     burr3_m_l: Optional[float] = Field(
         default=None, alias="Burr3_x0020_M_x002f_L", title="Burr3 M/L"
     )
-    burr3_perform_during: Optional[Burr3PerformDuring] = Field(
+    burr3_perform_during: Annotated[
+        Burr3PerformDuring, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr3_x0020_Perform_x0020_During",
         title="Burr3 Perform During",
     )
-    burr3_status: Optional[Burr3Status] = Field(
+    burr3_status: Annotated[Burr3Status, WrapValidator(optional_enum)] = Field(
         default=None, alias="Burr3_x0020_Status", title="Burr3 Status"
     )
-    burr3_virus_biosafet: Optional[Burr3VirusBiosafetyLevelBsl] = Field(
+    burr3_virus_biosafet: Annotated[
+        Burr3VirusBiosafetyLevelBsl, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr3_x0020_Virus_x0020_Biosafet",
         title="Burr3 Virus Biosafety Level (BSL)",
@@ -1616,7 +1623,9 @@ class NSBList(BaseModel, extra=Extra.allow):
     burr4_d_v: Optional[float] = Field(
         default=None, alias="Burr4_x0020_D_x002f_V", title="Burr4 D/V 1"
     )
-    burr4_injection_devi: Optional[Burr4InjectionDevice] = Field(
+    burr4_injection_devi: Annotated[
+        Burr4InjectionDevice, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr4_x0020_Injection_x0020_Devi",
         title="Burr4 Injection Device",
@@ -1624,15 +1633,19 @@ class NSBList(BaseModel, extra=Extra.allow):
     burr4_m_l: Optional[float] = Field(
         default=None, alias="Burr4_x0020_M_x002f_L", title="Burr4 M/L"
     )
-    burr4_perform_during: Optional[Burr4PerformDuring] = Field(
+    burr4_perform_during: Annotated[
+        Burr4PerformDuring, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr4_x0020_Perform_x0020_During",
         title="Burr4 Perform During",
     )
-    burr4_status: Optional[Burr4Status] = Field(
+    burr4_status: Annotated[Burr4Status, WrapValidator(optional_enum)] = Field(
         default=None, alias="Burr4_x0020_Status", title="Burr4 Status"
     )
-    burr4_virus_biosafte: Optional[Burr4VirusBiosafteyLevelBsl] = Field(
+    burr4_virus_biosafte: Annotated[
+        Burr4VirusBiosafteyLevelBsl, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr4_x0020_Virus_x0020_Biosafte",
         title="Burr4 Virus Biosaftey Level (BSL)",
@@ -1641,38 +1654,50 @@ class NSBList(BaseModel, extra=Extra.allow):
             " If other PI must provide material in requestor comments."
         ),
     )
-    burr5_injection_devi: Optional[Burr5InjectionDevice] = Field(
+    burr5_injection_devi: Annotated[
+        Burr5InjectionDevice, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr5_x0020_Injection_x0020_Devi",
         title="Burr5 Injection Device",
     )
-    burr5_perform_during: Optional[Burr5PerformDuring] = Field(
+    burr5_perform_during: Annotated[
+        Burr5PerformDuring, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr5_x0020_Perform_x0020_During",
         title="Burr5 Perform During",
     )
-    burr5_status: Optional[Burr5Status] = Field(
+    burr5_status: Annotated[Burr5Status, WrapValidator(optional_enum)] = Field(
         default=None, alias="Burr5_x0020_Status", title="Burr5 Status"
     )
-    burr5_virus_biosafte: Optional[Burr5VirusBiosafteyLevelBsl] = Field(
+    burr5_virus_biosafte: Annotated[
+        Burr5VirusBiosafteyLevelBsl, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr5_x0020_Virus_x0020_Biosafte",
         title="Burr5 Virus Biosaftey Level (BSL)",
     )
-    burr6_injection_devi: Optional[Burr6InjectionDevice] = Field(
+    burr6_injection_devi: Annotated[
+        Burr6InjectionDevice, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr6_x0020_Injection_x0020_Devi",
         title="Burr6 Injection Device",
     )
-    burr6_perform_during: Optional[Burr6PerformDuring] = Field(
+    burr6_perform_during: Annotated[
+        Burr6PerformDuring, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr6_x0020_Perform_x0020_During",
         title="Burr6 Perform During",
     )
-    burr6_status: Optional[Burr6Status] = Field(
+    burr6_status: Annotated[Burr6Status, WrapValidator(optional_enum)] = Field(
         default=None, alias="Burr6_x0020_Status", title="Burr6 Status"
     )
-    burr6_virus_biosafte: Optional[Burr6VirusBiosafteyLevelBsl] = Field(
+    burr6_virus_biosafte: Annotated[
+        Burr6VirusBiosafteyLevelBsl, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr6_x0020_Virus_x0020_Biosafte",
         title="Burr6 Virus Biosaftey Level (BSL)",
@@ -1687,10 +1712,12 @@ class NSBList(BaseModel, extra=Extra.allow):
         alias="Burr_x0020_1_x0020_DV_x0020_2",
         title="Burr 1 D/V 2",
     )
-    burr_1_fiber_t: Optional[Burr1FiberType] = Field(
-        default=None,
-        alias="Burr_x0020_1_x0020_Fiber_x0020_t",
-        title="Burr 1 Fiber type",
+    burr_1_fiber_t: Annotated[Burr1FiberType, WrapValidator(optional_enum)] = (
+        Field(
+            default=None,
+            alias="Burr_x0020_1_x0020_Fiber_x0020_t",
+            title="Burr 1 Fiber type",
+        )
     )
     burr_1_injectable_x00: Optional[str] = Field(
         default=None,
@@ -1742,10 +1769,12 @@ class NSBList(BaseModel, extra=Extra.allow):
         alias="Burr_x0020_2_x0020_D_x002f_V_x00",
         title="Burr 2 D/V 2",
     )
-    burr_2_fiber_t: Optional[Burr2FiberType] = Field(
-        default=None,
-        alias="Burr_x0020_2_x0020_Fiber_x0020_T",
-        title="Burr 2 Fiber Type",
+    burr_2_fiber_t: Annotated[Burr2FiberType, WrapValidator(optional_enum)] = (
+        Field(
+            default=None,
+            alias="Burr_x0020_2_x0020_Fiber_x0020_T",
+            title="Burr 2 Fiber Type",
+        )
     )
     burr_2_injectable_x00: Optional[str] = Field(
         default=None,
@@ -1800,12 +1829,16 @@ class NSBList(BaseModel, extra=Extra.allow):
         alias="Burr_x0020_3_x0020_D_x002f_V_x00",
         title="Burr 3 D/V 2",
     )
-    burr_3_fiber_t: Optional[Burr3FiberType] = Field(
-        default=None,
-        alias="Burr_x0020_3_x0020_Fiber_x0020_T",
-        title="Burr 3 Fiber Type",
+    burr_3_fiber_t: Annotated[Burr3FiberType, WrapValidator(optional_enum)] = (
+        Field(
+            default=None,
+            alias="Burr_x0020_3_x0020_Fiber_x0020_T",
+            title="Burr 3 Fiber Type",
+        )
     )
-    burr_3_hemisphere: Optional[Burr3Hemisphere] = Field(
+    burr_3_hemisphere: Annotated[
+        Burr3Hemisphere, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr_x0020_3_x0020_Hemisphere",
         title="Burr 3 Hemisphere",
@@ -1863,12 +1896,16 @@ class NSBList(BaseModel, extra=Extra.allow):
         alias="Burr_x0020_4_x0020_D_x002f_V_x00",
         title="Burr 4 D/V 2",
     )
-    burr_4_fiber_t: Optional[Burr4FiberType] = Field(
-        default=None,
-        alias="Burr_x0020_4_x0020_Fiber_x0020_T",
-        title="Burr 4 Fiber Type",
+    burr_4_fiber_t: Annotated[Burr4FiberType, WrapValidator(optional_enum)] = (
+        Field(
+            default=None,
+            alias="Burr_x0020_4_x0020_Fiber_x0020_T",
+            title="Burr 4 Fiber Type",
+        )
     )
-    burr_4_hemisphere: Optional[Burr4Hemisphere] = Field(
+    burr_4_hemisphere: Annotated[
+        Burr4Hemisphere, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr_x0020_4_x0020_Hemisphere",
         title="Burr 4 Hemisphere",
@@ -1934,12 +1971,16 @@ class NSBList(BaseModel, extra=Extra.allow):
         alias="Burr_x0020_5_x0020_D_x002f_V_x00",
         title="Burr 5 D/V 1",
     )
-    burr_5_fiber_t: Optional[Burr5FiberType] = Field(
-        default=None,
-        alias="Burr_x0020_5_x0020_Fiber_x0020_t",
-        title="Burr 5 Fiber type",
+    burr_5_fiber_t: Annotated[Burr5FiberType, WrapValidator(optional_enum)] = (
+        Field(
+            default=None,
+            alias="Burr_x0020_5_x0020_Fiber_x0020_t",
+            title="Burr 5 Fiber type",
+        )
     )
-    burr_5_hemisphere: Optional[Burr5Hemisphere] = Field(
+    burr_5_hemisphere: Annotated[
+        Burr5Hemisphere, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr_x0020_5_x0020_Hemisphere",
         title="Burr 5 Hemisphere",
@@ -2008,12 +2049,16 @@ class NSBList(BaseModel, extra=Extra.allow):
         alias="Burr_x0020_6_x0020_D_x002f_V_x00",
         title="Burr 6 D/V 1",
     )
-    burr_6_fiber_t: Optional[Burr6FiberType] = Field(
-        default=None,
-        alias="Burr_x0020_6_x0020_Fiber_x0020_t",
-        title="Burr 6 Fiber type",
+    burr_6_fiber_t: Annotated[Burr6FiberType, WrapValidator(optional_enum)] = (
+        Field(
+            default=None,
+            alias="Burr_x0020_6_x0020_Fiber_x0020_t",
+            title="Burr 6 Fiber type",
+        )
     )
-    burr_6_hemisphere: Optional[Burr6Hemisphere] = Field(
+    burr_6_hemisphere: Annotated[
+        Burr6Hemisphere, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Burr_x0020_6_x0020_Hemisphere",
         title="Burr 6 Hemisphere",
@@ -2061,64 +2106,68 @@ class NSBList(BaseModel, extra=Extra.allow):
     burr_6_m_l: Optional[float] = Field(
         default=None, alias="Burr_x0020_6_x0020_M_x002f_L", title="Burr 6 M/L"
     )
-    burr_hole_1: Optional[BurrHole1] = Field(
+    burr_hole_1: Annotated[BurrHole1, WrapValidator(optional_enum)] = Field(
         default=None, alias="Burr_x0020_hole_x0020_1", title="Burr hole 1"
     )
-    burr_hole_1_st: Optional[Burr1Status] = Field(
-        default=None,
-        alias="Burr_x0020_Hole_x0020_1_x0020_st",
-        title="Burr1 Status",
+    burr_hole_1_st: Annotated[Burr1Status, WrapValidator(optional_enum)] = (
+        Field(
+            default=None,
+            alias="Burr_x0020_Hole_x0020_1_x0020_st",
+            title="Burr1 Status",
+        )
     )
-    burr_hole_2: Optional[BurrHole2] = Field(
+    burr_hole_2: Annotated[BurrHole2, WrapValidator(optional_enum)] = Field(
         default=None, alias="Burr_x0020_hole_x0020_2", title="Burr hole 2"
     )
-    burr_hole_3: Optional[BurrHole3] = Field(
+    burr_hole_3: Annotated[BurrHole3, WrapValidator(optional_enum)] = Field(
         default=None, alias="Burr_x0020_hole_x0020_3", title="Burr hole 3"
     )
-    burr_hole_4: Optional[BurrHole4] = Field(
+    burr_hole_4: Annotated[BurrHole4, WrapValidator(optional_enum)] = Field(
         default=None, alias="Burr_x0020_hole_x0020_4", title="Burr hole 4"
     )
-    burr_hole_5: Optional[BurrHole5] = Field(
+    burr_hole_5: Annotated[BurrHole5, WrapValidator(optional_enum)] = Field(
         default=None, alias="Burr_x0020_hole_x0020_5", title="Burr hole 5"
     )
-    burr_hole_6: Optional[BurrHole6] = Field(
+    burr_hole_6: Annotated[BurrHole6, WrapValidator(optional_enum)] = Field(
         default=None, alias="Burr_x0020_hole_x0020_6", title="Burr hole 6"
     )
     color_tag: Optional[str] = Field(
         default=None, alias="_ColorTag", title="Color Tag"
     )
-    com_coplanar: Optional[Laceration] = Field(
+    com_coplanar: Annotated[Laceration, WrapValidator(optional_enum)] = Field(
         default=None, alias="ComCoplanar", title="Laceration"
     )
-    com_damage: Optional[Hematoma] = Field(
+    com_damage: Annotated[Hematoma, WrapValidator(optional_enum)] = Field(
         default=None, alias="ComDamage", title="Hematoma"
     )
-    com_durotomy: Optional[Durotomy] = Field(
+    com_durotomy: Annotated[Durotomy, WrapValidator(optional_enum)] = Field(
         default=None, alias="ComDurotomy", title="Durotomy"
     )
-    com_sinusbleed: Optional[SinusBleed] = Field(
-        default=None, alias="ComSinusbleed", title="Sinus Bleed"
+    com_sinusbleed: Annotated[SinusBleed, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="ComSinusbleed", title="Sinus Bleed")
     )
-    com_swelling: Optional[EdemaSwelling] = Field(
-        default=None, alias="ComSwelling", title="Edema (Swelling)"
+    com_swelling: Annotated[EdemaSwelling, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="ComSwelling", title="Edema (Swelling)")
     )
-    com_window: Optional[WindowPlacment] = Field(
-        default=None, alias="ComWindow", title="Window Placment"
+    com_window: Annotated[WindowPlacment, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="ComWindow", title="Window Placment")
     )
     compliance_asset_id: Optional[str] = Field(
         default=None, alias="ComplianceAssetId", title="Compliance Asset Id"
     )
-    contusion: Optional[Contusion] = Field(
+    contusion: Annotated[Contusion, WrapValidator(optional_enum)] = Field(
         default=None, alias="Contusion", title="Contusion"
     )
-    craniotomy_perform_d: Optional[CraniotomyPerformDuring] = Field(
+    craniotomy_perform_d: Annotated[
+        CraniotomyPerformDuring, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Craniotomy_x0020_Perform_x0020_D",
         title="Craniotomy Perform During",
     )
-    craniotomy_type: Optional[CraniotomyType] = Field(
-        default=None, alias="CraniotomyType", title="Craniotomy Type"
-    )
+    craniotomy_type: Annotated[
+        CraniotomyType, WrapValidator(optional_enum)
+    ] = Field(default=None, alias="CraniotomyType", title="Craniotomy Type")
     created: Optional[datetime] = Field(
         default=None, alias="Created", title="Created"
     )
@@ -2145,7 +2194,9 @@ class NSBList(BaseModel, extra=Extra.allow):
     fiber_implant1_dv: Optional[float] = Field(
         default=None, alias="FiberImplant1DV", title="Fiber Implant1 D/V"
     )
-    fiber_implant1_lengt: Optional[FiberImplant1Length] = Field(
+    fiber_implant1_lengt: Annotated[
+        FiberImplant1Length, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Fiber_x0020_Implant1_x0020_Lengt",
         title="Fiber Implant1 Length",
@@ -2153,7 +2204,9 @@ class NSBList(BaseModel, extra=Extra.allow):
     fiber_implant2_dv: Optional[float] = Field(
         default=None, alias="FiberImplant2DV", title="Fiber Implant2 D/V"
     )
-    fiber_implant2_lengt: Optional[FiberImplant2Length] = Field(
+    fiber_implant2_lengt: Annotated[
+        FiberImplant2Length, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Fiber_x0020_Implant2_x0020_Lengt",
         title="Fiber Implant2 Length",
@@ -2163,7 +2216,9 @@ class NSBList(BaseModel, extra=Extra.allow):
         alias="Fiber_x0020_Implant3_x0020_D_x00",
         title="Fiber Implant3 D/V",
     )
-    fiber_implant3_lengt: Optional[FiberImplant3Length] = Field(
+    fiber_implant3_lengt: Annotated[
+        FiberImplant3Length, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Fiber_x0020_Implant3_x0020_Lengt",
         title="Fiber Implant3 Length",
@@ -2173,7 +2228,9 @@ class NSBList(BaseModel, extra=Extra.allow):
         alias="Fiber_x0020_Implant4_x0020_D_x00",
         title="Fiber Implant4 D/V",
     )
-    fiber_implant4_lengt: Optional[FiberImplant4Length] = Field(
+    fiber_implant4_lengt: Annotated[
+        FiberImplant4Length, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Fiber_x0020_Implant4_x0020_Lengt",
         title="Fiber Implant4 Length",
@@ -2183,7 +2240,9 @@ class NSBList(BaseModel, extra=Extra.allow):
         alias="Fiber_x0020_Implant5_x0020_D_x00",
         title="Fiber Implant5 D/V",
     )
-    fiber_implant5_lengt: Optional[FiberImplant5Length] = Field(
+    fiber_implant5_lengt: Annotated[
+        FiberImplant5Length, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Fiber_x0020_Implant5_x0020_Lengt",
         title="Fiber Implant5 Length",
@@ -2193,7 +2252,9 @@ class NSBList(BaseModel, extra=Extra.allow):
         alias="Fiber_x0020_Implant6_x0020_D_x00",
         title="Fiber Implant6 D/V",
     )
-    fiber_implant6_lengt: Optional[FiberImplant6Length] = Field(
+    fiber_implant6_lengt: Annotated[
+        FiberImplant6Length, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Fiber_x0020_Implant6_x0020_Lengt",
         title="Fiber Implant6 Length",
@@ -2216,18 +2277,22 @@ class NSBList(BaseModel, extra=Extra.allow):
         alias="FirstInjectionWeightBefor",
         title="Follow up Weight Before",
     )
-    headpost: Optional[Headpost] = Field(
+    headpost: Annotated[Headpost, WrapValidator(optional_enum)] = Field(
         default=None, alias="Headpost", title="Headpost"
     )
-    headpost_perform_dur: Optional[HeadpostPerformDuring] = Field(
+    headpost_perform_dur: Annotated[
+        HeadpostPerformDuring, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Headpost_x0020_Perform_x0020_Dur",
         title="Headpost Perform During",
     )
-    headpost_type: Optional[Well] = Field(
+    headpost_type: Annotated[Well, WrapValidator(optional_enum)] = Field(
         default=None, alias="HeadpostType", title="Well"
     )
-    hemisphere2nd_inj: Optional[Burr2Hemisphere] = Field(
+    hemisphere2nd_inj: Annotated[
+        Burr2Hemisphere, WrapValidator(optional_enum)
+    ] = Field(
         default=None, alias="Hemisphere2ndInj", title="Burr 2 Hemisphere"
     )
     hp_iso_level: Optional[float] = Field(
@@ -2239,17 +2304,23 @@ class NSBList(BaseModel, extra=Extra.allow):
     hp_surgeon_comments: Optional[str] = Field(
         default=None, alias="HPSurgeonComments", title="Surgeon Comments"
     )
-    hp_work_station: Optional[InitialWorkStation] = Field(
+    hp_work_station: Annotated[
+        InitialWorkStation, WrapValidator(optional_enum)
+    ] = Field(
         default=None, alias="HpWorkStation", title="Initial Work Station"
     )
-    iacuc_protocol: Optional[IacucProtocol] = Field(
-        default=None,
-        alias="IACUC_x0020_Protocol_x0020__x002",
-        title="IACUC Protocol",
-        description="Create a secondary List for Protocols and link to drugs",
+    iacuc_protocol: Annotated[IacucProtocol, WrapValidator(optional_enum)] = (
+        Field(
+            default=None,
+            alias="IACUC_x0020_Protocol_x0020__x002",
+            title="IACUC Protocol",
+            description="Create a secondary List for Protocols and link to drugs",
+        )
     )
     id: Optional[int] = Field(default=None, alias="ID", title="ID")
-    implant_id_coverslip_type: Optional[ImplantIdCoverslipType] = Field(
+    implant_id_coverslip_type: Annotated[
+        ImplantIdCoverslipType, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="ImplantIDCoverslipType",
         title="Implant ID/Coverslip type",
@@ -2269,7 +2340,7 @@ class NSBList(BaseModel, extra=Extra.allow):
     inj1_storage_location: Optional[str] = Field(
         default=None, alias="Inj1StorageLocation", title="Inj1StorageLocation"
     )
-    inj1_type: Optional[Inj1Type] = Field(
+    inj1_type: Annotated[Inj1Type, WrapValidator(optional_enum)] = Field(
         default=None, alias="Inj1Type", title="Inj1Type"
     )
     inj1_virus_strain_rt: Optional[str] = Field(
@@ -2293,7 +2364,7 @@ class NSBList(BaseModel, extra=Extra.allow):
     inj2_storage_location: Optional[str] = Field(
         default=None, alias="Inj2StorageLocation", title="Inj2StorageLocation"
     )
-    inj2_type: Optional[Inj2Type] = Field(
+    inj2_type: Annotated[Inj2Type, WrapValidator(optional_enum)] = Field(
         default=None, alias="Inj2Type", title="Inj2Type"
     )
     inj2_virus_strain_rt: Optional[str] = Field(
@@ -2314,12 +2385,12 @@ class NSBList(BaseModel, extra=Extra.allow):
     inj3_storage_location: Optional[str] = Field(
         default=None, alias="Inj3StorageLocation", title="Inj3StorageLocation"
     )
-    inj3_type: Optional[Inj3Type] = Field(
+    inj3_type: Annotated[Inj3Type, WrapValidator(optional_enum)] = Field(
         default=None, alias="Inj3Type", title="Inj3Type"
     )
-    inj3ret_setting: Optional[Inj3Retsetting] = Field(
-        default=None, alias="Inj3retSetting", title="Inj3retSetting"
-    )
+    inj3ret_setting: Annotated[
+        Inj3Retsetting, WrapValidator(optional_enum)
+    ] = Field(default=None, alias="Inj3retSetting", title="Inj3retSetting")
     inj3volperdepth: Optional[float] = Field(
         default=None, alias="Inj3volperdepth", title="Inj3volperdepth"
     )
@@ -2335,15 +2406,15 @@ class NSBList(BaseModel, extra=Extra.allow):
     inj4_storage_location: Optional[str] = Field(
         default=None, alias="Inj4StorageLocation", title="Inj4StorageLocation"
     )
-    inj4_type: Optional[Inj4Type] = Field(
+    inj4_type: Annotated[Inj4Type, WrapValidator(optional_enum)] = Field(
         default=None, alias="Inj4Type", title="Inj4Type"
     )
     inj4_virus_strain_rt: Optional[str] = Field(
         default=None, alias="Inj4VirusStrain_rt", title="Inj4VirusStrain_rt"
     )
-    inj4ret_setting: Optional[Inj4Retsetting] = Field(
-        default=None, alias="Inj4retSetting", title="Inj4retSetting"
-    )
+    inj4ret_setting: Annotated[
+        Inj4Retsetting, WrapValidator(optional_enum)
+    ] = Field(default=None, alias="Inj4retSetting", title="Inj4retSetting")
     inj4volperdepth: Optional[float] = Field(
         default=None, alias="Inj4volperdepth", title="Inj4volperdepth"
     )
@@ -2359,15 +2430,15 @@ class NSBList(BaseModel, extra=Extra.allow):
     inj5_storage_location: Optional[str] = Field(
         default=None, alias="Inj5StorageLocation", title="Inj5StorageLocation"
     )
-    inj5_type: Optional[Inj5Type] = Field(
+    inj5_type: Annotated[Inj5Type, WrapValidator(optional_enum)] = Field(
         default=None, alias="Inj5Type", title="Inj5Type"
     )
     inj5_virus_strain_rt: Optional[str] = Field(
         default=None, alias="Inj5VirusStrain_rt", title="Inj5VirusStrain_rt"
     )
-    inj5ret_setting: Optional[Inj5Retsetting] = Field(
-        default=None, alias="Inj5retSetting", title="Inj5retSetting"
-    )
+    inj5ret_setting: Annotated[
+        Inj5Retsetting, WrapValidator(optional_enum)
+    ] = Field(default=None, alias="Inj5retSetting", title="Inj5retSetting")
     inj5volperdepth: Optional[float] = Field(
         default=None, alias="inj5volperdepth", title="inj5volperdepth"
     )
@@ -2383,25 +2454,29 @@ class NSBList(BaseModel, extra=Extra.allow):
     inj6_storage_location: Optional[str] = Field(
         default=None, alias="Inj6StorageLocation", title="Inj6StorageLocation"
     )
-    inj6_type: Optional[Inj6Type] = Field(
+    inj6_type: Annotated[Inj6Type, WrapValidator(optional_enum)] = Field(
         default=None, alias="Inj6Type", title="Inj6Type"
     )
     inj6_virus_strain_rt: Optional[str] = Field(
         default=None, alias="Inj6VirusStrain_rt", title="Inj6VirusStrain_rt"
     )
-    inj6ret_setting: Optional[Inj6Retsetting] = Field(
-        default=None, alias="Inj6retSetting", title="Inj6retSetting"
-    )
+    inj6ret_setting: Annotated[
+        Inj6Retsetting, WrapValidator(optional_enum)
+    ] = Field(default=None, alias="Inj6retSetting", title="Inj6retSetting")
     inj6volperdepth: Optional[float] = Field(
         default=None, alias="inj6volperdepth", title="inj6volperdepth"
     )
     inj_virus_strain_rt: Optional[str] = Field(
         default=None, alias="InjVirusStrain_rt", title="Inj3VirusStrain_rt"
     )
-    ionto_number_inj1: Optional[InitialIontoNumber] = Field(
+    ionto_number_inj1: Annotated[
+        InitialIontoNumber, WrapValidator(optional_enum)
+    ] = Field(
         default=None, alias="IontoNumberInj1", title="Initial Ionto Number"
     )
-    ionto_number_inj2: Optional[FolowUpIontoNumber] = Field(
+    ionto_number_inj2: Annotated[
+        FolowUpIontoNumber, WrapValidator(optional_enum)
+    ] = Field(
         default=None, alias="IontoNumberInj2", title="Folow up Ionto Number"
     )
     iso_on: Optional[float] = Field(
@@ -2419,20 +2494,22 @@ class NSBList(BaseModel, extra=Extra.allow):
         title="LabTracks Requestor",
         description="Who requested the animal in LabTracks",
     )
-    li_ms_required: Optional[LimsRequired] = Field(
-        default=None,
-        alias="LIMs_x0020_Required",
-        title="LIMS Required",
-        description="Is LIMS Entry required",
+    li_ms_required: Annotated[LimsRequired, WrapValidator(optional_enum)] = (
+        Field(
+            default=None,
+            alias="LIMs_x0020_Required",
+            title="LIMS Required",
+            description="Is LIMS Entry required",
+        )
     )
-    light_cycle: Optional[Lightcycle] = Field(
+    light_cycle: Annotated[Lightcycle, WrapValidator(optional_enum)] = Field(
         default=None, alias="LightCycle", title="LightCycle"
     )
-    lims_project: Optional[Limsproject] = Field(
+    lims_project: Annotated[Limsproject, WrapValidator(optional_enum)] = Field(
         default=None, alias="LIMSProject", title="LIMSProject"
     )
-    lims_taskflow: Optional[Limstaskflow] = Field(
-        default=None, alias="LIMSTaskflow", title="LIMSTaskflow"
+    lims_taskflow: Annotated[Limstaskflow, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="LIMSTaskflow", title="LIMSTaskflow")
     )
     long_requestor_comments: Optional[str] = Field(
         default=None, alias="LongRequestorComments", title="Requestor Comments"
@@ -2443,12 +2520,16 @@ class NSBList(BaseModel, extra=Extra.allow):
     modified: Optional[datetime] = Field(
         default=None, alias="Modified", title="Modified"
     )
-    nanoject_number_inj10: Optional[InitialNanojectNumber] = Field(
+    nanoject_number_inj10: Annotated[
+        InitialNanojectNumber, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="NanojectNumberInj10",
         title="Initial Nanoject Number",
     )
-    nanoject_number_inj2: Optional[FollowUpNanojectNumber] = Field(
+    nanoject_number_inj2: Annotated[
+        FollowUpNanojectNumber, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="NanojectNumberInj2",
         title="Follow up Nanoject Number",
@@ -2460,7 +2541,7 @@ class NSBList(BaseModel, extra=Extra.allow):
         description="Is this surgery going to be performed by NSB"
         " or someone else?",
     )
-    of_burr: Optional[OfBurrHoles] = Field(
+    of_burr: Annotated[OfBurrHoles, WrapValidator(optional_enum)] = Field(
         default=None,
         alias="_x0023__x0020_of_x0020_Burr_x002",
         title="# of Burr Holes",
@@ -2468,45 +2549,53 @@ class NSBList(BaseModel, extra=Extra.allow):
     pedigree_name: Optional[str] = Field(
         default=None, alias="PedigreeName", title="Pedigree Name"
     )
-    procedure: Optional[Procedure] = Field(
+    procedure: Annotated[Procedure, WrapValidator(optional_enum)] = Field(
         default=None,
         alias="Procedure",
         title="Procedure",
         description="Procedure, Specific T3",
     )
-    procedure_family: Optional[ProcedureCategory] = Field(
+    procedure_family: Annotated[
+        ProcedureCategory, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Procedure_x0020_Family",
         title="Procedure Category",
         description="Procedure Family T1",
     )
-    procedure_slots: Optional[ProcedureSlots] = Field(
+    procedure_slots: Annotated[
+        ProcedureSlots, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Procedure_x0020_Slots",
         title="Procedure Slots",
         description="Sinlge or mutpile surgical slots",
     )
-    procedure_t2: Optional[PhysiologyType] = Field(
-        default=None,
-        alias="Procedure_x0020_T2",
-        title="Physiology Type",
-        description="Procedure Imaging paradigm T2",
+    procedure_t2: Annotated[PhysiologyType, WrapValidator(optional_enum)] = (
+        Field(
+            default=None,
+            alias="Procedure_x0020_T2",
+            title="Physiology Type",
+            description="Procedure Imaging paradigm T2",
+        )
     )
-    project_id: Optional[Projectid] = Field(
+    project_id: Annotated[Projectid, WrapValidator(optional_enum)] = Field(
         default=None, alias="ProjectID", title="ProjectID"
     )
-    ret_setting0: Optional[Inj1Retsetting] = Field(
-        default=None, alias="retSetting0", title="Inj1retSetting"
+    ret_setting0: Annotated[Inj1Retsetting, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="retSetting0", title="Inj1retSetting")
     )
-    ret_setting1: Optional[Inj2Retsetting] = Field(
-        default=None, alias="retSetting1", title="Inj2retSetting"
+    ret_setting1: Annotated[Inj2Retsetting, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="retSetting1", title="Inj2retSetting")
     )
     round1_inj_isolevel: Optional[float] = Field(
         default=None, alias="Round1InjIsolevel", title="Follow up Iso Level"
     )
-    sex: Optional[Sex] = Field(default=None, alias="Sex", title="Sex")
-    surgery_status: Optional[SurgeryStatus] = Field(
-        default=None, alias="SurgeryStatus", title="Surgery Status"
+    sex: Annotated[Sex, WrapValidator(optional_enum)] = Field(
+        default=None, alias="Sex", title="Sex"
+    )
+    surgery_status: Annotated[SurgeryStatus, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="SurgeryStatus", title="Surgery Status")
     )
     title: Optional[str] = Field(default=None, alias="Title", title="Title")
     ui_version_string: Optional[str] = Field(
@@ -2518,7 +2607,9 @@ class NSBList(BaseModel, extra=Extra.allow):
     virus_d_v: Optional[float] = Field(
         default=None, alias="Virus_x0020_D_x002f_V", title="Burr  1 D/V 1"
     )
-    virus_hemisphere: Optional[Burr1Hemisphere] = Field(
+    virus_hemisphere: Annotated[
+        Burr1Hemisphere, WrapValidator(optional_enum)
+    ] = Field(
         default=None, alias="Virus_x0020_Hemisphere", title="Burr 1 Hemisphere"
     )
     virus_m_l: Optional[float] = Field(
@@ -2534,7 +2625,9 @@ class NSBList(BaseModel, extra=Extra.allow):
         alias="Weight_x0020_before_x0020_Surger",
         title="Initial Weight before",
     )
-    work_station1st_injection: Optional[FollowUpWorkstation] = Field(
+    work_station1st_injection: Annotated[
+        FollowUpWorkstation, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="WorkStation1stInjection",
         title="Follow up Workstation",

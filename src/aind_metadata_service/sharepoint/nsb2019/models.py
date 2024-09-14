@@ -2,26 +2,15 @@
 careful modifying the contents."""
 
 from datetime import datetime
-from enum import Enum, EnumMeta
-from typing import Optional
+from enum import Enum
+from typing import Annotated, Optional
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Field, WrapValidator
 
-
-class OptionalEnumMeta(EnumMeta):
-    """Return None if constructing from a value not in members."""
-
-    # TODO: No longer works bc pydantic 2.7 stricter validation.
-    #  Handle when enum value not in members.
-    # def __call__(cls, value, *args, **kw):
-    #     """Return none if value not in members. Else return enum."""
-    #     if value in [m.value for m in cls.__members__.values()]:
-    #         return super().__call__(value, *args, **kw)
-    #     else:
-    #         return None
+from aind_metadata_service.sharepoint.utils import optional_enum
 
 
-class After1StInjection(Enum, metaclass=OptionalEnumMeta):
+class After1StInjection(str, Enum):
     """Enum class for After1StInjection"""
 
     BLEEDING = "Bleeding"
@@ -33,7 +22,7 @@ class After1StInjection(Enum, metaclass=OptionalEnumMeta):
     SWELLING = "Swelling"
 
 
-class After2NdInjection(Enum, metaclass=OptionalEnumMeta):
+class After2NdInjection(str, Enum):
     """Enum class for After2NdInjection"""
 
     BLEEDING = "Bleeding"
@@ -45,7 +34,7 @@ class After2NdInjection(Enum, metaclass=OptionalEnumMeta):
     SWELLING = "Swelling"
 
 
-class Contusion(Enum, metaclass=OptionalEnumMeta):
+class Contusion(str, Enum):
     """Enum class for Contusion"""
 
     MILD = "Mild"
@@ -56,7 +45,7 @@ class Contusion(Enum, metaclass=OptionalEnumMeta):
     SEVERE = "Severe"
 
 
-class CraniotomyType(Enum, metaclass=OptionalEnumMeta):
+class CraniotomyType(str, Enum):
     """Enum class for CraniotomyType"""
 
     FRONTAL_WINDOW_3MM = "Frontal Window 3mm"
@@ -66,7 +55,7 @@ class CraniotomyType(Enum, metaclass=OptionalEnumMeta):
     WHC_NP = "WHC NP"
 
 
-class During1StInjection(Enum, metaclass=OptionalEnumMeta):
+class During1StInjection(str, Enum):
     """Enum class for During1StInjection"""
 
     BLEEDING = "Bleeding"
@@ -79,7 +68,7 @@ class During1StInjection(Enum, metaclass=OptionalEnumMeta):
     SWELLING = "Swelling"
 
 
-class During2NdInjection(Enum, metaclass=OptionalEnumMeta):
+class During2NdInjection(str, Enum):
     """Enum class for During2NdInjection"""
 
     BLEEDING = "Bleeding"
@@ -92,7 +81,7 @@ class During2NdInjection(Enum, metaclass=OptionalEnumMeta):
     SWELLING = "Swelling"
 
 
-class Durotomy(Enum, metaclass=OptionalEnumMeta):
+class Durotomy(str, Enum):
     """Enum class for Durotomy"""
 
     COMPLETE = "Complete"
@@ -104,7 +93,7 @@ class Durotomy(Enum, metaclass=OptionalEnumMeta):
     UNINTENTIONAL = "Unintentional"
 
 
-class EdemaSwelling(Enum, metaclass=OptionalEnumMeta):
+class EdemaSwelling(str, Enum):
     """Enum class for EdemaSwelling"""
 
     MILD = "Mild"
@@ -115,7 +104,7 @@ class EdemaSwelling(Enum, metaclass=OptionalEnumMeta):
     SEVERE = "Severe"
 
 
-class ExudateSeverity(Enum, metaclass=OptionalEnumMeta):
+class ExudateSeverity(str, Enum):
     """Enum class for ExudateSeverity"""
 
     MILD = "Mild"
@@ -125,7 +114,7 @@ class ExudateSeverity(Enum, metaclass=OptionalEnumMeta):
     SEVERE = "Severe"
 
 
-class EyeAffected(Enum, metaclass=OptionalEnumMeta):
+class EyeAffected(str, Enum):
     """Enum class for EyeAffected"""
 
     BOTH = "Both"
@@ -135,7 +124,7 @@ class EyeAffected(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class EyeIssue(Enum, metaclass=OptionalEnumMeta):
+class EyeIssue(str, Enum):
     """Enum class for EyeIssue"""
 
     CLOUD_POSSIBLY_BLIND = "Cloud/Possibly Blind"
@@ -147,7 +136,7 @@ class EyeIssue(Enum, metaclass=OptionalEnumMeta):
     WEEPY = "Weepy"
 
 
-class FirstRoundInjIsoLevel(Enum, metaclass=OptionalEnumMeta):
+class FirstRoundInjIsoLevel(str, Enum):
     """Enum class for FirstRoundInjIsoLevel"""
 
     N_025 = "0.25"
@@ -165,7 +154,7 @@ class FirstRoundInjIsoLevel(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class FirstRoundInjWorkstation(Enum, metaclass=OptionalEnumMeta):
+class FirstRoundInjWorkstation(str, Enum):
     """Enum class for FirstRoundInjWorkstation"""
 
     SELECT = "Select..."
@@ -180,7 +169,7 @@ class FirstRoundInjWorkstation(Enum, metaclass=OptionalEnumMeta):
     SWS_9 = "SWS 9"
 
 
-class Firstroundiontoissue(Enum, metaclass=OptionalEnumMeta):
+class Firstroundiontoissue(str, Enum):
     """Enum class for Firstroundiontoissue"""
 
     NA = "N/A"
@@ -189,7 +178,7 @@ class Firstroundiontoissue(Enum, metaclass=OptionalEnumMeta):
     YES = "Yes"
 
 
-class Firstroundiontonumber(Enum, metaclass=OptionalEnumMeta):
+class Firstroundiontonumber(str, Enum):
     """Enum class for Firstroundiontonumber"""
 
     IONTO_1 = "Ionto #1"
@@ -206,7 +195,7 @@ class Firstroundiontonumber(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Firstroundnanojectnumber(Enum, metaclass=OptionalEnumMeta):
+class Firstroundnanojectnumber(str, Enum):
     """Enum class for Firstroundnanojectnumber"""
 
     NA = "N/A"
@@ -221,7 +210,7 @@ class Firstroundnanojectnumber(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class HeadpostType(Enum, metaclass=OptionalEnumMeta):
+class HeadpostType(str, Enum):
     """Enum class for HeadpostType"""
 
     AI_STRAIGHT_HEADBAR = "AI Straight Headbar"
@@ -238,7 +227,7 @@ class HeadpostType(Enum, metaclass=OptionalEnumMeta):
     WHC_42_WITH_NEUROPIXEL_WE = "WHC #42 with Neuropixel well and well cap"
 
 
-class Hematoma(Enum, metaclass=OptionalEnumMeta):
+class Hematoma(str, Enum):
     """Enum class for Hematoma"""
 
     MILD = "Mild"
@@ -249,7 +238,7 @@ class Hematoma(Enum, metaclass=OptionalEnumMeta):
     SEVERE = "Severe"
 
 
-class HpDurotomy(Enum, metaclass=OptionalEnumMeta):
+class HpDurotomy(str, Enum):
     """Enum class for HpDurotomy"""
 
     NO = "No"
@@ -257,7 +246,7 @@ class HpDurotomy(Enum, metaclass=OptionalEnumMeta):
     YES = "Yes"
 
 
-class HpIsoLevel(Enum, metaclass=OptionalEnumMeta):
+class HpIsoLevel(str, Enum):
     """Enum class for HpIsoLevel"""
 
     N_025 = "0.25"
@@ -275,7 +264,7 @@ class HpIsoLevel(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class HpLocation(Enum, metaclass=OptionalEnumMeta):
+class HpLocation(str, Enum):
     """Enum class for HpLocation"""
 
     CENTER = "Center"
@@ -284,7 +273,7 @@ class HpLocation(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class HpPerferations(Enum, metaclass=OptionalEnumMeta):
+class HpPerferations(str, Enum):
     """Enum class for HpPerferations"""
 
     LEFT = "Left"
@@ -293,7 +282,7 @@ class HpPerferations(Enum, metaclass=OptionalEnumMeta):
     SELECT_IF_APPLICABLE = "Select if applicable..."
 
 
-class HpWorkStation(Enum, metaclass=OptionalEnumMeta):
+class HpWorkStation(str, Enum):
     """Enum class for HpWorkStation"""
 
     SELECT = "Select..."
@@ -308,7 +297,7 @@ class HpWorkStation(Enum, metaclass=OptionalEnumMeta):
     SWS_9 = "SWS 9"
 
 
-class IacucProtocol(Enum, metaclass=OptionalEnumMeta):
+class IacucProtocol(str, Enum):
     """Enum class for IacucProtocol"""
 
     N_2001 = "2001"
@@ -337,7 +326,7 @@ class IacucProtocol(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class ImplantIdCoverslipType(Enum, metaclass=OptionalEnumMeta):
+class ImplantIdCoverslipType(str, Enum):
     """Enum class for ImplantIdCoverslipType"""
 
     CUSTOM_IMPLANT_ADD_DETAIL = (
@@ -356,7 +345,7 @@ class ImplantIdCoverslipType(Enum, metaclass=OptionalEnumMeta):
     TS_05 = "TS-05"
 
 
-class Inj1Angle(Enum, metaclass=OptionalEnumMeta):
+class Inj1Angle(str, Enum):
     """Enum class for Inj1Angle"""
 
     N_0_DEGREES = "0 degrees"
@@ -368,7 +357,7 @@ class Inj1Angle(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Inj1Hemisphere(Enum, metaclass=OptionalEnumMeta):
+class Inj1Hemisphere(str, Enum):
     """Enum class for Inj1Hemisphere"""
 
     LEFT = "Left"
@@ -376,14 +365,14 @@ class Inj1Hemisphere(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Inj1Retsetting(Enum, metaclass=OptionalEnumMeta):
+class Inj1Retsetting(str, Enum):
     """Enum class for Inj1Retsetting"""
 
     OFF = "Off"
     ON = "On"
 
 
-class Inj1Round(Enum, metaclass=OptionalEnumMeta):
+class Inj1Round(str, Enum):
     """Enum class for Inj1Round"""
 
     NA = "NA"
@@ -392,7 +381,7 @@ class Inj1Round(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Inj1Type(Enum, metaclass=OptionalEnumMeta):
+class Inj1Type(str, Enum):
     """Enum class for Inj1Type"""
 
     IONTOPHORESIS = "Iontophoresis"
@@ -400,7 +389,7 @@ class Inj1Type(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Inj2Angle(Enum, metaclass=OptionalEnumMeta):
+class Inj2Angle(str, Enum):
     """Enum class for Inj2Angle"""
 
     N_0_DEGREES = "0 degrees"
@@ -412,7 +401,7 @@ class Inj2Angle(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Inj2Hemisphere(Enum, metaclass=OptionalEnumMeta):
+class Inj2Hemisphere(str, Enum):
     """Enum class for Inj2Hemisphere"""
 
     LEFT = "Left"
@@ -420,14 +409,14 @@ class Inj2Hemisphere(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Inj2Retsetting(Enum, metaclass=OptionalEnumMeta):
+class Inj2Retsetting(str, Enum):
     """Enum class for Inj2Retsetting"""
 
     OFF = "Off"
     ON = "On"
 
 
-class Inj2Round(Enum, metaclass=OptionalEnumMeta):
+class Inj2Round(str, Enum):
     """Enum class for Inj2Round"""
 
     NA = "NA"
@@ -436,7 +425,7 @@ class Inj2Round(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Inj2Type(Enum, metaclass=OptionalEnumMeta):
+class Inj2Type(str, Enum):
     """Enum class for Inj2Type"""
 
     IONTOPHORESIS = "Iontophoresis"
@@ -444,7 +433,7 @@ class Inj2Type(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Iontonumberhpinj(Enum, metaclass=OptionalEnumMeta):
+class Iontonumberhpinj(str, Enum):
     """Enum class for Iontonumberhpinj"""
 
     IONTO_1 = "Ionto #1"
@@ -458,7 +447,7 @@ class Iontonumberhpinj(Enum, metaclass=OptionalEnumMeta):
     IONTO_9 = "Ionto #9"
 
 
-class Issue(Enum, metaclass=OptionalEnumMeta):
+class Issue(str, Enum):
     """Enum class for Issue"""
 
     EXUDATE = "Exudate"
@@ -475,7 +464,7 @@ class Issue(Enum, metaclass=OptionalEnumMeta):
     Z_MOTION = "Z-Motion"
 
 
-class Laceration(Enum, metaclass=OptionalEnumMeta):
+class Laceration(str, Enum):
     """Enum class for Laceration"""
 
     MILD = "Mild"
@@ -486,7 +475,7 @@ class Laceration(Enum, metaclass=OptionalEnumMeta):
     SEVERE = "Severe"
 
 
-class LightCycle(Enum, metaclass=OptionalEnumMeta):
+class LightCycle(str, Enum):
     """Enum class for LightCycle"""
 
     NORMAL_6AM_TO_8PM = "Normal (6am to 8pm)"
@@ -494,7 +483,7 @@ class LightCycle(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class LimsProjectCode(Enum, metaclass=OptionalEnumMeta):
+class LimsProjectCode(str, Enum):
     """Enum class for LimsProjectCode"""
 
     AINDDISCOVERY = "aind-discovery"
@@ -544,7 +533,7 @@ class LimsProjectCode(Enum, metaclass=OptionalEnumMeta):
     VIP_SOMATIC_V1_PHASE2 = "VipSomaticV1Phase2"
 
 
-class LimsRequired(Enum, metaclass=OptionalEnumMeta):
+class LimsRequired(str, Enum):
     """Enum class for LimsRequired"""
 
     NO = "No"
@@ -552,7 +541,7 @@ class LimsRequired(Enum, metaclass=OptionalEnumMeta):
     YES = "Yes"
 
 
-class Limstaskflow(Enum, metaclass=OptionalEnumMeta):
+class Limstaskflow(str, Enum):
     """Enum class for Limstaskflow"""
 
     AIND_EPHYS_PASSIVE_BEHAVI = "AIND Ephys (Passive Behavior)"
@@ -608,7 +597,7 @@ class Limstaskflow(Enum, metaclass=OptionalEnumMeta):
     VGT_ENHANCERS_TRANSSYNAPT = "VGT Enhancers Transsynaptic"
 
 
-class PreviouslyInjected(Enum, metaclass=OptionalEnumMeta):
+class PreviouslyInjected(str, Enum):
     """Enum class for PreviouslyInjected"""
 
     NO = "No"
@@ -616,7 +605,7 @@ class PreviouslyInjected(Enum, metaclass=OptionalEnumMeta):
     YES = "Yes"
 
 
-class Procedure(Enum, metaclass=OptionalEnumMeta):
+class Procedure(str, Enum):
     """Enum class for Procedure"""
 
     CUSTOM = "Custom"
@@ -635,7 +624,7 @@ class Procedure(Enum, metaclass=OptionalEnumMeta):
     WHC_NP = "WHC NP"
 
 
-class ProjectId(Enum, metaclass=OptionalEnumMeta):
+class ProjectId(str, Enum):
     """Enum class for ProjectId"""
 
     CAMC506 = "CAM-C506"
@@ -700,7 +689,7 @@ class ProjectId(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Scabbing(Enum, metaclass=OptionalEnumMeta):
+class Scabbing(str, Enum):
     """Enum class for Scabbing"""
 
     MILD = "Mild"
@@ -710,7 +699,7 @@ class Scabbing(Enum, metaclass=OptionalEnumMeta):
     SEVERE = "Severe"
 
 
-class SecondRoundInjIsoLevel(Enum, metaclass=OptionalEnumMeta):
+class SecondRoundInjIsoLevel(str, Enum):
     """Enum class for SecondRoundInjIsoLevel"""
 
     N_025 = "0.25"
@@ -728,7 +717,7 @@ class SecondRoundInjIsoLevel(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class SecondRoundIontoIssue(Enum, metaclass=OptionalEnumMeta):
+class SecondRoundIontoIssue(str, Enum):
     """Enum class for SecondRoundIontoIssue"""
 
     NA = "N/A"
@@ -737,7 +726,7 @@ class SecondRoundIontoIssue(Enum, metaclass=OptionalEnumMeta):
     YES = "Yes"
 
 
-class SecondRoundWorkstation(Enum, metaclass=OptionalEnumMeta):
+class SecondRoundWorkstation(str, Enum):
     """Enum class for SecondRoundWorkstation"""
 
     SELECT = "Select..."
@@ -752,7 +741,7 @@ class SecondRoundWorkstation(Enum, metaclass=OptionalEnumMeta):
     SWS_9 = "SWS 9"
 
 
-class Secondroundiontonumber(Enum, metaclass=OptionalEnumMeta):
+class Secondroundiontonumber(str, Enum):
     """Enum class for Secondroundiontonumber"""
 
     IONTO_1 = "Ionto #1"
@@ -769,7 +758,7 @@ class Secondroundiontonumber(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Secondroundnanojectnumber(Enum, metaclass=OptionalEnumMeta):
+class Secondroundnanojectnumber(str, Enum):
     """Enum class for Secondroundnanojectnumber"""
 
     NA = "N/A"
@@ -784,7 +773,7 @@ class Secondroundnanojectnumber(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class Sex(Enum, metaclass=OptionalEnumMeta):
+class Sex(str, Enum):
     """Enum class for Sex"""
 
     FEMALE = "Female"
@@ -792,7 +781,7 @@ class Sex(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class SinusBleed(Enum, metaclass=OptionalEnumMeta):
+class SinusBleed(str, Enum):
     """Enum class for SinusBleed"""
 
     MILD = "Mild"
@@ -803,7 +792,7 @@ class SinusBleed(Enum, metaclass=OptionalEnumMeta):
     SEVERE = "Severe"
 
 
-class SurgeryStatus(Enum, metaclass=OptionalEnumMeta):
+class SurgeryStatus(str, Enum):
     """Enum class for SurgeryStatus"""
 
     INJECTION_PENDING = "Injection Pending"
@@ -815,7 +804,7 @@ class SurgeryStatus(Enum, metaclass=OptionalEnumMeta):
     UNPLANNED_ACUTE = "Unplanned Acute"
 
 
-class TouchUpStatus(Enum, metaclass=OptionalEnumMeta):
+class TouchUpStatus(str, Enum):
     """Enum class for TouchUpStatus"""
 
     COMPLETE = "Complete"
@@ -825,7 +814,7 @@ class TouchUpStatus(Enum, metaclass=OptionalEnumMeta):
     UNDER_OBSERVATION = "Under Observation"
 
 
-class WindowClarity(Enum, metaclass=OptionalEnumMeta):
+class WindowClarity(str, Enum):
     """Enum class for WindowClarity"""
 
     ANTERIOR = "Anterior"
@@ -838,7 +827,7 @@ class WindowClarity(Enum, metaclass=OptionalEnumMeta):
     SELECT = "Select..."
 
 
-class NSBList(BaseModel, extra=Extra.allow):
+class NSBList(BaseModel, extra="allow"):
     """Fields in Sharepoint list"""
 
     age_at_injection: Optional[str] = Field(
@@ -857,45 +846,53 @@ class NSBList(BaseModel, extra=Extra.allow):
     color_tag: Optional[str] = Field(
         default=None, alias="_ColorTag", title="Color Tag"
     )
-    com_after1st_inj: Optional[After1StInjection] = Field(
+    com_after1st_inj: Annotated[
+        After1StInjection, WrapValidator(optional_enum)
+    ] = Field(
         default=None, alias="ComAfter1stInj", title="After 1st Injection"
     )
-    com_after2nd_inj: Optional[After2NdInjection] = Field(
+    com_after2nd_inj: Annotated[
+        After2NdInjection, WrapValidator(optional_enum)
+    ] = Field(
         default=None, alias="ComAfter2ndInj", title="After 2nd Injection"
     )
-    com_coplanar: Optional[Laceration] = Field(
+    com_coplanar: Annotated[Laceration, WrapValidator(optional_enum)] = Field(
         default=None, alias="ComCoplanar", title="Laceration"
     )
-    com_damage: Optional[Hematoma] = Field(
+    com_damage: Annotated[Hematoma, WrapValidator(optional_enum)] = Field(
         default=None, alias="ComDamage", title="Hematoma"
     )
-    com_during1st_inj: Optional[During1StInjection] = Field(
+    com_during1st_inj: Annotated[
+        During1StInjection, WrapValidator(optional_enum)
+    ] = Field(
         default=None, alias="ComDuring1stInj", title="During 1st Injection"
     )
-    com_during2nd_inj: Optional[During2NdInjection] = Field(
+    com_during2nd_inj: Annotated[
+        During2NdInjection, WrapValidator(optional_enum)
+    ] = Field(
         default=None, alias="ComDuring2ndInj", title="During 2nd Injection"
     )
-    com_durotomy: Optional[Durotomy] = Field(
+    com_durotomy: Annotated[Durotomy, WrapValidator(optional_enum)] = Field(
         default=None, alias="ComDurotomy", title="Durotomy"
     )
-    com_sinusbleed: Optional[SinusBleed] = Field(
-        default=None, alias="ComSinusbleed", title="Sinus Bleed"
+    com_sinusbleed: Annotated[SinusBleed, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="ComSinusbleed", title="Sinus Bleed")
     )
-    com_swelling: Optional[EdemaSwelling] = Field(
-        default=None, alias="ComSwelling", title="Edema (Swelling)"
+    com_swelling: Annotated[EdemaSwelling, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="ComSwelling", title="Edema (Swelling)")
     )
-    com_window: Optional[WindowClarity] = Field(
+    com_window: Annotated[WindowClarity, WrapValidator(optional_enum)] = Field(
         default=None, alias="ComWindow", title="Window Clarity"
     )
     compliance_asset_id: Optional[str] = Field(
         default=None, alias="ComplianceAssetId", title="Compliance Asset Id"
     )
-    contusion: Optional[Contusion] = Field(
+    contusion: Annotated[Contusion, WrapValidator(optional_enum)] = Field(
         default=None, alias="Contusion", title="Contusion"
     )
-    craniotomy_type: Optional[CraniotomyType] = Field(
-        default=None, alias="CraniotomyType", title="Craniotomy Type"
-    )
+    craniotomy_type: Annotated[
+        CraniotomyType, WrapValidator(optional_enum)
+    ] = Field(default=None, alias="CraniotomyType", title="Craniotomy Type")
     created: Optional[datetime] = Field(
         default=None, alias="Created", title="Created"
     )
@@ -930,13 +927,15 @@ class NSBList(BaseModel, extra=Extra.allow):
     end_of_week: Optional[datetime] = Field(
         default=None, alias="End_x0020_of_x0020_Week", title="End of Week"
     )
-    exudate_severity: Optional[ExudateSeverity] = Field(
+    exudate_severity: Annotated[
+        ExudateSeverity, WrapValidator(optional_enum)
+    ] = Field(
         default=None, alias="Exudate_x0020_Severity", title="Exudate Severity"
     )
-    eye_affected: Optional[EyeAffected] = Field(
+    eye_affected: Annotated[EyeAffected, WrapValidator(optional_enum)] = Field(
         default=None, alias="Eye_x0020_Affected", title="Eye Affected"
     )
-    eye_issue: Optional[EyeIssue] = Field(
+    eye_issue: Annotated[EyeIssue, WrapValidator(optional_enum)] = Field(
         default=None, alias="Eye_x0020_Issue", title="Eye Issue"
     )
     fiber_implant1: Optional[bool] = Field(
@@ -975,42 +974,44 @@ class NSBList(BaseModel, extra=Extra.allow):
         alias="FirstInjectionWeightBefor",
         title="1st Round Inj Weight Before",
     )
-    first_round_ionto_issue: Optional[Firstroundiontoissue] = Field(
+    first_round_ionto_issue: Annotated[
+        Firstroundiontoissue, WrapValidator(optional_enum)
+    ] = Field(
         default=None, alias="FirstRoundIontoIssue", title="1stRoundIontoIssue"
     )
-    headpost_type: Optional[HeadpostType] = Field(
-        default=None, alias="HeadpostType", title="Headpost Type"
+    headpost_type: Annotated[HeadpostType, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="HeadpostType", title="Headpost Type")
     )
-    hemisphere2nd_inj: Optional[Inj2Hemisphere] = Field(
-        default=None, alias="Hemisphere2ndInj", title="Inj 2 Hemisphere"
-    )
+    hemisphere2nd_inj: Annotated[
+        Inj2Hemisphere, WrapValidator(optional_enum)
+    ] = Field(default=None, alias="Hemisphere2ndInj", title="Inj 2 Hemisphere")
     hp_a_p: Optional[str] = Field(
         default=None, alias="HP_x0020_A_x002f_P", title="HP A/P"
     )
     hp_diameter: Optional[str] = Field(
         default=None, alias="HP_x0020_Diameter", title="HP Diameter"
     )
-    hp_durotomy: Optional[HpDurotomy] = Field(
+    hp_durotomy: Annotated[HpDurotomy, WrapValidator(optional_enum)] = Field(
         default=None, alias="HPDurotomy", title="HP Durotomy"
     )
     hp_inj: Optional[str] = Field(
         default=None, alias="HP_x0020__x0026__x0020_Inj", title="HP & Inj"
     )
-    hp_iso_level: Optional[HpIsoLevel] = Field(
+    hp_iso_level: Annotated[HpIsoLevel, WrapValidator(optional_enum)] = Field(
         default=None, alias="HPIsoLevel", title="HP Iso Level"
     )
-    hp_loc: Optional[HpLocation] = Field(
+    hp_loc: Annotated[HpLocation, WrapValidator(optional_enum)] = Field(
         default=None, alias="HpLoc", title="HP Location"
     )
     hp_m_l: Optional[str] = Field(
         default=None, alias="HP_x0020_M_x002f_L", title="HP M/L"
     )
-    hp_perf: Optional[HpPerferations] = Field(
+    hp_perf: Annotated[HpPerferations, WrapValidator(optional_enum)] = Field(
         default=None, alias="HpPerf", title="HP Perferations"
     )
-    hp_prev_inject: Optional[PreviouslyInjected] = Field(
-        default=None, alias="HpPrevInject", title="Previously Injected"
-    )
+    hp_prev_inject: Annotated[
+        PreviouslyInjected, WrapValidator(optional_enum)
+    ] = Field(default=None, alias="HpPrevInject", title="Previously Injected")
     hp_recovery: Optional[float] = Field(
         default=None, alias="HPRecovery", title="HP Recovery"
     )
@@ -1027,17 +1028,21 @@ class NSBList(BaseModel, extra=Extra.allow):
     hp_surgeon_comments: Optional[str] = Field(
         default=None, alias="HPSurgeonComments", title="HP Surgeon Comments"
     )
-    hp_work_station: Optional[HpWorkStation] = Field(
-        default=None, alias="HpWorkStation", title="HP Work Station"
+    hp_work_station: Annotated[HpWorkStation, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="HpWorkStation", title="HP Work Station")
     )
-    iacuc_protocol: Optional[IacucProtocol] = Field(
-        default=None,
-        alias="IACUC_x0020_Protocol_x0020__x002",
-        title="IACUC Protocol",
-        description="Create a secondary List for Protocols and link to drugs",
+    iacuc_protocol: Annotated[IacucProtocol, WrapValidator(optional_enum)] = (
+        Field(
+            default=None,
+            alias="IACUC_x0020_Protocol_x0020__x002",
+            title="IACUC Protocol",
+            description="Create a secondary List for Protocols and link to drugs",
+        )
     )
     id: Optional[int] = Field(default=None, alias="ID", title="ID")
-    implant_id_coverslip_type: Optional[ImplantIdCoverslipType] = Field(
+    implant_id_coverslip_type: Annotated[
+        ImplantIdCoverslipType, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="ImplantIDCoverslipType",
         title="Implant ID/Coverslip type",
@@ -1054,13 +1059,13 @@ class NSBList(BaseModel, extra=Extra.allow):
     inj1_lenghtof_time: Optional[str] = Field(
         default=None, alias="Inj1LenghtofTime", title="Inj1LenghtofTime"
     )
-    inj1_round: Optional[Inj1Round] = Field(
+    inj1_round: Annotated[Inj1Round, WrapValidator(optional_enum)] = Field(
         default=None, alias="Inj1Round", title="Inj1Round"
     )
     inj1_storage_location: Optional[str] = Field(
         default=None, alias="Inj1StorageLocation", title="Inj1StorageLocation"
     )
-    inj1_type: Optional[Inj1Type] = Field(
+    inj1_type: Annotated[Inj1Type, WrapValidator(optional_enum)] = Field(
         default=None, alias="Inj1Type", title="Inj1Type"
     )
     inj1_virus_strain_rt: Optional[str] = Field(
@@ -1069,7 +1074,7 @@ class NSBList(BaseModel, extra=Extra.allow):
     inj1_vol: Optional[str] = Field(
         default=None, alias="Inj1Vol", title="Inj1Vol"
     )
-    inj1angle0: Optional[Inj1Angle] = Field(
+    inj1angle0: Annotated[Inj1Angle, WrapValidator(optional_enum)] = Field(
         default=None, alias="Inj1angle0", title="Inj1angle"
     )
     inj1volperdepth: Optional[str] = Field(
@@ -1087,13 +1092,13 @@ class NSBList(BaseModel, extra=Extra.allow):
     inj2_lenghtof_time: Optional[str] = Field(
         default=None, alias="Inj2LenghtofTime", title="Inj2LenghtofTime"
     )
-    inj2_round: Optional[Inj2Round] = Field(
+    inj2_round: Annotated[Inj2Round, WrapValidator(optional_enum)] = Field(
         default=None, alias="Inj2Round", title="Inj2Round"
     )
     inj2_storage_location: Optional[str] = Field(
         default=None, alias="Inj2StorageLocation", title="Inj2StorageLocation"
     )
-    inj2_type: Optional[Inj2Type] = Field(
+    inj2_type: Annotated[Inj2Type, WrapValidator(optional_enum)] = Field(
         default=None, alias="Inj2Type", title="Inj2Type"
     )
     inj2_virus_strain_rt: Optional[str] = Field(
@@ -1102,25 +1107,31 @@ class NSBList(BaseModel, extra=Extra.allow):
     inj2_vol: Optional[str] = Field(
         default=None, alias="Inj2Vol", title="Inj2Vol"
     )
-    inj2angle0: Optional[Inj2Angle] = Field(
+    inj2angle0: Annotated[Inj2Angle, WrapValidator(optional_enum)] = Field(
         default=None, alias="Inj2angle0", title="Inj2angle"
     )
     inj2volperdepth: Optional[str] = Field(
         default=None, alias="inj2volperdepth", title="inj2volperdepth"
     )
-    ionto_number_hpinj: Optional[Iontonumberhpinj] = Field(
-        default=None, alias="IontoNumberHPINJ", title="IontoNumberHPINJ"
-    )
-    ionto_number_inj1: Optional[Firstroundiontonumber] = Field(
+    ionto_number_hpinj: Annotated[
+        Iontonumberhpinj, WrapValidator(optional_enum)
+    ] = Field(default=None, alias="IontoNumberHPINJ", title="IontoNumberHPINJ")
+    ionto_number_inj1: Annotated[
+        Firstroundiontonumber, WrapValidator(optional_enum)
+    ] = Field(
         default=None, alias="IontoNumberInj1", title="1stRoundIontoNumber"
     )
-    ionto_number_inj2: Optional[Secondroundiontonumber] = Field(
+    ionto_number_inj2: Annotated[
+        Secondroundiontonumber, WrapValidator(optional_enum)
+    ] = Field(
         default=None, alias="IontoNumberInj2", title="2ndRoundIontoNumber"
     )
     iso_on: Optional[float] = Field(
         default=None, alias="Iso_x0020_On", title="HP Iso Duration"
     )
-    issue: Optional[Issue] = Field(default=None, alias="Issue", title="Issue")
+    issue: Annotated[Issue, WrapValidator(optional_enum)] = Field(
+        default=None, alias="Issue", title="Issue"
+    )
     lab_tracks_group: Optional[str] = Field(
         default=None, alias="LabTracks_x0020_Group", title="LabTracks Group"
     )
@@ -1136,22 +1147,26 @@ class NSBList(BaseModel, extra=Extra.allow):
         title="LabTracks Requestor",
         description="Who requested the animal in LabTracks",
     )
-    li_ms_required: Optional[LimsRequired] = Field(
-        default=None,
-        alias="LIMs_x0020_Required",
-        title="LIMs Required",
-        description="Is LIMs Entry required",
+    li_ms_required: Annotated[LimsRequired, WrapValidator(optional_enum)] = (
+        Field(
+            default=None,
+            alias="LIMs_x0020_Required",
+            title="LIMs Required",
+            description="Is LIMs Entry required",
+        )
     )
-    light_cycle: Optional[LightCycle] = Field(
+    light_cycle: Annotated[LightCycle, WrapValidator(optional_enum)] = Field(
         default=None, alias="Light_x0020_Cycle", title="Light Cycle"
     )
-    lim_staskflow1: Optional[Limstaskflow] = Field(
-        default=None, alias="LIMStaskflow1", title="LIMStaskflow"
+    lim_staskflow1: Annotated[Limstaskflow, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="LIMStaskflow1", title="LIMStaskflow")
     )
     lims_link: Optional[str] = Field(
         default=None, alias="LIMS_x0020_link", title="LIMS link"
     )
-    lims_project_code: Optional[LimsProjectCode] = Field(
+    lims_project_code: Annotated[
+        LimsProjectCode, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Lims_x0020_Project_x0020_Code",
         title="Lims Project Code",
@@ -1174,12 +1189,16 @@ class NSBList(BaseModel, extra=Extra.allow):
     modified: Optional[datetime] = Field(
         default=None, alias="Modified", title="Modified"
     )
-    nanoject_number_inj10: Optional[Firstroundnanojectnumber] = Field(
+    nanoject_number_inj10: Annotated[
+        Firstroundnanojectnumber, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="NanojectNumberInj10",
         title="1stRoundNanojectNumber",
     )
-    nanoject_number_inj2: Optional[Secondroundnanojectnumber] = Field(
+    nanoject_number_inj2: Annotated[
+        Secondroundnanojectnumber, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="NanojectNumberInj2",
         title="2ndRoundNanojectNumber",
@@ -1192,34 +1211,38 @@ class NSBList(BaseModel, extra=Extra.allow):
     pedigree_name: Optional[str] = Field(
         default=None, alias="PedigreeName", title="Pedigree Name"
     )
-    procedure: Optional[Procedure] = Field(
+    procedure: Annotated[Procedure, WrapValidator(optional_enum)] = Field(
         default=None,
         alias="Procedure",
         title="Procedure",
         description="Type of Surgical Procedure",
     )
-    project_id_te: Optional[ProjectId] = Field(
+    project_id_te: Annotated[ProjectId, WrapValidator(optional_enum)] = Field(
         default=None,
         alias="Project_x0020_ID_x0020__x0028_te",
         title="Project ID",
     )
-    ret_setting0: Optional[Inj1Retsetting] = Field(
-        default=None, alias="retSetting0", title="Inj1retSetting"
+    ret_setting0: Annotated[Inj1Retsetting, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="retSetting0", title="Inj1retSetting")
     )
-    ret_setting1: Optional[Inj2Retsetting] = Field(
-        default=None, alias="retSetting1", title="Inj2retSetting"
+    ret_setting1: Annotated[Inj2Retsetting, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="retSetting1", title="Inj2retSetting")
     )
-    round1_inj_isolevel: Optional[FirstRoundInjIsoLevel] = Field(
+    round1_inj_isolevel: Annotated[
+        FirstRoundInjIsoLevel, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Round1InjIsolevel",
         title="1st Round Inj Iso Level",
     )
-    round2_inj_isolevel: Optional[SecondRoundInjIsoLevel] = Field(
+    round2_inj_isolevel: Annotated[
+        SecondRoundInjIsoLevel, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="Round2InjIsolevel",
         title="2nd Round Inj Iso Level",
     )
-    scabbing: Optional[Scabbing] = Field(
+    scabbing: Annotated[Scabbing, WrapValidator(optional_enum)] = Field(
         default=None, alias="Scabbing", title="Scabbing"
     )
     second_inj_recover: Optional[float] = Field(
@@ -1240,12 +1263,16 @@ class NSBList(BaseModel, extra=Extra.allow):
         alias="SecondInjectionWeightBefore",
         title="2nd Round Inj Weight Before",
     )
-    second_round_ionto_issue: Optional[SecondRoundIontoIssue] = Field(
+    second_round_ionto_issue: Annotated[
+        SecondRoundIontoIssue, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="SecondRoundIontoIssue",
         title="2nd Round Ionto Issue",
     )
-    sex: Optional[Sex] = Field(default=None, alias="Sex", title="Sex")
+    sex: Annotated[Sex, WrapValidator(optional_enum)] = Field(
+        default=None, alias="Sex", title="Sex"
+    )
     st_round_injection_commen: Optional[str] = Field(
         default=None,
         alias="stRoundInjectionComments",
@@ -1254,8 +1281,8 @@ class NSBList(BaseModel, extra=Extra.allow):
     start_of_week: Optional[datetime] = Field(
         default=None, alias="Start_x0020_Of_x0020_Week", title="Start Of Week"
     )
-    surgery_status: Optional[SurgeryStatus] = Field(
-        default=None, alias="SurgeryStatus", title="Surgery Status"
+    surgery_status: Annotated[SurgeryStatus, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="SurgeryStatus", title="Surgery Status")
     )
     title: Optional[str] = Field(default=None, alias="Title", title="Title")
     touch_up_comp: Optional[datetime] = Field(
@@ -1263,10 +1290,12 @@ class NSBList(BaseModel, extra=Extra.allow):
         alias="Touch_x0020_Up_x0020__x0020_Comp",
         title="Touch Up  Completed",
     )
-    touch_up_status: Optional[TouchUpStatus] = Field(
-        default=None,
-        alias="Touch_x0020_Up_x0020_Status",
-        title="Touch Up Status",
+    touch_up_status: Annotated[TouchUpStatus, WrapValidator(optional_enum)] = (
+        Field(
+            default=None,
+            alias="Touch_x0020_Up_x0020_Status",
+            title="Touch Up Status",
+        )
     )
     touch_up_weight: Optional[str] = Field(
         default=None,
@@ -1282,7 +1311,9 @@ class NSBList(BaseModel, extra=Extra.allow):
     virus_d_v: Optional[str] = Field(
         default=None, alias="Virus_x0020_D_x002f_V", title="Inj 1 D/V"
     )
-    virus_hemisphere: Optional[Inj1Hemisphere] = Field(
+    virus_hemisphere: Annotated[
+        Inj1Hemisphere, WrapValidator(optional_enum)
+    ] = Field(
         default=None, alias="Virus_x0020_Hemisphere", title="Inj 1 Hemisphere"
     )
     virus_m_l: Optional[str] = Field(
@@ -1298,12 +1329,16 @@ class NSBList(BaseModel, extra=Extra.allow):
         alias="Weight_x0020_before_x0020_Surger",
         title="HP Weight before",
     )
-    work_station1st_injection: Optional[FirstRoundInjWorkstation] = Field(
+    work_station1st_injection: Annotated[
+        FirstRoundInjWorkstation, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="WorkStation1stInjection",
         title="1st Round Inj Workstation",
     )
-    work_station2nd_injection: Optional[SecondRoundWorkstation] = Field(
+    work_station2nd_injection: Annotated[
+        SecondRoundWorkstation, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="WorkStation2ndInjection",
         title="2nd Round Workstation",
