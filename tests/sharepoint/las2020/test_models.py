@@ -8,7 +8,7 @@ from typing import List
 from unittest import TestCase
 from unittest import main as unittest_main
 
-from aind_metadata_service.sharepoint.las2020.models import LASList
+from aind_metadata_service.sharepoint.las2020.models import LASList, Protocol
 
 if os.getenv("LOG_LEVEL"):  # pragma: no cover
     logging.basicConfig(level=os.getenv("LOG_LEVEL"))
@@ -47,6 +47,15 @@ class TestLASModels(TestCase):
             self.assertEqual(
                 las_model.author_id, int(list_item.get("AuthorId"))
             )
+
+    def test_optional_enum_meta_case(self):
+        """Tests optional enum wrapper returns None as expected."""
+        list_item = self.list_items[0]
+        las_model = LASList.model_validate(list_item)
+        self.assertEqual(
+            Protocol.N_2212_INVESTIGATING_BRAI, las_model.protocol
+        )
+        self.assertIsNone(las_model.bc_type)
 
 
 if __name__ == "__main__":
