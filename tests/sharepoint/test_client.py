@@ -346,8 +346,7 @@ class TestSharepointClient(unittest.TestCase):
             subject_id="12345", list_title="some_list_title2019"
         )
         response2019_empty = ModelResponse(
-            aind_models=[],
-            status_code=StatusCodes.DB_RESPONDED
+            aind_models=[], status_code=StatusCodes.DB_RESPONDED
         )
 
         expected_subject_procedures_left = self.list_items_2019[0][1]

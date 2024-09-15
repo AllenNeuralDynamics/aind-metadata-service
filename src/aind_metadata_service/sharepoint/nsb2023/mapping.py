@@ -7,6 +7,7 @@ from decimal import Decimal, DecimalException
 from enum import Enum
 from typing import Any, List, Optional, Union
 
+from aind_data_schema.components.devices import FiberProbe
 from aind_data_schema.core.procedures import (
     Anaesthetic,
     BrainInjection,
@@ -24,18 +25,15 @@ from aind_data_schema.core.procedures import (
     ViralMaterial,
 )
 from aind_data_schema.core.subject import Sex
-from aind_data_schema.components.devices import FiberProbe
 
-from aind_metadata_service.sharepoint.nsb2023.models import (
-    NSBList,
-    WindowPlacment,
-)
+from aind_metadata_service.sharepoint.nsb2023.models import NSBList
 from aind_metadata_service.sharepoint.nsb2023.models import (
     Procedure as NSBProcedure,
 )
 from aind_metadata_service.sharepoint.nsb2023.models import (
     ProcedureCategory as NSBProcedureCategory,
 )
+from aind_metadata_service.sharepoint.nsb2023.models import WindowPlacment
 
 
 class BurrHoleProcedure(Enum):

@@ -2,26 +2,15 @@
 Please be careful modifying the contents."""
 
 from datetime import datetime
-from enum import Enum, EnumMeta
-from typing import Optional
+from enum import Enum
+from typing import Annotated, Optional
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Field, WrapValidator
 
-
-class OptionalEnumMeta(EnumMeta):
-    """Return None if constructing from a value not in members."""
-
-    # TODO: No longer works bc pydantic 2.7 stricter validation.
-    #  Handle when enum value not in members.
-    # def __call__(cls, value, *args, **kw):
-    #     """Return none if value not in members. Else return enum."""
-    #     if value in [m.value for m in cls.__members__.values()]:
-    #         return super().__call__(value, *args, **kw)
-    #     else:
-    #         return None
+from aind_metadata_service.sharepoint.utils import optional_enum
 
 
-class Bctype(Enum, metaclass=OptionalEnumMeta):
+class Bctype(str, Enum):
     """Enum class for Bctype"""
 
     SUBMANDIBULAR = "Submandibular"
@@ -29,7 +18,7 @@ class Bctype(Enum, metaclass=OptionalEnumMeta):
     TERMINAL = "Terminal"
 
 
-class Doseroute(Enum, metaclass=OptionalEnumMeta):
+class Doseroute(str, Enum):
     """Enum class for Doseroute"""
 
     INTRAMUSCULAR_IM = "Intramuscular (IM)"
@@ -39,14 +28,14 @@ class Doseroute(Enum, metaclass=OptionalEnumMeta):
     SUBCUTANEOUS_SC = "Subcutaneous (SC)"
 
 
-class Icvlims(Enum, metaclass=OptionalEnumMeta):
+class Icvlims(str, Enum):
     """Enum class for Icvlims"""
 
     NEW_STEREOTAXIC_INJECTION = "New Stereotaxic Injections"
     STEREOTAXIC_INJECTIONS = "Stereotaxic Injections"
 
 
-class Icvroute1(Enum, metaclass=OptionalEnumMeta):
+class Icvroute1(str, Enum):
     """Enum class for Icvroute1"""
 
     ANY_UNILATERAL = "Any, Unilateral"
@@ -55,7 +44,7 @@ class Icvroute1(Enum, metaclass=OptionalEnumMeta):
     RIGHT_UNILATERAL = "Right, Unilateral"
 
 
-class Icvroute2(Enum, metaclass=OptionalEnumMeta):
+class Icvroute2(str, Enum):
     """Enum class for Icvroute2"""
 
     ANY_UNILATERAL = "Any, Unilateral"
@@ -64,7 +53,7 @@ class Icvroute2(Enum, metaclass=OptionalEnumMeta):
     RIGHT_UNILATERAL = "Right, Unilateral"
 
 
-class Icvroute3(Enum, metaclass=OptionalEnumMeta):
+class Icvroute3(str, Enum):
     """Enum class for Icvroute3"""
 
     ANY_UNILATERAL = "Any, Unilateral"
@@ -73,7 +62,7 @@ class Icvroute3(Enum, metaclass=OptionalEnumMeta):
     RIGHT_UNILATERAL = "Right, Unilateral"
 
 
-class Icvroute4(Enum, metaclass=OptionalEnumMeta):
+class Icvroute4(str, Enum):
     """Enum class for Icvroute4"""
 
     ANY_UNILATERAL = "Any, Unilateral"
@@ -82,7 +71,7 @@ class Icvroute4(Enum, metaclass=OptionalEnumMeta):
     RIGHT_UNILATERAL = "Right, Unilateral"
 
 
-class Icvroute5(Enum, metaclass=OptionalEnumMeta):
+class Icvroute5(str, Enum):
     """Enum class for Icvroute5"""
 
     ANY_UNILATERAL = "Any, Unilateral"
@@ -91,7 +80,7 @@ class Icvroute5(Enum, metaclass=OptionalEnumMeta):
     RIGHT_UNILATERAL = "Right, Unilateral"
 
 
-class Limsproject(Enum, metaclass=OptionalEnumMeta):
+class Limsproject(str, Enum):
     """Enum class for Limsproject"""
 
     AINDDISCOVERY = "aind-discovery"
@@ -285,7 +274,7 @@ class Limsproject(Enum, metaclass=OptionalEnumMeta):
     VI_DEEP_DIVE_EM_VOLUME = "VIDeepDiveEMVolume"
 
 
-class Limsworkflow(Enum, metaclass=OptionalEnumMeta):
+class Limsworkflow(str, Enum):
     """Enum class for Limsworkflow"""
 
     CHARACTERIZATION = "Characterization"
@@ -306,7 +295,7 @@ class Limsworkflow(Enum, metaclass=OptionalEnumMeta):
     T6015_TRANSSYNAPTIC = "T601.5 trans-synaptic"
 
 
-class Limsworkflow2(Enum, metaclass=OptionalEnumMeta):
+class Limsworkflow2(str, Enum):
     """Enum class for Limsworkflow2"""
 
     CHARACTERIZATION = "Characterization"
@@ -327,7 +316,7 @@ class Limsworkflow2(Enum, metaclass=OptionalEnumMeta):
     T6015_TRANSSYNAPTIC = "T601.5 trans-synaptic"
 
 
-class Postfix(Enum, metaclass=OptionalEnumMeta):
+class Postfix(str, Enum):
     """Enum class for Postfix"""
 
     NUCLEASEFREE_1X_PBS_OM_FI = "Nuclease-free 1xPBS (omFISH)"
@@ -346,7 +335,7 @@ class Postfix(Enum, metaclass=OptionalEnumMeta):
     OTHER_SPECIFY_BELOW = "Other (Specify below)"
 
 
-class Projectid(Enum, metaclass=OptionalEnumMeta):
+class Projectid(str, Enum):
     """Enum class for Projectid"""
 
     AAV_PRODUCTION_1028800410 = "AAV production 102-88-004-10"
@@ -453,7 +442,7 @@ class Projectid(Enum, metaclass=OptionalEnumMeta):
     RD_1028800410 = "R&D 102-88-004-10"
 
 
-class Protocol(Enum, metaclass=OptionalEnumMeta):
+class Protocol(str, Enum):
     """Enum class for Protocol"""
 
     N_2103_OPTICAL_PHYSIOLOGY = "2103 - Optical Physiology Mindscope Phase 4"
@@ -546,7 +535,7 @@ class Protocol(Enum, metaclass=OptionalEnumMeta):
     )
 
 
-class Reqpro1(Enum, metaclass=OptionalEnumMeta):
+class Reqpro1(str, Enum):
     """Enum class for Reqpro1"""
 
     BLOOD_COLLECTION = "Blood Collection"
@@ -559,7 +548,7 @@ class Reqpro1(Enum, metaclass=OptionalEnumMeta):
     TISSUE_COLLECTION = "Tissue Collection"
 
 
-class Reqpro2(Enum, metaclass=OptionalEnumMeta):
+class Reqpro2(str, Enum):
     """Enum class for Reqpro2"""
 
     BLOOD_COLLECTION = "Blood Collection"
@@ -572,7 +561,7 @@ class Reqpro2(Enum, metaclass=OptionalEnumMeta):
     TISSUE_COLLECTION = "Tissue Collection"
 
 
-class Reqpro3(Enum, metaclass=OptionalEnumMeta):
+class Reqpro3(str, Enum):
     """Enum class for Reqpro3"""
 
     BLOOD_COLLECTION = "Blood Collection"
@@ -585,7 +574,7 @@ class Reqpro3(Enum, metaclass=OptionalEnumMeta):
     TISSUE_COLLECTION = "Tissue Collection"
 
 
-class Requeststatus2(Enum, metaclass=OptionalEnumMeta):
+class Requeststatus2(str, Enum):
     """Enum class for Requeststatus2"""
 
     CANCELLED = "Cancelled"
@@ -594,7 +583,7 @@ class Requeststatus2(Enum, metaclass=OptionalEnumMeta):
     NEW = "New"
 
 
-class Roeye1(Enum, metaclass=OptionalEnumMeta):
+class Roeye1(str, Enum):
     """Enum class for Roeye1"""
 
     BEHIND_EITHER = "Behind Either"
@@ -602,7 +591,7 @@ class Roeye1(Enum, metaclass=OptionalEnumMeta):
     BEHIND_RIGHT = "Behind Right"
 
 
-class Roeye2(Enum, metaclass=OptionalEnumMeta):
+class Roeye2(str, Enum):
     """Enum class for Roeye2"""
 
     BEHIND_EITHER = "Behind Either"
@@ -610,7 +599,7 @@ class Roeye2(Enum, metaclass=OptionalEnumMeta):
     BEHIND_RIGHT = "Behind Right"
 
 
-class Roeye3(Enum, metaclass=OptionalEnumMeta):
+class Roeye3(str, Enum):
     """Enum class for Roeye3"""
 
     BEHIND_EITHER = "Behind Either"
@@ -618,7 +607,7 @@ class Roeye3(Enum, metaclass=OptionalEnumMeta):
     BEHIND_RIGHT = "Behind Right"
 
 
-class Roeye4(Enum, metaclass=OptionalEnumMeta):
+class Roeye4(str, Enum):
     """Enum class for Roeye4"""
 
     BEHIND_EITHER = "Behind Either"
@@ -626,7 +615,7 @@ class Roeye4(Enum, metaclass=OptionalEnumMeta):
     BEHIND_RIGHT = "Behind Right"
 
 
-class Roeye5(Enum, metaclass=OptionalEnumMeta):
+class Roeye5(str, Enum):
     """Enum class for Roeye5"""
 
     BEHIND_EITHER = "Behind Either"
@@ -634,14 +623,14 @@ class Roeye5(Enum, metaclass=OptionalEnumMeta):
     BEHIND_RIGHT = "Behind Right"
 
 
-class Rolims(Enum, metaclass=OptionalEnumMeta):
+class Rolims(str, Enum):
     """Enum class for Rolims"""
 
     NEW_STEREOTAXIC_INJECTION = "New Stereotaxic Injections"
     STEREOTAXIC_INJECTIONS = "Stereotaxic Injections"
 
 
-class Rosop(Enum, metaclass=OptionalEnumMeta):
+class Rosop(str, Enum):
     """Enum class for Rosop"""
 
     AF0131_RETROORBITAL_INJEC = "AF0131 Retro-orbital Injection"
@@ -651,14 +640,14 @@ class Rosop(Enum, metaclass=OptionalEnumMeta):
     )
 
 
-class Species(Enum, metaclass=OptionalEnumMeta):
+class Species(str, Enum):
     """Enum class for Species"""
 
     MOUSE = "Mouse"
     RAT = "Rat"
 
 
-class TamFrequency(Enum, metaclass=OptionalEnumMeta):
+class TamFrequency(str, Enum):
     """Enum class for TamFrequency"""
 
     OTHER_TYPE_IN = "Other (Type in)"
@@ -666,7 +655,7 @@ class TamFrequency(Enum, metaclass=OptionalEnumMeta):
     STANDARD_5_DAY_DOSE = "Standard 5 day dose"
 
 
-class TmpFrequency(Enum, metaclass=OptionalEnumMeta):
+class TmpFrequency(str, Enum):
     """Enum class for TmpFrequency"""
 
     OTHER_TYPEIN = "Other (Type-in)"
@@ -674,7 +663,7 @@ class TmpFrequency(Enum, metaclass=OptionalEnumMeta):
     STANDARD_3_DAY_DOSE = "Standard 3 day dose"
 
 
-class WhereToObtainSubstanceRo(Enum, metaclass=OptionalEnumMeta):
+class WhereToObtainSubstanceRo(str, Enum):
     """Enum class for WhereToObtainSubstanceRo"""
 
     LAS_BLUE_BIN_IN_VIVARIUM = (
@@ -683,14 +672,14 @@ class WhereToObtainSubstanceRo(Enum, metaclass=OptionalEnumMeta):
     OTHER_TYPE_IN = "Other (Type in)"
 
 
-class WheretoobtainsubstanceIcv(Enum, metaclass=OptionalEnumMeta):
+class WheretoobtainsubstanceIcv(str, Enum):
     """Enum class for WheretoobtainsubstanceIcv"""
 
     LAS_BLUE_BIN_IN_VIVARIUM = "LAS blue bin in Vivarium –80 freezer"
     OTHER_SPECIFY_BELOW = "Other (Specify below)"
 
 
-class LASList(BaseModel, extra=Extra.allow):
+class LASList(BaseModel, extra="allow"):
     """Fields in Sharepoint list"""
 
     accommodation_comment: Optional[str] = Field(
@@ -742,7 +731,7 @@ class LASList(BaseModel, extra=Extra.allow):
     bc_tube: Optional[str] = Field(
         default=None, alias="BCTube", title="BCTube"
     )
-    bc_type: Optional[Bctype] = Field(
+    bc_type: Annotated[Bctype, WrapValidator(optional_enum)] = Field(
         default=None, alias="BCType", title="BCType"
     )
     bc_volume: Optional[str] = Field(
@@ -769,7 +758,7 @@ class LASList(BaseModel, extra=Extra.allow):
     custpresent: Optional[bool] = Field(
         default=None, alias="custpresent", title="custpresent"
     )
-    dose_route: Optional[Doseroute] = Field(
+    dose_route: Annotated[Doseroute, WrapValidator(optional_enum)] = Field(
         default=None, alias="doseRoute", title="doseRoute"
     )
     dose_sub: Optional[str] = Field(
@@ -806,22 +795,22 @@ class LASList(BaseModel, extra=Extra.allow):
     icv_id5: Optional[str] = Field(
         default=None, alias="icvID5", title="icvID5"
     )
-    icv_lims: Optional[Icvlims] = Field(
+    icv_lims: Annotated[Icvlims, WrapValidator(optional_enum)] = Field(
         default=None, alias="icvLIMS", title="icvLIMS"
     )
-    icv_route1: Optional[Icvroute1] = Field(
+    icv_route1: Annotated[Icvroute1, WrapValidator(optional_enum)] = Field(
         default=None, alias="icvRoute1", title="icvRoute1"
     )
-    icv_route2: Optional[Icvroute2] = Field(
+    icv_route2: Annotated[Icvroute2, WrapValidator(optional_enum)] = Field(
         default=None, alias="icvRoute2", title="icvRoute2"
     )
-    icv_route3: Optional[Icvroute3] = Field(
+    icv_route3: Annotated[Icvroute3, WrapValidator(optional_enum)] = Field(
         default=None, alias="icvRoute3", title="icvRoute3"
     )
-    icv_route4: Optional[Icvroute4] = Field(
+    icv_route4: Annotated[Icvroute4, WrapValidator(optional_enum)] = Field(
         default=None, alias="icvRoute4", title="icvRoute4"
     )
-    icv_route5: Optional[Icvroute5] = Field(
+    icv_route5: Annotated[Icvroute5, WrapValidator(optional_enum)] = Field(
         default=None, alias="icvRoute5", title="icvRoute5"
     )
     icv_sub1: Optional[str] = Field(
@@ -876,14 +865,16 @@ class LASList(BaseModel, extra=Extra.allow):
     lims_entry: Optional[bool] = Field(
         default=None, alias="LIMSEntry", title="LIMSEntry"
     )
-    lims_project: Optional[Limsproject] = Field(
+    lims_project: Annotated[Limsproject, WrapValidator(optional_enum)] = Field(
         default=None, alias="LIMSProject", title="LIMSProject"
     )
-    lims_workflow: Optional[Limsworkflow] = Field(
-        default=None, alias="LIMSWorkflow", title="LIMSWorkflow"
+    lims_workflow: Annotated[Limsworkflow, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="LIMSWorkflow", title="LIMSWorkflow")
     )
-    lims_workflow_2: Optional[Limsworkflow2] = Field(
-        default=None, alias="LIMSWorkflow_x0020_2", title="LIMSWorkflow 2"
+    lims_workflow_2: Annotated[Limsworkflow2, WrapValidator(optional_enum)] = (
+        Field(
+            default=None, alias="LIMSWorkflow_x0020_2", title="LIMSWorkflow 2"
+        )
     )
     lt_task1: Optional[str] = Field(
         default=None, alias="LTTask1", title="LTTask1"
@@ -925,13 +916,13 @@ class LASList(BaseModel, extra=Extra.allow):
         default=None, alias="nStart_x0020_Date", title="Start Date"
     )
     oct: Optional[bool] = Field(default=None, alias="OCT", title="OCT")
-    post_fix: Optional[Postfix] = Field(
+    post_fix: Annotated[Postfix, WrapValidator(optional_enum)] = Field(
         default=None, alias="PostFix", title="PostFix"
     )
-    project_id: Optional[Projectid] = Field(
+    project_id: Annotated[Projectid, WrapValidator(optional_enum)] = Field(
         default=None, alias="ProjectID", title="ProjectID"
     )
-    protocol: Optional[Protocol] = Field(
+    protocol: Annotated[Protocol, WrapValidator(optional_enum)] = Field(
         default=None, alias="Protocol", title="Protocol"
     )
     qc_door_sheet: Optional[bool] = Field(
@@ -946,13 +937,13 @@ class LASList(BaseModel, extra=Extra.allow):
     req_age3: Optional[str] = Field(
         default=None, alias="ReqAge3", title="ReqAge3"
     )
-    req_pro1: Optional[Reqpro1] = Field(
+    req_pro1: Annotated[Reqpro1, WrapValidator(optional_enum)] = Field(
         default=None, alias="ReqPro1", title="ReqPro1"
     )
-    req_pro2: Optional[Reqpro2] = Field(
+    req_pro2: Annotated[Reqpro2, WrapValidator(optional_enum)] = Field(
         default=None, alias="ReqPro2", title="ReqPro2"
     )
-    req_pro3: Optional[Reqpro3] = Field(
+    req_pro3: Annotated[Reqpro3, WrapValidator(optional_enum)] = Field(
         default=None, alias="ReqPro3", title="ReqPro3"
     )
     reqdate1: Optional[datetime] = Field(
@@ -964,7 +955,9 @@ class LASList(BaseModel, extra=Extra.allow):
     reqdate3: Optional[datetime] = Field(
         default=None, alias="Reqdate3", title="Reqdate3"
     )
-    request_status2: Optional[Requeststatus2] = Field(
+    request_status2: Annotated[
+        Requeststatus2, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="RequestStatus2",
         title="RequestStatus2",
@@ -994,19 +987,19 @@ class LASList(BaseModel, extra=Extra.allow):
         title="roDiscard",
         description="Discard remaining substance after dose?",
     )
-    ro_eye1: Optional[Roeye1] = Field(
+    ro_eye1: Annotated[Roeye1, WrapValidator(optional_enum)] = Field(
         default=None, alias="roEye1", title="roEye1"
     )
-    ro_eye2: Optional[Roeye2] = Field(
+    ro_eye2: Annotated[Roeye2, WrapValidator(optional_enum)] = Field(
         default=None, alias="roEye2", title="roEye2"
     )
-    ro_eye3: Optional[Roeye3] = Field(
+    ro_eye3: Annotated[Roeye3, WrapValidator(optional_enum)] = Field(
         default=None, alias="roEye3", title="roEye3"
     )
-    ro_eye4: Optional[Roeye4] = Field(
+    ro_eye4: Annotated[Roeye4, WrapValidator(optional_enum)] = Field(
         default=None, alias="roEye4", title="roEye4"
     )
-    ro_eye5: Optional[Roeye5] = Field(
+    ro_eye5: Annotated[Roeye5, WrapValidator(optional_enum)] = Field(
         default=None, alias="roEye5", title="roEye5"
     )
     ro_gc1: Optional[str] = Field(default=None, alias="roGC1", title="roGC1")
@@ -1060,7 +1053,7 @@ class LASList(BaseModel, extra=Extra.allow):
         default=None, alias="roGC5d", title="roGC5d"
     )
     ro_ice: Optional[bool] = Field(default=None, alias="roIce", title="roIce")
-    ro_lims: Optional[Rolims] = Field(
+    ro_lims: Annotated[Rolims, WrapValidator(optional_enum)] = Field(
         default=None, alias="roLIMS", title="roLIMS"
     )
     ro_lot1: Optional[str] = Field(
@@ -1123,7 +1116,9 @@ class LASList(BaseModel, extra=Extra.allow):
     ro_lot5d: Optional[str] = Field(
         default=None, alias="roLot5d", title="roLot5d"
     )
-    ro_sop: Optional[Rosop] = Field(default=None, alias="roSOP", title="roSOP")
+    ro_sop: Annotated[Rosop, WrapValidator(optional_enum)] = Field(
+        default=None, alias="roSOP", title="roSOP"
+    )
     ro_spin_down: Optional[bool] = Field(
         default=None, alias="roSpinDown", title="roSpinDown"
     )
@@ -1337,7 +1332,9 @@ class LASList(BaseModel, extra=Extra.allow):
     ro_vol_v5d: Optional[str] = Field(
         default=None, alias="roVolV5d", title="roVolV5d"
     )
-    ro_where: Optional[WhereToObtainSubstanceRo] = Field(
+    ro_where: Annotated[
+        WhereToObtainSubstanceRo, WrapValidator(optional_enum)
+    ] = Field(
         default=None, alias="roWhere", title="Where to obtain substance (RO)"
     )
     spec_deli_loc: Optional[str] = Field(
@@ -1346,14 +1343,14 @@ class LASList(BaseModel, extra=Extra.allow):
         title="Specimen Delivery Location",
         description="Specimen Delivery Location",
     )
-    species: Optional[Species] = Field(
+    species: Annotated[Species, WrapValidator(optional_enum)] = Field(
         default=None, alias="Species", title="Species"
     )
     tam: Optional[bool] = Field(default=None, alias="TAM", title="TAM")
     tam_age: Optional[str] = Field(
         default=None, alias="TAMAge", title="TAM Age"
     )
-    tam_freq: Optional[TamFrequency] = Field(
+    tam_freq: Annotated[TamFrequency, WrapValidator(optional_enum)] = Field(
         default=None, alias="TAMFreq", title="TAM Frequency"
     )
     title: Optional[str] = Field(
@@ -1363,7 +1360,7 @@ class LASList(BaseModel, extra=Extra.allow):
     tmp_age: Optional[str] = Field(
         default=None, alias="TMPAge", title="TMP Age"
     )
-    tmp_freq: Optional[TmpFrequency] = Field(
+    tmp_freq: Annotated[TmpFrequency, WrapValidator(optional_enum)] = Field(
         default=None, alias="TMPFreq", title="TMP Frequency"
     )
     ui_version_string: Optional[str] = Field(
@@ -1374,7 +1371,9 @@ class LASList(BaseModel, extra=Extra.allow):
         alias="WellnessReport_x0028_No_x002F_Ye",
         title="WellnessReport(No/Yes)",
     )
-    whereto_obtainsubstance_i: Optional[WheretoobtainsubstanceIcv] = Field(
+    whereto_obtainsubstance_i: Annotated[
+        WheretoobtainsubstanceIcv, WrapValidator(optional_enum)
+    ] = Field(
         default=None,
         alias="WheretoObtainsubstance_x0028_ICV",
         title="WheretoObtainsubstance(ICV)",
