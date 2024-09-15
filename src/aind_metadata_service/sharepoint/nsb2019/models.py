@@ -1036,7 +1036,9 @@ class NSBList(BaseModel, extra="allow"):
             default=None,
             alias="IACUC_x0020_Protocol_x0020__x002",
             title="IACUC Protocol",
-            description="Create a secondary List for Protocols and link to drugs",
+            description=(
+                "Create a secondary List for Protocols and link to drugs"
+            ),
         )
     )
     id: Optional[int] = Field(default=None, alias="ID", title="ID")

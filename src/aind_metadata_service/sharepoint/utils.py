@@ -11,6 +11,7 @@ def optional_enum(
 ) -> Optional[Any]:
     """If an enum value does not exist, will use None instead"""
     try:
-        handler(v)
-    except ValidationError as e:
+        validated_v = handler(v)
+        return validated_v
+    except ValidationError:
         return None

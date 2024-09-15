@@ -57,7 +57,6 @@ class TestLASParsers(TestCase):
     def test_parser(self):
         """Checks that raw data is parsed correctly"""
         for list_item in self.list_items:
-            print(list_item)
             raw_data = list_item[0]
             expected_mapped_data = list_item[1]
             raw_file_name = list_item[1]

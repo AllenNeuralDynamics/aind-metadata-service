@@ -5,7 +5,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Annotated, Optional
 
-from pydantic import BaseModel, Extra, Field, WrapValidator
+from pydantic import BaseModel, Field, WrapValidator
 
 from aind_metadata_service.sharepoint.utils import optional_enum
 
