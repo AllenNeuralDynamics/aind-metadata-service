@@ -37,6 +37,8 @@ class FundingMapper(SmartSheetMapper):
         """
         if Organization().name_map.get(input_name) is not None:
             return Organization().name_map.get(input_name)
+        elif Organization().abbreviation_map.get(input_name) is not None:
+            return Organization().abbreviation_map.get(input_name)
         else:
             return input_name
 
