@@ -20,7 +20,7 @@ from aind_data_schema.core.subject import (
     Species,
     Subject,
 )
-from aind_data_schema.models.organizations import Organization
+from aind_data_schema_models.organizations import Organization
 from pydantic import Field, SecretStr, AliasChoices
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from starlette.responses import JSONResponse
@@ -30,8 +30,6 @@ from aind_metadata_service.labtracks.query_builder import (
     SubjectQueryColumns,
     TaskSetQueryColumns,
 )
-from aind_metadata_service.response_handler import ModelResponse, StatusCodes, \
-    ResponseHandler
 
 
 class LabTracksSettings(BaseSettings):
@@ -113,7 +111,7 @@ class LabTracksClient:
             return ResponseHandler.build_response(content=results)
         except Exception as e:
             logging.error(f"{e}")
-            return ResponseHandler.internal_server_error()
+            return {}
     #
     #
     # def get_subject_info(self, subject_id: str) -> ModelResponse:
