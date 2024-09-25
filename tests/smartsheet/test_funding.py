@@ -25,6 +25,9 @@ TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / ".."
 EXAMPLE_PATH = (
     TEST_DIR / "resources" / "smartsheet" / "test_funding_sheet.json"
 )
+EXAMPLE_PATH_2 = (
+    TEST_DIR / "resources" / "smartsheet" / "test_funding_sheet2.json"
+)
 
 
 class TestSmartsheetFundingClient(unittest.TestCase):
@@ -35,7 +38,10 @@ class TestSmartsheetFundingClient(unittest.TestCase):
         """Load json files before running tests."""
         with open(EXAMPLE_PATH, "r") as f:
             contents = json.load(f)
+        with open(EXAMPLE_PATH_2, "r") as f:
+            contents2 = json.load(f)
         cls.example_sheet = json.dumps(contents)
+        cls.example_sheet2 = json.dumps(contents2)
 
     @patch("smartsheet.sheets.Sheets.get_sheet")
     def test_mapping(self, mock_get_sheet: MagicMock):
@@ -54,6 +60,30 @@ class TestSmartsheetFundingClient(unittest.TestCase):
         expected_models = [
             Funding(
                 funder=Organization.AI,
+                grant_number=None,
+                fundee=("person.two@acme.org, J Smith, John Doe II"),
+            )
+        ]
+        self.assertEqual(expected_models, model_response.aind_models)
+        self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
+
+    @patch("smartsheet.sheets.Sheets.get_sheet")
+    def test_mapping_abbreviation(self, mock_get_sheet: MagicMock):
+        """Tests successful sheet return response when org abbreviation used"""
+        mock_get_sheet.return_value.to_json.return_value = self.example_sheet2
+        settings = SmartsheetSettings(
+            access_token="abc-123", sheet_id=7478444220698500
+        )
+        client = SmartSheetClient(smartsheet_settings=settings)
+        smart_sheet_response = client.get_sheet()
+        mapper = FundingMapper(
+            smart_sheet_response=smart_sheet_response,
+            input_id="AIND Scientific Activities",
+        )
+        model_response = mapper.get_model_response()
+        expected_models = [
+            Funding(
+                funder=Organization.NINDS,
                 grant_number=None,
                 fundee=("person.two@acme.org, J Smith, John Doe II"),
             )
