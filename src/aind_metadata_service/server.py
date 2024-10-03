@@ -1,17 +1,42 @@
-"""Starts and runs a Flask Service"""
+"""Starts and runs a FastAPI Server"""
 
-import os
+import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from aind_metadata_service.labtracks.client import (
-    LabTracksClient,
+from aind_metadata_service import __version__ as service_version
+from aind_metadata_service.routers.favicon.route import router as fv_router
+from aind_metadata_service.routers.healthcheck.route import router as hc_router
+from aind_metadata_service.routers.subject.route import router as subj_router
+
+logging.basicConfig(level="INFO")
+
+description = f"""
+## aind-metadata-service
+
+Here is a list of databases we're pulling data from:
+
+LabTracks
+
+SharePoint
+
+  NSB
+
+SLIMS
+
+TARS
+
+"""
+
+app = FastAPI(
+    title="aind-metadata-service",
+    description=description,
+    summary="Consolidates metadata from disparate databases.",
+    version=service_version,
 )
-from aind_metadata_service.labtracks.query_builder import LabTracksQueries
 
-app = FastAPI()
-
+# noinspection PyTypeChecker
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,22 +44,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# TODO: Handle favicon better?
-favicon_path = os.getenv("FAVICON_PATH")
 
-
-lb_client = LabTracksClient(settings=labtracks_settings)
-
-
-@app.get("/labtracks/{subject_id}")
-async def retrieve_labtracks_info(subject_id: str, table: str):
-
-    # TODO: Sanitize user input
-    if table == "subject":
-        query = LabTracksQueries.subject_from_subject_id(subject_id)
-    else:
-        query = LabTracksQueries.procedures_from_subject_id(subject_id)
-    response = lb_client.run_query(query)
-    return response
-
-
+app.include_router(subj_router)
+app.include_router(fv_router)
+app.include_router(hc_router)
