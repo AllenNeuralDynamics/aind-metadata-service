@@ -34,7 +34,8 @@ dev = [
     'isort',
     'Sphinx',
     'pytest',
-    'pytest_asyncio'
+    'pytest_asyncio',
+    'factory-boy'
 ]
 
 server = [

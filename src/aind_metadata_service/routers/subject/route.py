@@ -38,7 +38,7 @@ class MultipleItemsFound(Message):
 
 @router.get(
     "/subject/{subject_id}",
-    response_model=Subject,
+    response_model=SubjectResponse,
     responses={
         status.HTTP_300_MULTIPLE_CHOICES: {"model": MultipleItemsFound},
         status.HTTP_404_NOT_FOUND: {"model": NoDataFound},

@@ -65,20 +65,3 @@ class SessionHandler:
         results = self.session.execute(statement=statement)
         subject_models = [Subject.model_validate(r) for r in results]
         return subject_models
-
-
-# router = APIRouter()
-#
-#
-# @router.get(
-#     "/subject/{subject_id}",
-#     tags=["labtracks"],
-#     response_description="Return HTTP Status Code 200 (OK)",
-#     response_model=Subject,
-# )
-# async def get_subject(subject_id: str = Path(..., example="632269")):
-#     """
-#     ## LabTracks subject data
-#     Retrieves subject information from LabTracks.
-#     """
-#     return Subject(id=subject_id)

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Any, Dict
+from typing import Any, Dict, Literal
 
 
 class Message(BaseModel):
@@ -13,10 +13,10 @@ class InvalidModelResponse(Message):
 
 
 class InternalServerError(Message):
-    message = "Internal Server Error"
-    data: Any = None
+    message: Literal["Internal Server Error"]
+    data: Literal[None]
 
 
 class NoDataFound(Message):
-    message = "No Data Found."
-    data: Any = None
+    message: Literal["No Data Found."]
+    data: Literal[None]

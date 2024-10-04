@@ -100,6 +100,40 @@ class TestSubject(unittest.TestCase):
             ["WARNING:root:Pydantic validation error: []"], captured.output
         )
 
+    @patch(
+        "aind_metadata_service.backends.labtracks.models.MouseCustomClass"
+        ".from_xml"
+    )
+    def test_parse_xml_string_exception(
+        self, mock_parse_xml: MagicMock
+    ):
+        """Tests edge case where an exception happens"""
+
+        # Mock parse_xml to raise a Validation Error.
+        mock_parse_xml.side_effect = Exception("Something went wrong")
+
+        with self.assertLogs() as captured:
+            lab_tracks_subject = Subject(
+                id=123456,
+                class_values="<some_xml></some_xml>",
+            )
+        self.assertEqual(Subject(id=123456), lab_tracks_subject)
+        self.assertEqual(
+            [
+                "ERROR:root:Something went wrong parsing "
+                "<some_xml></some_xml>: ('Something went wrong',)"
+            ], captured.output
+        )
+
+    def test_parse_xml_string_edge_case(self):
+        """Tests edge case where input is not a string"""
+
+        lab_tracks_subject = Subject(
+                id=123456,
+                class_values=0,
+        )
+        self.assertEqual(Subject(id=123456), lab_tracks_subject)
+
 
 if __name__ == "__main__":
     unittest.main()
