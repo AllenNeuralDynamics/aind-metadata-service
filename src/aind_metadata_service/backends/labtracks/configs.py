@@ -1,8 +1,9 @@
 """Module for settings to connect to LabTracks backend"""
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field, AliasChoices, SecretStr
 from urllib.parse import quote_plus
+
+from pydantic import AliasChoices, Field, SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):

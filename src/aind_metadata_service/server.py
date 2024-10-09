@@ -12,7 +12,7 @@ from aind_metadata_service.routers.subject.route import router as subj_router
 
 logging.basicConfig(level="INFO")
 
-description = f"""
+description = """
 ## aind-metadata-service
 
 Here is a list of databases we're pulling data from:

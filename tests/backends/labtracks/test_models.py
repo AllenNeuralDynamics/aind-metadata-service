@@ -6,10 +6,10 @@ from unittest.mock import MagicMock, patch
 from pydantic import ValidationError
 
 from aind_metadata_service.backends.labtracks.models import (
-    Subject,
+    MouseCustomClass,
     SexNames,
     SpeciesNames,
-    MouseCustomClass,
+    Subject,
 )
 
 
@@ -104,9 +104,7 @@ class TestSubject(unittest.TestCase):
         "aind_metadata_service.backends.labtracks.models.MouseCustomClass"
         ".from_xml"
     )
-    def test_parse_xml_string_exception(
-        self, mock_parse_xml: MagicMock
-    ):
+    def test_parse_xml_string_exception(self, mock_parse_xml: MagicMock):
         """Tests edge case where an exception happens"""
 
         # Mock parse_xml to raise a Validation Error.
@@ -122,15 +120,16 @@ class TestSubject(unittest.TestCase):
             [
                 "ERROR:root:Something went wrong parsing "
                 "<some_xml></some_xml>: ('Something went wrong',)"
-            ], captured.output
+            ],
+            captured.output,
         )
 
     def test_parse_xml_string_edge_case(self):
         """Tests edge case where input is not a string"""
 
         lab_tracks_subject = Subject(
-                id=123456,
-                class_values=0,
+            id=123456,
+            class_values=0,
         )
         self.assertEqual(Subject(id=123456), lab_tracks_subject)
 

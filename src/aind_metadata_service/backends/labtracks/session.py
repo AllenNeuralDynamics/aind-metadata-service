@@ -1,8 +1,9 @@
 """Module to handle LabTracks database session"""
 
 from sqlalchemy.orm import sessionmaker
-from aind_metadata_service.backends.labtracks.configs import Settings
 from sqlmodel import Session, create_engine
+
+from aind_metadata_service.backends.labtracks.configs import Settings
 
 # Construct a Settings. Can be set via env vars or aws param store.
 settings = Settings()

@@ -1,22 +1,20 @@
 import logging
-
-from fastapi import APIRouter, Path, Depends
+from typing import Any, Dict, List, Union
 
 from aind_data_schema.core.subject import Subject
-from fastapi import status
+from fastapi import APIRouter, Depends, Path, status
+from fastapi.responses import JSONResponse
 from pydantic import ValidationError
-
-from aind_metadata_service.backends.labtracks.session import get_session
-from aind_metadata_service.backends.labtracks.handler import SessionHandler
-from aind_metadata_service.routers.subject.mapper import Mapper
 from sqlmodel import Session
-from typing import List, Dict, Any, Union
+
+from aind_metadata_service.backends.labtracks.handler import SessionHandler
+from aind_metadata_service.backends.labtracks.session import get_session
 from aind_metadata_service.responses import (
-    Message,
     InternalServerError,
+    Message,
     NoDataFound,
 )
-from fastapi.responses import JSONResponse
+from aind_metadata_service.routers.subject.mapper import Mapper
 
 router = APIRouter()
 

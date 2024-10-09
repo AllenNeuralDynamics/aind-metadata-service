@@ -1,15 +1,16 @@
 """Module to retrieve data from LabTracks using session object"""
 
+from typing import List, Union
+
+from sqlalchemy.orm import aliased
+from sqlmodel import Session, select
+
 from aind_metadata_service.backends.labtracks.models import (
-    Subject,
     AnimalsCommon,
     Groups,
     Species,
+    Subject,
 )
-from typing import Union, List
-
-from sqlmodel import select, Session
-from sqlalchemy.orm import aliased
 
 
 class SessionHandler:
@@ -48,12 +49,12 @@ class SessionHandler:
                 s.species_name,
                 ac.cage_id,
                 ac.room_id,
-                p.id,
-                p.class_values,
-                m.id,
-                m.class_values,
+                ac.paternal_index.label("paternal_id"),
+                p.class_values.label("paternal_class_values"),
+                ac.maternal_index.label("maternal_id"),
+                m.class_values.label("maternal_class_values"),
                 g.group_name,
-                gm.group_description,
+                gm.group_description.label("group_description"),
             )
             .where(ac.id == int(subject_id))
             .outerjoin(s, ac.species_id == s.id)

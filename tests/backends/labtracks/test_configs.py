@@ -1,6 +1,7 @@
 """Tests configs module"""
 
 import unittest
+
 from aind_metadata_service.backends.labtracks.configs import Settings
 
 
