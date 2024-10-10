@@ -1,1 +1,0 @@
-"""Tests Smartsheet client package"""
