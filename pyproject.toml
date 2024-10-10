@@ -32,11 +32,9 @@ dev = [
     'flake8',
     'interrogate',
     'isort',
-    'Sphinx',
     'pytest',
     'pytest-env',
     'pytest_asyncio',
-    'factory-boy'
 ]
 
 server = [
