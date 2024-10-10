@@ -17,6 +17,7 @@ class SessionHandler:
     """Handle session object to get data"""
 
     def __init__(self, session: Session):
+        """Class constructor"""
         self.session = session
 
     def get_subject_view(self, subject_id: Union[str, int]) -> List[Subject]:
@@ -40,6 +41,8 @@ class SessionHandler:
         g = aliased(Groups, name="g")
         gm = aliased(Groups, name="gm")
         s = aliased(Species, name="s")
+        # PyCharm raises warnings about the usage of the .label method
+        # noinspection PyUnresolvedReferences
         statement = (
             select(
                 ac.id,

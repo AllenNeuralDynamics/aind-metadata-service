@@ -1,4 +1,13 @@
+"""Set up fixtures to be used across all test modules."""
+
+import json
+import os
+from datetime import datetime
+from decimal import Decimal
+from pathlib import Path
+
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel, create_engine
 
@@ -9,18 +18,17 @@ from aind_metadata_service.backends.labtracks.models import (
     Species,
     Subject,
 )
-from datetime import datetime
-from decimal import Decimal
-from pathlib import Path
-import json
-import os
+from aind_metadata_service.backends.labtracks.session import (
+    get_session as get_lb_session,
+)
+from aind_metadata_service.server import app
 
-TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__)))
-TEST_DB_FILE = TEST_DIR / "resources" / "test_db.json"
+RESOURCES_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / "resources"
 
 
 @pytest.fixture(scope="module")
-def test_subject():
+def test_lab_tracks_subject():
+    """A common lab_tracks subject pulled from their db"""
     return Subject(
         id=Decimal("632269.0000000000"),
         class_values=MouseCustomClass(
@@ -58,12 +66,21 @@ def test_subject():
             phenotype="P100: F.G.",
         ),
         group_name="Exp-ND-01-001-2109",
-        group_description="test description 2",
+        group_description="BALB/c",
     )
 
 
 @pytest.fixture(scope="module")
+def example_200_subject_response():
+    """Expected response when a user requests a subject."""
+    with open(RESOURCES_DIR / "subject_responses" / "response_200.json") as f:
+        contents = json.load(f)
+    return contents
+
+
+@pytest.fixture(scope="session")
 def get_session():
+    """Generate a sqlite database to query lab_tracks data."""
     engine = create_engine(
         "sqlite:///:memory:",
         connect_args={"check_same_thread": False},
@@ -75,7 +92,7 @@ def get_session():
     )
     session = session_local()
     # Load sqlite db with test data
-    with open(TEST_DB_FILE, "r") as f:
+    with open(RESOURCES_DIR / "test_db.json", "r") as f:
         test_db = json.load(f)
     for ac_row in test_db["animals_common"]:
         ac = AnimalsCommon.model_validate(ac_row)
@@ -92,3 +109,17 @@ def get_session():
     finally:
         session.rollback()
         session.close()
+
+
+@pytest.fixture(scope="session")
+def client(get_session):
+    """Override a dependency required by the FastAPI app."""
+
+    def override_get_lb_session():
+        """Override standard session with the one for tests."""
+        yield get_session
+
+    app.dependency_overrides[get_lb_session] = override_get_lb_session
+    with TestClient(app) as c:
+        yield c
+    app.dependency_overrides.clear()

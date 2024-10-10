@@ -1,31 +1,38 @@
+"""Module to map data from sources into a Subject model"""
+
 import logging
 from typing import Optional
 
+from aind_data_schema.core.subject import (
+    BackgroundStrain,
+    BreedingInfo,
+    Housing,
+    Sex,
+    Subject,
+)
+from aind_data_schema_models.organizations import Organization
 from aind_data_schema_models.species import Species
 from pydantic import ValidationError
 
 from aind_metadata_service.backends.labtracks.models import (
-    Subject as LabTracksSubject,
+    BgStrains,
     SexNames,
     SpeciesNames,
-    BgStrains,
 )
-from aind_data_schema_models.organizations import Organization
-from aind_data_schema.core.subject import (
-    Subject,
-    Sex,
-    BackgroundStrain,
-    BreedingInfo,
-    Housing,
+from aind_metadata_service.backends.labtracks.models import (
+    Subject as LabTracksSubject,
 )
 
 
 class Mapper:
+    """Class to handle mapping data into Subject model."""
 
     def __init__(self, lab_tracks_subject: LabTracksSubject):
+        """Class constructor."""
         self.lab_tracks_subject = lab_tracks_subject
 
     def _map_sex(self) -> Optional[str]:
+        """Maps lab_tracks_sex to Sex"""
 
         lab_tracks_sex = self.lab_tracks_subject.sex
 
@@ -40,6 +47,7 @@ class Mapper:
                 logging.warning(f"Unmatched lab_tracks_sex {lab_tracks_sex}")
 
     def _map_species(self) -> Optional[Species]:
+        """Maps lab_tracks_species to Species"""
 
         lab_tracks_species = self.lab_tracks_subject.species_name
         if lab_tracks_species is None:
@@ -57,6 +65,7 @@ class Mapper:
                 return None
 
     def _map_bg_strain(self) -> Optional[str]:
+        """Maps lab_tracks_bg_strain to BackgroundStrain"""
         lab_tracks_bg_strain = self.lab_tracks_subject.group_description
         if lab_tracks_bg_strain is None:
             return None
@@ -72,6 +81,7 @@ class Mapper:
                 return None
 
     def _map_housing(self) -> Optional[Housing]:
+        """Maps lab_tracks_room_id and lab_tracks_cage_id into Housing"""
         room_id = self.lab_tracks_subject.room_id
         cage_id = self.lab_tracks_subject.cage_id
 
@@ -83,6 +93,7 @@ class Mapper:
             return Housing(room_id=room_id, cage_id=cage_id)
 
     def _map_breeding_info(self) -> Optional[BreedingInfo]:
+        """Maps lab_tracks information to BreedingInfo"""
 
         breeding_group = self.lab_tracks_subject.group_name
         if self.lab_tracks_subject.paternal_class_values is None:
@@ -133,12 +144,14 @@ class Mapper:
 
     @staticmethod
     def _map_source(breeding_info: Optional[BreedingInfo]) -> Organization:
+        """Maps BreedingInfo to Organization"""
         if breeding_info is None:
             return Organization.OTHER
         else:
             return Organization.AI
 
     def map_to_subject(self) -> Subject:
+        """Map labtracks_subject model to Subject."""
 
         subject_id = str(self.lab_tracks_subject.id)
         if self.lab_tracks_subject.class_values is None:

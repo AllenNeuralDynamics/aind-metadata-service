@@ -1,5 +1,5 @@
 """
-Entrypoint to get a healthcheck from the service.
+Endpoint to get a healthcheck from the service
 """
 
 from typing import Literal

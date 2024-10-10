@@ -256,7 +256,7 @@
    "groups": [
       {
          "facility_id": "4113121",
-         "group_description": "test description 1",
+         "group_description": null,
          "group_number": "2949",
          "class_values": "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<GroupCustomClass xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" />",
          "cage_transfer_rent_item_id": null,
@@ -293,7 +293,7 @@
       },
       {
          "facility_id": "4113121",
-         "group_description": "test description 2",
+         "group_description": "BALB/c",
          "group_number": "2972",
          "class_values": "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<GroupCustomClass xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n  <Colony_Manager>Person One</Colony_Manager>\r\n  <Experimental_Animals_Needed>2 double positives per month. 25 per year</Experimental_Animals_Needed>\r\n</GroupCustomClass>",
          "cage_transfer_rent_item_id": null,

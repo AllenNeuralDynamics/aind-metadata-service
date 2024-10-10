@@ -1,3 +1,5 @@
+"""Favicon endpoint"""
+
 import os
 
 from fastapi import APIRouter, status

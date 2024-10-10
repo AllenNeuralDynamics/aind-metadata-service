@@ -1,6 +1,7 @@
 """Starts and runs a FastAPI Server"""
 
 import logging
+import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,7 +11,8 @@ from aind_metadata_service.routers.favicon.route import router as fv_router
 from aind_metadata_service.routers.healthcheck.route import router as hc_router
 from aind_metadata_service.routers.subject.route import router as subj_router
 
-logging.basicConfig(level="INFO")
+log_level = os.getenv("LOG_LEVEL", "INFO")
+logging.basicConfig(level=log_level)
 
 description = """
 ## aind-metadata-service

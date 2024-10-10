@@ -3,10 +3,10 @@
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import Session, create_engine
 
-from aind_metadata_service.backends.labtracks.configs import Settings
+from aind_metadata_service.backends.labtracks.configs import get_settings
 
 # Construct a Settings. Can be set via env vars or aws param store.
-settings = Settings()
+settings = get_settings()
 
 engine = create_engine(url=settings.db_connection_str)
 
@@ -15,7 +15,7 @@ session_local = sessionmaker(
 )
 
 
-def get_session() -> Session:
+def get_session():
     """Yield a session object. This will automatically close the session when
     finished."""
     session = session_local()

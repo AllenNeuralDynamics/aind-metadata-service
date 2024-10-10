@@ -44,3 +44,8 @@ class Settings(BaseSettings):
             f"mssql+pyodbc://{self.user}:{encoded_password}@"
             f"{self.host}:{self.port}/{self.database}?driver={self.driver}"
         )
+
+
+def get_settings() -> Settings:
+    """Utility method to return a settings object."""
+    return Settings()

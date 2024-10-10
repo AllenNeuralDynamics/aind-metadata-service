@@ -4,21 +4,23 @@ import unittest
 from datetime import date, datetime
 
 from aind_data_schema.core.subject import (
-    Sex,
     BackgroundStrain,
-    Housing,
     BreedingInfo,
+    Housing,
+    Sex,
     Subject,
 )
 from aind_data_schema_models.organizations import Organization
 from aind_data_schema_models.species import Species
 
 from aind_metadata_service.backends.labtracks.models import (
-    Subject as LabTracksSubject,
+    BgStrains,
+    MouseCustomClass,
     SexNames,
     SpeciesNames,
-    MouseCustomClass,
-    BgStrains,
+)
+from aind_metadata_service.backends.labtracks.models import (
+    Subject as LabTracksSubject,
 )
 from aind_metadata_service.routers.subject.mapper import Mapper
 
@@ -27,6 +29,7 @@ class TestMapper(unittest.TestCase):
     """Tests methods in Mapper class"""
 
     def test_map_sex(self):
+        """Test map_sex method"""
         with self.assertLogs() as captured:
             lb_model1 = LabTracksSubject(id=123456, sex=SexNames.MALE)
             lb_model2 = LabTracksSubject(id=123456, sex=SexNames.FEMALE)
@@ -47,6 +50,7 @@ class TestMapper(unittest.TestCase):
         )
 
     def test_map_species(self):
+        """Test map_species method"""
         with self.assertLogs() as captured:
             lb_model1 = LabTracksSubject(
                 id=123456, species_name=SpeciesNames.MOUSE
@@ -72,6 +76,7 @@ class TestMapper(unittest.TestCase):
         )
 
     def test_map_bg_strain(self):
+        """Test map_bg_strain method"""
         with self.assertLogs() as captured:
             lb_model1 = LabTracksSubject(
                 id=123456, group_description=BgStrains.BALB_C
@@ -99,6 +104,7 @@ class TestMapper(unittest.TestCase):
         )
 
     def test_map_housing(self):
+        """Test map_housing method"""
         lb_model1 = LabTracksSubject(id=123456, room_id=-999, cage_id=1)
         lb_model2 = LabTracksSubject(id=123456, room_id=1, cage_id=2)
         lb_model3 = LabTracksSubject(id=123456, room_id=1, cage_id=-999)
@@ -120,6 +126,7 @@ class TestMapper(unittest.TestCase):
         self.assertIsNone(actual5)
 
     def test_map_breeding_info(self):
+        """Test map_breeding_info method"""
 
         paternal_class_values = MouseCustomClass(
             full_genotype="RCL-somBiPoles_mCerulean-WPRE/wt"
@@ -182,6 +189,7 @@ class TestMapper(unittest.TestCase):
         self.assertEqual(expected2, actual2)
 
     def test_map_subject(self):
+        """Test map_subject method"""
         paternal_class_values = MouseCustomClass(
             full_genotype="RCL-somBiPoles_mCerulean-WPRE/wt"
         )
@@ -243,6 +251,21 @@ class TestMapper(unittest.TestCase):
         actual2 = Mapper(lab_tracks_subject=lb_model2).map_to_subject()
         self.assertEqual(expected1, actual1)
         self.assertEqual(expected2, actual2)
+
+    def test_map_subject_invalid(self):
+        """Test map_subject with missing required data"""
+        lb_model1 = LabTracksSubject(
+            id=123456,
+        )
+        actual1 = Mapper(lab_tracks_subject=lb_model1).map_to_subject()
+        expected1 = Subject.model_construct(
+            subject_id="123456",
+            sex=None,
+            species=None,
+            source=Organization.OTHER,
+            date_of_birth=None,
+        )
+        self.assertEqual(expected1, actual1)
 
 
 if __name__ == "__main__":

@@ -1,3 +1,6 @@
+"""Module to handle subject endpoint responses"""
+
+import json
 import logging
 from typing import Any, Dict, List, Union
 
@@ -20,17 +23,23 @@ router = APIRouter()
 
 
 class SubjectResponse(Message):
+    """Valid Subject response"""
+
     message: str = "Valid Model"
     data: Subject
 
 
 class InvalidSubjectResponse(Message):
+    """Invalid Subject response"""
+
     message: str
-    data: Dict[str, Any]
+    data: Subject
 
 
 class MultipleItemsFound(Message):
-    message: str = "Multiple Items Found."
+    """Multiple Items Found response"""
+
+    message: str = "Multiple Items Found"
     data: List[Union[Subject, Dict[str, Any]]]
 
 
@@ -45,7 +54,7 @@ class MultipleItemsFound(Message):
     },
 )
 async def get_subject(
-    subject_id: str = Path(..., example="632269"),
+    subject_id: str = Path(..., examples=["632269"]),
     session: Session = Depends(get_session),
 ):
     """
@@ -56,10 +65,11 @@ async def get_subject(
         lab_tracks_subjects = SessionHandler(session=session).get_subject_view(
             subject_id=subject_id
         )
+        print("LB:", lab_tracks_subjects)
         if len(lab_tracks_subjects) == 0:
             return JSONResponse(
                 status_code=status.HTTP_404_NOT_FOUND,
-                content=NoDataFound().model_dump_json(),
+                content=json.loads(NoDataFound().model_dump_json()),
             )
         else:
             subjects = [
@@ -70,27 +80,28 @@ async def get_subject(
                 subject = subjects[0]
                 try:
                     Subject.model_validate(subject.model_dump())
-                    return JSONResponse(
-                        status_code=status.HTTP_200_OK,
-                        content=SubjectResponse(data=subject),
-                    )
+                    return SubjectResponse(data=subject)
                 except ValidationError as e:
                     errors = e.json()
                     return JSONResponse(
                         status_code=status.HTTP_406_NOT_ACCEPTABLE,
-                        content=InvalidSubjectResponse(
-                            message=f"Validation errors: {errors}",
-                            data=subject,
+                        content=json.loads(
+                            InvalidSubjectResponse(
+                                message=f"Validation errors: {errors}",
+                                data=subject,
+                            ).model_dump_json()
                         ),
                     )
             else:
                 return JSONResponse(
                     status_code=status.HTTP_300_MULTIPLE_CHOICES,
-                    content=MultipleItemsFound(data=subjects),
+                    content=json.loads(
+                        MultipleItemsFound(data=subjects).model_dump_json()
+                    ),
                 )
     except Exception as e:
         logging.error(f"An error occurred: {e.args}")
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content=InternalServerError().model_dump_json(),
+            content=json.loads(InternalServerError().model_dump_json()),
         )

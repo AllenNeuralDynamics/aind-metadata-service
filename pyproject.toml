@@ -34,6 +34,7 @@ dev = [
     'isort',
     'Sphinx',
     'pytest',
+    'pytest-env',
     'pytest_asyncio',
     'factory-boy'
 ]
@@ -42,7 +43,7 @@ server = [
     'pyodbc',
     'office365-rest-python-client==2.4.1',
     'smartsheet-python-sdk==3.0.2',
-    'fastapi',
+    'fastapi>=0.114.0',
     'fastapi-cache2',
     'sqlmodel',
     'uvicorn[standard]',
@@ -87,7 +88,7 @@ exclude = '''
 '''
 
 [tool.coverage.run]
-omit = ["*__init__*","*server*"]
+omit = ["*__init__*"]
 source = ["aind_metadata_service", "tests"]
 
 [tool.coverage.report]
@@ -110,3 +111,10 @@ fail-under = 100
 [tool.pytest.ini_options]
 asyncio_mode="auto"
 asyncio_default_fixture_loop_scope="function"
+env = [
+    "LABTRACKS_HOST=lb_host",
+    "LABTRACKS_PASSWORD=lb_password",
+    "LABTRACKS_USER=lb_user",
+    "LABTRACKS_PORT=123",
+    "LABTRACKS_DATABASE=lb_db"
+]
