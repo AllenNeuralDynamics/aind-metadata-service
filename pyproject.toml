@@ -44,7 +44,7 @@ server = [
     'python-dateutil',
     'slims-python-api==6.8.0',
     'azure-identity==1.15.0',
-    'aind-slims-api==0.1.13'
+    'aind-slims-api>=0.1.14'
 ]
 
 client = [
