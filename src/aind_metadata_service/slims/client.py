@@ -1,25 +1,22 @@
 """Module for slims client"""
 
 import logging
-from typing import Any, List
 
-import requests
 from aind_data_schema.core.instrument import Instrument
 from aind_data_schema.core.rig import Rig
-from aind_slims_api.models import SlimsAttachment
 from pydantic import Extra, Field, SecretStr
 from pydantic_settings import BaseSettings
 from requests.models import Response
 from slims.criteria import equals
-from slims.internal import Record
-from slims.slims import Slims
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
-from aind_metadata_service.slims.models import ContentsTableRow
 from aind_slims_api.exceptions import SlimsRecordNotFound
 from aind_slims_api import SlimsClient
+
+# TODO: update import once its moved
 from aind_slims_api.models.ecephys_session import SlimsInstrumentRdrc
+
 
 class SlimsSettings(BaseSettings):
     """Configuration class. Mostly a wrapper around smartsheet.Smartsheet
@@ -42,7 +39,9 @@ class SlimsHandler:
 
     def __init__(self, settings: SlimsSettings):
         """Class constructor for slims client"""
-        self.client = SlimsClient(username=settings.username, password=settings.password)
+        self.client = SlimsClient(
+            username=settings.username, password=settings.password
+        )
 
     @staticmethod
     def _is_json_file(file: Response) -> bool:
@@ -56,13 +55,23 @@ class SlimsHandler:
         """
         try:
             inst = self.client.fetch_model(SlimsInstrumentRdrc, name=input_id)
-            attachment = self.client.fetch_attachment(inst, equals("name", input_id))
+            attachment = self.client.fetch_attachment(
+                inst, equals("name", input_id)
+            )
             if attachment:
-                attachment_response = self.client.fetch_attachment_content(attachment)
-                if attachment_response.status_code == 200 and self._is_json_file(attachment_response):
-                    model = Instrument.model_construct(**attachment_response.json())
+                attachment_response = self.client.fetch_attachment_content(
+                    attachment
+                )
+                if (
+                    attachment_response.status_code == 200
+                    and self._is_json_file(attachment_response)
+                ):
+                    model = Instrument.model_construct(
+                        **attachment_response.json()
+                    )
                     return ModelResponse(
-                        aind_models=[model], status_code=StatusCodes.DB_RESPONDED
+                        aind_models=[model],
+                        status_code=StatusCodes.DB_RESPONDED,
                     )
                 elif attachment_response.status_code == 401:
                     return ModelResponse.connection_error_response()
@@ -82,13 +91,18 @@ class SlimsHandler:
         """
         try:
             inst = self.client.fetch_model(SlimsInstrumentRdrc, name=input_id)
-            attachment = self.client.fetch_attachment(inst, equals("name", input_id))
+            attachment = self.client.fetch_attachment(
+                inst, equals("name", input_id)
+            )
             if attachment:
-                attachment_response = self.client.fetch_attachment_content(attachment)
+                attachment_response = self.client.fetch_attachment_content(
+                    attachment
+                )
                 if attachment_response.status_code == 200:
                     model = Rig.model_construct(**attachment_response.json())
                     return ModelResponse(
-                        aind_models=[model], status_code=StatusCodes.DB_RESPONDED
+                        aind_models=[model],
+                        status_code=StatusCodes.DB_RESPONDED,
                     )
                 elif attachment_response.status_code == 401:
                     return ModelResponse.connection_error_response()
@@ -100,5 +114,3 @@ class SlimsHandler:
         except Exception as e:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
-
-
