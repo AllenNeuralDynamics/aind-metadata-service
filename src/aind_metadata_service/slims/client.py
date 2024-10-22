@@ -13,9 +13,7 @@ from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
 from aind_slims_api.exceptions import SlimsRecordNotFound
 from aind_slims_api import SlimsClient
-
-# TODO: update import once its moved
-from aind_slims_api.models.ecephys_session import SlimsInstrumentRdrc
+from aind_slims_api.models.instrument import SlimsInstrumentRdrc
 
 
 class SlimsSettings(BaseSettings):
@@ -40,7 +38,9 @@ class SlimsHandler:
     def __init__(self, settings: SlimsSettings):
         """Class constructor for slims client"""
         self.client = SlimsClient(
-            username=settings.username, password=settings.password
+            username=settings.username,
+            password=settings.password.get_secret_value().strip("'"),
+            url=settings.host
         )
 
     @staticmethod
@@ -110,7 +110,7 @@ class SlimsHandler:
                     return ModelResponse.internal_server_error_response()
         except SlimsRecordNotFound:
             return ModelResponse.no_data_found_error_response()
-        # Handles case where we might gt an exception from GET request
+        # Handles exception from GET request
         except Exception as e:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()

@@ -9,7 +9,7 @@ from aind_data_schema.core.instrument import Instrument
 from aind_data_schema.core.rig import Rig
 
 from aind_metadata_service.slims.client import SlimsHandler, SlimsSettings
-from aind_slims_api.models.ecephys_session import SlimsInstrumentRdrc
+from aind_slims_api.models.instrument import SlimsInstrumentRdrc
 
 
 class TestSlimsHandler(unittest.TestCase):
@@ -62,20 +62,16 @@ class TestSlimsHandler(unittest.TestCase):
                 SlimsInstrumentRdrc, name="test_id"
             )
 
-    @patch(
-        "aind_metadata_service.slims.client.SlimsHandler._is_json_file",
-        return_value=False,
-    )
-    def test_get_instrument_model_response_invalid_content(
-        self, mock_is_json_file
+    def test_get_instrument_model_response_invalid_response(
+        self
     ):
-        """Test response when the content is not valid JSON."""
+        """Test response when the content is not valid response."""
         mock_inst = MagicMock()
         self.mock_client.fetch_model.return_value = mock_inst
         mock_attachment = MagicMock()
         self.mock_client.fetch_attachment.return_value = mock_attachment
         mock_response = MagicMock(spec=Response)
-        mock_response.status_code = 200
+        mock_response.status_code = 500
         self.mock_client.fetch_attachment_content.return_value = mock_response
 
         response = self.handler.get_instrument_model_response("test_id")
@@ -84,6 +80,27 @@ class TestSlimsHandler(unittest.TestCase):
             response.status_code, StatusCodes.INTERNAL_SERVER_ERROR
         )
 
+    @patch('aind_metadata_service.slims.client.logging.error')
+    def test_get_instrument_model_response_exception(self, mock_logging_error):
+        """Test get_instrument_model_response handles generic exception."""
+        self.handler.client.fetch_model.side_effect = Exception("Some error from SLIMS.")
+        response = self.handler.get_instrument_model_response('test_id')
+        self.assertEqual(response.status_code, StatusCodes.INTERNAL_SERVER_ERROR)
+        mock_logging_error.assert_called_once_with(repr(Exception("Some error from SLIMS.")))
+
+        self.handler.client.fetch_model.assert_called_once_with(SlimsInstrumentRdrc, name='test_id')
+
+    @patch('aind_metadata_service.slims.client.logging.error')
+    def test_get_rig_model_response_exception(self, mock_logging_error):
+        """Test get_instrument_model_response handles generic exception."""
+        self.handler.client.fetch_model.side_effect = Exception("Some error from SLIMS.")
+        response = self.handler.get_rig_model_response('test_id')
+        self.assertEqual(response.status_code, StatusCodes.INTERNAL_SERVER_ERROR)
+        mock_logging_error.assert_called_once_with(repr(Exception("Some error from SLIMS.")))
+
+        self.handler.client.fetch_model.assert_called_once_with(SlimsInstrumentRdrc, name='test_id')
+
+
     def test_get_instrument_model_response_not_found(self):
         """Test response when SlimsRecordNotFound is raised."""
         self.mock_client.fetch_model.side_effect = SlimsRecordNotFound
@@ -91,12 +108,8 @@ class TestSlimsHandler(unittest.TestCase):
         response = self.handler.get_instrument_model_response("test_id")
         self.assertEqual(response.status_code, StatusCodes.NO_DATA_FOUND)
 
-    @patch(
-        "aind_metadata_service.slims.client.SlimsHandler._is_json_file",
-        return_value=True,
-    )
     def test_get_instrument_model_response_connection_error(
-        self, mock_is_json_file
+        self
     ):
         """Test response when a connection error occurs (status 401)."""
         mock_inst = MagicMock()
@@ -110,11 +123,7 @@ class TestSlimsHandler(unittest.TestCase):
         response = self.handler.get_instrument_model_response("test_id")
         self.assertEqual(response.status_code, StatusCodes.CONNECTION_ERROR)
 
-    @patch(
-        "aind_metadata_service.slims.client.SlimsHandler._is_json_file",
-        return_value=True,
-    )
-    def test_get_rig_model_response_success(self, mock_is_json_file):
+    def test_get_rig_model_response_success(self):
         """Test successful response from get_rig_model_response."""
         mock_inst = MagicMock()
         self.mock_client.fetch_model.return_value = mock_inst
@@ -143,6 +152,40 @@ class TestSlimsHandler(unittest.TestCase):
 
         response = self.handler.get_rig_model_response("test_id")
         self.assertEqual(response.status_code, StatusCodes.NO_DATA_FOUND)
+
+
+    def test_get_rig_model_response_connection_error(
+        self
+    ):
+        """Test response when a connection error occurs (status 401)."""
+        mock_inst = MagicMock()
+        self.mock_client.fetch_model.return_value = mock_inst
+        mock_attachment = MagicMock()
+        self.mock_client.fetch_attachment.return_value = mock_attachment
+        mock_response = MagicMock(spec=Response)
+        mock_response.status_code = 401
+        self.mock_client.fetch_attachment_content.return_value = mock_response
+
+        response = self.handler.get_rig_model_response("test_id")
+        self.assertEqual(response.status_code, StatusCodes.CONNECTION_ERROR)
+
+    def test_get_rig_model_response_invalid_response(
+        self
+    ):
+        """Test response when the content is not valid response."""
+        mock_inst = MagicMock()
+        self.mock_client.fetch_model.return_value = mock_inst
+        mock_attachment = MagicMock()
+        self.mock_client.fetch_attachment.return_value = mock_attachment
+        mock_response = MagicMock(spec=Response)
+        mock_response.status_code = 500
+        self.mock_client.fetch_attachment_content.return_value = mock_response
+
+        response = self.handler.get_rig_model_response("test_id")
+
+        self.assertEqual(
+            response.status_code, StatusCodes.INTERNAL_SERVER_ERROR
+        )
 
 
 if __name__ == "__main__":
