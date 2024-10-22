@@ -40,7 +40,7 @@ class SlimsHandler:
         self.client = SlimsClient(
             username=settings.username,
             password=settings.password.get_secret_value().strip("'"),
-            url=settings.host
+            url=settings.host,
         )
 
     @staticmethod
