@@ -39,9 +39,10 @@ class SlimsHandler:
         """Class constructor for slims client"""
         self.client = SlimsClient(
             username=settings.username,
-            password=settings.password.get_secret_value().strip("'"),
+            password=settings.password.get_secret_value(),
             url=settings.host,
         )
+
 
     @staticmethod
     def _is_json_file(file: Response) -> bool:
