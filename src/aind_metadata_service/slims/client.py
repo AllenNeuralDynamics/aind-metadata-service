@@ -43,7 +43,6 @@ class SlimsHandler:
             url=settings.host,
         )
 
-
     @staticmethod
     def _is_json_file(file: Response) -> bool:
         """Checks whether file is a json."""
