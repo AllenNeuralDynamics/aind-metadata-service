@@ -22,7 +22,6 @@ from aind_metadata_service.sharepoint.client import (
     SharePointClient,
     SharepointSettings,
 )
-from aind_metadata_service.slims.client import SlimsClient, SlimsSettings
 from aind_metadata_service.smartsheet.client import (
     SmartSheetClient,
     SmartsheetSettings,
@@ -37,6 +36,7 @@ from aind_metadata_service.smartsheet.protocols.mapping import (
 )
 from aind_metadata_service.tars.client import AzureSettings, TarsClient
 from aind_metadata_service.tars.mapping import TarsResponseHandler
+from aind_metadata_service.slims.client import SlimsSettings, SlimsHandler
 
 SMARTSHEET_FUNDING_ID = os.getenv("SMARTSHEET_FUNDING_ID")
 SMARTSHEET_FUNDING_TOKEN = os.getenv("SMARTSHEET_API_TOKEN")
@@ -88,9 +88,8 @@ funding_smart_sheet_client = SmartSheetClient(
 protocols_smart_sheet_client = SmartSheetClient(
     smartsheet_settings=protocols_smartsheet_settings
 )
-
+slims_client = SlimsHandler(settings=slims_settings)
 tars_client = TarsClient(azure_settings=tars_settings)
-slims_client = SlimsClient(settings=slims_settings)
 
 template_directory = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "templates")
