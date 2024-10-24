@@ -14,7 +14,8 @@ from aind_metadata_service.response_handler import ModelResponse
 from aind_slims_api.exceptions import SlimsRecordNotFound
 from aind_slims_api import SlimsClient
 from aind_slims_api.models.instrument import SlimsInstrumentRdrc
-
+from aind_metadata_service.slims.mapping import SlimsSessionMapper
+from aind_slims_api.operations.ecephys_session import fetch_ecephys_sessions
 
 class SlimsSettings(BaseSettings):
     """Configuration class. Mostly a wrapper around smartsheet.Smartsheet
@@ -47,6 +48,7 @@ class SlimsHandler:
     def _is_json_file(file: Response) -> bool:
         """Checks whether file is a json."""
         return file.headers.get("Content-Type", "") == "application/json"
+
 
     def get_instrument_model_response(self, input_id) -> ModelResponse:
         """
@@ -114,3 +116,25 @@ class SlimsHandler:
         except Exception as e:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
+
+    def get_sessions_model_response(self, subject_id: str) -> ModelResponse:
+        """
+        Fetches sessions for a given subject ID from SLIMS.
+        """
+        try:
+            sessions = fetch_ecephys_sessions(subject_id=subject_id, client=self.client)
+            if sessions:
+                mapper = SlimsSessionMapper()
+                mapped_sessions = mapper.map_sessions(sessions, subject_id)
+                return ModelResponse(
+                    aind_models=mapped_sessions,
+                    status_code=StatusCodes.DB_RESPONDED
+                )
+            else:
+                return ModelResponse.no_data_found_error_response()
+        except SlimsRecordNotFound:
+            return ModelResponse.no_data_found_error_response()
+        except Exception as e:
+            logging.error(repr(e))
+            return ModelResponse.internal_server_error_response()
+
