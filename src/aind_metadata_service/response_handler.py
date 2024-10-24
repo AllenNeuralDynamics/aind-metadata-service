@@ -133,6 +133,7 @@ class ModelResponse(Generic[T]):
                     " the databases."
                 )
         else:
+            # TODO: validate each model and add validation errors to message
             status_code = StatusCodes.MULTIPLE_RESPONSES.value
             message = "Multiple Items Found."
             content_data = [

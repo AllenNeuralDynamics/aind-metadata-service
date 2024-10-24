@@ -16,11 +16,9 @@ from aind_data_schema.core.session import (
     LaserConfig, RewardSolution, RewardSpoutConfig, RewardDeliveryConfig
 )
 from enum import Enum
-from aind_slims_api import SlimsClient
 from aind_slims_api.models.ecephys_session import SlimsBrainStructureRdrc, SlimsStimulusEpochsResult, \
     SlimsRewardSpoutsRdrc, SlimsRewardDeliveryRdrc
 from aind_slims_api.operations.ecephys_session import (
-    fetch_ecephys_sessions,
     EcephysSession as SlimsEcephysSession,
     SlimsStream,
     SlimsStreamModule, SlimsRewardDeliveryInfo,
@@ -52,29 +50,12 @@ class SlimsRewardSolution(str, Enum):
     WATER = "Water"
     OTHER = "Other, (if Other, specify below)"
 
-# TODO: refactor into client and mapper classes
-# TODO: wrap get_slims_sessions into JSONResponse object
-class SessionSlimsClient:
+class SlimsSessionMapper:
     """Client for interacting with SLIMS and mapping session data."""
 
-    def __init__(self, slims_client: SlimsClient):
-        """Initialize the client."""
-        self.client = slims_client
-
-    def get_slims_sessions(self, subject_id: str) -> List[Session]:
-        """
-        Fetches sessions for a given subject ID from SLIMS.
-
-        :param subject_id: The subject identifier
-        :return: List of mapped Session objects
-        """
-        try:
-            sessions = fetch_ecephys_sessions(subject_id=subject_id, client=self.client)
-            return [self._map_session(session, subject_id=subject_id) for session in sessions]
-        except Exception as e:
-            # log instead.
-            print(f"Error fetching SLIMS sessions: {e}")
-            return []
+    def map_sessions(self, sessions: List[SlimsEcephysSession], subject_id:str) -> List[Session]:
+        """Maps SLIMS sessions to AIND session models."""
+        return [self._map_session(session, subject_id=subject_id) for session in sessions]
 
     def _map_session(self, session: SlimsEcephysSession, subject_id: str) -> Session:
         """Map a single SLIMS session to the AIND session model."""
@@ -90,9 +71,9 @@ class SessionSlimsClient:
         animal_weight_post = getattr(session_result, 'weight_post_g', None)
         reward_consumed_total = getattr(session_result, 'reward_consumed_vol', None)
 
-        streams = [self._map_stream(stream) for stream in session.streams]
-        stimulus_epochs = [self._map_stimulus_epoch(epoch) for epoch in session.stimulus_epochs]
-        reward_delivery = self._map_reward_delivery(getattr(session, 'reward_delivery')) if getattr(session, 'reward_delivery') else None
+        streams = [self._map_stream(stream) for stream in getattr(session, "streams", [])]
+        stimulus_epochs = [self._map_stimulus_epoch(epoch) for epoch in getattr(session, "stimulus_epochs", [])]
+        reward_delivery_info = self._map_reward_delivery(getattr(session, 'reward_delivery')) if getattr(session, 'reward_delivery') else None
 
         # model_construct because start and end times are not stored in SLIMS
         return Session.model_construct(
@@ -105,17 +86,28 @@ class SessionSlimsClient:
             animal_weight_post=animal_weight_post,
             data_streams=streams,
             stimulus_epochs=stimulus_epochs,
-            reward_delivery=reward_delivery,
+            reward_delivery=reward_delivery_info,
             reward_consumed_total=reward_consumed_total,
         )
 
-    def _map_reward_delivery(self, reward_info: SlimsRewardDeliveryInfo) -> RewardDeliveryConfig:
+    def _map_reward_delivery(self, reward_info: SlimsRewardDeliveryInfo) -> Optional[RewardDeliveryConfig]:
         """Map reward info from SLIMS to RewardDeliveryConfig model."""
-        reward_solution, notes = self._map_reward_solution(reward_info.reward_delivery)
-        reward_spouts = [
-            self._map_reward_spouts(spout)
-            for spout in getattr(reward_info, 'reward_spouts', [])
-        ]
+
+        has_reward_delivery = bool(getattr(reward_info, 'reward_delivery', None))
+        has_reward_spouts = bool(getattr(reward_info, 'reward_spouts', None))
+
+        if not has_reward_delivery and not has_reward_spouts:
+            return None
+
+        if has_reward_delivery:
+            reward_solution, notes = self._map_reward_solution(reward_info.reward_delivery)
+        else:
+            reward_solution, notes = None, None
+
+        if has_reward_spouts:
+            reward_spouts = [self._map_reward_spouts(reward_info.reward_spouts)]
+        else:
+            reward_spouts = []
 
         return RewardDeliveryConfig(
             reward_solution=reward_solution,
