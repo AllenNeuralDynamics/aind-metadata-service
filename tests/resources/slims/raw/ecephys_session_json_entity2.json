@@ -1,0 +1,146 @@
+{
+   "session_group": {
+      "pk": 64952,
+      "created_on": 1729807856372,
+      "json_entity": {},
+      "name": "Group of Sessions",
+      "experimentrun_pk": 41181
+   },
+   "session_instrument": {
+      "pk": 1743,
+      "created_on": 1711642574300,
+      "json_entity": {},
+      "name": "323_EPHYS1_OPTO_20240212"
+   },
+   "session_result": {
+      "pk": 2894,
+      "created_on": 1729807858852,
+      "json_entity": {},
+      "test_label": "Mouse Session",
+      "mouse_session_id": "RSLT0000002946",
+      "mouse_session": null,
+      "weight_prior_g": 10.0,
+      "weight_post_g": 10.0,
+      "reward_consumed_vol": 12.0,
+      "mouse_pk": 3280,
+      "mouse_session_pk": null,
+      "experiment_run_step_pk": 64953
+   },
+   "streams": [
+      {
+         "pk": 2895,
+         "created_on": 1729807859729,
+         "json_entity": {},
+         "test_label": "Streams",
+         "mouse_session": null,
+         "stream_modalities": [
+            "Behavior",
+            "Ecephys"
+         ],
+         "daq_names": [
+            "Harp Behavior",
+            "NPopto Basestation"
+         ],
+         "camera_names": [
+            "Camera1",
+            "Camera2"
+         ],
+         "stream_modules_pk": [
+            3467,
+            3672
+         ],
+         "mouse_pk": 3280,
+         "mouse_session_pk": 2894,
+         "experiment_run_step_pk": 64954,
+         "stream_modules": [
+            {
+               "pk": 3467,
+               "created_on": 1726521670522,
+               "json_entity": {},
+               "implant_hole": 9.0,
+               "assembly_name": "assembly name test",
+               "probe_name": "ephys probe name test",
+               "primary_targeted_structure_pk": 1897,
+               "secondary_targeted_structures_pk": null,
+               "arc_angle": 3.0,
+               "module_angle": 3.0,
+               "rotation_angle": 3.0,
+               "coordinate_transform": null,
+               "ccf_coordinate_ap": 3.0,
+               "ccf_coordinate_ml": 3.0,
+               "ccf_coordinate_dv": 3.0,
+               "ccf_version": 3.0,
+               "bregma_target_ap": 3.0,
+               "bregma_target_ml": 3.0,
+               "bregma_target_dv": 3.0,
+               "surface_z": null,
+               "manipulator_x": 1.0,
+               "manipulator_y": 1.0,
+               "manipulator_z": 1.0,
+               "dye": null,
+               "fiber_connections_pk": null,
+               "primary_targeted_structure": {
+                  "pk": 1897,
+                  "created_on": 1714684334335,
+                  "json_entity": {},
+                  "name": "Nucleus accumbens"
+               },
+               "secondary_targeted_structures": []
+            },
+            {
+               "pk": 3672,
+               "created_on": 1729812275378,
+               "json_entity": {},
+               "implant_hole": null,
+               "assembly_name": "45881",
+               "probe_name": null,
+               "primary_targeted_structure_pk": null,
+               "secondary_targeted_structures_pk": null,
+               "arc_angle": 1.0,
+               "module_angle": 1.0,
+               "rotation_angle": 1.0,
+               "coordinate_transform": null,
+               "ccf_coordinate_ap": null,
+               "ccf_coordinate_ml": null,
+               "ccf_coordinate_dv": null,
+               "ccf_version": null,
+               "bregma_target_ap": null,
+               "bregma_target_ml": null,
+               "bregma_target_dv": null,
+               "surface_z": null,
+               "manipulator_x": null,
+               "manipulator_y": null,
+               "manipulator_z": null,
+               "dye": null,
+               "fiber_connections_pk": null,
+               "primary_targeted_structure": null,
+               "secondary_targeted_structures": []
+            }
+         ]
+      }
+   ],
+   "stimulus_epochs": [
+      {
+         "pk": 2896,
+         "created_on": 1729807860197,
+         "json_entity": {},
+         "test_label": "Stimulus Epochs",
+         "mouse_session": null,
+         "stimulus_device_names": "device1, device2",
+         "stimulus_name": "stim1",
+         "stimulus_modalities": [
+            "Auditory",
+            "Olfactory"
+         ],
+         "reward_consumed_during_epoch": 12.0,
+         "laser_name": "laserA",
+         "laser_wavelength": 12.0,
+         "laser_excitation_power": 1.0,
+         "speaker_name": "speaker1",
+         "speaker_volume": 1.0,
+         "mouse_pk": 3280,
+         "mouse_session_pk": 2894,
+         "experiment_run_step_pk": 64955
+      }
+   ]
+}

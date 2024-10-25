@@ -129,60 +129,44 @@ class SlimsSessionMapper:
             reward_consumed_total=reward_consumed_total,
         )
 
-    def _map_reward_delivery(
-            self, reward_info: SlimsRewardDeliveryInfo
-    ) -> Optional[RewardDeliveryConfig]:
+    def _map_reward_delivery(self, reward_info: SlimsRewardDeliveryInfo) -> Optional[RewardDeliveryConfig]:
         """Map reward info from SLIMS to RewardDeliveryConfig model."""
 
-        has_reward_delivery = bool(
-            getattr(reward_info, "reward_delivery", None)
-        )
-        has_reward_spouts = bool(getattr(reward_info, "reward_spouts", None))
+        slims_reward_delivery = getattr(reward_info, "reward_delivery", None)
+        slims_reward_spouts = getattr(reward_info, "reward_spouts", None)
 
-        if not has_reward_delivery and not has_reward_spouts:
+        if not slims_reward_delivery and not slims_reward_spouts:
             return None
+        else:
+            reward_solution, notes = (self._map_reward_solution(slims_reward_delivery)
+                                      if slims_reward_delivery else (None, None))
 
-        if has_reward_delivery:
-            reward_solution, notes = self._map_reward_solution(
-                reward_info.reward_delivery
+            reward_spouts = [self._map_reward_spouts(slims_reward_spouts)] if slims_reward_spouts else []
+
+            return RewardDeliveryConfig(
+                reward_solution=reward_solution,
+                reward_spouts=reward_spouts,
+                notes=notes,
             )
-        else:
-            reward_solution, notes = None, None
-
-        if has_reward_spouts:
-            reward_spouts = [
-                self._map_reward_spouts(reward_info.reward_spouts)
-            ]
-        else:
-            reward_spouts = []
-
-        return RewardDeliveryConfig(
-            reward_solution=reward_solution,
-            reward_spouts=reward_spouts,
-            notes=notes,
-        )
 
     @staticmethod
-    def _map_reward_solution(
-            reward_delivery: SlimsRewardDeliveryRdrc,
-    ) -> tuple[Optional[RewardSolution], Optional[str]]:
+    def _map_reward_solution(reward_delivery: SlimsRewardDeliveryRdrc) -> tuple[
+        Optional[RewardSolution], Optional[str]]:
         """Map reward solution and notes."""
-        slims_reward_solution = getattr(
-            reward_delivery, "reward_solution", None
-        )
+
+        slims_reward_solution = getattr(reward_delivery, "reward_solution", None)
 
         if slims_reward_solution == SlimsRewardSolution.WATER:
             return RewardSolution.WATER, None
-        elif slims_reward_solution == SlimsRewardSolution.OTHER:
+        if slims_reward_solution == SlimsRewardSolution.OTHER:
             notes = getattr(reward_delivery, "other_reward_solution", None)
             return RewardSolution.OTHER, notes
-        else:
-            return None, None
 
-    def _map_reward_spouts(
-            self, reward_spout: SlimsRewardSpoutsRdrc
-    ) -> RewardSpoutConfig:
+        return None, None
+
+    def _map_reward_spouts(self, reward_spout: SlimsRewardSpoutsRdrc) -> RewardSpoutConfig:
         """Map reward spout info to RewardSpoutConfig model"""
+
         spout_side = getattr(reward_spout, "spout_side", None)
         return RewardSpoutConfig.model_construct(
             side=self._map_spout_side(spout_side) if spout_side else None,
@@ -193,15 +177,16 @@ class SlimsSessionMapper:
     @staticmethod
     def _map_spout_side(spout_side: str) -> SpoutSide:
         """Maps SLIMS input spout side to SpoutSide"""
+
         spout_side_lower = spout_side.lower()
-        if "left" in spout_side:
+        if "left" in spout_side_lower:
             return SpoutSide.LEFT
-        elif "right" in spout_side_lower:
+        if "right" in spout_side_lower:
             return SpoutSide.RIGHT
-        elif "center" in spout_side_lower:
+        if "center" in spout_side_lower:
             return SpoutSide.CENTER
-        else:
-            return SpoutSide.OTHER
+
+        return SpoutSide.OTHER
 
     def _map_stimulus_epoch(
             self, stimulus_epoch: SlimsStimulusEpochsResult
