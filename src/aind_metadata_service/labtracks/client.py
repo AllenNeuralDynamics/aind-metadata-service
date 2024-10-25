@@ -57,13 +57,13 @@ class LabTracksClient:
     """This class contains the api to connect to LabTracks db."""
 
     def __init__(
-        self,
-        driver: str,
-        server: str,
-        port: str,
-        db: str,
-        user: str,
-        password: str,
+            self,
+            driver: str,
+            server: str,
+            port: str,
+            db: str,
+            user: str,
+            password: str,
     ) -> None:
         """
         Initialize a client
@@ -245,7 +245,7 @@ class LabTracksResponseHandler:
 
     @staticmethod
     def _map_class_values_to_genotype(
-        class_values: Optional[str],
+            class_values: Optional[str],
     ) -> Optional[str]:
         """
         Extracts the full genotype from the class values field.
@@ -319,7 +319,7 @@ class LabTracksResponseHandler:
 
     @staticmethod
     def _map_to_background_strain(
-        bg_strain: Optional[str],
+            bg_strain: Optional[str],
     ) -> Optional[BackgroundStrain]:
         """
         Maps the LabTracks BG Strain enum to the
@@ -344,7 +344,7 @@ class LabTracksResponseHandler:
 
     @staticmethod
     def _map_housing(
-        room_id: Optional[str], cage_id: Optional[str]
+            room_id: Optional[str], cage_id: Optional[str]
     ) -> Optional[Housing]:
         """
         Maps the LabTracks room_id and cage_id
@@ -452,8 +452,8 @@ class LabTracksResponseHandler:
 
     @staticmethod
     def map_response_to_procedures(
-        subject_id: str,
-        results: List[dict],
+            subject_id: str,
+            results: List[dict],
     ) -> Optional[Procedures]:
         """
         Maps a response from LabTracks to an aind_data_schema.Procedure
@@ -490,8 +490,8 @@ class LabTracksResponseHandler:
             type_name = result.get(TaskSetQueryColumns.TYPE_NAME.value)
             task_status = result.get(TaskSetQueryColumns.TASK_STATUS.value)
             if (
-                type_name
-                and task_status == LabTracksTaskStatuses.FINISHED.value
+                    type_name
+                    and task_status == LabTracksTaskStatuses.FINISHED.value
             ):
                 if LabTracksProcedures.PERFUSION.value in type_name:
                     output_specimen_ids = {

@@ -40,7 +40,7 @@ class TestSlimsHandler(unittest.TestCase):
         "aind_metadata_service.slims.client.SlimsHandler._is_json_file",
         return_value=True,
     )
-    def test_get_instrument_model_response_success(self, mock_is_json_file):
+    def test_get_instrument_model_response_success(self):
         """Test successful response from get_instrument_model_response."""
         mock_inst = MagicMock()
         self.mock_client.fetch_model.return_value = mock_inst

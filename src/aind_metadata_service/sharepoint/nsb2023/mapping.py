@@ -142,7 +142,7 @@ class HeadPostInfo:
     # flake8: noqa: C901
     @classmethod
     def from_hp_and_hp_type(
-        cls, hp: Optional[HeadPost], hp_type: Optional[HeadPostType]
+            cls, hp: Optional[HeadPost], hp_type: Optional[HeadPostType]
     ):
         """Construct HeadPostInfo2023 from headpost and headpost_type"""
         # TODO: mappings for Headpost: Zirconia, Full ring, Lshaped
@@ -238,7 +238,7 @@ class MappedNSBList:
             return None
 
     def _parse_length_of_time_str(
-        self, len_of_time_str: Optional[str]
+            self, len_of_time_str: Optional[str]
     ) -> Optional[Decimal]:
         """Parse length of time strings"""
         if len_of_time_str is not None:
@@ -259,7 +259,7 @@ class MappedNSBList:
 
     @staticmethod
     def _parse_virus_strain_str(
-        virus_strain_str: Optional[str],
+            virus_strain_str: Optional[str],
     ) -> Optional[str]:
         """Parse virus strain strings"""
         # TODO: Figure out how to parse virus strain field
@@ -280,7 +280,7 @@ class MappedNSBList:
 
     @staticmethod
     def _parse_concentration_str(
-        con_str: Optional[str],
+            con_str: Optional[str],
     ) -> Optional[Decimal]:
         """Parse string representation of concentration into Decimal."""
         return None if con_str is None else Decimal(str(float(con_str)))
@@ -3148,7 +3148,7 @@ class MappedNSBList:
         }
 
     def surgery_during_info(
-        self, during: During, inj_type: Optional[InjectionType] = None
+            self, during: During, inj_type: Optional[InjectionType] = None
     ) -> SurgeryDuringInfo:
         """
         Compiles burr hole information from NSB data
@@ -3452,7 +3452,7 @@ class MappedNSBList:
 
     @staticmethod
     def _map_burr_hole_number_to_probe(
-        burr_hole_num: int,
+            burr_hole_num: int,
     ) -> Optional[str]:
         """Maps NSB Burr hole number into AIND ProbeName"""
         # TODO: add probes for burr_hole_nums 5 and 6
@@ -3486,15 +3486,15 @@ class MappedNSBList:
             return [vol] * len(dv) if dv is not None else [vol]
 
     def map_burr_hole_injection_materials(
-        self, injectable_materials: List[InjectableMaterial]
+            self, injectable_materials: List[InjectableMaterial]
     ) -> Optional[List[Union[ViralMaterial, NonViralMaterial]]]:
         """Maps injection materials for burr hole."""
         injection_materials = []
         for injectable_material in injectable_materials:
             if (
-                injectable_material.material
-                and injectable_material.titer_str
-                and self._is_titer(injectable_material.titer_str)
+                    injectable_material.material
+                    and injectable_material.titer_str
+                    and self._is_titer(injectable_material.titer_str)
             ):
                 titer = re.search(
                     self.SCIENTIFIC_NOTATION_REGEX,
@@ -3506,9 +3506,9 @@ class MappedNSBList:
                 )
                 injection_materials.append(viral)
             elif (
-                injectable_material.material
-                and injectable_material.titer_str
-                and self._is_concentration(injectable_material.titer_str)
+                    injectable_material.material
+                    and injectable_material.titer_str
+                    and self._is_concentration(injectable_material.titer_str)
             ):
                 concentration = re.search(
                     self.CONCENTRATION_REGEX, injectable_material.titer_str
@@ -3522,7 +3522,7 @@ class MappedNSBList:
 
     @staticmethod
     def _pair_burr_hole_inj_materials(
-        materials: List[str], titers: List[str]
+            materials: List[str], titers: List[str]
     ) -> Optional[List[InjectableMaterial]]:
         """Pairs materials and corresponding titers/concentrations."""
         injectable_materials = []
@@ -3858,9 +3858,9 @@ class MappedNSBList:
 
         # generic surgery model if non-procedure info is available
         if (
-            len(other_procedures) == 0
-            and len(initial_procedures) == 0
-            and self.aind_date_of_surgery
+                len(other_procedures) == 0
+                and len(initial_procedures) == 0
+                and self.aind_date_of_surgery
         ):
             generic_surgery = Surgery.model_construct(
                 start_date=self.aind_date_of_surgery,

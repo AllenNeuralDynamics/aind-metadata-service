@@ -84,8 +84,8 @@ class SmartSheetMapper(ABC):
 
         """
         if (
-            self.smart_sheet_response.status_code
-            == StatusCodes.INTERNAL_SERVER_ERROR.value
+                self.smart_sheet_response.status_code
+                == StatusCodes.INTERNAL_SERVER_ERROR.value
         ):
             return ModelResponse.internal_server_error_response()
         elif self.sheet_contents is None:

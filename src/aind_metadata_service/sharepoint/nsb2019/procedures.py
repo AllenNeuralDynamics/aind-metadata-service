@@ -17,7 +17,7 @@ class NSB2019Procedures:
     _view_title = "New Request"
 
     def get_procedures_from_sharepoint(
-        self, subject_id: str, client_context: ClientContext, list_title: str
+            self, subject_id: str, client_context: ClientContext, list_title: str
     ) -> List[Surgery]:
         """
         Get list of Procedures from NSB 2019 database.

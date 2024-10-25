@@ -128,9 +128,10 @@ async def retrieve_sessions(subject_id):
     model_response = slims_client.get_sessions_model_response(subject_id)
     return model_response.map_to_json_response()
 
+
 @app.get("/protocols/{protocol_name}")
 async def retrieve_protocols(
-    protocol_name,
+        protocol_name,
 ):
     """Retrieves perfusion information from smartsheet"""
 

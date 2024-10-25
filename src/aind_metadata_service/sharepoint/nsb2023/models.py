@@ -2541,7 +2541,7 @@ class NSBList(BaseModel, extra="allow"):
         alias="Non_x002d_NSB_x0020_Surgeon",
         title="Non-NSB Surgeon",
         description="Is this surgery going to be performed by NSB"
-        " or someone else?",
+                    " or someone else?",
     )
     of_burr: Annotated[OfBurrHoles, WrapValidator(optional_enum)] = Field(
         default=None,

@@ -43,7 +43,7 @@ class FundingMapper(SmartSheetMapper):
             return input_name
 
     def _map_row_to_funding(
-        self, row: SheetRow, input_project_name: str
+            self, row: SheetRow, input_project_name: str
     ) -> Optional[Funding]:
         """
         Map a row to an optional funding model.

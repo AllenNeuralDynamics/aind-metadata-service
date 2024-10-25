@@ -75,7 +75,7 @@ class TarsResponseHandler:
 
     @staticmethod
     def _map_prep_type_and_protocol(
-        viral_prep_type: str,
+            viral_prep_type: str,
     ) -> tuple[Optional[VirusPrepType], Optional[str]]:
         """Maps TARS viral prep type to prep_type and prep_protocol"""
         if viral_prep_type == ViralPrepTypes.CRUDE_SOP.value:
@@ -159,7 +159,7 @@ class TarsResponseHandler:
         return full_genome_name
 
     def map_lot_to_injection_material(
-        self, viral_prep_lot: dict, viral_prep_aliases: ViralPrepAliases
+            self, viral_prep_lot: dict, viral_prep_aliases: ViralPrepAliases
     ) -> ViralMaterial:
         """
         Map prep lot dictionary to injection materials
@@ -217,10 +217,10 @@ class TarsResponseHandler:
             for subject_procedure in procedures.subject_procedures:
                 for procedure in subject_procedure.procedures:
                     if (
-                        isinstance(procedure, Injection)
-                        and hasattr(procedure, "injection_materials")
-                        and isinstance(procedure.injection_materials, list)
-                        and procedure.injection_materials
+                            isinstance(procedure, Injection)
+                            and hasattr(procedure, "injection_materials")
+                            and isinstance(procedure.injection_materials, list)
+                            and procedure.injection_materials
                     ):
                         virus_strains = [
                             getattr(material, "name")
@@ -231,7 +231,7 @@ class TarsResponseHandler:
 
     @staticmethod
     def integrate_injection_materials(
-        response: ModelResponse, tars_mapping: Dict[str, JSONResponse]
+            response: ModelResponse, tars_mapping: Dict[str, JSONResponse]
     ) -> ModelResponse:
         """
         Merges tars_response with procedures_response.
@@ -245,23 +245,23 @@ class TarsResponseHandler:
             for subject_procedure in pre_procedures.subject_procedures:
                 for procedure in subject_procedure.procedures:
                     if isinstance(procedure, Injection) and hasattr(
-                        procedure, "injection_materials"
+                            procedure, "injection_materials"
                     ):
                         for idx, injection_material in enumerate(
-                            procedure.injection_materials
+                                procedure.injection_materials
                         ):
                             if isinstance(
-                                injection_material, ViralMaterial
+                                    injection_material, ViralMaterial
                             ) and hasattr(injection_material, "name"):
                                 virus_strain = injection_material.name
                                 tars_response = tars_mapping.get(virus_strain)
                                 if (
-                                    tars_response.status_code
-                                    == StatusCodes.DB_RESPONDED.value
-                                    or tars_response.status_code
-                                    == StatusCodes.VALID_DATA.value
-                                    or tars_response.status_code
-                                    == StatusCodes.INVALID_DATA.value
+                                        tars_response.status_code
+                                        == StatusCodes.DB_RESPONDED.value
+                                        or tars_response.status_code
+                                        == StatusCodes.VALID_DATA.value
+                                        or tars_response.status_code
+                                        == StatusCodes.INVALID_DATA.value
                                 ):
                                     data = json.loads(tars_response.body)[
                                         "data"
@@ -274,8 +274,8 @@ class TarsResponseHandler:
                                         new_material
                                     )
                                 elif (
-                                    tars_response.status_code
-                                    == StatusCodes.NO_DATA_FOUND.value
+                                        tars_response.status_code
+                                        == StatusCodes.NO_DATA_FOUND.value
                                 ):
                                     pass
                                 else:

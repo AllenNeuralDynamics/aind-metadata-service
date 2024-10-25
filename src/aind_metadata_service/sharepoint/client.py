@@ -57,14 +57,14 @@ class SharePointClient:
     """This class contains the api to connect to SharePoint db."""
 
     def __init__(
-        self,
-        nsb_site_url: str,
-        las_site_url: str,
-        client_id: str,
-        client_secret: str,
-        nsb_2019_list_title: str,
-        nsb_2023_list_title: str,
-        las_2020_list_title: str,
+            self,
+            nsb_site_url: str,
+            las_site_url: str,
+            client_id: str,
+            client_secret: str,
+            nsb_2019_list_title: str,
+            nsb_2023_list_title: str,
+            las_2020_list_title: str,
     ) -> None:
         """
         Initialize a client
@@ -112,7 +112,7 @@ class SharePointClient:
         )
 
     def get_procedure_info(
-        self, subject_id: str, list_title: str
+            self, subject_id: str, list_title: str
     ) -> ModelResponse:
         """
         Primary interface. Maps a subject_id to a response.
@@ -160,7 +160,7 @@ class SharePointClient:
 
     @staticmethod
     def _handle_response_from_sharepoint(
-        subject_id: str, subject_procedures: Optional[list] = None
+            subject_id: str, subject_procedures: Optional[list] = None
     ) -> Optional[Procedures]:
         """
         Maps the response from SharePoint into a Procedures model
@@ -186,7 +186,7 @@ class SharePointClient:
 
     @staticmethod
     def _merge_procedures(
-        left_procedures: List[Procedures], right_procedures: List[Procedures]
+            left_procedures: List[Procedures], right_procedures: List[Procedures]
     ) -> List[Procedures]:
         """
         Merges two lists of Procedures. Given the way the lists are
@@ -209,8 +209,8 @@ class SharePointClient:
         else:
             subject_id = left_procedures[0].subject_id
             new_subject_procedures = (
-                left_procedures[0].subject_procedures
-                + right_procedures[0].subject_procedures
+                    left_procedures[0].subject_procedures
+                    + right_procedures[0].subject_procedures
             )
             return [
                 Procedures.model_construct(
@@ -220,9 +220,9 @@ class SharePointClient:
             ]
 
     def _merge_two_responses(
-        self,
-        left_model_response: ModelResponse[Procedures],
-        right_model_response: ModelResponse[Procedures],
+            self,
+            left_model_response: ModelResponse[Procedures],
+            right_model_response: ModelResponse[Procedures],
     ) -> ModelResponse[Procedures]:
         """
         Merges two ModelResponses of Procedures type.
@@ -238,13 +238,13 @@ class SharePointClient:
 
         """
         if (
-            left_model_response.status_code.value >= 500
-            and right_model_response.status_code.value >= 500
+                left_model_response.status_code.value >= 500
+                and right_model_response.status_code.value >= 500
         ):
             return ModelResponse.internal_server_error_response()
         elif (
-            left_model_response.status_code == StatusCodes.DB_RESPONDED
-            and right_model_response.status_code.value >= 500
+                left_model_response.status_code == StatusCodes.DB_RESPONDED
+                and right_model_response.status_code.value >= 500
         ):
             return ModelResponse(
                 aind_models=left_model_response.aind_models,
@@ -255,8 +255,8 @@ class SharePointClient:
                 ),
             )
         elif (
-            left_model_response.status_code.value >= 500
-            and right_model_response.status_code == StatusCodes.DB_RESPONDED
+                left_model_response.status_code.value >= 500
+                and right_model_response.status_code == StatusCodes.DB_RESPONDED
         ):
             return ModelResponse(
                 aind_models=right_model_response.aind_models,
@@ -276,8 +276,8 @@ class SharePointClient:
                 right_procedures=right_procedures,
             )
             if (
-                left_model_response.status_code == StatusCodes.MULTI_STATUS
-                or right_model_response.status_code == StatusCodes.MULTI_STATUS
+                    left_model_response.status_code == StatusCodes.MULTI_STATUS
+                    or right_model_response.status_code == StatusCodes.MULTI_STATUS
             ):
                 return ModelResponse(
                     aind_models=procedures,
@@ -294,7 +294,7 @@ class SharePointClient:
                 )
 
     def merge_responses(
-        self, model_responses: List[ModelResponse[Procedures]]
+            self, model_responses: List[ModelResponse[Procedures]]
     ) -> ModelResponse[Procedures]:
         """
         Merges a list of ModelResponses into a single ModelResponse using a
