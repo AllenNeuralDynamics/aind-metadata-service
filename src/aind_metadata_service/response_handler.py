@@ -142,6 +142,7 @@ class ModelResponse(Generic[T]):
 
         else:
             status_code = StatusCodes.MULTIPLE_RESPONSES.value
+            message = "Multiple Items Found."
             content_data = [
                 jsonable_encoder(json.loads(model.model_dump_json()))
                 for model in self.aind_models
@@ -152,20 +153,19 @@ class ModelResponse(Generic[T]):
                 validation_errors = []
                 for model in self.aind_models:
                     error = self._validate_model(model)
+                    print(error)
                     if error:
                         validation_errors.append(error)
 
                 if validation_errors:
-                    status_code = StatusCodes.INVALID_DATA.value
-                    message = (
-                        f"Validation Errors: {', '.join(validation_errors)}"
+                    message += (
+                        f" Validation Errors: {', '.join(validation_errors)}"
                     )
                 else:
-                    status_code = StatusCodes.VALID_DATA.value
-                    message = "All Models Valid."
+                    message += " All Models Valid."
             else:
-                message = (
-                    "Multiple Items Found. Models have not been validated."
+                message += (
+                    " Models have not been validated."
                 )
 
         return JSONResponse(

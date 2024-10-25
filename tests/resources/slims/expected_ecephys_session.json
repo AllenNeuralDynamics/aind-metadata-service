@@ -3,7 +3,7 @@
    "schema_version": "1.0.1",
    "protocol_id": [],
    "session_end_time": null,
-   "session_type": "Optotagging",
+   "session_type": null,
    "iacuc_protocol": null,
    "rig_id": "323_EPHYS1_OPTO_20240212",
    "calibrations": [],

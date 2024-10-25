@@ -195,7 +195,7 @@ class TestResponseHandler(unittest.TestCase):
         self.assertEqual(expected_json.body, actual_json.body)
 
     def test_multiple_items_response(self):
-        """Test multiple item response"""
+        """Test multiple item response with validation."""
         models = [sp_valid_model, sp_valid_model]
         model_response = ModelResponse(
             status_code=StatusCodes.DB_RESPONDED, aind_models=models
@@ -206,11 +206,38 @@ class TestResponseHandler(unittest.TestCase):
             jsonable_encoder(json.loads(model.model_dump_json()))
             for model in models
         ]
+        validation_error = ModelResponse._validate_model(sp_valid_model)
         expected_json = JSONResponse(
             status_code=300,
             content=(
                 {
-                    "message": "Multiple Items Found.",
+                    "message": f"Multiple Items Found. Validation Errors: {validation_error}, {validation_error}",
+                    "data": models_json,
+                }
+            ),
+        )
+
+        self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
+        self.assertEqual(expected_json.status_code, actual_json.status_code)
+        self.assertEqual(expected_json.body, actual_json.body)
+
+    def test_multiple_items_response_no_validation(self):
+        """Test multiple item response"""
+        models = [sp_valid_model, sp_valid_model]
+        model_response = ModelResponse(
+            status_code=StatusCodes.DB_RESPONDED, aind_models=models
+        )
+        actual_json = model_response.map_to_json_response(validate=False)
+
+        models_json = [
+            jsonable_encoder(json.loads(model.model_dump_json()))
+            for model in models
+        ]
+        expected_json = JSONResponse(
+            status_code=300,
+            content=(
+                {
+                    "message": f"Multiple Items Found. Models have not been validated.",
                     "data": models_json,
                 }
             ),

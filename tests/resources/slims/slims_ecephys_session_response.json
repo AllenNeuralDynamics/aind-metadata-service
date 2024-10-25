@@ -4,7 +4,6 @@
       "created_on": 1729807856372,
       "json_entity": {},
       "name": "Group of Sessions",
-      "session_type": "Optotagging",
       "experimentrun_pk": 41181
    },
    "session_instrument": {
@@ -43,7 +42,10 @@
             "Harp Behavior",
             "NPopto Basestation"
          ],
-         "camera_names": ["Camera1", "Camera2"],
+         "camera_names": [
+            "Camera1",
+            "Camera2"
+         ],
          "stream_modules_pk": [
             3467,
             3672
