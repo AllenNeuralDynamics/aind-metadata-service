@@ -1,0 +1,1 @@
+"""Route for funding info"""

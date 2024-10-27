@@ -78,8 +78,20 @@ def example_200_subject_response():
     return contents
 
 
+@pytest.fixture()
+def mock_get_raw_funding_sheet(mocker):
+    """Expected raw funding sheet."""
+    with open(RESOURCES_DIR / "backends" / "smartsheet" / "funding.json") as f:
+        contents = json.load(f)
+    mock_get = mocker.patch(
+        "aind_smartsheet_api.client.SmartsheetClient.get_raw_sheet"
+    )
+    mock_get.return_value = json.dumps(contents)
+    return mock_get
+
+
 @pytest.fixture(scope="session")
-def get_session():
+def get_lab_tracks_session():
     """Generate a sqlite database to query lab_tracks data."""
     engine = create_engine(
         "sqlite:///:memory:",
@@ -112,12 +124,12 @@ def get_session():
 
 
 @pytest.fixture(scope="session")
-def client(get_session):
+def client(get_lab_tracks_session):
     """Override a dependency required by the FastAPI app."""
 
     def override_get_lb_session():
         """Override standard session with the one for tests."""
-        yield get_session
+        yield get_lab_tracks_session
 
     app.dependency_overrides[get_lb_session] = override_get_lb_session
     with TestClient(app) as c:

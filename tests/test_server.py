@@ -18,7 +18,7 @@ class TestServer:
         assert 200 == response.status_code
 
     def test_get_subject(
-        self, client, get_session, example_200_subject_response
+        self, client, get_lab_tracks_session, example_200_subject_response
     ):
         """Tests subject"""
         response = client.get("/subject/632269")
