@@ -139,4 +139,3 @@ class SlimsHandler:
         except Exception as e:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
-
