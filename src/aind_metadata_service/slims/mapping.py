@@ -59,7 +59,7 @@ class SlimsStreamModalities(Enum):
 
 
 class SlimsRewardSolution(str, Enum):
-    """"""
+    """Enum class for reward solution in SLIMS."""
 
     WATER = "Water"
     OTHER = "Other, (if Other, specify below)"

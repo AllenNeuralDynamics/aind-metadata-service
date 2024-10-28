@@ -1,3 +1,4 @@
+"""Tests Slims Mapper"""
 import json
 import os
 import unittest
