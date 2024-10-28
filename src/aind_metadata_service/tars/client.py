@@ -64,7 +64,7 @@ class TarsClient:
         return {"Authorization": f"Bearer {self._access_token}"}
 
     def _get_prep_lot_response(
-            self, prep_lot_number: str
+        self, prep_lot_number: str
     ) -> Optional[requests.models.Response]:
         """
         Retrieves viral prep lot response from TARS. Returns
@@ -88,7 +88,7 @@ class TarsClient:
 
     @staticmethod
     def _filter_prep_lot_response(
-            prep_lot_number: str, response: requests.models.Response
+        prep_lot_number: str, response: requests.models.Response
     ) -> Optional[List]:
         """
         Filters response from TARS for exact match.
@@ -106,7 +106,7 @@ class TarsClient:
         return filtered_data
 
     def _get_molecules_response(
-            self, plasmid_name: str
+        self, plasmid_name: str
     ) -> requests.models.Response:
         """
         Retrieves molecules from TARS.
@@ -126,7 +126,7 @@ class TarsClient:
         return response
 
     def get_injection_materials_info(
-            self, prep_lot_number: str
+        self, prep_lot_number: str
     ) -> ModelResponse:
         """
         Fetches response from TARS and then handles mapping to
@@ -144,8 +144,8 @@ class TarsClient:
                     aliases=lot["viralPrep"]["virus"]["aliases"]
                 )
                 if (
-                        viral_prep_aliases.plasmid_name
-                        and viral_prep_aliases.full_genome_name is None
+                    viral_prep_aliases.plasmid_name
+                    and viral_prep_aliases.full_genome_name is None
                 ):
                     # check molecular registry for full genome name
                     molecule_response = self._get_molecules_response(

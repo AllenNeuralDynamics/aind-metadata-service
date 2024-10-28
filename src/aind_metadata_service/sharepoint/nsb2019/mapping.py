@@ -154,7 +154,7 @@ class MappedNSBList:
                 return None
 
     def _parse_weight_str(
-            self, weight_str: Optional[str]
+        self, weight_str: Optional[str]
     ) -> Optional[Decimal]:
         """Parse weight strings"""
         # Most entries are recorded as simple floats. There are some outliers.
@@ -166,7 +166,7 @@ class MappedNSBList:
             return None
 
     def _parse_alt_time_str(
-            self, alt_time_str: Optional[str]
+        self, alt_time_str: Optional[str]
     ) -> Optional[Decimal]:
         """Parse alternating time strings"""
         if alt_time_str is not None:
@@ -179,7 +179,7 @@ class MappedNSBList:
             return None
 
     def _parse_angle_str(
-            self, inj_ang_str: Optional[str]
+        self, inj_ang_str: Optional[str]
     ) -> Optional[Decimal]:
         """Parse angle strings"""
         if inj_ang_str is not None:
@@ -203,7 +203,7 @@ class MappedNSBList:
             return None
 
     def _parse_length_of_time_str(
-            self, len_of_time_str: Optional[str]
+        self, len_of_time_str: Optional[str]
     ) -> Optional[Decimal]:
         """Parse length of time strings"""
         if len_of_time_str is not None:
@@ -1366,7 +1366,7 @@ class MappedNSBList:
 
     @property
     def aind_craniotomy_coordinates_reference(
-            self,
+        self,
     ) -> Optional[CoordinateReferenceLocation]:
         """Map craniotomy type to CoordinateReferenceLocation"""
         return (
@@ -1381,12 +1381,12 @@ class MappedNSBList:
 
     @property
     def aind_inj1_coordinates_reference(
-            self,
+        self,
     ) -> Optional[CoordinateReferenceLocation]:
         """Map nsb inj1 field to CoordinateReferenceLocation"""
         if (
-                self._nsb.virus_a_p is not None
-                and "LAMBDA" in self._nsb.virus_a_p.upper()
+            self._nsb.virus_a_p is not None
+            and "LAMBDA" in self._nsb.virus_a_p.upper()
         ):
             return CoordinateReferenceLocation.LAMBDA
         else:
@@ -1394,12 +1394,12 @@ class MappedNSBList:
 
     @property
     def aind_inj2_coordinates_reference(
-            self,
+        self,
     ) -> Optional[CoordinateReferenceLocation]:
         """Map nsb inj2 field to CoordinateReferenceLocation"""
         if (
-                self._nsb.ap2nd_inj is not None
-                and "LAMBDA" in self._nsb.ap2nd_inj.upper()
+            self._nsb.ap2nd_inj is not None
+            and "LAMBDA" in self._nsb.ap2nd_inj.upper()
         ):
             return CoordinateReferenceLocation.LAMBDA
         else:
@@ -1694,10 +1694,10 @@ class MappedNSBList:
             return True
         else:
             return not (
-                    self.has_injection_procedure
-                    or self.has_fiber_implant_procedure
-                    or self.has_craniotomy_procedure
-                    or self.has_head_frame_procedure
+                self.has_injection_procedure
+                or self.has_fiber_implant_procedure
+                or self.has_craniotomy_procedure
+                or self.has_head_frame_procedure
             )
 
     def get_procedure(self) -> List[Surgery]:
@@ -1718,9 +1718,9 @@ class MappedNSBList:
         if self.has_fiber_implant_procedure:
             procedures.append(self.get_fiber_implant())
         if (
-                self.has_head_frame_procedure
-                or self.has_craniotomy_procedure
-                or self.has_fiber_implant_procedure
+            self.has_head_frame_procedure
+            or self.has_craniotomy_procedure
+            or self.has_fiber_implant_procedure
         ):
             start_date = self.aind_date_of_surgery
             animal_weight_prior = self.aind_weight_before_surger
@@ -1769,8 +1769,8 @@ class MappedNSBList:
 
         # create a surgery for 2nd injection
         if (
-                self.has_injection_procedure
-                and self.has_second_injection_procedure
+            self.has_injection_procedure
+            and self.has_second_injection_procedure
         ):
             start_date = self.aind_date2nd_injection
             animal_weight_prior = self.aind_second_injection_weight_b

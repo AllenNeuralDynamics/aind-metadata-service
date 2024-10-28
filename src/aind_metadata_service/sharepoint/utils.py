@@ -7,7 +7,7 @@ from pydantic_core.core_schema import ValidatorFunctionWrapHandler
 
 
 def optional_enum(
-        v: Any, handler: ValidatorFunctionWrapHandler
+    v: Any, handler: ValidatorFunctionWrapHandler
 ) -> Optional[Any]:
     """If an enum value does not exist, will use None instead"""
     try:

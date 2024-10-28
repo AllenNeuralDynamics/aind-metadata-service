@@ -30,7 +30,7 @@ class ProtocolsMapper(SmartSheetMapper):
     """Primary class to handle mapping data models and returning a response"""
 
     def _map_row_to_protocol(
-            self, row: SheetRow, input_protocol_name: Optional[str]
+        self, row: SheetRow, input_protocol_name: Optional[str]
     ) -> Optional[ProtocolInformation]:
         """
         Map a row to an optional funding model.
@@ -74,7 +74,7 @@ class ProtocolsMapper(SmartSheetMapper):
                 )
 
     def _get_protocol_list(
-            self, protocol_name: str
+        self, protocol_name: str
     ) -> List[ProtocolInformation]:
         """
         Return a list of Protocol Information for a given protocol name
@@ -156,7 +156,7 @@ class ProtocolsIntegrator:
         return protocol_list
 
     def integrate_protocols(
-            self, response: ModelResponse, protocols_mapping: Dict
+        self, response: ModelResponse, protocols_mapping: Dict
     ) -> ModelResponse:
         """
         Merges protocols responses with procedures response
@@ -176,25 +176,25 @@ class ProtocolsIntegrator:
             pre_procedures = response.aind_models[0]
             for subject_procedure in pre_procedures.subject_procedures:
                 if (
-                        isinstance(subject_procedure, Surgery)
-                        and hasattr(subject_procedure, "experimenter_full_name")
-                        and "NSB" in subject_procedure.experimenter_full_name
+                    isinstance(subject_procedure, Surgery)
+                    and hasattr(subject_procedure, "experimenter_full_name")
+                    and "NSB" in subject_procedure.experimenter_full_name
                 ):
                     protocol_name = ProtocolNames.SURGERY.value
                     smartsheet_response = protocols_mapping.get(protocol_name)
                     if (
-                            smartsheet_response.status_code
-                            == StatusCodes.DB_RESPONDED.value
-                            or smartsheet_response.status_code
-                            == StatusCodes.VALID_DATA.value
-                            or smartsheet_response.status_code
-                            == StatusCodes.INVALID_DATA.value
+                        smartsheet_response.status_code
+                        == StatusCodes.DB_RESPONDED.value
+                        or smartsheet_response.status_code
+                        == StatusCodes.VALID_DATA.value
+                        or smartsheet_response.status_code
+                        == StatusCodes.INVALID_DATA.value
                     ):
                         data = json.loads(smartsheet_response.body)["data"]
                         subject_procedure.protocol_id = data["doi"]
                     elif (
-                            smartsheet_response.status_code
-                            == StatusCodes.NO_DATA_FOUND.value
+                        smartsheet_response.status_code
+                        == StatusCodes.NO_DATA_FOUND.value
                     ):
                         pass
                     else:
@@ -203,18 +203,18 @@ class ProtocolsIntegrator:
                     protocol_name = self._get_protocol_name(procedure)
                     smartsheet_response = protocols_mapping.get(protocol_name)
                     if (
-                            smartsheet_response.status_code
-                            == StatusCodes.DB_RESPONDED.value
-                            or smartsheet_response.status_code
-                            == StatusCodes.VALID_DATA.value
-                            or smartsheet_response.status_code
-                            == StatusCodes.INVALID_DATA.value
+                        smartsheet_response.status_code
+                        == StatusCodes.DB_RESPONDED.value
+                        or smartsheet_response.status_code
+                        == StatusCodes.VALID_DATA.value
+                        or smartsheet_response.status_code
+                        == StatusCodes.INVALID_DATA.value
                     ):
                         data = json.loads(smartsheet_response.body)["data"]
                         procedure.protocol_id = data["doi"]
                     elif (
-                            smartsheet_response.status_code
-                            == StatusCodes.NO_DATA_FOUND.value
+                        smartsheet_response.status_code
+                        == StatusCodes.NO_DATA_FOUND.value
                     ):
                         pass
                     else:

@@ -13,8 +13,8 @@ from aind_data_schema.core.procedures import (
     ViralMaterial,
 )
 from aind_data_schema.core.rig import Rig
-from aind_data_schema.core.subject import Subject
 from aind_data_schema.core.session import Session
+from aind_data_schema.core.subject import Subject
 from aind_metadata_mapper.core import JobResponse
 from fastapi import Response
 from fastapi.encoders import jsonable_encoder
@@ -164,9 +164,7 @@ class ModelResponse(Generic[T]):
                 else:
                     message += " All Models Valid."
             else:
-                message += (
-                    " Models have not been validated."
-                )
+                message += " Models have not been validated."
 
         return JSONResponse(
             status_code=status_code,

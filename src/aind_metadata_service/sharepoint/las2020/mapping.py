@@ -1962,9 +1962,9 @@ class MappedLASList:
     def has_ip_injection(self) -> bool:
         """Is there an IP injection procedure?"""
         return (
-                LASProcedure.DOSING
-                in [self.aind_req_pro1, self.aind_req_pro2, self.aind_req_pro3]
-                and self.aind_dose_route == Doseroute.INTRAPERITONEAL_IP
+            LASProcedure.DOSING
+            in [self.aind_req_pro1, self.aind_req_pro2, self.aind_req_pro3]
+            and self.aind_dose_route == Doseroute.INTRAPERITONEAL_IP
         )
 
     def has_ro_injection(self) -> bool:
@@ -1976,7 +1976,7 @@ class MappedLASList:
         ]
 
     def _map_injectable_materials(
-            self, material_num: int
+        self, material_num: int
     ) -> List[InjectableMaterial]:
         """
         Maps injectable materials based on the material_num.

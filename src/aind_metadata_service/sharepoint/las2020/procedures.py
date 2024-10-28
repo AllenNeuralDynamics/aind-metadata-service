@@ -16,7 +16,7 @@ class LAS2020Procedures:
 
     @staticmethod
     def get_procedures_from_sharepoint(
-            subject_id: str, client_context: ClientContext, list_title: str
+        subject_id: str, client_context: ClientContext, list_title: str
     ) -> List[Surgery]:
         """
         Get list of Procedures from NSP database.

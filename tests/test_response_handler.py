@@ -211,7 +211,8 @@ class TestResponseHandler(unittest.TestCase):
             status_code=300,
             content=(
                 {
-                    "message": f"Multiple Items Found. Validation Errors: {validation_error}, {validation_error}",
+                    "message": f"Multiple Items Found. Validation Errors:"
+                               f" {validation_error}, {validation_error}",
                     "data": models_json,
                 }
             ),
@@ -237,7 +238,8 @@ class TestResponseHandler(unittest.TestCase):
             status_code=300,
             content=(
                 {
-                    "message": f"Multiple Items Found. Models have not been validated.",
+                    "message": "Multiple Items Found."
+                               " Models have not been validated.",
                     "data": models_json,
                 }
             ),

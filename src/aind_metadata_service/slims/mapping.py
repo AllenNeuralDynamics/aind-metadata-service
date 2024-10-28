@@ -2,38 +2,41 @@
 Module to map data from SLIMS to the Session model.
 """
 
+from enum import Enum
+from typing import List, Optional, Tuple
+
 from aind_data_schema.components.coordinates import CcfCoords, Coordinates3d
 from aind_data_schema.components.devices import SpoutSide
+from aind_data_schema.core.procedures import CoordinateReferenceLocation
 from aind_data_schema.core.session import (
-    Session,
     DomeModule,
-    ManipulatorModule,
-    Stream,
-    StimulusEpoch,
-    StimulusModality,
-    SpeakerConfig,
-    LightEmittingDiodeConfig,
     LaserConfig,
+    LightEmittingDiodeConfig,
+    ManipulatorModule,
+    RewardDeliveryConfig,
     RewardSolution,
     RewardSpoutConfig,
-    RewardDeliveryConfig,
+    Session,
+    SpeakerConfig,
+    StimulusEpoch,
+    StimulusModality,
+    Stream,
 )
-from enum import Enum
+from aind_data_schema_models.modalities import Modality
 from aind_slims_api.models.ecephys_session import (
     SlimsBrainStructureRdrc,
-    SlimsStimulusEpochsResult,
-    SlimsRewardSpoutsRdrc,
     SlimsRewardDeliveryRdrc,
+    SlimsRewardSpoutsRdrc,
+    SlimsStimulusEpochsResult,
 )
 from aind_slims_api.operations.ecephys_session import (
     EcephysSession as SlimsEcephysSession,
+)
+from aind_slims_api.operations.ecephys_session import (
+    SlimsRewardDeliveryInfo,
     SlimsStream,
     SlimsStreamModule,
-    SlimsRewardDeliveryInfo,
 )
-from typing import Optional, List, Tuple
-from aind_data_schema_models.modalities import Modality
-from aind_data_schema.core.procedures import CoordinateReferenceLocation
 
 
 class SlimsStreamModalities(Enum):
@@ -66,7 +69,7 @@ class SlimsSessionMapper:
     """Client for interacting with SLIMS and mapping session data."""
 
     def map_sessions(
-            self, sessions: List[SlimsEcephysSession], subject_id: str
+        self, sessions: List[SlimsEcephysSession], subject_id: str
     ) -> List[Session]:
         """Maps SLIMS sessions to AIND session models."""
         return [
@@ -75,7 +78,7 @@ class SlimsSessionMapper:
         ]
 
     def _map_session(
-            self, session: SlimsEcephysSession, subject_id: str
+        self, session: SlimsEcephysSession, subject_id: str
     ) -> Session:
         """Map a single SLIMS session to the AIND session model."""
         session_type = getattr(session.session_group, "session_type", None)
@@ -129,32 +132,41 @@ class SlimsSessionMapper:
             reward_consumed_total=reward_consumed_total,
         )
 
-    def _map_reward_delivery(self, reward_info: SlimsRewardDeliveryInfo) -> Optional[RewardDeliveryConfig]:
+    def _map_reward_delivery(
+        self, reward_info: SlimsRewardDeliveryInfo
+    ) -> RewardDeliveryConfig:
         """Map reward info from SLIMS to RewardDeliveryConfig model."""
 
         slims_reward_delivery = getattr(reward_info, "reward_delivery", None)
         slims_reward_spouts = getattr(reward_info, "reward_spouts", None)
 
-        if not slims_reward_delivery and not slims_reward_spouts:
-            return None
-        else:
-            reward_solution, notes = (self._map_reward_solution(slims_reward_delivery)
-                                      if slims_reward_delivery else (None, None))
+        reward_solution, notes = (
+            self._map_reward_solution(slims_reward_delivery)
+            if slims_reward_delivery
+            else (None, None)
+        )
 
-            reward_spouts = [self._map_reward_spouts(slims_reward_spouts)] if slims_reward_spouts else []
+        reward_spouts = (
+            [self._map_reward_spouts(slims_reward_spouts)]
+            if slims_reward_spouts
+            else []
+        )
 
-            return RewardDeliveryConfig(
-                reward_solution=reward_solution,
-                reward_spouts=reward_spouts,
-                notes=notes,
-            )
+        return RewardDeliveryConfig(
+            reward_solution=reward_solution,
+            reward_spouts=reward_spouts,
+            notes=notes,
+        )
 
     @staticmethod
-    def _map_reward_solution(reward_delivery: SlimsRewardDeliveryRdrc) -> tuple[
-        Optional[RewardSolution], Optional[str]]:
+    def _map_reward_solution(
+        reward_delivery: SlimsRewardDeliveryRdrc,
+    ) -> tuple[Optional[RewardSolution], Optional[str]]:
         """Map reward solution and notes."""
 
-        slims_reward_solution = getattr(reward_delivery, "reward_solution", None)
+        slims_reward_solution = getattr(
+            reward_delivery, "reward_solution", None
+        )
 
         if slims_reward_solution == SlimsRewardSolution.WATER:
             return RewardSolution.WATER, None
@@ -164,7 +176,9 @@ class SlimsSessionMapper:
 
         return None, None
 
-    def _map_reward_spouts(self, reward_spout: SlimsRewardSpoutsRdrc) -> RewardSpoutConfig:
+    def _map_reward_spouts(
+        self, reward_spout: SlimsRewardSpoutsRdrc
+    ) -> RewardSpoutConfig:
         """Map reward spout info to RewardSpoutConfig model"""
 
         spout_side = getattr(reward_spout, "spout_side", None)
@@ -189,7 +203,7 @@ class SlimsSessionMapper:
         return SpoutSide.OTHER
 
     def _map_stimulus_epoch(
-            self, stimulus_epoch: SlimsStimulusEpochsResult
+        self, stimulus_epoch: SlimsStimulusEpochsResult
     ) -> StimulusEpoch:
         """Maps stimulus epoch data from SLIMS to StimulusEpoch model"""
         stimulus_name = getattr(stimulus_epoch, "stimulus_name", None)
@@ -220,12 +234,12 @@ class SlimsSessionMapper:
 
     @staticmethod
     def _map_light_source_config(
-            stimulus_epoch,
+        stimulus_epoch,
     ) -> List[LaserConfig | LightEmittingDiodeConfig]:
         """Maps light source data from SLIMS to list of configs"""
         light_sources = []
         if getattr(stimulus_epoch, "laser_name", None) and getattr(
-                stimulus_epoch, "laser_wavelength", None
+            stimulus_epoch, "laser_wavelength", None
         ):
             laser = LaserConfig(
                 name=getattr(stimulus_epoch, "laser_name", None),
@@ -247,7 +261,7 @@ class SlimsSessionMapper:
 
     @staticmethod
     def _map_speaker_config(
-            speaker_name: Optional[str], speaker_volume: Optional[float]
+        speaker_name: Optional[str], speaker_volume: Optional[float]
     ) -> SpeakerConfig:
         """Maps speaker config"""
         return (
@@ -278,12 +292,16 @@ class SlimsSessionMapper:
         )
 
     def _map_stream_modules(
-            self, stream_modules: Optional[List[SlimsStreamModule]]
+        self, stream_modules: Optional[List[SlimsStreamModule]]
     ) -> Tuple[List[DomeModule], List[ManipulatorModule]]:
         """
-        Map stream modules to either stick microscopes (DomeModule) or manipulators (ManipulatorModule).
-        :param stream_modules: List of stream modules from SLIMS
-        :return: Tuple containing lists of stick microscopes and ephys modules
+        Map stream modules to either stick microscopes or manipulators.
+        Parameters
+        ----------
+        stream_modules: List of stream modules from SLIMS
+        Returns
+        -------
+        Tuple containing lists of stick microscopes and ephys modules
         """
         stick_microscopes, ephys_modules = [], []
 
@@ -300,17 +318,17 @@ class SlimsSessionMapper:
     @staticmethod
     def _is_manipulator_module(stream_module: SlimsStreamModule) -> bool:
         """
-        Check if the stream module contains fields related to a manipulator module.
+        Checks if stream module contains fields for a manipulator module.
         """
         return (
-                getattr(stream_module, "primary_targeted_structure", None)
-                or getattr(stream_module, "ccf_coordinate_ap", None)
-                or getattr(stream_module, "manipulator_x", None)
-                or getattr(stream_module, "bregma_target_ap", None)
+            getattr(stream_module, "primary_targeted_structure", None)
+            or getattr(stream_module, "ccf_coordinate_ap", None)
+            or getattr(stream_module, "manipulator_x", None)
+            or getattr(stream_module, "bregma_target_ap", None)
         )
 
     def _map_manipulator_module(
-            self, stream_module: SlimsStreamModule
+        self, stream_module: SlimsStreamModule
     ) -> ManipulatorModule:
         """
         Map a stream module to a ManipulatorModule instance.
@@ -398,15 +416,14 @@ class SlimsSessionMapper:
 
     @staticmethod
     def _map_ccf_coords(
-            ml: Optional[float], ap: Optional[float], dv: Optional[float]
+        ml: Optional[float], ap: Optional[float], dv: Optional[float]
     ) -> Optional[CcfCoords]:
         """Map coordinates to CcfCoords."""
         return CcfCoords(ml=ml, ap=ap, dv=dv) if ml and ap and dv else None
 
     @staticmethod
     def _map_3d_coords(
-            x: Optional[float], y: Optional[float], z: Optional[float]
+        x: Optional[float], y: Optional[float], z: Optional[float]
     ) -> Optional[Coordinates3d]:
         """Map coordinates to 3D space."""
         return Coordinates3d(x=x, y=y, z=z) if x and y and z else None
-

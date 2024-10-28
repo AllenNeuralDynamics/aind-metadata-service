@@ -4,6 +4,10 @@ import logging
 
 from aind_data_schema.core.instrument import Instrument
 from aind_data_schema.core.rig import Rig
+from aind_slims_api import SlimsClient
+from aind_slims_api.exceptions import SlimsRecordNotFound
+from aind_slims_api.models.instrument import SlimsInstrumentRdrc
+from aind_slims_api.operations.ecephys_session import fetch_ecephys_sessions
 from pydantic import Extra, Field, SecretStr
 from pydantic_settings import BaseSettings
 from requests.models import Response
@@ -11,11 +15,7 @@ from slims.criteria import equals
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
-from aind_slims_api.exceptions import SlimsRecordNotFound
-from aind_slims_api import SlimsClient
-from aind_slims_api.models.instrument import SlimsInstrumentRdrc
 from aind_metadata_service.slims.mapping import SlimsSessionMapper
-from aind_slims_api.operations.ecephys_session import fetch_ecephys_sessions
 
 
 class SlimsSettings(BaseSettings):
@@ -41,7 +41,7 @@ class SlimsHandler:
         """Class constructor for slims client"""
         self.client = SlimsClient(
             username=settings.username,
-            password=settings.password.get_secret_value().strip("'"),
+            password=settings.password.get_secret_value(),
             url=settings.host,
         )
 
@@ -65,8 +65,8 @@ class SlimsHandler:
                     attachment
                 )
                 if (
-                        attachment_response.status_code == 200
-                        and self._is_json_file(attachment_response)
+                    attachment_response.status_code == 200
+                    and self._is_json_file(attachment_response)
                 ):
                     model = Instrument.model_construct(
                         **attachment_response.json()
