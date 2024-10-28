@@ -22,6 +22,7 @@ from aind_metadata_service.sharepoint.client import (
     SharePointClient,
     SharepointSettings,
 )
+from aind_metadata_service.slims.client import SlimsHandler, SlimsSettings
 from aind_metadata_service.smartsheet.client import (
     SmartSheetClient,
     SmartsheetSettings,
@@ -36,7 +37,6 @@ from aind_metadata_service.smartsheet.protocols.mapping import (
 )
 from aind_metadata_service.tars.client import AzureSettings, TarsClient
 from aind_metadata_service.tars.mapping import TarsResponseHandler
-from aind_metadata_service.slims.client import SlimsSettings, SlimsHandler
 
 SMARTSHEET_FUNDING_ID = os.getenv("SMARTSHEET_FUNDING_ID")
 SMARTSHEET_FUNDING_TOKEN = os.getenv("SMARTSHEET_API_TOKEN")
@@ -120,6 +120,15 @@ async def retrieve_rig(rig_id):
     """Retrieves rig from slims"""
     model_response = slims_client.get_rig_model_response(rig_id)
     return model_response.map_to_json_response(validate=False)
+
+
+@app.get("/ecephys_sessions_by_subject/{subject_id}")
+async def retrieve_sessions(subject_id):
+    """Retrieves sessions from slims"""
+    model_response = await run_in_threadpool(
+        slims_client.get_sessions_model_response, subject_id=subject_id
+    )
+    return model_response.map_to_json_response()
 
 
 @app.get("/protocols/{protocol_name}")
