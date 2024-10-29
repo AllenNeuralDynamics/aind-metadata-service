@@ -10,6 +10,9 @@ from aind_metadata_service import __version__ as service_version
 from aind_metadata_service.routers.favicon.route import router as fv_router
 from aind_metadata_service.routers.funding.route import router as fund_router
 from aind_metadata_service.routers.healthcheck.route import router as hc_router
+from aind_metadata_service.routers.project_names.route import (
+    router as pn_router,
+)
 from aind_metadata_service.routers.subject.route import router as subj_router
 
 log_level = os.getenv("LOG_LEVEL", "INFO")
@@ -51,4 +54,5 @@ app.add_middleware(
 app.include_router(subj_router)
 app.include_router(fund_router)
 app.include_router(fv_router)
+app.include_router(pn_router)
 app.include_router(hc_router)
