@@ -10,7 +10,7 @@ from aind_metadata_service.backends.smartsheet.models import FundingModel
 
 
 class Mapper:
-    """Class to handle mapping data into Subject model."""
+    """Class to handle mapping data into Funding model."""
 
     def __init__(self, funding_model: FundingModel):
         """Class constructor."""

@@ -40,9 +40,7 @@ class TestRoute:
         assert 404 == response.status_code
         assert expected_response == response.json()
 
-    def test_500_internal_server_error(
-        self, client, get_lab_tracks_session, caplog
-    ):
+    def test_500_internal_server_error(self, client, caplog):
         """Tests an internal server error response"""
 
         with patch(

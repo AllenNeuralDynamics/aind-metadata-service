@@ -90,6 +90,34 @@ def mock_get_raw_funding_sheet(mocker):
     return mock_get
 
 
+@pytest.fixture()
+def mock_get_raw_perfusions_sheet(mocker):
+    """Expected raw perfusions sheet."""
+    with open(
+        RESOURCES_DIR / "backends" / "smartsheet" / "perfusions.json"
+    ) as f:
+        contents = json.load(f)
+    mock_get = mocker.patch(
+        "aind_smartsheet_api.client.SmartsheetClient.get_raw_sheet"
+    )
+    mock_get.return_value = json.dumps(contents)
+    return mock_get
+
+
+@pytest.fixture()
+def mock_get_raw_protocols_sheet(mocker):
+    """Expected raw protocols sheet."""
+    with open(
+        RESOURCES_DIR / "backends" / "smartsheet" / "protocols.json"
+    ) as f:
+        contents = json.load(f)
+    mock_get = mocker.patch(
+        "aind_smartsheet_api.client.SmartsheetClient.get_raw_sheet"
+    )
+    mock_get.return_value = json.dumps(contents)
+    return mock_get
+
+
 @pytest.fixture(scope="session")
 def get_lab_tracks_session():
     """Generate a sqlite database to query lab_tracks data."""
