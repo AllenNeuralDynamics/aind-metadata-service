@@ -64,8 +64,8 @@ async def get_funding(
     settings: SmartsheetAppConfigs = Depends(get_settings),
 ):
     """
-    ## Funding metadata
-    Retrieves funding information from SmartSheet for a project name.
+    ## Perfusions metadata
+    Retrieves perfusions information from SmartSheet for a subject_id.
     """
     try:
         handler = SessionHandler(session=session)

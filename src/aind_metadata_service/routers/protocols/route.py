@@ -69,8 +69,8 @@ async def get_protocols(
     settings: SmartsheetAppConfigs = Depends(get_settings),
 ):
     """
-    ## Funding metadata
-    Retrieves funding information from SmartSheet for a protocol name.
+    ## Protocols metadata
+    Retrieves protocol information from SmartSheet for a protocol name.
     """
     try:
         handler = SessionHandler(session=session)
