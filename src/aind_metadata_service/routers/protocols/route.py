@@ -76,7 +76,7 @@ async def get_protocols(
         handler = SessionHandler(session=session)
         # TODO: Pull sheet from cache
         parsed_sheet: List[ProtocolsModel] = handler.get_parsed_sheet(
-            sheet_id=settings.funding_id, model=ProtocolsModel
+            sheet_id=settings.protocols_id, model=ProtocolsModel
         )
         protocols_list = handler.get_protocols_info(
             parsed_sheet, protocol_name=protocol_name
