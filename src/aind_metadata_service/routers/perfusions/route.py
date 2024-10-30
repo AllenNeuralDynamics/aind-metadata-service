@@ -58,7 +58,7 @@ class MultipleItemsFound(Message):
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": InternalServerError},
     },
 )
-async def get_funding(
+async def get_perfusions(
     subject_id: str = Path(..., examples=["689418"]),
     session: SmartsheetClient = Depends(get_session),
     settings: SmartsheetAppConfigs = Depends(get_settings),
