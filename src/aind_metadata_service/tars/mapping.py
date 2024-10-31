@@ -223,7 +223,7 @@ class TarsResponseHandler:
                         and procedure.injection_materials
                     ):
                         virus_strains = [
-                            getattr(material, "name").strip(" \t\n\r")
+                            getattr(material, "name").strip()
                             for material in procedure.injection_materials
                         ]
                         viruses.extend(virus_strains)
@@ -253,9 +253,7 @@ class TarsResponseHandler:
                             if isinstance(
                                 injection_material, ViralMaterial
                             ) and hasattr(injection_material, "name"):
-                                virus_strain = injection_material.name.strip(
-                                    " \t\n\r"
-                                )
+                                virus_strain = injection_material.name.strip()
                                 tars_response = tars_mapping.get(virus_strain)
                                 if (
                                     tars_response.status_code
