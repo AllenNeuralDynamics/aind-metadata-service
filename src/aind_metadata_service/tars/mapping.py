@@ -257,7 +257,6 @@ class TarsResponseHandler:
                                     " \t\n\r"
                                 )
                                 tars_response = tars_mapping.get(virus_strain)
-                                print(tars_response)
                                 if (
                                     tars_response.status_code
                                     == StatusCodes.DB_RESPONDED.value
