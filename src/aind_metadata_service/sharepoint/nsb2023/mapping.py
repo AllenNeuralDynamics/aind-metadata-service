@@ -7,7 +7,7 @@ from decimal import Decimal, DecimalException
 from enum import Enum
 from typing import Any, List, Optional, Union
 
-from aind_data_schema.components.devices import FiberProbe
+from aind_data_schema.components.devices import FiberProbe, FerruleMaterial
 from aind_data_schema.core.procedures import (
     Anaesthetic,
     BrainInjection,
@@ -85,6 +85,10 @@ class InjectionType(Enum):
     NANOJECT = "Nanoject"
     IONTOPHORESIS = "Iontophoresis"
 
+class FiberType(Enum):
+    """Enum class for Fiber Types"""
+    STANDARD = "Standard"
+    CUSTOM = "Custom (specs in comment)."
 
 @dataclass
 class SurgeryDuringInfo:
@@ -126,8 +130,10 @@ class BurrHoleInfo:
     alternating_current: Optional[str] = None
     inj_duration: Optional[Decimal] = None
     inj_volume: Optional[List[Decimal]] = None
-    fiber_implant_depth: Optional[Decimal] = None
     inj_materials: Optional[List[InjectableMaterial]] = None
+    fiber_implant_depth: Optional[Decimal] = None
+    fiber_type: Optional[FiberType] = None
+    fiber_implant_length: Optional[Decimal] = None
 
 
 @dataclass
@@ -200,6 +206,7 @@ class MappedNSBList:
         r"^[-+]?\d*\.?\d+[eE][-+]?\d+(?![\d.])"
     )
     CONCENTRATION_REGEX = re.compile(r"^\d+(\.\d+)?\s*mg[/]m[lL]$")
+    LENGTH_MM_REGEX = re.compile(r"^([1-9]\.\d) mm$")
 
     def __init__(self, nsb: NSBList):
         """Class constructor"""
@@ -251,6 +258,20 @@ class MappedNSBList:
                 return None
         else:
             return None
+
+    def _parse_fiber_length_mm_str(self, fiber_length_str: Optional[str]):
+        """Parses length of fiber length strings"""
+        if fiber_length_str is not None:
+            parsed_string = re.search(
+                self.LENGTH_MM_REGEX, fiber_length_str
+            )
+            if parsed_string:
+                return self._parse_basic_decimal_str(parsed_string.group(1))
+            else:
+                return None
+        else:
+            return None
+
 
     @staticmethod
     def _parse_datetime_to_date(dt: Optional[datetime]) -> Optional[date]:
@@ -819,14 +840,14 @@ class MappedNSBList:
         return self._map_float_to_decimal(self._nsb.burr_1_dv_2)
 
     @property
-    def aind_burr_1_fiber_t(self) -> Optional[Any]:
+    def aind_burr_1_fiber_t(self) -> Optional[FiberType]:
         """Maps burr_1_fiber_t to aind model"""
         return (
             None
             if self._nsb.burr_1_fiber_t is None
             else {
-                self._nsb.burr_1_fiber_t.STANDARD_PROVIDED_BY_NSB: None,
-                self._nsb.burr_1_fiber_t.CUSTOM: None,
+                self._nsb.burr_1_fiber_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
+                self._nsb.burr_1_fiber_t.CUSTOM: FiberType.CUSTOM,
             }.get(self._nsb.burr_1_fiber_t, None)
         )
 
@@ -883,14 +904,14 @@ class MappedNSBList:
         return self._map_float_to_decimal(self._nsb.burr_2_d_v_x000)
 
     @property
-    def aind_burr_2_fiber_t(self) -> Optional[Any]:
+    def aind_burr_2_fiber_t(self) -> Optional[FiberType]:
         """Maps burr_2_fiber_t to aind model"""
         return (
             None
             if self._nsb.burr_2_fiber_t is None
             else {
-                self._nsb.burr_2_fiber_t.STANDARD_PROVIDED_BY_NSB: None,
-                self._nsb.burr_2_fiber_t.CUSTOM: None,
+                self._nsb.burr_2_fiber_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
+                self._nsb.burr_2_fiber_t.CUSTOM: FiberType.CUSTOM,
             }.get(self._nsb.burr_2_fiber_t, None)
         )
 
@@ -950,14 +971,14 @@ class MappedNSBList:
         return self._map_float_to_decimal(self._nsb.burr_3_d_v_x000)
 
     @property
-    def aind_burr_3_fiber_t(self) -> Optional[Any]:
+    def aind_burr_3_fiber_t(self) -> Optional[FiberType]:
         """Maps burr_3_fiber_t to aind model"""
         return (
             None
             if self._nsb.burr_3_fiber_t is None
             else {
-                self._nsb.burr_3_fiber_t.STANDARD_PROVIDED_BY_NSB: None,
-                self._nsb.burr_3_fiber_t.CUSTOM: None,
+                self._nsb.burr_3_fiber_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
+                self._nsb.burr_3_fiber_t.CUSTOM: FiberType.CUSTOM,
             }.get(self._nsb.burr_3_fiber_t, None)
         )
 
@@ -1030,14 +1051,14 @@ class MappedNSBList:
         return self._map_float_to_decimal(self._nsb.burr_4_d_v_x000)
 
     @property
-    def aind_burr_4_fiber_t(self) -> Optional[Any]:
+    def aind_burr_4_fiber_t(self) -> Optional[FiberType]:
         """Maps burr_4_fiber_t to aind model"""
         return (
             None
             if self._nsb.burr_4_fiber_t is None
             else {
-                self._nsb.burr_4_fiber_t.STANDARD_PROVIDED_BY_NSB: None,
-                self._nsb.burr_4_fiber_t.CUSTOM: None,
+                self._nsb.burr_4_fiber_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
+                self._nsb.burr_4_fiber_t.CUSTOM: FiberType.CUSTOM,
             }.get(self._nsb.burr_4_fiber_t, None)
         )
 
@@ -1126,8 +1147,8 @@ class MappedNSBList:
             None
             if self._nsb.burr_5_fiber_t is None
             else {
-                self._nsb.burr_5_fiber_t.STANDARD_PROVIDED_BY_NSB: None,
-                self._nsb.burr_5_fiber_t.CUSTOM: None,
+                self._nsb.burr_5_fiber_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
+                self._nsb.burr_5_fiber_t.CUSTOM: FiberType.CUSTOM,
             }.get(self._nsb.burr_5_fiber_t, None)
         )
 
@@ -1215,14 +1236,14 @@ class MappedNSBList:
         return self._map_float_to_decimal(self._nsb.burr_6_d_v_x001)
 
     @property
-    def aind_burr_6_fiber_t(self) -> Optional[Any]:
+    def aind_burr_6_fiber_t(self) -> Optional[FiberType]:
         """Maps burr_6_fiber_t to aind model"""
         return (
             None
             if self._nsb.burr_6_fiber_t is None
             else {
-                self._nsb.burr_6_fiber_t.STANDARD_PROVIDED_BY_NSB: None,
-                self._nsb.burr_6_fiber_t.CUSTOM: None,
+                self._nsb.burr_6_fiber_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
+                self._nsb.burr_6_fiber_t.CUSTOM: FiberType.CUSTOM,
             }.get(self._nsb.burr_6_fiber_t, None)
         )
 
@@ -1596,23 +1617,9 @@ class MappedNSBList:
         return self._map_float_to_decimal(self._nsb.fiber_implant1_dv)
 
     @property
-    def aind_fiber_implant1_lengt(self) -> Optional[Any]:
+    def aind_fiber_implant1_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant1_lengt to aind model"""
-        return (
-            None
-            if self._nsb.fiber_implant1_lengt is None
-            else {
-                self._nsb.fiber_implant1_lengt.SELECT: None,
-                self._nsb.fiber_implant1_lengt.N_15_MM: None,
-                self._nsb.fiber_implant1_lengt.N_20_MM: None,
-                self._nsb.fiber_implant1_lengt.N_25_MM: None,
-                self._nsb.fiber_implant1_lengt.N_30_MM: None,
-                self._nsb.fiber_implant1_lengt.N_35_MM: None,
-                self._nsb.fiber_implant1_lengt.N_40_MM: None,
-                self._nsb.fiber_implant1_lengt.N_45_MM: None,
-                self._nsb.fiber_implant1_lengt.N_50_MM: None,
-            }.get(self._nsb.fiber_implant1_lengt, None)
-        )
+        return self._parse_fiber_length_mm_str(self._nsb.fiber_implant1_lengt)
 
     @property
     def aind_fiber_implant2_dv(self) -> Optional[Decimal]:
@@ -1620,23 +1627,9 @@ class MappedNSBList:
         return self._map_float_to_decimal(self._nsb.fiber_implant2_dv)
 
     @property
-    def aind_fiber_implant2_lengt(self) -> Optional[Any]:
+    def aind_fiber_implant2_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant2_lengt to aind model"""
-        return (
-            None
-            if self._nsb.fiber_implant2_lengt is None
-            else {
-                self._nsb.fiber_implant2_lengt.SELECT: None,
-                self._nsb.fiber_implant2_lengt.N_15_MM: None,
-                self._nsb.fiber_implant2_lengt.N_20_MM: None,
-                self._nsb.fiber_implant2_lengt.N_25_MM: None,
-                self._nsb.fiber_implant2_lengt.N_30_MM: None,
-                self._nsb.fiber_implant2_lengt.N_35_MM: None,
-                self._nsb.fiber_implant2_lengt.N_40_MM: None,
-                self._nsb.fiber_implant2_lengt.N_45_MM: None,
-                self._nsb.fiber_implant2_lengt.N_50_MM: None,
-            }.get(self._nsb.fiber_implant2_lengt, None)
-        )
+        return self._parse_fiber_length_mm_str(self._nsb.fiber_implant2_lengt)
 
     @property
     def aind_fiber_implant3_d_x00(self) -> Optional[Decimal]:
@@ -1644,23 +1637,9 @@ class MappedNSBList:
         return self._map_float_to_decimal(self._nsb.fiber_implant3_d_x00)
 
     @property
-    def aind_fiber_implant3_lengt(self) -> Optional[Any]:
+    def aind_fiber_implant3_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant3_lengt to aind model"""
-        return (
-            None
-            if self._nsb.fiber_implant3_lengt is None
-            else {
-                self._nsb.fiber_implant3_lengt.SELECT: None,
-                self._nsb.fiber_implant3_lengt.N_15_MM: None,
-                self._nsb.fiber_implant3_lengt.N_20_MM: None,
-                self._nsb.fiber_implant3_lengt.N_25_MM: None,
-                self._nsb.fiber_implant3_lengt.N_30_MM: None,
-                self._nsb.fiber_implant3_lengt.N_35_MM: None,
-                self._nsb.fiber_implant3_lengt.N_40_MM: None,
-                self._nsb.fiber_implant3_lengt.N_45_MM: None,
-                self._nsb.fiber_implant3_lengt.N_50_MM: None,
-            }.get(self._nsb.fiber_implant3_lengt, None)
-        )
+        return self._parse_fiber_length_mm_str(self._nsb.fiber_implant3_lengt)
 
     @property
     def aind_fiber_implant4_d_x00(self) -> Optional[Decimal]:
@@ -1668,23 +1647,9 @@ class MappedNSBList:
         return self._map_float_to_decimal(self._nsb.fiber_implant4_d_x00)
 
     @property
-    def aind_fiber_implant4_lengt(self) -> Optional[Any]:
+    def aind_fiber_implant4_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant4_lengt to aind model"""
-        return (
-            None
-            if self._nsb.fiber_implant4_lengt is None
-            else {
-                self._nsb.fiber_implant4_lengt.SELECT: None,
-                self._nsb.fiber_implant4_lengt.N_15_MM: None,
-                self._nsb.fiber_implant4_lengt.N_20_MM: None,
-                self._nsb.fiber_implant4_lengt.N_25_MM: None,
-                self._nsb.fiber_implant4_lengt.N_30_MM: None,
-                self._nsb.fiber_implant4_lengt.N_35_MM: None,
-                self._nsb.fiber_implant4_lengt.N_40_MM: None,
-                self._nsb.fiber_implant4_lengt.N_45_MM: None,
-                self._nsb.fiber_implant4_lengt.N_50_MM: None,
-            }.get(self._nsb.fiber_implant4_lengt, None)
-        )
+        return self._parse_fiber_length_mm_str(self._nsb.fiber_implant4_lengt)
 
     @property
     def aind_fiber_implant5_d_x00(self) -> Optional[Decimal]:
@@ -1692,23 +1657,9 @@ class MappedNSBList:
         return self._map_float_to_decimal(self._nsb.fiber_implant5_d_x00)
 
     @property
-    def aind_fiber_implant5_lengt(self) -> Optional[Any]:
+    def aind_fiber_implant5_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant5_lengt to aind model"""
-        return (
-            None
-            if self._nsb.fiber_implant5_lengt is None
-            else {
-                self._nsb.fiber_implant5_lengt.SELECT: None,
-                self._nsb.fiber_implant5_lengt.N_15_MM: None,
-                self._nsb.fiber_implant5_lengt.N_20_MM: None,
-                self._nsb.fiber_implant5_lengt.N_25_MM: None,
-                self._nsb.fiber_implant5_lengt.N_30_MM: None,
-                self._nsb.fiber_implant5_lengt.N_35_MM: None,
-                self._nsb.fiber_implant5_lengt.N_40_MM: None,
-                self._nsb.fiber_implant5_lengt.N_45_MM: None,
-                self._nsb.fiber_implant5_lengt.N_50_MM: None,
-            }.get(self._nsb.fiber_implant5_lengt, None)
-        )
+        return self._parse_fiber_length_mm_str(self._nsb.fiber_implant5_lengt)
 
     @property
     def aind_fiber_implant6_d_x00(self) -> Optional[Decimal]:
@@ -1716,23 +1667,9 @@ class MappedNSBList:
         return self._map_float_to_decimal(self._nsb.fiber_implant6_d_x00)
 
     @property
-    def aind_fiber_implant6_lengt(self) -> Optional[Any]:
+    def aind_fiber_implant6_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant6_lengt to aind model"""
-        return (
-            None
-            if self._nsb.fiber_implant6_lengt is None
-            else {
-                self._nsb.fiber_implant6_lengt.SELECT: None,
-                self._nsb.fiber_implant6_lengt.N_15_MM: None,
-                self._nsb.fiber_implant6_lengt.N_20_MM: None,
-                self._nsb.fiber_implant6_lengt.N_25_MM: None,
-                self._nsb.fiber_implant6_lengt.N_30_MM: None,
-                self._nsb.fiber_implant6_lengt.N_35_MM: None,
-                self._nsb.fiber_implant6_lengt.N_40_MM: None,
-                self._nsb.fiber_implant6_lengt.N_45_MM: None,
-                self._nsb.fiber_implant6_lengt.N_50_MM: None,
-            }.get(self._nsb.fiber_implant6_lengt, None)
-        )
+        return self._parse_fiber_length_mm_str(self._nsb.fiber_implant6_lengt)
 
     @property
     def aind_first_inj_recovery(self) -> Optional[Decimal]:
@@ -3254,8 +3191,10 @@ class MappedNSBList:
                 inj_volume=self._map_burr_hole_volume(
                     vol=self.aind_inj1volperdepth, dv=coordinate_depth
                 ),
-                fiber_implant_depth=self.aind_fiber_implant1_dv,
                 inj_materials=injectable_materials,
+                fiber_implant_depth=self.aind_fiber_implant1_dv,
+                fiber_type=self.aind_burr_1_fiber_t,
+                fiber_implant_length=self.aind_fiber_implant1_lengt
             )
         elif burr_hole_num == 2:
             coordinate_depth = self._map_burr_hole_dv(
@@ -3292,8 +3231,10 @@ class MappedNSBList:
                 inj_volume=self._map_burr_hole_volume(
                     vol=self.aind_inj2volperdepth, dv=coordinate_depth
                 ),
-                fiber_implant_depth=self.aind_fiber_implant2_dv,
                 inj_materials=injectable_materials,
+                fiber_implant_depth=self.aind_fiber_implant2_dv,
+                fiber_type=self.aind_burr_2_fiber_t,
+                fiber_implant_length=self.aind_fiber_implant2_lengt
             )
         elif burr_hole_num == 3:
             coordinate_depth = self._map_burr_hole_dv(
@@ -3330,8 +3271,10 @@ class MappedNSBList:
                 inj_volume=self._map_burr_hole_volume(
                     vol=self.aind_inj3volperdepth, dv=coordinate_depth
                 ),
-                fiber_implant_depth=self.aind_fiber_implant3_d_x00,
                 inj_materials=injectable_materials,
+                fiber_implant_depth=self.aind_fiber_implant3_d_x00,
+                fiber_type=self.aind_burr_3_fiber_t,
+                fiber_implant_length=self.aind_fiber_implant3_lengt
             )
         elif burr_hole_num == 4:
             coordinate_depth = self._map_burr_hole_dv(
@@ -3368,8 +3311,10 @@ class MappedNSBList:
                 inj_volume=self._map_burr_hole_volume(
                     vol=self.aind_inj4volperdepth, dv=coordinate_depth
                 ),
-                fiber_implant_depth=self.aind_fiber_implant4_d_x00,
                 inj_materials=injectable_materials,
+                fiber_implant_depth=self.aind_fiber_implant4_d_x00,
+                fiber_type=self.aind_burr_4_fiber_t,
+                fiber_implant_length=self.aind_fiber_implant4_lengt
             )
         elif burr_hole_num == 5:
             coordinate_depth = self._map_burr_hole_dv(
@@ -3406,8 +3351,10 @@ class MappedNSBList:
                 inj_volume=self._map_burr_hole_volume(
                     vol=self.aind_inj5volperdepth, dv=coordinate_depth
                 ),
-                fiber_implant_depth=self.aind_fiber_implant5_d_x00,
                 inj_materials=injectable_materials,
+                fiber_implant_depth=self.aind_fiber_implant5_d_x00,
+                fiber_type=self.aind_burr_5_fiber_t,
+                fiber_implant_length=self.aind_fiber_implant5_lengt
             )
         elif burr_hole_num == 6:
             coordinate_depth = self._map_burr_hole_dv(
@@ -3444,8 +3391,10 @@ class MappedNSBList:
                 inj_volume=self._map_burr_hole_volume(
                     vol=self.aind_inj6volperdepth, dv=coordinate_depth
                 ),
-                fiber_implant_depth=self.aind_fiber_implant6_d_x00,
                 inj_materials=injectable_materials,
+                fiber_implant_depth=self.aind_fiber_implant6_d_x00,
+                fiber_type=self.aind_burr_6_fiber_t,
+                fiber_implant_length=self.aind_fiber_implant6_lengt
             )
         else:
             return BurrHoleInfo()
@@ -3455,7 +3404,7 @@ class MappedNSBList:
         burr_hole_num: int,
     ) -> Optional[str]:
         """Maps NSB Burr hole number into AIND ProbeName"""
-        # TODO: add probes for burr_hole_nums 5 and 6
+        # TODO: Name Probes based on AP/ML
         if burr_hole_num == 1:
             return "Probe A"
         elif burr_hole_num == 2:
@@ -3535,6 +3484,25 @@ class MappedNSBList:
                 injectable_material = InjectableMaterial(material=material)
             injectable_materials.append(injectable_material)
         return injectable_materials
+
+    def _map_burr_fiber_probe(self, fiber_type: Optional[FiberType]) -> Optional[FiberProbe]:
+        """Constructs a fiber probe"""
+        if fiber_type == FiberType.STANDARD:
+            # TODO: check that total_length is same as ferrule diameter
+            return FiberProbe.model_construct(
+                core_diameter=200,
+                numerical_aperature=0.37,
+                ferrule_material=FerruleMaterial.CERAMIC,
+                total_length=1.25,
+            )
+        elif fiber_type == FiberType.CUSTOM:
+            # if custom, specs are stored in requestor comments
+            return FiberProbe.model_construct(
+                notes=self.aind_long_requestor_comments
+            )
+        else:
+            return None
+
 
     def get_procedure(self) -> List[Surgery]:
         """Get a List of Surgeries"""
@@ -3760,7 +3728,6 @@ class MappedNSBList:
                 BurrHoleProcedure.FIBER_IMPLANT,
                 BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
             }:
-                probe_name = self._map_burr_hole_number_to_probe(burr_hole_num)
                 burr_hole_info = self.burr_hole_info(
                     burr_hole_num=burr_hole_num
                 )
@@ -3769,14 +3736,7 @@ class MappedNSBList:
                     inj_type=burr_hole_info.inj_type,
                 )
                 bregma_to_lambda_distance = self.aind_breg2_lamb
-                # Need to figure out core_diameter, numerical_aperture,
-                # total_length, and targeted_structure
-                fiber_probe = FiberProbe.model_construct(
-                    name=probe_name,
-                    core_diameter=None,
-                    numerical_aperture=None,
-                    total_length=None,
-                )
+                fiber_probe = self._map_burr_fiber_probe(burr_hole_info.fiber_type)
                 ophys_probe = OphysProbe.model_construct(
                     fiber_probe=fiber_probe,
                     targeted_structure=None,
