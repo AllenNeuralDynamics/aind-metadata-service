@@ -3488,19 +3488,20 @@ class MappedNSBList:
 
     @staticmethod
     def assign_fiber_probe_names(procedures: List) -> None:
-        """Assigns ordered names to FiberProbe objects within FiberImplant"""
-        probe_index = 0
+        """Assigns ordered names to FiberProbe objects within each fiber implant"""
+        all_probes = []
         for proc in procedures:
             if isinstance(proc, FiberImplant):
-                sorted_probes = sorted(
-                    proc.probes,
-                    key=lambda probe: (-float(probe.stereotactic_coordinate_ap), float(probe.stereotactic_coordinate_ml))
-                )
-                # Assign names based on sorted order
-                for probe in sorted_probes:
-                    probe.ophys_probe.name = f"Probe {probe_index}"
-                    probe_index += 1
-                    print(f"{probe.ophys_probe.name}: ml={probe.stereotactic_coordinate_ml}, ap={probe.stereotactic_coordinate_ap}")
+                all_probes.extend(proc.probes)
+
+        # Sort all probes based on ap (descending) and ml (ascending)
+        sorted_probes = sorted(
+            all_probes,
+            key=lambda probe: (-float(probe.stereotactic_coordinate_ap), float(probe.stereotactic_coordinate_ml))
+        )
+        for probe_index, probe in enumerate(sorted_probes):
+            probe.ophys_probe.name = f"Probe {probe_index}"
+
         return None
 
 
