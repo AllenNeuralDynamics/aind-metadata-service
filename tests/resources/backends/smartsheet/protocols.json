@@ -1,0 +1,552 @@
+{
+   "accessLevel": "OWNER",
+   "columns": [
+      {
+         "id": 8808571546324868,
+         "index": 0,
+         "options": [
+            "Specimen Procedures",
+            "Surgical Procedures",
+            "Ephys Techniques",
+            "Ophys Techniques",
+            "Imaging Techniques"
+         ],
+         "title": "Protocol Type",
+         "type": "PICKLIST",
+         "validation": true,
+         "version": 0,
+         "width": 150
+      },
+      {
+         "id": 6725511871942532,
+         "index": 1,
+         "title": "Procedure name",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 0,
+         "width": 150
+      },
+      {
+         "id": 6394619537346436,
+         "index": 2,
+         "primary": true,
+         "title": "Protocol name",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 0,
+         "width": 444
+      },
+      {
+         "id": 4142819723661188,
+         "index": 3,
+         "title": "DOI",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 0,
+         "width": 266
+      },
+      {
+         "id": 8646419351031684,
+         "index": 4,
+         "title": "Version",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 0,
+         "width": 96
+      },
+      {
+         "id": 223584756649860,
+         "index": 5,
+         "title": "Protocol collection",
+         "type": "CHECKBOX",
+         "validation": true,
+         "version": 0,
+         "width": 138
+      }
+   ],
+   "createdAt": "2023-09-21T19:21:18+00:00Z",
+   "dependenciesEnabled": false,
+   "effectiveAttachmentOptions": [
+      "DROPBOX",
+      "ONEDRIVE",
+      "EGNYTE",
+      "FILE",
+      "BOX_COM",
+      "GOOGLE_DRIVE",
+      "LINK",
+      "EVERNOTE"
+   ],
+   "ganttEnabled": false,
+   "hasSummaryFields": false,
+   "id": 7478444220698500,
+   "modifiedAt": "2024-02-17T00:31:41+00:00Z",
+   "name": "Published Protocols",
+   "permalink": "https://app.smartsheet.com/sheets/3XQgWWrXW3mh46xmXCw5Q9GfqQmmP4xwF9Cjfqg1",
+   "readOnly": true,
+   "resourceManagementEnabled": false,
+   "rows": [
+      {
+         "cells": [
+            {
+               "columnId": 8808571546324868,
+               "displayValue": "Specimen Procedures",
+               "value": "Specimen Procedures"
+            },
+            {
+               "columnId": 6725511871942532,
+               "displayValue": "Immunolabeling",
+               "value": "Immunolabeling"
+            },
+            {
+               "columnId": 6394619537346436,
+               "displayValue": "Immunolabeling of a Whole Mouse Brain",
+               "value": "Immunolabeling of a Whole Mouse Brain"
+            },
+            {
+               "columnId": 4142819723661188,
+               "displayValue": "dx.doi.org/10.17504/protocols.io.ewov1okwylr2/v1",
+               "value": "dx.doi.org/10.17504/protocols.io.ewov1okwylr2/v1"
+            },
+            {
+               "columnId": 8646419351031684,
+               "displayValue": "1",
+               "value": 1.0
+            },
+            {
+               "columnId": 223584756649860
+            }
+         ],
+         "createdAt": "2023-09-21T19:31:40+00:00Z",
+         "expanded": true,
+         "id": 5216174748766084,
+         "modifiedAt": "2023-10-02T20:20:50+00:00Z",
+         "rowNumber": 1
+      },
+      {
+         "cells": [
+            {
+               "columnId": 8808571546324868,
+               "displayValue": "Specimen Procedures",
+               "value": "Specimen Procedures"
+            },
+            {
+               "columnId": 6725511871942532,
+               "displayValue": "Delipidation",
+               "value": "Delipidation"
+            },
+            {
+               "columnId": 6394619537346436,
+               "displayValue": "Tetrahydrofuran and Dichloromethane Delipidation of a Whole Mouse Brain",
+               "value": "Tetrahydrofuran and Dichloromethane Delipidation of a Whole Mouse Brain"
+            },
+            {
+               "columnId": 4142819723661188,
+               "displayValue": "dx.doi.org/10.17504/protocols.io.36wgqj1kxvk5/v1",
+               "value": "dx.doi.org/10.17504/protocols.io.36wgqj1kxvk5/v1"
+            },
+            {
+               "columnId": 8646419351031684,
+               "displayValue": "1",
+               "value": 1.0
+            },
+            {
+               "columnId": 223584756649860
+            }
+         ],
+         "createdAt": "2023-09-21T19:31:40+00:00Z",
+         "expanded": true,
+         "id": 2964374935080836,
+         "modifiedAt": "2023-10-02T20:20:50+00:00Z",
+         "rowNumber": 2,
+         "siblingId": 5216174748766084
+      },
+      {
+         "cells": [
+            {
+               "columnId": 8808571546324868,
+               "displayValue": "Specimen Procedures",
+               "value": "Specimen Procedures"
+            },
+            {
+               "columnId": 6725511871942532,
+               "displayValue": "Delipidation",
+               "value": "Delipidation"
+            },
+            {
+               "columnId": 6394619537346436,
+               "displayValue": "Aqueous (SBiP) Delipidation of a Whole Mouse Brain",
+               "value": "Aqueous (SBiP) Delipidation of a Whole Mouse Brain"
+            },
+            {
+               "columnId": 4142819723661188,
+               "displayValue": "dx.doi.org/10.17504/protocols.io.n2bvj81mwgk5/v1",
+               "value": "dx.doi.org/10.17504/protocols.io.n2bvj81mwgk5/v1"
+            },
+            {
+               "columnId": 8646419351031684,
+               "displayValue": "1",
+               "value": 1.0
+            },
+            {
+               "columnId": 223584756649860
+            }
+         ],
+         "createdAt": "2023-09-21T19:31:40+00:00Z",
+         "expanded": true,
+         "id": 7467974562451332,
+         "modifiedAt": "2023-10-02T20:20:50+00:00Z",
+         "rowNumber": 3,
+         "siblingId": 2964374935080836
+      },
+      {
+         "cells": [
+            {
+               "columnId": 8808571546324868,
+               "displayValue": "Specimen Procedures",
+               "value": "Specimen Procedures"
+            },
+            {
+               "columnId": 6725511871942532,
+               "displayValue": "Gelation + previous steps",
+               "value": "Gelation + previous steps"
+            },
+            {
+               "columnId": 6394619537346436,
+               "displayValue": "Whole Mouse Brain Delipidation, Immunolabeling, and Expansion Microscopy",
+               "value": "Whole Mouse Brain Delipidation, Immunolabeling, and Expansion Microscopy"
+            },
+            {
+               "columnId": 4142819723661188,
+               "displayValue": "dx.doi.org/10.17504/protocols.io.n92ldpwjxl5b/v1",
+               "value": "dx.doi.org/10.17504/protocols.io.n92ldpwjxl5b/v1"
+            },
+            {
+               "columnId": 8646419351031684,
+               "displayValue": "1",
+               "value": 1.0
+            },
+            {
+               "columnId": 223584756649860,
+               "value": false
+            }
+         ],
+         "createdAt": "2023-09-21T19:31:40+00:00Z",
+         "expanded": true,
+         "id": 1838475028238212,
+         "modifiedAt": "2024-02-17T00:31:41+00:00Z",
+         "rowNumber": 4,
+         "siblingId": 7467974562451332
+      },
+      {
+         "cells": [
+            {
+               "columnId": 8808571546324868,
+               "displayValue": "Surgical Procedures",
+               "value": "Surgical Procedures"
+            },
+            {
+               "columnId": 6725511871942532,
+               "displayValue": "Injection Nanoject",
+               "value": "Injection Nanoject"
+            },
+            {
+               "columnId": 6394619537346436,
+               "displayValue": "Injection of Viral Tracers by Nanoject V.4",
+               "value": "Injection of Viral Tracers by Nanoject V.4"
+            },
+            {
+               "columnId": 4142819723661188,
+               "displayValue": "dx.doi.org/10.17504/protocols.io.bp2l6nr7kgqe/v4",
+               "value": "dx.doi.org/10.17504/protocols.io.bp2l6nr7kgqe/v4"
+            },
+            {
+               "columnId": 8646419351031684,
+               "displayValue": "4",
+               "value": 4.0
+            },
+            {
+               "columnId": 223584756649860
+            }
+         ],
+         "createdAt": "2023-09-21T19:31:40+00:00Z",
+         "expanded": true,
+         "id": 6342074655608708,
+         "modifiedAt": "2023-11-14T21:29:51+00:00Z",
+         "rowNumber": 5,
+         "siblingId": 1838475028238212
+      },
+      {
+         "cells": [
+            {
+               "columnId": 8808571546324868,
+               "displayValue": "Surgical Procedures",
+               "value": "Surgical Procedures"
+            },
+            {
+               "columnId": 6725511871942532,
+               "displayValue": "Injection Iontophoresis",
+               "value": "Injection Iontophoresis"
+            },
+            {
+               "columnId": 6394619537346436,
+               "displayValue": "Stereotaxic Surgery for Delivery of Tracers by Iontophoresis V.3",
+               "value": "Stereotaxic Surgery for Delivery of Tracers by Iontophoresis V.3"
+            },
+            {
+               "columnId": 4142819723661188,
+               "displayValue": "dx.doi.org/10.17504/protocols.io.bgpvjvn6",
+               "value": "dx.doi.org/10.17504/protocols.io.bgpvjvn6"
+            },
+            {
+               "columnId": 8646419351031684,
+               "displayValue": "3",
+               "value": 3.0
+            },
+            {
+               "columnId": 223584756649860
+            }
+         ],
+         "createdAt": "2023-09-21T19:31:40+00:00Z",
+         "expanded": true,
+         "id": 4090274841923460,
+         "modifiedAt": "2023-10-02T20:20:50+00:00Z",
+         "rowNumber": 6,
+         "siblingId": 6342074655608708
+      },
+      {
+         "cells": [
+            {
+               "columnId": 8808571546324868,
+               "displayValue": "Surgical Procedures",
+               "value": "Surgical Procedures"
+            },
+            {
+               "columnId": 6725511871942532,
+               "displayValue": "Perfusion",
+               "value": "Perfusion"
+            },
+            {
+               "columnId": 6394619537346436,
+               "displayValue": "Mouse Cardiac Perfusion Fixation and Brain Collection V.5",
+               "value": "Mouse Cardiac Perfusion Fixation and Brain Collection V.5"
+            },
+            {
+               "columnId": 4142819723661188,
+               "displayValue": "dx.doi.org/10.17504/protocols.io.bg5vjy66",
+               "value": "dx.doi.org/10.17504/protocols.io.bg5vjy66"
+            },
+            {
+               "columnId": 8646419351031684,
+               "displayValue": "5",
+               "value": 5.0
+            },
+            {
+               "columnId": 223584756649860
+            }
+         ],
+         "createdAt": "2023-09-21T19:31:40+00:00Z",
+         "expanded": true,
+         "id": 8593874469293956,
+         "modifiedAt": "2023-10-02T20:20:50+00:00Z",
+         "rowNumber": 7,
+         "siblingId": 4090274841923460
+      },
+      {
+         "cells": [
+            {
+               "columnId": 8808571546324868,
+               "displayValue": "Imaging Techniques",
+               "value": "Imaging Techniques"
+            },
+            {
+               "columnId": 6725511871942532,
+               "displayValue": "SmartSPIM Imaging",
+               "value": "SmartSPIM Imaging"
+            },
+            {
+               "columnId": 6394619537346436,
+               "displayValue": "Imaging cleared mouse brains on SmartSPIM",
+               "value": "Imaging cleared mouse brains on SmartSPIM"
+            },
+            {
+               "columnId": 4142819723661188,
+               "displayValue": "dx.doi.org/10.17504/protocols.io.3byl4jo1rlo5/v1",
+               "value": "dx.doi.org/10.17504/protocols.io.3byl4jo1rlo5/v1"
+            },
+            {
+               "columnId": 8646419351031684,
+               "displayValue": "1",
+               "value": 1.0
+            },
+            {
+               "columnId": 223584756649860
+            }
+         ],
+         "createdAt": "2023-12-05T19:01:57+00:00Z",
+         "expanded": true,
+         "id": 5674502608949124,
+         "modifiedAt": "2023-12-05T19:01:57+00:00Z",
+         "rowNumber": 8,
+         "siblingId": 8593874469293956
+      },
+      {
+         "cells": [
+            {
+               "columnId": 8808571546324868,
+               "displayValue": "Imaging Techniques",
+               "value": "Imaging Techniques"
+            },
+            {
+               "columnId": 6725511871942532,
+               "displayValue": "SmartSPIM setup",
+               "value": "SmartSPIM setup"
+            },
+            {
+               "columnId": 6394619537346436,
+               "displayValue": "SmartSPIM setup and alignment",
+               "value": "SmartSPIM setup and alignment"
+            },
+            {
+               "columnId": 4142819723661188,
+               "displayValue": "dx.doi.org/10.17504/protocols.io.5jyl8jyb7g2w/v1",
+               "value": "dx.doi.org/10.17504/protocols.io.5jyl8jyb7g2w/v1"
+            },
+            {
+               "columnId": 8646419351031684,
+               "displayValue": "1",
+               "value": 1.0
+            },
+            {
+               "columnId": 223584756649860
+            }
+         ],
+         "createdAt": "2023-12-05T18:58:55+00:00Z",
+         "expanded": true,
+         "id": 3443136437718916,
+         "modifiedAt": "2023-12-05T20:31:50+00:00Z",
+         "rowNumber": 9,
+         "siblingId": 5674502608949124
+      },
+      {
+         "cells": [
+            {
+               "columnId": 8808571546324868
+            },
+            {
+               "columnId": 6725511871942532
+            },
+            {
+               "columnId": 6394619537346436
+            },
+            {
+               "columnId": 4142819723661188
+            },
+            {
+               "columnId": 8646419351031684
+            },
+            {
+               "columnId": 223584756649860
+            }
+         ],
+         "createdAt": "2023-12-05T20:05:18+00:00Z",
+         "expanded": true,
+         "id": 5290349996576644,
+         "modifiedAt": "2024-02-13T22:25:51+00:00Z",
+         "rowNumber": 10,
+         "siblingId": 3443136437718916
+      },
+      {
+         "cells": [
+            {
+               "columnId": 8808571546324868
+            },
+            {
+               "columnId": 6725511871942532
+            },
+            {
+               "columnId": 6394619537346436
+            },
+            {
+               "columnId": 4142819723661188
+            },
+            {
+               "columnId": 8646419351031684
+            },
+            {
+               "columnId": 223584756649860
+            }
+         ],
+         "createdAt": "2023-12-15T17:30:18+00:00Z",
+         "expanded": true,
+         "id": 5142781918482308,
+         "modifiedAt": "2024-02-13T22:25:51+00:00Z",
+         "rowNumber": 11,
+         "siblingId": 5290349996576644
+      },
+      {
+         "cells": [
+            {
+               "columnId": 8808571546324868
+            },
+            {
+               "columnId": 6725511871942532
+            },
+            {
+               "columnId": 6394619537346436
+            },
+            {
+               "columnId": 4142819723661188
+            },
+            {
+               "columnId": 8646419351031684
+            },
+            {
+               "columnId": 223584756649860
+            }
+         ],
+         "createdAt": "2023-12-15T17:30:18+00:00Z",
+         "expanded": true,
+         "id": 2890982104797060,
+         "modifiedAt": "2024-02-13T22:25:51+00:00Z",
+         "rowNumber": 12,
+         "siblingId": 5142781918482308
+      },
+      {
+         "cells": [
+            {
+               "columnId": 8808571546324868
+            },
+            {
+               "columnId": 6725511871942532
+            },
+            {
+               "columnId": 6394619537346436
+            },
+            {
+               "columnId": 4142819723661188
+            },
+            {
+               "columnId": 8646419351031684
+            },
+            {
+               "columnId": 223584756649860
+            }
+         ],
+         "createdAt": "2023-12-15T17:30:18+00:00Z",
+         "expanded": true,
+         "id": 7394581732167556,
+         "modifiedAt": "2024-02-13T22:25:51+00:00Z",
+         "rowNumber": 13,
+         "siblingId": 2890982104797060
+      }
+   ],
+   "totalRowCount": 13,
+   "userPermissions": {
+      "summaryPermissions": "ADMIN"
+   },
+   "userSettings": {
+      "criticalPathEnabled": false,
+      "displaySummaryTasks": true
+   },
+   "version": 26
+}

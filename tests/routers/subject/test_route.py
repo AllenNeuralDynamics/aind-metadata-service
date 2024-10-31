@@ -13,7 +13,7 @@ class TestRoute:
     """Test subject responses."""
 
     def test_get_200_subject(
-        self, client, get_session, example_200_subject_response
+        self, client, get_lab_tracks_session, example_200_subject_response
     ):
         """Tests a good response"""
         response = client.get("/subject/632269")
@@ -23,7 +23,7 @@ class TestRoute:
     def test_get_404_subject(
         self,
         client,
-        get_session,
+        get_lab_tracks_session,
     ):
         """Tests a missing data response"""
 
@@ -32,7 +32,9 @@ class TestRoute:
         assert 404 == response.status_code
         assert expected_response == response.json()
 
-    def test_500_internal_server_error(self, client, get_session, caplog):
+    def test_500_internal_server_error(
+        self, client, get_lab_tracks_session, caplog
+    ):
         """Tests an internal server error response"""
 
         with patch(
@@ -51,7 +53,7 @@ class TestRoute:
         self,
         client,
         test_lab_tracks_subject,
-        get_session,
+        get_lab_tracks_session,
         example_200_subject_response,
     ):
         """Tests a multiple_items response"""
@@ -78,7 +80,7 @@ class TestRoute:
     def test_406_invalid_model(
         self,
         client,
-        get_session,
+        get_lab_tracks_session,
     ):
         """Tests an invalid model response"""
 

@@ -65,7 +65,6 @@ async def get_subject(
         lab_tracks_subjects = SessionHandler(session=session).get_subject_view(
             subject_id=subject_id
         )
-        print("LB:", lab_tracks_subjects)
         if len(lab_tracks_subjects) == 0:
             return JSONResponse(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -79,7 +78,7 @@ async def get_subject(
             if len(subjects) == 1:
                 subject = subjects[0]
                 try:
-                    Subject.model_validate(subject.model_dump())
+                    Subject.model_validate(subject.model_dump(warnings="none"))
                     return SubjectResponse(data=subject)
                 except ValidationError as e:
                     errors = e.json()
@@ -89,14 +88,16 @@ async def get_subject(
                             InvalidSubjectResponse(
                                 message=f"Validation errors: {errors}",
                                 data=subject,
-                            ).model_dump_json()
+                            ).model_dump_json(warnings="none")
                         ),
                     )
             else:
                 return JSONResponse(
                     status_code=status.HTTP_300_MULTIPLE_CHOICES,
                     content=json.loads(
-                        MultipleItemsFound(data=subjects).model_dump_json()
+                        MultipleItemsFound(data=subjects).model_dump_json(
+                            warnings="none"
+                        )
                     ),
                 )
     except Exception as e:

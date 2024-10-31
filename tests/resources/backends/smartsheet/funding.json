@@ -1,0 +1,194 @@
+{
+   "accessLevel": "EDITOR_SHARE",
+   "columns": [
+      {
+         "id": 3981351074090884,
+         "index": 0,
+         "title": "Project Name",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 0,
+         "width": 371
+      },
+      {
+         "id": 1729551260405636,
+         "index": 1,
+         "primary": true,
+         "title": "Project Code",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 0,
+         "width": 150
+      },
+      {
+         "id": 2990791841501060,
+         "index": 2,
+         "options": [
+            "Allen Institute",
+            "Allen Institute For Brain Science",
+            "Allen Institute For Neural Dynamics",
+            "Columbia University",
+            "Jackson Laboratory",
+            "Huazhong University Of Science And Technology",
+            "National Institute Of Neurological Disorders And Stroke",
+            "New York University",
+            "Simons Foundation",
+            "National Institutes of Health"
+         ],
+         "title": "Funding Institution",
+         "type": "PICKLIST",
+         "validation": false,
+         "version": 0,
+         "width": 150
+      },
+      {
+         "id": 3446515788894084,
+         "index": 3,
+         "title": "Grant Number",
+         "type": "PICKLIST",
+         "validation": false,
+         "version": 0,
+         "width": 150
+      },
+      {
+         "id": 4825776004222852,
+         "index": 4,
+         "title": "Investigators",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 1,
+         "width": 150
+      }
+   ],
+   "createdAt": "2023-07-31T20:52:39+00:00Z",
+   "dependenciesEnabled": false,
+   "effectiveAttachmentOptions": [
+      "EVERNOTE",
+      "FILE",
+      "EGNYTE",
+      "ONEDRIVE",
+      "GOOGLE_DRIVE",
+      "BOX_COM",
+      "DROPBOX",
+      "LINK"
+   ],
+   "ganttEnabled": false,
+   "hasSummaryFields": false,
+   "id": 2802362280267652,
+   "modifiedAt": "2023-12-20T18:36:26+00:00Z",
+   "name": "Project Name and Funding Source",
+   "permalink": "https://app.smartsheet.com/sheets/IJ5WvApEFriNhoReXpDWhQRhNOAWXmSoxsenGVAH",
+   "readOnly": true,
+   "resourceManagementEnabled": false,
+   "rows": [
+      {
+         "cells": [
+            {
+               "columnId": 3981351074090884,
+               "displayValue": "AIND Scientific Activities",
+               "value": "AIND Scientific Activities"
+            },
+            {
+               "columnId": 1729551260405636,
+               "displayValue": "122-01-001-10",
+               "value": "122-01-001-10"
+            },
+            {
+               "columnId": 2990791841501060,
+               "displayValue": "Allen Institute",
+               "value": "Allen Institute"
+            },
+            {
+               "columnId": 3446515788894084
+            },
+            {
+               "columnId": 4825776004222852,
+               "displayValue": "person.two@acme.org, J Smith, Mary Smith",
+               "value": "person.two@acme.org, J Smith, John Doe II"
+            }
+         ],
+         "createdAt": "2023-07-31T20:57:28+00:00Z",
+         "expanded": true,
+         "id": 2014892103339908,
+         "modifiedAt": "2023-12-20T18:32:10+00:00Z",
+         "rowNumber": 1
+      },
+      {
+         "cells": [
+            {
+               "columnId": 3981351074090884
+            },
+            {
+               "columnId": 1729551260405636,
+               "displayValue": "122-01-001-10",
+               "value": "122-01-001-10"
+            },
+            {
+               "columnId": 2990791841501060,
+               "displayValue": "Allen Institute",
+               "value": "Allen Institute"
+            },
+            {
+               "columnId": 3446515788894084
+            },
+            {
+               "columnId": 4825776004222852,
+               "displayValue": "John Doe, person.one@acme.org",
+               "value": "John Doe, person.one@acme.org"
+            }
+         ],
+         "createdAt": "2023-08-07T23:39:14+00:00Z",
+         "expanded": true,
+         "id": 3850275791343492,
+         "modifiedAt": "2023-12-20T18:32:10+00:00Z",
+         "rowNumber": 2,
+         "siblingId": 2014892103339908
+      },
+      {
+         "cells": [
+            {
+               "columnId": 3981351074090884,
+               "displayValue": "v1omFISH",
+               "value": "v1omFISH"
+            },
+            {
+               "columnId": 1729551260405636,
+               "displayValue": "121-01-010-10",
+               "value": "121-01-010-10"
+            },
+            {
+               "columnId": 2990791841501060,
+               "displayValue": "Allen Institute",
+               "value": "Allen Institute"
+            },
+            {
+               "columnId": 3446515788894084
+            },
+            {
+               "columnId": 4825776004222852,
+               "displayValue": "person.one@acme.org, Jane Doe",
+               "value": "person.one@acme.org, Jane Doe"
+            }
+         ],
+         "createdAt": "2023-08-02T19:28:24+00:00Z",
+         "expanded": true,
+         "id": 8831127549939588,
+         "modifiedAt": "2023-12-20T18:33:23+00:00Z",
+         "rowNumber": 3,
+         "siblingId": 4327527922569092
+      }
+   ],
+   "totalRowCount": 3,
+   "userPermissions": {
+      "summaryPermissions": "READ_WRITE"
+   },
+   "userSettings": {
+      "criticalPathEnabled": false,
+      "displaySummaryTasks": true
+   },
+   "version": 40,
+   "workspace": {
+      "id": 8949276219860868,
+      "name": "AIND Projects Workspace"
+   }
+}

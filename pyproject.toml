@@ -17,7 +17,7 @@ readme = "README.md"
 dynamic = ["version"]
 
 dependencies = [
-    'aind-data-schema==1.0.0',
+    'aind-data-schema==1.1.1',
     'aind-data-schema-models>=0.5.0',
     'pydantic>=2.0',
     'pydantic-settings>=2.0'
@@ -33,6 +33,7 @@ dev = [
     'interrogate',
     'isort',
     'pytest',
+    'pytest-mock',
     'pytest-env',
     'pytest_asyncio',
 ]
@@ -40,7 +41,7 @@ dev = [
 server = [
     'pyodbc',
     'office365-rest-python-client==2.4.1',
-    'smartsheet-python-sdk==3.0.2',
+    'aind-smartsheet-api==0.1.2',
     'fastapi>=0.114.0',
     'fastapi-cache2',
     'sqlmodel',
@@ -114,5 +115,11 @@ env = [
     "LABTRACKS_PASSWORD=lb_password",
     "LABTRACKS_USER=lb_user",
     "LABTRACKS_PORT=123",
-    "LABTRACKS_DATABASE=lb_db"
+    "LABTRACKS_DATABASE=lb_db",
+    "SMARTSHEET_FUNDING_ID=1000",
+    "SMARTSHEET_PERFUSIONS_ID=1001",
+    "SMARTSHEET_PROTOCOLS_ID=1002",
+    "SMARTSHEET_ACCESS_TOKEN=abc-123",
+    "SMARTSHEET_USER_AGENT=some_user_agent",
 ]
+filterwarnings = ["ignore::DeprecationWarning:smartsheet"]
