@@ -22,7 +22,7 @@ from aind_data_schema.core.procedures import (
     OphysProbe,
     Side,
     Surgery,
-    ViralMaterial,
+    ViralMaterial, Procedures,
 )
 from aind_data_schema.core.subject import Sex
 
@@ -3400,23 +3400,6 @@ class MappedNSBList:
             return BurrHoleInfo()
 
     @staticmethod
-    def _map_burr_hole_number_to_probe(
-        burr_hole_num: int,
-    ) -> Optional[str]:
-        """Maps NSB Burr hole number into AIND ProbeName"""
-        # TODO: Name Probes based on AP/ML
-        if burr_hole_num == 1:
-            return "Probe A"
-        elif burr_hole_num == 2:
-            return "Probe B"
-        elif burr_hole_num == 3:
-            return "Probe C"
-        elif burr_hole_num == 4:
-            return "Probe D"
-        else:
-            return None
-
-    @staticmethod
     def _map_burr_hole_dv(dv1, dv2, dv3):
         """Maps dvs for a burr hole to one coordinate depth list"""
         if all(dv is None for dv in (dv1, dv2, dv3)):
@@ -3502,6 +3485,23 @@ class MappedNSBList:
             )
         else:
             return None
+
+    @staticmethod
+    def assign_fiber_probe_names(procedures: List) -> None:
+        """Assigns ordered names to FiberProbe objects within FiberImplant"""
+        probe_index = 0
+        for proc in procedures:
+            if isinstance(proc, FiberImplant):
+                sorted_probes = sorted(
+                    proc.probes,
+                    key=lambda probe: (-float(probe.stereotactic_coordinate_ap), float(probe.stereotactic_coordinate_ml))
+                )
+                # Assign names based on sorted order
+                for probe in sorted_probes:
+                    probe.ophys_probe.name = f"Probe {probe_index}"
+                    probe_index += 1
+                    print(f"{probe.ophys_probe.name}: ml={probe.stereotactic_coordinate_ml}, ap={probe.stereotactic_coordinate_ap}")
+        return None
 
 
     def get_procedure(self) -> List[Surgery]:
@@ -3738,7 +3738,7 @@ class MappedNSBList:
                 bregma_to_lambda_distance = self.aind_breg2_lamb
                 fiber_probe = self._map_burr_fiber_probe(burr_hole_info.fiber_type)
                 ophys_probe = OphysProbe.model_construct(
-                    fiber_probe=fiber_probe,
+                    ophys_probe=fiber_probe,
                     targeted_structure=None,
                     stereotactic_coordinate_ml=burr_hole_info.coordinate_ml,
                     stereotactic_coordinate_ap=burr_hole_info.coordinate_ap,
@@ -3775,6 +3775,7 @@ class MappedNSBList:
 
         surgeries = []
         if initial_procedures:
+            self.assign_fiber_probe_names(initial_procedures)
             initial_surgery = Surgery.model_construct(
                 start_date=initial_start_date,
                 experimenter_full_name=experimenter_full_name,
@@ -3788,6 +3789,7 @@ class MappedNSBList:
             )
             surgeries.append(initial_surgery)
         if followup_procedures:
+            self.assign_fiber_probe_names(followup_procedures)
             followup_surgery = Surgery.model_construct(
                 start_date=followup_start_date,
                 experimenter_full_name=experimenter_full_name,
@@ -3812,7 +3814,7 @@ class MappedNSBList:
                 anaesthesia=None,
                 workstation_id=None,
                 notes=notes,
-                procedures=other_procedures,
+                procedures=self.assign_fiber_probe_names(other_procedures),
             )
             surgeries.append(other_surgery)
 
