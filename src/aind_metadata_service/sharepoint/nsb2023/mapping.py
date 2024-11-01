@@ -3468,17 +3468,16 @@ class MappedNSBList:
             injectable_materials.append(injectable_material)
         return injectable_materials
 
-    def _map_burr_fiber_probe(self, fiber_type: Optional[FiberType]) -> Optional[FiberProbe]:
+    def _map_burr_fiber_probe(self, burr_info: BurrHoleInfo) -> Optional[FiberProbe]:
         """Constructs a fiber probe"""
-        if fiber_type == FiberType.STANDARD:
-            # TODO: check that total_length is same as ferrule diameter
+        if burr_info.fiber_type == FiberType.STANDARD:
             return FiberProbe.model_construct(
                 core_diameter=200,
                 numerical_aperature=0.37,
                 ferrule_material=FerruleMaterial.CERAMIC,
-                total_length=1.25,
+                total_length=burr_info.fiber_implant_length
             )
-        elif fiber_type == FiberType.CUSTOM:
+        elif burr_info.fiber_type == FiberType.CUSTOM:
             # if custom, specs are stored in requestor comments
             return FiberProbe.model_construct(
                 notes=self.aind_long_requestor_comments
@@ -3737,7 +3736,7 @@ class MappedNSBList:
                     inj_type=burr_hole_info.inj_type,
                 )
                 bregma_to_lambda_distance = self.aind_breg2_lamb
-                fiber_probe = self._map_burr_fiber_probe(burr_hole_info.fiber_type)
+                fiber_probe = self._map_burr_fiber_probe(burr_hole_info)
                 ophys_probe = OphysProbe.model_construct(
                     ophys_probe=fiber_probe,
                     targeted_structure=None,
@@ -3806,6 +3805,7 @@ class MappedNSBList:
 
         # any other mapped procedures without During info will be put into one surgery object
         if other_procedures:
+            self.assign_fiber_probe_names(other_procedures)
             other_surgery = Surgery.model_construct(
                 start_date=None,
                 experimenter_full_name=experimenter_full_name,
@@ -3815,7 +3815,7 @@ class MappedNSBList:
                 anaesthesia=None,
                 workstation_id=None,
                 notes=notes,
-                procedures=self.assign_fiber_probe_names(other_procedures),
+                procedures=other_procedures,
             )
             surgeries.append(other_surgery)
 

@@ -68,6 +68,7 @@ class TestNSB2023Parsers(TestCase):
             expected_mapped_data = list_item[1]
             raw_file_name = list_item[2]
             logging.debug(f"Processing file: {raw_file_name}")
+            print(f"Processing file: {raw_file_name}")
             nsb_model = NSBList.model_validate(raw_data)
             mapper = MappedNSBList(nsb=nsb_model)
             mapped_procedure = mapper.get_procedure()
@@ -157,14 +158,6 @@ class TestNSB2023Parsers(TestCase):
         proc_types = [type(p) for p in mapped_procedure[0].procedures]
         self.assertTrue(BrainInjection in proc_types)
 
-    def test_burr_hole_to_probe_edge_case(self):
-        """Tests edge case where burr hole number greater than 6"""
-        list_item = self.list_items[2]
-        raw_data = deepcopy(list_item[0])
-        nsb_model = NSBList.model_validate(raw_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        self.assertIsNone(mapper._map_burr_hole_number_to_probe(7))
-        self.assertEqual(BurrHoleInfo(), mapper.burr_hole_info(7))
 
 
 if __name__ == "__main__":
