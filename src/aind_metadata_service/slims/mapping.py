@@ -86,7 +86,7 @@ class SlimsSessionMapper:
             session.session_group, "mouse_platform_name", None
         )
         active_mouse_platform = getattr(
-            session.session_group, "active_mouse_platform", None
+            session.session_group, "active_mouse_platform", False
         )
 
         rig_id = getattr(session.session_instrument, "name", None)

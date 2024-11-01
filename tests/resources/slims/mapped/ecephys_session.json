@@ -117,7 +117,7 @@
       }
    ],
    "mouse_platform_name": null,
-   "active_mouse_platform": null,
+   "active_mouse_platform": false,
    "headframe_registration": null,
    "reward_delivery": {
       "reward_solution": "Water",

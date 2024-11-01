@@ -1,4 +1,5 @@
 """Tests Slims Mapper"""
+
 import json
 import os
 import unittest
@@ -29,15 +30,13 @@ class TestSlimsSessionMapper(unittest.TestCase):
     def setUp(self):
         """Sets up test class"""
         self.mapper = SlimsSessionMapper()
-        with open(f"{RAW_DIR}/ecephys_session_response.json", "r") as f:
+        with open(RAW_DIR / "ecephys_session_response.json") as f:
             slims_data1 = json.load(f)
-        with open(f"{RAW_DIR}/ecephys_session_response2.json", "r") as f:
+        with open(RAW_DIR / "ecephys_session_response2.json") as f:
             slims_data2 = json.load(f)
-        with open(f"{MAPPED_DIR}/ecephys_session.json", encoding="utf-8") as f:
+        with open(MAPPED_DIR / "ecephys_session.json") as f:
             expected_data1 = json.load(f)
-        with open(
-            f"{MAPPED_DIR}/ecephys_session2.json", encoding="utf-8"
-        ) as f:
+        with open(MAPPED_DIR / "ecephys_session2.json") as f:
             expected_data2 = json.load(f)
         self.slims_sessions = [
             SlimsEcephysSession.model_validate(slims_data1),
