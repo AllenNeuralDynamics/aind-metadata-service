@@ -40,9 +40,9 @@ class TestSlimsHandler(unittest.TestCase):
         self.mock_client = mock_slims_client.return_value
         self.handler = SlimsHandler(settings)
 
-        with open(f"{RAW_DIR}/ecephys_session_response.json", "r") as f:
+        with open(RAW_DIR / "ecephys_session_response.json", "r") as f:
             slims_data1 = json.load(f)
-        with open(f"{MAPPED_DIR}/ecephys_session.json", encoding="utf-8") as f:
+        with open(MAPPED_DIR / "ecephys_session.json", encoding="utf-8") as f:
             expected_data1 = json.load(f)
         self.slims_sessions = [
             SlimsEcephysSession.model_validate(slims_data1),
