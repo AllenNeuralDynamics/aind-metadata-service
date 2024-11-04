@@ -4,6 +4,10 @@ import logging
 
 from aind_data_schema.core.instrument import Instrument
 from aind_data_schema.core.rig import Rig
+from aind_slims_api import SlimsClient
+from aind_slims_api.exceptions import SlimsRecordNotFound
+from aind_slims_api.models.instrument import SlimsInstrumentRdrc
+from aind_slims_api.operations.ecephys_session import fetch_ecephys_sessions
 from pydantic import Extra, Field, SecretStr
 from pydantic_settings import BaseSettings
 from requests.models import Response
@@ -11,9 +15,7 @@ from slims.criteria import equals
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
-from aind_slims_api.exceptions import SlimsRecordNotFound
-from aind_slims_api import SlimsClient
-from aind_slims_api.models.instrument import SlimsInstrumentRdrc
+from aind_metadata_service.slims.mapping import SlimsSessionMapper
 
 
 class SlimsSettings(BaseSettings):
@@ -111,6 +113,29 @@ class SlimsHandler:
         except SlimsRecordNotFound:
             return ModelResponse.no_data_found_error_response()
         # Handles exception from GET request
+        except Exception as e:
+            logging.error(repr(e))
+            return ModelResponse.internal_server_error_response()
+
+    def get_sessions_model_response(self, subject_id: str) -> ModelResponse:
+        """
+        Fetches sessions for a given subject ID from SLIMS.
+        """
+        try:
+            sessions = fetch_ecephys_sessions(
+                subject_id=subject_id, client=self.client
+            )
+            if sessions:
+                mapper = SlimsSessionMapper()
+                mapped_sessions = mapper.map_sessions(sessions, subject_id)
+                return ModelResponse(
+                    aind_models=mapped_sessions,
+                    status_code=StatusCodes.DB_RESPONDED,
+                )
+            else:
+                return ModelResponse.no_data_found_error_response()
+        except SlimsRecordNotFound:
+            return ModelResponse.no_data_found_error_response()
         except Exception as e:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
