@@ -78,6 +78,8 @@ class TestNSB2023Parsers(TestCase):
             mapped_procedure_json_parsed = [
                 json.loads(json_str) for json_str in mapped_procedure_json
             ]
+            with open(f"actual_mapped_{raw_file_name}.json", "w") as f:
+                json.dump(mapped_procedure_json_parsed, f, indent=4)
             self.assertEqual(
                 expected_mapped_data, mapped_procedure_json_parsed
             )
