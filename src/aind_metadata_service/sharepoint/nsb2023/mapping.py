@@ -3469,14 +3469,12 @@ class MappedNSBList:
             injectable_materials.append(injectable_material)
         return injectable_materials
 
-    def _map_burr_fiber_probe(
-        self, burr_info: BurrHoleInfo
-    ) -> FiberProbe:
+    def _map_burr_fiber_probe(self, burr_info: BurrHoleInfo) -> FiberProbe:
         """Constructs a fiber probe"""
         if burr_info.fiber_type == FiberType.STANDARD:
             return FiberProbe.model_construct(
                 core_diameter=200,
-                numerical_aperature=0.37,
+                numerical_aperture=0.37,
                 ferrule_material=FerruleMaterial.CERAMIC,
                 total_length=burr_info.fiber_implant_length,
             )
@@ -3484,7 +3482,7 @@ class MappedNSBList:
             # if custom, specs are stored in requestor comments
             return FiberProbe.model_construct(
                 total_length=burr_info.fiber_implant_length,
-                notes=self.aind_long_requestor_comments
+                notes=self.aind_long_requestor_comments,
             )
         else:
             return FiberProbe.model_construct(
