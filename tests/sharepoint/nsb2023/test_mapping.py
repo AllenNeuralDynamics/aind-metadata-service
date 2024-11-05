@@ -13,7 +13,6 @@ from unittest import main as unittest_main
 from aind_data_schema.core.procedures import BrainInjection, CraniotomyType
 
 from aind_metadata_service.sharepoint.nsb2023.mapping import (
-    BurrHoleInfo,
     HeadPost,
     HeadPostInfo,
     HeadPostType,
@@ -68,7 +67,6 @@ class TestNSB2023Parsers(TestCase):
             expected_mapped_data = list_item[1]
             raw_file_name = list_item[2]
             logging.debug(f"Processing file: {raw_file_name}")
-            print(f"Processing file: {raw_file_name}")
             nsb_model = NSBList.model_validate(raw_data)
             mapper = MappedNSBList(nsb=nsb_model)
             mapped_procedure = mapper.get_procedure()
@@ -78,8 +76,6 @@ class TestNSB2023Parsers(TestCase):
             mapped_procedure_json_parsed = [
                 json.loads(json_str) for json_str in mapped_procedure_json
             ]
-            with open(f"actual_mapped_{raw_file_name}.json", "w") as f:
-                json.dump(mapped_procedure_json_parsed, f, indent=4)
             self.assertEqual(
                 expected_mapped_data, mapped_procedure_json_parsed
             )
@@ -159,7 +155,6 @@ class TestNSB2023Parsers(TestCase):
         mapped_procedure = mapper.get_procedure()
         proc_types = [type(p) for p in mapped_procedure[0].procedures]
         self.assertTrue(BrainInjection in proc_types)
-
 
 
 if __name__ == "__main__":

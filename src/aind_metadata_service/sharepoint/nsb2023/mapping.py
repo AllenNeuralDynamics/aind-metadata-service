@@ -22,7 +22,8 @@ from aind_data_schema.core.procedures import (
     OphysProbe,
     Side,
     Surgery,
-    ViralMaterial, Procedures,
+    ViralMaterial,
+    Procedures,
 )
 from aind_data_schema.core.subject import Sex
 
@@ -85,10 +86,13 @@ class InjectionType(Enum):
     NANOJECT = "Nanoject"
     IONTOPHORESIS = "Iontophoresis"
 
+
 class FiberType(Enum):
     """Enum class for Fiber Types"""
+
     STANDARD = "Standard"
     CUSTOM = "Custom (specs in comment)."
+
 
 @dataclass
 class SurgeryDuringInfo:
@@ -262,16 +266,13 @@ class MappedNSBList:
     def _parse_fiber_length_mm_str(self, fiber_length_str: Optional[str]):
         """Parses length of fiber length strings"""
         if fiber_length_str is not None:
-            parsed_string = re.search(
-                self.LENGTH_MM_REGEX, fiber_length_str
-            )
+            parsed_string = re.search(self.LENGTH_MM_REGEX, fiber_length_str)
             if parsed_string:
                 return self._parse_basic_decimal_str(parsed_string.group(1))
             else:
                 return None
         else:
             return None
-
 
     @staticmethod
     def _parse_datetime_to_date(dt: Optional[datetime]) -> Optional[date]:
@@ -3194,7 +3195,7 @@ class MappedNSBList:
                 inj_materials=injectable_materials,
                 fiber_implant_depth=self.aind_fiber_implant1_dv,
                 fiber_type=self.aind_burr_1_fiber_t,
-                fiber_implant_length=self.aind_fiber_implant1_lengt
+                fiber_implant_length=self.aind_fiber_implant1_lengt,
             )
         elif burr_hole_num == 2:
             coordinate_depth = self._map_burr_hole_dv(
@@ -3234,7 +3235,7 @@ class MappedNSBList:
                 inj_materials=injectable_materials,
                 fiber_implant_depth=self.aind_fiber_implant2_dv,
                 fiber_type=self.aind_burr_2_fiber_t,
-                fiber_implant_length=self.aind_fiber_implant2_lengt
+                fiber_implant_length=self.aind_fiber_implant2_lengt,
             )
         elif burr_hole_num == 3:
             coordinate_depth = self._map_burr_hole_dv(
@@ -3274,7 +3275,7 @@ class MappedNSBList:
                 inj_materials=injectable_materials,
                 fiber_implant_depth=self.aind_fiber_implant3_d_x00,
                 fiber_type=self.aind_burr_3_fiber_t,
-                fiber_implant_length=self.aind_fiber_implant3_lengt
+                fiber_implant_length=self.aind_fiber_implant3_lengt,
             )
         elif burr_hole_num == 4:
             coordinate_depth = self._map_burr_hole_dv(
@@ -3314,7 +3315,7 @@ class MappedNSBList:
                 inj_materials=injectable_materials,
                 fiber_implant_depth=self.aind_fiber_implant4_d_x00,
                 fiber_type=self.aind_burr_4_fiber_t,
-                fiber_implant_length=self.aind_fiber_implant4_lengt
+                fiber_implant_length=self.aind_fiber_implant4_lengt,
             )
         elif burr_hole_num == 5:
             coordinate_depth = self._map_burr_hole_dv(
@@ -3354,7 +3355,7 @@ class MappedNSBList:
                 inj_materials=injectable_materials,
                 fiber_implant_depth=self.aind_fiber_implant5_d_x00,
                 fiber_type=self.aind_burr_5_fiber_t,
-                fiber_implant_length=self.aind_fiber_implant5_lengt
+                fiber_implant_length=self.aind_fiber_implant5_lengt,
             )
         elif burr_hole_num == 6:
             coordinate_depth = self._map_burr_hole_dv(
@@ -3394,7 +3395,7 @@ class MappedNSBList:
                 inj_materials=injectable_materials,
                 fiber_implant_depth=self.aind_fiber_implant6_d_x00,
                 fiber_type=self.aind_burr_6_fiber_t,
-                fiber_implant_length=self.aind_fiber_implant6_lengt
+                fiber_implant_length=self.aind_fiber_implant6_lengt,
             )
         else:
             return BurrHoleInfo()
@@ -3468,22 +3469,27 @@ class MappedNSBList:
             injectable_materials.append(injectable_material)
         return injectable_materials
 
-    def _map_burr_fiber_probe(self, burr_info: BurrHoleInfo) -> Optional[FiberProbe]:
+    def _map_burr_fiber_probe(
+        self, burr_info: BurrHoleInfo
+    ) -> FiberProbe:
         """Constructs a fiber probe"""
         if burr_info.fiber_type == FiberType.STANDARD:
             return FiberProbe.model_construct(
                 core_diameter=200,
                 numerical_aperature=0.37,
                 ferrule_material=FerruleMaterial.CERAMIC,
-                total_length=burr_info.fiber_implant_length
+                total_length=burr_info.fiber_implant_length,
             )
         elif burr_info.fiber_type == FiberType.CUSTOM:
             # if custom, specs are stored in requestor comments
             return FiberProbe.model_construct(
+                total_length=burr_info.fiber_implant_length,
                 notes=self.aind_long_requestor_comments
             )
         else:
-            return None
+            return FiberProbe.model_construct(
+                total_length=burr_info.fiber_implant_length,
+            )
 
     @staticmethod
     def assign_fiber_probe_names(procedures: List) -> None:
@@ -3496,13 +3502,15 @@ class MappedNSBList:
         # Sort all probes based on ap (descending) and ml (ascending)
         sorted_probes = sorted(
             all_probes,
-            key=lambda probe: (-float(probe.stereotactic_coordinate_ap), float(probe.stereotactic_coordinate_ml))
+            key=lambda probe: (
+                -float(probe.stereotactic_coordinate_ap),
+                float(probe.stereotactic_coordinate_ml),
+            ),
         )
         for probe_index, probe in enumerate(sorted_probes):
-            probe.ophys_probe.name = f"Probe {probe_index}"
+            probe.ophys_probe.name = f"Fiber {probe_index}"
 
         return None
-
 
     def get_procedure(self) -> List[Surgery]:
         """Get a List of Surgeries"""

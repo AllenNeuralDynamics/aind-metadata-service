@@ -68,7 +68,7 @@
                      "active_length": null,
                      "total_length": null,
                      "length_unit": "millimeter",
-                     "name": "Probe 1"
+                     "name": "Fiber 1"
                   },
                   "targeted_structure": null,
                   "stereotactic_coordinate_ap": "-0.85",
@@ -128,7 +128,7 @@
                      "active_length": null,
                      "total_length": "2.5",
                      "length_unit": "millimeter",
-                     "name": "Probe 0"
+                     "name": "Fiber 0"
                   },
                   "targeted_structure": null,
                   "stereotactic_coordinate_ap": "2.0",
@@ -207,7 +207,7 @@
                      "active_length": null,
                      "total_length": null,
                      "length_unit": "millimeter",
-                     "name": "Probe 1"
+                     "name": "Fiber 1"
                   },
                   "targeted_structure": null,
                   "stereotactic_coordinate_ap": "-6.1",
@@ -267,7 +267,7 @@
                      "active_length": null,
                      "total_length": null,
                      "length_unit": "millimeter",
-                     "name": "Probe 0"
+                     "name": "Fiber 0"
                   },
                   "targeted_structure": null,
                   "stereotactic_coordinate_ap": "1.0",
