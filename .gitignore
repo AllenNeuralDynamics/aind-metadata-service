@@ -140,6 +140,3 @@ dmypy.json
 
 # VSCode
 .vscode/
-
-#Conda
-.conda/
