@@ -13,11 +13,11 @@ from unittest import main as unittest_main
 from aind_data_schema.core.procedures import BrainInjection, CraniotomyType
 
 from aind_metadata_service.sharepoint.nsb2023.mapping import (
+    BurrHoleInfo,
     HeadPost,
     HeadPostInfo,
     HeadPostType,
     MappedNSBList,
-    BurrHoleInfo
 )
 from aind_metadata_service.sharepoint.nsb2023.models import NSBList
 
@@ -164,6 +164,7 @@ class TestNSB2023Parsers(TestCase):
         nsb_model = NSBList.model_validate(raw_data)
         mapper = MappedNSBList(nsb=nsb_model)
         self.assertEqual(BurrHoleInfo(), mapper.burr_hole_info(7))
+
 
 if __name__ == "__main__":
     unittest_main()

@@ -1,15 +1,16 @@
 """Testing SlimsHandler"""
 
 import unittest
-from unittest.mock import patch, MagicMock
-from requests.models import Response
-from aind_metadata_service.client import StatusCodes
-from aind_slims_api.exceptions import SlimsRecordNotFound
+from unittest.mock import MagicMock, patch
+
 from aind_data_schema.core.instrument import Instrument
 from aind_data_schema.core.rig import Rig
-
-from aind_metadata_service.slims.client import SlimsHandler, SlimsSettings
+from aind_slims_api.exceptions import SlimsRecordNotFound
 from aind_slims_api.models.instrument import SlimsInstrumentRdrc
+from requests.models import Response
+
+from aind_metadata_service.client import StatusCodes
+from aind_metadata_service.slims.client import SlimsHandler, SlimsSettings
 
 
 class TestSlimsHandler(unittest.TestCase):

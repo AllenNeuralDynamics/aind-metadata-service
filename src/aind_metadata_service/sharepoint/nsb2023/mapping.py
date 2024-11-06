@@ -7,7 +7,7 @@ from decimal import Decimal, DecimalException
 from enum import Enum
 from typing import Any, List, Optional, Union
 
-from aind_data_schema.components.devices import FiberProbe, FerruleMaterial
+from aind_data_schema.components.devices import FerruleMaterial, FiberProbe
 from aind_data_schema.core.procedures import (
     Anaesthetic,
     BrainInjection,
@@ -20,10 +20,10 @@ from aind_data_schema.core.procedures import (
     NanojectInjection,
     NonViralMaterial,
     OphysProbe,
+    Procedures,
     Side,
     Surgery,
     ViralMaterial,
-    Procedures,
 )
 from aind_data_schema.core.subject import Sex
 from aind_data_schema_models.organizations import Organization
