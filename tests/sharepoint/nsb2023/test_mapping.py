@@ -17,6 +17,7 @@ from aind_metadata_service.sharepoint.nsb2023.mapping import (
     HeadPostInfo,
     HeadPostType,
     MappedNSBList,
+    BurrHoleInfo
 )
 from aind_metadata_service.sharepoint.nsb2023.models import NSBList
 
@@ -156,6 +157,13 @@ class TestNSB2023Parsers(TestCase):
         proc_types = [type(p) for p in mapped_procedure[0].procedures]
         self.assertTrue(BrainInjection in proc_types)
 
+    def test_burr_hole_to_probe_edge_case(self):
+        """Tests edge case where burr hole number greater than 6"""
+        list_item = self.list_items[2]
+        raw_data = deepcopy(list_item[0])
+        nsb_model = NSBList.model_validate(raw_data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        self.assertEqual(BurrHoleInfo(), mapper.burr_hole_info(7))
 
 if __name__ == "__main__":
     unittest_main()

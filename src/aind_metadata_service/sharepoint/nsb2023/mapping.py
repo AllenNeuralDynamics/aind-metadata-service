@@ -26,6 +26,7 @@ from aind_data_schema.core.procedures import (
     Procedures,
 )
 from aind_data_schema.core.subject import Sex
+from aind_data_schema_models.organizations import Organization
 
 from aind_metadata_service.sharepoint.nsb2023.models import NSBList
 from aind_metadata_service.sharepoint.nsb2023.models import (
@@ -3473,6 +3474,7 @@ class MappedNSBList:
         """Constructs a fiber probe"""
         if burr_info.fiber_type == FiberType.STANDARD:
             return FiberProbe.model_construct(
+                manufacturer=Organization.NEUROPHOTOMETRICS,
                 core_diameter=200,
                 numerical_aperture=0.37,
                 ferrule_material=FerruleMaterial.CERAMIC,
