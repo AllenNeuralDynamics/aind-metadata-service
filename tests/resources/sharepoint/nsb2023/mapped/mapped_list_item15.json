@@ -82,7 +82,7 @@
               "active_length": null,
               "total_length": null,
               "length_unit": "millimeter",
-              "name": "Fiber 2"
+              "name": "Fiber_2"
             }
           }
         ],
@@ -148,7 +148,7 @@
               "active_length": null,
               "total_length": "2.5",
               "length_unit": "millimeter",
-              "name": "Fiber 0"
+              "name": "Fiber_0"
             }
           }
         ],
@@ -214,7 +214,7 @@
               "active_length": null,
               "total_length": null,
               "length_unit": "millimeter",
-              "name": "Fiber 3"
+              "name": "Fiber_3"
             }
           }
         ],
@@ -280,7 +280,7 @@
               "active_length": null,
               "total_length": null,
               "length_unit": "millimeter",
-              "name": "Fiber 1"
+              "name": "Fiber_1"
             }
           }
         ],

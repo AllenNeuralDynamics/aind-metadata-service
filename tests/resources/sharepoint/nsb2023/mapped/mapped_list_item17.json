@@ -70,7 +70,7 @@
               "active_length": null,
               "total_length": "2.5",
               "length_unit": "millimeter",
-              "name": "Fiber 0"
+              "name": "Fiber_0"
             },
             "targeted_structure": null,
             "stereotactic_coordinate_ap": "2.0",
@@ -155,7 +155,7 @@
               "active_length": null,
               "total_length": null,
               "length_unit": "millimeter",
-              "name": "Fiber 0"
+              "name": "Fiber_0"
             },
             "targeted_structure": null,
             "stereotactic_coordinate_ap": "-6.1",
@@ -236,7 +236,7 @@
               "active_length": null,
               "total_length": null,
               "length_unit": "millimeter",
-              "name": "Fiber 1"
+              "name": "Fiber_1"
             },
             "targeted_structure": null,
             "stereotactic_coordinate_ap": "-0.85",
@@ -302,7 +302,7 @@
               "active_length": null,
               "total_length": null,
               "length_unit": "millimeter",
-              "name": "Fiber 0"
+              "name": "Fiber_0"
             },
             "targeted_structure": null,
             "stereotactic_coordinate_ap": "1.0",

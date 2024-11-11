@@ -3508,7 +3508,7 @@ class MappedNSBList:
             ),
         )
         for probe_index, probe in enumerate(sorted_probes):
-            probe.ophys_probe.name = f"Fiber {probe_index}"
+            probe.ophys_probe.name = f"Fiber_{probe_index}"
 
         return None
 
