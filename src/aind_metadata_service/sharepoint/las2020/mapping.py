@@ -7,13 +7,13 @@ from decimal import Decimal, DecimalException
 from enum import Enum
 from typing import Any, List, Optional
 
-from IPython.conftest import inject
 from aind_data_schema.core.procedures import (
     IntraperitonealInjection,
     RetroOrbitalInjection,
     Side,
     Surgery,
-    ViralMaterial, NonViralMaterial,
+    ViralMaterial,
+    NonViralMaterial,
 )
 
 from aind_metadata_service.sharepoint.las2020.models import (
@@ -94,6 +94,7 @@ class RetroOrbitalInjectionInfo:
     box_label: Optional[str] = None
     injectable_materials: Optional[List[InjectableMaterial]] = None
 
+
 class LASProcedure(Enum):
     """Enum class of requested procedure types"""
 
@@ -109,6 +110,11 @@ class LASProcedure(Enum):
 
 class MappedLASList:
     """Mapped Fields in Sharepoint list"""
+
+    STANDARD_DOSE_REGEX = re.compile(
+        r"^([a-zA-Z0-9\s\-\(\)]+?)\s+(\d+(\.\d+)?)?\s*([a-zA-Z%\/]+)?"
+    )
+    DOSE_PAREN_REGEX = re.compile(r"\((\d+(\.\d+)?)\s*([a-zA-Z%\/]+)\)")
 
     def __init__(self, las: LASList):
         """Class constructor"""
@@ -127,29 +133,44 @@ class MappedLASList:
         """Parse date from datetime"""
         return None if dt is None else dt.date()
 
-    def _parse_dose_sub_to_nonviral_material(self, dose_sub: Optional[str]) -> Optional[NonViralMaterial]:
+    def _parse_dose_sub_to_nonviral_material(
+        self, dose_sub: Optional[str]
+    ) -> Optional[NonViralMaterial]:
         """
-        Parses substance name, concentration, and concentration unit from dose substance
-         if it follows a common pattern into aind NonViralMaterial model.
+        Parses substance name, concentration, and concentration unit from dose
+        if it follows a common pattern into aind NonViralMaterial model.
         """
-        pattern = r'^([a-zA-Z0-9\s\-\(\)]+?)\s+(\d+(\.\d+)?)?\s*([a-zA-Z%\/]+)?'
-        match = re.match(pattern, dose_sub.strip())
+        # if string is long it probably contains too much information
+        if (dose_sub and len(dose_sub) > 30) or dose_sub is None:
+            return None
 
+        match = re.match(self.STANDARD_DOSE_REGEX, dose_sub.strip())
         if match:
-            material = match.group(1).strip()  # Extract material name
+            material = match.group(1).strip().lower().capitalize()
             concentration_value = match.group(2) if match.group(2) else None
-            concentration_unit = match.group(4).lower() if match.group(4) else None
-            if concentration_value:
-                concentration_value = self._parse_basic_decimal_str(concentration_value)
-            material = material.strip().lower().capitalize()
+            concentration_unit = (
+                match.group(4).lower() if match.group(4) else None
+            )
+
+            # If no concentration found, look in parentheses
+            if not concentration_value or not concentration_unit:
+                parens_match = re.search(self.DOSE_PAREN_REGEX, dose_sub)
+                if parens_match:
+                    concentration_value = parens_match.group(1)
+                    concentration_unit = parens_match.group(3).lower()
 
             return NonViralMaterial.model_construct(
                 name=material,
-                concentration=concentration_value,
-                concentration_unit=concentration_unit
+                concentration=self._parse_basic_decimal_str(
+                    concentration_value
+                ),
+                concentration_unit=concentration_unit,
             )
         else:
-            return None
+            # If it doesn't match pattern, return full string in name
+            return NonViralMaterial.model_construct(
+                name=dose_sub,
+            )
 
     @property
     def aind_accommodation_comment(self) -> Optional[str]:
@@ -301,7 +322,7 @@ class MappedLASList:
     @property
     def aind_dose_sub(self) -> Optional[NonViralMaterial]:
         """Maps dose_sub to aind model"""
-        return self._parse_dose_substance(self._las.dose_sub)
+        return self._parse_dose_sub_to_nonviral_material(self._las.dose_sub)
 
     @property
     def aind_dose_where(self) -> Optional[str]:
@@ -2124,7 +2145,9 @@ class MappedLASList:
         subject_procedures = []
         if self.has_ip_injection():
             ip_injection = IntraperitonealInjection.model_construct(
-                injection_materials=[self.aind_dose_sub] if self.aind_dose_sub else [],
+                injection_materials=(
+                    [self.aind_dose_sub] if self.aind_dose_sub else []
+                ),
                 injection_volume=self.aind_dosevolume,
                 injection_duration=self.aind_doseduration,
             )

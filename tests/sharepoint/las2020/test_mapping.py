@@ -13,7 +13,6 @@ from unittest import main as unittest_main
 from aind_data_schema.core.procedures import NonViralMaterial
 from aind_metadata_service.sharepoint.las2020.mapping import MappedLASList
 from aind_metadata_service.sharepoint.las2020.models import LASList
-from sqlalchemy.orm import Mapped
 
 if os.getenv("LOG_LEVEL"):  # pragma: no cover
     logging.basicConfig(level=os.getenv("LOG_LEVEL"))
@@ -105,29 +104,41 @@ class TestLASParsers(TestCase):
             "Heparin 1000U/mL",
             "Heparin (1000U/mL)",
             "Heparin 1000U/ml",
-            "2% evans blue",
-            "Methoxy-XO4",
-            "Quinpirole",
-            "heparin 1000u/ml"
+            None,
         ]
         list_item = self.list_items[0]
         raw_data = deepcopy(list_item[0])
         las_model = LASList.model_validate(raw_data)
         mapped = MappedLASList(las=las_model)
-        parsed_data = [mapped._parse_dose_sub_to_nonviral_material(dose) for dose in sample_data]
+        parsed_data = [
+            mapped._parse_dose_sub_to_nonviral_material(dose)
+            for dose in sample_data
+        ]
 
         expected_heparin = NonViralMaterial.model_construct(
             name="Heparin",
-            concentration=Decimal('1000'),
-            concentration_unit="u/ml"
+            concentration=Decimal("1000"),
+            concentration_unit="u/ml",
         )
-
-        self.assertEqual(parsed_data[0], expected_heparin)
+        expected_dox = NonViralMaterial.model_construct(
+            name="Dox",
+            concentration=Decimal("200"),
+            concentration_unit="mg/kg",
+        )
+        expected_evans_blue = NonViralMaterial.model_construct(
+            name="2% Evans blue",
+        )
+        self.assertIsNone(parsed_data[0])
         self.assertEqual(parsed_data[1], expected_heparin)
+        self.assertEqual(parsed_data[2], expected_dox)
         self.assertEqual(parsed_data[3], expected_heparin)
+        self.assertIsNone(parsed_data[4])
+        self.assertEqual(parsed_data[5], expected_evans_blue)
         self.assertEqual(parsed_data[6], expected_heparin)
         self.assertEqual(parsed_data[7], expected_heparin)
         self.assertEqual(parsed_data[8], expected_heparin)
+        self.assertIsNone(parsed_data[9])
+
 
 if __name__ == "__main__":
     unittest_main()

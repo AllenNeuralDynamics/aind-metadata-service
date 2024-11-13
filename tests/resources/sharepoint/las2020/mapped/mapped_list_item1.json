@@ -10,6 +10,7 @@
   "workstation_id": null,
   "procedures": [
     {
+      "injection_materials": [],
       "injection_duration": "30",
       "injection_duration_unit": "minute",
       "injection_volume": "70.4",
