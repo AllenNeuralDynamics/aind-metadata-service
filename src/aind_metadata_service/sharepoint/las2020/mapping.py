@@ -2094,7 +2094,7 @@ class MappedLASList:
             )
         return viral_materials
 
-    def get_procedure(self, subject_id) -> Surgery:
+    def get_procedure(self, subject_id) -> Optional[Surgery]:
         """Return Surgery as best as possible from a record."""
         subject_procedures = []
         if self.has_ip_injection():
@@ -2118,10 +2118,13 @@ class MappedLASList:
                         injection_materials=injection_materials,
                     )
                     subject_procedures.append(ro_injection)
-        return Surgery.model_construct(
-            experimenter_full_name=self.aind_author_id,
-            iacuc_protocol=self.aind_protocol,
-            start_date=self.aind_n_start_date,
-            end_date=self.aind_n_end_date,
-            procedures=subject_procedures,
-        )
+        if subject_procedures:
+            return Surgery.model_construct(
+                experimenter_full_name=self.aind_author_id,
+                iacuc_protocol=self.aind_protocol,
+                start_date=self.aind_n_start_date,
+                end_date=self.aind_n_end_date,
+                procedures=subject_procedures,
+            )
+        else:
+            return None
