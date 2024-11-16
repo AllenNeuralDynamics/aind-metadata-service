@@ -20,22 +20,26 @@ class FundingMapper(SmartSheetMapper):
     """Primary class to handle mapping data models and returning a response"""
 
     @staticmethod
-    def _parse_institution(input_name: str) -> Union[Organization, str]:
+    def _parse_institution(
+        input_name: Optional[str],
+    ) -> Optional[Union[Organization, str]]:
         """
         Generate Institution from string
         Parameters
         ----------
-        input_name : str
+        input_name : Optional[str]
           Institution name
 
         Returns
         -------
-        Union[Institution, str]
+        Optional[Union[Institution, str]]
           Either an Institution parsed from the name. If the Institution can't
           be generated from the name, then it returns the input name.
 
         """
-        if Organization().name_map.get(input_name) is not None:
+        if input_name is None:
+            return None
+        elif Organization().name_map.get(input_name) is not None:
             return Organization().name_map.get(input_name)
         elif Organization().abbreviation_map.get(input_name) is not None:
             return Organization().abbreviation_map.get(input_name)
@@ -72,6 +76,8 @@ class FundingMapper(SmartSheetMapper):
         funder = self._parse_institution(institution_value)
         investigators = row_dict.get(FundingColumnNames.INVESTIGATORS)
         if input_project_name != project_name:
+            return None
+        elif funder is None and grant_number is None and investigators is None:
             return None
         else:
             try:

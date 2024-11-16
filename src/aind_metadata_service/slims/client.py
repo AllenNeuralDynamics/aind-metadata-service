@@ -4,6 +4,9 @@ import logging
 
 from aind_data_schema.core.instrument import Instrument
 from aind_data_schema.core.rig import Rig
+from aind_slims_api import SlimsClient
+from aind_slims_api.exceptions import SlimsRecordNotFound
+from aind_slims_api.models.instrument import SlimsInstrumentRdrc
 from pydantic import Extra, Field, SecretStr
 from pydantic_settings import BaseSettings
 from requests.models import Response
@@ -11,9 +14,6 @@ from slims.criteria import equals
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
-from aind_slims_api.exceptions import SlimsRecordNotFound
-from aind_slims_api import SlimsClient
-from aind_slims_api.models.instrument import SlimsInstrumentRdrc
 
 
 class SlimsSettings(BaseSettings):
