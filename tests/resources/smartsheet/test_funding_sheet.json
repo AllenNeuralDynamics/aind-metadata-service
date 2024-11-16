@@ -116,6 +116,32 @@
       {
          "cells": [
             {
+               "columnId": 3981351074090884,
+               "displayValue": "AIND Scientific Activities",
+               "value": "AIND Scientific Activities"
+            },
+            {
+               "columnId": 1729551260405636
+            },
+            {
+               "columnId": 2990791841501060
+            },
+            {
+               "columnId": 3446515788894084
+            },
+            {
+               "columnId": 4825776004222852
+            }
+         ],
+         "createdAt": "2023-07-31T20:57:28+00:00Z",
+         "expanded": true,
+         "id": 2014892103339909,
+         "modifiedAt": "2023-12-20T18:32:10+00:00Z",
+         "rowNumber": 2
+      },
+      {
+         "cells": [
+            {
                "columnId": 3981351074090884
             },
             {
@@ -141,7 +167,7 @@
          "expanded": true,
          "id": 3850275791343492,
          "modifiedAt": "2023-12-20T18:32:10+00:00Z",
-         "rowNumber": 2,
+         "rowNumber": 3,
          "siblingId": 2014892103339908
       },
       {
@@ -174,11 +200,11 @@
          "expanded": true,
          "id": 8831127549939588,
          "modifiedAt": "2023-12-20T18:33:23+00:00Z",
-         "rowNumber": 3,
+         "rowNumber": 4,
          "siblingId": 4327527922569092
       }
    ],
-   "totalRowCount": 3,
+   "totalRowCount": 4,
    "userPermissions": {
       "summaryPermissions": "READ_WRITE"
    },
