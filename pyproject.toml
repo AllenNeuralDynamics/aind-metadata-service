@@ -17,9 +17,10 @@ readme = "README.md"
 dynamic = ["version"]
 
 dependencies = [
-    'aind-data-schema==1.1.1',
-    'aind-data-schema-models>=0.5.0',
-    'pydantic>=2.0',
+    'pydantic>=2.10',
+    'aind-metadata-mapper[bergamo]==0.21.0',
+    'aind-data-schema==1.2.0',
+    'aind-data-schema-models==0.6.4',
     'pydantic-settings>=2.0'
 ]
 
