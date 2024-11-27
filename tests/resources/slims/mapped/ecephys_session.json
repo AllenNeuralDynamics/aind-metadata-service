@@ -1,0 +1,136 @@
+{
+   "describedBy": "https://raw.githubusercontent.com/AllenNeuralDynamics/aind-data-schema/main/src/aind_data_schema/core/session.py",
+   "schema_version": "1.0.3",
+   "protocol_id": [],
+   "session_end_time": null,
+   "session_type": null,
+   "iacuc_protocol": null,
+   "rig_id": "323_EPHYS1_OPTO_20240212",
+   "calibrations": [],
+   "maintenance": [],
+   "subject_id": "000000",
+   "animal_weight_prior": 10.0,
+   "animal_weight_post": 10.0,
+   "weight_unit": "gram",
+   "anaesthesia": null,
+   "data_streams": [
+      {
+         "daq_names": [
+            "Harp Behavior",
+            "NPopto Basestation"
+         ],
+         "camera_names": ["Camera1", "Camera2"],
+         "light_sources": [],
+         "ephys_modules": [
+            {
+               "assembly_name": "assembly name test",
+               "arc_angle": 3.0,
+               "module_angle": 3.0,
+               "angle_unit": "degrees",
+               "rotation_angle": 3.0,
+               "coordinate_transform": null,
+               "calibration_date": null,
+               "notes": "Anatomical Coordinates mapped AP:X, ML:Y, DV:Z",
+               "primary_targeted_structure": "Nucleus accumbens",
+               "other_targeted_structure": null,
+               "targeted_ccf_coordinates": [],
+               "manipulator_coordinates": {
+                  "x": "1.0",
+                  "y": "1.0",
+                  "z": "1.0",
+                  "unit": "micrometer"
+               },
+               "anatomical_coordinates": null,
+               "anatomical_reference": "Bregma",
+               "surface_z": null,
+               "surface_z_unit": "micrometer",
+               "dye": null,
+               "implant_hole_number": 9.0
+            }
+         ],
+         "stick_microscopes": [
+            {
+               "assembly_name": "45881",
+               "arc_angle": 1.0,
+               "module_angle": 1.0,
+               "angle_unit": "degrees",
+               "rotation_angle": 1.0,
+               "coordinate_transform": null,
+               "calibration_date": null,
+               "notes": null
+            }
+         ],
+         "manipulator_modules": [],
+         "detectors": [],
+         "fiber_connections": [],
+         "fiber_modules": [],
+         "ophys_fovs": [],
+         "slap_fovs": [],
+         "stack_parameters": null,
+         "mri_scans": [],
+         "stream_modalities": [
+            {
+               "name": "Behavior",
+               "abbreviation": "behavior"
+            },
+            {
+               "name": "Extracellular electrophysiology",
+               "abbreviation": "ecephys"
+            }
+         ],
+         "software": [],
+         "notes": null
+      }
+   ],
+   "stimulus_epochs": [
+      {
+         "stimulus_name": "stim1",
+         "session_number": null,
+         "software": [],
+         "script": null,
+         "stimulus_modalities": [
+            "Auditory",
+            "Olfactory"
+         ],
+         "stimulus_parameters": null,
+         "stimulus_device_names": "device1, device2",
+         "speaker_config": {
+            "name": "speaker1",
+            "volume": "1.0",
+            "volume_unit": "decibels"
+         },
+         "light_source_config": [
+            {
+               "device_type": "Light emitting diode",
+               "name": "diode",
+               "excitation_power": "12.0",
+               "excitation_power_unit": "milliwatt"
+            }
+         ],
+         "output_parameters": {},
+         "reward_consumed_during_epoch": 12.0,
+         "reward_consumed_unit": "microliter",
+         "trials_total": null,
+         "trials_finished": null,
+         "trials_rewarded": null,
+         "notes": null
+      }
+   ],
+   "mouse_platform_name": null,
+   "active_mouse_platform": false,
+   "headframe_registration": null,
+   "reward_delivery": {
+      "reward_solution": "Water",
+      "reward_spouts": [
+         {
+            "side": "Right",
+            "starting_position": "xyz",
+            "variable_position": true
+         }
+      ],
+      "notes": null
+   },
+   "reward_consumed_total": 12.0,
+   "reward_consumed_unit": "milliliter",
+   "notes": null
+}

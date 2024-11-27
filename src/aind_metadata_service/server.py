@@ -122,6 +122,15 @@ async def retrieve_rig(rig_id):
     return model_response.map_to_json_response(validate=False)
 
 
+@app.get("/ecephys_sessions_by_subject/{subject_id}")
+async def retrieve_sessions(subject_id):
+    """Retrieves sessions from slims"""
+    model_response = await run_in_threadpool(
+        slims_client.get_sessions_model_response, subject_id=subject_id
+    )
+    return model_response.map_to_json_response()
+
+
 @app.get("/protocols/{protocol_name}")
 async def retrieve_protocols(
     protocol_name,

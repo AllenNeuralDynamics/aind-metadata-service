@@ -163,7 +163,6 @@ class TestNSB2023Parsers(TestCase):
         raw_data = deepcopy(list_item[0])
         nsb_model = NSBList.model_validate(raw_data)
         mapper = MappedNSBList(nsb=nsb_model)
-        self.assertIsNone(mapper._map_burr_hole_number_to_probe(7))
         self.assertEqual(BurrHoleInfo(), mapper.burr_hole_info(7))
 
 

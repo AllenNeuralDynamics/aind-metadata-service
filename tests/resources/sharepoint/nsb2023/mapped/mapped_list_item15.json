@@ -60,7 +60,30 @@
             "stereotactic_coordinate_unit": "millimeter",
             "bregma_to_lambda_unit": "millimeter",
             "angle_unit": "degrees",
-            "notes": null
+            "notes": null,
+            "ophys_probe": {
+              "device_type": "Fiber optic probe",
+              "serial_number": null,
+              "manufacturer": {
+                "name": "Neurophotometrics",
+                "abbreviation": null,
+                "registry": null,
+                "registry_identifier": null
+              },
+              "model": null,
+              "path_to_cad": null,
+              "port_index": null,
+              "additional_settings": {},
+              "notes": null,
+              "core_diameter": 200,
+              "numerical_aperture": 0.37,
+              "core_diameter_unit": "micrometer",
+              "ferrule_material": "Ceramic",
+              "active_length": null,
+              "total_length": null,
+              "length_unit": "millimeter",
+              "name": "Fiber_2"
+            }
           }
         ],
         "procedure_type": "Fiber implant"
@@ -103,7 +126,30 @@
             "stereotactic_coordinate_unit": "millimeter",
             "bregma_to_lambda_unit": "millimeter",
             "angle_unit": "degrees",
-            "notes": null
+            "notes": null,
+            "ophys_probe": {
+              "device_type": "Fiber optic probe",
+              "serial_number": null,
+              "manufacturer": {
+                "name": "Neurophotometrics",
+                "abbreviation": null,
+                "registry": null,
+                "registry_identifier": null
+              },
+              "model": null,
+              "path_to_cad": null,
+              "port_index": null,
+              "additional_settings": {},
+              "notes": null,
+              "core_diameter": 200,
+              "numerical_aperture": 0.37,
+              "core_diameter_unit": "micrometer",
+              "ferrule_material": "Ceramic",
+              "active_length": null,
+              "total_length": "2.5",
+              "length_unit": "millimeter",
+              "name": "Fiber_0"
+            }
           }
         ],
         "procedure_type": "Fiber implant"
@@ -146,7 +192,30 @@
             "stereotactic_coordinate_unit": "millimeter",
             "bregma_to_lambda_unit": "millimeter",
             "angle_unit": "degrees",
-            "notes": null
+            "notes": null,
+            "ophys_probe": {
+              "device_type": "Fiber optic probe",
+              "serial_number": null,
+              "manufacturer": {
+                "name": "Neurophotometrics",
+                "abbreviation": null,
+                "registry": null,
+                "registry_identifier": null
+              },
+              "model": null,
+              "path_to_cad": null,
+              "port_index": null,
+              "additional_settings": {},
+              "notes": null,
+              "core_diameter": 200,
+              "numerical_aperture": 0.37,
+              "core_diameter_unit": "micrometer",
+              "ferrule_material": "Ceramic",
+              "active_length": null,
+              "total_length": null,
+              "length_unit": "millimeter",
+              "name": "Fiber_3"
+            }
           }
         ],
         "procedure_type": "Fiber implant"
@@ -189,7 +258,30 @@
             "stereotactic_coordinate_unit": "millimeter",
             "bregma_to_lambda_unit": "millimeter",
             "angle_unit": "degrees",
-            "notes": null
+            "notes": null,
+            "ophys_probe": {
+              "device_type": "Fiber optic probe",
+              "serial_number": null,
+              "manufacturer": {
+                "name": "Neurophotometrics",
+                "abbreviation": null,
+                "registry": null,
+                "registry_identifier": null
+              },
+              "model": null,
+              "path_to_cad": null,
+              "port_index": null,
+              "additional_settings": {},
+              "notes": null,
+              "core_diameter": 200,
+              "numerical_aperture": 0.37,
+              "core_diameter_unit": "micrometer",
+              "ferrule_material": "Ceramic",
+              "active_length": null,
+              "total_length": null,
+              "length_unit": "millimeter",
+              "name": "Fiber_1"
+            }
           }
         ],
         "procedure_type": "Fiber implant"

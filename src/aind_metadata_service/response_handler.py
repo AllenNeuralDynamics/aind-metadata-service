@@ -13,6 +13,7 @@ from aind_data_schema.core.procedures import (
     ViralMaterial,
 )
 from aind_data_schema.core.rig import Rig
+from aind_data_schema.core.session import Session
 from aind_data_schema.core.subject import Subject
 from aind_metadata_mapper.core import JobResponse
 from fastapi import Response
@@ -35,6 +36,7 @@ T = TypeVar(
     ProtocolInformation,
     Instrument,
     Rig,
+    Session,
 )
 
 
@@ -89,37 +91,42 @@ class ModelResponse(Generic[T]):
             message="No Data Found.",
         )
 
+    @staticmethod
+    def _validate_model(model) -> Optional[str]:
+        """Helper method to validate a model and return validation errors."""
+        validation_error = None
+        try:
+            model.__class__.model_validate(model.model_dump())
+        except ValidationError as e:
+            validation_error = repr(e)
+        except (AttributeError, ValueError, KeyError) as oe:
+            validation_error = repr(oe)
+        return validation_error
+
     def _map_data_response(  # noqa: C901
         self, validate: bool = True
     ) -> Union[Response, JSONResponse]:
         """Map ModelResponse with StatusCodes.DB_RESPONDED to a JSONResponse.
         Perform validations, bypasses validation if flag is set to False."""
+
         if len(self.aind_models) == 0:
             status_code = StatusCodes.NO_DATA_FOUND.value
             content_data = None
             message = "No Data Found."
+
         elif len(self.aind_models) == 1:
             aind_model = self.aind_models[0]
             content_data = jsonable_encoder(
                 json.loads(aind_model.model_dump_json())
             )
             if validate:
-                validation_error = None
-                try:
-                    aind_model.__class__.model_validate(
-                        aind_model.model_dump()
-                    )
-                except ValidationError as e:
-                    validation_error = repr(e)
-                except (AttributeError, ValueError, KeyError) as oe:
-                    validation_error = repr(oe)
+                validation_error = self._validate_model(aind_model)
                 if validation_error:
                     status_code = StatusCodes.INVALID_DATA.value
                     message = f"Validation Errors: {validation_error}"
                 else:
                     status_code = StatusCodes.VALID_DATA.value
                     message = "Valid Model."
-            # if validate flag is False
             else:
                 status_code = StatusCodes.UNPROCESSIBLE_ENTITY.value
                 message = (
@@ -132,6 +139,7 @@ class ModelResponse(Generic[T]):
                     "There was an error retrieving records from one or more of"
                     " the databases."
                 )
+
         else:
             status_code = StatusCodes.MULTIPLE_RESPONSES.value
             message = "Multiple Items Found."
@@ -139,6 +147,25 @@ class ModelResponse(Generic[T]):
                 jsonable_encoder(json.loads(model.model_dump_json()))
                 for model in self.aind_models
             ]
+
+            if validate:
+                # Validate each model and accumulate errors
+                validation_errors = []
+                for model in self.aind_models:
+                    error = self._validate_model(model)
+                    print(error)
+                    if error:
+                        validation_errors.append(error)
+
+                if validation_errors:
+                    message += (
+                        f" Validation Errors: {', '.join(validation_errors)}"
+                    )
+                else:
+                    message += " All Models Valid."
+            else:
+                message += " Models have not been validated."
+
         return JSONResponse(
             status_code=status_code,
             content=({"message": message, "data": content_data}),

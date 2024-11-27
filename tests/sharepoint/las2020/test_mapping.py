@@ -64,8 +64,16 @@ class TestLASParsers(TestCase):
             las_model = LASList.model_validate(raw_data)
             mapper = MappedLASList(las=las_model)
             mapped_procedure = mapper.get_procedure(subject_id="000000")
-            mapped_procedure_json = mapped_procedure.model_dump_json()
-            mapped_procedure_json_parsed = json.loads(mapped_procedure_json)
+            mapped_procedure_json = (
+                mapped_procedure.model_dump_json()
+                if mapped_procedure
+                else None
+            )
+            mapped_procedure_json_parsed = (
+                json.loads(mapped_procedure_json)
+                if mapped_procedure_json
+                else None
+            )
             self.assertEqual(
                 expected_mapped_data, mapped_procedure_json_parsed
             )
