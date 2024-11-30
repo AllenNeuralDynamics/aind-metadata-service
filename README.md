@@ -34,6 +34,15 @@ pip install -e .[dev]
 
 ## Contributing
 
+### Local Development
+
+Requires docker and docker-compose.
+
+- Create a file called env/webapp.env with appropriate env variables.
+- Run `docker-compose up -d --build`
+- Run `docker-compose logs -f fastapi` to see fastapi logs
+- Service will be available at `http://localhost:5000`
+
 ### Linters and testing
 
 There are several libraries used to run linters, check documentation, and run tests.

@@ -41,10 +41,11 @@ dev = [
 
 server = [
     'pyodbc',
+    'pydash',
     'office365-rest-python-client==2.4.1',
     'aind-smartsheet-api==0.1.2',
     'fastapi>=0.114.0',
-    'fastapi-cache2',
+    'fastapi-cache2[redis]>=0.2.2',
     'sqlmodel',
     'uvicorn[standard]',
     'python-dateutil',
