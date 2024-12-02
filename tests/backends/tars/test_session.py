@@ -1,7 +1,7 @@
 """Tests methods in session module"""
 
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from aind_metadata_service.backends.tars.session import get_session
 

@@ -30,6 +30,7 @@ dev = [
     'aind-metadata-service[client]',
     'black',
     'coverage',
+    'fakeredis',
     'flake8',
     'interrogate',
     'isort',
@@ -123,5 +124,10 @@ env = [
     "SMARTSHEET_PROTOCOLS_ID=1002",
     "SMARTSHEET_ACCESS_TOKEN=abc-123",
     "SMARTSHEET_USER_AGENT=some_user_agent",
+    "TARS_TENANT_ID=tars-tenant-id",
+    "TARS_CLIENT_ID=123456",
+    "TARS_CLIENT_SECRET=tars_secret",
+    "TARS_SCOPE=https://scope.example.com",
+    "TARS_RESOURCE=https://res.example.com"
 ]
 filterwarnings = ["ignore::DeprecationWarning:smartsheet"]

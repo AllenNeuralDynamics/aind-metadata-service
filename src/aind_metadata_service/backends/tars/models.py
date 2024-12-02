@@ -1,9 +1,13 @@
-from pydantic import BaseModel, Field
-from typing import Optional, List, Any
+"""Module for defining models from TARS"""
+
 from datetime import datetime
+from typing import Any, List, Optional
+
+from pydantic import BaseModel, Field
 
 
 class BaseResponse(BaseModel):
+    """Most responses have this shape"""
 
     data: list
     totalCount: int
@@ -17,6 +21,8 @@ class BaseResponse(BaseModel):
 
 
 class DataModel(BaseModel):
+    """Most items have these fields"""
+
     createdAt: Optional[datetime] = Field(default=None)
     updatedAt: Optional[datetime] = Field(default=None)
     createdBy: Optional[str] = Field(default=None)
@@ -24,14 +30,17 @@ class DataModel(BaseModel):
     id: Optional[str] = Field(default=None)
 
 
-# PrepLot Models
 class Alias(DataModel):
+    """Alias"""
+
     citation: Optional[Any] = Field(default=None)
     isPreferred: Optional[bool] = Field(default=None)
     name: Optional[str] = Field(default=None)
 
 
 class Virus(DataModel):
+    """Virus"""
+
     rrId: Optional[Any] = Field(default=None)
     aliases: List[Alias] = Field(default=[])
     capsid: Optional[Any] = Field(default=None)
@@ -42,10 +51,14 @@ class Virus(DataModel):
 
 
 class ViralPrepType(DataModel):
+    """ViralPrepType"""
+
     name: Optional[str] = Field(default=None)
 
 
 class ViralPrep(DataModel):
+    """ViralPrep"""
+
     rrId: Optional[Any] = Field(default=None)
     viralPrepType: Optional[ViralPrepType] = Field(default=None)
     virus: Optional[Virus] = Field(default=None)
@@ -58,6 +71,8 @@ class ViralPrep(DataModel):
 
 
 class Titers(DataModel):
+    """Ttiers"""
+
     notes: Optional[str] = Field(default=None)
     isPreferred: Optional[bool] = Field(default=None)
     thawedCount: Optional[int] = Field(default=None)
@@ -66,6 +81,8 @@ class Titers(DataModel):
 
 
 class PrepLotData(DataModel):
+    """PrepLotData"""
+
     lot: Optional[str] = Field(default=None)
     datePrepped: Optional[datetime] = Field(default=None)
     viralPrep: Optional[ViralPrep] = Field(default=None)
@@ -73,30 +90,39 @@ class PrepLotData(DataModel):
 
 
 class PrepLotResponse(BaseResponse):
+    """PrepLotResponse"""
+
     data: List[PrepLotData] = Field(default=[])
 
 
-# Molecule Models
-
-
 class MoleculeType(DataModel):
+    """MoleculeType"""
+
     name: Optional[str] = Field(default=None)
 
 
 class Species(DataModel):
+    """Species"""
+
     rorID: Optional[str] = Field(default=None)
     name: Optional[str] = Field(default=None)
 
 
 class TargetedCellPopulation(DataModel):
+    """TargetedCellPopulation"""
+
     name: Optional[str] = Field(default=None)
 
 
 class TargetedRoi(DataModel):
+    """TargetedRoi"""
+
     name: Optional[str] = Field(default=None)
 
 
 class MoleculeData(DataModel):
+    """MoleculeData"""
+
     moleculeType: Optional[MoleculeType] = Field(default=None)
     state: Optional[Any] = Field(default=None)
     aliases: List[Alias] = Field(default=[])
@@ -129,4 +155,6 @@ class MoleculeData(DataModel):
 
 
 class MoleculeResponse(BaseResponse):
+    """MoleculeResponse"""
+
     data: List[MoleculeData] = Field(default=[])

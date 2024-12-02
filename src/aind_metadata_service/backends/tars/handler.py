@@ -1,17 +1,18 @@
 """Module to retrieve data from TARS using session object"""
 
 # Tools and Reagent Service
+import json
 from typing import List
 
 from requests import Response, Session
-from aind_metadata_service.backends.tars.models import (
-    PrepLotResponse,
-    MoleculeResponse,
-    PrepLotData,
-)
 
 from aind_metadata_service.backends.tars.configs import Settings
-import json
+from aind_metadata_service.backends.tars.models import (
+    MoleculeData,
+    MoleculeResponse,
+    PrepLotData,
+    PrepLotResponse,
+)
 
 
 class SessionHandler:
@@ -144,7 +145,7 @@ class SessionHandler:
 
         return self.session.get(url=molecule_url, params=query_params)
 
-    def get_molecules_response(self, plasmid_name: str) -> Response:
+    def _get_molecule_response(self, plasmid_name: str) -> MoleculeResponse:
         """
         Requests data where the 'name' field contains plasmid_name
         Parameters
@@ -164,3 +165,26 @@ class SessionHandler:
             json.dumps(response.json())
         )
         return model_response
+
+    def get_molecule_data(self, plasmid_name: str) -> List[MoleculeData]:
+        """
+        Return prep_lot_data for a prep_lot_id
+        Parameters
+        ----------
+        plasmid_name : str
+
+        Returns
+        -------
+        List[MoleculeData]
+        """
+        sanitized_id = self._sanitize_input(plasmid_name)
+        response = self._get_molecule_response(plasmid_name=sanitized_id)
+        molecule_data = []
+        for d in response.data:
+            for a in d.aliases:
+                if isinstance(a.name, str) and a.name == sanitized_id:
+                    molecule_data.append(d)
+                    break
+                else:
+                    continue
+        return molecule_data

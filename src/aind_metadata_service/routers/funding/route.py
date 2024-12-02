@@ -28,14 +28,14 @@ router = APIRouter()
 
 
 class FundingResponse(Message):
-    """Valid Subject response"""
+    """Valid Funding response"""
 
     message: str = "Valid Model"
     data: Funding
 
 
 class InvalidFundingResponse(Message):
-    """Invalid Subject response"""
+    """Invalid Funding response"""
 
     message: str
     data: Funding

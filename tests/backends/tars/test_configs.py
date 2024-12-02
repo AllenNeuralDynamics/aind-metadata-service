@@ -2,7 +2,7 @@
 
 import os
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from aind_metadata_service.backends.tars.configs import Settings, get_settings
 
