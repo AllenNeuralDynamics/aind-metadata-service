@@ -42,7 +42,7 @@ class Mapper:
         else:
             return iacuc_protocol_id
 
-    def map_to_perfusions(self):
+    def map_to_perfusions(self) -> Surgery:
         """Map perfusions from Smartsheet to aind-data-schema Surgery model."""
 
         start_date = self.perfusions_model.date

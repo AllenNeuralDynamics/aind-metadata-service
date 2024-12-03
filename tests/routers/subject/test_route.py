@@ -17,6 +17,7 @@ class TestRoute:
     ):
         """Tests a good response"""
         response = client.get("/subject/632269")
+        print(response.json())
         assert 200 == response.status_code
         assert example_200_subject_response == response.json()
 

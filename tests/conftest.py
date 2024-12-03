@@ -8,6 +8,9 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.inmemory import InMemoryBackend
+from requests import Response
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel, create_engine
 
@@ -118,6 +121,50 @@ def mock_get_raw_protocols_sheet(mocker):
     return mock_get
 
 
+@pytest.fixture()
+def mock_get_access_token(mocker):
+    """Mock getting a bearer token."""
+    mock_get = mocker.patch(
+        "aind_metadata_service.backends.tars.configs.Settings.get_bearer_token"
+    )
+    mock_get.return_value = ("abc123def456", 1733101170)
+    return mock_get
+
+
+@pytest.fixture()
+def mock_get_raw_prep_lot_response(mocker):
+    """Mock raw prep_lot response"""
+    with open(
+        RESOURCES_DIR / "backends" / "tars" / "raw_prep_lot_response.json"
+    ) as f:
+        contents = json.load(f)
+    mock_get = mocker.patch(
+        "aind_metadata_service.backends.tars.handler.SessionHandler"
+        "._get_raw_prep_lot_response"
+    )
+    mock_response = Response()
+    mock_response.status_code = 200
+    mock_response._content = json.dumps(contents).encode("utf-8")
+    mock_get.return_value = mock_response
+
+
+@pytest.fixture()
+def mock_get_raw_molecule_response(mocker):
+    """Mock raw molecule response"""
+    with open(
+        RESOURCES_DIR / "backends" / "tars" / "raw_molecules_response.json"
+    ) as f:
+        contents = json.load(f)
+    mock_get = mocker.patch(
+        "aind_metadata_service.backends.tars.handler.SessionHandler"
+        "._get_raw_molecules_response"
+    )
+    mock_response = Response()
+    mock_response.status_code = 200
+    mock_response._content = json.dumps(contents).encode("utf-8")
+    mock_get.return_value = mock_response
+
+
 @pytest.fixture(scope="session")
 def get_lab_tracks_session():
     """Generate a sqlite database to query lab_tracks data."""
@@ -160,6 +207,7 @@ def client(get_lab_tracks_session):
         yield get_lab_tracks_session
 
     app.dependency_overrides[get_lb_session] = override_get_lb_session
+    FastAPICache.init(InMemoryBackend())
     with TestClient(app) as c:
         yield c
     app.dependency_overrides.clear()
