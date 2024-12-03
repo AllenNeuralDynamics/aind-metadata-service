@@ -358,8 +358,7 @@ class TestSessionHandler(unittest.TestCase):
                     mgiId=None,
                     notes=None,
                     sequence=(
-                        "CCTGCAGGCAGCTGCGCGCTCGCTCGCTCACTGAGGCCGCCCGGGTCGGGCGA"
-                        "CAACGCGGCCTTTTTACGGTTCCTGGCCTTTTGCTGGCCTTTTGCTCACATGT"
+                        "CATG"
                     ),
                     genes=[],
                     loci=[],
