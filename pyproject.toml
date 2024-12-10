@@ -17,9 +17,10 @@ readme = "README.md"
 dynamic = ["version"]
 
 dependencies = [
-    'aind-data-schema==1.1.1',
-    'aind-data-schema-models>=0.5.0',
-    'pydantic>=2.0',
+    'pydantic>=2.10',
+    'aind-metadata-mapper[bergamo]==0.21.0',
+    'aind-data-schema==1.2.0',
+    'aind-data-schema-models==0.6.4',
     'pydantic-settings>=2.0'
 ]
 
@@ -29,6 +30,7 @@ dev = [
     'aind-metadata-service[client]',
     'black',
     'coverage',
+    'fakeredis',
     'flake8',
     'interrogate',
     'isort',
@@ -40,10 +42,11 @@ dev = [
 
 server = [
     'pyodbc',
+    'pydash',
     'office365-rest-python-client==2.4.1',
     'aind-smartsheet-api==0.1.2',
     'fastapi>=0.114.0',
-    'fastapi-cache2',
+    'fastapi-cache2[redis]>=0.2.2',
     'sqlmodel',
     'uvicorn[standard]',
     'python-dateutil',
@@ -121,5 +124,10 @@ env = [
     "SMARTSHEET_PROTOCOLS_ID=1002",
     "SMARTSHEET_ACCESS_TOKEN=abc-123",
     "SMARTSHEET_USER_AGENT=some_user_agent",
+    "TARS_TENANT_ID=tars-tenant-id",
+    "TARS_CLIENT_ID=123456",
+    "TARS_CLIENT_SECRET=tars_secret",
+    "TARS_SCOPE=https://scope.example.com",
+    "TARS_RESOURCE=https://res.example.com"
 ]
 filterwarnings = ["ignore::DeprecationWarning:smartsheet"]

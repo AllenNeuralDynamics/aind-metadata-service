@@ -1,0 +1,110 @@
+{
+   "data": [
+      {
+         "moleculeType": {
+            "name": "Plasmid (DNA)",
+            "createdAt": "2021-01-14T10:38:10.534Z",
+            "createdBy": "System",
+            "updatedAt": null,
+            "updatedBy": null,
+            "id": "2cbd1e06-035d-4290-902c-50b3ced964e8"
+         },
+         "state": null,
+         "aliases": [
+            {
+               "name": "pAAV-MGT_E12-minGprom-FlpO-WPRE-hGHpA",
+               "isPreferred": false,
+               "citation": null,
+               "createdAt": "2024-07-19T02:50:18.403244Z",
+               "createdBy": "person.two@example.com",
+               "updatedAt": "2024-11-14T02:48:01.504357Z",
+               "updatedBy": "person.two@example.com",
+               "id": "2547b416-64c6-442a-9ebc-08de4d57414a"
+            },
+            {
+               "name": "AiP1109",
+               "isPreferred": true,
+               "citation": null,
+               "createdAt": "2023-03-03T05:19:01.069687Z",
+               "createdBy": "person.two@example.com",
+               "updatedAt": "2024-11-14T02:48:01.504353Z",
+               "updatedBy": "person.two@example.com",
+               "id": "6dac377d-1085-4a57-8cca-1dd0814d305a"
+            }
+         ],
+         "citations": [],
+         "rrId": null,
+         "fullName": "pAAV-AiE2012m-minG-FlpO-WPRE-HGHpA",
+         "addgeneId": null,
+         "mgiId": null,
+         "notes": null,
+         "sequence": "CATG",
+         "genes": [],
+         "loci": [],
+         "species": [
+            {
+               "rorId": "32630",
+               "name": "synthetic construct",
+               "createdAt": "2021-08-20T12:14:56.208931Z",
+               "createdBy": "System",
+               "updatedAt": null,
+               "updatedBy": null,
+               "id": "e5384ac0-0385-4a2e-8caa-c5eb0142813e"
+            }
+         ],
+         "organizations": [],
+         "shipments": [],
+         "materialTransferAgreements": [],
+         "genBankFiles": [
+            "de25d8b6-bb2a-4d04-a790-ef3d164cbe35"
+         ],
+         "mapFiles": [
+            "418390ca-bc97-4b84-ab28-915668406b20"
+         ],
+         "fastaFiles": [
+            "8f9e2880-3d22-4368-8c8f-c4b30ab6b035"
+         ],
+         "parents": [],
+         "children": [],
+         "patents": [],
+         "creators": [],
+         "principalInvestigator": null,
+         "targetedCellPopulations": [
+            {
+               "name": "L6_IT_Car3",
+               "createdAt": "2022-04-20T21:55:22.780516Z",
+               "createdBy": "person.two@example.com",
+               "updatedAt": null,
+               "updatedBy": null,
+               "id": "6e3f839e-1a6c-4557-ae1c-99d7212ba1fb"
+            }
+         ],
+         "validatedCellPopulations": [],
+         "targetedRois": [
+            {
+               "name": "CTX",
+               "createdAt": "2022-06-08T22:26:43.972576Z",
+               "createdBy": "person.one@example.com",
+               "updatedAt": null,
+               "updatedBy": null,
+               "id": "94d8b2cb-2a64-4fd8-b07c-f4dc8ed199ea"
+            }
+         ],
+         "validatedRois": [],
+         "genomeCoordinates": null,
+         "createdAt": "2023-03-03T05:19:00.949949Z",
+         "createdBy": "person.two@example.com",
+         "updatedAt": "2024-11-14T02:46:46.960826Z",
+         "updatedBy": "person.two@example.com",
+         "id": "d30ed9f0-27e5-446a-aa84-f8de3c1150cb"
+      }
+   ],
+   "totalCount": 1,
+   "pageSize": 50,
+   "page": 0,
+   "orderBy": "id",
+   "order": "1",
+   "morePages": false,
+   "search": "AiP1109",
+   "searchFields": "name"
+}
