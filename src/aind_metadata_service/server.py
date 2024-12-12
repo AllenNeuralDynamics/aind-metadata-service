@@ -17,6 +17,8 @@ from aind_metadata_service.labtracks.client import (
     LabTracksClient,
     LabTracksSettings,
 )
+from aind_metadata_service.mgi.client import MgiSettings, MgiClient
+from aind_metadata_service.mgi.mapping import MgiMapper
 from aind_metadata_service.response_handler import EtlResponse
 from aind_metadata_service.sharepoint.client import (
     SharePointClient,
@@ -65,6 +67,8 @@ protocols_smartsheet_settings = SmartsheetSettings(
     access_token=SMARTSHEET_PROTOCOLS_TOKEN, sheet_id=SMARTSHEET_PROTOCOLS_ID
 )
 
+mgi_settings = MgiSettings()
+
 app = FastAPI()
 
 app.add_middleware(
@@ -90,6 +94,7 @@ protocols_smart_sheet_client = SmartSheetClient(
 )
 slims_client = SlimsHandler(settings=slims_settings)
 tars_client = TarsClient(azure_settings=tars_settings)
+mgi_client = MgiClient(settings=mgi_settings)
 
 template_directory = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "templates")
@@ -143,6 +148,23 @@ async def retrieve_protocols(
     )
     mapper = ProtocolsMapper(
         smart_sheet_response=smart_sheet_response, input_id=protocol_name
+    )
+    model_response = mapper.get_model_response()
+    return model_response.map_to_json_response()
+
+
+@app.get("/mgi_allele/{allele_name}")
+async def retrieve_mgi_allele(
+    allele_name,
+):
+    """Retrieves allele information from mgi"""
+
+    # TODO: We can probably cache the response if it's 200
+    mgi_response = await run_in_threadpool(
+        mgi_client.get_allele_info, allele_name=allele_name
+    )
+    mapper = MgiMapper(
+        mgi_info=mgi_response
     )
     model_response = mapper.get_model_response()
     return model_response.map_to_json_response()

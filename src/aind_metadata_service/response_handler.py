@@ -16,6 +16,7 @@ from aind_data_schema.core.rig import Rig
 from aind_data_schema.core.session import Session
 from aind_data_schema.core.subject import Subject
 from aind_metadata_mapper.core import JobResponse
+from aind_data_schema_models.pid_names import PIDName
 from fastapi import Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -37,6 +38,7 @@ T = TypeVar(
     Instrument,
     Rig,
     Session,
+    PIDName
 )
 
 
