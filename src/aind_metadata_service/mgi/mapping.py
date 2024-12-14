@@ -52,7 +52,7 @@ class MgiMapper:
 
             pid_name = PIDName(
                 name=first_summary_row.symbol,
-                abbreviation=first_summary_row.bestMatchText,
+                abbreviation=None,
                 registry=Registry.MGI,
                 registry_identifier=registry_identifier,
             )

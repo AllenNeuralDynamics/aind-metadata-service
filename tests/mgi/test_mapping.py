@@ -80,7 +80,7 @@ class TestMgiMapping(unittest.TestCase):
         model_response = mapper.get_model_response()
         expected_response = PIDName(
             name="Igs7<tm93.1(tetO-GCaMP6f)Hze>",
-            abbreviation="Ai93",
+            abbreviation=None,
             registry=Registry.MGI,
             registry_identifier=None,
         )
@@ -93,7 +93,7 @@ class TestMgiMapping(unittest.TestCase):
         model_response = mapper.get_model_response()
         expected_response = PIDName(
             name="Igs7<tm93.1(tetO-GCaMP6f)Hze>",
-            abbreviation="Ai93",
+            abbreviation=None,
             registry=Registry.MGI,
             registry_identifier="5558086",
         )
