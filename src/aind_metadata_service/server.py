@@ -17,7 +17,7 @@ from aind_metadata_service.labtracks.client import (
     LabTracksClient,
     LabTracksSettings,
 )
-from aind_metadata_service.mgi.client import MgiSettings, MgiClient
+from aind_metadata_service.mgi.client import MgiClient, MgiSettings
 from aind_metadata_service.mgi.mapping import MgiMapper
 from aind_metadata_service.response_handler import EtlResponse
 from aind_metadata_service.sharepoint.client import (
@@ -163,9 +163,7 @@ async def retrieve_mgi_allele(
     mgi_response = await run_in_threadpool(
         mgi_client.get_allele_info, allele_name=allele_name
     )
-    mapper = MgiMapper(
-        mgi_info=mgi_response
-    )
+    mapper = MgiMapper(mgi_info=mgi_response, abbreviation=allele_name)
     model_response = mapper.get_model_response()
     return model_response.map_to_json_response()
 
