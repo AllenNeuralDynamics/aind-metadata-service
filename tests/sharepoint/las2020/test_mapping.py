@@ -11,6 +11,7 @@ from unittest import TestCase
 from unittest import main as unittest_main
 
 from aind_data_schema.core.procedures import NonViralMaterial
+
 from aind_metadata_service.sharepoint.las2020.mapping import MappedLASList
 from aind_metadata_service.sharepoint.las2020.models import LASList
 

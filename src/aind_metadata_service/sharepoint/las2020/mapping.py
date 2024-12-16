@@ -9,11 +9,11 @@ from typing import Any, List, Optional
 
 from aind_data_schema.core.procedures import (
     IntraperitonealInjection,
+    NonViralMaterial,
     RetroOrbitalInjection,
     Side,
     Surgery,
     ViralMaterial,
-    NonViralMaterial,
 )
 
 from aind_metadata_service.sharepoint.las2020.models import (

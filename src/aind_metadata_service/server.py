@@ -163,7 +163,7 @@ async def retrieve_mgi_allele(
     mgi_response = await run_in_threadpool(
         mgi_client.get_allele_info, allele_name=allele_name
     )
-    mapper = MgiMapper(mgi_info=mgi_response, abbreviation=allele_name)
+    mapper = MgiMapper(mgi_info=mgi_response)
     model_response = mapper.get_model_response()
     return model_response.map_to_json_response()
 
