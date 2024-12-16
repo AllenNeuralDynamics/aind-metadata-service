@@ -78,7 +78,7 @@ class InjectableMaterial:
     prep_lot_id: Optional[str] = None
     genome_copy: Optional[str] = None
     virus_volume: Optional[Decimal] = None
-    titer: Optional[Decimal] = None
+    titer: Optional[str] = None
 
 
 @dataclass
@@ -115,6 +115,9 @@ class MappedLASList:
         r"^([a-zA-Z0-9\s\-\(\)]+?)\s+(\d+(\.\d+)?)?\s*([a-zA-Z%\/]+)?"
     )
     DOSE_PAREN_REGEX = re.compile(r"\((\d+(\.\d+)?)\s*([a-zA-Z%\/]+)\)")
+    SCIENTIFIC_NOTATION_REGEX = re.compile(
+        r"^[-+]?\d*\.?\d+[eE][-+]?\d+(?![\d.])"
+    )
 
     def __init__(self, las: LASList):
         """Class constructor"""
@@ -171,6 +174,10 @@ class MappedLASList:
             return NonViralMaterial.model_construct(
                 name=dose_sub,
             )
+
+    def _is_titer(self, titer_str: str) -> bool:
+        """Checks whether titer field is in scientific notation."""
+        return bool(re.search(self.SCIENTIFIC_NOTATION_REGEX, titer_str))
 
     @property
     def aind_accommodation_comment(self) -> Optional[str]:
@@ -2126,16 +2133,22 @@ class MappedLASList:
                 ),
             )
 
-    @staticmethod
-    def map_viral_materials(injectable_materials: List[InjectableMaterial]):
+    def map_viral_materials(self, injectable_materials: List[InjectableMaterial]):
         """Maps injectable material to viral material"""
         # TODO: map injectable material info in case tars gets no response
         viral_materials = []
         for material in injectable_materials:
             # Use prep_lot_id in name for tars query
+            if self._is_titer(material.titer):
+                titer = re.search(
+                    self.SCIENTIFIC_NOTATION_REGEX,
+                    material.titer,
+                ).group(0)
+            else:
+                titer = material.titer.strip()
             viral_materials.append(
                 ViralMaterial.model_construct(
-                    name=material.prep_lot_id, titer=material.titer
+                    name=material.prep_lot_id, titer=int(float(titer))
                 )
             )
         return viral_materials
