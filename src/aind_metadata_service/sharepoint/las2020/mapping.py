@@ -118,6 +118,9 @@ class MappedLASList:
     SCIENTIFIC_NOTATION_REGEX = re.compile(
         r"^[-+]?\d*\.?\d+[eE][-+]?\d+(?![\d.])"
     )
+    TITER_WITH_UNIT_REGEX = re.compile(
+        r"(\d+\.?\d*)\s*gc/ml"
+    )
 
     def __init__(self, las: LASList):
         """Class constructor"""
@@ -175,10 +178,19 @@ class MappedLASList:
                 name=dose_sub,
             )
 
-    def _is_titer(self, titer_str: str) -> bool:
+    def _is_scientific_notation(self, titer_str: str) -> bool:
         """Checks whether titer field is in scientific notation."""
         return bool(re.search(self.SCIENTIFIC_NOTATION_REGEX, titer_str))
-
+    
+    def _parse_titer(self, titer_str: str):
+        """"""
+        if self._is_scientific_notation(titer_str):
+            titer = re.search(
+                self.SCIENTIFIC_NOTATION_REGEX,
+                titer_str,
+            ).group(0)
+        # TODO: check if is titer with unit
+            
     @property
     def aind_accommodation_comment(self) -> Optional[str]:
         """Maps accommodation_comment to aind model"""
@@ -2139,7 +2151,7 @@ class MappedLASList:
         viral_materials = []
         for material in injectable_materials:
             # Use prep_lot_id in name for tars query
-            if self._is_titer(material.titer):
+            if self._is_scientific_notation(material.titer):
                 titer = re.search(
                     self.SCIENTIFIC_NOTATION_REGEX,
                     material.titer,
