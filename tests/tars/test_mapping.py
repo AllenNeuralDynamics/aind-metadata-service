@@ -63,6 +63,7 @@ class TestTarsResponseHandler(unittest.TestCase):
         ],
         status_code=StatusCodes.DB_RESPONDED,
     )
+
     def test_map_prep_type_and_protocol(self):
         """Tests that prep_type and protocol are mapped as expected."""
         (
