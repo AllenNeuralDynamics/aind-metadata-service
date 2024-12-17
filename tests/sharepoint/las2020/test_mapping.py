@@ -61,7 +61,6 @@ class TestLASParsers(TestCase):
             raw_data = list_item[0]
             expected_mapped_data = list_item[1]
             raw_file_name = list_item[2]
-            print(f"Processing file: {raw_file_name}")
             logging.debug(f"Processing file: {raw_file_name}")
             las_model = LASList.model_validate(raw_data)
             mapper = MappedLASList(las=las_model)

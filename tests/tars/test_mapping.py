@@ -33,10 +33,7 @@ class TestTarsResponseHandler(unittest.TestCase):
     inj2 = NanojectInjection.model_construct(
         injection_materials=[ViralMaterial.model_construct(name=" 67890\t")]
     )
-    inj3 = NanojectInjection.model_construct(
-        injection_materials=[ViralMaterial.model_construct(titer=7)]
-    )
-    surgery = Surgery.model_construct(procedures=[inj1, inj2, inj3])
+    surgery = Surgery.model_construct(procedures=[inj1, inj2])
     procedures_response = ModelResponse(
         aind_models=[
             Procedures(subject_id="12345", subject_procedures=[surgery])

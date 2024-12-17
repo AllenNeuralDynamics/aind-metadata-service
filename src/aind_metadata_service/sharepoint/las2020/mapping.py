@@ -183,29 +183,24 @@ class MappedLASList:
         """Checks whether titer field is in titer with unit format."""
         return bool(re.search(self.VALUE_WITH_UNIT_REGEX, value_str))
 
-    def _parse_titer_str(self, titer_str: Optional[str]) -> Optional[float]:
+    def _parse_titer_str(self, titer_str: str) -> Optional[float]:
         """Parse string representation of titer into float."""
-        if titer_str is None:
-            return None
-        # Check if the string is a valid float or integer format
-        stripped_str = titer_str.strip()
-        if re.match(self.INTEGER_REGEX, stripped_str):
-            return int(float(stripped_str))
+        if re.match(self.INTEGER_REGEX, titer_str):
+            return int(float(titer_str))
         return None
 
     def _parse_titer(self, titer_str: Optional[str]) -> Optional[tuple]:
         """Parses titer field to integer."""
         unit = "gc/mL"  # default unit
-
         if titer_str is None:
             return None, unit
 
         titer_str = titer_str.strip()
-
         numeric_value = self._parse_titer_str(titer_str)
         if numeric_value is not None:
             return numeric_value, unit
 
+        titer_str = titer_str.strip()
         # If the string matches scientific notation
         if self._is_scientific_notation(titer_str):
             titer = float(
