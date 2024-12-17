@@ -78,7 +78,7 @@ class InjectableMaterial:
     prep_lot_id: Optional[str] = None
     genome_copy: Optional[str] = None
     virus_volume: Optional[Decimal] = None
-    titer: Optional[Decimal] = None
+    titer: Optional[str] = None
 
 
 @dataclass
@@ -115,6 +115,9 @@ class MappedLASList:
         r"^([a-zA-Z0-9\s\-\(\)]+?)\s+(\d+(\.\d+)?)?\s*([a-zA-Z%\/]+)?"
     )
     DOSE_PAREN_REGEX = re.compile(r"\((\d+(\.\d+)?)\s*([a-zA-Z%\/]+)\)")
+    SCIENTIFIC_NOTATION_REGEX = re.compile(r"^[-+]?\d+(?:\.\d+)?[eE][-+]?\d+$")
+    VALUE_WITH_UNIT_REGEX = re.compile(r"^([\d\.eE+-]+)\s*(\S+)$")
+    INTEGER_REGEX = re.compile(r"^[+-]?\d+$")
 
     def __init__(self, las: LASList):
         """Class constructor"""
@@ -171,6 +174,52 @@ class MappedLASList:
             return NonViralMaterial.model_construct(
                 name=dose_sub,
             )
+
+    def _is_scientific_notation(self, value_str: str) -> bool:
+        """Checks whether titer field is in scientific notation."""
+        return bool(re.search(self.SCIENTIFIC_NOTATION_REGEX, value_str))
+
+    def _is_value_with_unit(self, value_str: str) -> bool:
+        """Checks whether titer field is in titer with unit format."""
+        return bool(re.search(self.VALUE_WITH_UNIT_REGEX, value_str))
+
+    def _parse_titer_str(self, titer_str: str) -> Optional[float]:
+        """Parse string representation of titer into float."""
+        if re.match(self.INTEGER_REGEX, titer_str):
+            return int(float(titer_str))
+        return None
+
+    def _parse_titer(self, titer_str: Optional[str]) -> Optional[tuple]:
+        """Parses titer field to integer."""
+        unit = "gc/mL"  # default unit
+        if titer_str is None:
+            return None, unit
+
+        titer_str = titer_str.strip()
+        numeric_value = self._parse_titer_str(titer_str)
+        if numeric_value is not None:
+            return numeric_value, unit
+
+        titer_str = titer_str.strip()
+        # If the string matches scientific notation
+        if self._is_scientific_notation(titer_str):
+            titer = float(
+                re.match(self.SCIENTIFIC_NOTATION_REGEX, titer_str).group(0)
+            )
+            return int(titer), unit  # Always return an integer
+
+        # Check if the string has a value with unit
+        elif self._is_value_with_unit(titer_str):
+            match = re.match(self.VALUE_WITH_UNIT_REGEX, titer_str)
+            titer = match.group(1)
+            unit = match.group(2)
+            # Convert only the numeric value part
+            numeric_value = self._parse_titer_str(titer)
+            if numeric_value is not None:
+                return numeric_value, unit
+
+        # If none of the above, return None with default unit
+        return None, unit
 
     @property
     def aind_accommodation_comment(self) -> Optional[str]:
@@ -2126,16 +2175,17 @@ class MappedLASList:
                 ),
             )
 
-    @staticmethod
-    def map_viral_materials(injectable_materials: List[InjectableMaterial]):
+    def map_viral_materials(
+        self, injectable_materials: List[InjectableMaterial]
+    ):
         """Maps injectable material to viral material"""
         # TODO: map injectable material info in case tars gets no response
         viral_materials = []
         for material in injectable_materials:
-            # Use prep_lot_id in name for tars query
+            titer, unit = self._parse_titer(getattr(material, "titer", None))
             viral_materials.append(
                 ViralMaterial.model_construct(
-                    name=material.prep_lot_id, titer=material.titer
+                    name=material.prep_lot_id, titer=titer, titer_unit=unit
                 )
             )
         return viral_materials

@@ -17,7 +17,7 @@
           "material_type": "Virus",
           "name": "GT340C",
           "tars_identifiers": null,
-          "titer": "50",
+          "titer": 50,
           "titer_unit": "gc/mL"
         },
         {
@@ -25,7 +25,7 @@
           "material_type": "Virus",
           "name": null,
           "tars_identifiers": null,
-          "titer": "50 gc/mL",
+          "titer": 50,
           "titer_unit": "gc/mL"
         },
         {

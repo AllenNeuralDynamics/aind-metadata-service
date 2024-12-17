@@ -225,6 +225,7 @@ class TarsResponseHandler:
                         virus_strains = [
                             getattr(material, "name").strip()
                             for material in procedure.injection_materials
+                            if getattr(material, "name", None)
                         ]
                         viruses.extend(virus_strains)
         return viruses
@@ -252,7 +253,7 @@ class TarsResponseHandler:
                         ):
                             if isinstance(
                                 injection_material, ViralMaterial
-                            ) and hasattr(injection_material, "name"):
+                            ) and getattr(injection_material, "name", None):
                                 virus_strain = injection_material.name.strip()
                                 tars_response = tars_mapping.get(virus_strain)
                                 if (
