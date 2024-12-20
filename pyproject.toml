@@ -43,7 +43,7 @@ server = [
     'fastapi==0.115.0',
     'uvicorn[standard]==0.31.0',
     'python-dateutil',
-    'aind-slims-api==0.1.17',
+    'aind-slims-api@git+https://github.com/AllenNeuralDynamics/aind-slims-api.git@feat-51-histology-procs',
     'azure-identity==1.15.0'
 ]
 

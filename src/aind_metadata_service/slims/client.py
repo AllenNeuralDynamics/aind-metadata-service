@@ -7,7 +7,7 @@ from aind_data_schema.core.rig import Rig
 from aind_slims_api import SlimsClient
 from aind_slims_api.exceptions import SlimsRecordNotFound
 from aind_slims_api.models.instrument import SlimsInstrumentRdrc
-from aind_slims_api.operations.ecephys_session import fetch_ecephys_sessions
+from aind_slims_api.operations import fetch_ecephys_sessions, fetch_histology_procedures
 from pydantic import Extra, Field, SecretStr
 from pydantic_settings import BaseSettings
 from requests.models import Response
@@ -16,8 +16,9 @@ from slims.criteria import equals
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
 from aind_metadata_service.slims.mapping import SlimsSessionMapper
+from aind_metadata_service.slims.specimen_procedures import SlimsHistologyMapper
 
-
+# TODO: rename modules! should both mappers go in mapping or have sep modules? 
 class SlimsSettings(BaseSettings):
     """Configuration class. Mostly a wrapper around smartsheet.Smartsheet
     class constructor arguments."""
@@ -130,6 +131,30 @@ class SlimsHandler:
                 mapped_sessions = mapper.map_sessions(sessions, subject_id)
                 return ModelResponse(
                     aind_models=mapped_sessions,
+                    status_code=StatusCodes.DB_RESPONDED,
+                )
+            else:
+                return ModelResponse.no_data_found_error_response()
+        except SlimsRecordNotFound:
+            return ModelResponse.no_data_found_error_response()
+        except Exception as e:
+            logging.error(repr(e))
+            return ModelResponse.internal_server_error_response()
+        
+        
+    def get_specimen_procedures_model_response(self, specimen_id: str) -> ModelResponse:
+        """
+        Fetches specimen procedures for a given specimen ID from SLIMS.
+        """
+        try:
+            procs = fetch_histology_procedures(
+                specimen_id=specimen_id, client=self.client
+            )
+            if procs:
+                mapper = SlimsHistologyMapper()
+                mapped_procedures = mapper.map_specimen_procedures(procs, specimen_id)
+                return ModelResponse(
+                    aind_models=mapped_procedures,
                     status_code=StatusCodes.DB_RESPONDED,
                 )
             else:
