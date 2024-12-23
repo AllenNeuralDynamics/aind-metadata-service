@@ -10,6 +10,8 @@ from typing import List, Tuple
 from unittest import TestCase
 from unittest import main as unittest_main
 
+from aind_data_schema.core.procedures import NonViralMaterial
+
 from aind_metadata_service.sharepoint.las2020.mapping import MappedLASList
 from aind_metadata_service.sharepoint.las2020.models import LASList
 
@@ -59,7 +61,7 @@ class TestLASParsers(TestCase):
         for list_item in self.list_items:
             raw_data = list_item[0]
             expected_mapped_data = list_item[1]
-            raw_file_name = list_item[1]
+            raw_file_name = list_item[2]
             logging.debug(f"Processing file: {raw_file_name}")
             las_model = LASList.model_validate(raw_data)
             mapper = MappedLASList(las=las_model)
@@ -98,6 +100,53 @@ class TestLASParsers(TestCase):
             MappedLASList._parse_basic_decimal_str("0.25"), Decimal(0.25)
         )
         self.assertIsNone(MappedLASList._parse_basic_decimal_str("abc"), None)
+
+    def test_parse_dose_substance(self):
+        """Tests parsing of dose substances"""
+        sample_data = [
+            "heparin  1000U/mL (2 mice only)",
+            "Heparin 1000u/ml",
+            "Dox diet (200 mg/kg)",
+            "Heparin 1000u/mL",
+            "5 DAY TAM for triple positives at p35 (min P34 pull)",
+            "2% Evans blue",
+            "Heparin 1000U/mL",
+            "Heparin (1000U/mL)",
+            "Heparin 1000U/ml",
+            None,
+        ]
+        list_item = self.list_items[0]
+        raw_data = deepcopy(list_item[0])
+        las_model = LASList.model_validate(raw_data)
+        mapped = MappedLASList(las=las_model)
+        parsed_data = [
+            mapped._parse_dose_sub_to_nonviral_material(dose)
+            for dose in sample_data
+        ]
+
+        expected_heparin = NonViralMaterial.model_construct(
+            name="Heparin",
+            concentration=Decimal("1000"),
+            concentration_unit="u/ml",
+        )
+        expected_dox = NonViralMaterial.model_construct(
+            name="Dox",
+            concentration=Decimal("200"),
+            concentration_unit="mg/kg",
+        )
+        expected_evans_blue = NonViralMaterial.model_construct(
+            name="2% Evans blue",
+        )
+        self.assertIsNone(parsed_data[0])
+        self.assertEqual(parsed_data[1], expected_heparin)
+        self.assertEqual(parsed_data[2], expected_dox)
+        self.assertEqual(parsed_data[3], expected_heparin)
+        self.assertIsNone(parsed_data[4])
+        self.assertEqual(parsed_data[5], expected_evans_blue)
+        self.assertEqual(parsed_data[6], expected_heparin)
+        self.assertEqual(parsed_data[7], expected_heparin)
+        self.assertEqual(parsed_data[8], expected_heparin)
+        self.assertIsNone(parsed_data[9])
 
 
 if __name__ == "__main__":
