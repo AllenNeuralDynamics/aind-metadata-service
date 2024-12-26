@@ -13,6 +13,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.concurrency import run_in_threadpool
 
 from aind_metadata_service import __version__ as SERVICE_VERSION
+from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.labtracks.client import (
     LabTracksClient,
     LabTracksSettings,
@@ -216,12 +217,29 @@ async def retrieve_project_names():
 @app.get("/subject/{subject_id}")
 async def retrieve_subject(subject_id):
     """
-    Retrieves subject from Labtracks server
+    Retrieves subject from Labtracks server and adds alleles from MGI
     """
     lb_client = LabTracksClient.from_settings(labtracks_settings)
     model_response = await run_in_threadpool(
         lb_client.get_subject_info, subject_id=subject_id
     )
+    if model_response.status_code == StatusCodes.DB_RESPONDED:
+        for subject_model in model_response.aind_models:
+            alleles = []
+            genotype = subject_model.genotype
+            allele_names = mgi_client.get_allele_names_from_genotype(
+                genotype=genotype
+            )
+            for allele_name in allele_names:
+                mgi_response = await run_in_threadpool(
+                    mgi_client.get_allele_info, allele_name=allele_name
+                )
+                mapper = MgiMapper(mgi_info=mgi_response)
+                model_response = mapper.get_model_response()
+                if model_response.status_code == 200:
+                    allele = model_response.aind_models[0]
+                    alleles.append(allele)
+                subject_model.alleles = alleles
     return model_response.map_to_json_response()
 
 
