@@ -1,6 +1,7 @@
 """Module to handle retrieving information from MGI"""
 
 import logging
+import re
 from typing import Any, List, Optional, Union
 
 import requests
@@ -54,6 +55,26 @@ class MgiClient:
         """Class constructor"""
 
         self.settings = settings
+
+    @staticmethod
+    def get_allele_names_from_genotype(genotype: Optional[str]) -> List[str]:
+        """
+        Maps a genotype to list of allele names
+        Parameters
+        ----------
+        genotype : Optional[str]
+
+        Returns
+        -------
+        List[str]
+
+        """
+        if genotype is None:
+            filtered_alleles = []
+        else:
+            alleles = re.split("[; /]", genotype)
+            filtered_alleles = [a for a in alleles if a not in ["", "wt"]]
+        return filtered_alleles
 
     def get_allele_info(
         self, allele_name: str
