@@ -15,8 +15,8 @@ from slims.criteria import equals
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
-from aind_metadata_service.slims.mapping import SlimsSessionMapper
-from aind_metadata_service.slims.specimen_procedures import SlimsHistologyMapper
+from aind_metadata_service.slims.sessions.mapping import SlimsSessionMapper
+from aind_metadata_service.slims.procedures.mapping import SlimsHistologyMapper
 
 # TODO: rename modules! should both mappers go in mapping or have sep modules? 
 class SlimsSettings(BaseSettings):

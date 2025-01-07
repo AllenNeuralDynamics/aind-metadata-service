@@ -263,6 +263,11 @@ async def retrieve_procedures(subject_id):
         subject_id=subject_id,
         list_title=sharepoint_settings.las_2020_list,
     )
+    slims_response = await run_in_threadpool(
+        slims_client.get_specimen_procedures_model_response(
+            specimen_id=subject_id,
+        )
+    )
     merged_response = sharepoint_client.merge_responses(
         [lb_response, sp2019_response, sp2023_response, las2020_response]
     )
