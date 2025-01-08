@@ -82,38 +82,33 @@ class SlimsHistologyMapper:
                     if getattr(block.protocol, "link", None)
                     else []
                 ),
-                antibodies=self._map_antibody(wash) if wash else None,  # Antibody mapping
+                antibodies=self._map_antibody(wash) if wash else [],  # Antibody mapping
             )
             procedures.append(spec)
         return procedures
 
-    def _map_antibody(self, wash: SlimsWash) -> List[Antibody]:
+    def _map_antibody(self, wash: SlimsWash) -> Antibody:
         """Map antibody reagent from wash"""
-        antibodies = []
-        if wash.wash_step.wash_name == SlimsWashNames.PRIMARY_ANTIBODY_WASH:
+        if wash.wash_step.wash_name == SlimsWashNames.PRIMARY_ANTIBODY_WASH.value:
             label = ImmunolabelClass.PRIMARY
-        elif wash.wash_step.wash_name == SlimsWashNames.SECONDARY_ANTIBODY_WASH:
+        elif wash.wash_step.wash_name == SlimsWashNames.SECONDARY_ANTIBODY_WASH.value:
             label = ImmunolabelClass.SECONDARY
-        for reagent, source in wash.reagents:
-            antibody = Antibody.model_construct(
+        return (
+            Antibody.model_construct(
                 immunolabel_class=label,
-                mass=wash.mass,
-                name=reagent.reagent_name, 
-                source=self._map_source(source.name),
-                lot_number=reagent.lot_number,
+                mass=wash.wash_step.mass,
             )
-            antibodies.append(antibody)
-        return antibodies
+        )
 
     def _map_reagents(self, washes: List[SlimsWash]) -> List[Reagent]:
         """Map info from washes"""
         reagents = []
         for wash in washes:
-            for reagent, source in wash.reagents:
+            for reagent in wash.reagents:
                 reagent_model = Reagent.model_construct(
-                    # name=reagent.reagent_name,
-                    source=self._map_source(source.name),
-                    lot_number=reagent.lot_number,
+                    name=getattr(reagent.details, "name", None),
+                    source=self._map_source(reagent.source.name) if getattr(reagent.source, "name", None) else None,
+                    lot_number=getattr(reagent.content, "lot_number", None),
                 )
                 reagents.append(reagent_model)
         return reagents
