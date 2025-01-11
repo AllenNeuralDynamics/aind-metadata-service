@@ -2,6 +2,7 @@
 
 from typing import Optional
 
+from aind_data_schema.core.data_description import Funding
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -25,3 +26,10 @@ class ProtocolInformation(BaseModel):
             return None
         else:
             return str(value)
+
+
+class FundingInformation(Funding):
+    """Funding information that will be returned to the user that requests
+    information from the Funding SmartSheet"""
+
+    investigators: Optional[str] = Field(default=None)
