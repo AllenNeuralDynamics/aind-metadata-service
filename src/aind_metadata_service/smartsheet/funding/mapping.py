@@ -4,12 +4,12 @@ aind-data-schema Funding model."""
 import logging
 from typing import List, Optional, Union
 
-from aind_data_schema.core.data_description import Funding
 from aind_data_schema_models.organizations import Organization
 from pydantic import ValidationError
 from starlette.responses import JSONResponse
 
 from aind_metadata_service.client import StatusCodes
+from aind_metadata_service.models import FundingInformation
 from aind_metadata_service.response_handler import ModelResponse
 from aind_metadata_service.smartsheet.funding.models import FundingColumnNames
 from aind_metadata_service.smartsheet.mapper import SmartSheetMapper
@@ -48,7 +48,7 @@ class FundingMapper(SmartSheetMapper):
 
     def _map_row_to_funding(
         self, row: SheetRow, input_project_name: str
-    ) -> Optional[Funding]:
+    ) -> Optional[FundingInformation]:
         """
         Map a row to an optional funding model.
         Parameters
@@ -75,25 +75,33 @@ class FundingMapper(SmartSheetMapper):
         )
         funder = self._parse_institution(institution_value)
         investigators = row_dict.get(FundingColumnNames.INVESTIGATORS)
+        fundees = row_dict.get(FundingColumnNames.FUNDEES)
         if input_project_name != project_name:
             return None
-        elif funder is None and grant_number is None and investigators is None:
+        elif (
+            funder is None
+            and grant_number is None
+            and investigators is None
+            and fundees is None
+        ):
             return None
         else:
             try:
-                return Funding(
+                return FundingInformation(
                     funder=funder,
                     grant_number=grant_number,
-                    fundee=investigators,
+                    fundee=fundees,
+                    investigators=investigators,
                 )
             except ValidationError:
-                return Funding.model_construct(
+                return FundingInformation.model_construct(
                     funder=funder,
                     grant_number=grant_number,
-                    fundee=investigators,
+                    fundee=fundees,
+                    investigators=investigators,
                 )
 
-    def _get_funding_list(self, project_name: str) -> List[Funding]:
+    def _get_funding_list(self, project_name: str) -> List[FundingInformation]:
         """
         Return a list of Funding information for a give project code.
         Parameters
@@ -107,10 +115,12 @@ class FundingMapper(SmartSheetMapper):
           A list of Funding models. They might not necessarily pass validation
           checks.
         """
-        rows_associated_with_project_name: List[Funding] = []
+        rows_associated_with_project_name: List[FundingInformation] = []
         for row in self.model.rows:
-            opt_funding: Optional[Funding] = self._map_row_to_funding(
-                row=row, input_project_name=project_name
+            opt_funding: Optional[FundingInformation] = (
+                self._map_row_to_funding(
+                    row=row, input_project_name=project_name
+                )
             )
             if opt_funding is not None:
                 rows_associated_with_project_name.append(opt_funding)
