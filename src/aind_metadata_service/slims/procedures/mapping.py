@@ -24,13 +24,16 @@ class SlimsHistologyMapper:
         specimen_procedures = []
         for block in slims_blocks: 
             procedure_type = self._map_procedure_type(block.experiment_template.name)
-            if procedure_type == SpecimenProcedureType.IMMUNOLABELING:
+            if procedure_type is None:
+                continue
+            elif procedure_type == SpecimenProcedureType.IMMUNOLABELING:
                 procs = self.map_immunolabeling(block, specimen_id)
                 specimen_procedures.extend(procs)
             else:
                 specimen_procedure = self._map_specimen_procedure(block, procedure_type, specimen_id)
                 specimen_procedures.append(specimen_procedure)
         return specimen_procedures
+
 
     def _map_specimen_procedure(self, block: SPIMHistologyExpBlock, procedure_type: SpecimenProcedureType, specimen_id: str) -> SpecimenProcedure:
         """Map specimen procedure from block name and procedure name"""
@@ -54,9 +57,10 @@ class SlimsHistologyMapper:
                     if getattr(block.protocol, "link", None)
                     else []
                 ),
-            reagents=self._map_reagents(block.washes) if block.washes else None,  # Reagent mapping
+            reagents=self._map_reagents(block.washes) if block.washes else None, # Reagent mapping
         )
         return spec
+
 
     def map_immunolabeling(self, block: SPIMHistologyExpBlock, specimen_id: str) -> List[SpecimenProcedure]:
         """Map immunolabeling procedure for each antibody wash"""
