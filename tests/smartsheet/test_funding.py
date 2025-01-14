@@ -59,7 +59,6 @@ class TestSmartsheetFundingClient(unittest.TestCase):
             ),
         )
         model_response = mapper.get_model_response()
-        print(model_response)
         expected_models = [
             FundingInformation(
                 funder=Organization.AI,

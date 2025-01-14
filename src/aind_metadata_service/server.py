@@ -235,9 +235,9 @@ async def retrieve_subject(subject_id):
                     mgi_client.get_allele_info, allele_name=allele_name
                 )
                 mapper = MgiMapper(mgi_info=mgi_response)
-                model_response = mapper.get_model_response()
-                if model_response.status_code == 200:
-                    allele = model_response.aind_models[0]
+                mgi_model_response = mapper.get_model_response()
+                if mgi_model_response.status_code == 200:
+                    allele = mgi_model_response.aind_models[0]
                     alleles.append(allele)
                 subject_model.alleles = alleles
     return model_response.map_to_json_response()
