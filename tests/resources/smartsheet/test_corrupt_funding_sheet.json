@@ -1,0 +1,185 @@
+{
+   "accessLevel": "VIEWER",
+   "columns": [
+      {
+         "id": 2802903489138564,
+         "index": 0,
+         "primary": true,
+         "title": "Project Name",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 0,
+         "width": 292
+      },
+      {
+         "id": 3987940745367428,
+         "index": 1,
+         "title": "Subproject",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 0,
+         "width": 150
+      },
+      {
+         "id": 367734341717892,
+         "index": 2,
+         "options": [
+            "122-01-001-10",
+            "122-01-002-20",
+            "122-01-003-20",
+            "122-01-004-20",
+            "122-01-005-10",
+            "122-01-006-20",
+            "122-01-010-20",
+            "122-01-012-20",
+            "122-01-013-10",
+            "122-01-014-20",
+            "122-01-015-20",
+            "122-01-016-20",
+            "122-01-017-20"
+         ],
+         "title": "Project Code",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 2,
+         "width": 150
+      },
+      {
+         "id": 7306503116509060,
+         "index": 3,
+         "options": [
+            "Allen Institute",
+            "NINDS",
+            "NIMH",
+            "Simons Foundation",
+            "NIDA"
+         ],
+         "title": "Funding Institution",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 2,
+         "width": 150
+      },
+      {
+         "id": 8432403023351684,
+         "index": 4,
+         "title": "Grant Number",
+         "type": "PICKLIST",
+         "validation": false,
+         "version": 0,
+         "width": 261
+      },
+      {
+         "id": 1114053628874628,
+         "index": 5,
+         "title": "Fundees",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 1,
+         "width": 220
+      },
+      {
+         "id": 5793496946659204,
+         "index": 6,
+         "title": "Investigators",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 1,
+         "width": 150
+      }
+   ],
+   "createdAt": "2024-01-05T18:50:21+00:00Z",
+   "dependenciesEnabled": false,
+   "effectiveAttachmentOptions": [
+      "EVERNOTE",
+      "FILE",
+      "BOX_COM",
+      "DROPBOX",
+      "LINK",
+      "ONEDRIVE",
+      "GOOGLE_DRIVE",
+      "EGNYTE"
+   ],
+   "ganttEnabled": false,
+   "hasSummaryFields": false,
+   "id": 6011951083638660,
+   "modifiedAt": "2025-01-10T22:56:36+00:00Z",
+   "name": "Project Name and Funding Source v2",
+   "permalink": "https://app.smartsheet.com/sheets/R4GfCrXvHPJ5MjhjRvjgGRMJQxvwQg92wgcX5GP1",
+   "readOnly": true,
+   "resourceManagementEnabled": false,
+   "rows": [
+      {
+         "cells": [
+            {
+               "columnId": 2802903489138564
+            },
+            {
+               "columnId": 3987940745367428
+            },
+            {
+               "columnId": 367734341717892
+            },
+            {
+               "columnId": 7306503116509060
+            },
+            {
+               "columnId": 8432403023351684
+            },
+            {
+               "columnId": 1114053628874628
+            },
+            {
+               "columnId": 5793496946659204
+            }
+         ],
+         "createdAt": "2024-01-05T19:05:46+00:00Z",
+         "expanded": true,
+         "id": 32116355534724,
+         "modifiedAt": "2024-08-02T16:49:26+00:00Z",
+         "rowNumber": 1
+      },
+      {
+         "cells": [
+            {
+               "columnId": 2802903489138564,
+               "displayValue": "Some Project",
+               "value": "Some Project"
+            },
+            {
+               "columnId": 3987940745367428
+            },
+            {
+               "columnId": 367734341717892
+            },
+            {
+               "columnId": 7306503116509060
+            },
+            {
+               "columnId": 8432403023351684
+            },
+            {
+               "columnId": 1114053628874628
+            },
+            {
+               "columnId": 5793496946659204
+            }
+         ],
+         "createdAt": "2024-01-05T18:50:21+00:00Z",
+         "expanded": true,
+         "id": 927404066770820,
+         "modifiedAt": "2024-07-29T22:18:39+00:00Z",
+         "rowNumber": 1,
+         "siblingId": 32116355534724
+      }
+   ],
+   "totalRowCount": 1,
+   "userPermissions": {
+      "summaryPermissions": "READ_ONLY"
+   },
+   "userSettings": {
+      "criticalPathEnabled": false,
+      "displaySummaryTasks": true
+   },
+   "version": 105
+}

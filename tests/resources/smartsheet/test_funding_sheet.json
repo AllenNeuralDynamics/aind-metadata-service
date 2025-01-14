@@ -1,58 +1,86 @@
 {
-   "accessLevel": "EDITOR_SHARE",
+   "accessLevel": "VIEWER",
    "columns": [
       {
-         "id": 3981351074090884,
+         "id": 2802903489138564,
          "index": 0,
+         "primary": true,
          "title": "Project Name",
          "type": "TEXT_NUMBER",
          "validation": false,
          "version": 0,
-         "width": 371
+         "width": 292
       },
       {
-         "id": 1729551260405636,
+         "id": 3987940745367428,
          "index": 1,
-         "primary": true,
-         "title": "Project Code",
+         "title": "Subproject",
          "type": "TEXT_NUMBER",
          "validation": false,
          "version": 0,
          "width": 150
       },
       {
-         "id": 2990791841501060,
+         "id": 367734341717892,
          "index": 2,
          "options": [
-            "Allen Institute",
-            "Allen Institute For Brain Science",
-            "Allen Institute For Neural Dynamics",
-            "Columbia University",
-            "Jackson Laboratory",
-            "Huazhong University Of Science And Technology",
-            "National Institute Of Neurological Disorders And Stroke",
-            "New York University",
-            "Simons Foundation",
-            "National Institutes of Health"
+            "122-01-001-10",
+            "122-01-002-20",
+            "122-01-003-20",
+            "122-01-004-20",
+            "122-01-005-10",
+            "122-01-006-20",
+            "122-01-010-20",
+            "122-01-012-20",
+            "122-01-013-10",
+            "122-01-014-20",
+            "122-01-015-20",
+            "122-01-016-20",
+            "122-01-017-20"
          ],
-         "title": "Funding Institution",
-         "type": "PICKLIST",
+         "title": "Project Code",
+         "type": "TEXT_NUMBER",
          "validation": false,
-         "version": 0,
+         "version": 2,
          "width": 150
       },
       {
-         "id": 3446515788894084,
+         "id": 7306503116509060,
          "index": 3,
+         "options": [
+            "Allen Institute",
+            "NINDS",
+            "NIMH",
+            "Simons Foundation",
+            "NIDA"
+         ],
+         "title": "Funding Institution",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 2,
+         "width": 150
+      },
+      {
+         "id": 8432403023351684,
+         "index": 4,
          "title": "Grant Number",
          "type": "PICKLIST",
          "validation": false,
          "version": 0,
-         "width": 150
+         "width": 261
       },
       {
-         "id": 4825776004222852,
-         "index": 4,
+         "id": 1114053628874628,
+         "index": 5,
+         "title": "Fundees",
+         "type": "TEXT_NUMBER",
+         "validation": false,
+         "version": 1,
+         "width": 220
+      },
+      {
+         "id": 5793496946659204,
+         "index": 6,
          "title": "Investigators",
          "type": "TEXT_NUMBER",
          "validation": false,
@@ -60,161 +88,403 @@
          "width": 150
       }
    ],
-   "createdAt": "2023-07-31T20:52:39+00:00Z",
+   "createdAt": "2024-01-05T18:50:21+00:00Z",
    "dependenciesEnabled": false,
    "effectiveAttachmentOptions": [
       "EVERNOTE",
       "FILE",
-      "EGNYTE",
-      "ONEDRIVE",
-      "GOOGLE_DRIVE",
       "BOX_COM",
       "DROPBOX",
-      "LINK"
+      "LINK",
+      "ONEDRIVE",
+      "GOOGLE_DRIVE",
+      "EGNYTE"
    ],
    "ganttEnabled": false,
    "hasSummaryFields": false,
-   "id": 2802362280267652,
-   "modifiedAt": "2023-12-20T18:36:26+00:00Z",
-   "name": "Project Name and Funding Source",
-   "permalink": "https://app.smartsheet.com/sheets/IJ5WvApEFriNhoReXpDWhQRhNOAWXmSoxsenGVAH",
+   "id": 6011951083638660,
+   "modifiedAt": "2025-01-10T22:56:36+00:00Z",
+   "name": "Project Name and Funding Source v2",
+   "permalink": "https://app.smartsheet.com/sheets/R4GfCrXvHPJ5MjhjRvjgGRMJQxvwQg92wgcX5GP1",
    "readOnly": true,
    "resourceManagementEnabled": false,
    "rows": [
       {
          "cells": [
             {
-               "columnId": 3981351074090884,
-               "displayValue": "AIND Scientific Activities",
-               "value": "AIND Scientific Activities"
+               "columnId": 2802903489138564
             },
             {
-               "columnId": 1729551260405636,
-               "displayValue": "122-01-001-10",
-               "value": "122-01-001-10"
+               "columnId": 3987940745367428
             },
             {
-               "columnId": 2990791841501060,
-               "displayValue": "Allen Institute",
-               "value": "Allen Institute"
+               "columnId": 367734341717892
             },
             {
-               "columnId": 3446515788894084
+               "columnId": 7306503116509060
             },
             {
-               "columnId": 4825776004222852,
-               "displayValue": "person.two@acme.org, J Smith, Mary Smith",
-               "value": "person.two@acme.org, J Smith, John Doe II"
+               "columnId": 8432403023351684
+            },
+            {
+               "columnId": 1114053628874628
+            },
+            {
+               "columnId": 5793496946659204
             }
          ],
-         "createdAt": "2023-07-31T20:57:28+00:00Z",
+         "createdAt": "2024-01-05T19:05:46+00:00Z",
          "expanded": true,
-         "id": 2014892103339908,
-         "modifiedAt": "2023-12-20T18:32:10+00:00Z",
+         "id": 32116355534724,
+         "modifiedAt": "2024-08-02T16:49:26+00:00Z",
          "rowNumber": 1
       },
       {
          "cells": [
             {
-               "columnId": 3981351074090884,
-               "displayValue": "AIND Scientific Activities",
-               "value": "AIND Scientific Activities"
+               "columnId": 2802903489138564,
+               "displayValue": "Ephys Platform",
+               "value": "Ephys Platform"
             },
             {
-               "columnId": 1729551260405636
+               "columnId": 3987940745367428
             },
             {
-               "columnId": 2990791841501060
+               "columnId": 367734341717892
             },
             {
-               "columnId": 3446515788894084
+               "columnId": 7306503116509060,
+               "displayValue": "Allen Institute",
+               "value": "Allen Institute"
             },
             {
-               "columnId": 4825776004222852
+               "columnId": 8432403023351684
+            },
+            {
+               "columnId": 1114053628874628,
+               "displayValue": "Person One, Person Two, Person Three",
+               "value": "Person One, Person Two, Person Three"
+            },
+            {
+               "columnId": 5793496946659204
             }
          ],
-         "createdAt": "2023-07-31T20:57:28+00:00Z",
+         "createdAt": "2024-01-05T18:50:21+00:00Z",
          "expanded": true,
-         "id": 2014892103339909,
-         "modifiedAt": "2023-12-20T18:32:10+00:00Z",
-         "rowNumber": 2
+         "id": 927404066770820,
+         "modifiedAt": "2024-07-29T22:18:39+00:00Z",
+         "rowNumber": 2,
+         "siblingId": 32116355534724
       },
       {
          "cells": [
             {
-               "columnId": 3981351074090884
+               "columnId": 2802903489138564,
+               "displayValue": "MSMA Platform",
+               "value": "MSMA Platform"
             },
             {
-               "columnId": 1729551260405636,
+               "columnId": 3987940745367428
+            },
+            {
+               "columnId": 367734341717892,
                "displayValue": "122-01-001-10",
                "value": "122-01-001-10"
             },
             {
-               "columnId": 2990791841501060,
+               "columnId": 7306503116509060,
                "displayValue": "Allen Institute",
                "value": "Allen Institute"
             },
             {
-               "columnId": 3446515788894084
+               "columnId": 8432403023351684
             },
             {
-               "columnId": 4825776004222852,
-               "displayValue": "John Doe, person.one@acme.org",
-               "value": "John Doe, person.one@acme.org"
+               "columnId": 1114053628874628,
+               "displayValue": "Person Four",
+               "value": "Person Four"
+            },
+            {
+               "columnId": 5793496946659204
             }
          ],
-         "createdAt": "2023-08-07T23:39:14+00:00Z",
+         "createdAt": "2024-02-01T23:51:25+00:00Z",
          "expanded": true,
-         "id": 3850275791343492,
-         "modifiedAt": "2023-12-20T18:32:10+00:00Z",
+         "id": 54251313074052,
+         "modifiedAt": "2024-02-09T22:16:26+00:00Z",
          "rowNumber": 3,
-         "siblingId": 2014892103339908
+         "siblingId": 927404066770820
       },
       {
          "cells": [
             {
-               "columnId": 3981351074090884,
-               "displayValue": "v1omFISH",
-               "value": "v1omFISH"
+               "columnId": 2802903489138564,
+               "displayValue": "Discovery-Neuromodulator circuit dynamics during foraging",
+               "value": "Discovery-Neuromodulator circuit dynamics during foraging"
             },
             {
-               "columnId": 1729551260405636,
-               "displayValue": "121-01-010-10",
-               "value": "121-01-010-10"
+               "columnId": 3987940745367428,
+               "displayValue": "Subproject 1 Electrophysiological Recordings from NM Neurons During Behavior",
+               "value": "Subproject 1 Electrophysiological Recordings from NM Neurons During Behavior"
             },
             {
-               "columnId": 2990791841501060,
+               "columnId": 367734341717892,
+               "displayValue": "122-01-001-10",
+               "value": "122-01-001-10"
+            },
+            {
+               "columnId": 7306503116509060,
                "displayValue": "Allen Institute",
                "value": "Allen Institute"
             },
             {
-               "columnId": 3446515788894084
+               "columnId": 8432403023351684
             },
             {
-               "columnId": 4825776004222852,
-               "displayValue": "person.one@acme.org, Jane Doe",
-               "value": "person.one@acme.org, Jane Doe"
+               "columnId": 1114053628874628,
+               "displayValue": "Person Four, Person Five, Person Six, Person Seven, Person Eight",
+               "value": "Person Four, Person Five, Person Six, Person Seven, Person Eight"
+            },
+            {
+               "columnId": 5793496946659204
             }
          ],
-         "createdAt": "2023-08-02T19:28:24+00:00Z",
+         "createdAt": "2024-02-09T19:01:38+00:00Z",
          "expanded": true,
-         "id": 8831127549939588,
-         "modifiedAt": "2023-12-20T18:33:23+00:00Z",
+         "id": 3762986926641028,
+         "modifiedAt": "2025-01-10T22:48:16+00:00Z",
          "rowNumber": 4,
-         "siblingId": 4327527922569092
+         "siblingId": 754860182900612
+      },
+      {
+         "cells": [
+            {
+               "columnId": 2802903489138564,
+               "displayValue": "Discovery-Neuromodulator circuit dynamics during foraging",
+               "value": "Discovery-Neuromodulator circuit dynamics during foraging"
+            },
+            {
+               "columnId": 3987940745367428,
+               "displayValue": "Subproject 1 Electrophysiological Recordings from NM Neurons During Behavior",
+               "value": "Subproject 1 Electrophysiological Recordings from NM Neurons During Behavior"
+            },
+            {
+               "columnId": 367734341717892,
+               "displayValue": "122-01-012-20",
+               "value": "122-01-012-20"
+            },
+            {
+               "columnId": 7306503116509060,
+               "displayValue": "NINDS",
+               "value": "NINDS"
+            },
+            {
+               "columnId": 8432403023351684,
+               "displayValue": "1RF1NS131984",
+               "value": "1RF1NS131984"
+            },
+            {
+               "columnId": 1114053628874628,
+               "displayValue": "Person Five, Person Six, Person Eight",
+               "value": "Person Five, Person Six, Person Eight"
+            },
+            {
+               "columnId": 5793496946659204,
+               "displayValue": "Person Six, Person Eight",
+               "value": "Person Six, Person Eight"
+            }
+         ],
+         "createdAt": "2024-02-09T19:01:38+00:00Z",
+         "expanded": true,
+         "id": 948237159534468,
+         "modifiedAt": "2025-01-10T22:48:16+00:00Z",
+         "rowNumber": 5,
+         "siblingId": 3762986926641028
+      },
+      {
+         "cells": [
+            {
+               "columnId": 2802903489138564,
+               "displayValue": "Discovery-Neuromodulator circuit dynamics during foraging",
+               "value": "Discovery-Neuromodulator circuit dynamics during foraging"
+            },
+            {
+               "columnId": 3987940745367428,
+               "displayValue": "Subproject 2 Molecular Anatomy Cell Types",
+               "value": "Subproject 2 Molecular Anatomy Cell Types"
+            },
+            {
+               "columnId": 367734341717892,
+               "displayValue": "122-01-001-10",
+               "value": "122-01-001-10"
+            },
+            {
+               "columnId": 7306503116509060,
+               "displayValue": "Allen Institute",
+               "value": "Allen Institute"
+            },
+            {
+               "columnId": 8432403023351684
+            },
+            {
+               "columnId": 1114053628874628,
+               "displayValue": "Person Four, Person Five, Person Six, Person Seven, Person Eight",
+               "value": "Person Four, Person Five, Person Six, Person Seven, Person Eight"
+            },
+            {
+               "columnId": 5793496946659204,
+               "displayValue": "Person Seven",
+               "value": "Person Seven"
+            }
+         ],
+         "createdAt": "2024-03-25T23:18:40+00:00Z",
+         "expanded": true,
+         "id": 514913262538628,
+         "modifiedAt": "2025-01-10T22:48:16+00:00Z",
+         "rowNumber": 6,
+         "siblingId": 948237159534468
+      },
+      {
+         "cells": [
+            {
+               "columnId": 2802903489138564,
+               "displayValue": "Discovery-Neuromodulator circuit dynamics during foraging",
+               "value": "Discovery-Neuromodulator circuit dynamics during foraging"
+            },
+            {
+               "columnId": 3987940745367428,
+               "displayValue": "Subproject 2 Molecular Anatomy Cell Types",
+               "value": "Subproject 2 Molecular Anatomy Cell Types"
+            },
+            {
+               "columnId": 367734341717892,
+               "displayValue": "122-01-020-20",
+               "value": "122-01-020-20"
+            },
+            {
+               "columnId": 7306503116509060,
+               "displayValue": "NIMH",
+               "value": "NIMH"
+            },
+            {
+               "columnId": 8432403023351684,
+               "displayValue": "1R01MH134833",
+               "value": "1R01MH134833"
+            },
+            {
+               "columnId": 1114053628874628,
+               "displayValue": "Person Five, Person Nine, Person Ten, Person Seven, Person Eleven",
+               "value": "Person Five, Person Nine, Person Ten, Person Seven, Person Eleven"
+            },
+            {
+               "columnId": 5793496946659204,
+               "displayValue": "Person Seven",
+               "value": "Person Seven"
+            }
+         ],
+         "createdAt": "2025-01-10T22:41:04+00:00Z",
+         "expanded": true,
+         "id": 4511747065253764,
+         "modifiedAt": "2025-01-10T22:48:16+00:00Z",
+         "rowNumber": 7,
+         "siblingId": 514913262538628
+      },
+      {
+         "cells": [
+            {
+               "columnId": 2802903489138564,
+               "displayValue": "Discovery-Neuromodulator circuit dynamics during foraging",
+               "value": "Discovery-Neuromodulator circuit dynamics during foraging"
+            },
+            {
+               "columnId": 3987940745367428,
+               "displayValue": "Subproject 3 Fiber Photometry Recordings of NM Release During Behavior",
+               "value": "Subproject 3 Fiber Photometry Recordings of NM Release During Behavior"
+            },
+            {
+               "columnId": 367734341717892,
+               "displayValue": "122-01-001-10",
+               "value": "122-01-001-10"
+            },
+            {
+               "columnId": 7306503116509060,
+               "displayValue": "Allen Institute",
+               "value": "Allen Institute"
+            },
+            {
+               "columnId": 8432403023351684
+            },
+            {
+               "columnId": 1114053628874628,
+               "displayValue": "Person Four, Person Five, Person Six, Person Seven, Person Eight",
+               "value": "Person Four, Person Five, Person Six, Person Seven, Person Eight"
+            },
+            {
+               "columnId": 5793496946659204,
+               "displayValue": "Person Four, Person Ten, person.twelve@example.com, person.thirteen@example.com, Person Eight",
+               "value": "Person Four, Person Ten, person.twelve@example.com, person.thirteen@example.com, Person Eight"
+            }
+         ],
+         "createdAt": "2025-01-10T22:41:04+00:00Z",
+         "expanded": true,
+         "id": 8147437883268,
+         "modifiedAt": "2025-01-10T22:48:16+00:00Z",
+         "rowNumber": 8,
+         "siblingId": 4511747065253764
+      },
+      {
+         "cells": [
+            {
+               "columnId": 2802903489138564,
+               "displayValue": "Discovery-Neuromodulator circuit dynamics during foraging",
+               "value": "Discovery-Neuromodulator circuit dynamics during foraging"
+            },
+            {
+               "columnId": 3987940745367428,
+               "displayValue": "Subproject 3 Fiber Photometry Recordings of NM Release During Behavior",
+               "value": "Subproject 3 Fiber Photometry Recordings of NM Release During Behavior"
+            },
+            {
+               "columnId": 367734341717892,
+               "displayValue": "122-01-020-20",
+               "value": "122-01-020-20"
+            },
+            {
+               "columnId": 7306503116509060,
+               "displayValue": "NIMH",
+               "value": "NIMH"
+            },
+            {
+               "columnId": 8432403023351684,
+               "displayValue": "1R01MH134833",
+               "value": "1R01MH134833"
+            },
+            {
+               "columnId": 1114053628874628,
+               "displayValue": "Person Five, Person Nine, Person Ten, Person Seven, Person Eleven",
+               "value": "Person Five, Person Nine, Person Ten, Person Seven, Person Eleven"
+            },
+            {
+               "columnId": 5793496946659204,
+               "displayValue": "Person Four, Person Ten, person.twelve@example.com, person.thirteen@example.com, Person Eight",
+               "value": "Person Four, Person Ten, person.twelve@example.com, person.thirteen@example.com, Person Eight"
+            }
+         ],
+         "createdAt": "2025-01-10T22:41:04+00:00Z",
+         "expanded": true,
+         "id": 9002152553090948,
+         "modifiedAt": "2025-01-10T22:48:16+00:00Z",
+         "rowNumber": 9,
+         "siblingId": 8147437883268
       }
    ],
-   "totalRowCount": 4,
+   "totalRowCount": 9,
    "userPermissions": {
-      "summaryPermissions": "READ_WRITE"
+      "summaryPermissions": "READ_ONLY"
    },
    "userSettings": {
       "criticalPathEnabled": false,
       "displaySummaryTasks": true
    },
-   "version": 40,
-   "workspace": {
-      "id": 8949276219860868,
-      "name": "AIND Projects Workspace"
-   }
+   "version": 105
 }
