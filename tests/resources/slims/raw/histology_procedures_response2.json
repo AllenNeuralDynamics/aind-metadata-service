@@ -464,7 +464,7 @@
                                 "name": "xprs_createdBy",
                                 "title": "Created by",
                                 "position": 12,
-                                "value": "general_aind",
+                                "value": "experimenter2",
                                 "hidden": false,
                                 "editable": true
                             },
@@ -485,7 +485,7 @@
                                 "name": "xprs_modifiedBy",
                                 "title": "Modified by",
                                 "position": 14,
-                                "value": "general_aind",
+                                "value": "experimenter1",
                                 "hidden": false,
                                 "editable": true
                             },
@@ -705,7 +705,7 @@
                         ]
                     },
                     "name": "Wash 1",
-                    "modified_by": "general_aind",
+                    "modified_by":  "experimenter1",
                     "experimentrun_pk": 41255,
                     "experiment_template_pk": 1539,
                     "wash_name": "Wash 1",
@@ -2700,7 +2700,7 @@
                                 "name": "xprs_createdBy",
                                 "title": "Created by",
                                 "position": 12,
-                                "value": "general_aind",
+                                "value": "experimenter1",
                                 "hidden": false,
                                 "editable": true
                             },
@@ -2941,7 +2941,7 @@
                         ]
                     },
                     "name": "Wash 2",
-                    "modified_by": "general_aind",
+                    "modified_by": "experimenter2",
                     "experimentrun_pk": 41255,
                     "experiment_template_pk": 1539,
                     "wash_name": "Wash 2",
@@ -5174,7 +5174,7 @@
                         ]
                     },
                     "name": "Wash 3",
-                    "modified_by": "general_aind",
+                    "modified_by": "experimenter2",
                     "experimentrun_pk": 41255,
                     "experiment_template_pk": 1539,
                     "wash_name": "Wash 3",
@@ -7405,7 +7405,7 @@
                         ]
                     },
                     "name": "Wash 4",
-                    "modified_by": "general_aind",
+                    "modified_by": null,
                     "experimentrun_pk": 41255,
                     "experiment_template_pk": 1539,
                     "wash_name": "Wash 4",
@@ -9619,7 +9619,7 @@
                     }
                 ]
             },
-            "name": "SmartSPIM Labeling",
+            "name": null,
             "version_name": "SmartSPIM Labeling (v. 4)"
         }
     },
@@ -9943,389 +9943,7 @@
             "name": "Refractive Index Matching - EasyIndex",
             "link": "<a href=\"https://www.protocols.io/view/refractive-index-matching-easyindex-cttgwnjw\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">Refractive Index Matching, EasyIndex</a>"
         },
-        "washes": [
-            {
-                "wash_step": {
-                    "pk": 65221,
-                    "created_on": 1736209388605,
-                    "json_entity": {
-                        "pk": 65221,
-                        "tableName": "ExperimentRunStep",
-                        "columns": [
-                            {
-                                "datatype": "STRING",
-                                "name": "xprs_name",
-                                "title": "Name",
-                                "position": 0,
-                                "value": "Refractive Index Matching Wash",
-                                "hidden": false,
-                                "editable": true
-                            },
-                            {
-                                "datatype": "STRING",
-                                "name": "xprs_comments",
-                                "title": "Comments",
-                                "position": 1,
-                                "value": null,
-                                "hidden": false,
-                                "editable": true
-                            },
-                            {
-                                "datatype": "FOREIGN_KEY",
-                                "name": "xprs_fk_user",
-                                "title": "User",
-                                "position": 2,
-                                "value": null,
-                                "hidden": false,
-                                "editable": true,
-                                "foreignTable": "User",
-                                "displayValue": null,
-                                "displayField": "user_userName",
-                                "foreignDisplayColumn": "user_userName"
-                            },
-                            {
-                                "datatype": "ENUM",
-                                "name": "xprs_cf_spimWashType",
-                                "title": "SPIM Wash Type",
-                                "position": 3,
-                                "value": "Refractive Index Matching",
-                                "hidden": false,
-                                "editable": true,
-                                "displayValue": "Refractive Index Matching"
-                            },
-                            {
-                                "datatype": "DATE",
-                                "name": "xprs_observationStartDate",
-                                "title": "Start Observation",
-                                "position": 4,
-                                "value": 1736209388649,
-                                "hidden": false,
-                                "editable": true,
-                                "dateFormat": "MM/dd/yyyy HH:mm:ss",
-                                "subType": "datetime",
-                                "timeZone": "America/Los_Angeles"
-                            },
-                            {
-                                "datatype": "BOOLEAN",
-                                "name": "xprs_active",
-                                "title": "Active",
-                                "position": 5,
-                                "value": true,
-                                "hidden": false,
-                                "editable": true
-                            },
-                            {
-                                "datatype": "DATE",
-                                "name": "xprs_cf_sbipDelipidationWash1Start",
-                                "title": "Start Time",
-                                "position": 6,
-                                "value": 1736184180000,
-                                "hidden": false,
-                                "editable": true,
-                                "dateFormat": "MM/dd/yyyy HH:mm:ss",
-                                "subType": "datetime",
-                                "timeZone": "America/Los_Angeles"
-                            },
-                            {
-                                "datatype": "DATE",
-                                "name": "xprs_cf_sbipDelipidationWash6End",
-                                "title": "End Time",
-                                "position": 7,
-                                "value": 1736187780000,
-                                "hidden": false,
-                                "editable": true,
-                                "dateFormat": "MM/dd/yyyy HH:mm:ss",
-                                "subType": "datetime",
-                                "timeZone": "America/Los_Angeles"
-                            },
-                            {
-                                "datatype": "STRING",
-                                "name": "xprs_cf_notes",
-                                "title": "Notes",
-                                "position": 8,
-                                "value": null,
-                                "hidden": false,
-                                "editable": true
-                            },
-                            {
-                                "datatype": "STRING",
-                                "name": "xprs_uniqueIdentifier",
-                                "title": "Unique identifier",
-                                "position": 9,
-                                "value": "xprs_xprn0000001264_spim_histology_refractive_index_matching_v12_refractive_index_matching_wash",
-                                "hidden": false,
-                                "editable": true
-                            },
-                            {
-                                "datatype": "ENUM",
-                                "name": "xprs_status",
-                                "title": "Status",
-                                "position": 10,
-                                "value": "DONE",
-                                "hidden": false,
-                                "editable": true,
-                                "displayValue": "Done"
-                            },
-                            {
-                                "datatype": "STRING",
-                                "name": "xprs_createdBy",
-                                "title": "Created by",
-                                "position": 11,
-                                "value": "general_aind",
-                                "hidden": false,
-                                "editable": true
-                            },
-                            {
-                                "datatype": "DATE",
-                                "name": "xprs_createdOn",
-                                "title": "Created on",
-                                "position": 12,
-                                "value": 1736209388605,
-                                "hidden": false,
-                                "editable": true,
-                                "dateFormat": "MM/dd/yyyy HH:mm:ss",
-                                "subType": "datetime",
-                                "timeZone": "America/Los_Angeles"
-                            },
-                            {
-                                "datatype": "STRING",
-                                "name": "xprs_modifiedBy",
-                                "title": "Modified by",
-                                "position": 13,
-                                "value": "general_aind",
-                                "hidden": false,
-                                "editable": true
-                            },
-                            {
-                                "datatype": "DATE",
-                                "name": "xprs_modifiedOn",
-                                "title": "Modified on",
-                                "position": 14,
-                                "value": 1736209451453,
-                                "hidden": false,
-                                "editable": true,
-                                "dateFormat": "MM/dd/yyyy HH:mm:ss",
-                                "subType": "datetime",
-                                "timeZone": "America/Los_Angeles"
-                            },
-                            {
-                                "datatype": "DATE",
-                                "name": "xprs_lastEventOn",
-                                "title": "Last event on",
-                                "position": 15,
-                                "value": 1736209451453,
-                                "hidden": false,
-                                "editable": true,
-                                "dateFormat": "MM/dd/yyyy HH:mm:ss",
-                                "subType": "datetime",
-                                "timeZone": "America/Los_Angeles"
-                            },
-                            {
-                                "datatype": "FOREIGN_KEY",
-                                "name": "xprs_fk_experimentRun",
-                                "title": "Protocol run",
-                                "position": 16,
-                                "value": 41257,
-                                "hidden": true,
-                                "editable": true,
-                                "foreignTable": "ExperimentRun",
-                                "displayValue": null,
-                                "displayField": "xprn_name",
-                                "foreignDisplayColumn": "xprn_name"
-                            },
-                            {
-                                "datatype": "FOREIGN_KEY",
-                                "name": "xpst_fk_experimentTemplate",
-                                "title": "Protocol",
-                                "position": 17,
-                                "value": 1537,
-                                "hidden": true,
-                                "editable": true,
-                                "foreignTable": "ExperimentTemplate",
-                                "displayValue": null,
-                                "displayField": "xptm_nameVersion",
-                                "foreignDisplayColumn": "xptm_name"
-                            },
-                            {
-                                "datatype": "STRING",
-                                "name": "xpst_type",
-                                "title": "Type",
-                                "position": 18,
-                                "value": "FORM_STEP",
-                                "hidden": true,
-                                "editable": true
-                            },
-                            {
-                                "datatype": "STRING",
-                                "name": "xprs_actualType",
-                                "title": "xprs_actualType",
-                                "position": 19,
-                                "value": null,
-                                "hidden": true,
-                                "editable": true
-                            },
-                            {
-                                "datatype": "INTEGER",
-                                "name": "attachmentCount",
-                                "title": "attachmentCount",
-                                "position": 20,
-                                "value": 0,
-                                "hidden": true,
-                                "editable": true
-                            },
-                            {
-                                "datatype": "FOREIGN_KEY",
-                                "name": "xprs_fk_linkContent",
-                                "title": "Content block",
-                                "position": 21,
-                                "value": null,
-                                "hidden": true,
-                                "editable": true,
-                                "foreignTable": "ExperimentRunStep",
-                                "displayValue": null,
-                                "displayField": "xprs_name",
-                                "foreignDisplayColumn": "xprs_name"
-                            },
-                            {
-                                "datatype": "INTEGER",
-                                "name": "xprs_pk",
-                                "title": "xprs_pk",
-                                "position": 22,
-                                "value": 65221,
-                                "hidden": true,
-                                "editable": true
-                            },
-                            {
-                                "datatype": "FOREIGN_KEY",
-                                "name": "xprs_fk_experimentStep",
-                                "title": "Protocol step",
-                                "position": 23,
-                                "value": 3680,
-                                "hidden": true,
-                                "editable": false,
-                                "foreignTable": "ExperimentStep",
-                                "displayValue": "Refractive Index Matching Wash",
-                                "displayField": "xpst_name",
-                                "foreignDisplayColumn": "xpst_name"
-                            },
-                            {
-                                "datatype": "FOREIGN_KEY",
-                                "name": "xprs_fk_previousRunStep",
-                                "title": "Previous protocol run step",
-                                "position": 24,
-                                "value": 65220,
-                                "hidden": true,
-                                "editable": true,
-                                "foreignTable": "ExperimentRunStep",
-                                "displayValue": "Refractive Index Matching Wash",
-                                "displayField": "xprs_name",
-                                "foreignDisplayColumn": "xprs_name"
-                            }
-                        ],
-                        "canUpdate": true,
-                        "canDelete": true,
-                        "links": [
-                            {
-                                "rel": "self",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/ExperimentRunStep/65221"
-                            },
-                            {
-                                "rel": "xprs_fk_experimentRun",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/ExperimentRun/41257"
-                            },
-                            {
-                                "rel": "xprs_fk_previousRunStep",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/ExperimentRunStep/65220"
-                            },
-                            {
-                                "rel": "xprs_fk_experimentStep",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/ExperimentStep/3680"
-                            },
-                            {
-                                "rel": "xpst_fk_experimentTemplate",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/ExperimentTemplate/1537"
-                            },
-                            {
-                                "rel": "-cnvn_fk_experimentRunStep",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/ContentEvent?cnvn_fk_experimentRunStep=65221"
-                            },
-                            {
-                                "rel": "-qtus_fk_xRunStep",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/QuantityUsage?qtus_fk_xRunStep=65221"
-                            },
-                            {
-                                "rel": "-plte_fk_experimentRunStep",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/Plate?plte_fk_experimentRunStep=65221"
-                            },
-                            {
-                                "rel": "-xcui_fk_xRunStep",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/XprsContentUsageInstance?xcui_fk_xRunStep=65221"
-                            },
-                            {
-                                "rel": "-kitt_fk_experimentRunStep",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/Kit?kitt_fk_experimentRunStep=65221"
-                            },
-                            {
-                                "rel": "-xrsc_fk_experimentRunStep",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/ExperimentRunStepContent?xrsc_fk_experimentRunStep=65221"
-                            },
-                            {
-                                "rel": "-timr_fk_experimentRunStep",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/TimerRun?timr_fk_experimentRunStep=65221"
-                            },
-                            {
-                                "rel": "-xprs_fk_linkContent",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/ExperimentRunStep?xprs_fk_linkContent=65221"
-                            },
-                            {
-                                "rel": "-xprs_fk_previousRunStep",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/ExperimentRunStep?xprs_fk_previousRunStep=65221"
-                            },
-                            {
-                                "rel": "-rslt_fk_experimentRunStep",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/Result?rslt_fk_experimentRunStep=65221"
-                            },
-                            {
-                                "rel": "-flag_fk_experimentRunStep",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/Flag?flag_fk_experimentRunStep=65221"
-                            },
-                            {
-                                "rel": "-nsrn_fk_experimentRunStep",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/InstrumentRun?nsrn_fk_experimentRunStep=65221"
-                            },
-                            {
-                                "rel": "-pptp_fk_experimentRunStep",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/PlatePositionOutput?pptp_fk_experimentRunStep=65221"
-                            },
-                            {
-                                "rel": "-xrsl_fk_experimentRunStep",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/ExperimentRunStepLocation?xrsl_fk_experimentRunStep=65221"
-                            },
-                            {
-                                "rel": "-rrbn_fk_experimentRunStep",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/RuleRunBinding?rrbn_fk_experimentRunStep=65221"
-                            },
-                            {
-                                "rel": "attachments",
-                                "href": "https://aind-test.us.slims.agilent.com/slimsrest/rest/attachment/ExperimentRunStep/65221"
-                            }
-                        ]
-                    },
-                    "name": "Refractive Index Matching Wash",
-                    "modified_by": "general_aind",
-                    "experimentrun_pk": 41257,
-                    "experiment_template_pk": 1537,
-                    "wash_name": "Refractive Index Matching Wash",
-                    "spim_wash_type": "Refractive Index Matching",
-                    "reagent_pk": null,
-                    "start_time": 1736184180000,
-                    "end_time": 1736187780000,
-                    "mass": null,
-                    "notes": null
-                },
-                "reagents": []
-            }
-        ],
+        "washes": [],
         "experiment_template": {
             "pk": 1537,
             "created_on": 1731107836474,

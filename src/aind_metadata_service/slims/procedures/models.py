@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class SlimsWashNames(str, Enum):
     """Enum class of Slims Wash Names"""
 
@@ -18,6 +19,7 @@ class SlimsWashNames(str, Enum):
     GELATION_PROK = "Gelation + ProK RT"
     GELATION_ADDL = "Gelation + Add'l ProK 37C"
     FINAL_PBS_WASH = "Final PBS Wash"
+
 
 class SlimsExperimentTemplateNames(str, Enum):
     """Enum class of Experiment Template Names"""

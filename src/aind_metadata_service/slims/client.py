@@ -8,7 +8,10 @@ from aind_data_schema.core.procedures import Procedures
 from aind_slims_api import SlimsClient
 from aind_slims_api.exceptions import SlimsRecordNotFound
 from aind_slims_api.models.instrument import SlimsInstrumentRdrc
-from aind_slims_api.operations import fetch_ecephys_sessions, fetch_histology_procedures
+from aind_slims_api.operations import (
+    fetch_ecephys_sessions,
+    fetch_histology_procedures,
+)
 from pydantic import Extra, Field, SecretStr
 from pydantic_settings import BaseSettings
 from requests.models import Response
@@ -19,6 +22,7 @@ from aind_metadata_service.response_handler import ModelResponse
 from aind_metadata_service.slims.sessions.mapping import SlimsSessionMapper
 from aind_metadata_service.slims.procedures.mapping import SlimsHistologyMapper
 from typing import List
+
 
 class SlimsSettings(BaseSettings):
     """Configuration class. Mostly a wrapper around smartsheet.Smartsheet
@@ -141,9 +145,10 @@ class SlimsHandler:
         except Exception as e:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
-        
-        
-    def get_specimen_procedures_model_response(self, specimen_id: str) -> ModelResponse:
+
+    def get_specimen_procedures_model_response(
+        self, specimen_id: str
+    ) -> ModelResponse:
         """
         Fetches specimen procedures for a given specimen ID from SLIMS.
         """
@@ -153,7 +158,9 @@ class SlimsHandler:
             )
             if procs:
                 mapper = SlimsHistologyMapper()
-                mapped_procedures = mapper.map_specimen_procedures(procs, specimen_id)
+                mapped_procedures = mapper.map_specimen_procedures(
+                    procs, specimen_id
+                )
                 procedures = Procedures.model_construct(subject_id=specimen_id)
                 procedures.specimen_procedures = mapped_procedures
                 return ModelResponse(
@@ -167,91 +174,3 @@ class SlimsHandler:
         except Exception as e:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
-        
-        
-    def merge_procedures_responses(
-        self,
-        subject_procedures_response: ModelResponse[Procedures],
-        specimen_procedures_response: ModelResponse[Procedures],
-    ) -> ModelResponse[Procedures]:
-        """
-        Merges two ModelResponses of Procedures type.
-        Parameters
-        ----------
-        left_model_response : ModelResponse[Procedures]
-        right_model_response : ModelResponse[Procedures]
-
-        Returns
-        -------
-        ModelResponse[Procedures]
-          A merged response.
-
-        """
-        if (
-            subject_procedures_response.status_code.value >= 500
-            and specimen_procedures_response.status_code.value >= 500
-        ):
-            return ModelResponse.internal_server_error_response()
-        elif (
-            subject_procedures_response.status_code == StatusCodes.DB_RESPONDED
-            and specimen_procedures_response.status_code.value >= 500
-        ):
-            return ModelResponse(
-                aind_models=subject_procedures_response.aind_models,
-                status_code=StatusCodes.MULTI_STATUS,
-                message=(
-                    "There was an error retrieving records from one or more "
-                    "of the databases."
-                ),
-            )
-        elif (
-            subject_procedures_response.status_code.value >= 500
-            and specimen_procedures_response.status_code == StatusCodes.DB_RESPONDED
-        ):
-            return ModelResponse(
-                aind_models=specimen_procedures_response.aind_models,
-                status_code=StatusCodes.MULTI_STATUS,
-                message=(
-                    "There was an error retrieving records from one or more "
-                    "of the databases."
-                ),
-            )
-        else:
-            procedures = self._merge_procedures(
-                subject_procedures=subject_procedures_response.aind_models,
-                specimen_procedures=specimen_procedures_response.aind_models,
-                )
-            print("MERGED PROCEDURES", procedures)
-            if (
-                subject_procedures_response.status_code == StatusCodes.MULTI_STATUS
-                or specimen_procedures_response.status_code == StatusCodes.MULTI_STATUS
-            ):
-                return ModelResponse(
-                    aind_models=procedures,
-                    status_code=StatusCodes.MULTI_STATUS,
-                    message=(
-                        "There was an error retrieving records from one or "
-                        "more of the databases."
-                    ),
-                )
-            else:
-                return ModelResponse(
-                    aind_models=procedures,
-                    status_code=StatusCodes.DB_RESPONDED,
-                )
-            
-    @staticmethod
-    def _merge_procedures(subject_procedures: List[Procedures], specimen_procedures: List[Procedures]):
-        """Merges procedures"""
-        if len(subject_procedures) == 0:
-            return specimen_procedures
-        elif len(specimen_procedures) == 0:
-            return subject_procedures
-        else:
-            return [
-                Procedures.model_construct(
-                        subject_id=subject_procedures[0].subject_id,
-                    subject_procedures=subject_procedures[0].subject_procedures,
-                    specimen_procedures=specimen_procedures[0].specimen_procedures,
-                )
-            ]

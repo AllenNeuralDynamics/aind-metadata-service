@@ -17,6 +17,7 @@ from aind_metadata_service.slims.sessions.mapping import SlimsSessionMapper
 RESOURCES_DIR = (
     Path(os.path.dirname(os.path.realpath(__file__)))
     / ".."
+    / ".."
     / "resources"
     / "slims"
 )

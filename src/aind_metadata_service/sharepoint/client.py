@@ -212,10 +212,15 @@ class SharePointClient:
                 left_procedures[0].subject_procedures
                 + right_procedures[0].subject_procedures
             )
+            new_specimen_procedures = (
+                left_procedures[0].specimen_procedures
+                + right_procedures[0].specimen_procedures
+            )
             return [
                 Procedures.model_construct(
                     subject_id=subject_id,
                     subject_procedures=new_subject_procedures,
+                    specimen_procedures=new_specimen_procedures,
                 )
             ]
 
