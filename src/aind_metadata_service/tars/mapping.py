@@ -215,6 +215,8 @@ class TarsResponseHandler:
         if len(response.aind_models) > 0:
             procedures = response.aind_models[0]
             for subject_procedure in procedures.subject_procedures:
+                if not hasattr(subject_procedure, "procedures"):
+                    continue
                 for procedure in subject_procedure.procedures:
                     if (
                         isinstance(procedure, Injection)
@@ -244,6 +246,9 @@ class TarsResponseHandler:
         if len(response.aind_models) > 0:
             pre_procedures = response.aind_models[0]
             for subject_procedure in pre_procedures.subject_procedures:
+                if not hasattr(subject_procedure, "procedures"):
+                    output_aind_models = [pre_procedures]
+                    continue
                 for procedure in subject_procedure.procedures:
                     if isinstance(procedure, Injection) and hasattr(
                         procedure, "injection_materials"

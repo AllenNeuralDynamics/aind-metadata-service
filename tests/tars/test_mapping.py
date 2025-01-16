@@ -314,6 +314,20 @@ class TestTarsResponseHandler(unittest.TestCase):
         )
         self.assertEqual(empty_virus_strains, [])
 
+    def test_get_virus_strains_no_procedures(self):
+        """Tests that virus strains are retrieved as expected when objects
+        are missing procedures attribute."""
+        surgery = Surgery.model_construct()
+        procedures_response = ModelResponse(
+            aind_models=[
+                Procedures(subject_id="12345", subject_procedures=[surgery])
+            ],
+            status_code=StatusCodes.DB_RESPONDED,
+        )
+        virus_strains = self.handler.get_virus_strains(procedures_response)
+        expected_virus_strains = []
+        self.assertEqual(virus_strains, expected_virus_strains)
+
     def test_integrate_injection_materials(self):
         """Tests that injection materials are integrated into
         procedures response as expected"""
@@ -376,6 +390,47 @@ class TestTarsResponseHandler(unittest.TestCase):
         )
         self.assertEqual(
             merged_response.aind_models, expected_merged_response.aind_models
+        )
+
+    def test_integrate_injection_materials_no_procedures(self):
+        """Tests that injection materials are integrated into
+        procedures response as expected when objects are missing procedures."""
+        expected_injection_material = ViralMaterial.model_construct(
+            name="rAAV-MGT_789",
+            tars_identifiers=TarsVirusIdentifiers.model_construct(
+                virus_tars_id="AiV456",
+                plasmid_tars_alias="AiP123",
+                prep_lot_number="12345",
+                prep_date=date(2023, 12, 15),
+                prep_type=VirusPrepType.CRUDE,
+                prep_protocol="SOP#VC002",
+            ),
+        )
+        tars_response1 = ModelResponse(
+            aind_models=[expected_injection_material],
+            status_code=StatusCodes.DB_RESPONDED,
+        )
+        tars_mapping = {
+            "12345": tars_response1.map_to_json_response(),
+        }
+        surgery = Surgery.model_construct()
+        procedures_response = ModelResponse(
+            aind_models=[
+                Procedures(subject_id="12345", subject_procedures=[surgery])
+            ],
+            status_code=StatusCodes.DB_RESPONDED,
+        )
+        merged_response = self.handler.integrate_injection_materials(
+            response=procedures_response, tars_mapping=tars_mapping
+        )
+        expected_merged_response = ModelResponse(
+            aind_models=[
+                Procedures(subject_id="12345", subject_procedures=[surgery])
+            ],
+            status_code=StatusCodes.DB_RESPONDED,
+        )
+        self.assertEqual(
+            expected_merged_response.aind_models, merged_response.aind_models
         )
 
     def test_integrate_injection_materials_error(self):
