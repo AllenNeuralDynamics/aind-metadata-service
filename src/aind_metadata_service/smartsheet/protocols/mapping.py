@@ -174,66 +174,55 @@ class ProtocolsIntegrator:
         status_code = response.status_code
         if len(response.aind_models) > 0:
             pre_procedures = response.aind_models[0]
-            # integrate protocols into subject procedures
-            if (
-                hasattr(pre_procedures, "subject_procedures")
-                and pre_procedures.subject_procedures
-            ):
-                for subject_procedure in pre_procedures.subject_procedures:
+            for subject_procedure in pre_procedures.subject_procedures:
+                if (
+                    isinstance(subject_procedure, Surgery)
+                    and hasattr(subject_procedure, "experimenter_full_name")
+                    and "NSB" in subject_procedure.experimenter_full_name
+                ):
+                    protocol_name = ProtocolNames.SURGERY.value
+                    smartsheet_response = protocols_mapping.get(protocol_name)
                     if (
-                        isinstance(subject_procedure, Surgery)
-                        and hasattr(
-                            subject_procedure, "experimenter_full_name"
-                        )
-                        and "NSB" in subject_procedure.experimenter_full_name
+                        smartsheet_response.status_code
+                        == StatusCodes.DB_RESPONDED.value
+                        or smartsheet_response.status_code
+                        == StatusCodes.VALID_DATA.value
+                        or smartsheet_response.status_code
+                        == StatusCodes.INVALID_DATA.value
                     ):
-                        protocol_name = ProtocolNames.SURGERY.value
-                        smartsheet_response = protocols_mapping.get(
-                            protocol_name
-                        )
-                        if (
-                            smartsheet_response.status_code
-                            == StatusCodes.DB_RESPONDED.value
-                            or smartsheet_response.status_code
-                            == StatusCodes.VALID_DATA.value
-                            or smartsheet_response.status_code
-                            == StatusCodes.INVALID_DATA.value
-                        ):
-                            data = json.loads(smartsheet_response.body)["data"]
-                            subject_procedure.protocol_id = data["doi"]
-                        elif (
-                            smartsheet_response.status_code
-                            == StatusCodes.NO_DATA_FOUND.value
-                        ):
-                            pass
-                        else:
-                            status_code = StatusCodes.MULTI_STATUS
-                    for procedure in subject_procedure.procedures:
-                        protocol_name = self._get_protocol_name(procedure)
-                        smartsheet_response = protocols_mapping.get(
-                            protocol_name
-                        )
-                        if (
-                            smartsheet_response.status_code
-                            == StatusCodes.DB_RESPONDED.value
-                            or smartsheet_response.status_code
-                            == StatusCodes.VALID_DATA.value
-                            or smartsheet_response.status_code
-                            == StatusCodes.INVALID_DATA.value
-                        ):
-                            data = json.loads(smartsheet_response.body)["data"]
-                            procedure.protocol_id = data["doi"]
-                        elif (
-                            smartsheet_response.status_code
-                            == StatusCodes.NO_DATA_FOUND.value
-                        ):
-                            pass
-                        else:
-                            status_code = StatusCodes.MULTI_STATUS
+                        data = json.loads(smartsheet_response.body)["data"]
+                        subject_procedure.protocol_id = data["doi"]
+                    elif (
+                        smartsheet_response.status_code
+                        == StatusCodes.NO_DATA_FOUND.value
+                    ):
+                        pass
+                    else:
+                        status_code = StatusCodes.MULTI_STATUS
+                if not hasattr(subject_procedure, "procedures"):
                     output_aind_models = [pre_procedures]
-            else:
-                # specimen procedures have protocol info from slims, so no need to integrate
-                return response
+                    continue
+                for procedure in subject_procedure.procedures:
+                    protocol_name = self._get_protocol_name(procedure)
+                    smartsheet_response = protocols_mapping.get(protocol_name)
+                    if (
+                        smartsheet_response.status_code
+                        == StatusCodes.DB_RESPONDED.value
+                        or smartsheet_response.status_code
+                        == StatusCodes.VALID_DATA.value
+                        or smartsheet_response.status_code
+                        == StatusCodes.INVALID_DATA.value
+                    ):
+                        data = json.loads(smartsheet_response.body)["data"]
+                        procedure.protocol_id = data["doi"]
+                    elif (
+                        smartsheet_response.status_code
+                        == StatusCodes.NO_DATA_FOUND.value
+                    ):
+                        pass
+                    else:
+                        status_code = StatusCodes.MULTI_STATUS
+                output_aind_models = [pre_procedures]
         return ModelResponse(
             aind_models=output_aind_models, status_code=status_code
         )

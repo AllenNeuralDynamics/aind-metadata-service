@@ -1,9 +1,9 @@
 """Module to handle responses"""
 
 import json
+import logging
 from typing import Generic, List, Optional, TypeVar, Union
 
-from aind_data_schema.core.data_description import Funding
 from aind_data_schema.core.instrument import Instrument
 from aind_data_schema.core.procedures import (
     NonViralMaterial,
@@ -23,13 +23,16 @@ from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
 from aind_metadata_service.client import StatusCodes
-from aind_metadata_service.models import ProtocolInformation
+from aind_metadata_service.models import (
+    FundingInformation,
+    ProtocolInformation,
+)
 
 T = TypeVar(
     "T",
     Subject,
     Procedures,
-    Funding,
+    FundingInformation,
     Perfusion,
     Surgery,
     ViralMaterial,
@@ -155,7 +158,7 @@ class ModelResponse(Generic[T]):
                 validation_errors = []
                 for model in self.aind_models:
                     error = self._validate_model(model)
-                    print(error)
+                    logging.error(error)
                     if error:
                         validation_errors.append(error)
 

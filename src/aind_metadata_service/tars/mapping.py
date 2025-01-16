@@ -215,6 +215,8 @@ class TarsResponseHandler:
         if len(response.aind_models) > 0:
             procedures = response.aind_models[0]
             for subject_procedure in procedures.subject_procedures:
+                if not hasattr(subject_procedure, "procedures"):
+                    continue
                 for procedure in subject_procedure.procedures:
                     if (
                         isinstance(procedure, Injection)
@@ -237,64 +239,54 @@ class TarsResponseHandler:
         """
         Merges tars_response with procedures_response.
         Parameters
+        ----------
         """
         output_aind_models = []
         status_code = response.status_code
         if len(response.aind_models) > 0:
             pre_procedures = response.aind_models[0]
-            # integrates injection materials into subject procedures
-            if (
-                hasattr(pre_procedures, "subject_procedures")
-                and pre_procedures.subject_procedures
-            ):
-                for subject_procedure in pre_procedures.subject_procedures:
-                    for procedure in subject_procedure.procedures:
-                        if isinstance(procedure, Injection) and hasattr(
-                            procedure, "injection_materials"
+            for subject_procedure in pre_procedures.subject_procedures:
+                if not hasattr(subject_procedure, "procedures"):
+                    output_aind_models = [pre_procedures]
+                    continue
+                for procedure in subject_procedure.procedures:
+                    if isinstance(procedure, Injection) and hasattr(
+                        procedure, "injection_materials"
+                    ):
+                        for idx, injection_material in enumerate(
+                            procedure.injection_materials
                         ):
-                            for idx, injection_material in enumerate(
-                                procedure.injection_materials
-                            ):
-                                if isinstance(
-                                    injection_material, ViralMaterial
-                                ) and getattr(
-                                    injection_material, "name", None
+                            if isinstance(
+                                injection_material, ViralMaterial
+                            ) and getattr(injection_material, "name", None):
+                                virus_strain = injection_material.name.strip()
+                                tars_response = tars_mapping.get(virus_strain)
+                                if (
+                                    tars_response.status_code
+                                    == StatusCodes.DB_RESPONDED.value
+                                    or tars_response.status_code
+                                    == StatusCodes.VALID_DATA.value
+                                    or tars_response.status_code
+                                    == StatusCodes.INVALID_DATA.value
                                 ):
-                                    virus_strain = (
-                                        injection_material.name.strip()
+                                    data = json.loads(tars_response.body)[
+                                        "data"
+                                    ]
+                                    new_material = ViralMaterial(**data)
+                                    new_material.titer = (
+                                        injection_material.titer
                                     )
-                                    tars_response = tars_mapping.get(
-                                        virus_strain
+                                    procedure.injection_materials[idx] = (
+                                        new_material
                                     )
-                                    if (
-                                        tars_response.status_code
-                                        == StatusCodes.DB_RESPONDED.value
-                                        or tars_response.status_code
-                                        == StatusCodes.VALID_DATA.value
-                                        or tars_response.status_code
-                                        == StatusCodes.INVALID_DATA.value
-                                    ):
-                                        data = json.loads(tars_response.body)[
-                                            "data"
-                                        ]
-                                        new_material = ViralMaterial(**data)
-                                        new_material.titer = (
-                                            injection_material.titer
-                                        )
-                                        procedure.injection_materials[idx] = (
-                                            new_material
-                                        )
-                                    elif (
-                                        tars_response.status_code
-                                        == StatusCodes.NO_DATA_FOUND.value
-                                    ):
-                                        pass
-                                    else:
-                                        status_code = StatusCodes.MULTI_STATUS
+                                elif (
+                                    tars_response.status_code
+                                    == StatusCodes.NO_DATA_FOUND.value
+                                ):
+                                    pass
+                                else:
+                                    status_code = StatusCodes.MULTI_STATUS
                 output_aind_models = [pre_procedures]
-            else:
-                # returns response if no subject procedures
-                return response
         return ModelResponse(
             aind_models=output_aind_models, status_code=status_code
         )

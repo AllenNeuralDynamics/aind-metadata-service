@@ -8,11 +8,11 @@ from datetime import datetime
 from pathlib import Path
 from unittest.mock import MagicMock, call, patch
 
-from aind_data_schema.core.data_description import Funding
 from aind_data_schema_models.organizations import Organization
 from dateutil import tz
 
 from aind_metadata_service.client import StatusCodes
+from aind_metadata_service.models import FundingInformation
 from aind_metadata_service.response_handler import ModelResponse
 from aind_metadata_service.smartsheet.client import (
     SmartSheetClient,
@@ -26,7 +26,7 @@ EXAMPLE_PATH = (
     TEST_DIR / "resources" / "smartsheet" / "test_funding_sheet.json"
 )
 EXAMPLE_PATH_2 = (
-    TEST_DIR / "resources" / "smartsheet" / "test_funding_sheet2.json"
+    TEST_DIR / "resources" / "smartsheet" / "test_corrupt_funding_sheet.json"
 )
 
 
@@ -41,72 +41,122 @@ class TestSmartsheetFundingClient(unittest.TestCase):
         with open(EXAMPLE_PATH_2, "r") as f:
             contents2 = json.load(f)
         cls.example_sheet = json.dumps(contents)
-        cls.example_sheet2 = json.dumps(contents2)
+        cls.example_corrupt_sheet = json.dumps(contents2)
 
     @patch("smartsheet.sheets.Sheets.get_sheet")
     def test_mapping(self, mock_get_sheet: MagicMock):
         """Tests successful sheet return response"""
         mock_get_sheet.return_value.to_json.return_value = self.example_sheet
         settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+            access_token="abc-123", sheet_id=6011951083638660
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
         mapper = FundingMapper(
             smart_sheet_response=smart_sheet_response,
-            input_id="AIND Scientific Activities",
+            input_id=(
+                "Discovery-Neuromodulator circuit dynamics during foraging"
+            ),
         )
         model_response = mapper.get_model_response()
         expected_models = [
-            Funding(
+            FundingInformation(
                 funder=Organization.AI,
                 grant_number=None,
-                fundee=("person.two@acme.org, J Smith, John Doe II"),
-            )
-        ]
-        self.assertEqual(expected_models, model_response.aind_models)
-        self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
-
-    @patch("smartsheet.sheets.Sheets.get_sheet")
-    def test_mapping_abbreviation(self, mock_get_sheet: MagicMock):
-        """Tests successful sheet return response when org abbreviation used"""
-        mock_get_sheet.return_value.to_json.return_value = self.example_sheet2
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
-        )
-        client = SmartSheetClient(smartsheet_settings=settings)
-        smart_sheet_response = client.get_sheet()
-        mapper = FundingMapper(
-            smart_sheet_response=smart_sheet_response,
-            input_id="AIND Scientific Activities",
-        )
-        model_response = mapper.get_model_response()
-        expected_models = [
-            Funding(
+                fundee=(
+                    "Person Four, Person Five, Person Six, Person Seven, "
+                    "Person Eight"
+                ),
+                investigators=None,
+            ),
+            FundingInformation(
                 funder=Organization.NINDS,
+                grant_number="1RF1NS131984",
+                fundee="Person Five, Person Six, Person Eight",
+                investigators="Person Six, Person Eight",
+            ),
+            FundingInformation(
+                funder=Organization.AI,
                 grant_number=None,
-                fundee=("person.two@acme.org, J Smith, John Doe II"),
-            )
+                fundee=(
+                    "Person Four, Person Five, Person Six, Person Seven, "
+                    "Person Eight"
+                ),
+                investigators="Person Seven",
+            ),
+            FundingInformation(
+                funder=Organization.NIMH,
+                grant_number="1R01MH134833",
+                fundee=(
+                    "Person Five, Person Nine, Person Ten, Person Seven, "
+                    "Person Eleven"
+                ),
+                investigators="Person Seven",
+            ),
+            FundingInformation(
+                funder=Organization.AI,
+                grant_number=None,
+                fundee=(
+                    "Person Four, Person Five, Person Six, Person Seven, "
+                    "Person Eight"
+                ),
+                investigators=(
+                    "Person Four, Person Ten, person.twelve@example.com, "
+                    "person.thirteen@example.com, Person Eight"
+                ),
+            ),
+            FundingInformation(
+                funder=Organization.NIMH,
+                grant_number="1R01MH134833",
+                fundee=(
+                    "Person Five, Person Nine, Person Ten, Person Seven, "
+                    "Person Eleven"
+                ),
+                investigators=(
+                    "Person Four, Person Ten, person.twelve@example.com, "
+                    "person.thirteen@example.com, Person Eight"
+                ),
+            ),
         ]
         self.assertEqual(expected_models, model_response.aind_models)
         self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
 
     @patch("smartsheet.sheets.Sheets.get_sheet")
     def test_mapping_empty_response(self, mock_get_sheet: MagicMock):
-        """Tests successful sheet return response"""
+        """Tests empty response when no project name found"""
         mock_get_sheet.return_value.to_json.return_value = None
         settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+            access_token="abc-123", sheet_id=6011951083638660
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
         mapper = FundingMapper(
-            smart_sheet_response=smart_sheet_response, input_id="Project Name"
+            smart_sheet_response=smart_sheet_response, input_id="NONE"
         )
         model_response = mapper.get_model_response()
         expected_models = []
         self.assertEqual(expected_models, model_response.aind_models)
         self.assertEqual(StatusCodes.NO_DATA_FOUND, model_response.status_code)
+
+    @patch("smartsheet.sheets.Sheets.get_sheet")
+    def test_mapping_empty_response_info(self, mock_get_sheet: MagicMock):
+        """Tests empty response when no info found for project name"""
+
+        mock_get_sheet.return_value.to_json.return_value = (
+            self.example_corrupt_sheet
+        )
+        settings = SmartsheetSettings(
+            access_token="abc-123", sheet_id=6011951083638660
+        )
+        client = SmartSheetClient(smartsheet_settings=settings)
+        smart_sheet_response = client.get_sheet()
+        mapper = FundingMapper(
+            smart_sheet_response=smart_sheet_response, input_id="Some Project"
+        )
+        model_response = mapper.get_model_response()
+        expected_models = []
+        self.assertEqual(expected_models, model_response.aind_models)
+        self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
 
     @patch("smartsheet.sheets.Sheets.get_sheet")
     def test_mapping_invalid_institution(self, mock_get_sheet: MagicMock):
@@ -118,20 +168,21 @@ class TestSmartsheetFundingClient(unittest.TestCase):
 
         mock_get_sheet.return_value.to_json.return_value = incorrect_sheet
         settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+            access_token="abc-123", sheet_id=6011951083638660
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
         mapper = FundingMapper(
             smart_sheet_response=smart_sheet_response,
-            input_id="AIND Scientific Activities",
+            input_id="Ephys Platform",
         )
         model_response = mapper.get_model_response()
         expected_models = [
-            Funding.model_construct(
+            FundingInformation.model_construct(
                 funder="Some Institute",
                 grant_number=None,
-                fundee=("person.two@acme.org, J Smith, John Doe II"),
+                fundee="Person One, Person Two, Person Three",
+                investigators=None,
             )
         ]
         self.assertEqual(expected_models, model_response.aind_models)
@@ -150,7 +201,7 @@ class TestSmartsheetFundingClient(unittest.TestCase):
 
         type(mock_get_sheet.return_value).to_json = mock_get_sheet_error
         settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+            access_token="abc-123", sheet_id=6011951083638660
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
@@ -187,7 +238,7 @@ class TestSmartsheetFundingClient(unittest.TestCase):
         )
         mock_get_sheet.return_value.to_json.return_value = self.example_sheet
         settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+            access_token="abc-123", sheet_id=6011951083638660
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
@@ -210,7 +261,7 @@ class TestSmartsheetFundingClient(unittest.TestCase):
         """Tests successful sheet return response of project names"""
         mock_get_sheet.return_value.to_json.return_value = self.example_sheet
         settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+            access_token="abc-123", sheet_id=6011951083638660
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
@@ -221,7 +272,11 @@ class TestSmartsheetFundingClient(unittest.TestCase):
         json_response = mapper.get_project_names()
         expected_response = {
             "message": "Success",
-            "data": ["AIND Scientific Activities", "v1omFISH"],
+            "data": [
+                "Discovery-Neuromodulator circuit dynamics during foraging",
+                "Ephys Platform",
+                "MSMA Platform",
+            ],
         }
         self.assertEqual(
             json.loads(json_response.body.decode("utf-8")), expected_response
@@ -240,7 +295,7 @@ class TestSmartsheetFundingClient(unittest.TestCase):
 
         type(mock_get_sheet.return_value).to_json = mock_get_sheet_error
         settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+            access_token="abc-123", sheet_id=6011951083638660
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()

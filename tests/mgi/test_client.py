@@ -61,6 +61,29 @@ class TestMgiClient(unittest.TestCase):
         settings = MgiSettings(url="http://www.example.com")
         cls.example_client = MgiClient(settings=settings)
 
+    def test_get_allele_names_from_genotype(self):
+        """Tests get_allele_names_from_genotype"""
+
+        genotype = "Pvalb-IRES-Cre/wt;RCL-somBiPoles_mCerulean-WPRE/wt"
+        allele_names = self.example_client.get_allele_names_from_genotype(
+            genotype=genotype
+        )
+        expected_allele_names = [
+            "Pvalb-IRES-Cre",
+            "RCL-somBiPoles_mCerulean-WPRE",
+        ]
+        self.assertEqual(expected_allele_names, allele_names)
+
+    def test_get_allele_names_from_genotype_none(self):
+        """Tests get_allele_names_from_genotype when genotype is None"""
+
+        genotype = None
+        allele_names = self.example_client.get_allele_names_from_genotype(
+            genotype=genotype
+        )
+        expected_allele_names = []
+        self.assertEqual(expected_allele_names, allele_names)
+
     @patch("requests.get")
     def test_get_allele_info(self, mock_get: MagicMock):
         """Tests get_allele_info method"""
