@@ -1,6 +1,7 @@
 """Module to handle responses"""
 
 import json
+import logging
 from typing import Generic, List, Optional, TypeVar, Union
 
 from aind_data_schema.core.instrument import Instrument
@@ -157,7 +158,7 @@ class ModelResponse(Generic[T]):
                 validation_errors = []
                 for model in self.aind_models:
                     error = self._validate_model(model)
-                    print(error)
+                    logging.error(error)
                     if error:
                         validation_errors.append(error)
 

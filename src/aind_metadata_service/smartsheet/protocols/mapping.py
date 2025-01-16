@@ -148,6 +148,8 @@ class ProtocolsIntegrator:
             for subject_procedure in procedures.subject_procedures:
                 if isinstance(subject_procedure, Surgery):
                     protocol_list.append(ProtocolNames.SURGERY.value)
+                if not hasattr(subject_procedure, "procedures"):
+                    continue
                 for procedure in subject_procedure.procedures:
                     protocol_name = self._get_protocol_name(
                         procedure=procedure
@@ -199,6 +201,9 @@ class ProtocolsIntegrator:
                         pass
                     else:
                         status_code = StatusCodes.MULTI_STATUS
+                if not hasattr(subject_procedure, "procedures"):
+                    output_aind_models = [pre_procedures]
+                    continue
                 for procedure in subject_procedure.procedures:
                     protocol_name = self._get_protocol_name(procedure)
                     smartsheet_response = protocols_mapping.get(protocol_name)

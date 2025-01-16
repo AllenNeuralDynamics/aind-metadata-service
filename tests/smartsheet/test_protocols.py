@@ -254,6 +254,20 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
         ]
         self.assertEqual(expected_list, protocols_list)
 
+    def test_get_protocols_list_missing_procedures(self):
+        """Tests that protocols mapping is crated as expected when objects
+        are missing procedures."""
+        surgery = Surgery.model_construct()
+        procedures = Procedures.model_construct(subject_procedures=[surgery])
+        response = ModelResponse(
+            aind_models=[procedures], status_code=StatusCodes.DB_RESPONDED
+        )
+        protocols_list = self.protocols_integrator.get_protocols_list(response)
+        expected_list = [
+            ProtocolNames.SURGERY.value,
+        ]
+        self.assertEqual(expected_list, protocols_list)
+
     def test_integrate_protocols(self):
         """Tests that protocols are integrated into procedures
         response as expected"""
@@ -305,6 +319,65 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
                     protocol_id="dx.doi.org/some/doi/1"
                 )
             ],
+        )
+        expected_response = ModelResponse(
+            aind_models=[
+                Procedures(
+                    subject_id="12345", subject_procedures=[expected_surgery]
+                )
+            ],
+            status_code=StatusCodes.DB_RESPONDED,
+        )
+        self.assertEqual(
+            expected_response.aind_models, merged_response.aind_models
+        )
+        self.assertEqual(
+            expected_response.status_code, merged_response.status_code
+        )
+
+    def test_integrate_protocols_missing_procedures(self):
+        """Tests that protocols are integrated into procedures
+        response as expected when objects are missing procedures attribute"""
+        nano_protocol = ProtocolInformation.model_construct(
+            protocol_type="Surgical Procedures",
+            procedure_name="Injection Nanoject",
+            protocol_name=self.nano_name,
+            doi="dx.doi.org/some/doi/1",
+            version="1.0",
+            protocol_collection=None,
+        )
+        surgery_protocol = ProtocolInformation.model_construct(
+            protocol_type="Surgical Procedures",
+            procedure_name="Surgery",
+            protocol_name=self.surgery_name,
+            doi="dx.doi.org/some/doi/2",
+            version="1.0",
+            protocol_collection=None,
+        )
+        protocols_response1 = ModelResponse(
+            aind_models=[nano_protocol], status_code=StatusCodes.DB_RESPONDED
+        )
+        protocols_response2 = ModelResponse(
+            aind_models=[surgery_protocol],
+            status_code=StatusCodes.DB_RESPONDED,
+        )
+        protocols_mapping = {
+            self.nano_name: protocols_response1.map_to_json_response(),
+            self.surgery_name: protocols_response2.map_to_json_response(),
+        }
+        surgery = Surgery.model_construct(experimenter_full_name="NSB-123")
+        procedures_response = ModelResponse(
+            aind_models=[
+                Procedures(subject_id="12345", subject_procedures=[surgery])
+            ],
+            status_code=StatusCodes.DB_RESPONDED,
+        )
+        merged_response = self.protocols_integrator.integrate_protocols(
+            response=procedures_response, protocols_mapping=protocols_mapping
+        )
+        expected_surgery = Surgery.model_construct(
+            protocol_id="dx.doi.org/some/doi/2",
+            experimenter_full_name="NSB-123",
         )
         expected_response = ModelResponse(
             aind_models=[
