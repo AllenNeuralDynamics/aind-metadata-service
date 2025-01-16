@@ -1,30 +1,23 @@
 """Module for mapping specimen procedures"""
 
-from aind_data_schema.core.procedures import (
-    SpecimenProcedure,
-    ImmunolabelClass,
-    Antibody,
-)
+import re
+from typing import List, Optional
+
 from aind_data_schema.components.reagent import Reagent
+from aind_data_schema.core.procedures import (
+    Antibody,
+    ImmunolabelClass,
+    SpecimenProcedure,
+)
+from aind_data_schema_models.organizations import Organization
 from aind_data_schema_models.specimen_procedure_types import (
     SpecimenProcedureType,
 )
-from aind_data_schema_models.organizations import Organization
-from aind_metadata_service.slims.procedures.models import (
-    SlimsExperimentTemplateNames,
-)
 from aind_slims_api.operations.histology_procedures import (
-    SPIMHistologyExpBlock,
     SlimsWash,
+    SPIMHistologyExpBlock,
 )
-from aind_slims_api.models.histology import (
-    SlimsSampleContent,
-    SlimsReagentContent,
-    SlimsProtocolSOP,
-    SlimsSource,
-)
-from typing import List, Optional
-import re
+
 from aind_metadata_service.slims.procedures.models import (
     SlimsExperimentTemplateNames,
     SlimsWashNames,
@@ -135,7 +128,8 @@ class SlimsHistologyMapper:
             procedures.append(spec)
         return procedures
 
-    def _map_antibody(self, wash: SlimsWash) -> Antibody:
+    @staticmethod
+    def _map_antibody(wash: SlimsWash) -> Optional[Antibody]:
         """Map antibody reagent from wash"""
         if not hasattr(wash, "wash_step") or wash.wash_step is None:
             return None
@@ -169,12 +163,14 @@ class SlimsHistologyMapper:
                 reagents.append(reagent_model)
         return reagents
 
-    def _map_source(self, source_name: str) -> Optional[Organization]:
+    @staticmethod
+    def _map_source(source_name: str) -> Optional[Organization]:
         """Map source name to source type"""
         return Organization.from_name(source_name)
 
+    @staticmethod
     def _map_procedure_type(
-        self, block_name: str
+        block_name: str,
     ) -> Optional[SpecimenProcedureType]:
         """Map procedure type from experiment template name"""
         if (
@@ -206,7 +202,7 @@ class SlimsHistologyMapper:
                 if hasattr(wash, "wash_step") and wash.wash_step is not None
             }
         )
-        # Filter out None values if any wash_step.modified_by is missing
+        # Filter out None values
         unique_experimenters = [
             exp for exp in unique_experimenters if exp is not None
         ]
@@ -216,6 +212,5 @@ class SlimsHistologyMapper:
 
     def _extract_protocol_link(self, protocol_html: str) -> Optional[str]:
         """Parses out protocol link"""
-        if protocol_html:
-            match = re.search(self.PROTOCOL_HTML_REGEX, protocol_html)
+        match = re.search(self.PROTOCOL_HTML_REGEX, protocol_html)
         return match.group(1) if match else None

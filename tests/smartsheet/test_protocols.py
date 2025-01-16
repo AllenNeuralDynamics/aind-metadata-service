@@ -14,6 +14,8 @@ from aind_data_schema.core.procedures import (
     Perfusion,
     Procedures,
     ProtectiveMaterial,
+    SpecimenProcedure,
+    SpecimenProcedureType,
     Surgery,
 )
 from pydantic import ValidationError
@@ -302,9 +304,16 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
         surgery = Surgery.model_construct(
             experimenter_full_name="NSB-123", procedures=[nanoject_inj]
         )
+        spec = SpecimenProcedure.model_construct(
+            procedure_type=SpecimenProcedureType.OTHER, notes="test"
+        )
         procedures_response = ModelResponse(
             aind_models=[
-                Procedures(subject_id="12345", subject_procedures=[surgery])
+                Procedures(
+                    subject_id="12345",
+                    subject_procedures=[surgery],
+                    specimen_procedures=[spec],
+                )
             ],
             status_code=StatusCodes.DB_RESPONDED,
         )
@@ -323,7 +332,9 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
         expected_response = ModelResponse(
             aind_models=[
                 Procedures(
-                    subject_id="12345", subject_procedures=[expected_surgery]
+                    subject_id="12345",
+                    subject_procedures=[expected_surgery],
+                    specimen_procedures=[spec],
                 )
             ],
             status_code=StatusCodes.DB_RESPONDED,
@@ -443,6 +454,22 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
         )
         merged_response = self.protocols_integrator.integrate_protocols(
             response=procedures_response, protocols_mapping=protocols_mapping
+        )
+        self.assertEqual(merged_response.status_code, StatusCodes.DB_RESPONDED)
+
+    def test_integrate_protocols_specimen_procedures(self):
+        """Tests that protocols are not integrated for specimen procedures"""
+        spec = SpecimenProcedure.model_construct(
+            procedure_type=SpecimenProcedureType.OTHER, notes="test"
+        )
+        procedures_response = ModelResponse(
+            aind_models=[
+                Procedures(subject_id="12345", specimen_procedures=[spec])
+            ],
+            status_code=StatusCodes.DB_RESPONDED,
+        )
+        merged_response = self.protocols_integrator.integrate_protocols(
+            response=procedures_response, protocols_mapping={}
         )
         self.assertEqual(merged_response.status_code, StatusCodes.DB_RESPONDED)
 

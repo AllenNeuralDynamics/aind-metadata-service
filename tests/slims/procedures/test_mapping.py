@@ -3,15 +3,17 @@ import os
 import unittest
 from pathlib import Path
 
+from aind_data_schema.core.procedures import SpecimenProcedureType
+from aind_slims_api.models.experiment_run_step import SlimsWashRunStep
+from aind_slims_api.operations.histology_procedures import (
+    SlimsWash,
+    SPIMHistologyExpBlock,
+)
+
 from aind_metadata_service.slims.procedures.mapping import SlimsHistologyMapper
 from aind_metadata_service.slims.procedures.models import (
     SlimsExperimentTemplateNames,
 )
-from aind_data_schema.core.procedures import SpecimenProcedureType
-from aind_slims_api.operations.histology_procedures import (
-    SPIMHistologyExpBlock,
-)
-from aind_slims_api.operations.histology_procedures import SlimsWash
 
 RESOURCES_DIR = (
     Path(os.path.dirname(os.path.realpath(__file__)))
@@ -83,13 +85,25 @@ class TestSlimsHistologyMapper(unittest.TestCase):
         procedure_type = self.mapper._map_procedure_type(block_name)
         self.assertIsNone(procedure_type)
 
+    def test_map_experimenters(self):
+        """Tests experimenters list is mapped as expected"""
+        wash1 = SlimsWash.model_construct(
+            wash_step=SlimsWashRunStep(modified_by="experimenter1")
+        )
+        wash2 = SlimsWash.model_construct(
+            wash_step=SlimsWashRunStep(modified_by="experimenter2")
+        )
+        experimenters = self.mapper._map_experimenters(
+            washes=[wash1, wash2, wash1]
+        )
+        self.assertEqual(len(experimenters), 2)
+
     def test_map_antibody_edge_case(self):
         """Tests map antibody edge cases"""
         wash = SlimsWash.model_construct()
         self.assertIsNone(self.mapper._map_antibody(wash))
         wash2 = SlimsWash.model_construct(wash_step="some wash step")
         self.assertIsNone(self.mapper._map_antibody(wash2))
-
 
     def test_map_specimen_procedures(self):
         """Tests that specimen procedures are mapped correctly"""
@@ -100,18 +114,20 @@ class TestSlimsHistologyMapper(unittest.TestCase):
         self.assertEqual(len(specimen_procedures), 4)
         for i, procedure in enumerate(specimen_procedures):
             self.assertEqual(
-            json.loads(procedure.model_dump_json()),
-            self.expected_procedures[0][i],
+                json.loads(procedure.model_dump_json()),
+                self.expected_procedures[0][i],
             )
-            
+
         specimen_procedures = self.mapper.map_specimen_procedures(
             self.blocks2, specimen_id
         )
         self.assertEqual(len(specimen_procedures), 2)
         for i, procedure in enumerate(specimen_procedures):
             self.assertEqual(
-            json.loads(procedure.model_dump_json()),
-            self.expected_procedures[1][i],
+                json.loads(procedure.model_dump_json()),
+                self.expected_procedures[1][i],
             )
+
+
 if __name__ == "__main__":
     unittest.main()

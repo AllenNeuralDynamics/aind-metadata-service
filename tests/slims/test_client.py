@@ -10,6 +10,7 @@ from aind_data_schema.core.instrument import Instrument
 from aind_data_schema.core.rig import Rig
 from aind_slims_api.exceptions import SlimsRecordNotFound
 from aind_slims_api.models.instrument import SlimsInstrumentRdrc
+from aind_slims_api.operations import SPIMHistologyExpBlock
 from aind_slims_api.operations.ecephys_session import (
     EcephysSession as SlimsEcephysSession,
 )
@@ -48,6 +49,15 @@ class TestSlimsHandler(unittest.TestCase):
             SlimsEcephysSession.model_validate(slims_data1),
         ]
         self.expected_sessions = [expected_data1]
+        with open(RAW_DIR / "histology_procedures_response.json") as f:
+            slims_data2 = json.load(f)
+        with open(MAPPED_DIR / "specimen_procedures.json") as f:
+            expected_data2 = json.load(f)
+        self.slims_procedures = [
+            SPIMHistologyExpBlock.model_validate(block)
+            for block in slims_data2
+        ]
+        self.expected_procedures = expected_data2
 
     def test_is_json_file_true(self):
         """Test that _is_json_file returns True for valid JSON response."""
@@ -260,6 +270,60 @@ class TestSlimsHandler(unittest.TestCase):
         self.mock_client.fetch_model.side_effect = SlimsRecordNotFound
 
         response = self.handler.get_sessions_model_response("test_id")
+        self.assertEqual(response.status_code, StatusCodes.NO_DATA_FOUND)
+
+    @patch("aind_metadata_service.slims.client.SlimsHistologyMapper")
+    @patch("aind_metadata_service.slims.client.fetch_histology_procedures")
+    def test_get_specimen_procedures_model_response_success(
+        self, mock_fetch_procedures, mock_mapper
+    ):
+        """Tests that sessions data is fetched as expected."""
+        mock_fetch_procedures.return_value = self.slims_procedures
+        mock_mapper_instance = mock_mapper.return_value
+        mock_mapper_instance.map_specimen_procedures.return_value = (
+            self.expected_procedures
+        )
+        response = self.handler.get_specimen_procedures_model_response(
+            "test_id"
+        )
+        self.assertEqual(
+            response.aind_models[0].specimen_procedures,
+            self.expected_procedures,
+        )
+        self.assertEqual(response.status_code, StatusCodes.DB_RESPONDED)
+
+    @patch("aind_metadata_service.slims.client.fetch_histology_procedures")
+    def test_get_specimen_procedures_model_response_no_data(
+        self, mock_fetch_procedures
+    ):
+        """Tests no data found response."""
+        mock_fetch_procedures.return_value = []
+        response = self.handler.get_specimen_procedures_model_response(
+            "test_id"
+        )
+
+        self.assertEqual(response.status_code, StatusCodes.NO_DATA_FOUND)
+
+    @patch("aind_metadata_service.slims.client.fetch_histology_procedures")
+    def test_get_specimen_procedures_model_response_unexpected_error(
+        self, mock_fetch_procedures
+    ):
+        """Tests internal server error.""" ""
+        mock_fetch_procedures.side_effect = Exception("Unexpected error")
+        response = self.handler.get_specimen_procedures_model_response(
+            "test_id"
+        )
+        self.assertEqual(
+            response.status_code, StatusCodes.INTERNAL_SERVER_ERROR
+        )
+
+    def test_get_specimen_procedures_model_response_not_found(self):
+        """Test response when SlimsRecordNotFound is raised."""
+        self.mock_client.fetch_model.side_effect = SlimsRecordNotFound
+
+        response = self.handler.get_specimen_procedures_model_response(
+            "test_id"
+        )
         self.assertEqual(response.status_code, StatusCodes.NO_DATA_FOUND)
 
 

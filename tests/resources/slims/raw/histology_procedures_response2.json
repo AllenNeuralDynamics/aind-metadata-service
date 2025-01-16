@@ -705,7 +705,7 @@
                         ]
                     },
                     "name": "Wash 1",
-                    "modified_by":  "experimenter1",
+                    "modified_by":  "experimenter2",
                     "experimentrun_pk": 41255,
                     "experiment_template_pk": 1539,
                     "wash_name": "Wash 1",

@@ -5,7 +5,7 @@
       "specimen_id": "000000",
       "start_date": "2025-01-02",
       "end_date": null,
-      "experimenter_full_name": ["experimenter1", "experimenter2"],
+      "experimenter_full_name": "experimenter2",
       "protocol_id": [
          "https://www.protocols.io/view/aqueous-clearing-buffer-tissue-clearing-of-mouse-b-cgepttdn"
       ],

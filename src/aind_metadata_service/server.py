@@ -262,10 +262,10 @@ async def retrieve_procedures(subject_id):
     Retrieves procedure info from SharePoint and Labtracks servers
     """
     sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
-    # lb_client = LabTracksClient.from_settings(labtracks_settings)
-    # lb_response = await run_in_threadpool(
-    #     lb_client.get_procedures_info, subject_id=subject_id
-    # )
+    lb_client = LabTracksClient.from_settings(labtracks_settings)
+    lb_response = await run_in_threadpool(
+        lb_client.get_procedures_info, subject_id=subject_id
+    )
     sp2019_response = await run_in_threadpool(
         sharepoint_client.get_procedure_info,
         subject_id=subject_id,
@@ -286,9 +286,14 @@ async def retrieve_procedures(subject_id):
         specimen_id=subject_id,
     )
     merged_response = sharepoint_client.merge_responses(
-        [sp2019_response, sp2023_response, las2020_response, slims_response]
+        [
+            lb_response,
+            sp2019_response,
+            sp2023_response,
+            las2020_response,
+            slims_response,
+        ]
     )
-    print("merged procedures response", merged_response.aind_models)
     # integrate TARS response
     mapper = TarsResponseHandler()
     viruses = mapper.get_virus_strains(merged_response)
@@ -301,7 +306,6 @@ async def retrieve_procedures(subject_id):
     integrated_response = mapper.integrate_injection_materials(
         response=merged_response, tars_mapping=tars_mapping
     )
-    print("tars integrated response", integrated_response.aind_models)
     # integrate protocols from smartsheet
     smart_sheet_response = await run_in_threadpool(
         protocols_smart_sheet_client.get_sheet
@@ -322,7 +326,6 @@ async def retrieve_procedures(subject_id):
     integrated_response = protocols_integrator.integrate_protocols(
         response=integrated_response, protocols_mapping=protocols_mapping
     )
-    print("protocols integrated response", integrated_response.aind_models)
     return integrated_response.map_to_json_response()
 
 
