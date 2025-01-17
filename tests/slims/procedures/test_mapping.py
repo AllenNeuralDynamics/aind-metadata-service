@@ -1,3 +1,5 @@
+"""Module to test SlimsHistologyMapper methods"""
+
 import json
 import os
 import unittest
@@ -30,6 +32,7 @@ class TestSlimsHistologyMapper(unittest.TestCase):
     """Class to test methods of SlimsHistologyMapper"""
 
     def setUp(self):
+        """Set up test class"""
         self.mapper = SlimsHistologyMapper()
         with open(RAW_DIR / "histology_procedures_response.json") as f:
             slims_data1 = json.load(f)
