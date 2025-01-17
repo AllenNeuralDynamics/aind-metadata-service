@@ -245,11 +245,6 @@ class TarsResponseHandler:
         status_code = response.status_code
         if len(response.aind_models) > 0:
             pre_procedures = response.aind_models[0]
-            if not (
-                hasattr(pre_procedures, "subject_procedures")
-                and pre_procedures.subject_procedures
-            ):
-                output_aind_models = [pre_procedures]
             for subject_procedure in pre_procedures.subject_procedures:
                 if not hasattr(subject_procedure, "procedures"):
                     output_aind_models = [pre_procedures]

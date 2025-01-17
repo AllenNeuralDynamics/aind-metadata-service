@@ -157,6 +157,7 @@ class ProtocolsIntegrator:
                     protocol_list.append(protocol_name)
         return protocol_list
 
+    # flake8: noqa: C901
     def integrate_protocols(
         self, response: ModelResponse, protocols_mapping: Dict
     ) -> ModelResponse:
@@ -176,11 +177,6 @@ class ProtocolsIntegrator:
         status_code = response.status_code
         if len(response.aind_models) > 0:
             pre_procedures = response.aind_models[0]
-            if (
-                not hasattr(pre_procedures, "subject_procedures")
-                or not pre_procedures.subject_procedures
-            ):
-                return response
             for subject_procedure in pre_procedures.subject_procedures:
                 if (
                     isinstance(subject_procedure, Surgery)

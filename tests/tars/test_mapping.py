@@ -7,12 +7,8 @@ from unittest.mock import MagicMock, patch
 from aind_data_schema.core.procedures import (
     NanojectInjection,
     Procedures,
-    SpecimenProcedure,
     Surgery,
     TarsVirusIdentifiers,
-)
-from aind_data_schema_models.specimen_procedure_types import (
-    SpecimenProcedureType,
 )
 
 from aind_metadata_service.client import StatusCodes
@@ -488,23 +484,6 @@ class TestTarsResponseHandler(unittest.TestCase):
         )
         merged_response = self.handler.integrate_injection_materials(
             response=procedures_response, tars_mapping=tars_mapping
-        )
-        self.assertEqual(merged_response.status_code, StatusCodes.DB_RESPONDED)
-
-    def test_integrate_injection_materials_specimen_procedures(self):
-        """Tests that injection materials are integrated into
-        procedures response as expected"""
-        spec = SpecimenProcedure.model_construct(
-            procedure_type=SpecimenProcedureType.OTHER, notes="test"
-        )
-        procedures_response = ModelResponse(
-            aind_models=[
-                Procedures(subject_id="12345", specimen_procedures=[spec])
-            ],
-            status_code=StatusCodes.DB_RESPONDED,
-        )
-        merged_response = self.handler.integrate_injection_materials(
-            response=procedures_response, tars_mapping={}
         )
         self.assertEqual(merged_response.status_code, StatusCodes.DB_RESPONDED)
 

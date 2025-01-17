@@ -46,7 +46,7 @@ class SlimsHandler:
         """Class constructor for slims client"""
         self.client = SlimsClient(
             username=settings.username,
-            password=settings.password.get_secret_value(),
+            password=settings.password.get_secret_value().strip("'"),
             url=settings.host,
         )
 

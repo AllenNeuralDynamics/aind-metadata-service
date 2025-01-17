@@ -262,10 +262,10 @@ async def retrieve_procedures(subject_id):
     Retrieves procedure info from SharePoint and Labtracks servers
     """
     sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
-    lb_client = LabTracksClient.from_settings(labtracks_settings)
-    lb_response = await run_in_threadpool(
-        lb_client.get_procedures_info, subject_id=subject_id
-    )
+    # lb_client = LabTracksClient.from_settings(labtracks_settings)
+    # lb_response = await run_in_threadpool(
+    #     lb_client.get_procedures_info, subject_id=subject_id
+    # )
     sp2019_response = await run_in_threadpool(
         sharepoint_client.get_procedure_info,
         subject_id=subject_id,
@@ -281,17 +281,13 @@ async def retrieve_procedures(subject_id):
         subject_id=subject_id,
         list_title=sharepoint_settings.las_2020_list,
     )
-    slims_response = await run_in_threadpool(
-        slims_client.get_specimen_procedures_model_response,
-        specimen_id=subject_id,
-    )
+    # merge subject procedures
     merged_response = sharepoint_client.merge_responses(
         [
-            lb_response,
+            # lb_response,
             sp2019_response,
             sp2023_response,
             las2020_response,
-            slims_response,
         ]
     )
     # integrate TARS response
@@ -326,7 +322,15 @@ async def retrieve_procedures(subject_id):
     integrated_response = protocols_integrator.integrate_protocols(
         response=integrated_response, protocols_mapping=protocols_mapping
     )
-    return integrated_response.map_to_json_response()
+    # merge specimen procedures
+    slims_response = await run_in_threadpool(
+        slims_client.get_specimen_procedures_model_response,
+        specimen_id=subject_id,
+    )
+    merged_response = sharepoint_client.merge_responses(
+        [integrated_response, slims_response]
+    )
+    return merged_response.map_to_json_response()
 
 
 @app.get(
