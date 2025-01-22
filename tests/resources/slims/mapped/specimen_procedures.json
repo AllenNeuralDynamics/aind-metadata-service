@@ -62,7 +62,7 @@
         "protocol_id": [],
         "reagents": [],
         "hcr_series": null,
-        "antibodies": {
+        "antibodies": [{
             "rrid": null,
             "expiration_date": null,
             "immunolabel_class": "Primary",
@@ -70,7 +70,7 @@
             "mass": 10.0,
             "mass_unit": "microgram",
             "notes": null
-        },
+        }],
         "sectioning": null,
         "notes": null
     },
@@ -84,7 +84,7 @@
         "protocol_id": [],
         "reagents": [],
         "hcr_series": null,
-        "antibodies": {
+        "antibodies": [{
             "rrid": null,
             "expiration_date": null,
             "immunolabel_class": "Secondary",
@@ -92,7 +92,7 @@
             "mass": 10.5,
             "mass_unit": "microgram",
             "notes": null
-        },
+        }],
         "sectioning": null,
         "notes": null
     },

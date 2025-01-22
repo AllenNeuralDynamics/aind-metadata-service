@@ -122,7 +122,7 @@ class SlimsHistologyMapper:
                     else []
                 ),
                 antibodies=(
-                    self._map_antibody(wash) if wash else []
+                    [self._map_antibody(wash)] if wash else []
                 ),  # Antibody mapping
             )
             procedures.append(spec)

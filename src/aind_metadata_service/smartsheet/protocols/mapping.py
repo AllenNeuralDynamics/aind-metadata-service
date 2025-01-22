@@ -157,7 +157,6 @@ class ProtocolsIntegrator:
                     protocol_list.append(protocol_name)
         return protocol_list
 
-    # flake8: noqa: C901
     def integrate_protocols(
         self, response: ModelResponse, protocols_mapping: Dict
     ) -> ModelResponse:
