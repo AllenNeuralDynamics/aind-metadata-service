@@ -11,7 +11,7 @@ jobs:
     outputs:
       pkg_version: ${{ steps.output_version.outputs.pkg_version }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Get version from file
       run: |
         pkg_name=$(grep -P 'version = \{attr = .*\}' pyproject.toml | grep -oP '\w+.__version__')
@@ -42,7 +42,7 @@ jobs:
           ghcr.io/allenneuraldynamics/aind-metadata-service:${{ env.docker_tag }}
           ghcr.io/allenneuraldynamics/aind-metadata-service:latest
     - name: Set up Python 3.10
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: '3.10'
     - name: Install dependencies
