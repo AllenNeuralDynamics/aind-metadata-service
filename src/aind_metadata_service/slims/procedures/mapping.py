@@ -1,7 +1,7 @@
 """Module for mapping specimen procedures"""
 
-import re
 from typing import List, Optional
+import xml.etree.ElementTree as ET
 
 from aind_data_schema.components.reagent import Reagent
 from aind_data_schema.core.procedures import (
@@ -23,11 +23,8 @@ from aind_metadata_service.slims.procedures.models import (
     SlimsWashNames,
 )
 
-
 class SlimsHistologyMapper:
     """Mapper class for Slims histology procedures"""
-
-    PROTOCOL_HTML_REGEX = r'href="([^"]+)"'
 
     def map_specimen_procedures(
         self, slims_blocks: List[SPIMHistologyExpBlock], specimen_id: str
@@ -212,5 +209,5 @@ class SlimsHistologyMapper:
 
     def _extract_protocol_link(self, protocol_html: str) -> Optional[str]:
         """Parses out protocol link"""
-        match = re.search(self.PROTOCOL_HTML_REGEX, protocol_html)
-        return match.group(1) if match else None
+        root = ET.fromstring(protocol_html)
+        return root.get("href")
