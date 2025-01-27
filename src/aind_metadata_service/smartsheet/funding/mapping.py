@@ -69,6 +69,9 @@ class FundingMapper(SmartSheetMapper):
 
         row_dict = self.map_row_to_dict(row)
         project_name = row_dict.get(FundingColumnNames.PROJECT_NAME)
+        subproject_name = row_dict.get(FundingColumnNames.SUBPROJECT)
+        if subproject_name is not None:
+            project_name = f"{project_name} - {subproject_name}"
         grant_number = row_dict.get(FundingColumnNames.GRANT_NUMBER)
         institution_value = row_dict.get(
             FundingColumnNames.FUNDING_INSTITUTION
@@ -152,8 +155,11 @@ class FundingMapper(SmartSheetMapper):
             for row in self.model.rows:
                 row_dict = self.map_row_to_dict(row)
                 project_name = row_dict.get(FundingColumnNames.PROJECT_NAME)
-                if project_name is not None:
+                subproject_name = row_dict.get(FundingColumnNames.SUBPROJECT)
+                if project_name is not None and subproject_name is None:
                     project_names.add(project_name)
+                elif project_name is not None and subproject_name is not None:
+                    project_names.add(f"{project_name} - {subproject_name}")
             return JSONResponse(
                 status_code=200,
                 content=(
