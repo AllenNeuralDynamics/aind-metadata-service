@@ -55,7 +55,8 @@ class TestSmartsheetFundingClient(unittest.TestCase):
         mapper = FundingMapper(
             smart_sheet_response=smart_sheet_response,
             input_id=(
-                "Discovery-Neuromodulator circuit dynamics during foraging"
+                "Discovery-Neuromodulator circuit dynamics during foraging - "
+                "Subproject 2 Molecular Anatomy Cell Types"
             ),
         )
         model_response = mapper.get_model_response()
@@ -67,21 +68,6 @@ class TestSmartsheetFundingClient(unittest.TestCase):
                     "Person Four, Person Five, Person Six, Person Seven, "
                     "Person Eight"
                 ),
-                investigators=None,
-            ),
-            FundingInformation(
-                funder=Organization.NINDS,
-                grant_number="1RF1NS131984",
-                fundee="Person Five, Person Six, Person Eight",
-                investigators="Person Six, Person Eight",
-            ),
-            FundingInformation(
-                funder=Organization.AI,
-                grant_number=None,
-                fundee=(
-                    "Person Four, Person Five, Person Six, Person Seven, "
-                    "Person Eight"
-                ),
                 investigators="Person Seven",
             ),
             FundingInformation(
@@ -92,30 +78,6 @@ class TestSmartsheetFundingClient(unittest.TestCase):
                     "Person Eleven"
                 ),
                 investigators="Person Seven",
-            ),
-            FundingInformation(
-                funder=Organization.AI,
-                grant_number=None,
-                fundee=(
-                    "Person Four, Person Five, Person Six, Person Seven, "
-                    "Person Eight"
-                ),
-                investigators=(
-                    "Person Four, Person Ten, person.twelve@example.com, "
-                    "person.thirteen@example.com, Person Eight"
-                ),
-            ),
-            FundingInformation(
-                funder=Organization.NIMH,
-                grant_number="1R01MH134833",
-                fundee=(
-                    "Person Five, Person Nine, Person Ten, Person Seven, "
-                    "Person Eleven"
-                ),
-                investigators=(
-                    "Person Four, Person Ten, person.twelve@example.com, "
-                    "person.thirteen@example.com, Person Eight"
-                ),
             ),
         ]
         self.assertEqual(expected_models, model_response.aind_models)
@@ -273,7 +235,20 @@ class TestSmartsheetFundingClient(unittest.TestCase):
         expected_response = {
             "message": "Success",
             "data": [
-                "Discovery-Neuromodulator circuit dynamics during foraging",
+                (
+                    "Discovery-Neuromodulator circuit dynamics during foraging"
+                    " - Subproject 1 Electrophysiological Recordings from NM "
+                    "Neurons During Behavior"
+                ),
+                (
+                    "Discovery-Neuromodulator circuit dynamics during foraging"
+                    " - Subproject 2 Molecular Anatomy Cell Types"
+                ),
+                (
+                    "Discovery-Neuromodulator circuit dynamics during foraging"
+                    " - Subproject 3 Fiber Photometry Recordings of NM Release"
+                    " During Behavior"
+                ),
                 "Ephys Platform",
                 "MSMA Platform",
             ],
