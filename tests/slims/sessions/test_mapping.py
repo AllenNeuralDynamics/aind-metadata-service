@@ -12,10 +12,11 @@ from aind_slims_api.operations.ecephys_session import (
     EcephysSession as SlimsEcephysSession,
 )
 
-from aind_metadata_service.slims.mapping import SlimsSessionMapper
+from aind_metadata_service.slims.sessions.mapping import SlimsSessionMapper
 
 RESOURCES_DIR = (
     Path(os.path.dirname(os.path.realpath(__file__)))
+    / ".."
     / ".."
     / "resources"
     / "slims"

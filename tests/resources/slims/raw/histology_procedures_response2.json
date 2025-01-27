@@ -1,0 +1,253 @@
+[
+    {
+        "protocol": {
+            "pk": 7,
+            "created_on": 1678483015418,
+            "json_entity": {},
+            "name": "LifeCanvas Clearing",
+            "link": "<a href=\"https://www.protocols.io/view/aqueous-clearing-buffer-tissue-clearing-of-mouse-b-cgepttdn\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">LifeCanvas Clearing</a>"
+        },
+        "washes": [
+            {
+                "wash_step": {
+                    "pk": 65211,
+                    "created_on": 1736209090180,
+                    "json_entity": {},
+                    "name": "Wash 1",
+                    "modified_by": "experimenter2",
+                    "experimentrun_pk": 41255,
+                    "experiment_template_pk": 1539,
+                    "wash_name": "Wash 1",
+                    "spim_wash_type": "Shield Fixation",
+                    "reagent_pk": [
+                        3418
+                    ],
+                    "start_time": 1735777080000,
+                    "end_time": 1735780680000,
+                    "mass": null,
+                    "notes": null
+                },
+                "reagents": [
+                    {
+                        "content": {
+                            "pk": 3418,
+                            "created_on": 1727751374366,
+                            "json_entity": {},
+                            "barcode": "rgntE00000024",
+                            "content_type": 110,
+                            "lot_number": "on29",
+                            "reagent_ref_pk": 3592,
+                            "source_pk": null
+                        },
+                        "source": {
+                            "pk": 45,
+                            "created_on": 1717181070939,
+                            "json_entity": {},
+                            "name": "LifeCanvas"
+                        },
+                        "details": {
+                            "pk": 3592,
+                            "created_on": 1727749826492,
+                            "json_entity": {},
+                            "name": "SHIELD On",
+                            "manufacturer_pk": 45
+                        }
+                    }
+                ]
+            },
+            {
+                "wash_step": {
+                    "pk": 65212,
+                    "created_on": 1736209090235,
+                    "json_entity": {},
+                    "name": "Wash 2",
+                    "modified_by": "experimenter2",
+                    "experimentrun_pk": 41255,
+                    "experiment_template_pk": 1539,
+                    "wash_name": "Wash 2",
+                    "spim_wash_type": "Passive Delipidation",
+                    "reagent_pk": [
+                        3785
+                    ],
+                    "start_time": 1735839300000,
+                    "end_time": 1735863540000,
+                    "mass": null,
+                    "notes": null
+                },
+                "reagents": [
+                    {
+                        "content": {
+                            "pk": 3785,
+                            "created_on": 1734651794775,
+                            "json_entity": {},
+                            "barcode": "rgntEx00000054",
+                            "content_type": 112,
+                            "lot_number": "DBBP25",
+                            "reagent_ref_pk": 3594,
+                            "source_pk": null
+                        },
+                        "source": {
+                            "pk": 45,
+                            "created_on": 1717181070939,
+                            "json_entity": {},
+                            "name": "LifeCanvas"
+                        },
+                        "details": {
+                            "pk": 3594,
+                            "created_on": 1727750002154,
+                            "json_entity": {},
+                            "name": "Delipidation Buffer",
+                            "manufacturer_pk": 45
+                        }
+                    }
+                ]
+            },
+            {
+                "wash_step": {
+                    "pk": 65213,
+                    "created_on": 1736209090276,
+                    "json_entity": {},
+                    "name": "Wash 3",
+                    "modified_by": "experimenter2",
+                    "experimentrun_pk": 41255,
+                    "experiment_template_pk": 1539,
+                    "wash_name": "Wash 3",
+                    "spim_wash_type": "Active Delipidation",
+                    "reagent_pk": [
+                        3420
+                    ],
+                    "start_time": 1735863600000,
+                    "end_time": 1735864080000,
+                    "mass": null,
+                    "notes": null
+                },
+                "reagents": [
+                    {
+                        "content": {
+                            "pk": 3420,
+                            "created_on": 1727751456442,
+                            "json_entity": {},
+                            "barcode": "rgntE00000026",
+                            "content_type": 112,
+                            "lot_number": "d23",
+                            "reagent_ref_pk": 3594,
+                            "source_pk": null
+                        },
+                        "source": {
+                            "pk": 45,
+                            "created_on": 1717181070939,
+                            "json_entity": {},
+                            "name": "LifeCanvas"
+                        },
+                        "details": {
+                            "pk": 3594,
+                            "created_on": 1727750002154,
+                            "json_entity": {},
+                            "name": "Delipidation Buffer",
+                            "manufacturer_pk": 45
+                        }
+                    }
+                ]
+            },
+            {
+                "wash_step": {
+                    "pk": 65214,
+                    "created_on": 1736209090342,
+                    "json_entity": {},
+                    "name": "Wash 4",
+                    "modified_by": null,
+                    "experimentrun_pk": 41255,
+                    "experiment_template_pk": 1539,
+                    "wash_name": "Wash 4",
+                    "spim_wash_type": null,
+                    "reagent_pk": [],
+                    "start_time": null,
+                    "end_time": null,
+                    "mass": null,
+                    "notes": null
+                },
+                "reagents": []
+            }
+        ],
+        "experiment_template": {
+            "pk": 1539,
+            "created_on": 1731534046597,
+            "json_entity": {},
+            "name": "SmartSPIM Delipidation",
+            "version_name": "SmartSPIM Delipidation (v. 6)"
+        }
+    },
+    {
+        "protocol": {
+            "pk": 32,
+            "created_on": 1691783500610,
+            "json_entity": {},
+            "name": "Core Protocol for Imaging Fluorescently-Labeled Sections on the Olympus VS Series Microscopes (VS110 and VS120)",
+            "link": null
+        },
+        "washes": [
+            {
+                "wash_step": {
+                    "pk": 65217,
+                    "created_on": 1736209287162,
+                    "json_entity": {},
+                    "name": "Primary Antibody Wash",
+                    "modified_by": "general_aind",
+                    "experimentrun_pk": 41256,
+                    "experiment_template_pk": 1422,
+                    "wash_name": "Primary Antibody Wash",
+                    "spim_wash_type": "Immuno: Primary Antibody",
+                    "reagent_pk": null,
+                    "start_time": 1735928460000,
+                    "end_time": 1735935720000,
+                    "mass": 10.0,
+                    "notes": null
+                },
+                "reagents": []
+            },
+            {
+                "wash_step": {
+                    "pk": 65218,
+                    "created_on": 1736209287214,
+                    "json_entity": {},
+                    "name": "Secondary Antibody Wash",
+                    "modified_by": "general_aind",
+                    "experimentrun_pk": 41256,
+                    "experiment_template_pk": 1422,
+                    "wash_name": "Secondary Antibody Wash",
+                    "spim_wash_type": "Immuno: Secondary Antibody",
+                    "reagent_pk": null,
+                    "start_time": 1735943400000,
+                    "end_time": 1735950120000,
+                    "mass": 10.5,
+                    "notes": null
+                },
+                "reagents": []
+            }
+        ],
+        "experiment_template": {
+            "pk": 1422,
+            "created_on": 1727643303433,
+            "json_entity": {},
+            "name": null,
+            "version_name": "SmartSPIM Labeling (v. 4)"
+        }
+    },
+    {
+        "protocol": {
+            "pk": 44,
+            "created_on": 1735859276082,
+            "json_entity": {},
+            "name": "Refractive Index Matching - EasyIndex",
+            "link": "<a href=\"https://www.protocols.io/view/refractive-index-matching-easyindex-cttgwnjw\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">Refractive Index Matching, EasyIndex</a>"
+        },
+        "washes": [],
+        "experiment_template": {
+            "pk": 1537,
+            "created_on": 1731107836474,
+            "json_entity": {},
+            "name": "SmartSPIM Refractive Index Matching",
+            "version_name": "SmartSPIM Refractive Index Matching (v. 12)"
+        }
+    }
+]

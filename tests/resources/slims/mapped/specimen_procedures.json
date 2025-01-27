@@ -1,0 +1,115 @@
+[
+    {
+        "procedure_type": "Delipidation",
+        "procedure_name": "LifeCanvas Clearing",
+        "specimen_id": "000000",
+        "start_date": "2025-01-02",
+        "end_date": null,
+        "experimenter_full_name": "general_aind",
+        "protocol_id": [
+            "https://www.protocols.io/view/aqueous-clearing-buffer-tissue-clearing-of-mouse-b-cgepttdn"
+        ],
+        "reagents": [
+            {
+                "name": "SHIELD On",
+                "source": {
+                    "name": "LifeCanvas",
+                    "abbreviation": null,
+                    "registry": null,
+                    "registry_identifier": null
+                },
+                "rrid": null,
+                "lot_number": "on29",
+                "expiration_date": null
+            },
+            {
+                "name": "Delipidation Buffer",
+                "source": {
+                    "name": "LifeCanvas",
+                    "abbreviation": null,
+                    "registry": null,
+                    "registry_identifier": null
+                },
+                "rrid": null,
+                "lot_number": "DBBP25",
+                "expiration_date": null
+            },
+            {
+                "name": "Delipidation Buffer",
+                "source": {
+                    "name": "LifeCanvas",
+                    "abbreviation": null,
+                    "registry": null,
+                    "registry_identifier": null
+                },
+                "rrid": null,
+                "lot_number": "d23",
+                "expiration_date": null
+            }
+        ],
+        "hcr_series": null,
+        "antibodies": null,
+        "sectioning": null,
+        "notes": null
+    },
+    {
+        "procedure_type": "Immunolabeling",
+        "procedure_name": "Core Protocol for Imaging Fluorescently-Labeled Sections on the Olympus VS Series Microscopes (VS110 and VS120)",
+        "specimen_id": "000000",
+        "start_date": "2025-01-03",
+        "end_date": "2025-01-03",
+        "experimenter_full_name": "general_aind",
+        "protocol_id": [],
+        "reagents": [],
+        "hcr_series": null,
+        "antibodies": [{
+            "rrid": null,
+            "expiration_date": null,
+            "immunolabel_class": "Primary",
+            "fluorophore": null,
+            "mass": 10.0,
+            "mass_unit": "microgram",
+            "notes": null
+        }],
+        "sectioning": null,
+        "notes": null
+    },
+    {
+        "procedure_type": "Immunolabeling",
+        "procedure_name": "Core Protocol for Imaging Fluorescently-Labeled Sections on the Olympus VS Series Microscopes (VS110 and VS120)",
+        "specimen_id": "000000",
+        "start_date": "2025-01-03",
+        "end_date": "2025-01-04",
+        "experimenter_full_name": "general_aind",
+        "protocol_id": [],
+        "reagents": [],
+        "hcr_series": null,
+        "antibodies": [{
+            "rrid": null,
+            "expiration_date": null,
+            "immunolabel_class": "Secondary",
+            "fluorophore": null,
+            "mass": 10.5,
+            "mass_unit": "microgram",
+            "notes": null
+        }],
+        "sectioning": null,
+        "notes": null
+    },
+    {
+        "procedure_type": "Refractive index matching",
+        "procedure_name": "Refractive Index Matching - EasyIndex",
+        "specimen_id": "000000",
+        "start_date": "2025-01-06",
+        "end_date": "2025-01-06",
+        "experimenter_full_name": "general_aind",
+        "protocol_id": [
+            "https://www.protocols.io/view/refractive-index-matching-easyindex-cttgwnjw"
+        ],
+        "reagents": [],
+        "hcr_series": null,
+        "antibodies": null,
+        "sectioning": null,
+        "notes": null
+    }
+]

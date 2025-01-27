@@ -1,0 +1,71 @@
+[
+   {
+      "procedure_type": "Delipidation",
+      "procedure_name": "LifeCanvas Clearing",
+      "specimen_id": "000000",
+      "start_date": "2025-01-02",
+      "end_date": null,
+      "experimenter_full_name": "experimenter2",
+      "protocol_id": [
+         "https://www.protocols.io/view/aqueous-clearing-buffer-tissue-clearing-of-mouse-b-cgepttdn"
+      ],
+      "reagents": [
+         {
+            "name": "SHIELD On",
+            "source": {
+               "name": "LifeCanvas",
+               "abbreviation": null,
+               "registry": null,
+               "registry_identifier": null
+            },
+            "rrid": null,
+            "lot_number": "on29",
+            "expiration_date": null
+         },
+         {
+            "name": "Delipidation Buffer",
+            "source": {
+               "name": "LifeCanvas",
+               "abbreviation": null,
+               "registry": null,
+               "registry_identifier": null
+            },
+            "rrid": null,
+            "lot_number": "DBBP25",
+            "expiration_date": null
+         },
+         {
+            "name": "Delipidation Buffer",
+            "source": {
+               "name": "LifeCanvas",
+               "abbreviation": null,
+               "registry": null,
+               "registry_identifier": null
+            },
+            "rrid": null,
+            "lot_number": "d23",
+            "expiration_date": null
+         }
+      ],
+      "hcr_series": null,
+      "antibodies": null,
+      "sectioning": null,
+      "notes": null
+   },
+   {
+      "procedure_type": "Refractive index matching",
+      "procedure_name": "Refractive Index Matching - EasyIndex",
+      "specimen_id": "000000",
+      "start_date": null,
+      "end_date": null,
+      "experimenter_full_name": null,
+      "protocol_id": [
+         "https://www.protocols.io/view/refractive-index-matching-easyindex-cttgwnjw"
+      ],
+      "reagents": null,
+      "hcr_series": null,
+      "antibodies": null,
+      "sectioning": null,
+      "notes": null
+   }
+]
