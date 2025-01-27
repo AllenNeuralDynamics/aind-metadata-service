@@ -23,6 +23,7 @@ from aind_metadata_service.slims.procedures.models import (
     SlimsWashNames,
 )
 
+
 class SlimsHistologyMapper:
     """Mapper class for Slims histology procedures"""
 
