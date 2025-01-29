@@ -1,7 +1,7 @@
 """Module for mapping specimen procedures"""
 
-from typing import List, Optional
 import xml.etree.ElementTree as ET
+from typing import List, Optional
 
 from aind_data_schema.components.reagent import Reagent
 from aind_data_schema.core.procedures import (
