@@ -235,6 +235,7 @@ class TestSmartsheetFundingClient(unittest.TestCase):
         expected_response = {
             "message": "Success",
             "data": [
+                "Discovery-Neuromodulator circuit dynamics during " "foraging",
                 (
                     "Discovery-Neuromodulator circuit dynamics during foraging"
                     " - Subproject 1 Electrophysiological Recordings from NM "
@@ -254,7 +255,7 @@ class TestSmartsheetFundingClient(unittest.TestCase):
             ],
         }
         self.assertEqual(
-            json.loads(json_response.body.decode("utf-8")), expected_response
+            expected_response, json.loads(json_response.body.decode("utf-8"))
         )
 
     @patch("smartsheet.sheets.Sheets.get_sheet")
