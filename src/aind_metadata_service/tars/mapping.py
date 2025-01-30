@@ -232,8 +232,9 @@ class TarsResponseHandler:
                         viruses.extend(virus_strains)
         return viruses
 
+    # TODO: Refactor this method
     @staticmethod
-    def integrate_injection_materials(
+    def integrate_injection_materials(  # noqa: C901
         response: ModelResponse, tars_mapping: Dict[str, JSONResponse]
     ) -> ModelResponse:
         """
@@ -262,7 +263,8 @@ class TarsResponseHandler:
                                 virus_strain = injection_material.name.strip()
                                 tars_response = tars_mapping.get(virus_strain)
                                 if (
-                                    tars_response.status_code
+                                    tars_response
+                                    and tars_response.status_code
                                     == StatusCodes.DB_RESPONDED.value
                                     or tars_response.status_code
                                     == StatusCodes.VALID_DATA.value
@@ -272,10 +274,21 @@ class TarsResponseHandler:
                                     data = json.loads(tars_response.body)[
                                         "data"
                                     ]
-                                    new_material = ViralMaterial(**data)
-                                    new_material.titer = (
-                                        injection_material.titer
-                                    )
+                                    try:
+                                        new_material = ViralMaterial(**data)
+                                        new_material.titer = (
+                                            injection_material.titer
+                                        )
+                                    except ValidationError as e:
+                                        logging.error(f"{e}")
+                                        new_material = (
+                                            ViralMaterial.model_construct(
+                                                **data
+                                            )
+                                        )
+                                        new_material.titer = (
+                                            injection_material.titer
+                                        )
                                     procedure.injection_materials[idx] = (
                                         new_material
                                     )
