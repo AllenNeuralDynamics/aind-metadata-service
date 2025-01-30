@@ -281,8 +281,14 @@ async def retrieve_procedures(subject_id):
         subject_id=subject_id,
         list_title=sharepoint_settings.las_2020_list,
     )
+    # merge subject procedures
     merged_response = sharepoint_client.merge_responses(
-        [lb_response, sp2019_response, sp2023_response, las2020_response]
+        [
+            lb_response,
+            sp2019_response,
+            sp2023_response,
+            las2020_response,
+        ]
     )
     # integrate TARS response
     mapper = TarsResponseHandler()
@@ -316,7 +322,15 @@ async def retrieve_procedures(subject_id):
     integrated_response = protocols_integrator.integrate_protocols(
         response=integrated_response, protocols_mapping=protocols_mapping
     )
-    return integrated_response.map_to_json_response()
+    # merge specimen procedures
+    slims_response = await run_in_threadpool(
+        slims_client.get_specimen_procedures_model_response,
+        specimen_id=subject_id,
+    )
+    merged_response = sharepoint_client.merge_responses(
+        [integrated_response, slims_response]
+    )
+    return merged_response.map_to_json_response()
 
 
 @app.get(

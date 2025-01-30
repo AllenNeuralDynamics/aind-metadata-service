@@ -304,7 +304,10 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
         )
         procedures_response = ModelResponse(
             aind_models=[
-                Procedures(subject_id="12345", subject_procedures=[surgery])
+                Procedures(
+                    subject_id="12345",
+                    subject_procedures=[surgery],
+                )
             ],
             status_code=StatusCodes.DB_RESPONDED,
         )
@@ -323,7 +326,8 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
         expected_response = ModelResponse(
             aind_models=[
                 Procedures(
-                    subject_id="12345", subject_procedures=[expected_surgery]
+                    subject_id="12345",
+                    subject_procedures=[expected_surgery],
                 )
             ],
             status_code=StatusCodes.DB_RESPONDED,
