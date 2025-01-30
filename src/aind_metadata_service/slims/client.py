@@ -11,6 +11,7 @@ from aind_slims_api.models.instrument import SlimsInstrumentRdrc
 from aind_slims_api.operations import (
     fetch_ecephys_sessions,
     fetch_histology_procedures,
+    fetch_imaging_metadata,
 )
 from pydantic import Extra, Field, SecretStr
 from pydantic_settings import BaseSettings
@@ -21,7 +22,10 @@ from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
 from aind_metadata_service.slims.procedures.mapping import SlimsHistologyMapper
 from aind_metadata_service.slims.sessions.mapping import SlimsSessionMapper
+from aind_metadata_service.slims.acquisitions.mapping import SlimsAcquisitionMapper
 
+from typing import Optional
+from datetime import datetime
 
 class SlimsSettings(BaseSettings):
     """Configuration class. Mostly a wrapper around smartsheet.Smartsheet
@@ -46,7 +50,7 @@ class SlimsHandler:
         """Class constructor for slims client"""
         self.client = SlimsClient(
             username=settings.username,
-            password=settings.password.get_secret_value(),
+            password=settings.password.get_secret_value().strip("'"),
             url=settings.host,
         )
 
@@ -173,3 +177,44 @@ class SlimsHandler:
         except Exception as e:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
+        
+    def get_imaging_acquisitions_model_response(
+            self, subject_id: str, date_performed: Optional[str], latest: bool 
+    ):
+        """
+        Fetches imaging acquisitions for a given subject ID from SLIMS.
+        """
+        if date_performed and latest:
+            return ModelResponse.internal_server_error_response(
+                message="Cannot provide both date_performed and latest"
+            )
+        elif date_performed:
+            try:
+                date_performed = datetime.fromisoformat(date_performed)
+            except ValueError:
+                return ModelResponse.internal_server_error_response(
+                    message="Invalid date format. Use ISO format (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)"
+                )
+        else:
+            pass
+        try:
+            imaging_metadata = fetch_imaging_metadata(
+                subject_id=subject_id, client=self.client
+            )
+            if imaging_metadata:
+                mapper = SlimsAcquisitionMapper()
+                mapped_acquisitions = mapper.map_imaging_acquisitions(
+                    slims_metadata=imaging_metadata, subject_id=subject_id, date_performed=date_performed, latest=latest
+                )
+                return ModelResponse(
+                    aind_models=mapped_acquisitions,
+                    status_code=StatusCodes.DB_RESPONDED,
+                )
+            else:
+                return ModelResponse.no_data_found_error_response()
+        except SlimsRecordNotFound:
+            return ModelResponse.no_data_found_error_response()
+        except Exception as e:
+            logging.error(repr(e))
+            return ModelResponse.internal_server_error_response()
+
