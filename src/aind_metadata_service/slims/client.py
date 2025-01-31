@@ -1,7 +1,6 @@
 """Module for slims client"""
 
 import logging
-
 from aind_data_schema.core.instrument import Instrument
 from aind_data_schema.core.procedures import Procedures
 from aind_data_schema.core.rig import Rig
@@ -12,6 +11,7 @@ from aind_slims_api.operations import (
     fetch_ecephys_sessions,
     fetch_histology_procedures,
 )
+from aind_slims_api.operations.spim_imaging import fetch_imaging_metadata
 from pydantic import Extra, Field, SecretStr
 from pydantic_settings import BaseSettings
 from requests.models import Response
@@ -21,6 +21,15 @@ from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
 from aind_metadata_service.slims.procedures.mapping import SlimsHistologyMapper
 from aind_metadata_service.slims.sessions.mapping import SlimsSessionMapper
+from fastapi.responses import JSONResponse
+from typing import Optional
+from aind_metadata_service.slims.imaging.utils import (
+    validate_parameters,
+    parse_date_performed,
+    filter_by_date,
+    get_latest_metadata,
+    format_response,
+)
 
 
 class SlimsSettings(BaseSettings):
@@ -46,7 +55,7 @@ class SlimsHandler:
         """Class constructor for slims client"""
         self.client = SlimsClient(
             username=settings.username,
-            password=settings.password.get_secret_value(),
+            password=settings.password.get_secret_value().strip("'"),
             url=settings.host,
         )
 
@@ -173,3 +182,56 @@ class SlimsHandler:
         except Exception as e:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
+
+    def get_smartspim_imaging_json_response(
+        self,
+        subject_id: str,
+        date_performed: Optional[str] = None,
+        latest: bool = False,
+    ) -> JSONResponse:
+        """
+        Fetches SmartSPIM imaging data for a given subject ID from SLIMS.
+        """
+        validation_error = validate_parameters(date_performed, latest)
+        if validation_error:
+            return validation_error
+
+        date_performed_dt = parse_date_performed(date_performed)
+        if isinstance(date_performed_dt, JSONResponse):
+            return date_performed_dt  # Return error response if date parsing failed
+
+        try:
+            imaging_metadata = fetch_imaging_metadata(
+                subject_id=subject_id, client=self.client
+            )
+            if not imaging_metadata:
+                return JSONResponse(
+                    status_code=404,
+                    content={"message": "No data found", "data": None},
+                )
+
+            # Apply filters based on the parameters
+            if date_performed_dt:
+                imaging_metadata = filter_by_date(
+                    imaging_metadata, date_performed_dt
+                )
+            elif latest:
+                imaging_metadata = get_latest_metadata(imaging_metadata)
+
+            return format_response(imaging_metadata)
+
+        except SlimsRecordNotFound:
+            return JSONResponse(
+                status_code=404,
+                content={"message": "No data found", "data": None},
+            )
+
+        except Exception as e:
+            logging.error(f"Internal Server Error: {repr(e)}")
+            return JSONResponse(
+                status_code=500,
+                content={
+                    "message": f"Internal Server Error: {e}",
+                    "data": None,
+                },
+            )

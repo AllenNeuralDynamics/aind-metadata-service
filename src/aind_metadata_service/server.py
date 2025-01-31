@@ -1,12 +1,12 @@
 """Starts and runs a Flask Service"""
 
 import os
-
+from typing import Optional
 from aind_metadata_mapper.bergamo.session import BergamoEtl
 from aind_metadata_mapper.bergamo.session import (
     JobSettings as BergamoJobSettings,
 )
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -214,6 +214,30 @@ async def retrieve_project_names():
     return json_response
 
 
+@app.get("/slims/smartspim_imaging/{subject_id}")
+async def retrieve_smartspim_imaging(
+    subject_id,
+    date: Optional[str] = Query(
+        None,
+        alias="date_performed",
+        description="Date in ISO format (YYYY-MM-DD or YYYY-MM-DDTHH:MM)",
+    ),
+    latest: bool = Query(
+        False, description="Flag to get the latest acquisition"
+    ),
+):
+    """
+    Retrieves acquisitions from SLIMS server
+    """
+    json_response = await run_in_threadpool(
+        slims_client.get_smartspim_imaging_json_response,
+        subject_id=subject_id,
+        date_performed=date,
+        latest=latest,
+    )
+    return json_response
+
+
 @app.get("/subject/{subject_id}")
 async def retrieve_subject(subject_id):
     """
@@ -253,6 +277,30 @@ async def retrieve_injection_materials(prep_lot_number):
         prep_lot_number=prep_lot_number,
     )
     # TODO: move molecules call to here
+    return model_response.map_to_json_response()
+
+
+@app.get("/smartspim_imaging/{subject_id}")
+async def retrieve_acquisitions(
+    subject_id,
+    date: Optional[str] = Query(
+        None,
+        alias="date_performed",
+        description="Date in ISO format (YYYY-MM-DD or YYYY-MM-DDTHH:MM)",
+    ),
+    latest: bool = Query(
+        False, description="Flag to get the latest acquisition"
+    ),
+):
+    """
+    Retrieves acquisitions from SLIMS server
+    """
+    model_response = await run_in_threadpool(
+        slims_client.get_acquisitions_model_response,
+        subject_id=subject_id,
+        date_performed=date,
+        latest=latest,
+    )
     return model_response.map_to_json_response()
 
 
