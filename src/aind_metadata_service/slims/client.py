@@ -15,6 +15,7 @@ from aind_slims_api.operations import (
 from pydantic import Extra, Field, SecretStr
 from pydantic_settings import BaseSettings
 from requests.models import Response
+from slims import criteria
 from slims.criteria import equals
 
 from aind_metadata_service.client import StatusCodes
@@ -55,16 +56,29 @@ class SlimsHandler:
         """Checks whether file is a json."""
         return file.headers.get("Content-Type", "") == "application/json"
 
-    def get_instrument_model_response(self, input_id) -> ModelResponse:
+    def get_instrument_model_response(
+        self, input_id: str, partial_match: bool = False
+    ) -> ModelResponse:
         """
         Fetches a response from SLIMS, extracts Instrument models from the
         response and creates a ModelResponse with said models.
         """
         try:
-            inst = self.client.fetch_model(SlimsInstrumentRdrc, name=input_id)
-            attachment = self.client.fetch_attachment(
-                inst, equals("name", input_id)
-            )
+            if partial_match:
+                inst = self.client.fetch_model(
+                    SlimsInstrumentRdrc,
+                    criteria.contains("name", input_id),
+                )
+                attachment = self.client.fetch_attachment(
+                    inst,
+                )
+            else:
+                inst = self.client.fetch_model(
+                    SlimsInstrumentRdrc, name=input_id
+                )
+                attachment = self.client.fetch_attachment(
+                    inst, equals("name", input_id)
+                )
             if attachment:
                 attachment_response = self.client.fetch_attachment_content(
                     attachment
@@ -91,16 +105,29 @@ class SlimsHandler:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
 
-    def get_rig_model_response(self, input_id) -> ModelResponse:
+    def get_rig_model_response(
+        self, input_id: str, partial_match: bool = False
+    ) -> ModelResponse:
         """
         Fetches a response from SLIMS, extracts Rig models from the
         response and creates a ModelResponse with said models.
         """
         try:
-            inst = self.client.fetch_model(SlimsInstrumentRdrc, name=input_id)
-            attachment = self.client.fetch_attachment(
-                inst, equals("name", input_id)
-            )
+            if partial_match:
+                inst = self.client.fetch_model(
+                    SlimsInstrumentRdrc,
+                    criteria.contains("name", input_id),
+                )
+                attachment = self.client.fetch_attachment(
+                    inst,
+                )
+            else:
+                inst = self.client.fetch_model(
+                    SlimsInstrumentRdrc, name=input_id
+                )
+                attachment = self.client.fetch_attachment(
+                    inst, equals("name", input_id)
+                )
             if attachment:
                 attachment_response = self.client.fetch_attachment_content(
                     attachment
