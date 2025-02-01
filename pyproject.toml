@@ -51,7 +51,7 @@ server = [
     'uvicorn[standard]',
     'python-dateutil',
     'xmltodict==0.13.0',
-    'slims-python-api==6.8.0',
+    'aind-slims-api>=0.1.21',
     'azure-identity==1.15.0',
     'pydantic-xml',
     'httpx'
@@ -119,6 +119,9 @@ env = [
     "LABTRACKS_USER=lb_user",
     "LABTRACKS_PORT=123",
     "LABTRACKS_DATABASE=lb_db",
+    "SLIMS_URL=http://slims.example.com",
+    "SLIMS_USERNAME=slims_user",
+    "SLIMS_PASSWORD=slims_password",
     "SMARTSHEET_FUNDING_ID=1000",
     "SMARTSHEET_PERFUSIONS_ID=1001",
     "SMARTSHEET_PROTOCOLS_ID=1002",

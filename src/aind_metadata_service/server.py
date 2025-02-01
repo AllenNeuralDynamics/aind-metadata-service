@@ -20,6 +20,8 @@ from aind_metadata_service.routers.project_names.route import (
 )
 from aind_metadata_service.routers.protocols.route import router as pt_router
 from aind_metadata_service.routers.subject.route import router as subj_router
+from aind_metadata_service.routers.rig.route import router as rig_router
+from aind_metadata_service.routers.instrument.route import router as ins_router
 
 log_level = os.getenv("LOG_LEVEL", "INFO")
 logging.basicConfig(level=log_level)
@@ -66,3 +68,5 @@ app.include_router(fv_router)
 app.include_router(pn_router)
 app.include_router(hc_router)
 app.include_router(inj_router)
+app.include_router(rig_router)
+app.include_router(ins_router)

@@ -25,7 +25,7 @@ router = APIRouter()
 
 
 class ProjectNamesResponse(Message):
-    """Valid Subject response"""
+    """Valid Project Names response"""
 
     message: str = "Success"
     data: List[str]
