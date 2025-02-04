@@ -98,6 +98,37 @@ class TestSlimsHandler(unittest.TestCase):
                 SlimsInstrumentRdrc, name="test_id"
             )
 
+    @patch(
+        "aind_metadata_service.slims.client.SlimsHandler._is_json_file",
+    )
+    @patch("slims.criteria.contains")
+    def test_get_instrument_model_response_success_partial_match(
+        self, mock_contains: MagicMock, mock_is_json_file: MagicMock
+    ):
+        """Test successful response from get_instrument_model_response when
+        partial_match is set to True"""
+        mock_inst = MagicMock()
+        mock_is_json_file.return_value = True
+        self.mock_client.fetch_model.return_value = mock_inst
+        mock_attachment = MagicMock()
+        self.mock_client.fetch_attachment.return_value = mock_attachment
+        mock_response = MagicMock(spec=Response)
+        mock_response.status_code = 200
+        mock_response.json.return_value = {}
+        self.mock_client.fetch_attachment_content.return_value = mock_response
+
+        with patch(
+            "aind_data_schema.core.instrument.Instrument.model_construct"
+        ) as mock_construct:
+            mock_construct.return_value = MagicMock(spec=Instrument)
+            response = self.handler.get_instrument_model_response(
+                "test_id", partial_match=True
+            )
+
+            self.assertEqual(response.status_code, StatusCodes.DB_RESPONDED)
+            mock_construct.assert_called_once_with(**mock_response.json())
+            mock_contains.assert_called_once_with("name", "test_id")
+
     def test_get_instrument_model_response_invalid_response(self):
         """Test response when the content is not valid response."""
         mock_inst = MagicMock()
@@ -192,6 +223,33 @@ class TestSlimsHandler(unittest.TestCase):
             self.mock_client.fetch_model.assert_called_once_with(
                 SlimsInstrumentRdrc, name="test_id"
             )
+
+    @patch("slims.criteria.contains")
+    def test_get_rig_model_response_success_partial_match(
+        self, mock_contains: MagicMock
+    ):
+        """Test successful response from get_rig_model_response when
+        partial_match is set to True."""
+        mock_inst = MagicMock()
+        self.mock_client.fetch_model.return_value = mock_inst
+        mock_attachment = MagicMock()
+        self.mock_client.fetch_attachment.return_value = mock_attachment
+        mock_response = MagicMock(spec=Response)
+        mock_response.status_code = 200
+        mock_response.json.return_value = {}
+        self.mock_client.fetch_attachment_content.return_value = mock_response
+
+        with patch(
+            "aind_data_schema.core.rig.Rig.model_construct"
+        ) as mock_construct:
+            mock_construct.return_value = MagicMock(spec=Rig)
+            response = self.handler.get_rig_model_response(
+                "test_id", partial_match=True
+            )
+
+            self.assertEqual(response.status_code, StatusCodes.DB_RESPONDED)
+            mock_construct.assert_called_once_with(**mock_response.json())
+            mock_contains.assert_called_once_with("name", "test_id")
 
     def test_get_rig_model_response_not_found(self):
         """Test when SlimsRecordNotFound is raised."""
