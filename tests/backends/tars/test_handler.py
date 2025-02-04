@@ -357,9 +357,7 @@ class TestSessionHandler(unittest.TestCase):
                     addgeneId=None,
                     mgiId=None,
                     notes=None,
-                    sequence=(
-                        "CATG"
-                    ),
+                    sequence=("CATG"),
                     genes=[],
                     loci=[],
                     species=[

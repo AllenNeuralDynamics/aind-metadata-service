@@ -14,11 +14,13 @@ from aind_metadata_service.routers.healthcheck.route import router as hc_router
 from aind_metadata_service.routers.injection_materials.route import (
     router as inj_router,
 )
+from aind_metadata_service.routers.instrument.route import router as ins_router
 from aind_metadata_service.routers.perfusions.route import router as pf_router
 from aind_metadata_service.routers.project_names.route import (
     router as pn_router,
 )
 from aind_metadata_service.routers.protocols.route import router as pt_router
+from aind_metadata_service.routers.rig.route import router as rig_router
 from aind_metadata_service.routers.subject.route import router as subj_router
 
 log_level = os.getenv("LOG_LEVEL", "INFO")
@@ -66,3 +68,5 @@ app.include_router(fv_router)
 app.include_router(pn_router)
 app.include_router(hc_router)
 app.include_router(inj_router)
+app.include_router(rig_router)
+app.include_router(ins_router)

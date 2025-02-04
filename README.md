@@ -39,9 +39,10 @@ pip install -e .[dev]
 Requires docker and docker-compose.
 
 - Create a file called env/webapp.env with appropriate env variables.
-- Run `docker-compose up -d --build`
-- Run `docker-compose logs -f fastapi` to see fastapi logs
+- Run `docker compose up -d --build`
+- Run `docker compose logs -f fastapi` to see fastapi logs
 - Service will be available at `http://localhost:5000`
+- Run `docker compose down` to shut down service
 
 ### Linters and testing
 
