@@ -15,6 +15,7 @@ from aind_slims_api.operations.ecephys_session import (
     EcephysSession as SlimsEcephysSession,
 )
 from requests.models import Response
+from fastapi.responses import JSONResponse
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.slims.client import SlimsHandler, SlimsSettings
@@ -325,6 +326,60 @@ class TestSlimsHandler(unittest.TestCase):
             "test_id"
         )
         self.assertEqual(response.status_code, StatusCodes.NO_DATA_FOUND)
+
+    def test_get_smartspim_imaging_json_response_validation_fails(self):
+        """Should return 400 if both datetime_performed and latest are provided."""
+        response = self.handler.get_smartspim_imaging_json_response(subject_id="000000", datetime_performed="2024-10-18T22:27:00", latest=True)
+        self.assertEqual(response.status_code, 400)
+
+    # @patch("utils.parse_date_performed", return_value=JSONResponse(status_code=400, content={"message": "Invalid date"}))
+    # def test_get_smartspim_imaging_json_response_invalid_date(self, mock_parse_date):
+    #     """Should return 400 if an invalid date is passed."""
+    #     response = self.instance.get_smartspim_imaging_json_response("123", "invalid-date", False)
+    #     self.assertEqual(response.status_code, 400)
+
+    # @patch("utils.fetch_imaging_metadata", return_value=[])
+    # def test_no_data_found(self, mock_fetch_metadata):
+    #     """Should return 404 if no imaging metadata is found."""
+    #     response = self.instance.get_smartspim_imaging_json_response("123")
+    #     self.assertEqual(response.status_code, 404)
+
+    # @patch("utils.fetch_imaging_metadata", return_value=[{"date_performed": "2024-10-18T22:27:00"}])
+    # @patch("utils.parse_date_performed", return_value=datetime(2024, 10, 18, 22, 27, 0))
+    # @patch("utils.filter_by_date", return_value=[{"date_performed": "2024-10-18T22:27:00"}])
+    # def test_filter_by_date(self, mock_filter, mock_parse_date, mock_fetch_metadata):
+    #     """Should filter imaging metadata by date_performed."""
+    #     response = self.instance.get_smartspim_imaging_json_response("123", "2024-10-18T22:27:00")
+    #     self.assertEqual(response.status_code, 200)
+    #     mock_filter.assert_called_once()
+
+    # @patch("utils.fetch_imaging_metadata", return_value=[{"date_performed": "2024-10-18T22:27:00"}, {"date_performed": "2024-10-19T15:45:00"}])
+    # @patch("utils.get_latest_metadata", return_value=[{"date_performed": "2024-10-19T15:45:00"}])
+    # def test_get_latest_metadata(self, mock_get_latest, mock_fetch_metadata):
+    #     """Should return the latest imaging metadata."""
+    #     response = self.instance.get_smartspim_imaging_json_response("123", latest=True)
+    #     self.assertEqual(response.status_code, 200)
+    #     mock_get_latest.assert_called_once()
+
+    # @patch("utils.fetch_imaging_metadata", return_value=[{"date_performed": "2024-10-18T22:27:00"}])
+    # @patch("utils.format_response", return_value=JSONResponse(status_code=200, content={"message": "Success"}))
+    # def test_successful_response(self, mock_format_response, mock_fetch_metadata):
+    #     """Should return a properly formatted response."""
+    #     response = self.instance.get_smartspim_imaging_json_response("123")
+    #     self.assertEqual(response.status_code, 200)
+    #     mock_format_response.assert_called_once()
+
+    # @patch("utils.fetch_imaging_metadata", side_effect=SlimsRecordNotFound)
+    # def test_slims_record_not_found(self, mock_fetch_metadata):
+    #     """Should return 404 when SlimsRecordNotFound is raised."""
+    #     response = self.instance.get_smartspim_imaging_json_response("123")
+    #     self.assertEqual(response.status_code, 404)
+
+    # @patch("utils.fetch_imaging_metadata", side_effect=Exception("Unexpected error"))
+    # def test_internal_server_error(self, mock_fetch_metadata):
+    #     """Should return 500 on an unexpected exception."""
+    #     response = self.instance.get_smartspim_imaging_json_response("123")
+    #     self.assertEqual(response.status_code, 500)
 
 
 if __name__ == "__main__":

@@ -186,36 +186,25 @@ class SlimsHandler:
     def get_smartspim_imaging_json_response(
         self,
         subject_id: str,
-        date_performed: Optional[str] = None,
+        datetime_performed: Optional[str] = None,
         latest: bool = False,
     ) -> JSONResponse:
         """
         Fetches SmartSPIM imaging data for a given subject ID from SLIMS.
         """
-        validation_error = validate_parameters(date_performed, latest)
-        if validation_error:
-            return validation_error
-
-        date_performed_dt = parse_date_performed(date_performed)
-        if isinstance(date_performed_dt, JSONResponse):
-            return date_performed_dt  # Return error response if date parsing failed
+        _ = validate_parameters(datetime_performed, latest)
+        date_performed_dt = parse_date_performed(datetime_performed)
 
         try:
             imaging_metadata = fetch_imaging_metadata(
                 subject_id=subject_id, client=self.client
             )
-            if not imaging_metadata:
-                return JSONResponse(
-                    status_code=404,
-                    content={"message": "No data found", "data": None},
-                )
-
             # Apply filters based on the parameters
-            if date_performed_dt:
+            if date_performed_dt and imaging_metadata:
                 imaging_metadata = filter_by_date(
                     imaging_metadata, date_performed_dt
                 )
-            elif latest:
+            elif latest and imaging_metadata:
                 imaging_metadata = get_latest_metadata(imaging_metadata)
 
             return format_response(imaging_metadata)
