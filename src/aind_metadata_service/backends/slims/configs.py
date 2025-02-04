@@ -11,8 +11,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="SLIMS_")
     url: str = Field(
         ...,
-        title="Host",
-        description="Host address of the LabTracks Server.",
+        title="SLIMS URL",
+        description="URL of SLIMS REST Endpoint.",
     )
     username: str = Field(..., title="User Name", description="User name.")
     password: SecretStr = Field(..., title="Password", description="Password.")
