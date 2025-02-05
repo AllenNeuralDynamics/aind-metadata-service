@@ -1,85 +1,61 @@
-from fastapi.responses import JSONResponse
-from typing import Optional, List, Dict
-from datetime import datetime
-import json
+"""Utility methods for handling smartspim imaging."""
 
-
-def validate_parameters(date_performed: Optional[str], latest: bool):
-    """Ensures that both `date_performed` and `latest` are not set simultaneously."""
-    # TODO: should this return a JSONResponse or raise an error? Error should be in response?
-    if date_performed and latest:
-        raise Exception("Both date_performed and latest cannot be set.")
-    return None  # No validation error
+from typing import Optional, List
+from datetime import datetime, timezone
+import logging
+from aind_metadata_service.models import SpimImagingInformation
 
 
 def parse_date_performed(date_performed: Optional[str]) -> Optional[datetime]:
-    """Converts `date_performed` to a datetime object with zeroed seconds/microseconds."""
+    """
+    Converts `date_performed` to a datetime object with zeroed
+    seconds/microseconds.
+    """
     if not date_performed:
         return None
     else:
-        return datetime.fromisoformat(date_performed).replace(
-            second=0, microsecond=0
-        ) # if this raises an error -> it should throw internal server error
-    # except ValueError:
-    #     return JSONResponse(
-    #         status_code=400,
-    #         content={
-    #             "message": "Invalid date format. Use ISO format (YYYY-MM-DDTHH:MM:SS)",
-    #             "data": None,
-    #         },
-    #     )
+        try:
+            return datetime.fromisoformat(date_performed).replace(
+                second=0, microsecond=0
+            )
+        except ValueError as e:
+            logging.error(repr(e))
+            return None
+
 
 def filter_by_date(
-    imaging_metadata: List[Dict], date_performed: datetime
-) -> List[Dict]:
-    """Filters imaging metadata by the given `date_performed`."""
-    # TODO: no data found, or internal server error w message? 
+    imaging_metadata: List[SpimImagingInformation], date_performed: datetime
+) -> Optional[List[SpimImagingInformation]]:
+    """
+    Filters imaging metadata by the given `date_performed`.
+    If no data is found, returns an empty list.
+    """
+    if date_performed.tzinfo is None:
+        date_performed = date_performed.replace(tzinfo=timezone.utc)
     filtered_metadata = [
         data
         for data in imaging_metadata
-        if data.get("date_performed")
-        and datetime.fromisoformat(str(data["date_performed"])).replace(
-            second=0, microsecond=0
-        )
+        if getattr(data, "date_performed", None)
+        and data.date_performed.replace(second=0, microsecond=0)
         == date_performed
     ]
     return filtered_metadata if filtered_metadata else []
 
 
-def get_latest_metadata(imaging_metadata: List[Dict]) -> List[Dict]:
-    """Finds the most recent imaging metadata based on `date_performed`."""
-    #TODO: how to handle case where there is no date_performed in SLIMS? 
-    # logging? 
+def get_latest_metadata(
+    imaging_metadata: List[SpimImagingInformation],
+) -> Optional[List[SpimImagingInformation]]:
+    """
+    Finds the most recent imaging metadata based on `date_performed`.
+    If no data is found, returns an empty list.
+    """
     dated_metadata = [
-        data for data in imaging_metadata if data.get("date_performed")
+        data
+        for data in imaging_metadata
+        if getattr(data, "date_performed", None)
     ]
-    print(dated_metadata[0]["date_performed"])
     return (
-        [
-            max(
-                dated_metadata,
-                key=lambda x: datetime.fromisoformat(str(x["date_performed"])),
-            )
-        ]
+        [max(dated_metadata, key=lambda x: x.date_performed)]
         if dated_metadata
         else []
     )
-
-
-def format_response(imaging_metadata: List[Dict]) -> JSONResponse:
-    """Formats the final JSON response based on the number of results."""
-    if len(imaging_metadata) == 0:
-        return JSONResponse(
-            status_code=404,
-            content={"message": "No Data Found.", "data": None},
-        )
-    else:
-        return JSONResponse(
-            status_code=200,
-            content={
-                "message": "Success",
-                "data": json.loads(
-                    json.dumps(imaging_metadata, default=str)
-                ),
-            },
-        )

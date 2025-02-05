@@ -220,7 +220,7 @@ async def retrieve_smartspim_imaging(
     datetime: Optional[str] = Query(
         None,
         alias="datetime",
-        description="Datetime acquisition was performed. in ISO format (YYYY-MM-DDTHH:MM)",
+        description="Datetime performed in ISO format (YYYY-MM-DDTHH:MM)",
     ),
     latest: bool = Query(
         False, description="Flag to get the latest acquisition"
@@ -229,13 +229,13 @@ async def retrieve_smartspim_imaging(
     """
     Retrieves acquisitions from SLIMS server
     """
-    json_response = await run_in_threadpool(
-        slims_client.get_smartspim_imaging_json_response,
+    response = await run_in_threadpool(
+        slims_client.get_smartspim_imaging_model_response,
         subject_id=subject_id,
         datetime_performed=datetime,
         latest=latest,
     )
-    return json_response
+    return response.map_to_json_response()
 
 
 @app.get("/subject/{subject_id}")

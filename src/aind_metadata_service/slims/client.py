@@ -21,15 +21,13 @@ from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
 from aind_metadata_service.slims.procedures.mapping import SlimsHistologyMapper
 from aind_metadata_service.slims.sessions.mapping import SlimsSessionMapper
-from fastapi.responses import JSONResponse
 from typing import Optional
 from aind_metadata_service.slims.imaging.utils import (
-    validate_parameters,
     parse_date_performed,
     filter_by_date,
     get_latest_metadata,
-    format_response,
 )
+from aind_metadata_service.models import SpimImagingInformation
 
 
 class SlimsSettings(BaseSettings):
@@ -183,22 +181,30 @@ class SlimsHandler:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
 
-    def get_smartspim_imaging_json_response(
+    def get_smartspim_imaging_model_response(
         self,
         subject_id: str,
         datetime_performed: Optional[str] = None,
         latest: bool = False,
-    ) -> JSONResponse:
+    ) -> ModelResponse:
         """
         Fetches SmartSPIM imaging data for a given subject ID from SLIMS.
         """
-        _ = validate_parameters(datetime_performed, latest)
+        if datetime_performed and latest:
+            return ModelResponse.bad_request_error_response()
+
         date_performed_dt = parse_date_performed(datetime_performed)
+        if datetime_performed and not date_performed_dt:
+            return ModelResponse.bad_request_error_response()
 
         try:
             imaging_metadata = fetch_imaging_metadata(
                 subject_id=subject_id, client=self.client
             )
+            imaging_metadata = [
+                SpimImagingInformation(**metadata)
+                for metadata in imaging_metadata
+            ]
             # Apply filters based on the parameters
             if date_performed_dt and imaging_metadata:
                 imaging_metadata = filter_by_date(
@@ -206,21 +212,16 @@ class SlimsHandler:
                 )
             elif latest and imaging_metadata:
                 imaging_metadata = get_latest_metadata(imaging_metadata)
-
-            return format_response(imaging_metadata)
-
+            elif imaging_metadata:
+                pass
+            else:
+                return ModelResponse.no_data_found_error_response()
+            return ModelResponse(
+                aind_models=imaging_metadata,
+                status_code=StatusCodes.DB_RESPONDED,
+            )
         except SlimsRecordNotFound:
-            return JSONResponse(
-                status_code=404,
-                content={"message": "No data found", "data": None},
-            )
-
+            return ModelResponse.no_data_found_error_response()
         except Exception as e:
-            logging.error(f"Internal Server Error: {repr(e)}")
-            return JSONResponse(
-                status_code=500,
-                content={
-                    "message": f"Internal Server Error: {e}",
-                    "data": None,
-                },
-            )
+            logging.error(repr(e))
+            return ModelResponse.internal_server_error_response()

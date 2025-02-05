@@ -15,10 +15,10 @@ from aind_slims_api.operations.ecephys_session import (
     EcephysSession as SlimsEcephysSession,
 )
 from requests.models import Response
-from fastapi.responses import JSONResponse
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.slims.client import SlimsHandler, SlimsSettings
+from aind_metadata_service.models import SpimImagingInformation
 
 RESOURCES_DIR = (
     Path(os.path.dirname(os.path.realpath(__file__)))
@@ -59,6 +59,15 @@ class TestSlimsHandler(unittest.TestCase):
             for block in slims_data2
         ]
         self.expected_procedures = expected_data2
+        with open(RAW_DIR / "imaging_metadata_response.json") as f:
+            slims_data3 = json.load(f)
+        slims_data4 = slims_data3.copy()
+        slims_data4["date_performed"] = "2024-10-19T20:12:00Z"
+        self.slims_imaging_metadata = [slims_data3, slims_data4]
+        self.expected_imaging_metadata = [
+            SpimImagingInformation(**slims_data3),
+            SpimImagingInformation(**slims_data4),
+        ]
 
     def test_is_json_file_true(self):
         """Test that _is_json_file returns True for valid JSON response."""
@@ -327,59 +336,97 @@ class TestSlimsHandler(unittest.TestCase):
         )
         self.assertEqual(response.status_code, StatusCodes.NO_DATA_FOUND)
 
-    def test_get_smartspim_imaging_json_response_validation_fails(self):
-        """Should return 400 if both datetime_performed and latest are provided."""
-        response = self.handler.get_smartspim_imaging_json_response(subject_id="000000", datetime_performed="2024-10-18T22:27:00", latest=True)
-        self.assertEqual(response.status_code, 400)
+    def test_get_smartspim_imaging_model_response_bad_request(self):
+        """
+        Should return 400 if both datetime_performed and latest are provided.
+        Or if datetime_performed is invalid.
+        """
+        response = self.handler.get_smartspim_imaging_model_response(
+            subject_id="000000",
+            datetime_performed="2024-10-18T22:27:00",
+            latest=True,
+        )
+        self.assertEqual(response.status_code, StatusCodes.BAD_REQUEST)
 
-    # @patch("utils.parse_date_performed", return_value=JSONResponse(status_code=400, content={"message": "Invalid date"}))
-    # def test_get_smartspim_imaging_json_response_invalid_date(self, mock_parse_date):
-    #     """Should return 400 if an invalid date is passed."""
-    #     response = self.instance.get_smartspim_imaging_json_response("123", "invalid-date", False)
-    #     self.assertEqual(response.status_code, 400)
+        # Should return 400 if datetime_performed is invalid.
+        response = self.handler.get_smartspim_imaging_model_response(
+            subject_id="000000",
+            datetime_performed="2024-10-1822:27:",
+        )
+        self.assertEqual(response.status_code, StatusCodes.BAD_REQUEST)
 
-    # @patch("utils.fetch_imaging_metadata", return_value=[])
-    # def test_no_data_found(self, mock_fetch_metadata):
-    #     """Should return 404 if no imaging metadata is found."""
-    #     response = self.instance.get_smartspim_imaging_json_response("123")
-    #     self.assertEqual(response.status_code, 404)
+    @patch("aind_metadata_service.slims.client.fetch_imaging_metadata")
+    def test_get_smartspim_imaging_model_response_success(
+        self, mock_fetch_imaging
+    ):
+        """Tests that imaging data is fetched as expected."""
+        mock_fetch_imaging.return_value = self.slims_imaging_metadata
+        response = self.handler.get_smartspim_imaging_model_response("test_id")
+        self.assertEqual(
+            response.aind_models,
+            self.expected_imaging_metadata,
+        )
+        self.assertEqual(response.status_code, StatusCodes.DB_RESPONDED)
 
-    # @patch("utils.fetch_imaging_metadata", return_value=[{"date_performed": "2024-10-18T22:27:00"}])
-    # @patch("utils.parse_date_performed", return_value=datetime(2024, 10, 18, 22, 27, 0))
-    # @patch("utils.filter_by_date", return_value=[{"date_performed": "2024-10-18T22:27:00"}])
-    # def test_filter_by_date(self, mock_filter, mock_parse_date, mock_fetch_metadata):
-    #     """Should filter imaging metadata by date_performed."""
-    #     response = self.instance.get_smartspim_imaging_json_response("123", "2024-10-18T22:27:00")
-    #     self.assertEqual(response.status_code, 200)
-    #     mock_filter.assert_called_once()
+    @patch("aind_metadata_service.slims.client.fetch_imaging_metadata")
+    def test_get_smartspim_imaging_model_response_success_date(
+        self, mock_fetch_imaging
+    ):
+        """Tests that imaging data is filtered by date as expected."""
+        mock_fetch_imaging.return_value = self.slims_imaging_metadata
+        response = self.handler.get_smartspim_imaging_model_response(
+            "test_id", datetime_performed="2024-10-18T22:27:00"
+        )
+        self.assertEqual(len(response.aind_models), 1)
+        self.assertEqual(
+            response.aind_models[0],
+            self.expected_imaging_metadata[0],
+        )
+        self.assertEqual(response.status_code, StatusCodes.DB_RESPONDED)
 
-    # @patch("utils.fetch_imaging_metadata", return_value=[{"date_performed": "2024-10-18T22:27:00"}, {"date_performed": "2024-10-19T15:45:00"}])
-    # @patch("utils.get_latest_metadata", return_value=[{"date_performed": "2024-10-19T15:45:00"}])
-    # def test_get_latest_metadata(self, mock_get_latest, mock_fetch_metadata):
-    #     """Should return the latest imaging metadata."""
-    #     response = self.instance.get_smartspim_imaging_json_response("123", latest=True)
-    #     self.assertEqual(response.status_code, 200)
-    #     mock_get_latest.assert_called_once()
+    @patch("aind_metadata_service.slims.client.fetch_imaging_metadata")
+    def test_get_smartspim_imaging_model_response_success_latest(
+        self, mock_fetch_imaging
+    ):
+        """Tests that imaging data is filtered by date as expected."""
+        mock_fetch_imaging.return_value = self.slims_imaging_metadata
+        response = self.handler.get_smartspim_imaging_model_response(
+            "test_id", latest=True
+        )
+        self.assertEqual(len(response.aind_models), 1)
+        self.assertEqual(
+            response.aind_models[0],
+            self.expected_imaging_metadata[1],
+        )
+        self.assertEqual(response.status_code, StatusCodes.DB_RESPONDED)
 
-    # @patch("utils.fetch_imaging_metadata", return_value=[{"date_performed": "2024-10-18T22:27:00"}])
-    # @patch("utils.format_response", return_value=JSONResponse(status_code=200, content={"message": "Success"}))
-    # def test_successful_response(self, mock_format_response, mock_fetch_metadata):
-    #     """Should return a properly formatted response."""
-    #     response = self.instance.get_smartspim_imaging_json_response("123")
-    #     self.assertEqual(response.status_code, 200)
-    #     mock_format_response.assert_called_once()
+    @patch("aind_metadata_service.slims.client.fetch_imaging_metadata")
+    def test_get_smartspim_imaging_model_response_no_data(
+        self, mock_fetch_imaging
+    ):
+        """Tests no data found response."""
+        mock_fetch_imaging.return_value = []
+        response = self.handler.get_smartspim_imaging_model_response("test_id")
 
-    # @patch("utils.fetch_imaging_metadata", side_effect=SlimsRecordNotFound)
-    # def test_slims_record_not_found(self, mock_fetch_metadata):
-    #     """Should return 404 when SlimsRecordNotFound is raised."""
-    #     response = self.instance.get_smartspim_imaging_json_response("123")
-    #     self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, StatusCodes.NO_DATA_FOUND)
 
-    # @patch("utils.fetch_imaging_metadata", side_effect=Exception("Unexpected error"))
-    # def test_internal_server_error(self, mock_fetch_metadata):
-    #     """Should return 500 on an unexpected exception."""
-    #     response = self.instance.get_smartspim_imaging_json_response("123")
-    #     self.assertEqual(response.status_code, 500)
+    @patch("aind_metadata_service.slims.client.fetch_imaging_metadata")
+    def test_get_smartspim_imaging_model_response_unexpected_error(
+        self, mock_fetch_imaging
+    ):
+        """Tests internal server error.""" ""
+        mock_fetch_imaging.side_effect = Exception("Unexpected error")
+        response = self.handler.get_smartspim_imaging_model_response("test_id")
+        self.assertEqual(
+            response.status_code, StatusCodes.INTERNAL_SERVER_ERROR
+        )
+
+    def test_get_smartspim_imaging_model_response_not_found(self):
+        """Test response when SlimsRecordNotFound is raised."""
+        self.mock_client.fetch_model.side_effect = SlimsRecordNotFound
+
+        response = self.handler.get_smartspim_imaging_model_response("test_id")
+        self.assertEqual(response.status_code, StatusCodes.NO_DATA_FOUND)
 
 
 if __name__ == "__main__":
