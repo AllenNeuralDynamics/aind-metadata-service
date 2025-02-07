@@ -104,24 +104,6 @@ class TarsClient:
         if not filtered_data:
             raise ValueError(f"No data found for {prep_lot_number}")
         return filtered_data
-    
-    @staticmethod
-    def _filter_virus_response(
-        virus_tars_id: str, response: requests.models.Response
-    ) -> Optional[List]:
-        """
-        Filters response from TARS for exact match.
-        Parameters
-        ----------
-        prep_lot_number: str
-           Prep lot number used to query Virus endpoint.
-        response : requests.models.Response
-           Raw Response from Virus endpoint
-        """
-        data = response.json()["data"]
-        if not data: 
-            raise ValueError(f"No data found for {virus_tars_id}")
-        return data[0]
 
     def _get_molecules_response(
         self, plasmid_name: str
@@ -178,18 +160,13 @@ class TarsClient:
             injection_materials = []
 
             for lot in data:
-                print("Lot", lot)
                 # virus tars id is the preferred virus alias
                 virus_tars_id = next(
                     (alias["name"] for alias in lot["viralPrep"]["virus"]["aliases"] if alias["isPreferred"]), 
                     None
                 )
-                print("virus tars id", virus_tars_id)
-                # check virus registry with tars id 
+                # check virus registry with tars id
                 virus_response = self._get_virus_response(virus_tars_id)
-                # virus_data = self._filter_virus_response(virus_tars_id, virus_response)
-                
-                # check if virus can be assumed as 1 or if we need to loop 
                 injection_material = trh.map_lot_to_injection_material(
                     viral_prep_lot=lot, virus=virus_response.json()["data"][0], virus_tars_id=virus_tars_id
                 )

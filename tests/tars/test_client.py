@@ -196,15 +196,42 @@ class TestTarsClient(unittest.TestCase):
         mock_get.assert_called_once_with(
             expected_url, headers=self.tars_client._headers
         )
+        
+    @patch("aind_metadata_service.tars.client.requests.get")
+    def test_get_virus_response(self, mock_get):
+        """Tests that client can fetch viral prep lot."""
+
+        mock_response = Mock()
+
+        mock_response.json.return_value = {
+            "data": [
+                {"aliases": [{"name": "AiP123"}, {"name": "rAAV-MGT_789"}]}
+            ]
+        }
+        mock_get.return_value = mock_response
+        result = self.tars_client._get_virus_response("AiP123")
+        expected_url = (
+            f"{self.azure_settings.resource}/api/v1/Viruses"
+            f"?order=1&orderBy=id"
+            f"&searchFields=aliases.name"
+            f"&search=AiP123"
+        )
+
+        self.assertEqual(
+            result.json()["data"][0]["aliases"][0]["name"], "AiP123"
+        )
+        mock_get.assert_called_once_with(
+            expected_url, headers=self.tars_client._headers
+        )
 
     @patch(
         "aind_metadata_service.tars.client.TarsClient._get_prep_lot_response"
     )
     @patch(
-        "aind_metadata_service.tars.client.TarsClient._get_molecules_response"
+        "aind_metadata_service.tars.client.TarsClient._get_virus_response"
     )
     def test_get_injection_materials_info_success(
-        self, mock_molecules_response, mock_get_prep_lot_response
+        self, mock_virus_response, mock_get_prep_lot_response
     ):
         """Tests that ModelResponse is created successfully."""
         mock_get_prep_lot_response.return_value.json.return_value = {
@@ -216,21 +243,54 @@ class TestTarsClient(unittest.TestCase):
                         "viralPrepType": {"name": "Crude-SOP#VC002"},
                         "virus": {
                             "aliases": [
-                                {"name": "AiP123"},
-                                {"name": "AiV456"},
+                                {
+                                    "name": "AiP123",
+                                    "isPreferred": True,
+                                },
+                                {
+                                    "name": "AiV456",
+                                    "isPreferred": False,
+                                },
                             ]
                         },
                     },
+                    "titers": [],
                 }
             ]
         }
-        mock_molecules_response.return_value.json.return_value = {
+        mock_virus_response.return_value.json.return_value = {
             "data": [
-                {"aliases": [{"name": "AiP123"}, {"name": "rAAV-MGT_789"}]}
+                {
+                    "aliases": [
+                        {
+                            "name": "AiP123",
+                            "isPreferred": True,
+                        },
+                        {
+                            "name": "rAAV-MGT_789",
+                            "isPreferred": False,
+                        },
+                    ],
+                    "molecules": [
+                        {
+                            "aliases": [
+                                {
+                                    "name": "ExP123",
+                                    "isPreferred": True,
+                                },
+                                {
+                                    "name": "rAAV-MGT_789",
+                                    "isPreferred": False,
+                                },
+                            ],
+                            "fullName": "rAAV-MGT_789",
+                        }
+                    ]
+                }
             ]
         }
-
         result = self.tars_client.get_injection_materials_info("12345")
+        print(result.aind_models)
         expected_response = ModelResponse(
             aind_models=[self.expected_materials],
             status_code=StatusCodes.DB_RESPONDED,
