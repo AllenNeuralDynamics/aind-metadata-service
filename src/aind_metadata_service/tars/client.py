@@ -104,6 +104,24 @@ class TarsClient:
         if not filtered_data:
             raise ValueError(f"No data found for {prep_lot_number}")
         return filtered_data
+    
+    @staticmethod
+    def _filter_virus_response(
+        virus_tars_id: str, response: requests.models.Response
+    ) -> Optional[List]:
+        """
+        Filters response from TARS for exact match.
+        Parameters
+        ----------
+        prep_lot_number: str
+           Prep lot number used to query Virus endpoint.
+        response : requests.models.Response
+           Raw Response from Virus endpoint
+        """
+        data = response.json()["data"]
+        if not data: 
+            raise ValueError(f"No data found for {virus_tars_id}")
+        return data[0]
 
     def _get_molecules_response(
         self, plasmid_name: str
@@ -124,6 +142,26 @@ class TarsClient:
         )
         response = requests.get(query, headers=headers)
         return response
+    
+    def _get_virus_response(
+        self, virus_name: str
+    ) -> requests.models.Response:
+        """
+        Retrieves virus from TARS.
+        Parameters
+        ----------
+        virus_name: str
+           Virus name used to query Virus endpoint.
+        """
+        headers = self._headers
+        query = (
+            f"{self.resource}/api/v1/Viruses"
+            f"?order=1&orderBy=id"
+            f"&searchFields=aliases.name"
+            f"&search={virus_name}"
+        )
+        response = requests.get(query, headers=headers)
+        return response
 
     def get_injection_materials_info(
         self, prep_lot_number: str
@@ -140,24 +178,20 @@ class TarsClient:
             injection_materials = []
 
             for lot in data:
-                viral_prep_aliases = trh.map_virus_aliases(
-                    aliases=lot["viralPrep"]["virus"]["aliases"]
+                print("Lot", lot)
+                # virus tars id is the preferred virus alias
+                virus_tars_id = next(
+                    (alias["name"] for alias in lot["viralPrep"]["virus"]["aliases"] if alias["isPreferred"]), 
+                    None
                 )
-                if (
-                    viral_prep_aliases.plasmid_name
-                    and viral_prep_aliases.full_genome_name is None
-                ):
-                    # check molecular registry for full genome name
-                    molecule_response = self._get_molecules_response(
-                        viral_prep_aliases.plasmid_name
-                    )
-                    viral_prep_aliases.full_genome_name = (
-                        trh.map_full_genome_name(
-                            molecule_response, viral_prep_aliases.plasmid_name
-                        )
-                    )
+                print("virus tars id", virus_tars_id)
+                # check virus registry with tars id 
+                virus_response = self._get_virus_response(virus_tars_id)
+                # virus_data = self._filter_virus_response(virus_tars_id, virus_response)
+                
+                # check if virus can be assumed as 1 or if we need to loop 
                 injection_material = trh.map_lot_to_injection_material(
-                    viral_prep_lot=lot, viral_prep_aliases=viral_prep_aliases
+                    viral_prep_lot=lot, virus=virus_response.json()["data"][0], virus_tars_id=virus_tars_id
                 )
                 injection_materials.append(injection_material)
             return ModelResponse(
