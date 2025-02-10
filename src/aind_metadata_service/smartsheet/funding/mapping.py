@@ -164,8 +164,6 @@ class FundingMapper(SmartSheetMapper):
                 if project_name is not None and subproject_name is None:
                     project_names.add(project_name)
                 elif project_name is not None and subproject_name is not None:
-                    # Support legacy input.
-                    project_names.add(project_name)
                     project_names.add(f"{project_name} - {subproject_name}")
             return JSONResponse(
                 status_code=200,
