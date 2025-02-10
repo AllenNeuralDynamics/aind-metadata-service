@@ -13,12 +13,12 @@ from aind_data_schema.core.procedures import (
 )
 
 from aind_metadata_service.client import StatusCodes
+from aind_metadata_service.models import ViralMaterialInformation
 from aind_metadata_service.response_handler import ModelResponse
 from aind_metadata_service.tars.mapping import (
     PrepProtocols,
     TarsResponseHandler,
     ViralMaterial,
-    ViralPrepAliases,
     ViralPrepTypes,
     VirusPrepType,
 )
@@ -163,95 +163,79 @@ class TestTarsResponseHandler(unittest.TestCase):
             " YYYY-MM-DDTHH:MM:SSZ"
         )
 
-    def test_map_virus_aliases(self):
-        """Tests that aliases are mapped to fields as expected."""
-        aliases = [
-            {"name": "AiP123"},
-            {"name": "AiV456"},
-            {"name": "UnknownVirus"},
-        ]
-
-        viral_prep_aliases = TarsResponseHandler.map_virus_aliases(aliases)
-
-        self.assertEqual(viral_prep_aliases.plasmid_name, "AiP123")
-        self.assertEqual(viral_prep_aliases.material_id, "AiV456")
-        self.assertEqual(viral_prep_aliases.full_genome_name, "UnknownVirus")
-
-    def test_map_full_genome_name(self):
-        """Tests that genome name is mapped as expected."""
-        response_data = {
-            "data": [
-                {"aliases": [{"name": "AiP123"}, {"name": "rAAV-MGT_789"}]}
-            ]
-        }
-        response_data2 = {
-            "data": [
-                {"aliases": [{"name": "rAAV-MGT_789"}, {"name": "AiP123"}]}
-            ]
-        }
-        response_data3 = {
-            "data": [{"aliases": [{"name": None}, {"name": "AiP123"}]}]
-        }
-        mock_response = MagicMock()
-        mock_response.json.return_value = response_data
-
-        mock_response2 = MagicMock()
-        mock_response2.json.return_value = response_data2
-
-        mock_response3 = MagicMock()
-        mock_response3.json.return_value = response_data3
-
-        genome_name = self.handler.map_full_genome_name(
-            mock_response, plasmid_name="AiP123"
-        )
-
-        genome_name2 = self.handler.map_full_genome_name(
-            mock_response2, plasmid_name="AiP123"
-        )
-
-        genome_name3 = self.handler.map_full_genome_name(
-            mock_response3, plasmid_name="AiP123"
-        )
-
-        self.assertEqual(genome_name, "rAAV-MGT_789")
-        self.assertEqual(genome_name2, "rAAV-MGT_789")
-        self.assertIsNone(genome_name3)
-
     def test_map_lot_to_injection_materials(self):
         """Tests that prep lot is mapped to ViralMaterial as expected."""
-        response_data = {
+        prep_lot_response = {
             "lot": "12345",
             "datePrepped": "2023-12-15T12:34:56Z",
             "viralPrep": {
-                "viralPrepType": {"name": ViralPrepTypes.CRUDE_SOP.value},
+                "viralPrepType": {"name": "Crude-SOP#VC002"},
                 "virus": {
                     "aliases": [
-                        {"name": "AiP123"},
-                        {"name": "AiV456"},
+                        {
+                            "name": "AiP123",
+                            "isPreferred": True,
+                        },
+                        {
+                            "name": "AiV456",
+                            "isPreferred": False,
+                        },
                     ]
                 },
             },
+            "titers": [
+                {
+                    "isPreferred": True,
+                    "result": 413000000000,
+                }
+            ],
         }
 
-        viral_prep_aliases = ViralPrepAliases(
-            material_id="AiV456",
-            full_genome_name="rAAV-MGT_789",
-            plasmid_name="AiP123",
-        )
+        virus_response = {
+            "aliases": [
+                {
+                    "name": "AiP123",
+                    "isPreferred": True,
+                },
+                {
+                    "name": "rAAV-MGT_789",
+                    "isPreferred": False,
+                },
+            ],
+            "molecules": [
+                {
+                    "aliases": [
+                        {
+                            "name": "ExP123",
+                            "isPreferred": True,
+                        },
+                        {
+                            "name": "rAAV-MGT_789",
+                            "isPreferred": False,
+                        },
+                    ],
+                    "fullName": "rAAV-MGT_789",
+                }
+            ],
+        }
         injection_material = self.handler.map_lot_to_injection_material(
-            viral_prep_lot=response_data, viral_prep_aliases=viral_prep_aliases
+            viral_prep_lot=prep_lot_response,
+            virus=virus_response,
+            virus_tars_id="AiP123",
         )
-        expected_tars_virus_ids = TarsVirusIdentifiers(
-            virus_tars_id="AiV456",
-            plasmid_tars_alias="AiP123",
+        tars_virus_identifiers = TarsVirusIdentifiers(
+            virus_tars_id="AiP123",
+            plasmid_tars_alias="ExP123",
             prep_lot_number="12345",
             prep_date=date(2023, 12, 15),
-            prep_type=VirusPrepType.CRUDE,
+            prep_type="Crude",
             prep_protocol="SOP#VC002",
         )
-
-        expected_injection_material = ViralMaterial(
-            name="rAAV-MGT_789", tars_identifiers=expected_tars_virus_ids
+        expected_injection_material = ViralMaterialInformation(
+            material_type="Virus",
+            name="rAAV-MGT_789",
+            tars_identifiers=tars_virus_identifiers,
+            stock_titer=[413000000000],
         )
         self.assertIsInstance(injection_material, ViralMaterial)
         self.assertEqual(injection_material, expected_injection_material)
@@ -259,41 +243,39 @@ class TestTarsResponseHandler(unittest.TestCase):
     def test_map_lot_to_injection_materials_validation_error(self):
         """Tests that prep lot is mapped to ViralMaterial even if there is a
         validation error."""
-        response_data = {
+        prep_lot_response = {
             "lot": "12345",
-            "datePrepped": "2023-12-15T12:34:56Z",
-            "viralPrep": {
-                "viralPrepType": {"name": ViralPrepTypes.CRUDE_SOP.value},
-                "virus": {
-                    "aliases": [
-                        {"name": "AiP123"},
-                        {"name": "AiV456"},
-                    ]
-                },
-            },
+            "datePrepped": "invalid-date",
+            "viralPrep": {"viralPrepType": {"name": "Crude-SOP#VC002"}},
+            "titers": [{"isPreferred": True, "result": None}],
         }
 
-        handler = TarsResponseHandler()
-        viral_prep_aliases = ViralPrepAliases(
-            material_id="AiV456", plasmid_name="AiP123", full_genome_name=None
-        )
-        injection_material = handler.map_lot_to_injection_material(
-            viral_prep_lot=response_data, viral_prep_aliases=viral_prep_aliases
-        )
-        expected_tars_virus_ids = TarsVirusIdentifiers(
-            virus_tars_id="AiV456",
-            plasmid_tars_alias="AiP123",
-            prep_lot_number="12345",
-            prep_date=date(2023, 12, 15),
-            prep_type=VirusPrepType.CRUDE,
-            prep_protocol="SOP#VC002",
+        virus_response = {
+            "aliases": [
+                {"name": "AiP123", "isPreferred": True},
+            ],
+            "molecules": [
+                {
+                    "aliases": [
+                        {"name": "ExP123", "isPreferred": True},
+                    ],
+                    "fullName": None,
+                }
+            ],
+        }
+
+        injection_material = self.handler.map_lot_to_injection_material(
+            viral_prep_lot=prep_lot_response,
+            virus=virus_response,
+            virus_tars_id="AiP123",
         )
 
-        expected_injection_material = ViralMaterial.model_construct(
-            name=None, tars_identifiers=expected_tars_virus_ids
-        )
-        self.assertIsInstance(injection_material, ViralMaterial)
-        self.assertEqual(injection_material, expected_injection_material)
+        self.assertIsInstance(injection_material, ViralMaterialInformation)
+        self.assertIsNone(injection_material.tars_identifiers.prep_date)
+        self.assertEqual(
+            injection_material.stock_titer, []
+        )  # Should be an empty list due to invalid titer
+        self.assertIsNone(injection_material.name)
 
     def test_get_virus_strains(self):
         """Tests that virus strains are retrieved as expected"""
@@ -332,7 +314,30 @@ class TestTarsResponseHandler(unittest.TestCase):
     def test_integrate_injection_materials(self):
         """Tests that injection materials are integrated into
         procedures response as expected"""
+        tars_material = ViralMaterialInformation.model_construct(
+            name="rAAV-MGT_789",
+            tars_identifiers=TarsVirusIdentifiers.model_construct(
+                virus_tars_id="AiV456",
+                plasmid_tars_alias="AiP123",
+                prep_lot_number="12345",
+                prep_date=date(2023, 12, 15),
+                prep_type=VirusPrepType.CRUDE,
+                prep_protocol="SOP#VC002",
+            ),
+            stock_titer=[413000000000],
+        )
         expected_injection_material = ViralMaterial.model_construct(
+            name="rAAV-MGT_789",
+            tars_identifiers=TarsVirusIdentifiers.model_construct(
+                virus_tars_id="AiV456",
+                plasmid_tars_alias="AiP123",
+                prep_lot_number="12345",
+                prep_date=date(2023, 12, 15),
+                prep_type=VirusPrepType.CRUDE,
+                prep_protocol="SOP#VC002",
+            ),
+        )
+        tars_material2 = ViralMaterialInformation.model_construct(
             name="rAAV-MGT_789",
             tars_identifiers=TarsVirusIdentifiers.model_construct(
                 virus_tars_id="AiV456",
@@ -354,22 +359,25 @@ class TestTarsResponseHandler(unittest.TestCase):
                 prep_protocol="SOP#VC002",
             ),
         )
+
         tars_response1 = ModelResponse(
-            aind_models=[expected_injection_material],
+            aind_models=[tars_material],
             status_code=StatusCodes.DB_RESPONDED,
         )
         tars_response2 = ModelResponse(
-            aind_models=[expected_injection_material2],
+            aind_models=[tars_material2],
             status_code=StatusCodes.DB_RESPONDED,
         )
         tars_mapping = {
             "12345": tars_response1.map_to_json_response(),
             "67890": tars_response2.map_to_json_response(),
         }
+
         procedures_response = deepcopy(self.procedures_response)
         merged_response = self.handler.integrate_injection_materials(
             response=procedures_response, tars_mapping=tars_mapping
         )
+        # expected should serialize tars ViralInformation to ViralMaterial
         expected_surgery = Surgery.model_construct(
             procedures=[
                 NanojectInjection.model_construct(

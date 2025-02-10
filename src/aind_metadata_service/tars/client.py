@@ -124,10 +124,8 @@ class TarsClient:
         )
         response = requests.get(query, headers=headers)
         return response
-    
-    def _get_virus_response(
-        self, virus_name: str
-    ) -> requests.models.Response:
+
+    def _get_virus_response(self, virus_name: str) -> requests.models.Response:
         """
         Retrieves virus from TARS.
         Parameters
@@ -162,13 +160,19 @@ class TarsClient:
             for lot in data:
                 # virus tars id is the preferred virus alias
                 virus_tars_id = next(
-                    (alias["name"] for alias in lot["viralPrep"]["virus"]["aliases"] if alias["isPreferred"]), 
-                    None
+                    (
+                        alias["name"]
+                        for alias in lot["viralPrep"]["virus"]["aliases"]
+                        if alias["isPreferred"]
+                    ),
+                    None,
                 )
                 # check virus registry with tars id
                 virus_response = self._get_virus_response(virus_tars_id)
                 injection_material = trh.map_lot_to_injection_material(
-                    viral_prep_lot=lot, virus=virus_response.json()["data"][0], virus_tars_id=virus_tars_id
+                    viral_prep_lot=lot,
+                    virus=virus_response.json()["data"][0],
+                    virus_tars_id=virus_tars_id,
                 )
                 injection_materials.append(injection_material)
             return ModelResponse(

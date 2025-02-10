@@ -5,11 +5,9 @@ import unittest
 from datetime import date
 from unittest.mock import MagicMock, Mock, patch
 
-from aind_data_schema.core.procedures import (
-    TarsVirusIdentifiers,
-    ViralMaterial,
-)
+from aind_data_schema.core.procedures import TarsVirusIdentifiers
 
+from aind_metadata_service.models import ViralMaterialInformation
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 from aind_metadata_service.tars.client import AzureSettings, TarsClient
 
@@ -67,16 +65,18 @@ class TestTarsClient(unittest.TestCase):
             resource="https://some_resource",
         )
         tars_virus_identifiers = TarsVirusIdentifiers(
-            virus_tars_id="AiV456",
-            plasmid_tars_alias="AiP123",
+            virus_tars_id="AiP123",
+            plasmid_tars_alias="ExP123",
             prep_lot_number="12345",
             prep_date=date(2023, 12, 15),
             prep_type="Crude",
             prep_protocol="SOP#VC002",
         )
-
-        viral_material = ViralMaterial(
-            name="rAAV-MGT_789", tars_identifiers=tars_virus_identifiers
+        viral_material = ViralMaterialInformation(
+            material_type="Virus",
+            name="rAAV-MGT_789",
+            tars_identifiers=tars_virus_identifiers,
+            stock_titer=[413000000000],
         )
 
         mock_credential.return_value.get_token.return_value = (
@@ -196,7 +196,7 @@ class TestTarsClient(unittest.TestCase):
         mock_get.assert_called_once_with(
             expected_url, headers=self.tars_client._headers
         )
-        
+
     @patch("aind_metadata_service.tars.client.requests.get")
     def test_get_virus_response(self, mock_get):
         """Tests that client can fetch viral prep lot."""
@@ -227,9 +227,7 @@ class TestTarsClient(unittest.TestCase):
     @patch(
         "aind_metadata_service.tars.client.TarsClient._get_prep_lot_response"
     )
-    @patch(
-        "aind_metadata_service.tars.client.TarsClient._get_virus_response"
-    )
+    @patch("aind_metadata_service.tars.client.TarsClient._get_virus_response")
     def test_get_injection_materials_info_success(
         self, mock_virus_response, mock_get_prep_lot_response
     ):
@@ -254,7 +252,12 @@ class TestTarsClient(unittest.TestCase):
                             ]
                         },
                     },
-                    "titers": [],
+                    "titers": [
+                        {
+                            "isPreferred": True,
+                            "result": 413000000000,
+                        }
+                    ],
                 }
             ]
         }
@@ -285,12 +288,11 @@ class TestTarsClient(unittest.TestCase):
                             ],
                             "fullName": "rAAV-MGT_789",
                         }
-                    ]
+                    ],
                 }
             ]
         }
         result = self.tars_client.get_injection_materials_info("12345")
-        print(result.aind_models)
         expected_response = ModelResponse(
             aind_models=[self.expected_materials],
             status_code=StatusCodes.DB_RESPONDED,
