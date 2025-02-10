@@ -4,6 +4,7 @@ from typing import Optional
 
 from aind_data_schema.core.data_description import Funding
 from pydantic import BaseModel, Field, field_validator
+from datetime import datetime
 
 
 class ProtocolInformation(BaseModel):
@@ -33,3 +34,35 @@ class FundingInformation(Funding):
     information from the Funding SmartSheet"""
 
     investigators: Optional[str] = Field(default=None)
+
+
+class SpimImagingInformation(BaseModel):
+    """SmartSPIM Imaging information that will be returned to the user that
+    requests information from the SmartSPIM Imaging SLIMS Workflow"""
+
+    specimen_id: str = Field(..., description="Specimen ID")
+    subject_id: str = Field(..., description="Subject ID")
+    protocol_name: Optional[str] = Field(None, description="Protocol Name")
+    protocol_id: Optional[str] = Field(None, description="Protocol ID")
+    date_performed: Optional[datetime] = Field(
+        None, description="Date Performed"
+    )
+    chamber_immersion_medium: Optional[str] = Field(
+        None, description="Chamber Immersion Medium"
+    )
+    sample_immersion_medium: Optional[str] = Field(
+        None, description="Sample Immersion Medium"
+    )
+    chamber_refractive_index: Optional[float] = Field(
+        None, description="Chamber Refractive Index"
+    )
+    sample_refractive_index: Optional[float] = Field(
+        None, description="Sample Refractive Index"
+    )
+    instrument_id: Optional[str] = Field(None, description="Instrument ID")
+    experimenter_name: Optional[str] = Field(
+        None, description="Experimenter Name"
+    )
+    z_direction: Optional[str] = Field(None, description="Z Direction")
+    y_direction: Optional[str] = Field(None, description="Y Direction")
+    x_direction: Optional[str] = Field(None, description="X Direction")

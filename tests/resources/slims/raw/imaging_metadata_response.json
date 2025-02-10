@@ -1,0 +1,16 @@
+{
+    "specimen_id": "BRN00000006",
+    "subject_id": "758792",
+            "protocol_name": null,
+            "protocol_id": null,
+            "date_performed": "2024-10-18T22:27:00Z",
+            "chamber_immersion_medium": "Cargille Oil 1.5200",
+            "sample_immersion_medium": "EasyIndex",
+            "chamber_refractive_index": 1.5178,
+            "sample_refractive_index": 1.5189,
+            "instrument_id": "440_SmartSPIM1_20240327",
+            "experimenter_name": "Some Experimenter",
+            "z_direction": "Superior to Inferior",
+            "y_direction": "Anterior to Posterior",
+            "x_direction": "Left to Right"
+}

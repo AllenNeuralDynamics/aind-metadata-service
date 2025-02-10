@@ -1,7 +1,6 @@
 """Module for slims client"""
 
 import logging
-
 from aind_data_schema.core.instrument import Instrument
 from aind_data_schema.core.procedures import Procedures
 from aind_data_schema.core.rig import Rig
@@ -12,6 +11,7 @@ from aind_slims_api.operations import (
     fetch_ecephys_sessions,
     fetch_histology_procedures,
 )
+from aind_slims_api.operations.spim_imaging import fetch_imaging_metadata
 from pydantic import Extra, Field, SecretStr
 from pydantic_settings import BaseSettings
 from requests.models import Response
@@ -22,6 +22,13 @@ from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
 from aind_metadata_service.slims.procedures.mapping import SlimsHistologyMapper
 from aind_metadata_service.slims.sessions.mapping import SlimsSessionMapper
+from typing import Optional
+from aind_metadata_service.slims.imaging.utils import (
+    parse_date_performed,
+    filter_by_date,
+    get_latest_metadata,
+)
+from aind_metadata_service.models import SpimImagingInformation
 
 
 class SlimsSettings(BaseSettings):
@@ -195,6 +202,51 @@ class SlimsHandler:
                 )
             else:
                 return ModelResponse.no_data_found_error_response()
+        except SlimsRecordNotFound:
+            return ModelResponse.no_data_found_error_response()
+        except Exception as e:
+            logging.error(repr(e))
+            return ModelResponse.internal_server_error_response()
+
+    def get_smartspim_imaging_model_response(
+        self,
+        subject_id: str,
+        datetime_performed: Optional[str] = None,
+        latest: bool = False,
+    ) -> ModelResponse:
+        """
+        Fetches SmartSPIM imaging data for a given subject ID from SLIMS.
+        """
+        if datetime_performed and latest:
+            return ModelResponse.bad_request_error_response()
+
+        date_performed_dt = parse_date_performed(datetime_performed)
+        if datetime_performed and not date_performed_dt:
+            return ModelResponse.bad_request_error_response()
+
+        try:
+            imaging_metadata = fetch_imaging_metadata(
+                subject_id=subject_id, client=self.client
+            )
+            imaging_metadata = [
+                SpimImagingInformation(**metadata)
+                for metadata in imaging_metadata
+            ]
+            # Apply filters based on the parameters
+            if date_performed_dt and imaging_metadata:
+                imaging_metadata = filter_by_date(
+                    imaging_metadata, date_performed_dt
+                )
+            elif latest and imaging_metadata:
+                imaging_metadata = get_latest_metadata(imaging_metadata)
+            elif imaging_metadata:
+                pass
+            else:
+                return ModelResponse.no_data_found_error_response()
+            return ModelResponse(
+                aind_models=imaging_metadata,
+                status_code=StatusCodes.DB_RESPONDED,
+            )
         except SlimsRecordNotFound:
             return ModelResponse.no_data_found_error_response()
         except Exception as e:
