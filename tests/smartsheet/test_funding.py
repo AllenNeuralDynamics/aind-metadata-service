@@ -235,7 +235,6 @@ class TestSmartsheetFundingClient(unittest.TestCase):
         expected_response = {
             "message": "Success",
             "data": [
-                "Discovery-Neuromodulator circuit dynamics during " "foraging",
                 (
                     "Discovery-Neuromodulator circuit dynamics during foraging"
                     " - Subproject 1 Electrophysiological Recordings from NM "
