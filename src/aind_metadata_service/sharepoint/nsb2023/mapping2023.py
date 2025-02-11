@@ -3038,6 +3038,596 @@ class MappedNSBList:
         """Map author id to experimenter name"""
         return "NSB" if self.aind_author_id is None else f"NSB-{self.aind_author_id}"
 
+    @property
+    def aind_burr_6_intended_x0022(self) -> Optional[Any]:
+            """Maps burr_6_intended_x0022 to aind model"""
+            return (
+                 None 
+                 if self._nsb.burr_6_intended_x0022 is None
+                 else {
+                    self._nsb.burr_6_intended_x0022.NA: None,
+                    self._nsb.burr_6_intended_x0022.DOPAMINE: None,
+                    self._nsb.burr_6_intended_x0022.SEROTONIN: None,
+                    self._nsb.burr_6_intended_x0022.NOREPINEPHRINE: None,
+                    self._nsb.burr_6_intended_x0022.ACETYLCHOLINE: None,
+                    self._nsb.burr_6_intended_x0022.HISTAMINE: None,
+                    self._nsb.burr_6_intended_x0022.GLUTAMATE: None,
+                    self._nsb.burr_6_intended_x0022.GABA: None,
+                    self._nsb.burr_6_intended_x0022.CALCIUM: None,
+                    self._nsb.burr_6_intended_x0022.VOLTAGE: None,
+                    self._nsb.burr_6_intended_x0022.CONTROL: None,
+                }.get(self._nsb.burr_6_intended_x0022, None)
+            )
+    
+    @property
+    def aind_burr_6_intended_x0023(self) -> Optional[Any]:
+            """Maps burr_6_intended_x0023 to aind model"""
+            return (
+                None
+                if self._nsb.burr_6_intended_x0023 is None
+                else {
+                    self._nsb.burr_6_intended_x0023.NA: None,
+                    self._nsb.burr_6_intended_x0023.DOPAMINE: None,
+                    self._nsb.burr_6_intended_x0023.SEROTONIN: None,
+                    self._nsb.burr_6_intended_x0023.NOREPINEPHRINE: None,
+                    self._nsb.burr_6_intended_x0023.ACETYLCHOLINE: None,
+                    self._nsb.burr_6_intended_x0023.HISTAMINE: None,
+                    self._nsb.burr_6_intended_x0023.GLUTAMATE: None,
+                    self._nsb.burr_6_intended_x0023.GABA: None,
+                    self._nsb.burr_6_intended_x0023.CALCIUM: None,
+                    self._nsb.burr_6_intended_x0023.VOLTAGE: None,
+                    self._nsb.burr_6_intended_x0023.CONTROL: None,
+                }.get(self._nsb.burr_6_intended_x0023, None)
+            )
+
+    @property
+    def aind_burr_6_intended_x0021(self) -> Optional[Any]:
+            """Maps burr_6_intended_x0021 to aind model"""
+            return (
+                None
+                if self._nsb.burr_6_intended_x0021 is None
+                else {
+                    self._nsb.burr_6_intended_x0021.NA: None,
+                    self._nsb.burr_6_intended_x0021.DOPAMINE: None,
+                    self._nsb.burr_6_intended_x0021.SEROTONIN: None,
+                    self._nsb.burr_6_intended_x0021.NOREPINEPHRINE: None,
+                    self._nsb.burr_6_intended_x0021.ACETYLCHOLINE: None,
+                    self._nsb.burr_6_intended_x0021.HISTAMINE: None,
+                    self._nsb.burr_6_intended_x0021.GLUTAMATE: None,
+                    self._nsb.burr_6_intended_x0021.GABA: None,
+                    self._nsb.burr_6_intended_x0021.CALCIUM: None,
+                    self._nsb.burr_6_intended_x0021.VOLTAGE: None,
+                    self._nsb.burr_6_intended_x0021.CONTROL: None,
+                }.get(self._nsb.burr_6_intended_x0021, None)
+            )
+
+    @property
+    def aind_burr_5_intended_x0020(self) -> Optional[Any]:
+            """Maps burr_5_intended_x0020 to aind model"""
+            return (
+                None
+                if self._nsb.burr_5_intended_x0020 is None
+                else {
+                    self._nsb.burr_5_intended_x0020.NA: None,
+                    self._nsb.burr_5_intended_x0020.DOPAMINE: None,
+                    self._nsb.burr_5_intended_x0020.SEROTONIN: None,
+                    self._nsb.burr_5_intended_x0020.NOREPINEPHRINE: None,
+                    self._nsb.burr_5_intended_x0020.ACETYLCHOLINE: None,
+                    self._nsb.burr_5_intended_x0020.HISTAMINE: None,
+                    self._nsb.burr_5_intended_x0020.GLUTAMATE: None,
+                    self._nsb.burr_5_intended_x0020.GABA: None,
+                    self._nsb.burr_5_intended_x0020.CALCIUM: None,
+                    self._nsb.burr_5_intended_x0020.VOLTAGE: None,
+                    self._nsb.burr_5_intended_x0020.CONTROL: None,
+                }.get(self._nsb.burr_5_intended_x0020, None)
+            )
+    
+    @property
+    def aind_burr_5_intended_x0021(self) -> Optional[Any]:
+            """Maps burr_5_intended_x0021 to aind model"""
+            return (
+                None
+                if self._nsb.burr_5_intended_x0021 is None
+                else {
+                    self._nsb.burr_5_intended_x0021.NA: None,
+                    self._nsb.burr_5_intended_x0021.DOPAMINE: None,
+                    self._nsb.burr_5_intended_x0021.SEROTONIN: None,
+                    self._nsb.burr_5_intended_x0021.NOREPINEPHRINE: None,
+                    self._nsb.burr_5_intended_x0021.ACETYLCHOLINE: None,
+                    self._nsb.burr_5_intended_x0021.HISTAMINE: None,
+                    self._nsb.burr_5_intended_x0021.GLUTAMATE: None,
+                    self._nsb.burr_5_intended_x0021.GABA: None,
+                    self._nsb.burr_5_intended_x0021.CALCIUM: None,
+                    self._nsb.burr_5_intended_x0021.VOLTAGE: None,
+                    self._nsb.burr_5_intended_x0021.CONTROL: None,
+                }.get(self._nsb.burr_5_intended_x0021, None)
+            )
+    
+    @property
+    def aind_burr_5_intended_x0022(self) -> Optional[Any]:
+            """Maps burr_5_intended_x0022 to aind model"""
+            return (
+                None
+                if self._nsb.burr_5_intended_x0022 is None
+                else {
+                    self._nsb.burr_5_intended_x0022.NA: None,
+                    self._nsb.burr_5_intended_x0022.DOPAMINE: None,
+                    self._nsb.burr_5_intended_x0022.SEROTONIN: None,
+                    self._nsb.burr_5_intended_x0022.NOREPINEPHRINE: None,
+                    self._nsb.burr_5_intended_x0022.ACETYLCHOLINE: None,
+                    self._nsb.burr_5_intended_x0022.HISTAMINE: None,
+                    self._nsb.burr_5_intended_x0022.GLUTAMATE: None,
+                    self._nsb.burr_5_intended_x0022.GABA: None,
+                    self._nsb.burr_5_intended_x0022.CALCIUM: None,
+                    self._nsb.burr_5_intended_x0022.VOLTAGE: None,
+                    self._nsb.burr_5_intended_x0022.CONTROL: None,
+                }.get(self._nsb.burr_5_intended_x0022, None)
+            )
+    
+    @property
+    def aind_burr_5_intended_x0023(self) -> Optional[Any]:
+            """Maps burr_5_intended_x0023 to aind model"""
+            return (
+                None
+                if self._nsb.burr_5_intended_x0023 is None
+                else {
+                    self._nsb.burr_5_intended_x0023.NA: None,
+                    self._nsb.burr_5_intended_x0023.DOPAMINE: None,
+                    self._nsb.burr_5_intended_x0023.SEROTONIN: None,
+                    self._nsb.burr_5_intended_x0023.NOREPINEPHRINE: None,
+                    self._nsb.burr_5_intended_x0023.ACETYLCHOLINE: None,
+                    self._nsb.burr_5_intended_x0023.HISTAMINE: None,
+                    self._nsb.burr_5_intended_x0023.GLUTAMATE: None,
+                    self._nsb.burr_5_intended_x0023.GABA: None,
+                    self._nsb.burr_5_intended_x0023.CALCIUM: None,
+                    self._nsb.burr_5_intended_x0023.VOLTAGE: None,
+                    self._nsb.burr_5_intended_x0023.CONTROL: None,
+                }.get(self._nsb.burr_5_intended_x0023, None)
+            )
+
+    @property
+    def aind_inj6_ionto_polarity(self) -> Optional[Any]:
+            """Maps inj6_ionto_polarity to aind model"""
+            return (
+                None
+                if self._nsb.inj6_ionto_polarity is None
+                else {
+                    self._nsb.inj6_ionto_polarity.POSITIVE: None,
+                    self._nsb.inj6_ionto_polarity.NEGATIVE: None,
+                }.get(self._nsb.inj6_ionto_polarity, None)
+            )
+
+    @property
+    def aind_inj2_ionto_polarity(self) -> Optional[Any]:
+            """Maps inj2_ionto_polarity to aind model"""
+            return (
+                None
+                if self._nsb.inj2_ionto_polarity is None
+                else {
+                    self._nsb.inj2_ionto_polarity.POSITIVE: None,
+                    self._nsb.inj2_ionto_polarity.NEGATIVE: None,
+                }.get(self._nsb.inj2_ionto_polarity, None)
+            )
+
+    @property
+    def aind_inj3_ionto_polarity(self) -> Optional[Any]:
+            """Maps inj3_ionto_polarity to aind model"""
+            return (
+                None
+                if self._nsb.inj3_ionto_polarity is None
+                else {
+                    self._nsb.inj3_ionto_polarity.POSITIVE: None,
+                    self._nsb.inj3_ionto_polarity.NEGATIVE: None,
+                }.get(self._nsb.inj3_ionto_polarity, None)
+            )
+
+    @property
+    def aind_inj1_ionto_polarity(self) -> Optional[Any]:
+            """Maps inj1_ionto_polarity to aind model"""
+            return (
+                None
+                if self._nsb.inj1_ionto_polarity is None
+                else {
+                    self._nsb.inj1_ionto_polarity.POSITIVE: None,
+                    self._nsb.inj1_ionto_polarity.NEGATIVE: None,
+                }.get(self._nsb.inj1_ionto_polarity, None)
+            )
+
+    @property
+    def aind_burr_2_intended_x0020(self) -> Optional[Any]:
+            """Maps burr_2_intended_x0020 to aind model"""
+            return (
+                None
+                if self._nsb.burr_2_intended_x0020 is None
+                else {
+                    self._nsb.burr_2_intended_x0020.NA: None,
+                    self._nsb.burr_2_intended_x0020.DOPAMINE: None,
+                    self._nsb.burr_2_intended_x0020.SEROTONIN: None,
+                    self._nsb.burr_2_intended_x0020.NOREPINEPHRINE: None,
+                    self._nsb.burr_2_intended_x0020.ACETYLCHOLINE: None,
+                    self._nsb.burr_2_intended_x0020.HISTAMINE: None,
+                    self._nsb.burr_2_intended_x0020.GLUTAMATE: None,
+                    self._nsb.burr_2_intended_x0020.GABA: None,
+                    self._nsb.burr_2_intended_x0020.CALCIUM: None,
+                    self._nsb.burr_2_intended_x0020.VOLTAGE: None,
+                    self._nsb.burr_2_intended_x0020.CONTROL: None,
+                }.get(self._nsb.burr_2_intended_x0020, None)
+            )
+    
+    @property
+    def aind_burr_2_intended_x0021(self) -> Optional[Any]:
+            """Maps burr_2_intended_x0021 to aind model"""
+            return (
+                None
+                if self._nsb_burr_2_intended_x0021 is None
+                else {
+                    self._nsb.burr_2_intended_x0021.NA: None,
+                    self._nsb.burr_2_intended_x0021.DOPAMINE: None,
+                    self._nsb.burr_2_intended_x0021.SEROTONIN: None,
+                    self._nsb.burr_2_intended_x0021.NOREPINEPHRINE: None,
+                    self._nsb.burr_2_intended_x0021.ACETYLCHOLINE: None,
+                    self._nsb.burr_2_intended_x0021.HISTAMINE: None,
+                    self._nsb.burr_2_intended_x0021.GLUTAMATE: None,
+                    self._nsb.burr_2_intended_x0021.GABA: None,
+                    self._nsb.burr_2_intended_x0021.CALCIUM: None,
+                    self._nsb.burr_2_intended_x0021.VOLTAGE: None,
+                    self._nsb.burr_2_intended_x0021.CONTROL: None,
+                }.get(self._nsb.burr_2_intended_x0021, None)
+            )
+    
+    @property
+    def aind_burr_2_intended_x0022(self) -> Optional[Any]:
+            """Maps burr_2_intended_x0022 to aind model"""
+            return (
+                None
+                if self._nsb.burr_2_intended_x0022 is None
+                else {
+                    self._nsb.burr_2_intended_x0022.NA: None,
+                    self._nsb.burr_2_intended_x0022.DOPAMINE: None,
+                    self._nsb.burr_2_intended_x0022.SEROTONIN: None,
+                    self._nsb.burr_2_intended_x0022.NOREPINEPHRINE: None,
+                    self._nsb.burr_2_intended_x0022.ACETYLCHOLINE: None,
+                    self._nsb.burr_2_intended_x0022.HISTAMINE: None,
+                    self._nsb.burr_2_intended_x0022.GLUTAMATE: None,
+                    self._nsb.burr_2_intended_x0022.GABA: None,
+                    self._nsb.burr_2_intended_x0022.CALCIUM: None,
+                    self._nsb.burr_2_intended_x0022.VOLTAGE: None,
+                    self._nsb.burr_2_intended_x0022.CONTROL: None,
+                }.get(self._nsb.burr_2_intended_x0022, None)
+            )
+    
+    @property
+    def aind_burr_2_intended_x0023(self) -> Optional[Any]:
+            """Maps burr_2_intended_x0023 to aind model"""
+            return (
+                None
+                if self._nsb.burr_2_intended_x0023 is None
+                else {
+                    self._nsb.burr_2_intended_x0023.NA: None,
+                    self._nsb.burr_2_intended_x0023.DOPAMINE: None,
+                    self._nsb.burr_2_intended_x0023.SEROTONIN: None,
+                    self._nsb.burr_2_intended_x0023.NOREPINEPHRINE: None,
+                    self._nsb.burr_2_intended_x0023.ACETYLCHOLINE: None,
+                    self._nsb.burr_2_intended_x0023.HISTAMINE: None,
+                    self._nsb.burr_2_intended_x0023.GLUTAMATE: None,
+                    self._nsb.burr_2_intended_x0023.GABA: None,
+                    self._nsb.burr_2_intended_x0023.CALCIUM: None,
+                    self._nsb.burr_2_intended_x0023.VOLTAGE: None,
+                    self._nsb.burr_2_intended_x0023.CONTROL: None,
+                }.get(self._nsb.burr_2_intended_x0023, None)
+            )
+
+    @property
+    def aind_burr_1_intended_x0020(self) -> Optional[Any]:
+            """Maps burr_1_intended_x0020 to aind model"""
+            return (
+                None
+                if self._nsb.burr_1_intended_x0020 is None
+                else {
+                    self._nsb.burr_1_intended_x0020.NA: None,
+                    self._nsb.burr_1_intended_x0020.DOPAMINE: None,
+                    self._nsb.burr_1_intended_x0020.SEROTONIN: None,
+                    self._nsb.burr_1_intended_x0020.NOREPINEPHRINE: None,
+                    self._nsb.burr_1_intended_x0020.ACETYLCHOLINE: None,
+                    self._nsb.burr_1_intended_x0020.HISTAMINE: None,
+                    self._nsb.burr_1_intended_x0020.GLUTAMATE: None,
+                    self._nsb.burr_1_intended_x0020.GABA: None,
+                    self._nsb.burr_1_intended_x0020.CALCIUM: None,
+                    self._nsb.burr_1_intended_x0020.VOLTAGE: None,
+                    self._nsb.burr_1_intended_x0020.CONTROL: None,
+                }.get(self._nsb.burr_1_intended_x0020, None)
+            )
+    
+    @property
+    def aind_burr_1_intended_x0021(self) -> Optional[Any]:
+            """Maps burr_1_intended_x0021 to aind model"""
+            return (
+                None
+                if self._nsb.burr_1_intended_x0021 is None 
+                else {
+                    self._nsb.burr_1_intended_x0021.NA: None,
+                    self._nsb.burr_1_intended_x0021.DOPAMINE: None,
+                    self._nsb.burr_1_intended_x0021.SEROTONIN: None,
+                    self._nsb.burr_1_intended_x0021.NOREPINEPHRINE: None,
+                    self._nsb.burr_1_intended_x0021.ACETYLCHOLINE: None,
+                    self._nsb.burr_1_intended_x0021.HISTAMINE: None,
+                    self._nsb.burr_1_intended_x0021.GLUTAMATE: None,
+                    self._nsb.burr_1_intended_x0021.GABA: None,
+                    self._nsb.burr_1_intended_x0021.CALCIUM: None,
+                    self._nsb.burr_1_intended_x0021.VOLTAGE: None,
+                    self._nsb.burr_1_intended_x0021.CONTROL: None,
+                }.get(self._nsb.burr_1_intended_x0021, None)
+            )
+    
+    @property
+    def aind_burr_1_intended_x0022(self) -> Optional[Any]:
+            """Maps burr_1_intended_x0022 to aind model"""
+            return (
+                None 
+                if self._nsb.burr_1_intended_x0022 is None
+                else {
+                    self._nsb.burr_1_intended_x0022.NA: None,
+                    self._nsb.burr_1_intended_x0022.DOPAMINE: None,
+                    self._nsb.burr_1_intended_x0022.SEROTONIN: None,
+                    self._nsb.burr_1_intended_x0022.NOREPINEPHRINE: None,
+                    self._nsb.burr_1_intended_x0022.ACETYLCHOLINE: None,
+                    self._nsb.burr_1_intended_x0022.HISTAMINE: None,
+                    self._nsb.burr_1_intended_x0022.GLUTAMATE: None,
+                    self._nsb.burr_1_intended_x0022.GABA: None,
+                    self._nsb.burr_1_intended_x0022.CALCIUM: None,
+                    self._nsb.burr_1_intended_x0022.VOLTAGE: None,
+                    self._nsb.burr_1_intended_x0022.CONTROL: None,
+                }.get(self._nsb.burr_1_intended_x0022, None)
+            )
+    
+    @property
+    def aind_burr_1_intended_x0023(self) -> Optional[Any]:
+            """Maps burr_1_intended_x0023 to aind model"""
+            return (
+                None
+                if self._nsb.burr_1_intended_x0023 is None
+                else {
+                    self._nsb.burr_1_intended_x0023.NA: None,
+                    self._nsb.burr_1_intended_x0023.DOPAMINE: None,
+                    self._nsb.burr_1_intended_x0023.SEROTONIN: None,
+                    self._nsb.burr_1_intended_x0023.NOREPINEPHRINE: None,
+                    self._nsb.burr_1_intended_x0023.ACETYLCHOLINE: None,
+                    self._nsb.burr_1_intended_x0023.HISTAMINE: None,
+                    self._nsb.burr_1_intended_x0023.GLUTAMATE: None,
+                    self._nsb.burr_1_intended_x0023.GABA: None,
+                    self._nsb.burr_1_intended_x0023.CALCIUM: None,
+                    self._nsb.burr_1_intended_x0023.VOLTAGE: None,
+                    self._nsb.burr_1_intended_x0023.CONTROL: None,
+                }.get(self._nsb.burr_1_intended_x0023, None)
+            )
+
+    @property
+    def aind_burr_4_intended_x0020(self) -> Optional[Any]:
+            """Maps burr_4_intended_x0020 to aind model"""
+            return (
+                None
+                if self._nsb.burr_4_intended_x0020 is None
+                else {
+                    self._nsb.burr_4_intended_x0020.NA: None,
+                    self._nsb.burr_4_intended_x0020.DOPAMINE: None,
+                    self._nsb.burr_4_intended_x0020.SEROTONIN: None,
+                    self._nsb.burr_4_intended_x0020.NOREPINEPHRINE: None,
+                    self._nsb.burr_4_intended_x0020.ACETYLCHOLINE: None,
+                    self._nsb.burr_4_intended_x0020.HISTAMINE: None,
+                    self._nsb.burr_4_intended_x0020.GLUTAMATE: None,
+                    self._nsb.burr_4_intended_x0020.GABA: None,
+                    self._nsb.burr_4_intended_x0020.CALCIUM: None,
+                    self._nsb.burr_4_intended_x0020.VOLTAGE: None,
+                    self._nsb.burr_4_intended_x0020.CONTROL: None,
+                }.get(self._nsb.burr_4_intended_x0020, None)
+            )
+    
+    @property
+    def aind_burr_4_intended_x0021(self) -> Optional[Any]:
+            """Maps burr_4_intended_x0021 to aind model"""
+            return (
+                None
+                if self._nsb.burr_4_intended_x0021 is None
+                else {
+                    self._nsb.burr_4_intended_x0021.NA: None,
+                    self._nsb.burr_4_intended_x0021.DOPAMINE: None,
+                    self._nsb.burr_4_intended_x0021.SEROTONIN: None,
+                    self._nsb.burr_4_intended_x0021.NOREPINEPHRINE: None,
+                    self._nsb.burr_4_intended_x0021.ACETYLCHOLINE: None,
+                    self._nsb.burr_4_intended_x0021.HISTAMINE: None,
+                    self._nsb.burr_4_intended_x0021.GLUTAMATE: None,
+                    self._nsb.burr_4_intended_x0021.GABA: None,
+                    self._nsb.burr_4_intended_x0021.CALCIUM: None,
+                    self._nsb.burr_4_intended_x0021.VOLTAGE: None,
+                    self._nsb.burr_4_intended_x0021.CONTROL: None,
+                }.get(self._nsb.burr_4_intended_x0021, None)
+            )
+    
+    @property
+    def aind_burr_4_intended_x0022(self) -> Optional[Any]:
+            """Maps burr_4_intended_x0022 to aind model"""
+            return (
+                None
+                if self._nsb.burr_4_intended_x0022 is None
+                else {
+                    self._nsb.burr_4_intended_x0022.NA: None,
+                    self._nsb.burr_4_intended_x0022.DOPAMINE: None,
+                    self._nsb.burr_4_intended_x0022.SEROTONIN: None,
+                    self._nsb.burr_4_intended_x0022.NOREPINEPHRINE: None,
+                    self._nsb.burr_4_intended_x0022.ACETYLCHOLINE: None,
+                    self._nsb.burr_4_intended_x0022.HISTAMINE: None,
+                    self._nsb.burr_4_intended_x0022.GLUTAMATE: None,
+                    self._nsb.burr_4_intended_x0022.GABA: None,
+                    self._nsb.burr_4_intended_x0022.CALCIUM: None,
+                    self._nsb.burr_4_intended_x0022.VOLTAGE: None,
+                    self._nsb.burr_4_intended_x0022.CONTROL: None,
+                }.get(self._nsb.burr_4_intended_x0022, None)
+            )
+    
+    @property
+    def aind_burr_4_intended_x0023(self) -> Optional[Any]:
+            """Maps burr_4_intended_x0023 to aind model"""
+            return (
+                None
+                if self._nsb_burr_4_intended_x0023 is None
+                else {
+                    self._nsb.burr_4_intended_x0023.NA: None,
+                    self._nsb.burr_4_intended_x0023.DOPAMINE: None,
+                    self._nsb.burr_4_intended_x0023.SEROTONIN: None,
+                    self._nsb.burr_4_intended_x0023.NOREPINEPHRINE: None,
+                    self._nsb.burr_4_intended_x0023.ACETYLCHOLINE: None,
+                    self._nsb.burr_4_intended_x0023.HISTAMINE: None,
+                    self._nsb.burr_4_intended_x0023.GLUTAMATE: None,
+                    self._nsb.burr_4_intended_x0023.GABA: None,
+                    self._nsb.burr_4_intended_x0023.CALCIUM: None,
+                    self._nsb.burr_4_intended_x0023.VOLTAGE: None,
+                    self._nsb.burr_4_intended_x0023.CONTROL: None,
+                }.get(self._nsb.burr_4_intended_x0023, None)
+            )
+
+    @property
+    def aind_burr_6_intended_x0020(self) -> Optional[Any]:
+            """Maps burr_6_intended_x0020 to aind model"""
+            return (
+                None
+                if self._nsb_burr_6_intended_x0020 is None
+                else {
+                    self._nsb.burr_6_intended_x0020.NA: None,
+                    self._nsb.burr_6_intended_x0020.DOPAMINE: None,
+                    self._nsb.burr_6_intended_x0020.SEROTONIN: None,
+                    self._nsb.burr_6_intended_x0020.NOREPINEPHRINE: None,
+                    self._nsb.burr_6_intended_x0020.ACETYLCHOLINE: None,
+                    self._nsb.burr_6_intended_x0020.HISTAMINE: None,
+                    self._nsb.burr_6_intended_x0020.GLUTAMATE: None,
+                    self._nsb.burr_6_intended_x0020.GABA: None,
+                    self._nsb.burr_6_intended_x0020.CALCIUM: None,
+                    self._nsb.burr_6_intended_x0020.VOLTAGE: None,
+                    self._nsb.burr_6_intended_x0020.CONTROL: None,
+                }.get(self._nsb.burr_6_intended_x0020, None)
+            )
+
+    @property
+    def aind_burr_3_intended_x0020(self) -> Optional[Any]:
+            """Maps burr_3_intended_x0020 to aind model"""
+            return (
+                None
+                if self._nsb.burr_3_intended_x0020 is None
+                else {
+                    self._nsb.burr_3_intended_x0020.ENTER_CHOICE_1: None,
+                    self._nsb.burr_3_intended_x0020.ENTER_CHOICE_2: None,
+                    self._nsb.burr_3_intended_x0020.ENTER_CHOICE_3: None,
+                }.get(self._nsb.burr_3_intended_x0020, None)
+            )
+    
+    @property
+    def aind_burr_3_intended_x0021(self) -> Optional[Any]:
+            """Maps burr_3_intended_x0021 to aind model"""
+            return (
+                None
+                if self._nsb.burr_3_intended_x0021 is None
+                else {
+                    self._nsb.burr_3_intended_x0021.NA: None,
+                    self._nsb.burr_3_intended_x0021.DOPAMINE: None,
+                    self._nsb.burr_3_intended_x0021.SEROTONIN: None,
+                    self._nsb.burr_3_intended_x0021.NOREPINEPHRINE: None,
+                    self._nsb.burr_3_intended_x0021.ACETYLCHOLINE: None,
+                    self._nsb.burr_3_intended_x0021.HISTAMINE: None,
+                    self._nsb.burr_3_intended_x0021.GLUTAMATE: None,
+                    self._nsb.burr_3_intended_x0021.GABA: None,
+                    self._nsb.burr_3_intended_x0021.CALCIUM: None,
+                    self._nsb.burr_3_intended_x0021.VOLTAGE: None,
+                    self._nsb.burr_3_intended_x0021.CONTROL: None,
+                }.get(self._nsb.burr_3_intended_x0021, None)
+            )
+    
+    @property
+    def aind_burr_3_intended_x0022(self) -> Optional[Any]:
+            """Maps burr_3_intended_x0022 to aind model"""
+            return (
+                None
+                if self._nsb.burr_3_intended_x0022 is None
+                else {
+                    self._nsb.burr_3_intended_x0022.NA: None,
+                    self._nsb.burr_3_intended_x0022.DOPAMINE: None,
+                    self._nsb.burr_3_intended_x0022.SEROTONIN: None,
+                    self._nsb.burr_3_intended_x0022.NOREPINEPHRINE: None,
+                    self._nsb.burr_3_intended_x0022.ACETYLCHOLINE: None,
+                    self._nsb.burr_3_intended_x0022.HISTAMINE: None,
+                    self._nsb.burr_3_intended_x0022.GLUTAMATE: None,
+                    self._nsb.burr_3_intended_x0022.GABA: None,
+                    self._nsb.burr_3_intended_x0022.CALCIUM: None,
+                    self._nsb.burr_3_intended_x0022.VOLTAGE: None,
+                    self._nsb.burr_3_intended_x0022.CONTROL: None,
+                }.get(self._nsb.burr_3_intended_x0022, None)
+            )
+    
+    @property
+    def aind_burr_3_intended_x0023(self) -> Optional[Any]:
+            """Maps burr_3_intended_x0023 to aind model"""
+            return (
+                None
+                if self._nsb.burr_3_intended_x0023 is None
+                else {
+                    self._nsb.burr_3_intended_x0023.NA: None,
+                    self._nsb.burr_3_intended_x0023.DOPAMINE: None,
+                    self._nsb.burr_3_intended_x0023.SEROTONIN: None,
+                    self._nsb.burr_3_intended_x0023.NOREPINEPHRINE: None,
+                    self._nsb.burr_3_intended_x0023.ACETYLCHOLINE: None,
+                    self._nsb.burr_3_intended_x0023.HISTAMINE: None,
+                    self._nsb.burr_3_intended_x0023.GLUTAMATE: None,
+                    self._nsb.burr_3_intended_x0023.GABA: None,
+                    self._nsb.burr_3_intended_x0023.CALCIUM: None,
+                    self._nsb.burr_3_intended_x0023.VOLTAGE: None,
+                    self._nsb.burr_3_intended_x0023.CONTROL: None,
+                }.get(self._nsb.burr_3_intended_x0023, None)
+            )
+    
+    @property
+    def aind_burr_4_angle(self) -> Optional[float]:
+            """Maps burr_4_angle to aind model"""
+            return self._nsb.burr_4_angle
+    
+    @property
+    def aind_burr_2_d_v_x00(self) -> Optional[float]:
+            """Maps burr_2_d_v_x00 to aind model"""
+            return self._nsb.burr_2_d_v_x00
+    
+    @property
+    def aind_burr_5_a_p(self) -> Optional[float]:
+            """Maps burr_5_a_p to aind model"""
+            return self._nsb.burr_5_a_p
+
+    @property
+    def aind_inj4_ionto_polarity(self) -> Optional[Any]:
+            """Maps inj4_ionto_polarity to aind model"""
+            return {
+                self._nsb.inj4_ionto_polarity.POSITIVE: None,
+                self._nsb.inj4_ionto_polarity.NEGATIVE: None,
+            }.get(self._nsb.inj4_ionto_polarity, None)
+    
+    @property
+    def aind_inj4_ionto_time(self) -> Optional[str]:
+            """Maps inj4_ionto_time to aind model"""
+            return self._nsb.inj4_ionto_time
+    
+    @property
+    def aind_burr_5_a_p(self) -> Optional[float]:
+            """Maps burr_5_a_p to aind model"""
+            return self._nsb.burr_5_a_p
+
+    @property
+    def aind_inj5_ionto_polarity(self) -> Optional[Any]:
+            """Maps inj5_ionto_polarity to aind model"""
+            return {
+                self._nsb.inj5_ionto_polarity.POSITIVE: None,
+                self._nsb.inj5_ionto_polarity.NEGATIVE: None,
+            }.get(self._nsb.inj5_ionto_polarity, None)
+    
+    @property
+    def aind_inj5_ionto_time(self) -> Optional[str]:
+            """Maps inj5_ionto_time to aind model"""
+            return self._nsb.inj5_ionto_time
+
     def has_hp_procedure(self) -> bool:
         """Is there a headpost procedure?"""
         return self.aind_procedure in {
@@ -3796,1213 +4386,3 @@ class MappedNSBList:
             surgeries.append(generic_surgery)
 
         return surgeries
-
-    @property
-        def aind_burr_6_intended_x0022(self) -> Optional[Any]:
-            """Maps burr_6_intended_x0022 to aind model"""
-            return {
-                self._nsb.burr_6_intended_x0022.NA: None,
-                self._nsb.burr_6_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_6_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_6_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_6_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_6_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_6_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_6_intended_x0022.GABA: None,
-                self._nsb.burr_6_intended_x0022.CALCIUM: None,
-                self._nsb.burr_6_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_6_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_6_intended_x0022, None)
-    
-        @property
-        def aind_burr_6_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_6_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_6_intended_x0023.NA: None,
-                self._nsb.burr_6_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_6_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_6_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_6_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_6_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_6_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_6_intended_x0023.GABA: None,
-                self._nsb.burr_6_intended_x0023.CALCIUM: None,
-                self._nsb.burr_6_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_6_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_6_intended_x0023, None)
-    
-        @property
-        def aind_burr_6_m_l(self) -> Optional[float]:
-            """Maps burr_6_m_l to aind model"""
-            return self._nsb.burr_6_m_l
-
-    @property
-        def aind_burr_6_intended_x0021(self) -> Optional[Any]:
-            """Maps burr_6_intended_x0021 to aind model"""
-            return {
-                self._nsb.burr_6_intended_x0021.NA: None,
-                self._nsb.burr_6_intended_x0021.DOPAMINE: None,
-                self._nsb.burr_6_intended_x0021.SEROTONIN: None,
-                self._nsb.burr_6_intended_x0021.NOREPINEPHRINE: None,
-                self._nsb.burr_6_intended_x0021.ACETYLCHOLINE: None,
-                self._nsb.burr_6_intended_x0021.HISTAMINE: None,
-                self._nsb.burr_6_intended_x0021.GLUTAMATE: None,
-                self._nsb.burr_6_intended_x0021.GABA: None,
-                self._nsb.burr_6_intended_x0021.CALCIUM: None,
-                self._nsb.burr_6_intended_x0021.VOLTAGE: None,
-                self._nsb.burr_6_intended_x0021.CONTROL: None,
-            }.get(self._nsb.burr_6_intended_x0021, None)
-    
-        @property
-        def aind_burr_6_intended_x0022(self) -> Optional[Any]:
-            """Maps burr_6_intended_x0022 to aind model"""
-            return {
-                self._nsb.burr_6_intended_x0022.NA: None,
-                self._nsb.burr_6_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_6_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_6_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_6_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_6_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_6_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_6_intended_x0022.GABA: None,
-                self._nsb.burr_6_intended_x0022.CALCIUM: None,
-                self._nsb.burr_6_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_6_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_6_intended_x0022, None)
-    
-        @property
-        def aind_burr_6_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_6_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_6_intended_x0023.NA: None,
-                self._nsb.burr_6_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_6_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_6_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_6_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_6_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_6_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_6_intended_x0023.GABA: None,
-                self._nsb.burr_6_intended_x0023.CALCIUM: None,
-                self._nsb.burr_6_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_6_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_6_intended_x0023, None)
-    
-        @property
-        def aind_burr_6_m_l(self) -> Optional[float]:
-            """Maps burr_6_m_l to aind model"""
-            return self._nsb.burr_6_m_l
-
-    @property
-        def aind_burr_5_intended_x0020(self) -> Optional[Any]:
-            """Maps burr_5_intended_x0020 to aind model"""
-            return {
-                self._nsb.burr_5_intended_x0020.NA: None,
-                self._nsb.burr_5_intended_x0020.DOPAMINE: None,
-                self._nsb.burr_5_intended_x0020.SEROTONIN: None,
-                self._nsb.burr_5_intended_x0020.NOREPINEPHRINE: None,
-                self._nsb.burr_5_intended_x0020.ACETYLCHOLINE: None,
-                self._nsb.burr_5_intended_x0020.HISTAMINE: None,
-                self._nsb.burr_5_intended_x0020.GLUTAMATE: None,
-                self._nsb.burr_5_intended_x0020.GABA: None,
-                self._nsb.burr_5_intended_x0020.CALCIUM: None,
-                self._nsb.burr_5_intended_x0020.VOLTAGE: None,
-                self._nsb.burr_5_intended_x0020.CONTROL: None,
-            }.get(self._nsb.burr_5_intended_x0020, None)
-    
-        @property
-        def aind_burr_5_intended_x0021(self) -> Optional[Any]:
-            """Maps burr_5_intended_x0021 to aind model"""
-            return {
-                self._nsb.burr_5_intended_x0021.NA: None,
-                self._nsb.burr_5_intended_x0021.DOPAMINE: None,
-                self._nsb.burr_5_intended_x0021.SEROTONIN: None,
-                self._nsb.burr_5_intended_x0021.NOREPINEPHRINE: None,
-                self._nsb.burr_5_intended_x0021.ACETYLCHOLINE: None,
-                self._nsb.burr_5_intended_x0021.HISTAMINE: None,
-                self._nsb.burr_5_intended_x0021.GLUTAMATE: None,
-                self._nsb.burr_5_intended_x0021.GABA: None,
-                self._nsb.burr_5_intended_x0021.CALCIUM: None,
-                self._nsb.burr_5_intended_x0021.VOLTAGE: None,
-                self._nsb.burr_5_intended_x0021.CONTROL: None,
-            }.get(self._nsb.burr_5_intended_x0021, None)
-    
-        @property
-        def aind_burr_5_intended_x0022(self) -> Optional[Any]:
-            """Maps burr_5_intended_x0022 to aind model"""
-            return {
-                self._nsb.burr_5_intended_x0022.NA: None,
-                self._nsb.burr_5_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_5_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_5_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_5_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_5_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_5_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_5_intended_x0022.GABA: None,
-                self._nsb.burr_5_intended_x0022.CALCIUM: None,
-                self._nsb.burr_5_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_5_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_5_intended_x0022, None)
-    
-        @property
-        def aind_burr_5_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_5_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_5_intended_x0023.NA: None,
-                self._nsb.burr_5_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_5_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_5_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_5_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_5_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_5_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_5_intended_x0023.GABA: None,
-                self._nsb.burr_5_intended_x0023.CALCIUM: None,
-                self._nsb.burr_5_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_5_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_5_intended_x0023, None)
-    
-        @property
-        def aind_burr_5_m_l(self) -> Optional[float]:
-            """Maps burr_5_m_l to aind model"""
-            return self._nsb.burr_5_m_l
-
-    @property
-        def aind_inj6_ionto_polarity(self) -> Optional[Any]:
-            """Maps inj6_ionto_polarity to aind model"""
-            return {
-                self._nsb.inj6_ionto_polarity.POSITIVE: None,
-                self._nsb.inj6_ionto_polarity.NEGATIVE: None,
-            }.get(self._nsb.inj6_ionto_polarity, None)
-    
-        @property
-        def aind_inj6_ionto_time(self) -> Optional[str]:
-            """Maps inj6_ionto_time to aind model"""
-            return self._nsb.inj6_ionto_time
-
-    @property
-        def aind_burr_3_intended_x0022(self) -> Optional[Any]:
-            """Maps burr_3_intended_x0022 to aind model"""
-            return {
-                self._nsb.burr_3_intended_x0022.NA: None,
-                self._nsb.burr_3_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_3_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_3_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_3_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_3_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_3_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_3_intended_x0022.GABA: None,
-                self._nsb.burr_3_intended_x0022.CALCIUM: None,
-                self._nsb.burr_3_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_3_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_3_intended_x0022, None)
-    
-        @property
-        def aind_burr_3_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_3_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_3_intended_x0023.NA: None,
-                self._nsb.burr_3_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_3_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_3_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_3_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_3_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_3_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_3_intended_x0023.GABA: None,
-                self._nsb.burr_3_intended_x0023.CALCIUM: None,
-                self._nsb.burr_3_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_3_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_3_intended_x0023, None)
-    
-        @property
-        def aind_burr_4_angle(self) -> Optional[float]:
-            """Maps burr_4_angle to aind model"""
-            return self._nsb.burr_4_angle
-
-    @property
-        def aind_burr_5_intended_x0021(self) -> Optional[Any]:
-            """Maps burr_5_intended_x0021 to aind model"""
-            return {
-                self._nsb.burr_5_intended_x0021.NA: None,
-                self._nsb.burr_5_intended_x0021.DOPAMINE: None,
-                self._nsb.burr_5_intended_x0021.SEROTONIN: None,
-                self._nsb.burr_5_intended_x0021.NOREPINEPHRINE: None,
-                self._nsb.burr_5_intended_x0021.ACETYLCHOLINE: None,
-                self._nsb.burr_5_intended_x0021.HISTAMINE: None,
-                self._nsb.burr_5_intended_x0021.GLUTAMATE: None,
-                self._nsb.burr_5_intended_x0021.GABA: None,
-                self._nsb.burr_5_intended_x0021.CALCIUM: None,
-                self._nsb.burr_5_intended_x0021.VOLTAGE: None,
-                self._nsb.burr_5_intended_x0021.CONTROL: None,
-            }.get(self._nsb.burr_5_intended_x0021, None)
-    
-        @property
-        def aind_burr_5_intended_x0022(self) -> Optional[Any]:
-            """Maps burr_5_intended_x0022 to aind model"""
-            return {
-                self._nsb.burr_5_intended_x0022.NA: None,
-                self._nsb.burr_5_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_5_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_5_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_5_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_5_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_5_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_5_intended_x0022.GABA: None,
-                self._nsb.burr_5_intended_x0022.CALCIUM: None,
-                self._nsb.burr_5_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_5_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_5_intended_x0022, None)
-    
-        @property
-        def aind_burr_5_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_5_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_5_intended_x0023.NA: None,
-                self._nsb.burr_5_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_5_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_5_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_5_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_5_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_5_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_5_intended_x0023.GABA: None,
-                self._nsb.burr_5_intended_x0023.CALCIUM: None,
-                self._nsb.burr_5_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_5_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_5_intended_x0023, None)
-    
-        @property
-        def aind_burr_5_m_l(self) -> Optional[float]:
-            """Maps burr_5_m_l to aind model"""
-            return self._nsb.burr_5_m_l
-
-    @property
-        def aind_inj2_ionto_polarity(self) -> Optional[Any]:
-            """Maps inj2_ionto_polarity to aind model"""
-            return {
-                self._nsb.inj2_ionto_polarity.POSITIVE: None,
-                self._nsb.inj2_ionto_polarity.NEGATIVE: None,
-            }.get(self._nsb.inj2_ionto_polarity, None)
-    
-        @property
-        def aind_inj2_ionto_time(self) -> Optional[str]:
-            """Maps inj2_ionto_time to aind model"""
-            return self._nsb.inj2_ionto_time
-
-    @property
-        def aind_burr_5_intended_x0022(self) -> Optional[Any]:
-            """Maps burr_5_intended_x0022 to aind model"""
-            return {
-                self._nsb.burr_5_intended_x0022.NA: None,
-                self._nsb.burr_5_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_5_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_5_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_5_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_5_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_5_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_5_intended_x0022.GABA: None,
-                self._nsb.burr_5_intended_x0022.CALCIUM: None,
-                self._nsb.burr_5_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_5_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_5_intended_x0022, None)
-    
-        @property
-        def aind_burr_5_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_5_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_5_intended_x0023.NA: None,
-                self._nsb.burr_5_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_5_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_5_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_5_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_5_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_5_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_5_intended_x0023.GABA: None,
-                self._nsb.burr_5_intended_x0023.CALCIUM: None,
-                self._nsb.burr_5_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_5_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_5_intended_x0023, None)
-    
-        @property
-        def aind_burr_5_m_l(self) -> Optional[float]:
-            """Maps burr_5_m_l to aind model"""
-            return self._nsb.burr_5_m_l
-
-    @property
-        def aind_inj3_ionto_polarity(self) -> Optional[Any]:
-            """Maps inj3_ionto_polarity to aind model"""
-            return {
-                self._nsb.inj3_ionto_polarity.POSITIVE: None,
-                self._nsb.inj3_ionto_polarity.NEGATIVE: None,
-            }.get(self._nsb.inj3_ionto_polarity, None)
-    
-        @property
-        def aind_inj3_ionto_time(self) -> Optional[str]:
-            """Maps inj3_ionto_time to aind model"""
-            return self._nsb.inj3_ionto_time
-
-    @property
-        def aind_burr_5_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_5_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_5_intended_x0023.NA: None,
-                self._nsb.burr_5_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_5_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_5_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_5_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_5_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_5_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_5_intended_x0023.GABA: None,
-                self._nsb.burr_5_intended_x0023.CALCIUM: None,
-                self._nsb.burr_5_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_5_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_5_intended_x0023, None)
-    
-        @property
-        def aind_burr_5_m_l(self) -> Optional[float]:
-            """Maps burr_5_m_l to aind model"""
-            return self._nsb.burr_5_m_l
-
-    @property
-        def aind_burr_1_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_1_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_1_intended_x0023.NA: None,
-                self._nsb.burr_1_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_1_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_1_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_1_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_1_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_1_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_1_intended_x0023.GABA: None,
-                self._nsb.burr_1_intended_x0023.CALCIUM: None,
-                self._nsb.burr_1_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_1_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_1_intended_x0023, None)
-    
-        @property
-        def aind_burr_2_d_v_x00(self) -> Optional[float]:
-            """Maps burr_2_d_v_x00 to aind model"""
-            return self._nsb.burr_2_d_v_x00
-
-    @property
-        def aind_burr_4_intended_x0021(self) -> Optional[Any]:
-            """Maps burr_4_intended_x0021 to aind model"""
-            return {
-                self._nsb.burr_4_intended_x0021.NA: None,
-                self._nsb.burr_4_intended_x0021.DOPAMINE: None,
-                self._nsb.burr_4_intended_x0021.SEROTONIN: None,
-                self._nsb.burr_4_intended_x0021.NOREPINEPHRINE: None,
-                self._nsb.burr_4_intended_x0021.ACETYLCHOLINE: None,
-                self._nsb.burr_4_intended_x0021.HISTAMINE: None,
-                self._nsb.burr_4_intended_x0021.GLUTAMATE: None,
-                self._nsb.burr_4_intended_x0021.GABA: None,
-                self._nsb.burr_4_intended_x0021.CALCIUM: None,
-                self._nsb.burr_4_intended_x0021.VOLTAGE: None,
-                self._nsb.burr_4_intended_x0021.CONTROL: None,
-            }.get(self._nsb.burr_4_intended_x0021, None)
-    
-        @property
-        def aind_burr_4_intended_x0022(self) -> Optional[Any]:
-            """Maps burr_4_intended_x0022 to aind model"""
-            return {
-                self._nsb.burr_4_intended_x0022.NA: None,
-                self._nsb.burr_4_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_4_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_4_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_4_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_4_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_4_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_4_intended_x0022.GABA: None,
-                self._nsb.burr_4_intended_x0022.CALCIUM: None,
-                self._nsb.burr_4_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_4_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_4_intended_x0022, None)
-    
-        @property
-        def aind_burr_4_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_4_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_4_intended_x0023.NA: None,
-                self._nsb.burr_4_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_4_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_4_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_4_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_4_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_4_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_4_intended_x0023.GABA: None,
-                self._nsb.burr_4_intended_x0023.CALCIUM: None,
-                self._nsb.burr_4_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_4_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_4_intended_x0023, None)
-    
-        @property
-        def aind_burr_5_a_p(self) -> Optional[float]:
-            """Maps burr_5_a_p to aind model"""
-            return self._nsb.burr_5_a_p
-
-    @property
-        def aind_burr_2_intended_x0021(self) -> Optional[Any]:
-            """Maps burr_2_intended_x0021 to aind model"""
-            return {
-                self._nsb.burr_2_intended_x0021.NA: None,
-                self._nsb.burr_2_intended_x0021.DOPAMINE: None,
-                self._nsb.burr_2_intended_x0021.SEROTONIN: None,
-                self._nsb.burr_2_intended_x0021.NOREPINEPHRINE: None,
-                self._nsb.burr_2_intended_x0021.ACETYLCHOLINE: None,
-                self._nsb.burr_2_intended_x0021.HISTAMINE: None,
-                self._nsb.burr_2_intended_x0021.GLUTAMATE: None,
-                self._nsb.burr_2_intended_x0021.GABA: None,
-                self._nsb.burr_2_intended_x0021.CALCIUM: None,
-                self._nsb.burr_2_intended_x0021.VOLTAGE: None,
-                self._nsb.burr_2_intended_x0021.CONTROL: None,
-            }.get(self._nsb.burr_2_intended_x0021, None)
-    
-        @property
-        def aind_burr_2_intended_x0022(self) -> Optional[Any]:
-            """Maps burr_2_intended_x0022 to aind model"""
-            return {
-                self._nsb.burr_2_intended_x0022.NA: None,
-                self._nsb.burr_2_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_2_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_2_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_2_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_2_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_2_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_2_intended_x0022.GABA: None,
-                self._nsb.burr_2_intended_x0022.CALCIUM: None,
-                self._nsb.burr_2_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_2_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_2_intended_x0022, None)
-    
-        @property
-        def aind_burr_2_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_2_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_2_intended_x0023.NA: None,
-                self._nsb.burr_2_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_2_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_2_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_2_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_2_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_2_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_2_intended_x0023.GABA: None,
-                self._nsb.burr_2_intended_x0023.CALCIUM: None,
-                self._nsb.burr_2_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_2_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_2_intended_x0023, None)
-    
-        @property
-        def aind_burr_3_angle(self) -> Optional[float]:
-            """Maps burr_3_angle to aind model"""
-            return self._nsb.burr_3_angle
-
-    @property
-        def aind_burr_1_intended_x0021(self) -> Optional[Any]:
-            """Maps burr_1_intended_x0021 to aind model"""
-            return {
-                self._nsb.burr_1_intended_x0021.NA: None,
-                self._nsb.burr_1_intended_x0021.DOPAMINE: None,
-                self._nsb.burr_1_intended_x0021.SEROTONIN: None,
-                self._nsb.burr_1_intended_x0021.NOREPINEPHRINE: None,
-                self._nsb.burr_1_intended_x0021.ACETYLCHOLINE: None,
-                self._nsb.burr_1_intended_x0021.HISTAMINE: None,
-                self._nsb.burr_1_intended_x0021.GLUTAMATE: None,
-                self._nsb.burr_1_intended_x0021.GABA: None,
-                self._nsb.burr_1_intended_x0021.CALCIUM: None,
-                self._nsb.burr_1_intended_x0021.VOLTAGE: None,
-                self._nsb.burr_1_intended_x0021.CONTROL: None,
-            }.get(self._nsb.burr_1_intended_x0021, None)
-    
-        @property
-        def aind_burr_1_intended_x0022(self) -> Optional[Any]:
-            """Maps burr_1_intended_x0022 to aind model"""
-            return {
-                self._nsb.burr_1_intended_x0022.NA: None,
-                self._nsb.burr_1_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_1_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_1_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_1_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_1_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_1_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_1_intended_x0022.GABA: None,
-                self._nsb.burr_1_intended_x0022.CALCIUM: None,
-                self._nsb.burr_1_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_1_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_1_intended_x0022, None)
-    
-        @property
-        def aind_burr_1_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_1_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_1_intended_x0023.NA: None,
-                self._nsb.burr_1_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_1_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_1_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_1_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_1_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_1_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_1_intended_x0023.GABA: None,
-                self._nsb.burr_1_intended_x0023.CALCIUM: None,
-                self._nsb.burr_1_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_1_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_1_intended_x0023, None)
-    
-        @property
-        def aind_burr_2_d_v_x00(self) -> Optional[float]:
-            """Maps burr_2_d_v_x00 to aind model"""
-            return self._nsb.burr_2_d_v_x00
-
-    @property
-        def aind_inj1_ionto_polarity(self) -> Optional[Any]:
-            """Maps inj1_ionto_polarity to aind model"""
-            return {
-                self._nsb.inj1_ionto_polarity.POSITIVE: None,
-                self._nsb.inj1_ionto_polarity.NEGATIVE: None,
-            }.get(self._nsb.inj1_ionto_polarity, None)
-    
-        @property
-        def aind_inj1_ionto_time(self) -> Optional[str]:
-            """Maps inj1_ionto_time to aind model"""
-            return self._nsb.inj1_ionto_time
-
-    @property
-        def aind_burr_2_intended_x0020(self) -> Optional[Any]:
-            """Maps burr_2_intended_x0020 to aind model"""
-            return {
-                self._nsb.burr_2_intended_x0020.NA: None,
-                self._nsb.burr_2_intended_x0020.DOPAMINE: None,
-                self._nsb.burr_2_intended_x0020.SEROTONIN: None,
-                self._nsb.burr_2_intended_x0020.NOREPINEPHRINE: None,
-                self._nsb.burr_2_intended_x0020.ACETYLCHOLINE: None,
-                self._nsb.burr_2_intended_x0020.HISTAMINE: None,
-                self._nsb.burr_2_intended_x0020.GLUTAMATE: None,
-                self._nsb.burr_2_intended_x0020.GABA: None,
-                self._nsb.burr_2_intended_x0020.CALCIUM: None,
-                self._nsb.burr_2_intended_x0020.VOLTAGE: None,
-                self._nsb.burr_2_intended_x0020.CONTROL: None,
-            }.get(self._nsb.burr_2_intended_x0020, None)
-    
-        @property
-        def aind_burr_2_intended_x0021(self) -> Optional[Any]:
-            """Maps burr_2_intended_x0021 to aind model"""
-            return {
-                self._nsb.burr_2_intended_x0021.NA: None,
-                self._nsb.burr_2_intended_x0021.DOPAMINE: None,
-                self._nsb.burr_2_intended_x0021.SEROTONIN: None,
-                self._nsb.burr_2_intended_x0021.NOREPINEPHRINE: None,
-                self._nsb.burr_2_intended_x0021.ACETYLCHOLINE: None,
-                self._nsb.burr_2_intended_x0021.HISTAMINE: None,
-                self._nsb.burr_2_intended_x0021.GLUTAMATE: None,
-                self._nsb.burr_2_intended_x0021.GABA: None,
-                self._nsb.burr_2_intended_x0021.CALCIUM: None,
-                self._nsb.burr_2_intended_x0021.VOLTAGE: None,
-                self._nsb.burr_2_intended_x0021.CONTROL: None,
-            }.get(self._nsb.burr_2_intended_x0021, None)
-    
-        @property
-        def aind_burr_2_intended_x0022(self) -> Optional[Any]:
-            """Maps burr_2_intended_x0022 to aind model"""
-            return {
-                self._nsb.burr_2_intended_x0022.NA: None,
-                self._nsb.burr_2_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_2_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_2_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_2_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_2_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_2_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_2_intended_x0022.GABA: None,
-                self._nsb.burr_2_intended_x0022.CALCIUM: None,
-                self._nsb.burr_2_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_2_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_2_intended_x0022, None)
-    
-        @property
-        def aind_burr_2_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_2_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_2_intended_x0023.NA: None,
-                self._nsb.burr_2_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_2_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_2_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_2_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_2_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_2_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_2_intended_x0023.GABA: None,
-                self._nsb.burr_2_intended_x0023.CALCIUM: None,
-                self._nsb.burr_2_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_2_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_2_intended_x0023, None)
-    
-        @property
-        def aind_burr_3_angle(self) -> Optional[float]:
-            """Maps burr_3_angle to aind model"""
-            return self._nsb.burr_3_angle
-
-    @property
-        def aind_burr_1_intended_x0020(self) -> Optional[Any]:
-            """Maps burr_1_intended_x0020 to aind model"""
-            return {
-                self._nsb.burr_1_intended_x0020.NA: None,
-                self._nsb.burr_1_intended_x0020.DOPAMINE: None,
-                self._nsb.burr_1_intended_x0020.SEROTONIN: None,
-                self._nsb.burr_1_intended_x0020.NOREPINEPHRINE: None,
-                self._nsb.burr_1_intended_x0020.ACETYLCHOLINE: None,
-                self._nsb.burr_1_intended_x0020.HISTAMINE: None,
-                self._nsb.burr_1_intended_x0020.GLUTAMATE: None,
-                self._nsb.burr_1_intended_x0020.GABA: None,
-                self._nsb.burr_1_intended_x0020.CALCIUM: None,
-                self._nsb.burr_1_intended_x0020.VOLTAGE: None,
-                self._nsb.burr_1_intended_x0020.CONTROL: None,
-            }.get(self._nsb.burr_1_intended_x0020, None)
-    
-        @property
-        def aind_burr_1_intended_x0021(self) -> Optional[Any]:
-            """Maps burr_1_intended_x0021 to aind model"""
-            return {
-                self._nsb.burr_1_intended_x0021.NA: None,
-                self._nsb.burr_1_intended_x0021.DOPAMINE: None,
-                self._nsb.burr_1_intended_x0021.SEROTONIN: None,
-                self._nsb.burr_1_intended_x0021.NOREPINEPHRINE: None,
-                self._nsb.burr_1_intended_x0021.ACETYLCHOLINE: None,
-                self._nsb.burr_1_intended_x0021.HISTAMINE: None,
-                self._nsb.burr_1_intended_x0021.GLUTAMATE: None,
-                self._nsb.burr_1_intended_x0021.GABA: None,
-                self._nsb.burr_1_intended_x0021.CALCIUM: None,
-                self._nsb.burr_1_intended_x0021.VOLTAGE: None,
-                self._nsb.burr_1_intended_x0021.CONTROL: None,
-            }.get(self._nsb.burr_1_intended_x0021, None)
-    
-        @property
-        def aind_burr_1_intended_x0022(self) -> Optional[Any]:
-            """Maps burr_1_intended_x0022 to aind model"""
-            return {
-                self._nsb.burr_1_intended_x0022.NA: None,
-                self._nsb.burr_1_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_1_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_1_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_1_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_1_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_1_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_1_intended_x0022.GABA: None,
-                self._nsb.burr_1_intended_x0022.CALCIUM: None,
-                self._nsb.burr_1_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_1_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_1_intended_x0022, None)
-    
-        @property
-        def aind_burr_1_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_1_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_1_intended_x0023.NA: None,
-                self._nsb.burr_1_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_1_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_1_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_1_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_1_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_1_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_1_intended_x0023.GABA: None,
-                self._nsb.burr_1_intended_x0023.CALCIUM: None,
-                self._nsb.burr_1_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_1_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_1_intended_x0023, None)
-    
-        @property
-        def aind_burr_2_d_v_x00(self) -> Optional[float]:
-            """Maps burr_2_d_v_x00 to aind model"""
-            return self._nsb.burr_2_d_v_x00
-
-    @property
-        def aind_burr_6_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_6_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_6_intended_x0023.NA: None,
-                self._nsb.burr_6_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_6_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_6_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_6_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_6_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_6_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_6_intended_x0023.GABA: None,
-                self._nsb.burr_6_intended_x0023.CALCIUM: None,
-                self._nsb.burr_6_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_6_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_6_intended_x0023, None)
-    
-        @property
-        def aind_burr_6_m_l(self) -> Optional[float]:
-            """Maps burr_6_m_l to aind model"""
-            return self._nsb.burr_6_m_l
-
-    @property
-        def aind_burr_4_intended_x0020(self) -> Optional[Any]:
-            """Maps burr_4_intended_x0020 to aind model"""
-            return {
-                self._nsb.burr_4_intended_x0020.NA: None,
-                self._nsb.burr_4_intended_x0020.DOPAMINE: None,
-                self._nsb.burr_4_intended_x0020.SEROTONIN: None,
-                self._nsb.burr_4_intended_x0020.NOREPINEPHRINE: None,
-                self._nsb.burr_4_intended_x0020.ACETYLCHOLINE: None,
-                self._nsb.burr_4_intended_x0020.HISTAMINE: None,
-                self._nsb.burr_4_intended_x0020.GLUTAMATE: None,
-                self._nsb.burr_4_intended_x0020.GABA: None,
-                self._nsb.burr_4_intended_x0020.CALCIUM: None,
-                self._nsb.burr_4_intended_x0020.VOLTAGE: None,
-                self._nsb.burr_4_intended_x0020.CONTROL: None,
-            }.get(self._nsb.burr_4_intended_x0020, None)
-    
-        @property
-        def aind_burr_4_intended_x0021(self) -> Optional[Any]:
-            """Maps burr_4_intended_x0021 to aind model"""
-            return {
-                self._nsb.burr_4_intended_x0021.NA: None,
-                self._nsb.burr_4_intended_x0021.DOPAMINE: None,
-                self._nsb.burr_4_intended_x0021.SEROTONIN: None,
-                self._nsb.burr_4_intended_x0021.NOREPINEPHRINE: None,
-                self._nsb.burr_4_intended_x0021.ACETYLCHOLINE: None,
-                self._nsb.burr_4_intended_x0021.HISTAMINE: None,
-                self._nsb.burr_4_intended_x0021.GLUTAMATE: None,
-                self._nsb.burr_4_intended_x0021.GABA: None,
-                self._nsb.burr_4_intended_x0021.CALCIUM: None,
-                self._nsb.burr_4_intended_x0021.VOLTAGE: None,
-                self._nsb.burr_4_intended_x0021.CONTROL: None,
-            }.get(self._nsb.burr_4_intended_x0021, None)
-    
-        @property
-        def aind_burr_4_intended_x0022(self) -> Optional[Any]:
-            """Maps burr_4_intended_x0022 to aind model"""
-            return {
-                self._nsb.burr_4_intended_x0022.NA: None,
-                self._nsb.burr_4_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_4_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_4_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_4_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_4_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_4_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_4_intended_x0022.GABA: None,
-                self._nsb.burr_4_intended_x0022.CALCIUM: None,
-                self._nsb.burr_4_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_4_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_4_intended_x0022, None)
-    
-        @property
-        def aind_burr_4_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_4_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_4_intended_x0023.NA: None,
-                self._nsb.burr_4_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_4_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_4_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_4_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_4_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_4_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_4_intended_x0023.GABA: None,
-                self._nsb.burr_4_intended_x0023.CALCIUM: None,
-                self._nsb.burr_4_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_4_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_4_intended_x0023, None)
-    
-        @property
-        def aind_burr_5_a_p(self) -> Optional[float]:
-            """Maps burr_5_a_p to aind model"""
-            return self._nsb.burr_5_a_p
-
-    @property
-        def aind_burr_2_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_2_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_2_intended_x0023.NA: None,
-                self._nsb.burr_2_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_2_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_2_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_2_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_2_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_2_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_2_intended_x0023.GABA: None,
-                self._nsb.burr_2_intended_x0023.CALCIUM: None,
-                self._nsb.burr_2_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_2_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_2_intended_x0023, None)
-    
-        @property
-        def aind_burr_3_angle(self) -> Optional[float]:
-            """Maps burr_3_angle to aind model"""
-            return self._nsb.burr_3_angle
-
-    @property
-        def aind_burr_2_intended_x0022(self) -> Optional[Any]:
-            """Maps burr_2_intended_x0022 to aind model"""
-            return {
-                self._nsb.burr_2_intended_x0022.NA: None,
-                self._nsb.burr_2_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_2_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_2_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_2_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_2_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_2_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_2_intended_x0022.GABA: None,
-                self._nsb.burr_2_intended_x0022.CALCIUM: None,
-                self._nsb.burr_2_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_2_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_2_intended_x0022, None)
-    
-        @property
-        def aind_burr_2_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_2_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_2_intended_x0023.NA: None,
-                self._nsb.burr_2_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_2_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_2_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_2_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_2_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_2_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_2_intended_x0023.GABA: None,
-                self._nsb.burr_2_intended_x0023.CALCIUM: None,
-                self._nsb.burr_2_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_2_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_2_intended_x0023, None)
-    
-        @property
-        def aind_burr_3_angle(self) -> Optional[float]:
-            """Maps burr_3_angle to aind model"""
-            return self._nsb.burr_3_angle
-
-    @property
-        def aind_burr_3_intended_x0021(self) -> Optional[Any]:
-            """Maps burr_3_intended_x0021 to aind model"""
-            return {
-                self._nsb.burr_3_intended_x0021.NA: None,
-                self._nsb.burr_3_intended_x0021.DOPAMINE: None,
-                self._nsb.burr_3_intended_x0021.SEROTONIN: None,
-                self._nsb.burr_3_intended_x0021.NOREPINEPHRINE: None,
-                self._nsb.burr_3_intended_x0021.ACETYLCHOLINE: None,
-                self._nsb.burr_3_intended_x0021.HISTAMINE: None,
-                self._nsb.burr_3_intended_x0021.GLUTAMATE: None,
-                self._nsb.burr_3_intended_x0021.GABA: None,
-                self._nsb.burr_3_intended_x0021.CALCIUM: None,
-                self._nsb.burr_3_intended_x0021.VOLTAGE: None,
-                self._nsb.burr_3_intended_x0021.CONTROL: None,
-            }.get(self._nsb.burr_3_intended_x0021, None)
-    
-        @property
-        def aind_burr_3_intended_x0022(self) -> Optional[Any]:
-            """Maps burr_3_intended_x0022 to aind model"""
-            return {
-                self._nsb.burr_3_intended_x0022.NA: None,
-                self._nsb.burr_3_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_3_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_3_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_3_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_3_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_3_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_3_intended_x0022.GABA: None,
-                self._nsb.burr_3_intended_x0022.CALCIUM: None,
-                self._nsb.burr_3_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_3_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_3_intended_x0022, None)
-    
-        @property
-        def aind_burr_3_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_3_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_3_intended_x0023.NA: None,
-                self._nsb.burr_3_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_3_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_3_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_3_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_3_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_3_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_3_intended_x0023.GABA: None,
-                self._nsb.burr_3_intended_x0023.CALCIUM: None,
-                self._nsb.burr_3_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_3_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_3_intended_x0023, None)
-    
-        @property
-        def aind_burr_4_angle(self) -> Optional[float]:
-            """Maps burr_4_angle to aind model"""
-            return self._nsb.burr_4_angle
-
-    @property
-        def aind_burr_6_intended_x0020(self) -> Optional[Any]:
-            """Maps burr_6_intended_x0020 to aind model"""
-            return {
-                self._nsb.burr_6_intended_x0020.NA: None,
-                self._nsb.burr_6_intended_x0020.DOPAMINE: None,
-                self._nsb.burr_6_intended_x0020.SEROTONIN: None,
-                self._nsb.burr_6_intended_x0020.NOREPINEPHRINE: None,
-                self._nsb.burr_6_intended_x0020.ACETYLCHOLINE: None,
-                self._nsb.burr_6_intended_x0020.HISTAMINE: None,
-                self._nsb.burr_6_intended_x0020.GLUTAMATE: None,
-                self._nsb.burr_6_intended_x0020.GABA: None,
-                self._nsb.burr_6_intended_x0020.CALCIUM: None,
-                self._nsb.burr_6_intended_x0020.VOLTAGE: None,
-                self._nsb.burr_6_intended_x0020.CONTROL: None,
-            }.get(self._nsb.burr_6_intended_x0020, None)
-    
-        @property
-        def aind_burr_6_intended_x0021(self) -> Optional[Any]:
-            """Maps burr_6_intended_x0021 to aind model"""
-            return {
-                self._nsb.burr_6_intended_x0021.NA: None,
-                self._nsb.burr_6_intended_x0021.DOPAMINE: None,
-                self._nsb.burr_6_intended_x0021.SEROTONIN: None,
-                self._nsb.burr_6_intended_x0021.NOREPINEPHRINE: None,
-                self._nsb.burr_6_intended_x0021.ACETYLCHOLINE: None,
-                self._nsb.burr_6_intended_x0021.HISTAMINE: None,
-                self._nsb.burr_6_intended_x0021.GLUTAMATE: None,
-                self._nsb.burr_6_intended_x0021.GABA: None,
-                self._nsb.burr_6_intended_x0021.CALCIUM: None,
-                self._nsb.burr_6_intended_x0021.VOLTAGE: None,
-                self._nsb.burr_6_intended_x0021.CONTROL: None,
-            }.get(self._nsb.burr_6_intended_x0021, None)
-    
-        @property
-        def aind_burr_6_intended_x0022(self) -> Optional[Any]:
-            """Maps burr_6_intended_x0022 to aind model"""
-            return {
-                self._nsb.burr_6_intended_x0022.NA: None,
-                self._nsb.burr_6_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_6_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_6_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_6_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_6_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_6_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_6_intended_x0022.GABA: None,
-                self._nsb.burr_6_intended_x0022.CALCIUM: None,
-                self._nsb.burr_6_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_6_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_6_intended_x0022, None)
-    
-        @property
-        def aind_burr_6_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_6_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_6_intended_x0023.NA: None,
-                self._nsb.burr_6_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_6_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_6_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_6_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_6_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_6_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_6_intended_x0023.GABA: None,
-                self._nsb.burr_6_intended_x0023.CALCIUM: None,
-                self._nsb.burr_6_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_6_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_6_intended_x0023, None)
-    
-        @property
-        def aind_burr_6_m_l(self) -> Optional[float]:
-            """Maps burr_6_m_l to aind model"""
-            return self._nsb.burr_6_m_l
-
-    @property
-        def aind_burr_3_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_3_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_3_intended_x0023.NA: None,
-                self._nsb.burr_3_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_3_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_3_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_3_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_3_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_3_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_3_intended_x0023.GABA: None,
-                self._nsb.burr_3_intended_x0023.CALCIUM: None,
-                self._nsb.burr_3_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_3_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_3_intended_x0023, None)
-    
-        @property
-        def aind_burr_4_angle(self) -> Optional[float]:
-            """Maps burr_4_angle to aind model"""
-            return self._nsb.burr_4_angle
-
-    @property
-        def aind_burr_3_intended_x0020(self) -> Optional[Any]:
-            """Maps burr_3_intended_x0020 to aind model"""
-            return {
-                self._nsb.burr_3_intended_x0020.ENTER_CHOICE_1: None,
-                self._nsb.burr_3_intended_x0020.ENTER_CHOICE_2: None,
-                self._nsb.burr_3_intended_x0020.ENTER_CHOICE_3: None,
-            }.get(self._nsb.burr_3_intended_x0020, None)
-    
-        @property
-        def aind_burr_3_intended_x0021(self) -> Optional[Any]:
-            """Maps burr_3_intended_x0021 to aind model"""
-            return {
-                self._nsb.burr_3_intended_x0021.NA: None,
-                self._nsb.burr_3_intended_x0021.DOPAMINE: None,
-                self._nsb.burr_3_intended_x0021.SEROTONIN: None,
-                self._nsb.burr_3_intended_x0021.NOREPINEPHRINE: None,
-                self._nsb.burr_3_intended_x0021.ACETYLCHOLINE: None,
-                self._nsb.burr_3_intended_x0021.HISTAMINE: None,
-                self._nsb.burr_3_intended_x0021.GLUTAMATE: None,
-                self._nsb.burr_3_intended_x0021.GABA: None,
-                self._nsb.burr_3_intended_x0021.CALCIUM: None,
-                self._nsb.burr_3_intended_x0021.VOLTAGE: None,
-                self._nsb.burr_3_intended_x0021.CONTROL: None,
-            }.get(self._nsb.burr_3_intended_x0021, None)
-    
-        @property
-        def aind_burr_3_intended_x0022(self) -> Optional[Any]:
-            """Maps burr_3_intended_x0022 to aind model"""
-            return {
-                self._nsb.burr_3_intended_x0022.NA: None,
-                self._nsb.burr_3_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_3_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_3_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_3_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_3_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_3_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_3_intended_x0022.GABA: None,
-                self._nsb.burr_3_intended_x0022.CALCIUM: None,
-                self._nsb.burr_3_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_3_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_3_intended_x0022, None)
-    
-        @property
-        def aind_burr_3_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_3_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_3_intended_x0023.NA: None,
-                self._nsb.burr_3_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_3_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_3_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_3_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_3_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_3_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_3_intended_x0023.GABA: None,
-                self._nsb.burr_3_intended_x0023.CALCIUM: None,
-                self._nsb.burr_3_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_3_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_3_intended_x0023, None)
-    
-        @property
-        def aind_burr_4_angle(self) -> Optional[float]:
-            """Maps burr_4_angle to aind model"""
-            return self._nsb.burr_4_angle
-
-    @property
-        def aind_burr_1_intended_x0022(self) -> Optional[Any]:
-            """Maps burr_1_intended_x0022 to aind model"""
-            return {
-                self._nsb.burr_1_intended_x0022.NA: None,
-                self._nsb.burr_1_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_1_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_1_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_1_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_1_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_1_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_1_intended_x0022.GABA: None,
-                self._nsb.burr_1_intended_x0022.CALCIUM: None,
-                self._nsb.burr_1_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_1_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_1_intended_x0022, None)
-    
-        @property
-        def aind_burr_1_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_1_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_1_intended_x0023.NA: None,
-                self._nsb.burr_1_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_1_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_1_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_1_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_1_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_1_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_1_intended_x0023.GABA: None,
-                self._nsb.burr_1_intended_x0023.CALCIUM: None,
-                self._nsb.burr_1_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_1_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_1_intended_x0023, None)
-    
-        @property
-        def aind_burr_2_d_v_x00(self) -> Optional[float]:
-            """Maps burr_2_d_v_x00 to aind model"""
-            return self._nsb.burr_2_d_v_x00
-
-    @property
-        def aind_burr_4_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_4_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_4_intended_x0023.NA: None,
-                self._nsb.burr_4_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_4_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_4_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_4_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_4_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_4_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_4_intended_x0023.GABA: None,
-                self._nsb.burr_4_intended_x0023.CALCIUM: None,
-                self._nsb.burr_4_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_4_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_4_intended_x0023, None)
-    
-        @property
-        def aind_burr_5_a_p(self) -> Optional[float]:
-            """Maps burr_5_a_p to aind model"""
-            return self._nsb.burr_5_a_p
-
-    @property
-        def aind_inj4_ionto_polarity(self) -> Optional[Any]:
-            """Maps inj4_ionto_polarity to aind model"""
-            return {
-                self._nsb.inj4_ionto_polarity.POSITIVE: None,
-                self._nsb.inj4_ionto_polarity.NEGATIVE: None,
-            }.get(self._nsb.inj4_ionto_polarity, None)
-    
-        @property
-        def aind_inj4_ionto_time(self) -> Optional[str]:
-            """Maps inj4_ionto_time to aind model"""
-            return self._nsb.inj4_ionto_time
-
-    @property
-        def aind_burr_4_intended_x0022(self) -> Optional[Any]:
-            """Maps burr_4_intended_x0022 to aind model"""
-            return {
-                self._nsb.burr_4_intended_x0022.NA: None,
-                self._nsb.burr_4_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_4_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_4_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_4_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_4_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_4_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_4_intended_x0022.GABA: None,
-                self._nsb.burr_4_intended_x0022.CALCIUM: None,
-                self._nsb.burr_4_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_4_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_4_intended_x0022, None)
-    
-        @property
-        def aind_burr_4_intended_x0023(self) -> Optional[Any]:
-            """Maps burr_4_intended_x0023 to aind model"""
-            return {
-                self._nsb.burr_4_intended_x0023.NA: None,
-                self._nsb.burr_4_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_4_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_4_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_4_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_4_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_4_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_4_intended_x0023.GABA: None,
-                self._nsb.burr_4_intended_x0023.CALCIUM: None,
-                self._nsb.burr_4_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_4_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_4_intended_x0023, None)
-    
-        @property
-        def aind_burr_5_a_p(self) -> Optional[float]:
-            """Maps burr_5_a_p to aind model"""
-            return self._nsb.burr_5_a_p
-
-    @property
-        def aind_inj5_ionto_polarity(self) -> Optional[Any]:
-            """Maps inj5_ionto_polarity to aind model"""
-            return {
-                self._nsb.inj5_ionto_polarity.POSITIVE: None,
-                self._nsb.inj5_ionto_polarity.NEGATIVE: None,
-            }.get(self._nsb.inj5_ionto_polarity, None)
-    
-        @property
-        def aind_inj5_ionto_time(self) -> Optional[str]:
-            """Maps inj5_ionto_time to aind model"""
-            return self._nsb.inj5_ionto_time
