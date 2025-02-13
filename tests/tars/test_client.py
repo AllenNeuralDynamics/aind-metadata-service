@@ -76,7 +76,7 @@ class TestTarsClient(unittest.TestCase):
             material_type="Virus",
             name="rAAV-MGT_789",
             tars_identifiers=tars_virus_identifiers,
-            stock_titer=[413000000000],
+            stock_titer=413000000000,
         )
 
         mock_credential.return_value.get_token.return_value = (

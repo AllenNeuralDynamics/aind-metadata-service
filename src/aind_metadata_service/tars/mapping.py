@@ -124,11 +124,9 @@ class TarsResponseHandler:
     @staticmethod
     def map_stock_titer(titers: List[dict]) -> Optional[int]:
         """Maps titer from viral prep lot"""
-        return [
-            int(titer["result"])
-            for titer in titers
-            if titer.get("result") is not None
-        ]
+        if titers and titers[0].get("result") is not None:
+            return int(titers[0]["result"])
+        return None
 
     def map_name_and_plasmid_from_virus_response(
         self, virus: dict
@@ -183,7 +181,7 @@ class TarsResponseHandler:
                 name=name,
                 tars_identifiers=tars_virus_identifiers,
                 stock_titer=self.map_stock_titer(
-                    viral_prep_lot.get("titers", [])
+                    viral_prep_lot.get("titers", None)
                 ),
             )
         except ValidationError:
@@ -199,7 +197,7 @@ class TarsResponseHandler:
                 name=name,
                 tars_identifiers=tars_virus_identifiers,
                 stock_titer=self.map_stock_titer(
-                    viral_prep_lot.get("titers", [])
+                    viral_prep_lot.get("titers", None)
                 ),
             )
 

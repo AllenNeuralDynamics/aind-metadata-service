@@ -1,6 +1,6 @@
 """Additional response models not defined in aind-data-schema"""
 
-from typing import List, Optional
+from typing import Optional
 
 from aind_data_schema.core.data_description import Funding
 from aind_data_schema.core.procedures import ViralMaterial
@@ -39,4 +39,4 @@ class FundingInformation(Funding):
 class ViralMaterialInformation(ViralMaterial):
     """Viral Material with Stock Titer from SLIMS"""
 
-    stock_titer: Optional[List[int]] = Field(default=None)
+    stock_titer: Optional[int] = Field(default=None)

@@ -235,7 +235,7 @@ class TestTarsResponseHandler(unittest.TestCase):
             material_type="Virus",
             name="rAAV-MGT_789",
             tars_identifiers=tars_virus_identifiers,
-            stock_titer=[413000000000],
+            stock_titer=413000000000,
         )
         self.assertIsInstance(injection_material, ViralMaterial)
         self.assertEqual(injection_material, expected_injection_material)
@@ -272,9 +272,8 @@ class TestTarsResponseHandler(unittest.TestCase):
 
         self.assertIsInstance(injection_material, ViralMaterialInformation)
         self.assertIsNone(injection_material.tars_identifiers.prep_date)
-        self.assertEqual(
-            injection_material.stock_titer, []
-        )  # Should be an empty list due to invalid titer
+        self.assertIsNone(injection_material.stock_titer)
+
         self.assertIsNone(injection_material.name)
 
     def test_get_virus_strains(self):
