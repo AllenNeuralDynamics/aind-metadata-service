@@ -125,6 +125,24 @@ class TarsClient:
         response = requests.get(query, headers=headers)
         return response
 
+    def _get_virus_response(self, virus_name: str) -> requests.models.Response:
+        """
+        Retrieves virus from TARS.
+        Parameters
+        ----------
+        virus_name: str
+           Virus name used to query Virus endpoint.
+        """
+        headers = self._headers
+        query = (
+            f"{self.resource}/api/v1/Viruses"
+            f"?order=1&orderBy=id"
+            f"&searchFields=aliases.name"
+            f"&search={virus_name}"
+        )
+        response = requests.get(query, headers=headers)
+        return response
+
     def get_injection_materials_info(
         self, prep_lot_number: str
     ) -> ModelResponse:
@@ -140,24 +158,21 @@ class TarsClient:
             injection_materials = []
 
             for lot in data:
-                viral_prep_aliases = trh.map_virus_aliases(
-                    aliases=lot["viralPrep"]["virus"]["aliases"]
+                # virus tars id is the preferred virus alias
+                virus_tars_id = next(
+                    (
+                        alias["name"]
+                        for alias in lot["viralPrep"]["virus"]["aliases"]
+                        if alias["isPreferred"]
+                    ),
+                    None,
                 )
-                if (
-                    viral_prep_aliases.plasmid_name
-                    and viral_prep_aliases.full_genome_name is None
-                ):
-                    # check molecular registry for full genome name
-                    molecule_response = self._get_molecules_response(
-                        viral_prep_aliases.plasmid_name
-                    )
-                    viral_prep_aliases.full_genome_name = (
-                        trh.map_full_genome_name(
-                            molecule_response, viral_prep_aliases.plasmid_name
-                        )
-                    )
+                # check virus registry with tars id
+                virus_response = self._get_virus_response(virus_tars_id)
                 injection_material = trh.map_lot_to_injection_material(
-                    viral_prep_lot=lot, viral_prep_aliases=viral_prep_aliases
+                    viral_prep_lot=lot,
+                    virus=virus_response.json()["data"][0],
+                    virus_tars_id=virus_tars_id,
                 )
                 injection_materials.append(injection_material)
             return ModelResponse(

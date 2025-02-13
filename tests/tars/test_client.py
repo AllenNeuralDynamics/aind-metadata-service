@@ -5,11 +5,9 @@ import unittest
 from datetime import date
 from unittest.mock import MagicMock, Mock, patch
 
-from aind_data_schema.core.procedures import (
-    TarsVirusIdentifiers,
-    ViralMaterial,
-)
+from aind_data_schema.core.procedures import TarsVirusIdentifiers
 
+from aind_metadata_service.models import ViralMaterialInformation
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 from aind_metadata_service.tars.client import AzureSettings, TarsClient
 
@@ -67,16 +65,18 @@ class TestTarsClient(unittest.TestCase):
             resource="https://some_resource",
         )
         tars_virus_identifiers = TarsVirusIdentifiers(
-            virus_tars_id="AiV456",
-            plasmid_tars_alias="AiP123",
+            virus_tars_id="AiV123",
+            plasmid_tars_alias="AiP456",
             prep_lot_number="12345",
             prep_date=date(2023, 12, 15),
             prep_type="Crude",
             prep_protocol="SOP#VC002",
         )
-
-        viral_material = ViralMaterial(
-            name="rAAV-MGT_789", tars_identifiers=tars_virus_identifiers
+        viral_material = ViralMaterialInformation(
+            material_type="Virus",
+            name="rAAV-MGT_789",
+            tars_identifiers=tars_virus_identifiers,
+            stock_titer=413000000000,
         )
 
         mock_credential.return_value.get_token.return_value = (
@@ -197,14 +197,39 @@ class TestTarsClient(unittest.TestCase):
             expected_url, headers=self.tars_client._headers
         )
 
+    @patch("aind_metadata_service.tars.client.requests.get")
+    def test_get_virus_response(self, mock_get):
+        """Tests that client can fetch viral prep lot."""
+
+        mock_response = Mock()
+
+        mock_response.json.return_value = {
+            "data": [
+                {"aliases": [{"name": "AiP123"}, {"name": "rAAV-MGT_789"}]}
+            ]
+        }
+        mock_get.return_value = mock_response
+        result = self.tars_client._get_virus_response("AiP123")
+        expected_url = (
+            f"{self.azure_settings.resource}/api/v1/Viruses"
+            f"?order=1&orderBy=id"
+            f"&searchFields=aliases.name"
+            f"&search=AiP123"
+        )
+
+        self.assertEqual(
+            result.json()["data"][0]["aliases"][0]["name"], "AiP123"
+        )
+        mock_get.assert_called_once_with(
+            expected_url, headers=self.tars_client._headers
+        )
+
     @patch(
         "aind_metadata_service.tars.client.TarsClient._get_prep_lot_response"
     )
-    @patch(
-        "aind_metadata_service.tars.client.TarsClient._get_molecules_response"
-    )
+    @patch("aind_metadata_service.tars.client.TarsClient._get_virus_response")
     def test_get_injection_materials_info_success(
-        self, mock_molecules_response, mock_get_prep_lot_response
+        self, mock_virus_response, mock_get_prep_lot_response
     ):
         """Tests that ModelResponse is created successfully."""
         mock_get_prep_lot_response.return_value.json.return_value = {
@@ -216,20 +241,57 @@ class TestTarsClient(unittest.TestCase):
                         "viralPrepType": {"name": "Crude-SOP#VC002"},
                         "virus": {
                             "aliases": [
-                                {"name": "AiP123"},
-                                {"name": "AiV456"},
+                                {
+                                    "name": "AiV123",
+                                    "isPreferred": True,
+                                },
+                                {
+                                    "name": "AiP456",
+                                    "isPreferred": False,
+                                },
                             ]
                         },
                     },
+                    "titers": [
+                        {
+                            "isPreferred": True,
+                            "result": 413000000000,
+                        }
+                    ],
                 }
             ]
         }
-        mock_molecules_response.return_value.json.return_value = {
+        mock_virus_response.return_value.json.return_value = {
             "data": [
-                {"aliases": [{"name": "AiP123"}, {"name": "rAAV-MGT_789"}]}
+                {
+                    "aliases": [
+                        {
+                            "name": "AiV123",
+                            "isPreferred": True,
+                        },
+                        {
+                            "name": "rAAV-MGT_789",
+                            "isPreferred": False,
+                        },
+                    ],
+                    "molecules": [
+                        {
+                            "aliases": [
+                                {
+                                    "name": "AiP456",
+                                    "isPreferred": True,
+                                },
+                                {
+                                    "name": "rAAV-MGT_789",
+                                    "isPreferred": False,
+                                },
+                            ],
+                            "fullName": "rAAV-MGT_789",
+                        }
+                    ],
+                }
             ]
         }
-
         result = self.tars_client.get_injection_materials_info("12345")
         expected_response = ModelResponse(
             aind_models=[self.expected_materials],
