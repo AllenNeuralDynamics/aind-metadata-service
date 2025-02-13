@@ -194,7 +194,7 @@ class TestTarsResponseHandler(unittest.TestCase):
         virus_response = {
             "aliases": [
                 {
-                    "name": "AiP123",
+                    "name": "AiV123",
                     "isPreferred": True,
                 },
                 {
@@ -206,7 +206,7 @@ class TestTarsResponseHandler(unittest.TestCase):
                 {
                     "aliases": [
                         {
-                            "name": "ExP123",
+                            "name": "AiP456",
                             "isPreferred": True,
                         },
                         {
@@ -221,11 +221,11 @@ class TestTarsResponseHandler(unittest.TestCase):
         injection_material = self.handler.map_lot_to_injection_material(
             viral_prep_lot=prep_lot_response,
             virus=virus_response,
-            virus_tars_id="AiP123",
+            virus_tars_id="AiV123",
         )
         tars_virus_identifiers = TarsVirusIdentifiers(
-            virus_tars_id="AiP123",
-            plasmid_tars_alias="ExP123",
+            virus_tars_id="AiV123",
+            plasmid_tars_alias="AiP456",
             prep_lot_number="12345",
             prep_date=date(2023, 12, 15),
             prep_type="Crude",
