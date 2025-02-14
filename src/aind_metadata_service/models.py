@@ -3,6 +3,7 @@
 from typing import Optional
 
 from aind_data_schema.core.data_description import Funding
+from aind_data_schema.core.procedures import ViralMaterial
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -33,3 +34,9 @@ class FundingInformation(Funding):
     information from the Funding SmartSheet"""
 
     investigators: Optional[str] = Field(default=None)
+
+
+class ViralMaterialInformation(ViralMaterial):
+    """Viral Material with Stock Titer from SLIMS"""
+
+    stock_titer: Optional[int] = Field(default=None)
