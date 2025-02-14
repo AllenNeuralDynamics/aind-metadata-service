@@ -3,7 +3,6 @@
 import json
 import logging
 import re
-from dataclasses import dataclass
 from datetime import date, datetime
 from enum import Enum
 from typing import Dict, List, Optional
@@ -18,6 +17,7 @@ from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
 from aind_metadata_service.client import StatusCodes
+from aind_metadata_service.models import ViralMaterialInformation
 from aind_metadata_service.response_handler import ModelResponse
 
 
@@ -51,23 +51,6 @@ class PrepProtocols(Enum):
     MGT1 = "MGT#1.0"
     PHP_SOP_UW = "PHPeB-SOP-UW"
     HGT1 = "HGT#1.0"
-
-
-class VirusAliasPatterns(Enum):
-    """Virus Alias Patterns"""
-
-    # TODO: add pattern for genome_name once confirmed
-    AIP = re.compile(r"^AiP[a-zA-Z0-9_-]+$")
-    AIV = re.compile(r"^AiV[a-zA-Z0-9_-]+$")
-
-
-@dataclass
-class ViralPrepAliases:
-    """Model for mapping viral prep aliases"""
-
-    plasmid_name: Optional[str]
-    material_id: Optional[str]
-    full_genome_name: Optional[str]
 
 
 class TarsResponseHandler:
@@ -127,39 +110,42 @@ class TarsResponseHandler:
         return datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ").date()
 
     @staticmethod
-    def map_virus_aliases(aliases: list) -> ViralPrepAliases:
-        """Maps aliases to full_genome_name, material_id, viral prep id"""
-        plasmid_name, material_id, full_genome_name = None, None, None
-        for alias in aliases:
-            name = alias["name"]
-            if VirusAliasPatterns.AIP.value.match(name):
-                plasmid_name = name
-            elif VirusAliasPatterns.AIV.value.match(name):
-                material_id = name
-            else:
-                full_genome_name = name
-        viral_prep_aliases = ViralPrepAliases(
-            plasmid_name=plasmid_name,
-            material_id=material_id,
-            full_genome_name=full_genome_name,
+    def map_plasmid_name(aliases: List[Dict]) -> Optional[str]:
+        """Maps plasmid name from aliases"""
+        return next(
+            (
+                alias.get("name")
+                for alias in aliases
+                if alias.get("isPreferred")
+            ),
+            None,
         )
-        return viral_prep_aliases
 
     @staticmethod
-    def map_full_genome_name(response, plasmid_name) -> Optional[str]:
-        """Maps genome name from molecular response"""
-        full_genome_name = None
-        data = response.json()["data"][0]
-        aliases = data["aliases"]
-        if len(aliases) == 2:
-            if aliases[0]["name"] != plasmid_name:
-                full_genome_name = aliases[0]["name"]
-            elif aliases[1]["name"] != plasmid_name:
-                full_genome_name = aliases[1]["name"]
-        return full_genome_name
+    def map_stock_titer(titers: List[dict]) -> Optional[int]:
+        """Maps titer from viral prep lot"""
+        if titers and titers[0].get("result") is not None:
+            return int(titers[0]["result"])
+        return None
+
+    def map_name_and_plasmid_from_virus_response(
+        self, virus: dict
+    ) -> tuple[Optional[str], Optional[str]]:
+        """Maps name and plasmid name from virus response"""
+        names = []
+        plasmid_aliases = []
+        for molecule in virus.get("molecules", []):
+            if molecule.get("fullName"):
+                names.append(molecule["fullName"])
+            plasmid_name = self.map_plasmid_name(molecule.get("aliases", []))
+            if plasmid_name:
+                plasmid_aliases.append(plasmid_name)
+        name = "; ".join(names) if names else None
+        plasmid_alias = "; ".join(plasmid_aliases) if plasmid_aliases else None
+        return name, plasmid_alias
 
     def map_lot_to_injection_material(
-        self, viral_prep_lot: dict, viral_prep_aliases: ViralPrepAliases
+        self, viral_prep_lot: dict, virus: dict, virus_tars_id: str
     ) -> ViralMaterial:
         """
         Map prep lot dictionary to injection materials
@@ -167,39 +153,52 @@ class TarsResponseHandler:
         ----------
         viral_prep_lot: dict
             Dictionary of raw viral prep lot data from TARS response.
-        viral_prep_aliases: ViralPrepAliases
-            Prep aliases mapped from TARS viral prep and molecular endpoints.
+        virus: dict
+            Dictionary of raw virus data from TARS response.
         """
-        prep_lot_number = viral_prep_lot["lot"]
-        prep_date = self._convert_datetime(viral_prep_lot["datePrepped"])
+        prep_lot_number = viral_prep_lot.get("lot")
+        prep_date = self._convert_datetime(
+            viral_prep_lot.get("datePrepped", "")
+        )
         prep_type, prep_protocol = self._map_prep_type_and_protocol(
-            viral_prep_lot["viralPrep"]["viralPrepType"]["name"]
+            viral_prep_lot.get("viralPrep", {})
+            .get("viralPrepType", {})
+            .get("name", "")
+        )
+        name, plasmid_alias = self.map_name_and_plasmid_from_virus_response(
+            virus
         )
         try:
             tars_virus_identifiers = TarsVirusIdentifiers(
-                virus_tars_id=viral_prep_aliases.material_id,
-                plasmid_tars_alias=viral_prep_aliases.plasmid_name,
+                virus_tars_id=virus_tars_id,
+                plasmid_tars_alias=plasmid_alias,
                 prep_lot_number=prep_lot_number,
                 prep_date=prep_date,
                 prep_type=prep_type,
                 prep_protocol=prep_protocol,
             )
-            return ViralMaterial(
-                name=viral_prep_aliases.full_genome_name,
+            return ViralMaterialInformation(
+                name=name,
                 tars_identifiers=tars_virus_identifiers,
+                stock_titer=self.map_stock_titer(
+                    viral_prep_lot.get("titers", None)
+                ),
             )
         except ValidationError:
             tars_virus_identifiers = TarsVirusIdentifiers.model_construct(
-                virus_tars_id=viral_prep_aliases.material_id,
-                plasmid_tars_alias=viral_prep_aliases.plasmid_name,
+                virus_tars_id=virus_tars_id,
+                plasmid_tars_alias=plasmid_alias,
                 prep_lot_number=prep_lot_number,
                 prep_date=prep_date,
                 prep_type=prep_type,
                 prep_protocol=prep_protocol,
             )
-            return ViralMaterial.model_construct(
-                name=viral_prep_aliases.full_genome_name,
+            return ViralMaterialInformation.model_construct(
+                name=name,
                 tars_identifiers=tars_virus_identifiers,
+                stock_titer=self.map_stock_titer(
+                    viral_prep_lot.get("titers", None)
+                ),
             )
 
     @staticmethod
@@ -275,6 +274,9 @@ class TarsResponseHandler:
                                         "data"
                                     ]
                                     try:
+                                        data.pop(
+                                            "stock_titer", None
+                                        )  # Remove extra field
                                         new_material = ViralMaterial(**data)
                                         new_material.titer = (
                                             injection_material.titer

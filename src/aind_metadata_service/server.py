@@ -115,16 +115,20 @@ async def retrieve_bergamo_session(job_settings: BergamoJobSettings):
 
 
 @app.get("/instrument/{instrument_id}")
-async def retrieve_instrument(instrument_id):
+async def retrieve_instrument(instrument_id, partial_match=False):
     """Retrieves instrument from slims"""
-    model_response = slims_client.get_instrument_model_response(instrument_id)
+    model_response = slims_client.get_instrument_model_response(
+        instrument_id, partial_match=partial_match
+    )
     return model_response.map_to_json_response(validate=False)
 
 
 @app.get("/rig/{rig_id}")
-async def retrieve_rig(rig_id):
+async def retrieve_rig(rig_id, partial_match=False):
     """Retrieves rig from slims"""
-    model_response = slims_client.get_rig_model_response(rig_id)
+    model_response = slims_client.get_rig_model_response(
+        rig_id, partial_match=partial_match
+    )
     return model_response.map_to_json_response(validate=False)
 
 
