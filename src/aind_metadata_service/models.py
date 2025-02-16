@@ -1,10 +1,10 @@
 """Additional response models not defined in aind-data-schema"""
 
+from datetime import datetime
 from typing import Optional
 
 from aind_data_schema.core.data_description import Funding
 from pydantic import BaseModel, Field, field_validator
-from datetime import datetime
 
 
 class ProtocolInformation(BaseModel):

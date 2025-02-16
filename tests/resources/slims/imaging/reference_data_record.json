@@ -1,0 +1,70 @@
+[
+   {
+      "pk": 40,
+      "tableName": "ReferenceDataRecord",
+      "columns": [
+         {
+            "name": "rdrc_name",
+            "value": "440_SmartSPIM1_20240327",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "rdrc_fk_referenceDataType",
+            "value": 4,
+            "displayValue": "AIND Instruments",
+            "datatype": "FOREIGN_KEY",
+            "title": "Reference Data Type"
+         },
+         {
+            "name": "rdrc_pk",
+            "value": 40,
+            "datatype": "INTEGER",
+            "title": "rdrc_pk"
+         }
+      ]
+   },
+   {
+      "pk": 1624,
+      "tableName": "ReferenceDataRecord",
+      "columns": [
+         {
+            "name": "rdrc_name",
+            "value": "Horizontal, Superior; AP",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "rdrc_cf_zDirection",
+            "value": "Superior to Inferior",
+            "datatype": "STRING",
+            "title": "Z Direction"
+         },
+         {
+            "name": "rdrc_cf_yDirection",
+            "value": "Anterior to Posterior",
+            "datatype": "STRING",
+            "title": "Y Direction"
+         },
+         {
+            "name": "rdrc_cf_xDirection",
+            "value": "Left to Right",
+            "datatype": "STRING",
+            "title": "X Direction"
+         },
+         {
+            "name": "rdrc_fk_referenceDataType",
+            "value": 21,
+            "displayValue": "SPIM Brain Orientation",
+            "datatype": "FOREIGN_KEY",
+            "title": "Reference Data Type"
+         },
+         {
+            "name": "rdrc_pk",
+            "value": 1624,
+            "datatype": "INTEGER",
+            "title": "rdrc_pk"
+         }
+      ]
+   }
+]

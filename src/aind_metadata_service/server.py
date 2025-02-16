@@ -2,11 +2,12 @@
 
 import os
 from typing import Optional
+
 from aind_metadata_mapper.bergamo.session import BergamoEtl
 from aind_metadata_mapper.bergamo.session import (
     JobSettings as BergamoJobSettings,
 )
-from fastapi import FastAPI, Request, Query
+from fastapi import FastAPI, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -218,28 +219,30 @@ async def retrieve_project_names():
     return json_response
 
 
-@app.get("/slims/smartspim_imaging/{subject_id}")
+@app.get("/slims/smartspim_imaging")
 async def retrieve_smartspim_imaging(
-    subject_id,
-    datetime: Optional[str] = Query(
+    subject_id: Optional[str] = Query(None, alias="subject_id"),
+    start_date_gte: Optional[str] = Query(
         None,
-        alias="datetime",
-        description="Datetime performed in ISO format (YYYY-MM-DDTHH:MM)",
+        alias="start_date_gte",
+        description="Experiment run created on or after. (ISO format)",
     ),
-    latest: bool = Query(
-        False, description="Flag to get the latest acquisition"
+    end_date_lte: Optional[str] = Query(
+        None,
+        alias="end_date_lte",
+        description="Experiment run created on or before. (ISO format)",
     ),
 ):
     """
-    Retrieves acquisitions from SLIMS server
+    Retrieves SPIM Imaging data from SLIMS server
     """
     response = await run_in_threadpool(
-        slims_client.get_smartspim_imaging_model_response,
+        slims_client.get_slims_imaging_response,
         subject_id=subject_id,
-        datetime_performed=datetime,
-        latest=latest,
+        start_date=start_date_gte,
+        end_date=end_date_lte,
     )
-    return response.map_to_json_response()
+    return response
 
 
 @app.get("/subject/{subject_id}")

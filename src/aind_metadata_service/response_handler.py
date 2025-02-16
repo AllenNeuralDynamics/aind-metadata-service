@@ -97,12 +97,12 @@ class ModelResponse(Generic[T]):
         )
 
     @classmethod
-    def bad_request_error_response(cls):
+    def bad_request_error_response(cls, message="Bad Request."):
         """Bad Request Error"""
         return cls(
             status_code=StatusCodes.BAD_REQUEST,
             aind_models=[],
-            message="Bad Request.",
+            message=message,
         )
 
     @staticmethod
