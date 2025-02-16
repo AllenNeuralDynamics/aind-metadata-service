@@ -36,6 +36,7 @@ class FundingInformation(Funding):
 
     investigators: Optional[str] = Field(default=None)
 
+
 class SpimImagingInformation(BaseModel):
     """SmartSPIM Imaging information that will be returned to the user that
     requests information from the SmartSPIM Imaging SLIMS Workflow"""
@@ -66,6 +67,8 @@ class SpimImagingInformation(BaseModel):
     z_direction: Optional[str] = Field(None, description="Z Direction")
     y_direction: Optional[str] = Field(None, description="Y Direction")
     x_direction: Optional[str] = Field(None, description="X Direction")
+
+
 class ViralMaterialInformation(ViralMaterial):
     """Viral Material with Stock Titer from SLIMS"""
 

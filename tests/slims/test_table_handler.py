@@ -2,6 +2,7 @@
 
 import unittest
 from datetime import datetime, timezone
+
 from aind_metadata_service.slims.table_handler import SlimsTableHandler
 
 
