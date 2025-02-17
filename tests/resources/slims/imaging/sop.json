@@ -1,0 +1,26 @@
+[
+   {
+      "pk": 18,
+      "tableName": "Sop",
+      "columns": [
+         {
+            "name": "stop_name",
+            "value": "Imaging cleared mouse brains on SmartSPIM",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "stop_link",
+            "value": "<a href=\"https://dx.doi.org/10.17504/protocols.io.3byl4jo1rlo5/v1\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">Imaging cleared mouse brains on SmartSPIM</a>",
+            "datatype": "STRING",
+            "title": "Link"
+         },
+         {
+            "name": "stop_pk",
+            "value": 18,
+            "datatype": "INTEGER",
+            "title": "stop_pk"
+         }
+      ]
+   }
+]

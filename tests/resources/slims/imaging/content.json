@@ -1,0 +1,74 @@
+[
+   {
+      "pk": 233,
+      "tableName": "Content",
+      "columns": [
+         {
+            "name": "cntn_barCode",
+            "value": "BRN00000016",
+            "datatype": "STRING",
+            "title": "Barcode"
+         },
+         {
+            "name": "cntn_cf_parentBarcode",
+            "value": "740610",
+            "datatype": "STRING",
+            "title": "Parent Barcode"
+         },
+         {
+            "name": "cntn_pk",
+            "value": 233,
+            "datatype": "INTEGER",
+            "title": "cntn_pk"
+         }
+      ]
+   },
+   {
+      "pk": 235,
+      "tableName": "Content",
+      "columns": [
+         {
+            "name": "cntn_barCode",
+            "value": "BRN00000018",
+            "datatype": "STRING",
+            "title": "Barcode"
+         },
+         {
+            "name": "cntn_cf_parentBarcode",
+            "value": "744742",
+            "datatype": "STRING",
+            "title": "Parent Barcode"
+         },
+         {
+            "name": "cntn_pk",
+            "value": 235,
+            "datatype": "INTEGER",
+            "title": "cntn_pk"
+         }
+      ]
+   },
+   {
+      "pk": 234,
+      "tableName": "Content",
+      "columns": [
+         {
+            "name": "cntn_barCode",
+            "value": "BRN00000017",
+            "datatype": "STRING",
+            "title": "Barcode"
+         },
+         {
+            "name": "cntn_cf_parentBarcode",
+            "value": "744744",
+            "datatype": "STRING",
+            "title": "Parent Barcode"
+         },
+         {
+            "name": "cntn_pk",
+            "value": 234,
+            "datatype": "INTEGER",
+            "title": "cntn_pk"
+         }
+      ]
+   }
+]

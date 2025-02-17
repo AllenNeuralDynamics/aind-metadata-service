@@ -1,12 +1,13 @@
 """Starts and runs a Flask Service"""
 
 import os
+from typing import Optional
 
 from aind_metadata_mapper.bergamo.session import BergamoEtl
 from aind_metadata_mapper.bergamo.session import (
     JobSettings as BergamoJobSettings,
 )
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -216,6 +217,32 @@ async def retrieve_project_names():
     )
     json_response = mapper.get_project_names()
     return json_response
+
+
+@app.get("/slims/smartspim_imaging")
+async def retrieve_smartspim_imaging(
+    subject_id: Optional[str] = Query(None, alias="subject_id"),
+    start_date_gte: Optional[str] = Query(
+        None,
+        alias="start_date_gte",
+        description="Experiment run created on or after. (ISO format)",
+    ),
+    end_date_lte: Optional[str] = Query(
+        None,
+        alias="end_date_lte",
+        description="Experiment run created on or before. (ISO format)",
+    ),
+):
+    """
+    Retrieves SPIM Imaging data from SLIMS server
+    """
+    response = await run_in_threadpool(
+        slims_client.get_slims_imaging_response,
+        subject_id=subject_id,
+        start_date=start_date_gte,
+        end_date=end_date_lte,
+    )
+    return response
 
 
 @app.get("/subject/{subject_id}")

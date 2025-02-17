@@ -1,0 +1,95 @@
+[
+   {
+      "pk": 40015,
+      "tableName": "ExperimentRun",
+      "columns": [
+         {
+            "name": "xprn_fk_experimentTemplate",
+            "value": 45,
+            "displayValue": "SPIM Imaging (v. 1)",
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol"
+         },
+         {
+            "name": "xprn_createdOn",
+            "value": 1739301437964,
+            "datatype": "DATE",
+            "title": "Created on"
+         },
+         {
+            "name": "xprn_pk",
+            "value": 40015,
+            "datatype": "INTEGER",
+            "title": "xprn_pk"
+         },
+         {
+            "name": "xptm_name",
+            "value": "SPIM Imaging",
+            "datatype": "STRING",
+            "title": "Name"
+         }
+      ]
+   },
+   {
+      "pk": 40016,
+      "tableName": "ExperimentRun",
+      "columns": [
+         {
+            "name": "xprn_fk_experimentTemplate",
+            "value": 45,
+            "displayValue": "SPIM Imaging (v. 1)",
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol"
+         },
+         {
+            "name": "xprn_createdOn",
+            "value": 1739383241200,
+            "datatype": "DATE",
+            "title": "Created on"
+         },
+         {
+            "name": "xprn_pk",
+            "value": 40016,
+            "datatype": "INTEGER",
+            "title": "xprn_pk"
+         },
+         {
+            "name": "xptm_name",
+            "value": "SPIM Imaging",
+            "datatype": "STRING",
+            "title": "Name"
+         }
+      ]
+   },
+   {
+      "pk": 40017,
+      "tableName": "ExperimentRun",
+      "columns": [
+         {
+            "name": "xprn_fk_experimentTemplate",
+            "value": 45,
+            "displayValue": "SPIM Imaging (v. 1)",
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol"
+         },
+         {
+            "name": "xprn_createdOn",
+            "value": 1739398415380,
+            "datatype": "DATE",
+            "title": "Created on"
+         },
+         {
+            "name": "xprn_pk",
+            "value": 40017,
+            "datatype": "INTEGER",
+            "title": "xprn_pk"
+         },
+         {
+            "name": "xptm_name",
+            "value": "SPIM Imaging",
+            "datatype": "STRING",
+            "title": "Name"
+         }
+      ]
+   }
+]

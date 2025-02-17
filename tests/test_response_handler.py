@@ -309,6 +309,23 @@ class TestResponseHandler(unittest.TestCase):
         self.assertEqual(expected_json.status_code, actual_json.status_code)
         self.assertEqual(expected_json.body, actual_json.body)
 
+    def test_bad_request_error(self):
+        """Test bad request error response"""
+        model_response = ModelResponse.bad_request_error_response()
+        actual_json = model_response.map_to_json_response()
+        expected_json = JSONResponse(
+            status_code=400,
+            content=(
+                {
+                    "message": "Bad Request.",
+                    "data": None,
+                }
+            ),
+        )
+        self.assertEqual(StatusCodes.BAD_REQUEST, model_response.status_code)
+        self.assertEqual(expected_json.status_code, actual_json.status_code)
+        self.assertEqual(expected_json.body, actual_json.body)
+
 
 class TestEtlResponse(unittest.TestCase):
     """Tests methods in EtlResponse class"""
