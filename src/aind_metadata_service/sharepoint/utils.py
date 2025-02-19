@@ -3,7 +3,7 @@
 from typing import Any, Optional
 
 from pydantic import ValidationError
-from pydantic_core.core_schema import ValidatorFunctionWrapHandler
+from pydantic import ValidatorFunctionWrapHandler
 
 
 def optional_enum(
