@@ -6,23 +6,37 @@ from typing import Optional, Annotated
 from pydantic import BaseModel, Extra, Field, WrapValidator
 from aind_metadata_service.sharepoint.utils import optional_enum
 
+
 class Projectid(Enum, metaclass=EnumMeta):
     """Enum class for ProjectID."""
+
     N_101_03_001_10__COSTA_PG = "101-03-001-10 Costa PGA Lab Research (Direct)"
     N_102_01_009_10_CTY__MORP = "102-01-009-10 CTY Morphology"
     N_102_01_011_10_CTY__CONN = "102-01-011-10 CTY Connectome EM"
     N_102_01_012_10_CTY__CONN = "102-01-012-10 CTY Connectome Meso"
     N_102_01_016_10_CTY__TAXO = "102-01-016-10 CTY Taxonomy"
-    N_102_01_029_20_CTY_BRAIN = "102-01-029-20 CTY BRAIN Cell-type Specific Enhancer Viruses"
-    N_102_01_031_20_W4_CTY_EU = "102-01-031-20 W4 - CTY EU Horizon 2020 BRAINTIME"
-    N_102_01_031_20_W5_CTY_EU = "102-01-031-20 W5 - CTY EU Horizon 2020 BRAINTIME"
+    N_102_01_029_20_CTY_BRAIN = (
+        "102-01-029-20 CTY BRAIN Cell-type Specific Enhancer Viruses"
+    )
+    N_102_01_031_20_W4_CTY_EU = (
+        "102-01-031-20 W4 - CTY EU Horizon 2020 BRAINTIME"
+    )
+    N_102_01_031_20_W5_CTY_EU = (
+        "102-01-031-20 W5 - CTY EU Horizon 2020 BRAINTIME"
+    )
     N_102_01_032_20_CTY__MOUS = "102-01-032-20 CTY Mouse Aging"
-    N_102_01_036_20_CTY__DISS = "102-01-036-20 CTY Dissemination of 3-Photon Imaging"
-    N_102_01_040_20_CTY_BRAIN = "102-01-040-20 CTY BRAIN UG3/UH3 Genetic Viral Tools"
+    N_102_01_036_20_CTY__DISS = (
+        "102-01-036-20 CTY Dissemination of 3-Photon Imaging"
+    )
+    N_102_01_040_20_CTY_BRAIN = (
+        "102-01-040-20 CTY BRAIN UG3/UH3 Genetic Viral Tools"
+    )
     N_102_01_043_20_CTY__OPTI = "102-01-043-20 CTY Optical interrogation"
     N_102_01_044_10_CTY__GENO = "102-01-044-10 – CTY Genomics"
     N_102_01_045_10_CTY_IVSCC = "102-01-045-10 – CTY IVSCC"
-    N_102_01_046_20_CTY__WEIL = "102-01-046-20 - CTY Weill Neuronal Heterogeneity"
+    N_102_01_046_20_CTY__WEIL = (
+        "102-01-046-20 - CTY Weill Neuronal Heterogeneity"
+    )
     N_102_01_048_10_CTY__BARC = "102-01-048-10 CTY Barcoded Connectomics"
     N_102_01_049_20_CTY__OPIO = "102-01-049-20 - CTY Opioid Transcriptomics"
     N_102_01_054_20_CTY_PFAC = "102-01-054-20 CTY PFAC"
@@ -30,7 +44,9 @@ class Projectid(Enum, metaclass=EnumMeta):
     N_102_01_059_20_CTY_SCORC = "102-01-059-20 CTY SCORCH"
     N_102_01_060_20_CTY__BRAI = "102-01-060-20 CTY Brain Drain"
     N_102_01_061_20_CTY_BICAN = "102-01-061-20 CTY BICAN Human and NHP Atlas"
-    N_102_01_062_20_CTY_BICAN = "102-01-062-20 CTY BICAN Mouse Developmental Atlas"
+    N_102_01_062_20_CTY_BICAN = (
+        "102-01-062-20 CTY BICAN Mouse Developmental Atlas"
+    )
     N_102_01_064_10_CTY__GENE = "102-01-064-10 CTY Genetic Tools"
     N_102_01_066_20_AIBS_CTY = "102-01-066-20 AIBS CTY CONNECTS HIVE"
     N_102_01_066_20_AIND_CTY = "102-01-066-20 AIND CTY CONNECTS HIVE"
@@ -38,12 +54,18 @@ class Projectid(Enum, metaclass=EnumMeta):
     N_102_01_069_20__PRE__SPE = "102-01-069-20 Pre-Spend"
     N_102_01_070_20_CTY_CONNE = "102-01-070-20 CTY CONNECTS MouseConnects"
     N_102_01_078_20_AIBS__VOC = "102-01-078-20 AIBS Vocal Circuit"
-    N_102_01_079_20_AIBS_CONN = "102-01-079-20 AIBS CONNECTS TransNeuronal Tools"
+    N_102_01_079_20_AIBS_CONN = (
+        "102-01-079-20 AIBS CONNECTS TransNeuronal Tools"
+    )
     N_102_01_999_10_CTY__PROG = "102-01-999-10 CTY Program Admin"
     N_102_02_004_10_BTV__VISU = "102-02-004-10 BTV Visual Behavior"
     N_102_02_012_20_BTV_BRAIN = "102-02-012-20 BTV BRAIN Viral Strategies"
-    N_102_04_004_10_OTH__MERI = "102-04-004-10 OTH Meritorious Scholar Directed Research"
-    N_102_04_006_20_OTH__MEAS = "102-04-006-20 OTH Measuring Consciousness Ph2 (TBD)"
+    N_102_04_004_10_OTH__MERI = (
+        "102-04-004-10 OTH Meritorious Scholar Directed Research"
+    )
+    N_102_04_006_20_OTH__MEAS = (
+        "102-04-006-20 OTH Measuring Consciousness Ph2 (TBD)"
+    )
     N_102_04_007_10_APLD__TAR = "102-04-007-10 APLD Targeted CNS Gene Therapy"
     N_102_04_010_10_CTY_SR_SL = "102-04-010-10 CTY SR: SLC6A1"
     N_102_04_011_10_CTY_SR_SY = "102-04-011-10 CTY SR: SYNGAP1"
@@ -58,9 +80,13 @@ class Projectid(Enum, metaclass=EnumMeta):
     N_110_01_001_10_PG__PROTE = "110-01-001-10 PG Proteomics"
     N_121_01_016_20_MSP_BRAIN = "121-01-016-20 MSP BRAIN OpenScope"
     N_121_01_018_20_MSP__EPHA = "121-01-018-20 MSP Ephaptic Cell Typ"
-    N_121_01_023_20_MSP__TEMP = "121-01-023-20 MSP Templeton - Testing Theories of Consciousness"
+    N_121_01_023_20_MSP__TEMP = (
+        "121-01-023-20 MSP Templeton - Testing Theories of Consciousness"
+    )
     N_121_01_025_20_MSP_U01 = "121-01-025-20 MSP U01 Bridging Function, Connectivity, & Transcriptomics"
-    N_121_01_026_20_MSP__TEMP = "121-01-026-20 MSP Templeton Measuring Distinct Conscious State"
+    N_121_01_026_20_MSP__TEMP = (
+        "121-01-026-20 MSP Templeton Measuring Distinct Conscious State"
+    )
     N_122_01_001_10_AIND__SCI = "122-01-001-10 AIND Scientific Activities"
     N_122_01_002_20__MOLECULA = "122-01-002-20 Molecular Core"
     N_122_01_002_20__PROJECT = "122-01-002-20 Project 1"
@@ -68,8 +94,12 @@ class Projectid(Enum, metaclass=EnumMeta):
     N_122_01_002_20__PROJECT_3 = "122-01-002-20 Project 4"
     N_122_01_004_20_AIND__BRA = "122-01-004-20 AIND Brainstem RF1"
     N_122_01_010_20_AIND__POO = "122-01-010-20 - AIND Poo Simons BTI"
-    N_122_01_011_20_AIND__COH = "122-01-011-20 - AIND Cohen JHU R01 Transferred Subaward"
-    N_122_01_012_20_AIND_RF1 = "122-01-012-20 - AIND RF1 Functions of locus coeruleus"
+    N_122_01_011_20_AIND__COH = (
+        "122-01-011-20 - AIND Cohen JHU R01 Transferred Subaward"
+    )
+    N_122_01_012_20_AIND_RF1 = (
+        "122-01-012-20 - AIND RF1 Functions of locus coeruleus"
+    )
     N_122_01_013_10_MSP__SCIE = "122-01-013-10 MSP Scientific Activities"
     N_122_01_014_20_AIND__SIE = "122-01-014-20 - AIND Siegle U01 NPOpto"
     N_122_01_019_20_AIND_CZI = "122-01-019-20 AIND CZI Collaborative Pairs"
@@ -78,10 +108,11 @@ class Projectid(Enum, metaclass=EnumMeta):
     N_122_01_022_20_AIND__POD = "122-01-022-20 AIND Podgorski UM1"
     N_123_01_003_20__MOTOR__C = "123-01-003-20 Motor Circuit Dysfunction in PD"
     N_124_01_001_10__BRAIN__C = "124-01-001-10 Brain & Consciousness (Direct)"
-    N_125_01_001_10__SEA_HUB = "125-01-001-10 - SeaHub Scientific Activities (Direct)"
+    N_125_01_001_10__SEA_HUB = (
+        "125-01-001-10 - SeaHub Scientific Activities (Direct)"
+    )
     AAV_PRODUCTION_102_88_004 = "AAV production 102-88-004-10"
     R_D_102_88_004_10 = "R&D 102-88-004-10"
-
 
     # Added missing attributes
     N_1020400910_CAPSID_SCREE = "102-04-009-10  Capsid Screening"
@@ -90,14 +121,14 @@ class Projectid(Enum, metaclass=EnumMeta):
     N_1210100110_MSP_DEEP_INT = "121-01-001-10 MSP Deep Interpolation"
     N_1210100210_MSP_BEHAVIOR = "121-01-002-10 MSP Behavioral Dynamics"
     N_1210100310_MSP_X_AREA_F = (
-    "121-01-003-10 MSP X - Area Functional Interactions"
+        "121-01-003-10 MSP X - Area Functional Interactions"
     )
     N_1210100410_MSP_VIP_REGU = (
-    "121-01-004-10 MSP VIP Regulated Stabilized Network"
+        "121-01-004-10 MSP VIP Regulated Stabilized Network"
     )
     N_1210100510_MSP_SURROUND = "121-01-005-10 MSP Surround Structure Function"
     N_1210100610_MSP_AUTOMATI = (
-    "121-01-006-10 MSP Automatically Optimized Model"
+        "121-01-006-10 MSP Automatically Optimized Model"
     )
     N_1210100710_MSP_TASK_TRA = "121-01-007-10 MSP Task Trained Networks"
     N_1210100810_MSP_NEURAL_E = "121-01-008-10 MSP Neural Ensemble Variability"
@@ -106,15 +137,17 @@ class Projectid(Enum, metaclass=EnumMeta):
     N_1210101110_MSP_DYNAMIC = "121-01-011-10 MSP Dynamic Routing"
     N_1210101210_MSP_LEARNING = "121-01-012-10 MSP Learning mFISH"
     N_1210101420_MSP_BRAIN_MO = (
-    "121-01-014-20 MSP BRAIN Model Structure Function"
+        "121-01-014-20 MSP BRAIN Model Structure Function"
     )
     N_1210101510_MSP_FALCONWO = "121-01-015-10 MSP Falconwood"
     N_1210199910_MSP_CROSS_PR = "121-01-999-10 MSP Cross Program 10YP"
     N_1210199910_MSP_CROS_001 = "121-01-999-10 MSP Cross Program  Scientific"
     N_1210101210_LEARNING_MFISH = "121-01-012-10 Learning mFISH"
 
+
 class IacucProtocol(Enum, metaclass=EnumMeta):
     """Enum class for IACUC Protocol."""
+
     SELECT = "Select..."
     N_2117 = "2117"
     N_2201 = "2201"
@@ -141,7 +174,6 @@ class IacucProtocol(Enum, metaclass=EnumMeta):
     N_2418 = "2418"
     N_2427 = "2427"
 
-
     # Added missing attributes
     N_1906 = "1906"
     N_2001 = "2001"
@@ -163,33 +195,61 @@ class IacucProtocol(Enum, metaclass=EnumMeta):
     N_2115 = "2115"
     N_2010 = "2010"
 
+
 class Protocol(Enum, metaclass=EnumMeta):
     """Enum class for Protocol."""
+
     SELECT = "Select..."
-    N_2119__TRAINING_AND_QUAL = "2119 - Training and qualification of animal users"
+    N_2119__TRAINING_AND_QUAL = (
+        "2119 - Training and qualification of animal users"
+    )
     N_2201__INTERROGATING_PRO = "2201 - Interrogating projections and gene expression of neurons by in situ sequencing"
-    N_2202__TESTING_AA_VS_IN = "2202 - Testing AAVs in Parkinson's mouse models"
+    N_2202__TESTING_AA_VS_IN = (
+        "2202 - Testing AAVs in Parkinson's mouse models"
+    )
     N_2204__PRIMARY_NEURON_AN = "2204 - Primary neuron and brain slice culture from postnatal rodent brain"
-    N_2205__OPTIMIZATION_AND = "2205 - Optimization and validation of viral vectors"
+    N_2205__OPTIMIZATION_AND = (
+        "2205 - Optimization and validation of viral vectors"
+    )
     N_2207__IN__VITRO__BRAIN = "2207 - In Vitro Brain Stimulation"
     N_2212__INVESTIGATING__BR = "2212 - Investigating Brain States"
-    N_2301__TESTING_OF_ENHANC = "2301 - Testing of enhancers and AAV gene therapy vectors"
-    N_2304__NEUROSURGERY__BEH = "2304 - Neurosurgery & Behavior Training Protocol"
+    N_2301__TESTING_OF_ENHANC = (
+        "2301 - Testing of enhancers and AAV gene therapy vectors"
+    )
+    N_2304__NEUROSURGERY__BEH = (
+        "2304 - Neurosurgery & Behavior Training Protocol"
+    )
     N_2305__IN__VIVO__BRAIN = "2305 - In Vivo Brain Stimulation"
     N_2306__PATCH_SEQ_CHARACT = "2306 - Patch-seq characterization of mouse neurons in acute brain slices for cross-species comparison studies"
-    N_2307__DISSECTING_THE_NE = "2307 - Dissecting the neural circuits of adaptive control of behavior"
+    N_2307__DISSECTING_THE_NE = (
+        "2307 - Dissecting the neural circuits of adaptive control of behavior"
+    )
     N_2308__INDUCTION_OF__IMM = "2308 - Induction of Immune Memory"
-    N_2401__THE_USE_OF_MICE_F = "2401 - The use of mice for the development of biological recorders"
+    N_2401__THE_USE_OF_MICE_F = (
+        "2401 - The use of mice for the development of biological recorders"
+    )
     N_2402__BRAIN__OBSERVATOR = "2402 - Brain Observatory Optical Physiology"
     N_2403__ELECTROPHYSIOLOGY = "2403 - Electrophysiology Mindscope Phase 4"
-    N_2405__ANALYSIS_OF__INTE = "2405 - Analysis of Integrated Neuronal Phenotypes"
-    N_2406__CHARACTERIZATION = "2406 - Characterization of mouse and viral genetic tools"
-    N_2410__VALIDATION_OF_BRA = "2410 - Validation of brain cell type enhancer AAV vectors in rats"
-    N_2412__CIRCUIT_TRACING_A = "2412 - Circuit tracing and optical physiology of mouse cortex"
-    N_2413__NEUROPHYSIOLOGY_O = "2413 - Neurophysiology of Naturalistic Learning"
+    N_2405__ANALYSIS_OF__INTE = (
+        "2405 - Analysis of Integrated Neuronal Phenotypes"
+    )
+    N_2406__CHARACTERIZATION = (
+        "2406 - Characterization of mouse and viral genetic tools"
+    )
+    N_2410__VALIDATION_OF_BRA = (
+        "2410 - Validation of brain cell type enhancer AAV vectors in rats"
+    )
+    N_2412__CIRCUIT_TRACING_A = (
+        "2412 - Circuit tracing and optical physiology of mouse cortex"
+    )
+    N_2413__NEUROPHYSIOLOGY_O = (
+        "2413 - Neurophysiology of Naturalistic Learning"
+    )
     N_2414__ELECTROPHYSIOLOGI = "2414 - Electrophysiological and optical interrogation of brain-wide neural circuits in the mouse"
     N_2415__OPTOPHYSIOLOGICAL = "2415 - Optophysiological analysis of brain-wide neural circuits in the mouse"
-    N_2416__ANATOMICAL_ANALYS = "2416 - Anatomical analysis of brain-wide neural circuits in the mouse"
+    N_2416__ANATOMICAL_ANALYS = (
+        "2416 - Anatomical analysis of brain-wide neural circuits in the mouse"
+    )
     N_2417__CHARACTERIZATION = "2417 - Characterization of transcriptomic cell type activation and their molecular adaptations that occur during psychedelic, antidepressants, and antipsychotic drug use"
     N_2418__IN__VITRO__SINGLE = "2418 - In Vitro Single Cell Characterization"
     N_2427__OPEN_SCOPE__MINDS = "2427 - OpenScope Mindscope animal protocol for Optical Physiology and Neuropixel"
@@ -197,10 +257,10 @@ class Protocol(Enum, metaclass=EnumMeta):
 
 class Lightcycle(Enum, metaclass=EnumMeta):
     """Enum class for LightCycle."""
+
     STANDARD__LIGHT__CYCLE_6A = "Standard Light Cycle (6am to 8pm light)"
     REVERSE__LIGHT__CYCLE_9PM = "Reverse Light Cycle (9pm to 9am light)"
     N_249_ABSL2 = "249 (ABSL2)"
-
 
     # Added missing attributes
     REVERSE_LIGHT_CYCLE_9PM_T = "Reverse Light Cycle (9pm to 9am light)"
@@ -208,20 +268,23 @@ class Lightcycle(Enum, metaclass=EnumMeta):
     REVERSE_9PM_TO_9AM = "Reverse (9pm to 9am)"
     STANDARD_6AM_TO_8PM = "Standard (6am to 8pm)"
 
+
 class LimsRequired(Enum, metaclass=EnumMeta):
     """Enum class for LIMS Required."""
+
     SELECT = "Select..."
     LIMS = "LIMS"
     SLIMS = "SLIMS"
     N_A = "N/A"
 
-
     # Added missing attributes
     NO = "No"
     YES = "Yes"
 
+
 class Limsproject(Enum, metaclass=EnumMeta):
     """Enum class for LIMSProject."""
+
     N_0200 = "0200"
     N_0309 = "0309"
     N_0310 = "0310"
@@ -412,9 +475,9 @@ class Limsproject(Enum, metaclass=EnumMeta):
     VISUAL_BEHAV_IOR_MULTISCO = "VisualBehavIorMultiscopeTask1G"
     VISUAL_BEHAVIOR_TASK1_B = "VisualBehaviorTask1B"
 
-
     # Added missing attributes
     S200_C = "S200C"
+
 
 class Limstaskflow(Enum, metaclass=EnumMeta):
     """Enum class for LIMSTaskflow."""
@@ -426,43 +489,71 @@ class Limstaskflow(Enum, metaclass=EnumMeta):
     AIND_U19_THALAMUS = "AIND U19 Thalamus"
     AIND_WATERLOG = "AIND Waterlog"
     BRAIN_LARGE_SCALE_RECORDING = "BRAIN Large Scale Recording"
-    BRAIN_MOUSE_BRAIN_CELL_ATLAS_TRANS_SYNAPTIC = "BRAIN Mouse Brain Cell Atlas trans-synaptic"
+    BRAIN_MOUSE_BRAIN_CELL_ATLAS_TRANS_SYNAPTIC = (
+        "BRAIN Mouse Brain Cell Atlas trans-synaptic"
+    )
     BRAIN_OBSERVATORY_DEEPSCOPE = "Brain Observatory Deepscope"
     BRAIN_OBSERVATORY_EPHYS_DEV = "Brain Observatory Ephys Dev"
     BRAIN_OBSERVATORY_MAPSCOPE = "Brain Observatory Mapscope"
     BRAIN_OBSERVATORY_MESOSCOPE = "Brain Observatory Mesoscope"
     BRAIN_OBSERVATORY_MESOSCOPE_1G = "Brain Observatory Mesoscope 1G"
     BRAIN_OBSERVATORY_NEUROPIXEL_DEV = "Brain Observatory Neuropixel Dev"
-    BRAIN_OBSERVATORY_TRANSGENIC_CHARACTERIZATION = "Brain Observatory Transgenic Characterization"
+    BRAIN_OBSERVATORY_TRANSGENIC_CHARACTERIZATION = (
+        "Brain Observatory Transgenic Characterization"
+    )
     BRAIN_OBSERVATORY_V1_DD = "Brain Observatory V1DD"
     BRAIN_OBSERVATORY_VISUAL_BEHAVIOR = "Brain Observatory Visual Behavior"
-    BRAIN_OBSERVATORY_VISUAL_BEHAVIOR_1B = "Brain Observatory Visual Behavior 1B"
-    BRAIN_OBSERVATORY_VISUAL_BEHAVIOR_NEUROPIXEL = "Brain Observatory Visual Behavior Neuropixel"
+    BRAIN_OBSERVATORY_VISUAL_BEHAVIOR_1B = (
+        "Brain Observatory Visual Behavior 1B"
+    )
+    BRAIN_OBSERVATORY_VISUAL_BEHAVIOR_NEUROPIXEL = (
+        "Brain Observatory Visual Behavior Neuropixel"
+    )
     BRAIN_OBSERVATORY_VISUAL_CODING = "Brain Observatory Visual Coding"
     BTV_BRAIN_VIRAL_STRATEGIES = "BTV BRAIN Viral Strategies"
     CITRIC_ACID_PILOT = "Citric Acid Pilot"
     EPHYS_DEV_VISUAL_BEHAVIOR = "Ephys Dev Visual Behavior"
     EPHYS_DEV_VISUAL_BEHAVIOR_2 = "Ephys Dev Visual Behavior 2"
-    EPHYS_TASK_DEV_DYNAMIC_ROUTING_DOC_LEFT_EYE = "Ephys Task Dev Dynamic Routing DOC Left Eye"
-    EPHYS_TASK_DEV_DYANMIC_ROUTING_NSB_BEH = "Ephys Task Dev Dyanmic Routing (NSB Beh)"
-    EPHYS_TASK_DEV_DYNAMIC_ROUTING_SC_BEH = "Ephys Task Dev Dynamic Routing (S/C Beh)"
+    EPHYS_TASK_DEV_DYNAMIC_ROUTING_DOC_LEFT_EYE = (
+        "Ephys Task Dev Dynamic Routing DOC Left Eye"
+    )
+    EPHYS_TASK_DEV_DYANMIC_ROUTING_NSB_BEH = (
+        "Ephys Task Dev Dyanmic Routing (NSB Beh)"
+    )
+    EPHYS_TASK_DEV_DYNAMIC_ROUTING_SC_BEH = (
+        "Ephys Task Dev Dynamic Routing (S/C Beh)"
+    )
     IVSCC_HVA_RETRO_PATCHSEQ = "IVSCC HVA Retro PatchSeq"
     IVSCCM_INJECTION = "IVSCCm injection"
     IVSPCM_INJECTION = "IVSPCm Injection"
     MGT_LAB = "MGT Lab"
     MGT_TISSUECYTE = "MGT TissueCyte"
     MINDSCOPE_2P_TESTING = "Mindscope 2P Testing"
-    MSP_DYNAMIC_ROUTING_BEHAVIOR_DEVELOPMENT = "MSP Dynamic Routing Behavior Development"
+    MSP_DYNAMIC_ROUTING_BEHAVIOR_DEVELOPMENT = (
+        "MSP Dynamic Routing Behavior Development"
+    )
     MSP_DYNAMIC_ROUTING_OPTO_DEV = "MSP Dynamic Routing Opto Dev"
-    MSP_DYNAMIC_ROUTING_SURGICAL_DEVELOPMENT = "MSP Dynamic Routing Surgical Development"
-    MSP_DYNAMIC_ROUTING_ULTRA_OPTOTAGGING_BEHAVIOR = "MSP Dynamic Routing Ultra Optotagging Behavior"
-    MSP_DYNAMIC_ROUTING_TASK_1_PRODUCTION = "MSP Dynamic Routing Task 1 Production"
-    MSP_DYNAMIC_ROUTING_TASK_2_PRODUCTION = "MSP Dynamic Routing Task 2 Production"
+    MSP_DYNAMIC_ROUTING_SURGICAL_DEVELOPMENT = (
+        "MSP Dynamic Routing Surgical Development"
+    )
+    MSP_DYNAMIC_ROUTING_ULTRA_OPTOTAGGING_BEHAVIOR = (
+        "MSP Dynamic Routing Ultra Optotagging Behavior"
+    )
+    MSP_DYNAMIC_ROUTING_TASK_1_PRODUCTION = (
+        "MSP Dynamic Routing Task 1 Production"
+    )
+    MSP_DYNAMIC_ROUTING_TASK_2_PRODUCTION = (
+        "MSP Dynamic Routing Task 2 Production"
+    )
     MSP_GCAMP8_TESTING = "MSP GCaMP8 Testing"
     MSP_GCAMP8_TESTING_RO = "MSP GCaMP8 Testing (RO)"
     MSP_LEARNING_MFISH_DEVELOPMENT = "MSP Learning & mFISH Development"
-    MSP_LEARNING_MFISH_DEVELOPMENT_DOX = "MSP Learning & mFISH Development (Dox)"
-    MSP_LEARNING_MFISH_FRONTAL_WINDOW_DEV = "MSP Learning & mFISH Frontal Window Dev"
+    MSP_LEARNING_MFISH_DEVELOPMENT_DOX = (
+        "MSP Learning & mFISH Development (Dox)"
+    )
+    MSP_LEARNING_MFISH_FRONTAL_WINDOW_DEV = (
+        "MSP Learning & mFISH Frontal Window Dev"
+    )
     MSP_LEARNING_MFISH_VIRUS_TESTING = "MSP Learning & mFISH Virus Testing"
     MSP_OMFISH_COREGISTRATION_PILOT = "MSP omFISH Co-registration Pilot"
     MSP_OMFISH_CUX2_PILOT = "MSP omFISH Cux2 Pilot"
@@ -470,16 +561,28 @@ class Limstaskflow(Enum, metaclass=EnumMeta):
     MSP_OMFISH_GAD2_PILOT = "MSP omFISH Gad2 Pilot"
     MSP_OMFISH_RBP4_MESO = "MSP omFISH Rbp4 Meso"
     MSP_OMFISH_RORB_PILOT = "MSP omFISH Rorb Pilot"
-    MSP_OMFISH_ROB_INJECTION_VIRUS_PILOT = "MSP omFISH ROB Injection Virus Pilot"
+    MSP_OMFISH_ROB_INJECTION_VIRUS_PILOT = (
+        "MSP omFISH ROB Injection Virus Pilot"
+    )
     MSP_OMFISH_SST_MESO_GAMMASTIM = "MSP omFISH Sst Meso (GammaStim)"
     MSP_OMFISH_VIP_MESO_GAMMASTIM = "MSP omFISH Vip Meso (GammaStim)"
     MSP_OPENSCOPE_DENDRITE_COUPLING = "MSP OpenScope Dendrite Coupling"
     MSP_OPENSCOPE_ILLUSION = "MSP OpenScope Illusion"
-    MSP_OPENSCOPE_GLOBAL_LOCAL_ODDBALLS_COHORT_1 = "MSP OpenScope Global Local Oddballs (Cohort 1)"
-    MSP_OPENSCOPE_GLOBAL_LOCAL_ODDBALLS_COHORT_2 = "MSP OpenScope Global Local Oddballs (Cohort 2)"
-    MSP_TASK_TRAINED_NETWORKS_MULTISCOPE = "MSP Task Trained Networks Multiscope"
-    MSP_TASK_TRAINED_NETWORKS_NEUROPIXEL = "MSP Task Trained Networks Neuropixel"
-    MSP_U01_BRIDGING_FUNCTION_CONNECTIVITY_TRANSCRIPTOMICS = "MSP U01 Bridging Function, Connectivity, and Transcriptomics"
+    MSP_OPENSCOPE_GLOBAL_LOCAL_ODDBALLS_COHORT_1 = (
+        "MSP OpenScope Global Local Oddballs (Cohort 1)"
+    )
+    MSP_OPENSCOPE_GLOBAL_LOCAL_ODDBALLS_COHORT_2 = (
+        "MSP OpenScope Global Local Oddballs (Cohort 2)"
+    )
+    MSP_TASK_TRAINED_NETWORKS_MULTISCOPE = (
+        "MSP Task Trained Networks Multiscope"
+    )
+    MSP_TASK_TRAINED_NETWORKS_NEUROPIXEL = (
+        "MSP Task Trained Networks Neuropixel"
+    )
+    MSP_U01_BRIDGING_FUNCTION_CONNECTIVITY_TRANSCRIPTOMICS = (
+        "MSP U01 Bridging Function, Connectivity, and Transcriptomics"
+    )
     MSP_VARIABILITY_AIM_1 = "MSP Variability Aim 1"
     MSP_VARIABILITY_AIM_1_PILOT = "MSP Variability Aim 1 Pilot"
     MSP_VARIABILITY_SPONTANEOUS = "MSP Variability Spontaneous"
@@ -491,7 +594,9 @@ class Limstaskflow(Enum, metaclass=EnumMeta):
     OPENSCOPE_MOTION_PILOT = "OpenScope Motion Pilot"
     OPENSCOPE_MULTIPLEX_PILOT_INJECTION = "OpenScope Multiplex Pilot Inj"
     OPENSCOPE_MULTIPLEX_PILOT_NOINJECTION = "OpenScope Multiplex Pilot Nolnj"
-    OPENSCOPE_MULTIPLEX_PRODUCTION_NOINJECTION = "OpenScope Multiplex Production NoInj"
+    OPENSCOPE_MULTIPLEX_PRODUCTION_NOINJECTION = (
+        "OpenScope Multiplex Production NoInj"
+    )
     OPENSCOPE_MULTIPLEX_PRODUCTION = "OpenScope Multiplex Production"
     OPENSCOPE_LOOP = "OpenScope Loop"
     OPENSCOPE_MOTION_PRODUCTION = "Openscope Motion Production"
@@ -508,7 +613,9 @@ class Limstaskflow(Enum, metaclass=EnumMeta):
     TEMPLETON_PSYCHEDELICS = "Templeton Psychedelics"
     TILTY_MOUSE = "Tilty Mouse"
     TINY_BLUE_DOT_BEHAVIOR = "Tiny Blue Dot Behavior"
-    TRANSGENIC_CHARACTERIZATION_PASSIVE = "Transgenic Characterization (Passive)"
+    TRANSGENIC_CHARACTERIZATION_PASSIVE = (
+        "Transgenic Characterization (Passive)"
+    )
     VISB_DEV_CONTROL_GROUP = "VisB Dev Control Group"
     VISB_LATERAL_PREP_DEVELOPMENT = "VisB Lateral Prep Development"
     VISB_TASK_2_DEVELOPMENT = "VisB Task 2 Development"
@@ -517,6 +624,7 @@ class Limstaskflow(Enum, metaclass=EnumMeta):
 
 class InitialWorkStation(Enum, metaclass=EnumMeta):
     """Enum class for Initial Work Station."""
+
     SELECT = "Select..."
     SWS_1 = "SWS 1"
     SWS_2 = "SWS 2"
@@ -527,9 +635,11 @@ class InitialWorkStation(Enum, metaclass=EnumMeta):
     SWS_7 = "SWS 7"
     SWS_8 = "SWS 8"
     SWS_9 = "SWS 9"
+
 
 class FollowUpWorkstation(Enum, metaclass=EnumMeta):
     """Enum class for Follow up Workstation."""
+
     SELECT = "Select..."
     SWS_1 = "SWS 1"
     SWS_2 = "SWS 2"
@@ -541,8 +651,10 @@ class FollowUpWorkstation(Enum, metaclass=EnumMeta):
     SWS_8 = "SWS 8"
     SWS_9 = "SWS 9"
 
+
 class Sex(Enum, metaclass=EnumMeta):
     """Enum class for Sex."""
+
     SELECT = "Select..."
     MALE = "Male"
     FEMALE = "Female"
@@ -550,6 +662,7 @@ class Sex(Enum, metaclass=EnumMeta):
 
 class SurgeryStatus(Enum, metaclass=EnumMeta):
     """Enum class for Surgery Status."""
+
     INJECTION_PENDING = "Injection Pending"
     NO_SURGERY = "No Surgery"
     PHASE_2_PENDING = "Phase 2 Pending"
@@ -557,14 +670,18 @@ class SurgeryStatus(Enum, metaclass=EnumMeta):
     READY_FOR_FEEDBACK = "Ready for Feedback"
     UNPLANNED_ACUTE = "Unplanned Acute"
 
+
 class ProcedureSlots(Enum, metaclass=EnumMeta):
     """Enum class for Procedure Slots."""
+
     SELECT = "Select..."
     SINGLE_SURGICAL_SESSION = "Single surgical session"
     INITIAL_SURGERY_WITH_FOLL = "Initial surgery with follow up session"
 
+
 class ProcedureCategory(Enum, metaclass=EnumMeta):
     """Enum class for Procedure Category."""
+
     SELECT = "Select..."
     INJECTION = "Injection"
     CRANIAL_WINDOW = "Cranial Window"
@@ -574,8 +691,10 @@ class ProcedureCategory(Enum, metaclass=EnumMeta):
     CUSTOM = "Custom"
     DEVELOPMENT = "Development"
 
+
 class PhysiologyType(Enum, metaclass=EnumMeta):
     """Enum class for Physiology Type."""
+
     SELECT = "Select..."
     N_2_P = "2P"
     NP = "NP"
@@ -584,6 +703,7 @@ class PhysiologyType(Enum, metaclass=EnumMeta):
 
 class Procedure(Enum, metaclass=EnumMeta):
     """Enum class for Procedure."""
+
     SELECT = "Select..."
     SX__CUSTOM = "Sx- Custom"
     SX_1__VISUAL__CTX_2_P = "Sx-1	Visual Ctx 2P"
@@ -603,15 +723,18 @@ class Procedure(Enum, metaclass=EnumMeta):
     SX_17_DHC = "Sx-17 DHC"
     SX_18_INJ_DHC = "Sx-18 INJ+DHC"
     SX_21__FIBER__OPTIC__IMPL = "Sx-21 Fiber Optic Implant (with Headpost)"
-    SX_21__INJECTION__FIBER = "Sx-21 Injection + Fiber Optic Implant (with Headpost)"
+    SX_21__INJECTION__FIBER = (
+        "Sx-21 Injection + Fiber Optic Implant (with Headpost)"
+    )
     SX_24__STEREOTAXIC_INJECT = "Sx-24 Stereotaxic injections: 1 INJ material"
-    SX_25__STEREOTAXIC_INJECT = "Sx-25 Stereotaxic injections: 2+ INJ materials"
+    SX_25__STEREOTAXIC_INJECT = (
+        "Sx-25 Stereotaxic injections: 2+ INJ materials"
+    )
     SX_26_ISI_GUIDED__INJECTI = "Sx-26 ISI-guided Injection (with Headpost)"
     SX__SPINAL__CORD_INJ = "Sx- Spinal Cord INJ"
     SX_EMG__ARRAY = "Sx- EMG Array"
     SX__TESTES__INJECTION = "Sx- Testes Injection"
     SX__OVIDUCT__INJECTION = "Sx- Oviduct Injection"
-
 
     # Added missing attributes
     """Enum class for Procedure"""
@@ -634,8 +757,10 @@ class Procedure(Enum, metaclass=EnumMeta):
     WHC_2_P = "WHC 2P"
     WHC_NP = "WHC NP"
 
+
 class Headpost(Enum, metaclass=EnumMeta):
     """Enum class for Headpost."""
+
     SELECT = "Select..."
     AI_STRAIGHT_BAR = "AI Straight bar"
     FRONTAL_CTX = "Frontal Ctx"
@@ -653,6 +778,7 @@ class Headpost(Enum, metaclass=EnumMeta):
 
 class Well(Enum, metaclass=EnumMeta):
     """Enum class for Well."""
+
     SELECT = "Select..."
     NO_WELL = "No Well"
     SCIENTIFICA_CAM = "Scientifica (CAM)"
@@ -668,8 +794,10 @@ class Well(Enum, metaclass=EnumMeta):
     VISUAL__CTX_SLAP2_WELL = "Visual Ctx SLAP2 well"
     OTHER_SEE_REQUESTOR_COMM = "Other (See requestor comments)"
 
+
 class CraniotomyType(Enum, metaclass=EnumMeta):
     """Enum class for Craniotomy Type."""
+
     SELECT = "Select..."
     N_3MM = "3mm"
     N_5MM = "5mm"
@@ -677,8 +805,10 @@ class CraniotomyType(Enum, metaclass=EnumMeta):
     WHC_NP = "WHC NP"
     DHC = "DHC"
 
+
 class ImplantIdCoverslipType(Enum, metaclass=EnumMeta):
     """Enum class for Implant ID/Coverslip type."""
+
     SELECT = "Select..."
     N_2002 = "2002"
     N_2005 = "2005"
@@ -697,8 +827,9 @@ class ImplantIdCoverslipType(Enum, metaclass=EnumMeta):
     WHC_2_P_CURVED_GLASS_WITH = "WHC 2P curved glass (with window frame)"
     N_3MM_STACKED_COVERSLIP = "3mm stacked coverslip"
     N_5MM_STACKED_COVERSLIP = "5mm stacked coverslip"
-    N_5MM_STACKED_COVERSLIP_W = "5mm stacked coverslip (with silicone coating for Neuropixel)"
-
+    N_5MM_STACKED_COVERSLIP_W = (
+        "5mm stacked coverslip (with silicone coating for Neuropixel)"
+    )
 
     # Added missing attributes
     N_2001 = "2001"
@@ -712,8 +843,10 @@ class ImplantIdCoverslipType(Enum, metaclass=EnumMeta):
     N_3002 = "3002"
     N_3002_25_PURALUBESYSTANE = "3002 (25% puralube/systane)"
 
+
 class OfBurrHoles(Enum, metaclass=EnumMeta):
     """Enum class for # of Burr Holes."""
+
     SELECT = "Select..."
     N_1 = "1"
     N_2 = "2"
@@ -722,8 +855,10 @@ class OfBurrHoles(Enum, metaclass=EnumMeta):
     N_5 = "5"
     N_6 = "6"
 
+
 class BurrHole1(Enum, metaclass=EnumMeta):
     """Enum class for Burr hole 1."""
+
     SELECT = "Select..."
     STEREOTAXIC_INJECTION = "Stereotaxic Injection"
     SPINAL_INJECTION = "Spinal Injection"
@@ -732,13 +867,14 @@ class BurrHole1(Enum, metaclass=EnumMeta):
     FIBER_IMPLANT = "Fiber Implant"
     STEREOTAXIC_INJECTION_F = "Stereotaxic Injection & Fiber Implant"
 
-
     # Added missing attributes
     INJECTION = "Injection"
     INJECTION_FIBER_IMPLANT = "Injection & Fiber Implant"
 
+
 class Burr1VirusBiosafteyLevelBsl(Enum, metaclass=EnumMeta):
     """Enum class for Burr1 Virus Biosaftey Level (BSL)."""
+
     SELECT = "Select..."
     BSL_1_AAV = "BSL 1 - AAV"
     BSL_1_AAV_BEADS = "BSL 1 - AAV + Beads"
@@ -753,34 +889,46 @@ class Burr1VirusBiosafteyLevelBsl(Enum, metaclass=EnumMeta):
     BSL_2_CHOLERA_TOXIN_B = "BSL 2 - Cholera Toxin B"
     BSL_2__OTHER__WRITE_IN_CO = "BSL 2 - Other (Write in comments)"
 
+
 class Burr1Status(Enum, metaclass=EnumMeta):
     """Enum class for Burr1 Status."""
+
     COMPLETE = "Complete"
+
 
 class Inj1Type(Enum, metaclass=EnumMeta):
     """Enum class for Inj1Type."""
+
     SELECT = "Select..."
     IONTOPHORESIS = "Iontophoresis"
     NANOJECT_PRESSURE = "Nanoject (Pressure)"
 
+
 class Burr1Hemisphere(Enum, metaclass=EnumMeta):
     """Enum class for Burr 1 Hemisphere."""
+
     SELECT = "Select..."
     LEFT = "Left"
     RIGHT = "Right"
 
+
 class Inj1Retsetting(Enum, metaclass=EnumMeta):
     """Enum class for Inj1retSetting."""
+
     OFF = "Off"
     ON = "On"
 
+
 class Burr1FiberType(Enum, metaclass=EnumMeta):
     """Enum class for Burr 1 Fiber type."""
+
     STANDARD_PROVIDED_BY_NSB = "Standard (provided by NSB)"
     CUSTOM = "Custom"
 
+
 class FiberImplant1Length(Enum, metaclass=EnumMeta):
     """Enum class for Fiber Implant1 Length."""
+
     SELECT = "Select..."
     N_1_0_MM = "1.0 mm"
     N_1_5_MM = "1.5 mm"
@@ -792,21 +940,24 @@ class FiberImplant1Length(Enum, metaclass=EnumMeta):
     N_4_5_MM = "4.5 mm"
     N_5_0_MM = "5.0 mm"
 
+
 class BurrHole2(Enum, metaclass=EnumMeta):
     """Enum class for Burr hole 2."""
+
     SELECT = "Select..."
     STEREOTAXIC_INJECTION = "Stereotaxic Injection"
     SPINAL_INJECTION = "Spinal Injection"
     FIBER_IMPLANT = "Fiber Implant"
     STEREOTAXIC_INJECTION__F = "Stereotaxic Injection & Fiber Implant"
 
-
     # Added missing attributes
     INJECTION = "Injection"
     INJECTION_FIBER_IMPLANT = "Injection & Fiber Implant"
 
+
 class Burr2VirusBiosafteyLevelBsl(Enum, metaclass=EnumMeta):
     """Enum class for Burr2 Virus Biosaftey Level (BSL)."""
+
     SELECT = "Select..."
     BSL_1_AAV = "BSL 1 - AAV"
     BSL_1__BEADS = "BSL 1 - Beads"
@@ -821,34 +972,46 @@ class Burr2VirusBiosafteyLevelBsl(Enum, metaclass=EnumMeta):
     BSL_2__CHOLERA__TOXIN_B = "BSL 2 - Cholera Toxin B"
     BSL_2__OTHER__WRITE_IN_CO = "BSL 2 - Other (Write in comments)"
 
+
 class Burr2Status(Enum, metaclass=EnumMeta):
     """Enum class for Burr2 Status."""
+
     COMPLETE = "Complete"
+
 
 class Inj2Type(Enum, metaclass=EnumMeta):
     """Enum class for Inj2Type."""
+
     SELECT = "Select..."
     IONTOPHORESIS = "Iontophoresis"
     NANOJECT_PRESSURE = "Nanoject (Pressure)"
 
+
 class Burr2Hemisphere(Enum, metaclass=EnumMeta):
     """Enum class for Burr 2 Hemisphere."""
+
     SELECT = "Select..."
     LEFT = "Left"
     RIGHT = "Right"
 
+
 class Inj2Retsetting(Enum, metaclass=EnumMeta):
     """Enum class for Inj2retSetting."""
+
     OFF = "Off"
     ON = "On"
 
+
 class Burr2FiberType(Enum, metaclass=EnumMeta):
     """Enum class for Burr 2 Fiber Type."""
+
     STANDARD__PROVIDED_BY_NSB = "Standard (Provided by NSB)"
     CUSTOM = "Custom"
 
+
 class FiberImplant2Length(Enum, metaclass=EnumMeta):
     """Enum class for Fiber Implant2 Length."""
+
     SELECT = "Select..."
     N_1_0_MM = "1.0 mm"
     N_1_5_MM = "1.5 mm"
@@ -860,21 +1023,24 @@ class FiberImplant2Length(Enum, metaclass=EnumMeta):
     N_4_5_MM = "4.5 mm"
     N_5_0_MM = "5.0 mm"
 
+
 class BurrHole3(Enum, metaclass=EnumMeta):
     """Enum class for Burr hole 3."""
+
     SELECT = "Select..."
     STEREOTAXIC_INJECTION = "Stereotaxic Injection"
     FIBER_IMPLANT = "Fiber Implant"
     STEREOTAXIC_INJECTION__F = "Stereotaxic Injection & Fiber Implant"
-
 
     # Added missing attributes
     """Enum class for BurrHole3"""
     INJECTION = "Injection"
     INJECTION_FIBER_IMPLANT = "Injection & Fiber Implant"
 
+
 class Burr3VirusBiosafetyLevelBsl(Enum, metaclass=EnumMeta):
     """Enum class for Burr3 Virus Biosafety Level (BSL)."""
+
     SELECT = "Select..."
     BSL_1_AAV = "BSL 1 - AAV"
     BSL_1__BEADS = "BSL 1 - Beads"
@@ -889,12 +1055,16 @@ class Burr3VirusBiosafetyLevelBsl(Enum, metaclass=EnumMeta):
     BSL_2__CHOLERA__TOXIN_B = "BSL 2 - Cholera Toxin B"
     BSL_2__OTHER__WRITE_IN_CO = "BSL 2 - Other (Write in comments)"
 
+
 class Burr3Status(Enum, metaclass=EnumMeta):
     """Enum class for Burr3 Status."""
+
     COMPLETE = "Complete"
+
 
 class Inj3Type(Enum, metaclass=EnumMeta):
     """Enum class for Inj3Type."""
+
     SELECT = "Select..."
     IONTOPHORESIS = "Iontophoresis"
     NANOJECT_PRESSURE = "Nanoject (Pressure)"
@@ -902,23 +1072,29 @@ class Inj3Type(Enum, metaclass=EnumMeta):
 
 class Burr3Hemisphere(Enum, metaclass=EnumMeta):
     """Enum class for Burr 3 Hemisphere."""
+
     SELECT = "Select..."
     LEFT = "Left"
     RIGHT = "Right"
 
+
 class Inj3Retsetting(Enum, metaclass=EnumMeta):
     """Enum class for Inj3retSetting."""
+
     OFF = "Off"
     ON = "On"
 
+
 class Burr3FiberType(Enum, metaclass=EnumMeta):
     """Enum class for Burr 3 Fiber Type."""
+
     STANDARD__PROVIDED_BY_NSB = "Standard (Provided by NSB)"
     CUSTOM = "Custom"
 
 
 class FiberImplant3Length(Enum, metaclass=EnumMeta):
     """Enum class for Fiber Implant3 Length."""
+
     SELECT = "Select..."
     N_1_0_MM = "1.0 mm"
     N_1_5_MM = "1.5 mm"
@@ -930,20 +1106,23 @@ class FiberImplant3Length(Enum, metaclass=EnumMeta):
     N_4_5_MM = "4.5 mm"
     N_5_0_MM = "5.0 mm"
 
+
 class BurrHole4(Enum, metaclass=EnumMeta):
     """Enum class for Burr hole 4."""
+
     SELECT = "Select..."
     STEREOTAXIC_INJECTION = "Stereotaxic Injection"
     FIBER_IMPLANT = "Fiber Implant"
     STEREOTAXIC_INJECTION__F = "Stereotaxic Injection & Fiber Implant"
 
-
     # Added missing attributes
     INJECTION = "Injection"
     INJECTION_FIBER_IMPLANT = "Injection & Fiber Implant"
 
+
 class Burr4VirusBiosafteyLevelBsl(Enum, metaclass=EnumMeta):
     """Enum class for Burr4 Virus Biosaftey Level (BSL)."""
+
     SELECT = "Select..."
     BSL_1_AAV = "BSL 1 - AAV"
     BSL_1__BEADS = "BSL 1 - Beads"
@@ -958,12 +1137,16 @@ class Burr4VirusBiosafteyLevelBsl(Enum, metaclass=EnumMeta):
     BSL_2__CHOLERA__TOXIN_B = "BSL 2 - Cholera Toxin B"
     BSL_2__OTHER__WRITE_IN_CO = "BSL 2 - Other (Write in comments)"
 
+
 class Burr4Status(Enum, metaclass=EnumMeta):
     """Enum class for Burr4 Status."""
+
     COMPLETE = "Complete"
+
 
 class Inj4Type(Enum, metaclass=EnumMeta):
     """Enum class for Inj4Type."""
+
     SELECT = "Select..."
     IONTOPHORESIS = "Iontophoresis"
     NANOJECT_PRESSURE = "Nanoject (Pressure)"
@@ -971,23 +1154,29 @@ class Inj4Type(Enum, metaclass=EnumMeta):
 
 class Burr4Hemisphere(Enum, metaclass=EnumMeta):
     """Enum class for Burr 4 Hemisphere."""
+
     SELECT = "Select..."
     LEFT = "Left"
     RIGHT = "Right"
 
+
 class Inj4Retsetting(Enum, metaclass=EnumMeta):
     """Enum class for Inj4retSetting."""
+
     OFF = "Off"
     ON = "On"
 
+
 class Burr4FiberType(Enum, metaclass=EnumMeta):
     """Enum class for Burr 4 Fiber Type."""
+
     STANDARD__PROVIDED_BY_NSB = "Standard (Provided by NSB)"
     CUSTOM = "Custom"
 
 
 class FiberImplant4Length(Enum, metaclass=EnumMeta):
     """Enum class for Fiber Implant4 Length."""
+
     SELECT = "Select..."
     N_1_0_MM = "1.0 mm"
     N_1_5_MM = "1.5 mm"
@@ -1002,18 +1191,20 @@ class FiberImplant4Length(Enum, metaclass=EnumMeta):
 
 class BurrHole5(Enum, metaclass=EnumMeta):
     """Enum class for Burr hole 5."""
+
     SELECT = "Select..."
     STEREOTAXIC_INJECTION = "Stereotaxic Injection"
     FIBER_IMPLANT = "Fiber Implant"
     STEREOTAXIC_INJECTION__F = "Stereotaxic Injection & Fiber Implant"
 
-
     # Added missing attributes
     INJECTION = "Injection"
     INJECTION_FIBER_IMPLANT = "Injection & Fiber Implant"
 
+
 class Burr5VirusBiosafteyLevelBsl(Enum, metaclass=EnumMeta):
     """Enum class for Burr5 Virus Biosaftey Level (BSL)."""
+
     SELECT = "Select..."
     BSL_1_AAV = "BSL 1 - AAV"
     BSL_1__BEADS = "BSL 1 - Beads"
@@ -1028,13 +1219,16 @@ class Burr5VirusBiosafteyLevelBsl(Enum, metaclass=EnumMeta):
     BSL_2__CHOLERA__TOXIN_B = "BSL 2 - Cholera Toxin B"
     BSL_2__OTHER__WRITE_IN_CO = "BSL 2 - Other (Write in comments)"
 
+
 class Burr5Status(Enum, metaclass=EnumMeta):
     """Enum class for Burr5 Status."""
+
     COMPLETE = "Complete"
 
 
 class Inj5Type(Enum, metaclass=EnumMeta):
     """Enum class for Inj5Type."""
+
     SELECT = "Select..."
     IONTOPHORESIS = "Iontophoresis"
     NANOJECT_PRESSURE = "Nanoject (Pressure)"
@@ -1042,6 +1236,7 @@ class Inj5Type(Enum, metaclass=EnumMeta):
 
 class Burr5Hemisphere(Enum, metaclass=EnumMeta):
     """Enum class for Burr 5 Hemisphere."""
+
     SELECT = "Select..."
     LEFT = "Left"
     RIGHT = "Right"
@@ -1049,18 +1244,21 @@ class Burr5Hemisphere(Enum, metaclass=EnumMeta):
 
 class Inj5Retsetting(Enum, metaclass=EnumMeta):
     """Enum class for Inj5retSetting."""
+
     OFF = "Off"
     ON = "On"
 
 
 class Burr5FiberType(Enum, metaclass=EnumMeta):
     """Enum class for Burr 5 Fiber type."""
+
     STANDARD_PROVIDED_BY_NSB = "Standard (provided by NSB)"
     CUSTOM = "Custom"
 
 
 class FiberImplant5Length(Enum, metaclass=EnumMeta):
     """Enum class for Fiber Implant5 Length."""
+
     SELECT = "Select..."
     N_1_0_MM = "1.0 mm"
     N_1_5_MM = "1.5 mm"
@@ -1075,18 +1273,20 @@ class FiberImplant5Length(Enum, metaclass=EnumMeta):
 
 class BurrHole6(Enum, metaclass=EnumMeta):
     """Enum class for Burr hole 6."""
+
     SELECT = "Select..."
     STEREOTAXIC_INJECTION = "Stereotaxic Injection"
     FIBER_IMPLANT = "Fiber Implant"
     STEREOTAXIC_INJECTION__F = "Stereotaxic Injection & Fiber Implant"
 
-
     # Added missing attributes
     INJECTION = "Injection"
     INJECTION_FIBER_IMPLANT = "Injection & Fiber Implant"
 
+
 class Burr6VirusBiosafteyLevelBsl(Enum, metaclass=EnumMeta):
     """Enum class for Burr6 Virus Biosaftey Level (BSL)."""
+
     SELECT = "Select..."
     BSL_1_AAV = "BSL 1 - AAV"
     BSL_1__BEADS = "BSL 1 - Beads"
@@ -1101,13 +1301,16 @@ class Burr6VirusBiosafteyLevelBsl(Enum, metaclass=EnumMeta):
     BSL_2__CHOLERA__TOXIN_B = "BSL 2 - Cholera Toxin B"
     BSL_2__OTHER__WRITE_IN_CO = "BSL 2 - Other (Write in comments)"
 
+
 class Burr6Status(Enum, metaclass=EnumMeta):
     """Enum class for Burr6 Status."""
+
     COMPLETE = "Complete"
 
 
 class Inj6Type(Enum, metaclass=EnumMeta):
     """Enum class for Inj6Type."""
+
     SELECT = "Select..."
     IONTOPHORESIS = "Iontophoresis"
     NANOJECT_PRESSURE = "Nanoject (Pressure)"
@@ -1115,23 +1318,29 @@ class Inj6Type(Enum, metaclass=EnumMeta):
 
 class Burr6Hemisphere(Enum, metaclass=EnumMeta):
     """Enum class for Burr 6 Hemisphere."""
+
     SELECT = "Select..."
     LEFT = "Left"
     RIGHT = "Right"
 
+
 class Inj6Retsetting(Enum, metaclass=EnumMeta):
     """Enum class for Inj6retSetting."""
+
     OFF = "Off"
     ON = "On"
 
+
 class Burr6FiberType(Enum, metaclass=EnumMeta):
     """Enum class for Burr 6 Fiber type."""
+
     STANDARD_PROVIDED_BY_NSB = "Standard (provided by NSB)"
     CUSTOM = "Custom"
 
 
 class FiberImplant6Length(Enum, metaclass=EnumMeta):
     """Enum class for Fiber Implant6 Length."""
+
     SELECT = "Select..."
     N_1_0_MM = "1.0 mm"
     N_1_5_MM = "1.5 mm"
@@ -1143,8 +1352,10 @@ class FiberImplant6Length(Enum, metaclass=EnumMeta):
     N_4_5_MM = "4.5 mm"
     N_5_0_MM = "5.0 mm"
 
+
 class ContusionHematoma(Enum, metaclass=EnumMeta):
     """Enum class for Contusion/Hematoma."""
+
     SELECT = "Select..."
     NONE = "None"
     MILD = "Mild"
@@ -1155,24 +1366,29 @@ class ContusionHematoma(Enum, metaclass=EnumMeta):
 
 class EdemaSwelling(Enum, metaclass=EnumMeta):
     """Enum class for Edema (Swelling)."""
+
     SELECT = "Select..."
     NONE = "None"
     MILD = "Mild"
     MODERATE = "Moderate"
     SEVERE = "Severe"
     N_A = "N/A"
+
 
 class SinusBleed(Enum, metaclass=EnumMeta):
     """Enum class for Sinus Bleed."""
+
     SELECT = "Select..."
     NONE = "None"
     MILD = "Mild"
     MODERATE = "Moderate"
     SEVERE = "Severe"
     N_A = "N/A"
+
 
 class Laceration(Enum, metaclass=EnumMeta):
     """Enum class for Laceration."""
+
     SELECT = "Select..."
     NONE = "None"
     MILD = "Mild"
@@ -1180,8 +1396,10 @@ class Laceration(Enum, metaclass=EnumMeta):
     SEVERE = "Severe"
     N_A = "N/A"
 
+
 class InitialIontoNumber(Enum, metaclass=EnumMeta):
     """Enum class for Initial Ionto Number."""
+
     SELECT = "Select..."
     IONTO_1 = "Ionto #1"
     IONTO_2 = "Ionto #2"
@@ -1194,9 +1412,11 @@ class InitialIontoNumber(Enum, metaclass=EnumMeta):
     IONTO_9 = "Ionto #9"
     IONTO_10 = "Ionto #10"
     N_A = "N/A"
+
 
 class InitialNanojectNumber(Enum, metaclass=EnumMeta):
     """Enum class for Initial Nanoject Number."""
+
     SELECT = "Select..."
     NJ_1 = "NJ#1"
     NJ_2 = "NJ#2"
@@ -1208,8 +1428,10 @@ class InitialNanojectNumber(Enum, metaclass=EnumMeta):
     NJ_8 = "NJ#8"
     N_A = "N/A"
 
+
 class FolowUpIontoNumber(Enum, metaclass=EnumMeta):
     """Enum class for Folow up Ionto Number."""
+
     SELECT = "Select..."
     IONTO_1 = "Ionto #1"
     IONTO_2 = "Ionto #2"
@@ -1223,8 +1445,10 @@ class FolowUpIontoNumber(Enum, metaclass=EnumMeta):
     IONTO_10 = "Ionto #10"
     N_A = "N/A"
 
+
 class FollowUpNanojectNumber(Enum, metaclass=EnumMeta):
     """Enum class for Follow up Nanoject Number."""
+
     SELECT = "Select..."
     NJ_1 = "NJ#1"
     NJ_2 = "NJ#2"
@@ -1236,50 +1460,66 @@ class FollowUpNanojectNumber(Enum, metaclass=EnumMeta):
     NJ_8 = "NJ#8"
     N_A = "N/A"
 
+
 class Burr1PerformDuring(Enum, metaclass=EnumMeta):
     """Enum class for Burr1 Perform During."""
+
     INITIAL_SURGERY = "Initial Surgery"
     FOLLOW_UP_SURGERY = "Follow up Surgery"
 
+
 class Burr2PerformDuring(Enum, metaclass=EnumMeta):
     """Enum class for Burr2 Perform During."""
+
     INITIAL_SURGERY = "Initial Surgery"
     FOLLOW_UP_SURGERY = "Follow up Surgery"
 
 
 class Burr3PerformDuring(Enum, metaclass=EnumMeta):
     """Enum class for Burr3 Perform During."""
+
     INITIAL_SURGERY = "Initial Surgery"
     FOLLOW_UP_SURGERY = "Follow up Surgery"
+
 
 class Burr4PerformDuring(Enum, metaclass=EnumMeta):
     """Enum class for Burr4 Perform During."""
+
     INITIAL_SURGERY = "Initial Surgery"
     FOLLOW_UP_SURGERY = "Follow up Surgery"
+
 
 class Burr5PerformDuring(Enum, metaclass=EnumMeta):
     """Enum class for Burr5 Perform During."""
+
     INITIAL_SURGERY = "Initial Surgery"
     FOLLOW_UP_SURGERY = "Follow up Surgery"
 
+
 class Burr6PerformDuring(Enum, metaclass=EnumMeta):
     """Enum class for Burr6 Perform During."""
+
     INITIAL_SURGERY = "Initial Surgery"
     FOLLOW_UP_SURGERY = "Follow up Surgery"
 
 
 class HeadpostPerformDuring(Enum, metaclass=EnumMeta):
     """Enum class for Headpost Perform During."""
+
     FOLLOW_UP_SURGERY = "Follow up Surgery"
     INITIAL_SURGERY = "Initial Surgery"
+
 
 class CraniotomyPerformDuring(Enum, metaclass=EnumMeta):
     """Enum class for Craniotomy Perform During."""
+
     FOLLOW_UP_SURGERY = "Follow up Surgery"
     INITIAL_SURGERY = "Initial Surgery"
 
+
 class Burr1InjectionDevice(Enum, metaclass=EnumMeta):
     """Enum class for Burr1 Injection Device."""
+
     SELECT = "Select..."
     NANO_1 = "Nano #1"
     IONTO_1 = "Ionto #1"
@@ -1299,9 +1539,11 @@ class Burr1InjectionDevice(Enum, metaclass=EnumMeta):
     IONTO_8 = "Ionto #8"
     NANO_9 = "Nano #9"
     IONTO_9 = "Ionto #9"
+
 
 class Burr2InjectionDevice(Enum, metaclass=EnumMeta):
     """Enum class for Burr2 Injection Device."""
+
     SELECT = "Select..."
     NANO_1 = "Nano #1"
     IONTO_1 = "Ionto #1"
@@ -1321,9 +1563,11 @@ class Burr2InjectionDevice(Enum, metaclass=EnumMeta):
     IONTO_8 = "Ionto #8"
     NANO_9 = "Nano #9"
     IONTO_9 = "Ionto #9"
+
 
 class Burr3InjectionDevice(Enum, metaclass=EnumMeta):
     """Enum class for Burr3 Injection Device."""
+
     SELECT = "Select..."
     NANO_1 = "Nano #1"
     IONTO_1 = "Ionto #1"
@@ -1343,9 +1587,11 @@ class Burr3InjectionDevice(Enum, metaclass=EnumMeta):
     IONTO_8 = "Ionto #8"
     NANO_9 = "Nano #9"
     IONTO_9 = "Ionto #9"
+
 
 class Burr4InjectionDevice(Enum, metaclass=EnumMeta):
     """Enum class for Burr4 Injection Device."""
+
     SELECT = "Select..."
     NANO_1 = "Nano #1"
     IONTO_1 = "Ionto #1"
@@ -1365,9 +1611,11 @@ class Burr4InjectionDevice(Enum, metaclass=EnumMeta):
     IONTO_8 = "Ionto #8"
     NANO_9 = "Nano #9"
     IONTO_9 = "Ionto #9"
+
 
 class Burr5InjectionDevice(Enum, metaclass=EnumMeta):
     """Enum class for Burr5 Injection Device."""
+
     SELECT = "Select..."
     NANO_1 = "Nano #1"
     IONTO_1 = "Ionto #1"
@@ -1387,9 +1635,11 @@ class Burr5InjectionDevice(Enum, metaclass=EnumMeta):
     IONTO_8 = "Ionto #8"
     NANO_9 = "Nano #9"
     IONTO_9 = "Ionto #9"
+
 
 class Burr6InjectionDevice(Enum, metaclass=EnumMeta):
     """Enum class for Burr6 Injection Device."""
+
     SELECT = "Select..."
     NANO_1 = "Nano #1"
     IONTO_1 = "Ionto #1"
@@ -1410,35 +1660,40 @@ class Burr6InjectionDevice(Enum, metaclass=EnumMeta):
     NANO_9 = "Nano #9"
     IONTO_9 = "Ionto #9"
 
+
 class Behavior(Enum, metaclass=EnumMeta):
     """Enum class for Behavior."""
+
     NO = "No"
     YES = "Yes"
 
+
 class BehaviorType(Enum, metaclass=EnumMeta):
     """Enum class for Behavior Type."""
+
     SELECT = "Select..."
     FORAGING = "Foraging"
     FORAGING_FP = "Foraging + FP"
     WR__HAB = "WR+Hab"
     HAB__ONLY = "Hab Only"
 
-
     # Added missing attributes
     AIBS_CHARACTERIZATION_ROT = "AIBS Characterization (Rotarod & Open Field)"
     AIND_FORAGING_TASK_WITH_O = (
-    "AIND Foraging Task (with or without fiber photometry)"
+        "AIND Foraging Task (with or without fiber photometry)"
     )
     AIND_MOTOR_OBSERVATORY_WH = (
-    "AIND Motor Observatory (Wheel & Open Field & Isometric Task)"
+        "AIND Motor Observatory (Wheel & Open Field & Isometric Task)"
     )
     CHANGE_DETECTION_TASK = "Change Detection Task"
     DR_AUDITORY_VISUAL_TASK = "DR Auditory/Visual Task"
     HABITUATION_ONLY = "Habituation Only"
     HABITUATION_PASSIVE_TRAIN = "Habituation + Passive Training"
 
+
 class BehaviorPlatform(Enum, metaclass=EnumMeta):
     """Enum class for Behavior Platform."""
+
     MINDSCOPE = "Mindscope"
     FORAGING = "Foraging"
     VR = "VR"
@@ -1446,6 +1701,7 @@ class BehaviorPlatform(Enum, metaclass=EnumMeta):
 
 class BehaviorDestination(Enum, metaclass=EnumMeta):
     """Enum class for Behavior Destination."""
+
     EPHYS = "Ephys"
     OPHYS = "Ophys"
     HSFP = "HSFP"
@@ -1455,6 +1711,7 @@ class BehaviorDestination(Enum, metaclass=EnumMeta):
 
 class BehaviorAutotrainCurriculum(Enum, metaclass=EnumMeta):
     """Enum class for Behavior Autotrain Curriculum."""
+
     COUPLED__BAITING = "Coupled Baiting"
     UNCOUPLED__BAITING = "Uncoupled Baiting"
     UNCOUPLED__WITHOUT__BAITI = "Uncoupled Without Baiting"
@@ -1463,6 +1720,7 @@ class BehaviorAutotrainCurriculum(Enum, metaclass=EnumMeta):
 
 class BehaviorCurriculumVersion(Enum, metaclass=EnumMeta):
     """Enum class for Behavior Curriculum Version."""
+
     N_2_3 = "2.3"
     N_2_3_1RWD_DELAY159 = "2.3.1rwdDelay159"
     N_A = "N/A"
@@ -1470,6 +1728,7 @@ class BehaviorCurriculumVersion(Enum, metaclass=EnumMeta):
 
 class BehaviorFirstVideoRecordingStage(Enum, metaclass=EnumMeta):
     """Enum class for Behavior First Video Recording Stage."""
+
     N_1_1 = "1.1"
     N_1_2 = "1.2"
     N_2 = "2"
@@ -1484,12 +1743,14 @@ class BehaviorFirstVideoRecordingStage(Enum, metaclass=EnumMeta):
 
 class BehaviorFiberPhotometry(Enum, metaclass=EnumMeta):
     """Enum class for Behavior Fiber Photometry."""
+
     YES = "Yes"
     NO = "No"
 
 
 class BehaviorFipMode(Enum, metaclass=EnumMeta):
     """Enum class for Behavior FIP Mode."""
+
     N_A = "N/A"
     NORMAL = "Normal"
     AXON = "Axon"
@@ -1497,6 +1758,7 @@ class BehaviorFipMode(Enum, metaclass=EnumMeta):
 
 class BehaviorFirstFipStage(Enum, metaclass=EnumMeta):
     """Enum class for Behavior First FIP Stage."""
+
     N_1_1 = "1.1"
     N_1_2 = "1.2"
     N_2 = "2"
@@ -1511,16 +1773,25 @@ class BehaviorFirstFipStage(Enum, metaclass=EnumMeta):
 
 class Burr1IntendedCcfTarget(Enum, metaclass=EnumMeta):
     """Enum class for Burr 1 Intended CCF Target."""
+
     FRP__FRONTAL_POLE_CEREBRA = "FRP - Frontal pole cerebral cortex"
     M_OP__PRIMARY_MOTOR_AREA = "MOp - Primary motor area"
     M_OS__SECONDARY_MOTOR_ARE = "MOs - Secondary motor area"
     S_SP_N__PRIMARY_SOMATOSEN = "SSp-n - Primary somatosensory area nose"
-    S_SP_BFD__PRIMARY_SOMATOS = "SSp-bfd - Primary somatosensory area barrel field"
-    S_SP_LL__PRIMARY_SOMATOSE = "SSp-ll - Primary somatosensory area lower limb"
+    S_SP_BFD__PRIMARY_SOMATOS = (
+        "SSp-bfd - Primary somatosensory area barrel field"
+    )
+    S_SP_LL__PRIMARY_SOMATOSE = (
+        "SSp-ll - Primary somatosensory area lower limb"
+    )
     S_SP_M__PRIMARY_SOMATOSEN = "SSp-m - Primary somatosensory area mouth"
-    S_SP_UL__PRIMARY_SOMATOSE = "SSp-ul - Primary somatosensory area upper limb"
+    S_SP_UL__PRIMARY_SOMATOSE = (
+        "SSp-ul - Primary somatosensory area upper limb"
+    )
     S_SP_TR__PRIMARY_SOMATOSE = "SSp-tr - Primary somatosensory area trunk"
-    S_SP_UN__PRIMARY_SOMATOSE = "SSp-un - Primary somatosensory area unassigned"
+    S_SP_UN__PRIMARY_SOMATOSE = (
+        "SSp-un - Primary somatosensory area unassigned"
+    )
     S_SS__SUPPLEMENTAL_SOMATO = "SSs - Supplemental somatosensory area"
     GU__GUSTATORY_AREAS = "GU - Gustatory areas"
     VISC__VISCERAL_AREA = "VISC - Visceral area"
@@ -1547,7 +1818,9 @@ class Burr1IntendedCcfTarget(Enum, metaclass=EnumMeta):
     A_ID__AGRANULAR_INSULAR_A = "AId - Agranular insular area dorsal part"
     A_IP__AGRANULAR_INSULAR_A = "AIp - Agranular insular area posterior part"
     A_IV__AGRANULAR_INSULAR_A = "AIv - Agranular insular area ventral part"
-    RS_PAGL__RETROSPLENIAL_AR = "RSPagl - Retrosplenial area lateral agranular part"
+    RS_PAGL__RETROSPLENIAL_AR = (
+        "RSPagl - Retrosplenial area lateral agranular part"
+    )
     RS_PD__RETROSPLENIAL_AREA = "RSPd - Retrosplenial area dorsal part"
     RS_PV__RETROSPLENIAL_AREA = "RSPv - Retrosplenial area ventral part"
     VI_SA__ANTERIOR_AREA = "VISa - Anterior area"
@@ -1574,7 +1847,9 @@ class Burr1IntendedCcfTarget(Enum, metaclass=EnumMeta):
     FC__FASCIOLA_CINEREA = "FC - Fasciola cinerea"
     IG__INDUSEUM_GRISEUM = "IG - Induseum griseum"
     EN_TL__ENTORHINAL_AREA_LA = "ENTl - Entorhinal area lateral part"
-    EN_TM__ENTORHINAL_AREA_ME = "ENTm - Entorhinal area medial part dorsal zone"
+    EN_TM__ENTORHINAL_AREA_ME = (
+        "ENTm - Entorhinal area medial part dorsal zone"
+    )
     PAR__PARASUBICULUM = "PAR - Parasubiculum"
     POST__POSTSUBICULUM = "POST - Postsubiculum"
     PRE__PRESUBICULUM = "PRE - Presubiculum"
@@ -1593,13 +1868,19 @@ class Burr1IntendedCcfTarget(Enum, metaclass=EnumMeta):
     ACB__NUCLEUS_ACCUMBENS = "ACB - Nucleus accumbens"
     FS__FUNDUS_OF_STRIATUM = "FS - Fundus of striatum"
     OT__OLFACTORY_TUBERCLE = "OT - Olfactory tubercle"
-    L_SC__LATERAL_SEPTAL_NUCL = "LSc - Lateral septal nucleus caudal (caudodorsal) part"
-    L_SR__LATERAL_SEPTAL_NUCL = "LSr - Lateral septal nucleus rostral (rostroventral) part"
+    L_SC__LATERAL_SEPTAL_NUCL = (
+        "LSc - Lateral septal nucleus caudal (caudodorsal) part"
+    )
+    L_SR__LATERAL_SEPTAL_NUCL = (
+        "LSr - Lateral septal nucleus rostral (rostroventral) part"
+    )
     L_SV__LATERAL_SEPTAL_NUCL = "LSv - Lateral septal nucleus ventral part"
     SF__SEPTOFIMBRIAL_NUCLEUS = "SF - Septofimbrial nucleus"
     SH__SEPTOHIPPOCAMPAL_NUCL = "SH - Septohippocampal nucleus"
     AAA__ANTERIOR_AMYGDALAR_A = "AAA - Anterior amygdalar area"
-    BA__BED_NUCLEUS_OF_THE_AC = "BA - Bed nucleus of the accessory olfactory tract"
+    BA__BED_NUCLEUS_OF_THE_AC = (
+        "BA - Bed nucleus of the accessory olfactory tract"
+    )
     CEA__CENTRAL_AMYGDALAR_NU = "CEA - Central amygdalar nucleus"
     IA__INTERCALATED_AMYGDALA = "IA - Intercalated amygdalar nucleus"
     MEA__MEDIAL_AMYGDALAR_NUC = "MEA - Medial amygdalar nucleus"
@@ -1611,30 +1892,48 @@ class Burr1IntendedCcfTarget(Enum, metaclass=EnumMeta):
     NDB__DIAGONAL_BAND_NUCLEU = "NDB - Diagonal band nucleus"
     TRS__TRIANGULAR_NUCLEUS_O = "TRS - Triangular nucleus of septum"
     BST__BED_NUCLEI_OF_THE_ST = "BST - Bed nuclei of the stria terminalis"
-    VAL__VENTRAL_ANTERIOR_LAT = "VAL - Ventral anterior-lateral complex of the thalamus"
+    VAL__VENTRAL_ANTERIOR_LAT = (
+        "VAL - Ventral anterior-lateral complex of the thalamus"
+    )
     VM__VENTRAL_MEDIAL_NUCLEU = "VM - Ventral medial nucleus of the thalamus"
-    VPL__VENTRAL_POSTEROLATER = "VPL - Ventral posterolateral nucleus of the thalamus"
+    VPL__VENTRAL_POSTEROLATER = (
+        "VPL - Ventral posterolateral nucleus of the thalamus"
+    )
     VP_LPC__VENTRAL_POSTEROLA = "VPLpc - Ventral posterolateral nucleus of the thalamus parvicellular part"
-    VPM__VENTRAL_POSTEROMEDIA = "VPM - Ventral posteromedial nucleus of the thalamus"
+    VPM__VENTRAL_POSTEROMEDIA = (
+        "VPM - Ventral posteromedial nucleus of the thalamus"
+    )
     VP_MPC__VENTRAL_POSTEROME = "VPMpc - Ventral posteromedial nucleus of the thalamus parvicellular part"
     PO_T__POSTERIOR_TRIANGULA = "PoT - Posterior triangular thalamic nucleus"
     SPF__SUBPARAFASCICULAR_NU = "SPF - Subparafascicular nucleus"
     SPA__SUBPARAFASCICULAR_AR = "SPA - Subparafascicular area"
     PP__PERIPEDUNCULAR_NUCLEU = "PP - Peripeduncular nucleus"
     MG__MEDIAL_GENICULATE_COM = "MG - Medial geniculate complex"
-    L_GD__DORSAL_PART_OF_THE = "LGd - Dorsal part of the lateral geniculate complex"
-    LP__LATERAL_POSTERIOR_NUC = "LP - Lateral posterior nucleus of the thalamus"
+    L_GD__DORSAL_PART_OF_THE = (
+        "LGd - Dorsal part of the lateral geniculate complex"
+    )
+    LP__LATERAL_POSTERIOR_NUC = (
+        "LP - Lateral posterior nucleus of the thalamus"
+    )
     PO__POSTERIOR_COMPLEX_OF = "PO - Posterior complex of the thalamus"
-    POL__POSTERIOR_LIMITING_N = "POL - Posterior limiting nucleus of the thalamus"
+    POL__POSTERIOR_LIMITING_N = (
+        "POL - Posterior limiting nucleus of the thalamus"
+    )
     SGN__SUPRAGENICULATE_NUCL = "SGN - Suprageniculate nucleus"
     ETH__ETHMOID_NUCLEUS_OF_T = "Eth - Ethmoid nucleus of the thalamus"
     AV__ANTEROVENTRAL_NUCLEUS = "AV - Anteroventral nucleus of thalamus"
     AM__ANTEROMEDIAL_NUCLEUS = "AM - Anteromedial nucleus"
     AD__ANTERODORSAL_NUCLEUS = "AD - Anterodorsal nucleus"
-    IAM__INTERANTEROMEDIAL_NU = "IAM - Interanteromedial nucleus of the thalamus"
-    IAD__INTERANTERODORSAL_NU = "IAD - Interanterodorsal nucleus of the thalamus"
+    IAM__INTERANTEROMEDIAL_NU = (
+        "IAM - Interanteromedial nucleus of the thalamus"
+    )
+    IAD__INTERANTERODORSAL_NU = (
+        "IAD - Interanterodorsal nucleus of the thalamus"
+    )
     LD__LATERAL_DORSAL_NUCLEU = "LD - Lateral dorsal nucleus of thalamus"
-    IMD__INTERMEDIODORSAL_NUC = "IMD - Intermediodorsal nucleus of the thalamus"
+    IMD__INTERMEDIODORSAL_NUC = (
+        "IMD - Intermediodorsal nucleus of the thalamus"
+    )
     MD__MEDIODORSAL_NUCLEUS_O = "MD - Mediodorsal nucleus of thalamus"
     SMT__SUBMEDIAL_NUCLEUS_OF = "SMT - Submedial nucleus of the thalamus"
     PR__PERIREUNENSIS_NUCLEUS = "PR - Perireunensis nucleus"
@@ -1649,16 +1948,24 @@ class Burr1IntendedCcfTarget(Enum, metaclass=EnumMeta):
     PF__PARAFASCICULAR_NUCLEU = "PF - Parafascicular nucleus"
     PIL__POSTERIOR_INTRALAMIN = "PIL - Posterior intralaminar thalamic nucleus"
     RT__RETICULAR_NUCLEUS_OF = "RT - Reticular nucleus of the thalamus"
-    IGL__INTERGENICULATE_LEAF = "IGL - Intergeniculate leaflet of the lateral geniculate complex"
+    IGL__INTERGENICULATE_LEAF = (
+        "IGL - Intergeniculate leaflet of the lateral geniculate complex"
+    )
     INT_G__INTERMEDIATE_GENIC = "IntG - Intermediate geniculate nucleus"
-    L_GV__VENTRAL_PART_OF_THE = "LGv - Ventral part of the lateral geniculate complex"
+    L_GV__VENTRAL_PART_OF_THE = (
+        "LGv - Ventral part of the lateral geniculate complex"
+    )
     SUB_G__SUBGENICULATE_NUCL = "SubG - Subgeniculate nucleus"
     MH__MEDIAL_HABENULA = "MH - Medial habenula"
     LH__LATERAL_HABENULA = "LH - Lateral habenula"
     SO__SUPRAOPTIC_NUCLEUS = "SO - Supraoptic nucleus"
     PVH__PARAVENTRICULAR_HYPO = "PVH - Paraventricular hypothalamic nucleus"
-    P_VA__PERIVENTRICULAR_HYP = "PVa - Periventricular hypothalamic nucleus anterior part"
-    P_VI__PERIVENTRICULAR_HYP = "PVi - Periventricular hypothalamic nucleus intermediate part"
+    P_VA__PERIVENTRICULAR_HYP = (
+        "PVa - Periventricular hypothalamic nucleus anterior part"
+    )
+    P_VI__PERIVENTRICULAR_HYP = (
+        "PVi - Periventricular hypothalamic nucleus intermediate part"
+    )
     ARH__ARCUATE_HYPOTHALAMIC = "ARH - Arcuate hypothalamic nucleus"
     ADP__ANTERODORSAL_PREOPTI = "ADP - Anterodorsal preoptic nucleus"
     AVP__ANTEROVENTRAL_PREOPT = "AVP - Anteroventral preoptic nucleus"
@@ -1667,8 +1974,12 @@ class Burr1IntendedCcfTarget(Enum, metaclass=EnumMeta):
     MEPO__MEDIAN_PREOPTIC_NUC = "MEPO - Median preoptic nucleus"
     MPO__MEDIAL_PREOPTIC_AREA = "MPO - Medial preoptic area"
     PS__PARASTRIAL_NUCLEUS = "PS - Parastrial nucleus"
-    P_VP__PERIVENTRICULAR_HYP = "PVp - Periventricular hypothalamic nucleus posterior part"
-    P_VPO__PERIVENTRICULAR_HY = "PVpo - Periventricular hypothalamic nucleus preoptic part"
+    P_VP__PERIVENTRICULAR_HYP = (
+        "PVp - Periventricular hypothalamic nucleus posterior part"
+    )
+    P_VPO__PERIVENTRICULAR_HY = (
+        "PVpo - Periventricular hypothalamic nucleus preoptic part"
+    )
     SBPV__SUBPARAVENTRICULAR = "SBPV - Subparaventricular zone"
     SCH__SUPRACHIASMATIC_NUCL = "SCH - Suprachiasmatic nucleus"
     SFO__SUBFORNICAL_ORGAN = "SFO - Subfornical organ"
@@ -1682,7 +1993,9 @@ class Burr1IntendedCcfTarget(Enum, metaclass=EnumMeta):
     MPN__MEDIAL_PREOPTIC_NUCL = "MPN - Medial preoptic nucleus"
     P_MD__DORSAL_PREMAMMILLAR = "PMd - Dorsal premammillary nucleus"
     P_MV__VENTRAL_PREMAMMILLA = "PMv - Ventral premammillary nucleus"
-    PV_HD__PARAVENTRICULAR_HY = "PVHd - Paraventricular hypothalamic nucleus descending division"
+    PV_HD__PARAVENTRICULAR_HY = (
+        "PVHd - Paraventricular hypothalamic nucleus descending division"
+    )
     VMH__VENTROMEDIAL_HYPOTHA = "VMH - Ventromedial hypothalamic nucleus"
     PH__POSTERIOR_HYPOTHALAMI = "PH - Posterior hypothalamic nucleus"
     LHA__LATERAL_HYPOTHALAMIC = "LHA - Lateral hypothalamic area"
@@ -1695,13 +2008,17 @@ class Burr1IntendedCcfTarget(Enum, metaclass=EnumMeta):
     ZI__ZONA_INCERTA = "ZI - Zona incerta"
     S_CS__SUPERIOR_COLLICULUS = "SCs - Superior colliculus sensory related"
     IC__INFERIOR_COLLICULUS = "IC - Inferior colliculus"
-    NB__NUCLEUS_OF_THE_BRACHI = "NB - Nucleus of the brachium of the inferior colliculus"
+    NB__NUCLEUS_OF_THE_BRACHI = (
+        "NB - Nucleus of the brachium of the inferior colliculus"
+    )
     SAG__NUCLEUS_SAGULUM = "SAG - Nucleus sagulum"
     PBG__PARABIGEMINAL_NUCLEU = "PBG - Parabigeminal nucleus"
     S_NR__SUBSTANTIA_NIGRA_RE = "SNr - Substantia nigra reticular part"
     VTA__VENTRAL_TEGMENTAL_AR = "VTA - Ventral tegmental area"
     PN__PARANIGRAL_NUCLEUS = "PN - Paranigral nucleus"
-    RR__MIDBRAIN_RETICULAR_NU = "RR - Midbrain reticular nucleus retrorubral area"
+    RR__MIDBRAIN_RETICULAR_NU = (
+        "RR - Midbrain reticular nucleus retrorubral area"
+    )
     MRN__MIDBRAIN_RETICULAR_N = "MRN - Midbrain reticular nucleus"
     S_CM__SUPERIOR_COLLICULUS = "SCm - Superior colliculus motor related"
     PAG__PERIAQUEDUCTAL_GRAY = "PAG - Periaqueductal gray"
@@ -1721,9 +2038,15 @@ class Burr1IntendedCcfTarget(Enum, metaclass=EnumMeta):
     PA4__PARATROCHLEAR_NUCLEU = "Pa4 - Paratrochlear nucleus"
     VTN__VENTRAL_TEGMENTAL_NU = "VTN - Ventral tegmental nucleus"
     AT__ANTERIOR_TEGMENTAL_NU = "AT - Anterior tegmental nucleus"
-    LT__LATERAL_TERMINAL_NUCL = "LT - Lateral terminal nucleus of the accessory optic tract"
-    DT__DORSAL_TERMINAL_NUCLE = "DT - Dorsal terminal nucleus of the accessory optic tract"
-    MT__MEDIAL_TERMINAL_NUCLE = "MT - Medial terminal nucleus of the accessory optic tract"
+    LT__LATERAL_TERMINAL_NUCL = (
+        "LT - Lateral terminal nucleus of the accessory optic tract"
+    )
+    DT__DORSAL_TERMINAL_NUCLE = (
+        "DT - Dorsal terminal nucleus of the accessory optic tract"
+    )
+    MT__MEDIAL_TERMINAL_NUCLE = (
+        "MT - Medial terminal nucleus of the accessory optic tract"
+    )
     S_NC__SUBSTANTIA_NIGRA_CO = "SNc - Substantia nigra compact part"
     PPN__PEDUNCULOPONTINE_NUC = "PPN - Pedunculopontine nucleus"
     IF__INTERFASCICULAR_NUCLE = "IF - Interfascicular nucleus raphe"
@@ -1732,7 +2055,9 @@ class Burr1IntendedCcfTarget(Enum, metaclass=EnumMeta):
     CLI__CENTRAL_LINEAR_NUCLE = "CLI - Central linear nucleus raphe"
     DR__DORSAL_NUCLEUS_RAPHE = "DR - Dorsal nucleus raphe"
     NLL__NUCLEUS_OF_THE_LATER = "NLL - Nucleus of the lateral lemniscus"
-    PSV__PRINCIPAL_SENSORY_NU = "PSV - Principal sensory nucleus of the trigeminal"
+    PSV__PRINCIPAL_SENSORY_NU = (
+        "PSV - Principal sensory nucleus of the trigeminal"
+    )
     PB__PARABRACHIAL_NUCLEUS = "PB - Parabrachial nucleus"
     SOC__SUPERIOR_OLIVARY_COM = "SOC - Superior olivary complex"
     B__BARRINGTON_S_NUCLEUS = "B - Barrington's nucleus"
@@ -1766,9 +2091,15 @@ class Burr1IntendedCcfTarget(Enum, metaclass=EnumMeta):
     ECU__EXTERNAL_CUNEATE_NUC = "ECU - External cuneate nucleus"
     NTB__NUCLEUS_OF_THE_TRAPE = "NTB - Nucleus of the trapezoid body"
     NTS__NUCLEUS_OF_THE_SOLIT = "NTS - Nucleus of the solitary tract"
-    SPVC__SPINAL_NUCLEUS_OF_T = "SPVC - Spinal nucleus of the trigeminal caudal part"
-    SPVI__SPINAL_NUCLEUS_OF_T = "SPVI - Spinal nucleus of the trigeminal interpolar part"
-    SPVO__SPINAL_NUCLEUS_OF_T = "SPVO - Spinal nucleus of the trigeminal oral part"
+    SPVC__SPINAL_NUCLEUS_OF_T = (
+        "SPVC - Spinal nucleus of the trigeminal caudal part"
+    )
+    SPVI__SPINAL_NUCLEUS_OF_T = (
+        "SPVI - Spinal nucleus of the trigeminal interpolar part"
+    )
+    SPVO__SPINAL_NUCLEUS_OF_T = (
+        "SPVO - Spinal nucleus of the trigeminal oral part"
+    )
     PA5__PARATRIGEMINAL_NUCLE = "Pa5 - Paratrigeminal nucleus"
     VI__ABDUCENS_NUCLEUS = "VI - Abducens nucleus"
     VII__FACIAL_MOTOR_NUCLEUS = "VII - Facial motor nucleus"
@@ -1824,16 +2155,25 @@ class Burr1IntendedCcfTarget(Enum, metaclass=EnumMeta):
 
 class Burr2IntendedCcfTarget(Enum, metaclass=EnumMeta):
     """Enum class for Burr 2 Intended CCF Target."""
+
     FRP__FRONTAL_POLE_CEREBRA = "FRP - Frontal pole cerebral cortex"
     M_OP__PRIMARY_MOTOR_AREA = "MOp - Primary motor area"
     M_OS__SECONDARY_MOTOR_ARE = "MOs - Secondary motor area"
     S_SP_N__PRIMARY_SOMATOSEN = "SSp-n - Primary somatosensory area nose"
-    S_SP_BFD__PRIMARY_SOMATOS = "SSp-bfd - Primary somatosensory area barrel field"
-    S_SP_LL__PRIMARY_SOMATOSE = "SSp-ll - Primary somatosensory area lower limb"
+    S_SP_BFD__PRIMARY_SOMATOS = (
+        "SSp-bfd - Primary somatosensory area barrel field"
+    )
+    S_SP_LL__PRIMARY_SOMATOSE = (
+        "SSp-ll - Primary somatosensory area lower limb"
+    )
     S_SP_M__PRIMARY_SOMATOSEN = "SSp-m - Primary somatosensory area mouth"
-    S_SP_UL__PRIMARY_SOMATOSE = "SSp-ul - Primary somatosensory area upper limb"
+    S_SP_UL__PRIMARY_SOMATOSE = (
+        "SSp-ul - Primary somatosensory area upper limb"
+    )
     S_SP_TR__PRIMARY_SOMATOSE = "SSp-tr - Primary somatosensory area trunk"
-    S_SP_UN__PRIMARY_SOMATOSE = "SSp-un - Primary somatosensory area unassigned"
+    S_SP_UN__PRIMARY_SOMATOSE = (
+        "SSp-un - Primary somatosensory area unassigned"
+    )
     S_SS__SUPPLEMENTAL_SOMATO = "SSs - Supplemental somatosensory area"
     GU__GUSTATORY_AREAS = "GU - Gustatory areas"
     VISC__VISCERAL_AREA = "VISC - Visceral area"
@@ -1860,7 +2200,9 @@ class Burr2IntendedCcfTarget(Enum, metaclass=EnumMeta):
     A_ID__AGRANULAR_INSULAR_A = "AId - Agranular insular area dorsal part"
     A_IP__AGRANULAR_INSULAR_A = "AIp - Agranular insular area posterior part"
     A_IV__AGRANULAR_INSULAR_A = "AIv - Agranular insular area ventral part"
-    RS_PAGL__RETROSPLENIAL_AR = "RSPagl - Retrosplenial area lateral agranular part"
+    RS_PAGL__RETROSPLENIAL_AR = (
+        "RSPagl - Retrosplenial area lateral agranular part"
+    )
     RS_PD__RETROSPLENIAL_AREA = "RSPd - Retrosplenial area dorsal part"
     RS_PV__RETROSPLENIAL_AREA = "RSPv - Retrosplenial area ventral part"
     VI_SA__ANTERIOR_AREA = "VISa - Anterior area"
@@ -1887,7 +2229,9 @@ class Burr2IntendedCcfTarget(Enum, metaclass=EnumMeta):
     FC__FASCIOLA_CINEREA = "FC - Fasciola cinerea"
     IG__INDUSEUM_GRISEUM = "IG - Induseum griseum"
     EN_TL__ENTORHINAL_AREA_LA = "ENTl - Entorhinal area lateral part"
-    EN_TM__ENTORHINAL_AREA_ME = "ENTm - Entorhinal area medial part dorsal zone"
+    EN_TM__ENTORHINAL_AREA_ME = (
+        "ENTm - Entorhinal area medial part dorsal zone"
+    )
     PAR__PARASUBICULUM = "PAR - Parasubiculum"
     POST__POSTSUBICULUM = "POST - Postsubiculum"
     PRE__PRESUBICULUM = "PRE - Presubiculum"
@@ -1906,13 +2250,19 @@ class Burr2IntendedCcfTarget(Enum, metaclass=EnumMeta):
     ACB__NUCLEUS_ACCUMBENS = "ACB - Nucleus accumbens"
     FS__FUNDUS_OF_STRIATUM = "FS - Fundus of striatum"
     OT__OLFACTORY_TUBERCLE = "OT - Olfactory tubercle"
-    L_SC__LATERAL_SEPTAL_NUCL = "LSc - Lateral septal nucleus caudal (caudodorsal) part"
-    L_SR__LATERAL_SEPTAL_NUCL = "LSr - Lateral septal nucleus rostral (rostroventral) part"
+    L_SC__LATERAL_SEPTAL_NUCL = (
+        "LSc - Lateral septal nucleus caudal (caudodorsal) part"
+    )
+    L_SR__LATERAL_SEPTAL_NUCL = (
+        "LSr - Lateral septal nucleus rostral (rostroventral) part"
+    )
     L_SV__LATERAL_SEPTAL_NUCL = "LSv - Lateral septal nucleus ventral part"
     SF__SEPTOFIMBRIAL_NUCLEUS = "SF - Septofimbrial nucleus"
     SH__SEPTOHIPPOCAMPAL_NUCL = "SH - Septohippocampal nucleus"
     AAA__ANTERIOR_AMYGDALAR_A = "AAA - Anterior amygdalar area"
-    BA__BED_NUCLEUS_OF_THE_AC = "BA - Bed nucleus of the accessory olfactory tract"
+    BA__BED_NUCLEUS_OF_THE_AC = (
+        "BA - Bed nucleus of the accessory olfactory tract"
+    )
     CEA__CENTRAL_AMYGDALAR_NU = "CEA - Central amygdalar nucleus"
     IA__INTERCALATED_AMYGDALA = "IA - Intercalated amygdalar nucleus"
     MEA__MEDIAL_AMYGDALAR_NUC = "MEA - Medial amygdalar nucleus"
@@ -1924,30 +2274,48 @@ class Burr2IntendedCcfTarget(Enum, metaclass=EnumMeta):
     NDB__DIAGONAL_BAND_NUCLEU = "NDB - Diagonal band nucleus"
     TRS__TRIANGULAR_NUCLEUS_O = "TRS - Triangular nucleus of septum"
     BST__BED_NUCLEI_OF_THE_ST = "BST - Bed nuclei of the stria terminalis"
-    VAL__VENTRAL_ANTERIOR_LAT = "VAL - Ventral anterior-lateral complex of the thalamus"
+    VAL__VENTRAL_ANTERIOR_LAT = (
+        "VAL - Ventral anterior-lateral complex of the thalamus"
+    )
     VM__VENTRAL_MEDIAL_NUCLEU = "VM - Ventral medial nucleus of the thalamus"
-    VPL__VENTRAL_POSTEROLATER = "VPL - Ventral posterolateral nucleus of the thalamus"
+    VPL__VENTRAL_POSTEROLATER = (
+        "VPL - Ventral posterolateral nucleus of the thalamus"
+    )
     VP_LPC__VENTRAL_POSTEROLA = "VPLpc - Ventral posterolateral nucleus of the thalamus parvicellular part"
-    VPM__VENTRAL_POSTEROMEDIA = "VPM - Ventral posteromedial nucleus of the thalamus"
+    VPM__VENTRAL_POSTEROMEDIA = (
+        "VPM - Ventral posteromedial nucleus of the thalamus"
+    )
     VP_MPC__VENTRAL_POSTEROME = "VPMpc - Ventral posteromedial nucleus of the thalamus parvicellular part"
     PO_T__POSTERIOR_TRIANGULA = "PoT - Posterior triangular thalamic nucleus"
     SPF__SUBPARAFASCICULAR_NU = "SPF - Subparafascicular nucleus"
     SPA__SUBPARAFASCICULAR_AR = "SPA - Subparafascicular area"
     PP__PERIPEDUNCULAR_NUCLEU = "PP - Peripeduncular nucleus"
     MG__MEDIAL_GENICULATE_COM = "MG - Medial geniculate complex"
-    L_GD__DORSAL_PART_OF_THE = "LGd - Dorsal part of the lateral geniculate complex"
-    LP__LATERAL_POSTERIOR_NUC = "LP - Lateral posterior nucleus of the thalamus"
+    L_GD__DORSAL_PART_OF_THE = (
+        "LGd - Dorsal part of the lateral geniculate complex"
+    )
+    LP__LATERAL_POSTERIOR_NUC = (
+        "LP - Lateral posterior nucleus of the thalamus"
+    )
     PO__POSTERIOR_COMPLEX_OF = "PO - Posterior complex of the thalamus"
-    POL__POSTERIOR_LIMITING_N = "POL - Posterior limiting nucleus of the thalamus"
+    POL__POSTERIOR_LIMITING_N = (
+        "POL - Posterior limiting nucleus of the thalamus"
+    )
     SGN__SUPRAGENICULATE_NUCL = "SGN - Suprageniculate nucleus"
     ETH__ETHMOID_NUCLEUS_OF_T = "Eth - Ethmoid nucleus of the thalamus"
     AV__ANTEROVENTRAL_NUCLEUS = "AV - Anteroventral nucleus of thalamus"
     AM__ANTEROMEDIAL_NUCLEUS = "AM - Anteromedial nucleus"
     AD__ANTERODORSAL_NUCLEUS = "AD - Anterodorsal nucleus"
-    IAM__INTERANTEROMEDIAL_NU = "IAM - Interanteromedial nucleus of the thalamus"
-    IAD__INTERANTERODORSAL_NU = "IAD - Interanterodorsal nucleus of the thalamus"
+    IAM__INTERANTEROMEDIAL_NU = (
+        "IAM - Interanteromedial nucleus of the thalamus"
+    )
+    IAD__INTERANTERODORSAL_NU = (
+        "IAD - Interanterodorsal nucleus of the thalamus"
+    )
     LD__LATERAL_DORSAL_NUCLEU = "LD - Lateral dorsal nucleus of thalamus"
-    IMD__INTERMEDIODORSAL_NUC = "IMD - Intermediodorsal nucleus of the thalamus"
+    IMD__INTERMEDIODORSAL_NUC = (
+        "IMD - Intermediodorsal nucleus of the thalamus"
+    )
     MD__MEDIODORSAL_NUCLEUS_O = "MD - Mediodorsal nucleus of thalamus"
     SMT__SUBMEDIAL_NUCLEUS_OF = "SMT - Submedial nucleus of the thalamus"
     PR__PERIREUNENSIS_NUCLEUS = "PR - Perireunensis nucleus"
@@ -1962,16 +2330,24 @@ class Burr2IntendedCcfTarget(Enum, metaclass=EnumMeta):
     PF__PARAFASCICULAR_NUCLEU = "PF - Parafascicular nucleus"
     PIL__POSTERIOR_INTRALAMIN = "PIL - Posterior intralaminar thalamic nucleus"
     RT__RETICULAR_NUCLEUS_OF = "RT - Reticular nucleus of the thalamus"
-    IGL__INTERGENICULATE_LEAF = "IGL - Intergeniculate leaflet of the lateral geniculate complex"
+    IGL__INTERGENICULATE_LEAF = (
+        "IGL - Intergeniculate leaflet of the lateral geniculate complex"
+    )
     INT_G__INTERMEDIATE_GENIC = "IntG - Intermediate geniculate nucleus"
-    L_GV__VENTRAL_PART_OF_THE = "LGv - Ventral part of the lateral geniculate complex"
+    L_GV__VENTRAL_PART_OF_THE = (
+        "LGv - Ventral part of the lateral geniculate complex"
+    )
     SUB_G__SUBGENICULATE_NUCL = "SubG - Subgeniculate nucleus"
     MH__MEDIAL_HABENULA = "MH - Medial habenula"
     LH__LATERAL_HABENULA = "LH - Lateral habenula"
     SO__SUPRAOPTIC_NUCLEUS = "SO - Supraoptic nucleus"
     PVH__PARAVENTRICULAR_HYPO = "PVH - Paraventricular hypothalamic nucleus"
-    P_VA__PERIVENTRICULAR_HYP = "PVa - Periventricular hypothalamic nucleus anterior part"
-    P_VI__PERIVENTRICULAR_HYP = "PVi - Periventricular hypothalamic nucleus intermediate part"
+    P_VA__PERIVENTRICULAR_HYP = (
+        "PVa - Periventricular hypothalamic nucleus anterior part"
+    )
+    P_VI__PERIVENTRICULAR_HYP = (
+        "PVi - Periventricular hypothalamic nucleus intermediate part"
+    )
     ARH__ARCUATE_HYPOTHALAMIC = "ARH - Arcuate hypothalamic nucleus"
     ADP__ANTERODORSAL_PREOPTI = "ADP - Anterodorsal preoptic nucleus"
     AVP__ANTEROVENTRAL_PREOPT = "AVP - Anteroventral preoptic nucleus"
@@ -1980,8 +2356,12 @@ class Burr2IntendedCcfTarget(Enum, metaclass=EnumMeta):
     MEPO__MEDIAN_PREOPTIC_NUC = "MEPO - Median preoptic nucleus"
     MPO__MEDIAL_PREOPTIC_AREA = "MPO - Medial preoptic area"
     PS__PARASTRIAL_NUCLEUS = "PS - Parastrial nucleus"
-    P_VP__PERIVENTRICULAR_HYP = "PVp - Periventricular hypothalamic nucleus posterior part"
-    P_VPO__PERIVENTRICULAR_HY = "PVpo - Periventricular hypothalamic nucleus preoptic part"
+    P_VP__PERIVENTRICULAR_HYP = (
+        "PVp - Periventricular hypothalamic nucleus posterior part"
+    )
+    P_VPO__PERIVENTRICULAR_HY = (
+        "PVpo - Periventricular hypothalamic nucleus preoptic part"
+    )
     SBPV__SUBPARAVENTRICULAR = "SBPV - Subparaventricular zone"
     SCH__SUPRACHIASMATIC_NUCL = "SCH - Suprachiasmatic nucleus"
     SFO__SUBFORNICAL_ORGAN = "SFO - Subfornical organ"
@@ -1995,7 +2375,9 @@ class Burr2IntendedCcfTarget(Enum, metaclass=EnumMeta):
     MPN__MEDIAL_PREOPTIC_NUCL = "MPN - Medial preoptic nucleus"
     P_MD__DORSAL_PREMAMMILLAR = "PMd - Dorsal premammillary nucleus"
     P_MV__VENTRAL_PREMAMMILLA = "PMv - Ventral premammillary nucleus"
-    PV_HD__PARAVENTRICULAR_HY = "PVHd - Paraventricular hypothalamic nucleus descending division"
+    PV_HD__PARAVENTRICULAR_HY = (
+        "PVHd - Paraventricular hypothalamic nucleus descending division"
+    )
     VMH__VENTROMEDIAL_HYPOTHA = "VMH - Ventromedial hypothalamic nucleus"
     PH__POSTERIOR_HYPOTHALAMI = "PH - Posterior hypothalamic nucleus"
     LHA__LATERAL_HYPOTHALAMIC = "LHA - Lateral hypothalamic area"
@@ -2008,13 +2390,17 @@ class Burr2IntendedCcfTarget(Enum, metaclass=EnumMeta):
     ZI__ZONA_INCERTA = "ZI - Zona incerta"
     S_CS__SUPERIOR_COLLICULUS = "SCs - Superior colliculus sensory related"
     IC__INFERIOR_COLLICULUS = "IC - Inferior colliculus"
-    NB__NUCLEUS_OF_THE_BRACHI = "NB - Nucleus of the brachium of the inferior colliculus"
+    NB__NUCLEUS_OF_THE_BRACHI = (
+        "NB - Nucleus of the brachium of the inferior colliculus"
+    )
     SAG__NUCLEUS_SAGULUM = "SAG - Nucleus sagulum"
     PBG__PARABIGEMINAL_NUCLEU = "PBG - Parabigeminal nucleus"
     S_NR__SUBSTANTIA_NIGRA_RE = "SNr - Substantia nigra reticular part"
     VTA__VENTRAL_TEGMENTAL_AR = "VTA - Ventral tegmental area"
     PN__PARANIGRAL_NUCLEUS = "PN - Paranigral nucleus"
-    RR__MIDBRAIN_RETICULAR_NU = "RR - Midbrain reticular nucleus retrorubral area"
+    RR__MIDBRAIN_RETICULAR_NU = (
+        "RR - Midbrain reticular nucleus retrorubral area"
+    )
     MRN__MIDBRAIN_RETICULAR_N = "MRN - Midbrain reticular nucleus"
     S_CM__SUPERIOR_COLLICULUS = "SCm - Superior colliculus motor related"
     PAG__PERIAQUEDUCTAL_GRAY = "PAG - Periaqueductal gray"
@@ -2034,9 +2420,15 @@ class Burr2IntendedCcfTarget(Enum, metaclass=EnumMeta):
     PA4__PARATROCHLEAR_NUCLEU = "Pa4 - Paratrochlear nucleus"
     VTN__VENTRAL_TEGMENTAL_NU = "VTN - Ventral tegmental nucleus"
     AT__ANTERIOR_TEGMENTAL_NU = "AT - Anterior tegmental nucleus"
-    LT__LATERAL_TERMINAL_NUCL = "LT - Lateral terminal nucleus of the accessory optic tract"
-    DT__DORSAL_TERMINAL_NUCLE = "DT - Dorsal terminal nucleus of the accessory optic tract"
-    MT__MEDIAL_TERMINAL_NUCLE = "MT - Medial terminal nucleus of the accessory optic tract"
+    LT__LATERAL_TERMINAL_NUCL = (
+        "LT - Lateral terminal nucleus of the accessory optic tract"
+    )
+    DT__DORSAL_TERMINAL_NUCLE = (
+        "DT - Dorsal terminal nucleus of the accessory optic tract"
+    )
+    MT__MEDIAL_TERMINAL_NUCLE = (
+        "MT - Medial terminal nucleus of the accessory optic tract"
+    )
     S_NC__SUBSTANTIA_NIGRA_CO = "SNc - Substantia nigra compact part"
     PPN__PEDUNCULOPONTINE_NUC = "PPN - Pedunculopontine nucleus"
     IF__INTERFASCICULAR_NUCLE = "IF - Interfascicular nucleus raphe"
@@ -2045,7 +2437,9 @@ class Burr2IntendedCcfTarget(Enum, metaclass=EnumMeta):
     CLI__CENTRAL_LINEAR_NUCLE = "CLI - Central linear nucleus raphe"
     DR__DORSAL_NUCLEUS_RAPHE = "DR - Dorsal nucleus raphe"
     NLL__NUCLEUS_OF_THE_LATER = "NLL - Nucleus of the lateral lemniscus"
-    PSV__PRINCIPAL_SENSORY_NU = "PSV - Principal sensory nucleus of the trigeminal"
+    PSV__PRINCIPAL_SENSORY_NU = (
+        "PSV - Principal sensory nucleus of the trigeminal"
+    )
     PB__PARABRACHIAL_NUCLEUS = "PB - Parabrachial nucleus"
     SOC__SUPERIOR_OLIVARY_COM = "SOC - Superior olivary complex"
     B__BARRINGTON_S_NUCLEUS = "B - Barrington's nucleus"
@@ -2079,9 +2473,15 @@ class Burr2IntendedCcfTarget(Enum, metaclass=EnumMeta):
     ECU__EXTERNAL_CUNEATE_NUC = "ECU - External cuneate nucleus"
     NTB__NUCLEUS_OF_THE_TRAPE = "NTB - Nucleus of the trapezoid body"
     NTS__NUCLEUS_OF_THE_SOLIT = "NTS - Nucleus of the solitary tract"
-    SPVC__SPINAL_NUCLEUS_OF_T = "SPVC - Spinal nucleus of the trigeminal caudal part"
-    SPVI__SPINAL_NUCLEUS_OF_T = "SPVI - Spinal nucleus of the trigeminal interpolar part"
-    SPVO__SPINAL_NUCLEUS_OF_T = "SPVO - Spinal nucleus of the trigeminal oral part"
+    SPVC__SPINAL_NUCLEUS_OF_T = (
+        "SPVC - Spinal nucleus of the trigeminal caudal part"
+    )
+    SPVI__SPINAL_NUCLEUS_OF_T = (
+        "SPVI - Spinal nucleus of the trigeminal interpolar part"
+    )
+    SPVO__SPINAL_NUCLEUS_OF_T = (
+        "SPVO - Spinal nucleus of the trigeminal oral part"
+    )
     PA5__PARATRIGEMINAL_NUCLE = "Pa5 - Paratrigeminal nucleus"
     VI__ABDUCENS_NUCLEUS = "VI - Abducens nucleus"
     VII__FACIAL_MOTOR_NUCLEUS = "VII - Facial motor nucleus"
@@ -2137,16 +2537,25 @@ class Burr2IntendedCcfTarget(Enum, metaclass=EnumMeta):
 
 class Burr3IntendedCcfTarget(Enum, metaclass=EnumMeta):
     """Enum class for Burr 3 Intended CCF Target."""
+
     FRP__FRONTAL_POLE_CEREBRA = "FRP - Frontal pole cerebral cortex"
     M_OP__PRIMARY_MOTOR_AREA = "MOp - Primary motor area"
     M_OS__SECONDARY_MOTOR_ARE = "MOs - Secondary motor area"
     S_SP_N__PRIMARY_SOMATOSEN = "SSp-n - Primary somatosensory area nose"
-    S_SP_BFD__PRIMARY_SOMATOS = "SSp-bfd - Primary somatosensory area barrel field"
-    S_SP_LL__PRIMARY_SOMATOSE = "SSp-ll - Primary somatosensory area lower limb"
+    S_SP_BFD__PRIMARY_SOMATOS = (
+        "SSp-bfd - Primary somatosensory area barrel field"
+    )
+    S_SP_LL__PRIMARY_SOMATOSE = (
+        "SSp-ll - Primary somatosensory area lower limb"
+    )
     S_SP_M__PRIMARY_SOMATOSEN = "SSp-m - Primary somatosensory area mouth"
-    S_SP_UL__PRIMARY_SOMATOSE = "SSp-ul - Primary somatosensory area upper limb"
+    S_SP_UL__PRIMARY_SOMATOSE = (
+        "SSp-ul - Primary somatosensory area upper limb"
+    )
     S_SP_TR__PRIMARY_SOMATOSE = "SSp-tr - Primary somatosensory area trunk"
-    S_SP_UN__PRIMARY_SOMATOSE = "SSp-un - Primary somatosensory area unassigned"
+    S_SP_UN__PRIMARY_SOMATOSE = (
+        "SSp-un - Primary somatosensory area unassigned"
+    )
     S_SS__SUPPLEMENTAL_SOMATO = "SSs - Supplemental somatosensory area"
     GU__GUSTATORY_AREAS = "GU - Gustatory areas"
     VISC__VISCERAL_AREA = "VISC - Visceral area"
@@ -2173,7 +2582,9 @@ class Burr3IntendedCcfTarget(Enum, metaclass=EnumMeta):
     A_ID__AGRANULAR_INSULAR_A = "AId - Agranular insular area dorsal part"
     A_IP__AGRANULAR_INSULAR_A = "AIp - Agranular insular area posterior part"
     A_IV__AGRANULAR_INSULAR_A = "AIv - Agranular insular area ventral part"
-    RS_PAGL__RETROSPLENIAL_AR = "RSPagl - Retrosplenial area lateral agranular part"
+    RS_PAGL__RETROSPLENIAL_AR = (
+        "RSPagl - Retrosplenial area lateral agranular part"
+    )
     RS_PD__RETROSPLENIAL_AREA = "RSPd - Retrosplenial area dorsal part"
     RS_PV__RETROSPLENIAL_AREA = "RSPv - Retrosplenial area ventral part"
     VI_SA__ANTERIOR_AREA = "VISa - Anterior area"
@@ -2200,7 +2611,9 @@ class Burr3IntendedCcfTarget(Enum, metaclass=EnumMeta):
     FC__FASCIOLA_CINEREA = "FC - Fasciola cinerea"
     IG__INDUSEUM_GRISEUM = "IG - Induseum griseum"
     EN_TL__ENTORHINAL_AREA_LA = "ENTl - Entorhinal area lateral part"
-    EN_TM__ENTORHINAL_AREA_ME = "ENTm - Entorhinal area medial part dorsal zone"
+    EN_TM__ENTORHINAL_AREA_ME = (
+        "ENTm - Entorhinal area medial part dorsal zone"
+    )
     PAR__PARASUBICULUM = "PAR - Parasubiculum"
     POST__POSTSUBICULUM = "POST - Postsubiculum"
     PRE__PRESUBICULUM = "PRE - Presubiculum"
@@ -2219,13 +2632,19 @@ class Burr3IntendedCcfTarget(Enum, metaclass=EnumMeta):
     ACB__NUCLEUS_ACCUMBENS = "ACB - Nucleus accumbens"
     FS__FUNDUS_OF_STRIATUM = "FS - Fundus of striatum"
     OT__OLFACTORY_TUBERCLE = "OT - Olfactory tubercle"
-    L_SC__LATERAL_SEPTAL_NUCL = "LSc - Lateral septal nucleus caudal (caudodorsal) part"
-    L_SR__LATERAL_SEPTAL_NUCL = "LSr - Lateral septal nucleus rostral (rostroventral) part"
+    L_SC__LATERAL_SEPTAL_NUCL = (
+        "LSc - Lateral septal nucleus caudal (caudodorsal) part"
+    )
+    L_SR__LATERAL_SEPTAL_NUCL = (
+        "LSr - Lateral septal nucleus rostral (rostroventral) part"
+    )
     L_SV__LATERAL_SEPTAL_NUCL = "LSv - Lateral septal nucleus ventral part"
     SF__SEPTOFIMBRIAL_NUCLEUS = "SF - Septofimbrial nucleus"
     SH__SEPTOHIPPOCAMPAL_NUCL = "SH - Septohippocampal nucleus"
     AAA__ANTERIOR_AMYGDALAR_A = "AAA - Anterior amygdalar area"
-    BA__BED_NUCLEUS_OF_THE_AC = "BA - Bed nucleus of the accessory olfactory tract"
+    BA__BED_NUCLEUS_OF_THE_AC = (
+        "BA - Bed nucleus of the accessory olfactory tract"
+    )
     CEA__CENTRAL_AMYGDALAR_NU = "CEA - Central amygdalar nucleus"
     IA__INTERCALATED_AMYGDALA = "IA - Intercalated amygdalar nucleus"
     MEA__MEDIAL_AMYGDALAR_NUC = "MEA - Medial amygdalar nucleus"
@@ -2237,30 +2656,48 @@ class Burr3IntendedCcfTarget(Enum, metaclass=EnumMeta):
     NDB__DIAGONAL_BAND_NUCLEU = "NDB - Diagonal band nucleus"
     TRS__TRIANGULAR_NUCLEUS_O = "TRS - Triangular nucleus of septum"
     BST__BED_NUCLEI_OF_THE_ST = "BST - Bed nuclei of the stria terminalis"
-    VAL__VENTRAL_ANTERIOR_LAT = "VAL - Ventral anterior-lateral complex of the thalamus"
+    VAL__VENTRAL_ANTERIOR_LAT = (
+        "VAL - Ventral anterior-lateral complex of the thalamus"
+    )
     VM__VENTRAL_MEDIAL_NUCLEU = "VM - Ventral medial nucleus of the thalamus"
-    VPL__VENTRAL_POSTEROLATER = "VPL - Ventral posterolateral nucleus of the thalamus"
+    VPL__VENTRAL_POSTEROLATER = (
+        "VPL - Ventral posterolateral nucleus of the thalamus"
+    )
     VP_LPC__VENTRAL_POSTEROLA = "VPLpc - Ventral posterolateral nucleus of the thalamus parvicellular part"
-    VPM__VENTRAL_POSTEROMEDIA = "VPM - Ventral posteromedial nucleus of the thalamus"
+    VPM__VENTRAL_POSTEROMEDIA = (
+        "VPM - Ventral posteromedial nucleus of the thalamus"
+    )
     VP_MPC__VENTRAL_POSTEROME = "VPMpc - Ventral posteromedial nucleus of the thalamus parvicellular part"
     PO_T__POSTERIOR_TRIANGULA = "PoT - Posterior triangular thalamic nucleus"
     SPF__SUBPARAFASCICULAR_NU = "SPF - Subparafascicular nucleus"
     SPA__SUBPARAFASCICULAR_AR = "SPA - Subparafascicular area"
     PP__PERIPEDUNCULAR_NUCLEU = "PP - Peripeduncular nucleus"
     MG__MEDIAL_GENICULATE_COM = "MG - Medial geniculate complex"
-    L_GD__DORSAL_PART_OF_THE = "LGd - Dorsal part of the lateral geniculate complex"
-    LP__LATERAL_POSTERIOR_NUC = "LP - Lateral posterior nucleus of the thalamus"
+    L_GD__DORSAL_PART_OF_THE = (
+        "LGd - Dorsal part of the lateral geniculate complex"
+    )
+    LP__LATERAL_POSTERIOR_NUC = (
+        "LP - Lateral posterior nucleus of the thalamus"
+    )
     PO__POSTERIOR_COMPLEX_OF = "PO - Posterior complex of the thalamus"
-    POL__POSTERIOR_LIMITING_N = "POL - Posterior limiting nucleus of the thalamus"
+    POL__POSTERIOR_LIMITING_N = (
+        "POL - Posterior limiting nucleus of the thalamus"
+    )
     SGN__SUPRAGENICULATE_NUCL = "SGN - Suprageniculate nucleus"
     ETH__ETHMOID_NUCLEUS_OF_T = "Eth - Ethmoid nucleus of the thalamus"
     AV__ANTEROVENTRAL_NUCLEUS = "AV - Anteroventral nucleus of thalamus"
     AM__ANTEROMEDIAL_NUCLEUS = "AM - Anteromedial nucleus"
     AD__ANTERODORSAL_NUCLEUS = "AD - Anterodorsal nucleus"
-    IAM__INTERANTEROMEDIAL_NU = "IAM - Interanteromedial nucleus of the thalamus"
-    IAD__INTERANTERODORSAL_NU = "IAD - Interanterodorsal nucleus of the thalamus"
+    IAM__INTERANTEROMEDIAL_NU = (
+        "IAM - Interanteromedial nucleus of the thalamus"
+    )
+    IAD__INTERANTERODORSAL_NU = (
+        "IAD - Interanterodorsal nucleus of the thalamus"
+    )
     LD__LATERAL_DORSAL_NUCLEU = "LD - Lateral dorsal nucleus of thalamus"
-    IMD__INTERMEDIODORSAL_NUC = "IMD - Intermediodorsal nucleus of the thalamus"
+    IMD__INTERMEDIODORSAL_NUC = (
+        "IMD - Intermediodorsal nucleus of the thalamus"
+    )
     MD__MEDIODORSAL_NUCLEUS_O = "MD - Mediodorsal nucleus of thalamus"
     SMT__SUBMEDIAL_NUCLEUS_OF = "SMT - Submedial nucleus of the thalamus"
     PR__PERIREUNENSIS_NUCLEUS = "PR - Perireunensis nucleus"
@@ -2275,16 +2712,24 @@ class Burr3IntendedCcfTarget(Enum, metaclass=EnumMeta):
     PF__PARAFASCICULAR_NUCLEU = "PF - Parafascicular nucleus"
     PIL__POSTERIOR_INTRALAMIN = "PIL - Posterior intralaminar thalamic nucleus"
     RT__RETICULAR_NUCLEUS_OF = "RT - Reticular nucleus of the thalamus"
-    IGL__INTERGENICULATE_LEAF = "IGL - Intergeniculate leaflet of the lateral geniculate complex"
+    IGL__INTERGENICULATE_LEAF = (
+        "IGL - Intergeniculate leaflet of the lateral geniculate complex"
+    )
     INT_G__INTERMEDIATE_GENIC = "IntG - Intermediate geniculate nucleus"
-    L_GV__VENTRAL_PART_OF_THE = "LGv - Ventral part of the lateral geniculate complex"
+    L_GV__VENTRAL_PART_OF_THE = (
+        "LGv - Ventral part of the lateral geniculate complex"
+    )
     SUB_G__SUBGENICULATE_NUCL = "SubG - Subgeniculate nucleus"
     MH__MEDIAL_HABENULA = "MH - Medial habenula"
     LH__LATERAL_HABENULA = "LH - Lateral habenula"
     SO__SUPRAOPTIC_NUCLEUS = "SO - Supraoptic nucleus"
     PVH__PARAVENTRICULAR_HYPO = "PVH - Paraventricular hypothalamic nucleus"
-    P_VA__PERIVENTRICULAR_HYP = "PVa - Periventricular hypothalamic nucleus anterior part"
-    P_VI__PERIVENTRICULAR_HYP = "PVi - Periventricular hypothalamic nucleus intermediate part"
+    P_VA__PERIVENTRICULAR_HYP = (
+        "PVa - Periventricular hypothalamic nucleus anterior part"
+    )
+    P_VI__PERIVENTRICULAR_HYP = (
+        "PVi - Periventricular hypothalamic nucleus intermediate part"
+    )
     ARH__ARCUATE_HYPOTHALAMIC = "ARH - Arcuate hypothalamic nucleus"
     ADP__ANTERODORSAL_PREOPTI = "ADP - Anterodorsal preoptic nucleus"
     AVP__ANTEROVENTRAL_PREOPT = "AVP - Anteroventral preoptic nucleus"
@@ -2293,8 +2738,12 @@ class Burr3IntendedCcfTarget(Enum, metaclass=EnumMeta):
     MEPO__MEDIAN_PREOPTIC_NUC = "MEPO - Median preoptic nucleus"
     MPO__MEDIAL_PREOPTIC_AREA = "MPO - Medial preoptic area"
     PS__PARASTRIAL_NUCLEUS = "PS - Parastrial nucleus"
-    P_VP__PERIVENTRICULAR_HYP = "PVp - Periventricular hypothalamic nucleus posterior part"
-    P_VPO__PERIVENTRICULAR_HY = "PVpo - Periventricular hypothalamic nucleus preoptic part"
+    P_VP__PERIVENTRICULAR_HYP = (
+        "PVp - Periventricular hypothalamic nucleus posterior part"
+    )
+    P_VPO__PERIVENTRICULAR_HY = (
+        "PVpo - Periventricular hypothalamic nucleus preoptic part"
+    )
     SBPV__SUBPARAVENTRICULAR = "SBPV - Subparaventricular zone"
     SCH__SUPRACHIASMATIC_NUCL = "SCH - Suprachiasmatic nucleus"
     SFO__SUBFORNICAL_ORGAN = "SFO - Subfornical organ"
@@ -2308,7 +2757,9 @@ class Burr3IntendedCcfTarget(Enum, metaclass=EnumMeta):
     MPN__MEDIAL_PREOPTIC_NUCL = "MPN - Medial preoptic nucleus"
     P_MD__DORSAL_PREMAMMILLAR = "PMd - Dorsal premammillary nucleus"
     P_MV__VENTRAL_PREMAMMILLA = "PMv - Ventral premammillary nucleus"
-    PV_HD__PARAVENTRICULAR_HY = "PVHd - Paraventricular hypothalamic nucleus descending division"
+    PV_HD__PARAVENTRICULAR_HY = (
+        "PVHd - Paraventricular hypothalamic nucleus descending division"
+    )
     VMH__VENTROMEDIAL_HYPOTHA = "VMH - Ventromedial hypothalamic nucleus"
     PH__POSTERIOR_HYPOTHALAMI = "PH - Posterior hypothalamic nucleus"
     LHA__LATERAL_HYPOTHALAMIC = "LHA - Lateral hypothalamic area"
@@ -2321,13 +2772,17 @@ class Burr3IntendedCcfTarget(Enum, metaclass=EnumMeta):
     ZI__ZONA_INCERTA = "ZI - Zona incerta"
     S_CS__SUPERIOR_COLLICULUS = "SCs - Superior colliculus sensory related"
     IC__INFERIOR_COLLICULUS = "IC - Inferior colliculus"
-    NB__NUCLEUS_OF_THE_BRACHI = "NB - Nucleus of the brachium of the inferior colliculus"
+    NB__NUCLEUS_OF_THE_BRACHI = (
+        "NB - Nucleus of the brachium of the inferior colliculus"
+    )
     SAG__NUCLEUS_SAGULUM = "SAG - Nucleus sagulum"
     PBG__PARABIGEMINAL_NUCLEU = "PBG - Parabigeminal nucleus"
     S_NR__SUBSTANTIA_NIGRA_RE = "SNr - Substantia nigra reticular part"
     VTA__VENTRAL_TEGMENTAL_AR = "VTA - Ventral tegmental area"
     PN__PARANIGRAL_NUCLEUS = "PN - Paranigral nucleus"
-    RR__MIDBRAIN_RETICULAR_NU = "RR - Midbrain reticular nucleus retrorubral area"
+    RR__MIDBRAIN_RETICULAR_NU = (
+        "RR - Midbrain reticular nucleus retrorubral area"
+    )
     MRN__MIDBRAIN_RETICULAR_N = "MRN - Midbrain reticular nucleus"
     S_CM__SUPERIOR_COLLICULUS = "SCm - Superior colliculus motor related"
     PAG__PERIAQUEDUCTAL_GRAY = "PAG - Periaqueductal gray"
@@ -2347,9 +2802,15 @@ class Burr3IntendedCcfTarget(Enum, metaclass=EnumMeta):
     PA4__PARATROCHLEAR_NUCLEU = "Pa4 - Paratrochlear nucleus"
     VTN__VENTRAL_TEGMENTAL_NU = "VTN - Ventral tegmental nucleus"
     AT__ANTERIOR_TEGMENTAL_NU = "AT - Anterior tegmental nucleus"
-    LT__LATERAL_TERMINAL_NUCL = "LT - Lateral terminal nucleus of the accessory optic tract"
-    DT__DORSAL_TERMINAL_NUCLE = "DT - Dorsal terminal nucleus of the accessory optic tract"
-    MT__MEDIAL_TERMINAL_NUCLE = "MT - Medial terminal nucleus of the accessory optic tract"
+    LT__LATERAL_TERMINAL_NUCL = (
+        "LT - Lateral terminal nucleus of the accessory optic tract"
+    )
+    DT__DORSAL_TERMINAL_NUCLE = (
+        "DT - Dorsal terminal nucleus of the accessory optic tract"
+    )
+    MT__MEDIAL_TERMINAL_NUCLE = (
+        "MT - Medial terminal nucleus of the accessory optic tract"
+    )
     S_NC__SUBSTANTIA_NIGRA_CO = "SNc - Substantia nigra compact part"
     PPN__PEDUNCULOPONTINE_NUC = "PPN - Pedunculopontine nucleus"
     IF__INTERFASCICULAR_NUCLE = "IF - Interfascicular nucleus raphe"
@@ -2358,7 +2819,9 @@ class Burr3IntendedCcfTarget(Enum, metaclass=EnumMeta):
     CLI__CENTRAL_LINEAR_NUCLE = "CLI - Central linear nucleus raphe"
     DR__DORSAL_NUCLEUS_RAPHE = "DR - Dorsal nucleus raphe"
     NLL__NUCLEUS_OF_THE_LATER = "NLL - Nucleus of the lateral lemniscus"
-    PSV__PRINCIPAL_SENSORY_NU = "PSV - Principal sensory nucleus of the trigeminal"
+    PSV__PRINCIPAL_SENSORY_NU = (
+        "PSV - Principal sensory nucleus of the trigeminal"
+    )
     PB__PARABRACHIAL_NUCLEUS = "PB - Parabrachial nucleus"
     SOC__SUPERIOR_OLIVARY_COM = "SOC - Superior olivary complex"
     B__BARRINGTON_S_NUCLEUS = "B - Barrington's nucleus"
@@ -2392,9 +2855,15 @@ class Burr3IntendedCcfTarget(Enum, metaclass=EnumMeta):
     ECU__EXTERNAL_CUNEATE_NUC = "ECU - External cuneate nucleus"
     NTB__NUCLEUS_OF_THE_TRAPE = "NTB - Nucleus of the trapezoid body"
     NTS__NUCLEUS_OF_THE_SOLIT = "NTS - Nucleus of the solitary tract"
-    SPVC__SPINAL_NUCLEUS_OF_T = "SPVC - Spinal nucleus of the trigeminal caudal part"
-    SPVI__SPINAL_NUCLEUS_OF_T = "SPVI - Spinal nucleus of the trigeminal interpolar part"
-    SPVO__SPINAL_NUCLEUS_OF_T = "SPVO - Spinal nucleus of the trigeminal oral part"
+    SPVC__SPINAL_NUCLEUS_OF_T = (
+        "SPVC - Spinal nucleus of the trigeminal caudal part"
+    )
+    SPVI__SPINAL_NUCLEUS_OF_T = (
+        "SPVI - Spinal nucleus of the trigeminal interpolar part"
+    )
+    SPVO__SPINAL_NUCLEUS_OF_T = (
+        "SPVO - Spinal nucleus of the trigeminal oral part"
+    )
     PA5__PARATRIGEMINAL_NUCLE = "Pa5 - Paratrigeminal nucleus"
     VI__ABDUCENS_NUCLEUS = "VI - Abducens nucleus"
     VII__FACIAL_MOTOR_NUCLEUS = "VII - Facial motor nucleus"
@@ -2450,16 +2919,25 @@ class Burr3IntendedCcfTarget(Enum, metaclass=EnumMeta):
 
 class Burr4IntendedCcfTarget(Enum, metaclass=EnumMeta):
     """Enum class for Burr 4 Intended CCF Target."""
+
     FRP__FRONTAL_POLE_CEREBRA = "FRP - Frontal pole cerebral cortex"
     M_OP__PRIMARY_MOTOR_AREA = "MOp - Primary motor area"
     M_OS__SECONDARY_MOTOR_ARE = "MOs - Secondary motor area"
     S_SP_N__PRIMARY_SOMATOSEN = "SSp-n - Primary somatosensory area nose"
-    S_SP_BFD__PRIMARY_SOMATOS = "SSp-bfd - Primary somatosensory area barrel field"
-    S_SP_LL__PRIMARY_SOMATOSE = "SSp-ll - Primary somatosensory area lower limb"
+    S_SP_BFD__PRIMARY_SOMATOS = (
+        "SSp-bfd - Primary somatosensory area barrel field"
+    )
+    S_SP_LL__PRIMARY_SOMATOSE = (
+        "SSp-ll - Primary somatosensory area lower limb"
+    )
     S_SP_M__PRIMARY_SOMATOSEN = "SSp-m - Primary somatosensory area mouth"
-    S_SP_UL__PRIMARY_SOMATOSE = "SSp-ul - Primary somatosensory area upper limb"
+    S_SP_UL__PRIMARY_SOMATOSE = (
+        "SSp-ul - Primary somatosensory area upper limb"
+    )
     S_SP_TR__PRIMARY_SOMATOSE = "SSp-tr - Primary somatosensory area trunk"
-    S_SP_UN__PRIMARY_SOMATOSE = "SSp-un - Primary somatosensory area unassigned"
+    S_SP_UN__PRIMARY_SOMATOSE = (
+        "SSp-un - Primary somatosensory area unassigned"
+    )
     S_SS__SUPPLEMENTAL_SOMATO = "SSs - Supplemental somatosensory area"
     GU__GUSTATORY_AREAS = "GU - Gustatory areas"
     VISC__VISCERAL_AREA = "VISC - Visceral area"
@@ -2486,7 +2964,9 @@ class Burr4IntendedCcfTarget(Enum, metaclass=EnumMeta):
     A_ID__AGRANULAR_INSULAR_A = "AId - Agranular insular area dorsal part"
     A_IP__AGRANULAR_INSULAR_A = "AIp - Agranular insular area posterior part"
     A_IV__AGRANULAR_INSULAR_A = "AIv - Agranular insular area ventral part"
-    RS_PAGL__RETROSPLENIAL_AR = "RSPagl - Retrosplenial area lateral agranular part"
+    RS_PAGL__RETROSPLENIAL_AR = (
+        "RSPagl - Retrosplenial area lateral agranular part"
+    )
     RS_PD__RETROSPLENIAL_AREA = "RSPd - Retrosplenial area dorsal part"
     RS_PV__RETROSPLENIAL_AREA = "RSPv - Retrosplenial area ventral part"
     VI_SA__ANTERIOR_AREA = "VISa - Anterior area"
@@ -2513,7 +2993,9 @@ class Burr4IntendedCcfTarget(Enum, metaclass=EnumMeta):
     FC__FASCIOLA_CINEREA = "FC - Fasciola cinerea"
     IG__INDUSEUM_GRISEUM = "IG - Induseum griseum"
     EN_TL__ENTORHINAL_AREA_LA = "ENTl - Entorhinal area lateral part"
-    EN_TM__ENTORHINAL_AREA_ME = "ENTm - Entorhinal area medial part dorsal zone"
+    EN_TM__ENTORHINAL_AREA_ME = (
+        "ENTm - Entorhinal area medial part dorsal zone"
+    )
     PAR__PARASUBICULUM = "PAR - Parasubiculum"
     POST__POSTSUBICULUM = "POST - Postsubiculum"
     PRE__PRESUBICULUM = "PRE - Presubiculum"
@@ -2532,13 +3014,19 @@ class Burr4IntendedCcfTarget(Enum, metaclass=EnumMeta):
     ACB__NUCLEUS_ACCUMBENS = "ACB - Nucleus accumbens"
     FS__FUNDUS_OF_STRIATUM = "FS - Fundus of striatum"
     OT__OLFACTORY_TUBERCLE = "OT - Olfactory tubercle"
-    L_SC__LATERAL_SEPTAL_NUCL = "LSc - Lateral septal nucleus caudal (caudodorsal) part"
-    L_SR__LATERAL_SEPTAL_NUCL = "LSr - Lateral septal nucleus rostral (rostroventral) part"
+    L_SC__LATERAL_SEPTAL_NUCL = (
+        "LSc - Lateral septal nucleus caudal (caudodorsal) part"
+    )
+    L_SR__LATERAL_SEPTAL_NUCL = (
+        "LSr - Lateral septal nucleus rostral (rostroventral) part"
+    )
     L_SV__LATERAL_SEPTAL_NUCL = "LSv - Lateral septal nucleus ventral part"
     SF__SEPTOFIMBRIAL_NUCLEUS = "SF - Septofimbrial nucleus"
     SH__SEPTOHIPPOCAMPAL_NUCL = "SH - Septohippocampal nucleus"
     AAA__ANTERIOR_AMYGDALAR_A = "AAA - Anterior amygdalar area"
-    BA__BED_NUCLEUS_OF_THE_AC = "BA - Bed nucleus of the accessory olfactory tract"
+    BA__BED_NUCLEUS_OF_THE_AC = (
+        "BA - Bed nucleus of the accessory olfactory tract"
+    )
     CEA__CENTRAL_AMYGDALAR_NU = "CEA - Central amygdalar nucleus"
     IA__INTERCALATED_AMYGDALA = "IA - Intercalated amygdalar nucleus"
     MEA__MEDIAL_AMYGDALAR_NUC = "MEA - Medial amygdalar nucleus"
@@ -2550,30 +3038,48 @@ class Burr4IntendedCcfTarget(Enum, metaclass=EnumMeta):
     NDB__DIAGONAL_BAND_NUCLEU = "NDB - Diagonal band nucleus"
     TRS__TRIANGULAR_NUCLEUS_O = "TRS - Triangular nucleus of septum"
     BST__BED_NUCLEI_OF_THE_ST = "BST - Bed nuclei of the stria terminalis"
-    VAL__VENTRAL_ANTERIOR_LAT = "VAL - Ventral anterior-lateral complex of the thalamus"
+    VAL__VENTRAL_ANTERIOR_LAT = (
+        "VAL - Ventral anterior-lateral complex of the thalamus"
+    )
     VM__VENTRAL_MEDIAL_NUCLEU = "VM - Ventral medial nucleus of the thalamus"
-    VPL__VENTRAL_POSTEROLATER = "VPL - Ventral posterolateral nucleus of the thalamus"
+    VPL__VENTRAL_POSTEROLATER = (
+        "VPL - Ventral posterolateral nucleus of the thalamus"
+    )
     VP_LPC__VENTRAL_POSTEROLA = "VPLpc - Ventral posterolateral nucleus of the thalamus parvicellular part"
-    VPM__VENTRAL_POSTEROMEDIA = "VPM - Ventral posteromedial nucleus of the thalamus"
+    VPM__VENTRAL_POSTEROMEDIA = (
+        "VPM - Ventral posteromedial nucleus of the thalamus"
+    )
     VP_MPC__VENTRAL_POSTEROME = "VPMpc - Ventral posteromedial nucleus of the thalamus parvicellular part"
     PO_T__POSTERIOR_TRIANGULA = "PoT - Posterior triangular thalamic nucleus"
     SPF__SUBPARAFASCICULAR_NU = "SPF - Subparafascicular nucleus"
     SPA__SUBPARAFASCICULAR_AR = "SPA - Subparafascicular area"
     PP__PERIPEDUNCULAR_NUCLEU = "PP - Peripeduncular nucleus"
     MG__MEDIAL_GENICULATE_COM = "MG - Medial geniculate complex"
-    L_GD__DORSAL_PART_OF_THE = "LGd - Dorsal part of the lateral geniculate complex"
-    LP__LATERAL_POSTERIOR_NUC = "LP - Lateral posterior nucleus of the thalamus"
+    L_GD__DORSAL_PART_OF_THE = (
+        "LGd - Dorsal part of the lateral geniculate complex"
+    )
+    LP__LATERAL_POSTERIOR_NUC = (
+        "LP - Lateral posterior nucleus of the thalamus"
+    )
     PO__POSTERIOR_COMPLEX_OF = "PO - Posterior complex of the thalamus"
-    POL__POSTERIOR_LIMITING_N = "POL - Posterior limiting nucleus of the thalamus"
+    POL__POSTERIOR_LIMITING_N = (
+        "POL - Posterior limiting nucleus of the thalamus"
+    )
     SGN__SUPRAGENICULATE_NUCL = "SGN - Suprageniculate nucleus"
     ETH__ETHMOID_NUCLEUS_OF_T = "Eth - Ethmoid nucleus of the thalamus"
     AV__ANTEROVENTRAL_NUCLEUS = "AV - Anteroventral nucleus of thalamus"
     AM__ANTEROMEDIAL_NUCLEUS = "AM - Anteromedial nucleus"
     AD__ANTERODORSAL_NUCLEUS = "AD - Anterodorsal nucleus"
-    IAM__INTERANTEROMEDIAL_NU = "IAM - Interanteromedial nucleus of the thalamus"
-    IAD__INTERANTERODORSAL_NU = "IAD - Interanterodorsal nucleus of the thalamus"
+    IAM__INTERANTEROMEDIAL_NU = (
+        "IAM - Interanteromedial nucleus of the thalamus"
+    )
+    IAD__INTERANTERODORSAL_NU = (
+        "IAD - Interanterodorsal nucleus of the thalamus"
+    )
     LD__LATERAL_DORSAL_NUCLEU = "LD - Lateral dorsal nucleus of thalamus"
-    IMD__INTERMEDIODORSAL_NUC = "IMD - Intermediodorsal nucleus of the thalamus"
+    IMD__INTERMEDIODORSAL_NUC = (
+        "IMD - Intermediodorsal nucleus of the thalamus"
+    )
     MD__MEDIODORSAL_NUCLEUS_O = "MD - Mediodorsal nucleus of thalamus"
     SMT__SUBMEDIAL_NUCLEUS_OF = "SMT - Submedial nucleus of the thalamus"
     PR__PERIREUNENSIS_NUCLEUS = "PR - Perireunensis nucleus"
@@ -2588,16 +3094,24 @@ class Burr4IntendedCcfTarget(Enum, metaclass=EnumMeta):
     PF__PARAFASCICULAR_NUCLEU = "PF - Parafascicular nucleus"
     PIL__POSTERIOR_INTRALAMIN = "PIL - Posterior intralaminar thalamic nucleus"
     RT__RETICULAR_NUCLEUS_OF = "RT - Reticular nucleus of the thalamus"
-    IGL__INTERGENICULATE_LEAF = "IGL - Intergeniculate leaflet of the lateral geniculate complex"
+    IGL__INTERGENICULATE_LEAF = (
+        "IGL - Intergeniculate leaflet of the lateral geniculate complex"
+    )
     INT_G__INTERMEDIATE_GENIC = "IntG - Intermediate geniculate nucleus"
-    L_GV__VENTRAL_PART_OF_THE = "LGv - Ventral part of the lateral geniculate complex"
+    L_GV__VENTRAL_PART_OF_THE = (
+        "LGv - Ventral part of the lateral geniculate complex"
+    )
     SUB_G__SUBGENICULATE_NUCL = "SubG - Subgeniculate nucleus"
     MH__MEDIAL_HABENULA = "MH - Medial habenula"
     LH__LATERAL_HABENULA = "LH - Lateral habenula"
     SO__SUPRAOPTIC_NUCLEUS = "SO - Supraoptic nucleus"
     PVH__PARAVENTRICULAR_HYPO = "PVH - Paraventricular hypothalamic nucleus"
-    P_VA__PERIVENTRICULAR_HYP = "PVa - Periventricular hypothalamic nucleus anterior part"
-    P_VI__PERIVENTRICULAR_HYP = "PVi - Periventricular hypothalamic nucleus intermediate part"
+    P_VA__PERIVENTRICULAR_HYP = (
+        "PVa - Periventricular hypothalamic nucleus anterior part"
+    )
+    P_VI__PERIVENTRICULAR_HYP = (
+        "PVi - Periventricular hypothalamic nucleus intermediate part"
+    )
     ARH__ARCUATE_HYPOTHALAMIC = "ARH - Arcuate hypothalamic nucleus"
     ADP__ANTERODORSAL_PREOPTI = "ADP - Anterodorsal preoptic nucleus"
     AVP__ANTEROVENTRAL_PREOPT = "AVP - Anteroventral preoptic nucleus"
@@ -2606,8 +3120,12 @@ class Burr4IntendedCcfTarget(Enum, metaclass=EnumMeta):
     MEPO__MEDIAN_PREOPTIC_NUC = "MEPO - Median preoptic nucleus"
     MPO__MEDIAL_PREOPTIC_AREA = "MPO - Medial preoptic area"
     PS__PARASTRIAL_NUCLEUS = "PS - Parastrial nucleus"
-    P_VP__PERIVENTRICULAR_HYP = "PVp - Periventricular hypothalamic nucleus posterior part"
-    P_VPO__PERIVENTRICULAR_HY = "PVpo - Periventricular hypothalamic nucleus preoptic part"
+    P_VP__PERIVENTRICULAR_HYP = (
+        "PVp - Periventricular hypothalamic nucleus posterior part"
+    )
+    P_VPO__PERIVENTRICULAR_HY = (
+        "PVpo - Periventricular hypothalamic nucleus preoptic part"
+    )
     SBPV__SUBPARAVENTRICULAR = "SBPV - Subparaventricular zone"
     SCH__SUPRACHIASMATIC_NUCL = "SCH - Suprachiasmatic nucleus"
     SFO__SUBFORNICAL_ORGAN = "SFO - Subfornical organ"
@@ -2621,7 +3139,9 @@ class Burr4IntendedCcfTarget(Enum, metaclass=EnumMeta):
     MPN__MEDIAL_PREOPTIC_NUCL = "MPN - Medial preoptic nucleus"
     P_MD__DORSAL_PREMAMMILLAR = "PMd - Dorsal premammillary nucleus"
     P_MV__VENTRAL_PREMAMMILLA = "PMv - Ventral premammillary nucleus"
-    PV_HD__PARAVENTRICULAR_HY = "PVHd - Paraventricular hypothalamic nucleus descending division"
+    PV_HD__PARAVENTRICULAR_HY = (
+        "PVHd - Paraventricular hypothalamic nucleus descending division"
+    )
     VMH__VENTROMEDIAL_HYPOTHA = "VMH - Ventromedial hypothalamic nucleus"
     PH__POSTERIOR_HYPOTHALAMI = "PH - Posterior hypothalamic nucleus"
     LHA__LATERAL_HYPOTHALAMIC = "LHA - Lateral hypothalamic area"
@@ -2634,13 +3154,17 @@ class Burr4IntendedCcfTarget(Enum, metaclass=EnumMeta):
     ZI__ZONA_INCERTA = "ZI - Zona incerta"
     S_CS__SUPERIOR_COLLICULUS = "SCs - Superior colliculus sensory related"
     IC__INFERIOR_COLLICULUS = "IC - Inferior colliculus"
-    NB__NUCLEUS_OF_THE_BRACHI = "NB - Nucleus of the brachium of the inferior colliculus"
+    NB__NUCLEUS_OF_THE_BRACHI = (
+        "NB - Nucleus of the brachium of the inferior colliculus"
+    )
     SAG__NUCLEUS_SAGULUM = "SAG - Nucleus sagulum"
     PBG__PARABIGEMINAL_NUCLEU = "PBG - Parabigeminal nucleus"
     S_NR__SUBSTANTIA_NIGRA_RE = "SNr - Substantia nigra reticular part"
     VTA__VENTRAL_TEGMENTAL_AR = "VTA - Ventral tegmental area"
     PN__PARANIGRAL_NUCLEUS = "PN - Paranigral nucleus"
-    RR__MIDBRAIN_RETICULAR_NU = "RR - Midbrain reticular nucleus retrorubral area"
+    RR__MIDBRAIN_RETICULAR_NU = (
+        "RR - Midbrain reticular nucleus retrorubral area"
+    )
     MRN__MIDBRAIN_RETICULAR_N = "MRN - Midbrain reticular nucleus"
     S_CM__SUPERIOR_COLLICULUS = "SCm - Superior colliculus motor related"
     PAG__PERIAQUEDUCTAL_GRAY = "PAG - Periaqueductal gray"
@@ -2660,9 +3184,15 @@ class Burr4IntendedCcfTarget(Enum, metaclass=EnumMeta):
     PA4__PARATROCHLEAR_NUCLEU = "Pa4 - Paratrochlear nucleus"
     VTN__VENTRAL_TEGMENTAL_NU = "VTN - Ventral tegmental nucleus"
     AT__ANTERIOR_TEGMENTAL_NU = "AT - Anterior tegmental nucleus"
-    LT__LATERAL_TERMINAL_NUCL = "LT - Lateral terminal nucleus of the accessory optic tract"
-    DT__DORSAL_TERMINAL_NUCLE = "DT - Dorsal terminal nucleus of the accessory optic tract"
-    MT__MEDIAL_TERMINAL_NUCLE = "MT - Medial terminal nucleus of the accessory optic tract"
+    LT__LATERAL_TERMINAL_NUCL = (
+        "LT - Lateral terminal nucleus of the accessory optic tract"
+    )
+    DT__DORSAL_TERMINAL_NUCLE = (
+        "DT - Dorsal terminal nucleus of the accessory optic tract"
+    )
+    MT__MEDIAL_TERMINAL_NUCLE = (
+        "MT - Medial terminal nucleus of the accessory optic tract"
+    )
     S_NC__SUBSTANTIA_NIGRA_CO = "SNc - Substantia nigra compact part"
     PPN__PEDUNCULOPONTINE_NUC = "PPN - Pedunculopontine nucleus"
     IF__INTERFASCICULAR_NUCLE = "IF - Interfascicular nucleus raphe"
@@ -2671,7 +3201,9 @@ class Burr4IntendedCcfTarget(Enum, metaclass=EnumMeta):
     CLI__CENTRAL_LINEAR_NUCLE = "CLI - Central linear nucleus raphe"
     DR__DORSAL_NUCLEUS_RAPHE = "DR - Dorsal nucleus raphe"
     NLL__NUCLEUS_OF_THE_LATER = "NLL - Nucleus of the lateral lemniscus"
-    PSV__PRINCIPAL_SENSORY_NU = "PSV - Principal sensory nucleus of the trigeminal"
+    PSV__PRINCIPAL_SENSORY_NU = (
+        "PSV - Principal sensory nucleus of the trigeminal"
+    )
     PB__PARABRACHIAL_NUCLEUS = "PB - Parabrachial nucleus"
     SOC__SUPERIOR_OLIVARY_COM = "SOC - Superior olivary complex"
     B__BARRINGTON_S_NUCLEUS = "B - Barrington's nucleus"
@@ -2705,9 +3237,15 @@ class Burr4IntendedCcfTarget(Enum, metaclass=EnumMeta):
     ECU__EXTERNAL_CUNEATE_NUC = "ECU - External cuneate nucleus"
     NTB__NUCLEUS_OF_THE_TRAPE = "NTB - Nucleus of the trapezoid body"
     NTS__NUCLEUS_OF_THE_SOLIT = "NTS - Nucleus of the solitary tract"
-    SPVC__SPINAL_NUCLEUS_OF_T = "SPVC - Spinal nucleus of the trigeminal caudal part"
-    SPVI__SPINAL_NUCLEUS_OF_T = "SPVI - Spinal nucleus of the trigeminal interpolar part"
-    SPVO__SPINAL_NUCLEUS_OF_T = "SPVO - Spinal nucleus of the trigeminal oral part"
+    SPVC__SPINAL_NUCLEUS_OF_T = (
+        "SPVC - Spinal nucleus of the trigeminal caudal part"
+    )
+    SPVI__SPINAL_NUCLEUS_OF_T = (
+        "SPVI - Spinal nucleus of the trigeminal interpolar part"
+    )
+    SPVO__SPINAL_NUCLEUS_OF_T = (
+        "SPVO - Spinal nucleus of the trigeminal oral part"
+    )
     PA5__PARATRIGEMINAL_NUCLE = "Pa5 - Paratrigeminal nucleus"
     VI__ABDUCENS_NUCLEUS = "VI - Abducens nucleus"
     VII__FACIAL_MOTOR_NUCLEUS = "VII - Facial motor nucleus"
@@ -2763,16 +3301,25 @@ class Burr4IntendedCcfTarget(Enum, metaclass=EnumMeta):
 
 class Burr5IntendedCcfTarget(Enum, metaclass=EnumMeta):
     """Enum class for Burr 5 Intended CCF Target."""
+
     FRP__FRONTAL_POLE_CEREBRA = "FRP - Frontal pole cerebral cortex"
     M_OP__PRIMARY_MOTOR_AREA = "MOp - Primary motor area"
     M_OS__SECONDARY_MOTOR_ARE = "MOs - Secondary motor area"
     S_SP_N__PRIMARY_SOMATOSEN = "SSp-n - Primary somatosensory area nose"
-    S_SP_BFD__PRIMARY_SOMATOS = "SSp-bfd - Primary somatosensory area barrel field"
-    S_SP_LL__PRIMARY_SOMATOSE = "SSp-ll - Primary somatosensory area lower limb"
+    S_SP_BFD__PRIMARY_SOMATOS = (
+        "SSp-bfd - Primary somatosensory area barrel field"
+    )
+    S_SP_LL__PRIMARY_SOMATOSE = (
+        "SSp-ll - Primary somatosensory area lower limb"
+    )
     S_SP_M__PRIMARY_SOMATOSEN = "SSp-m - Primary somatosensory area mouth"
-    S_SP_UL__PRIMARY_SOMATOSE = "SSp-ul - Primary somatosensory area upper limb"
+    S_SP_UL__PRIMARY_SOMATOSE = (
+        "SSp-ul - Primary somatosensory area upper limb"
+    )
     S_SP_TR__PRIMARY_SOMATOSE = "SSp-tr - Primary somatosensory area trunk"
-    S_SP_UN__PRIMARY_SOMATOSE = "SSp-un - Primary somatosensory area unassigned"
+    S_SP_UN__PRIMARY_SOMATOSE = (
+        "SSp-un - Primary somatosensory area unassigned"
+    )
     S_SS__SUPPLEMENTAL_SOMATO = "SSs - Supplemental somatosensory area"
     GU__GUSTATORY_AREAS = "GU - Gustatory areas"
     VISC__VISCERAL_AREA = "VISC - Visceral area"
@@ -2799,7 +3346,9 @@ class Burr5IntendedCcfTarget(Enum, metaclass=EnumMeta):
     A_ID__AGRANULAR_INSULAR_A = "AId - Agranular insular area dorsal part"
     A_IP__AGRANULAR_INSULAR_A = "AIp - Agranular insular area posterior part"
     A_IV__AGRANULAR_INSULAR_A = "AIv - Agranular insular area ventral part"
-    RS_PAGL__RETROSPLENIAL_AR = "RSPagl - Retrosplenial area lateral agranular part"
+    RS_PAGL__RETROSPLENIAL_AR = (
+        "RSPagl - Retrosplenial area lateral agranular part"
+    )
     RS_PD__RETROSPLENIAL_AREA = "RSPd - Retrosplenial area dorsal part"
     RS_PV__RETROSPLENIAL_AREA = "RSPv - Retrosplenial area ventral part"
     VI_SA__ANTERIOR_AREA = "VISa - Anterior area"
@@ -2826,7 +3375,9 @@ class Burr5IntendedCcfTarget(Enum, metaclass=EnumMeta):
     FC__FASCIOLA_CINEREA = "FC - Fasciola cinerea"
     IG__INDUSEUM_GRISEUM = "IG - Induseum griseum"
     EN_TL__ENTORHINAL_AREA_LA = "ENTl - Entorhinal area lateral part"
-    EN_TM__ENTORHINAL_AREA_ME = "ENTm - Entorhinal area medial part dorsal zone"
+    EN_TM__ENTORHINAL_AREA_ME = (
+        "ENTm - Entorhinal area medial part dorsal zone"
+    )
     PAR__PARASUBICULUM = "PAR - Parasubiculum"
     POST__POSTSUBICULUM = "POST - Postsubiculum"
     PRE__PRESUBICULUM = "PRE - Presubiculum"
@@ -2845,13 +3396,19 @@ class Burr5IntendedCcfTarget(Enum, metaclass=EnumMeta):
     ACB__NUCLEUS_ACCUMBENS = "ACB - Nucleus accumbens"
     FS__FUNDUS_OF_STRIATUM = "FS - Fundus of striatum"
     OT__OLFACTORY_TUBERCLE = "OT - Olfactory tubercle"
-    L_SC__LATERAL_SEPTAL_NUCL = "LSc - Lateral septal nucleus caudal (caudodorsal) part"
-    L_SR__LATERAL_SEPTAL_NUCL = "LSr - Lateral septal nucleus rostral (rostroventral) part"
+    L_SC__LATERAL_SEPTAL_NUCL = (
+        "LSc - Lateral septal nucleus caudal (caudodorsal) part"
+    )
+    L_SR__LATERAL_SEPTAL_NUCL = (
+        "LSr - Lateral septal nucleus rostral (rostroventral) part"
+    )
     L_SV__LATERAL_SEPTAL_NUCL = "LSv - Lateral septal nucleus ventral part"
     SF__SEPTOFIMBRIAL_NUCLEUS = "SF - Septofimbrial nucleus"
     SH__SEPTOHIPPOCAMPAL_NUCL = "SH - Septohippocampal nucleus"
     AAA__ANTERIOR_AMYGDALAR_A = "AAA - Anterior amygdalar area"
-    BA__BED_NUCLEUS_OF_THE_AC = "BA - Bed nucleus of the accessory olfactory tract"
+    BA__BED_NUCLEUS_OF_THE_AC = (
+        "BA - Bed nucleus of the accessory olfactory tract"
+    )
     CEA__CENTRAL_AMYGDALAR_NU = "CEA - Central amygdalar nucleus"
     IA__INTERCALATED_AMYGDALA = "IA - Intercalated amygdalar nucleus"
     MEA__MEDIAL_AMYGDALAR_NUC = "MEA - Medial amygdalar nucleus"
@@ -2863,30 +3420,48 @@ class Burr5IntendedCcfTarget(Enum, metaclass=EnumMeta):
     NDB__DIAGONAL_BAND_NUCLEU = "NDB - Diagonal band nucleus"
     TRS__TRIANGULAR_NUCLEUS_O = "TRS - Triangular nucleus of septum"
     BST__BED_NUCLEI_OF_THE_ST = "BST - Bed nuclei of the stria terminalis"
-    VAL__VENTRAL_ANTERIOR_LAT = "VAL - Ventral anterior-lateral complex of the thalamus"
+    VAL__VENTRAL_ANTERIOR_LAT = (
+        "VAL - Ventral anterior-lateral complex of the thalamus"
+    )
     VM__VENTRAL_MEDIAL_NUCLEU = "VM - Ventral medial nucleus of the thalamus"
-    VPL__VENTRAL_POSTEROLATER = "VPL - Ventral posterolateral nucleus of the thalamus"
+    VPL__VENTRAL_POSTEROLATER = (
+        "VPL - Ventral posterolateral nucleus of the thalamus"
+    )
     VP_LPC__VENTRAL_POSTEROLA = "VPLpc - Ventral posterolateral nucleus of the thalamus parvicellular part"
-    VPM__VENTRAL_POSTEROMEDIA = "VPM - Ventral posteromedial nucleus of the thalamus"
+    VPM__VENTRAL_POSTEROMEDIA = (
+        "VPM - Ventral posteromedial nucleus of the thalamus"
+    )
     VP_MPC__VENTRAL_POSTEROME = "VPMpc - Ventral posteromedial nucleus of the thalamus parvicellular part"
     PO_T__POSTERIOR_TRIANGULA = "PoT - Posterior triangular thalamic nucleus"
     SPF__SUBPARAFASCICULAR_NU = "SPF - Subparafascicular nucleus"
     SPA__SUBPARAFASCICULAR_AR = "SPA - Subparafascicular area"
     PP__PERIPEDUNCULAR_NUCLEU = "PP - Peripeduncular nucleus"
     MG__MEDIAL_GENICULATE_COM = "MG - Medial geniculate complex"
-    L_GD__DORSAL_PART_OF_THE = "LGd - Dorsal part of the lateral geniculate complex"
-    LP__LATERAL_POSTERIOR_NUC = "LP - Lateral posterior nucleus of the thalamus"
+    L_GD__DORSAL_PART_OF_THE = (
+        "LGd - Dorsal part of the lateral geniculate complex"
+    )
+    LP__LATERAL_POSTERIOR_NUC = (
+        "LP - Lateral posterior nucleus of the thalamus"
+    )
     PO__POSTERIOR_COMPLEX_OF = "PO - Posterior complex of the thalamus"
-    POL__POSTERIOR_LIMITING_N = "POL - Posterior limiting nucleus of the thalamus"
+    POL__POSTERIOR_LIMITING_N = (
+        "POL - Posterior limiting nucleus of the thalamus"
+    )
     SGN__SUPRAGENICULATE_NUCL = "SGN - Suprageniculate nucleus"
     ETH__ETHMOID_NUCLEUS_OF_T = "Eth - Ethmoid nucleus of the thalamus"
     AV__ANTEROVENTRAL_NUCLEUS = "AV - Anteroventral nucleus of thalamus"
     AM__ANTEROMEDIAL_NUCLEUS = "AM - Anteromedial nucleus"
     AD__ANTERODORSAL_NUCLEUS = "AD - Anterodorsal nucleus"
-    IAM__INTERANTEROMEDIAL_NU = "IAM - Interanteromedial nucleus of the thalamus"
-    IAD__INTERANTERODORSAL_NU = "IAD - Interanterodorsal nucleus of the thalamus"
+    IAM__INTERANTEROMEDIAL_NU = (
+        "IAM - Interanteromedial nucleus of the thalamus"
+    )
+    IAD__INTERANTERODORSAL_NU = (
+        "IAD - Interanterodorsal nucleus of the thalamus"
+    )
     LD__LATERAL_DORSAL_NUCLEU = "LD - Lateral dorsal nucleus of thalamus"
-    IMD__INTERMEDIODORSAL_NUC = "IMD - Intermediodorsal nucleus of the thalamus"
+    IMD__INTERMEDIODORSAL_NUC = (
+        "IMD - Intermediodorsal nucleus of the thalamus"
+    )
     MD__MEDIODORSAL_NUCLEUS_O = "MD - Mediodorsal nucleus of thalamus"
     SMT__SUBMEDIAL_NUCLEUS_OF = "SMT - Submedial nucleus of the thalamus"
     PR__PERIREUNENSIS_NUCLEUS = "PR - Perireunensis nucleus"
@@ -2901,16 +3476,24 @@ class Burr5IntendedCcfTarget(Enum, metaclass=EnumMeta):
     PF__PARAFASCICULAR_NUCLEU = "PF - Parafascicular nucleus"
     PIL__POSTERIOR_INTRALAMIN = "PIL - Posterior intralaminar thalamic nucleus"
     RT__RETICULAR_NUCLEUS_OF = "RT - Reticular nucleus of the thalamus"
-    IGL__INTERGENICULATE_LEAF = "IGL - Intergeniculate leaflet of the lateral geniculate complex"
+    IGL__INTERGENICULATE_LEAF = (
+        "IGL - Intergeniculate leaflet of the lateral geniculate complex"
+    )
     INT_G__INTERMEDIATE_GENIC = "IntG - Intermediate geniculate nucleus"
-    L_GV__VENTRAL_PART_OF_THE = "LGv - Ventral part of the lateral geniculate complex"
+    L_GV__VENTRAL_PART_OF_THE = (
+        "LGv - Ventral part of the lateral geniculate complex"
+    )
     SUB_G__SUBGENICULATE_NUCL = "SubG - Subgeniculate nucleus"
     MH__MEDIAL_HABENULA = "MH - Medial habenula"
     LH__LATERAL_HABENULA = "LH - Lateral habenula"
     SO__SUPRAOPTIC_NUCLEUS = "SO - Supraoptic nucleus"
     PVH__PARAVENTRICULAR_HYPO = "PVH - Paraventricular hypothalamic nucleus"
-    P_VA__PERIVENTRICULAR_HYP = "PVa - Periventricular hypothalamic nucleus anterior part"
-    P_VI__PERIVENTRICULAR_HYP = "PVi - Periventricular hypothalamic nucleus intermediate part"
+    P_VA__PERIVENTRICULAR_HYP = (
+        "PVa - Periventricular hypothalamic nucleus anterior part"
+    )
+    P_VI__PERIVENTRICULAR_HYP = (
+        "PVi - Periventricular hypothalamic nucleus intermediate part"
+    )
     ARH__ARCUATE_HYPOTHALAMIC = "ARH - Arcuate hypothalamic nucleus"
     ADP__ANTERODORSAL_PREOPTI = "ADP - Anterodorsal preoptic nucleus"
     AVP__ANTEROVENTRAL_PREOPT = "AVP - Anteroventral preoptic nucleus"
@@ -2919,8 +3502,12 @@ class Burr5IntendedCcfTarget(Enum, metaclass=EnumMeta):
     MEPO__MEDIAN_PREOPTIC_NUC = "MEPO - Median preoptic nucleus"
     MPO__MEDIAL_PREOPTIC_AREA = "MPO - Medial preoptic area"
     PS__PARASTRIAL_NUCLEUS = "PS - Parastrial nucleus"
-    P_VP__PERIVENTRICULAR_HYP = "PVp - Periventricular hypothalamic nucleus posterior part"
-    P_VPO__PERIVENTRICULAR_HY = "PVpo - Periventricular hypothalamic nucleus preoptic part"
+    P_VP__PERIVENTRICULAR_HYP = (
+        "PVp - Periventricular hypothalamic nucleus posterior part"
+    )
+    P_VPO__PERIVENTRICULAR_HY = (
+        "PVpo - Periventricular hypothalamic nucleus preoptic part"
+    )
     SBPV__SUBPARAVENTRICULAR = "SBPV - Subparaventricular zone"
     SCH__SUPRACHIASMATIC_NUCL = "SCH - Suprachiasmatic nucleus"
     SFO__SUBFORNICAL_ORGAN = "SFO - Subfornical organ"
@@ -2934,7 +3521,9 @@ class Burr5IntendedCcfTarget(Enum, metaclass=EnumMeta):
     MPN__MEDIAL_PREOPTIC_NUCL = "MPN - Medial preoptic nucleus"
     P_MD__DORSAL_PREMAMMILLAR = "PMd - Dorsal premammillary nucleus"
     P_MV__VENTRAL_PREMAMMILLA = "PMv - Ventral premammillary nucleus"
-    PV_HD__PARAVENTRICULAR_HY = "PVHd - Paraventricular hypothalamic nucleus descending division"
+    PV_HD__PARAVENTRICULAR_HY = (
+        "PVHd - Paraventricular hypothalamic nucleus descending division"
+    )
     VMH__VENTROMEDIAL_HYPOTHA = "VMH - Ventromedial hypothalamic nucleus"
     PH__POSTERIOR_HYPOTHALAMI = "PH - Posterior hypothalamic nucleus"
     LHA__LATERAL_HYPOTHALAMIC = "LHA - Lateral hypothalamic area"
@@ -2947,13 +3536,17 @@ class Burr5IntendedCcfTarget(Enum, metaclass=EnumMeta):
     ZI__ZONA_INCERTA = "ZI - Zona incerta"
     S_CS__SUPERIOR_COLLICULUS = "SCs - Superior colliculus sensory related"
     IC__INFERIOR_COLLICULUS = "IC - Inferior colliculus"
-    NB__NUCLEUS_OF_THE_BRACHI = "NB - Nucleus of the brachium of the inferior colliculus"
+    NB__NUCLEUS_OF_THE_BRACHI = (
+        "NB - Nucleus of the brachium of the inferior colliculus"
+    )
     SAG__NUCLEUS_SAGULUM = "SAG - Nucleus sagulum"
     PBG__PARABIGEMINAL_NUCLEU = "PBG - Parabigeminal nucleus"
     S_NR__SUBSTANTIA_NIGRA_RE = "SNr - Substantia nigra reticular part"
     VTA__VENTRAL_TEGMENTAL_AR = "VTA - Ventral tegmental area"
     PN__PARANIGRAL_NUCLEUS = "PN - Paranigral nucleus"
-    RR__MIDBRAIN_RETICULAR_NU = "RR - Midbrain reticular nucleus retrorubral area"
+    RR__MIDBRAIN_RETICULAR_NU = (
+        "RR - Midbrain reticular nucleus retrorubral area"
+    )
     MRN__MIDBRAIN_RETICULAR_N = "MRN - Midbrain reticular nucleus"
     S_CM__SUPERIOR_COLLICULUS = "SCm - Superior colliculus motor related"
     PAG__PERIAQUEDUCTAL_GRAY = "PAG - Periaqueductal gray"
@@ -2973,9 +3566,15 @@ class Burr5IntendedCcfTarget(Enum, metaclass=EnumMeta):
     PA4__PARATROCHLEAR_NUCLEU = "Pa4 - Paratrochlear nucleus"
     VTN__VENTRAL_TEGMENTAL_NU = "VTN - Ventral tegmental nucleus"
     AT__ANTERIOR_TEGMENTAL_NU = "AT - Anterior tegmental nucleus"
-    LT__LATERAL_TERMINAL_NUCL = "LT - Lateral terminal nucleus of the accessory optic tract"
-    DT__DORSAL_TERMINAL_NUCLE = "DT - Dorsal terminal nucleus of the accessory optic tract"
-    MT__MEDIAL_TERMINAL_NUCLE = "MT - Medial terminal nucleus of the accessory optic tract"
+    LT__LATERAL_TERMINAL_NUCL = (
+        "LT - Lateral terminal nucleus of the accessory optic tract"
+    )
+    DT__DORSAL_TERMINAL_NUCLE = (
+        "DT - Dorsal terminal nucleus of the accessory optic tract"
+    )
+    MT__MEDIAL_TERMINAL_NUCLE = (
+        "MT - Medial terminal nucleus of the accessory optic tract"
+    )
     S_NC__SUBSTANTIA_NIGRA_CO = "SNc - Substantia nigra compact part"
     PPN__PEDUNCULOPONTINE_NUC = "PPN - Pedunculopontine nucleus"
     IF__INTERFASCICULAR_NUCLE = "IF - Interfascicular nucleus raphe"
@@ -2984,7 +3583,9 @@ class Burr5IntendedCcfTarget(Enum, metaclass=EnumMeta):
     CLI__CENTRAL_LINEAR_NUCLE = "CLI - Central linear nucleus raphe"
     DR__DORSAL_NUCLEUS_RAPHE = "DR - Dorsal nucleus raphe"
     NLL__NUCLEUS_OF_THE_LATER = "NLL - Nucleus of the lateral lemniscus"
-    PSV__PRINCIPAL_SENSORY_NU = "PSV - Principal sensory nucleus of the trigeminal"
+    PSV__PRINCIPAL_SENSORY_NU = (
+        "PSV - Principal sensory nucleus of the trigeminal"
+    )
     PB__PARABRACHIAL_NUCLEUS = "PB - Parabrachial nucleus"
     SOC__SUPERIOR_OLIVARY_COM = "SOC - Superior olivary complex"
     B__BARRINGTON_S_NUCLEUS = "B - Barrington's nucleus"
@@ -3018,9 +3619,15 @@ class Burr5IntendedCcfTarget(Enum, metaclass=EnumMeta):
     ECU__EXTERNAL_CUNEATE_NUC = "ECU - External cuneate nucleus"
     NTB__NUCLEUS_OF_THE_TRAPE = "NTB - Nucleus of the trapezoid body"
     NTS__NUCLEUS_OF_THE_SOLIT = "NTS - Nucleus of the solitary tract"
-    SPVC__SPINAL_NUCLEUS_OF_T = "SPVC - Spinal nucleus of the trigeminal caudal part"
-    SPVI__SPINAL_NUCLEUS_OF_T = "SPVI - Spinal nucleus of the trigeminal interpolar part"
-    SPVO__SPINAL_NUCLEUS_OF_T = "SPVO - Spinal nucleus of the trigeminal oral part"
+    SPVC__SPINAL_NUCLEUS_OF_T = (
+        "SPVC - Spinal nucleus of the trigeminal caudal part"
+    )
+    SPVI__SPINAL_NUCLEUS_OF_T = (
+        "SPVI - Spinal nucleus of the trigeminal interpolar part"
+    )
+    SPVO__SPINAL_NUCLEUS_OF_T = (
+        "SPVO - Spinal nucleus of the trigeminal oral part"
+    )
     PA5__PARATRIGEMINAL_NUCLE = "Pa5 - Paratrigeminal nucleus"
     VI__ABDUCENS_NUCLEUS = "VI - Abducens nucleus"
     VII__FACIAL_MOTOR_NUCLEUS = "VII - Facial motor nucleus"
@@ -3076,16 +3683,25 @@ class Burr5IntendedCcfTarget(Enum, metaclass=EnumMeta):
 
 class Burr6IntendedCcfTarget(Enum, metaclass=EnumMeta):
     """Enum class for Burr 6 Intended CCF Target."""
+
     FRP__FRONTAL_POLE_CEREBRA = "FRP - Frontal pole cerebral cortex"
     M_OP__PRIMARY_MOTOR_AREA = "MOp - Primary motor area"
     M_OS__SECONDARY_MOTOR_ARE = "MOs - Secondary motor area"
     S_SP_N__PRIMARY_SOMATOSEN = "SSp-n - Primary somatosensory area nose"
-    S_SP_BFD__PRIMARY_SOMATOS = "SSp-bfd - Primary somatosensory area barrel field"
-    S_SP_LL__PRIMARY_SOMATOSE = "SSp-ll - Primary somatosensory area lower limb"
+    S_SP_BFD__PRIMARY_SOMATOS = (
+        "SSp-bfd - Primary somatosensory area barrel field"
+    )
+    S_SP_LL__PRIMARY_SOMATOSE = (
+        "SSp-ll - Primary somatosensory area lower limb"
+    )
     S_SP_M__PRIMARY_SOMATOSEN = "SSp-m - Primary somatosensory area mouth"
-    S_SP_UL__PRIMARY_SOMATOSE = "SSp-ul - Primary somatosensory area upper limb"
+    S_SP_UL__PRIMARY_SOMATOSE = (
+        "SSp-ul - Primary somatosensory area upper limb"
+    )
     S_SP_TR__PRIMARY_SOMATOSE = "SSp-tr - Primary somatosensory area trunk"
-    S_SP_UN__PRIMARY_SOMATOSE = "SSp-un - Primary somatosensory area unassigned"
+    S_SP_UN__PRIMARY_SOMATOSE = (
+        "SSp-un - Primary somatosensory area unassigned"
+    )
     S_SS__SUPPLEMENTAL_SOMATO = "SSs - Supplemental somatosensory area"
     GU__GUSTATORY_AREAS = "GU - Gustatory areas"
     VISC__VISCERAL_AREA = "VISC - Visceral area"
@@ -3112,7 +3728,9 @@ class Burr6IntendedCcfTarget(Enum, metaclass=EnumMeta):
     A_ID__AGRANULAR_INSULAR_A = "AId - Agranular insular area dorsal part"
     A_IP__AGRANULAR_INSULAR_A = "AIp - Agranular insular area posterior part"
     A_IV__AGRANULAR_INSULAR_A = "AIv - Agranular insular area ventral part"
-    RS_PAGL__RETROSPLENIAL_AR = "RSPagl - Retrosplenial area lateral agranular part"
+    RS_PAGL__RETROSPLENIAL_AR = (
+        "RSPagl - Retrosplenial area lateral agranular part"
+    )
     RS_PD__RETROSPLENIAL_AREA = "RSPd - Retrosplenial area dorsal part"
     RS_PV__RETROSPLENIAL_AREA = "RSPv - Retrosplenial area ventral part"
     VI_SA__ANTERIOR_AREA = "VISa - Anterior area"
@@ -3139,7 +3757,9 @@ class Burr6IntendedCcfTarget(Enum, metaclass=EnumMeta):
     FC__FASCIOLA_CINEREA = "FC - Fasciola cinerea"
     IG__INDUSEUM_GRISEUM = "IG - Induseum griseum"
     EN_TL__ENTORHINAL_AREA_LA = "ENTl - Entorhinal area lateral part"
-    EN_TM__ENTORHINAL_AREA_ME = "ENTm - Entorhinal area medial part dorsal zone"
+    EN_TM__ENTORHINAL_AREA_ME = (
+        "ENTm - Entorhinal area medial part dorsal zone"
+    )
     PAR__PARASUBICULUM = "PAR - Parasubiculum"
     POST__POSTSUBICULUM = "POST - Postsubiculum"
     PRE__PRESUBICULUM = "PRE - Presubiculum"
@@ -3158,13 +3778,19 @@ class Burr6IntendedCcfTarget(Enum, metaclass=EnumMeta):
     ACB__NUCLEUS_ACCUMBENS = "ACB - Nucleus accumbens"
     FS__FUNDUS_OF_STRIATUM = "FS - Fundus of striatum"
     OT__OLFACTORY_TUBERCLE = "OT - Olfactory tubercle"
-    L_SC__LATERAL_SEPTAL_NUCL = "LSc - Lateral septal nucleus caudal (caudodorsal) part"
-    L_SR__LATERAL_SEPTAL_NUCL = "LSr - Lateral septal nucleus rostral (rostroventral) part"
+    L_SC__LATERAL_SEPTAL_NUCL = (
+        "LSc - Lateral septal nucleus caudal (caudodorsal) part"
+    )
+    L_SR__LATERAL_SEPTAL_NUCL = (
+        "LSr - Lateral septal nucleus rostral (rostroventral) part"
+    )
     L_SV__LATERAL_SEPTAL_NUCL = "LSv - Lateral septal nucleus ventral part"
     SF__SEPTOFIMBRIAL_NUCLEUS = "SF - Septofimbrial nucleus"
     SH__SEPTOHIPPOCAMPAL_NUCL = "SH - Septohippocampal nucleus"
     AAA__ANTERIOR_AMYGDALAR_A = "AAA - Anterior amygdalar area"
-    BA__BED_NUCLEUS_OF_THE_AC = "BA - Bed nucleus of the accessory olfactory tract"
+    BA__BED_NUCLEUS_OF_THE_AC = (
+        "BA - Bed nucleus of the accessory olfactory tract"
+    )
     CEA__CENTRAL_AMYGDALAR_NU = "CEA - Central amygdalar nucleus"
     IA__INTERCALATED_AMYGDALA = "IA - Intercalated amygdalar nucleus"
     MEA__MEDIAL_AMYGDALAR_NUC = "MEA - Medial amygdalar nucleus"
@@ -3176,30 +3802,48 @@ class Burr6IntendedCcfTarget(Enum, metaclass=EnumMeta):
     NDB__DIAGONAL_BAND_NUCLEU = "NDB - Diagonal band nucleus"
     TRS__TRIANGULAR_NUCLEUS_O = "TRS - Triangular nucleus of septum"
     BST__BED_NUCLEI_OF_THE_ST = "BST - Bed nuclei of the stria terminalis"
-    VAL__VENTRAL_ANTERIOR_LAT = "VAL - Ventral anterior-lateral complex of the thalamus"
+    VAL__VENTRAL_ANTERIOR_LAT = (
+        "VAL - Ventral anterior-lateral complex of the thalamus"
+    )
     VM__VENTRAL_MEDIAL_NUCLEU = "VM - Ventral medial nucleus of the thalamus"
-    VPL__VENTRAL_POSTEROLATER = "VPL - Ventral posterolateral nucleus of the thalamus"
+    VPL__VENTRAL_POSTEROLATER = (
+        "VPL - Ventral posterolateral nucleus of the thalamus"
+    )
     VP_LPC__VENTRAL_POSTEROLA = "VPLpc - Ventral posterolateral nucleus of the thalamus parvicellular part"
-    VPM__VENTRAL_POSTEROMEDIA = "VPM - Ventral posteromedial nucleus of the thalamus"
+    VPM__VENTRAL_POSTEROMEDIA = (
+        "VPM - Ventral posteromedial nucleus of the thalamus"
+    )
     VP_MPC__VENTRAL_POSTEROME = "VPMpc - Ventral posteromedial nucleus of the thalamus parvicellular part"
     PO_T__POSTERIOR_TRIANGULA = "PoT - Posterior triangular thalamic nucleus"
     SPF__SUBPARAFASCICULAR_NU = "SPF - Subparafascicular nucleus"
     SPA__SUBPARAFASCICULAR_AR = "SPA - Subparafascicular area"
     PP__PERIPEDUNCULAR_NUCLEU = "PP - Peripeduncular nucleus"
     MG__MEDIAL_GENICULATE_COM = "MG - Medial geniculate complex"
-    L_GD__DORSAL_PART_OF_THE = "LGd - Dorsal part of the lateral geniculate complex"
-    LP__LATERAL_POSTERIOR_NUC = "LP - Lateral posterior nucleus of the thalamus"
+    L_GD__DORSAL_PART_OF_THE = (
+        "LGd - Dorsal part of the lateral geniculate complex"
+    )
+    LP__LATERAL_POSTERIOR_NUC = (
+        "LP - Lateral posterior nucleus of the thalamus"
+    )
     PO__POSTERIOR_COMPLEX_OF = "PO - Posterior complex of the thalamus"
-    POL__POSTERIOR_LIMITING_N = "POL - Posterior limiting nucleus of the thalamus"
+    POL__POSTERIOR_LIMITING_N = (
+        "POL - Posterior limiting nucleus of the thalamus"
+    )
     SGN__SUPRAGENICULATE_NUCL = "SGN - Suprageniculate nucleus"
     ETH__ETHMOID_NUCLEUS_OF_T = "Eth - Ethmoid nucleus of the thalamus"
     AV__ANTEROVENTRAL_NUCLEUS = "AV - Anteroventral nucleus of thalamus"
     AM__ANTEROMEDIAL_NUCLEUS = "AM - Anteromedial nucleus"
     AD__ANTERODORSAL_NUCLEUS = "AD - Anterodorsal nucleus"
-    IAM__INTERANTEROMEDIAL_NU = "IAM - Interanteromedial nucleus of the thalamus"
-    IAD__INTERANTERODORSAL_NU = "IAD - Interanterodorsal nucleus of the thalamus"
+    IAM__INTERANTEROMEDIAL_NU = (
+        "IAM - Interanteromedial nucleus of the thalamus"
+    )
+    IAD__INTERANTERODORSAL_NU = (
+        "IAD - Interanterodorsal nucleus of the thalamus"
+    )
     LD__LATERAL_DORSAL_NUCLEU = "LD - Lateral dorsal nucleus of thalamus"
-    IMD__INTERMEDIODORSAL_NUC = "IMD - Intermediodorsal nucleus of the thalamus"
+    IMD__INTERMEDIODORSAL_NUC = (
+        "IMD - Intermediodorsal nucleus of the thalamus"
+    )
     MD__MEDIODORSAL_NUCLEUS_O = "MD - Mediodorsal nucleus of thalamus"
     SMT__SUBMEDIAL_NUCLEUS_OF = "SMT - Submedial nucleus of the thalamus"
     PR__PERIREUNENSIS_NUCLEUS = "PR - Perireunensis nucleus"
@@ -3214,16 +3858,24 @@ class Burr6IntendedCcfTarget(Enum, metaclass=EnumMeta):
     PF__PARAFASCICULAR_NUCLEU = "PF - Parafascicular nucleus"
     PIL__POSTERIOR_INTRALAMIN = "PIL - Posterior intralaminar thalamic nucleus"
     RT__RETICULAR_NUCLEUS_OF = "RT - Reticular nucleus of the thalamus"
-    IGL__INTERGENICULATE_LEAF = "IGL - Intergeniculate leaflet of the lateral geniculate complex"
+    IGL__INTERGENICULATE_LEAF = (
+        "IGL - Intergeniculate leaflet of the lateral geniculate complex"
+    )
     INT_G__INTERMEDIATE_GENIC = "IntG - Intermediate geniculate nucleus"
-    L_GV__VENTRAL_PART_OF_THE = "LGv - Ventral part of the lateral geniculate complex"
+    L_GV__VENTRAL_PART_OF_THE = (
+        "LGv - Ventral part of the lateral geniculate complex"
+    )
     SUB_G__SUBGENICULATE_NUCL = "SubG - Subgeniculate nucleus"
     MH__MEDIAL_HABENULA = "MH - Medial habenula"
     LH__LATERAL_HABENULA = "LH - Lateral habenula"
     SO__SUPRAOPTIC_NUCLEUS = "SO - Supraoptic nucleus"
     PVH__PARAVENTRICULAR_HYPO = "PVH - Paraventricular hypothalamic nucleus"
-    P_VA__PERIVENTRICULAR_HYP = "PVa - Periventricular hypothalamic nucleus anterior part"
-    P_VI__PERIVENTRICULAR_HYP = "PVi - Periventricular hypothalamic nucleus intermediate part"
+    P_VA__PERIVENTRICULAR_HYP = (
+        "PVa - Periventricular hypothalamic nucleus anterior part"
+    )
+    P_VI__PERIVENTRICULAR_HYP = (
+        "PVi - Periventricular hypothalamic nucleus intermediate part"
+    )
     ARH__ARCUATE_HYPOTHALAMIC = "ARH - Arcuate hypothalamic nucleus"
     ADP__ANTERODORSAL_PREOPTI = "ADP - Anterodorsal preoptic nucleus"
     AVP__ANTEROVENTRAL_PREOPT = "AVP - Anteroventral preoptic nucleus"
@@ -3232,8 +3884,12 @@ class Burr6IntendedCcfTarget(Enum, metaclass=EnumMeta):
     MEPO__MEDIAN_PREOPTIC_NUC = "MEPO - Median preoptic nucleus"
     MPO__MEDIAL_PREOPTIC_AREA = "MPO - Medial preoptic area"
     PS__PARASTRIAL_NUCLEUS = "PS - Parastrial nucleus"
-    P_VP__PERIVENTRICULAR_HYP = "PVp - Periventricular hypothalamic nucleus posterior part"
-    P_VPO__PERIVENTRICULAR_HY = "PVpo - Periventricular hypothalamic nucleus preoptic part"
+    P_VP__PERIVENTRICULAR_HYP = (
+        "PVp - Periventricular hypothalamic nucleus posterior part"
+    )
+    P_VPO__PERIVENTRICULAR_HY = (
+        "PVpo - Periventricular hypothalamic nucleus preoptic part"
+    )
     SBPV__SUBPARAVENTRICULAR = "SBPV - Subparaventricular zone"
     SCH__SUPRACHIASMATIC_NUCL = "SCH - Suprachiasmatic nucleus"
     SFO__SUBFORNICAL_ORGAN = "SFO - Subfornical organ"
@@ -3247,7 +3903,9 @@ class Burr6IntendedCcfTarget(Enum, metaclass=EnumMeta):
     MPN__MEDIAL_PREOPTIC_NUCL = "MPN - Medial preoptic nucleus"
     P_MD__DORSAL_PREMAMMILLAR = "PMd - Dorsal premammillary nucleus"
     P_MV__VENTRAL_PREMAMMILLA = "PMv - Ventral premammillary nucleus"
-    PV_HD__PARAVENTRICULAR_HY = "PVHd - Paraventricular hypothalamic nucleus descending division"
+    PV_HD__PARAVENTRICULAR_HY = (
+        "PVHd - Paraventricular hypothalamic nucleus descending division"
+    )
     VMH__VENTROMEDIAL_HYPOTHA = "VMH - Ventromedial hypothalamic nucleus"
     PH__POSTERIOR_HYPOTHALAMI = "PH - Posterior hypothalamic nucleus"
     LHA__LATERAL_HYPOTHALAMIC = "LHA - Lateral hypothalamic area"
@@ -3260,13 +3918,17 @@ class Burr6IntendedCcfTarget(Enum, metaclass=EnumMeta):
     ZI__ZONA_INCERTA = "ZI - Zona incerta"
     S_CS__SUPERIOR_COLLICULUS = "SCs - Superior colliculus sensory related"
     IC__INFERIOR_COLLICULUS = "IC - Inferior colliculus"
-    NB__NUCLEUS_OF_THE_BRACHI = "NB - Nucleus of the brachium of the inferior colliculus"
+    NB__NUCLEUS_OF_THE_BRACHI = (
+        "NB - Nucleus of the brachium of the inferior colliculus"
+    )
     SAG__NUCLEUS_SAGULUM = "SAG - Nucleus sagulum"
     PBG__PARABIGEMINAL_NUCLEU = "PBG - Parabigeminal nucleus"
     S_NR__SUBSTANTIA_NIGRA_RE = "SNr - Substantia nigra reticular part"
     VTA__VENTRAL_TEGMENTAL_AR = "VTA - Ventral tegmental area"
     PN__PARANIGRAL_NUCLEUS = "PN - Paranigral nucleus"
-    RR__MIDBRAIN_RETICULAR_NU = "RR - Midbrain reticular nucleus retrorubral area"
+    RR__MIDBRAIN_RETICULAR_NU = (
+        "RR - Midbrain reticular nucleus retrorubral area"
+    )
     MRN__MIDBRAIN_RETICULAR_N = "MRN - Midbrain reticular nucleus"
     S_CM__SUPERIOR_COLLICULUS = "SCm - Superior colliculus motor related"
     PAG__PERIAQUEDUCTAL_GRAY = "PAG - Periaqueductal gray"
@@ -3286,9 +3948,15 @@ class Burr6IntendedCcfTarget(Enum, metaclass=EnumMeta):
     PA4__PARATROCHLEAR_NUCLEU = "Pa4 - Paratrochlear nucleus"
     VTN__VENTRAL_TEGMENTAL_NU = "VTN - Ventral tegmental nucleus"
     AT__ANTERIOR_TEGMENTAL_NU = "AT - Anterior tegmental nucleus"
-    LT__LATERAL_TERMINAL_NUCL = "LT - Lateral terminal nucleus of the accessory optic tract"
-    DT__DORSAL_TERMINAL_NUCLE = "DT - Dorsal terminal nucleus of the accessory optic tract"
-    MT__MEDIAL_TERMINAL_NUCLE = "MT - Medial terminal nucleus of the accessory optic tract"
+    LT__LATERAL_TERMINAL_NUCL = (
+        "LT - Lateral terminal nucleus of the accessory optic tract"
+    )
+    DT__DORSAL_TERMINAL_NUCLE = (
+        "DT - Dorsal terminal nucleus of the accessory optic tract"
+    )
+    MT__MEDIAL_TERMINAL_NUCLE = (
+        "MT - Medial terminal nucleus of the accessory optic tract"
+    )
     S_NC__SUBSTANTIA_NIGRA_CO = "SNc - Substantia nigra compact part"
     PPN__PEDUNCULOPONTINE_NUC = "PPN - Pedunculopontine nucleus"
     IF__INTERFASCICULAR_NUCLE = "IF - Interfascicular nucleus raphe"
@@ -3297,7 +3965,9 @@ class Burr6IntendedCcfTarget(Enum, metaclass=EnumMeta):
     CLI__CENTRAL_LINEAR_NUCLE = "CLI - Central linear nucleus raphe"
     DR__DORSAL_NUCLEUS_RAPHE = "DR - Dorsal nucleus raphe"
     NLL__NUCLEUS_OF_THE_LATER = "NLL - Nucleus of the lateral lemniscus"
-    PSV__PRINCIPAL_SENSORY_NU = "PSV - Principal sensory nucleus of the trigeminal"
+    PSV__PRINCIPAL_SENSORY_NU = (
+        "PSV - Principal sensory nucleus of the trigeminal"
+    )
     PB__PARABRACHIAL_NUCLEUS = "PB - Parabrachial nucleus"
     SOC__SUPERIOR_OLIVARY_COM = "SOC - Superior olivary complex"
     B__BARRINGTON_S_NUCLEUS = "B - Barrington's nucleus"
@@ -3331,9 +4001,15 @@ class Burr6IntendedCcfTarget(Enum, metaclass=EnumMeta):
     ECU__EXTERNAL_CUNEATE_NUC = "ECU - External cuneate nucleus"
     NTB__NUCLEUS_OF_THE_TRAPE = "NTB - Nucleus of the trapezoid body"
     NTS__NUCLEUS_OF_THE_SOLIT = "NTS - Nucleus of the solitary tract"
-    SPVC__SPINAL_NUCLEUS_OF_T = "SPVC - Spinal nucleus of the trigeminal caudal part"
-    SPVI__SPINAL_NUCLEUS_OF_T = "SPVI - Spinal nucleus of the trigeminal interpolar part"
-    SPVO__SPINAL_NUCLEUS_OF_T = "SPVO - Spinal nucleus of the trigeminal oral part"
+    SPVC__SPINAL_NUCLEUS_OF_T = (
+        "SPVC - Spinal nucleus of the trigeminal caudal part"
+    )
+    SPVI__SPINAL_NUCLEUS_OF_T = (
+        "SPVI - Spinal nucleus of the trigeminal interpolar part"
+    )
+    SPVO__SPINAL_NUCLEUS_OF_T = (
+        "SPVO - Spinal nucleus of the trigeminal oral part"
+    )
     PA5__PARATRIGEMINAL_NUCLE = "Pa5 - Paratrigeminal nucleus"
     VI__ABDUCENS_NUCLEUS = "VI - Abducens nucleus"
     VII__FACIAL_MOTOR_NUCLEUS = "VII - Facial motor nucleus"
@@ -3389,6 +4065,7 @@ class Burr6IntendedCcfTarget(Enum, metaclass=EnumMeta):
 
 class Burr1IntendedMeasurementRed(Enum, metaclass=EnumMeta):
     """Enum class for Burr 1 intended measurement red."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3404,6 +4081,7 @@ class Burr1IntendedMeasurementRed(Enum, metaclass=EnumMeta):
 
 class Burr2IntendedMeasurementRed(Enum, metaclass=EnumMeta):
     """Enum class for Burr 2 intended measurement red."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3419,6 +4097,7 @@ class Burr2IntendedMeasurementRed(Enum, metaclass=EnumMeta):
 
 class Burr3IntendedMeasurementRed(Enum, metaclass=EnumMeta):
     """Enum class for Burr 3 intended measurement red."""
+
     ENTER__CHOICE_1 = "Enter Choice #1"
     ENTER__CHOICE_2 = "Enter Choice #2"
     ENTER__CHOICE_3 = "Enter Choice #3"
@@ -3426,6 +4105,7 @@ class Burr3IntendedMeasurementRed(Enum, metaclass=EnumMeta):
 
 class Burr4IntendedMeasurementRed(Enum, metaclass=EnumMeta):
     """Enum class for Burr 4 intended measurement red."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3441,6 +4121,7 @@ class Burr4IntendedMeasurementRed(Enum, metaclass=EnumMeta):
 
 class Burr5IntendedMeasurementRed(Enum, metaclass=EnumMeta):
     """Enum class for Burr 5 intended measurement red."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3456,6 +4137,7 @@ class Burr5IntendedMeasurementRed(Enum, metaclass=EnumMeta):
 
 class Burr6IntendedMeasurementRed(Enum, metaclass=EnumMeta):
     """Enum class for Burr 6 intended measurement red."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3471,6 +4153,7 @@ class Burr6IntendedMeasurementRed(Enum, metaclass=EnumMeta):
 
 class Burr1IntendedMeasurementGreen(Enum, metaclass=EnumMeta):
     """Enum class for Burr 1 intended measurement green."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3486,6 +4169,7 @@ class Burr1IntendedMeasurementGreen(Enum, metaclass=EnumMeta):
 
 class Burr2IntendedMeasurementGreen(Enum, metaclass=EnumMeta):
     """Enum class for Burr 2 intended measurement green."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3501,6 +4185,7 @@ class Burr2IntendedMeasurementGreen(Enum, metaclass=EnumMeta):
 
 class Burr3IntendedMeasurementGreen(Enum, metaclass=EnumMeta):
     """Enum class for Burr 3 intended measurement green."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3516,6 +4201,7 @@ class Burr3IntendedMeasurementGreen(Enum, metaclass=EnumMeta):
 
 class Burr4IntendedMeasurementGreen(Enum, metaclass=EnumMeta):
     """Enum class for Burr 4 intended measurement green."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3531,6 +4217,7 @@ class Burr4IntendedMeasurementGreen(Enum, metaclass=EnumMeta):
 
 class Burr5IntendedMeasurementGreen(Enum, metaclass=EnumMeta):
     """Enum class for Burr 5 intended measurement green."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3546,6 +4233,7 @@ class Burr5IntendedMeasurementGreen(Enum, metaclass=EnumMeta):
 
 class Burr6IntendedMeasurementGreen(Enum, metaclass=EnumMeta):
     """Enum class for Burr 6 intended measurement green."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3561,6 +4249,7 @@ class Burr6IntendedMeasurementGreen(Enum, metaclass=EnumMeta):
 
 class Burr1IntendedMeasurementBlue(Enum, metaclass=EnumMeta):
     """Enum class for Burr 1 intended measurement blue."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3576,6 +4265,7 @@ class Burr1IntendedMeasurementBlue(Enum, metaclass=EnumMeta):
 
 class Burr2IntendedMeasurementBlue(Enum, metaclass=EnumMeta):
     """Enum class for Burr 2 intended measurement blue."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3591,6 +4281,7 @@ class Burr2IntendedMeasurementBlue(Enum, metaclass=EnumMeta):
 
 class Burr3IntendedMeasurementBlue(Enum, metaclass=EnumMeta):
     """Enum class for Burr 3 intended measurement blue."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3606,6 +4297,7 @@ class Burr3IntendedMeasurementBlue(Enum, metaclass=EnumMeta):
 
 class Burr4IntendedMeasurementBlue(Enum, metaclass=EnumMeta):
     """Enum class for Burr 4 intended measurement blue."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3621,6 +4313,7 @@ class Burr4IntendedMeasurementBlue(Enum, metaclass=EnumMeta):
 
 class Burr5IntendedMeasurementBlue(Enum, metaclass=EnumMeta):
     """Enum class for Burr 5 intended measurement blue."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3636,6 +4329,7 @@ class Burr5IntendedMeasurementBlue(Enum, metaclass=EnumMeta):
 
 class Burr6IntendedMeasurementBlue(Enum, metaclass=EnumMeta):
     """Enum class for Burr 6 intended measurement blue."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3651,6 +4345,7 @@ class Burr6IntendedMeasurementBlue(Enum, metaclass=EnumMeta):
 
 class Burr1IntendedMeasurementIsosbestic(Enum, metaclass=EnumMeta):
     """Enum class for Burr 1 intended measurement isosbestic."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3666,6 +4361,7 @@ class Burr1IntendedMeasurementIsosbestic(Enum, metaclass=EnumMeta):
 
 class Burr2IntendedMeasurementIsosbestic(Enum, metaclass=EnumMeta):
     """Enum class for Burr 2 intended measurement isosbestic."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3681,6 +4377,7 @@ class Burr2IntendedMeasurementIsosbestic(Enum, metaclass=EnumMeta):
 
 class Burr3IntendedMeasurementIsosbestic(Enum, metaclass=EnumMeta):
     """Enum class for Burr 3 intended measurement isosbestic."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3696,6 +4393,7 @@ class Burr3IntendedMeasurementIsosbestic(Enum, metaclass=EnumMeta):
 
 class Burr4IntendedMeasurementIsosbestic(Enum, metaclass=EnumMeta):
     """Enum class for Burr 4 intended measurement isosbestic."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3711,6 +4409,7 @@ class Burr4IntendedMeasurementIsosbestic(Enum, metaclass=EnumMeta):
 
 class Burr5IntendedMeasurementIsosbestic(Enum, metaclass=EnumMeta):
     """Enum class for Burr 5 intended measurement isosbestic."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3726,6 +4425,7 @@ class Burr5IntendedMeasurementIsosbestic(Enum, metaclass=EnumMeta):
 
 class Burr6IntendedMeasurementIsosbestic(Enum, metaclass=EnumMeta):
     """Enum class for Burr 6 intended measurement isosbestic."""
+
     N_A = "N/A"
     DOPAMINE = "dopamine"
     SEROTONIN = "serotonin"
@@ -3741,12 +4441,14 @@ class Burr6IntendedMeasurementIsosbestic(Enum, metaclass=EnumMeta):
 
 class Thermistor(Enum, metaclass=EnumMeta):
     """Enum class for Thermistor."""
+
     NO = "No"
     YES = "Yes"
 
 
 class Burr1SpinalLocation(Enum, metaclass=EnumMeta):
     """Enum class for Burr 1 Spinal Location."""
+
     SELECT = "Select..."
     BETWEEN_C1_C2 = "Between C1-C2"
     BETWEEN_C2_C3 = "Between C2-C3"
@@ -3760,6 +4462,7 @@ class Burr1SpinalLocation(Enum, metaclass=EnumMeta):
 
 class Burr2SpinalLocation(Enum, metaclass=EnumMeta):
     """Enum class for Burr 2 Spinal Location."""
+
     SELECT = "Select..."
     BETWEEN_C1_C2 = "Between C1-C2"
     BETWEEN_C2_C3 = "Between C2-C3"
@@ -3773,34 +4476,45 @@ class Burr2SpinalLocation(Enum, metaclass=EnumMeta):
 
 class BlackCement(Enum, metaclass=EnumMeta):
     """Enum class for Black Cement."""
+
     YES = "Yes"
     NO = "No"
 
 
 class AindProjectName(Enum, metaclass=EnumMeta):
     """Enum class for AIND Project Name."""
+
     BRAIN__WIDE__CIRCUIT__DYN = "Brain Wide Circuit Dynamics"
     CELL__TYPE__LOOKUP__TABLE = "Cell Type Lookup Table"
     COGNITIVE_FLEXIBILITY_IN = "Cognitive flexibility in patch foraging"
-    CREDIT_ASSIGNMENT_DURING = "Credit assignment during learning (Brain Computer Interface)"
+    CREDIT_ASSIGNMENT_DURING = (
+        "Credit assignment during learning (Brain Computer Interface)"
+    )
     DYNAMIC__ROUTING = "Dynamic Routing"
     FORCE__FORGING = "Force Forging"
     GENETIC__PERTURBATION__PR = "Genetic Perturbation Project (GPP)"
     INDICATOR__TESTING = "Indicator Testing"
-    INFORMATION_SEEKING_IN_PA = "Information seeking in partially observable environments"
+    INFORMATION_SEEKING_IN_PA = (
+        "Information seeking in partially observable environments"
+    )
     MEDULLA = "Medulla"
     MULTIPLEXED_NM = "Multiplexed NM"
-    NEUROMODULATOR_CIRCUIT_DY = "Neuromodulator circuit dynamics during foraging"
+    NEUROMODULATOR_CIRCUIT_DY = (
+        "Neuromodulator circuit dynamics during foraging"
+    )
     OPEN_SCOPE = "OpenScope"
     OPHYS_M_FISH__CELL_TYPES = 'Ophys mFISH* "Cell types and learning"'
     PLACE = "PLACE"
-    SINGLE__NEURON__COMPUTATI = "Single-Neuron Computations within Brain-Wide Circuits (SCBC)*"
+    SINGLE__NEURON__COMPUTATI = (
+        "Single-Neuron Computations within Brain-Wide Circuits (SCBC)*"
+    )
     THALAMUS = "Thalamus"
     THALAMUS_AIND__SCIENTIFIC = "Thalamus - AIND Scientific Activites"
 
 
 class CareModuele(Enum, metaclass=EnumMeta):
     """Enum class for Care Moduele."""
+
     SELECT = "Select..."
     CM_S_01_A_B = "CM S 01 A/B"
     CM_S_01_C_D = "CM S 01 C/D"
@@ -3821,7 +4535,6 @@ class Contusion(str, Enum):
     SEVERE = "Severe"
 
 
-
 class Durotomy(str, Enum):
     """Enum class for Durotomy"""
 
@@ -3834,7 +4547,6 @@ class Durotomy(str, Enum):
     UNINTENTIONAL = "Unintentional"
 
 
-
 class Hematoma(str, Enum):
     """Enum class for Hematoma"""
 
@@ -3844,7 +4556,6 @@ class Hematoma(str, Enum):
     NONE = "None"
     SELECT = "Select..."
     SEVERE = "Severe"
-
 
 
 class WindowPlacment(str, Enum):
@@ -3859,316 +4570,1512 @@ class WindowPlacment(str, Enum):
     POSTERIOR = "Posterior"
     SELECT = "Select..."
 
+
 class NSBList(BaseModel, extra="allow"):
     """Fields in SharePoint list."""
 
-    age_x0020_at_x0020__injec: Optional[str] = Field(default=None, alias='Age_x0020_at_x0020_Injection', title='Age at Injection 1')
-    aind_x0020__project_x0020: Annotated[AindProjectName, WrapValidator(optional_enum)] = Field(default=None, alias='AIND_x0020_Project_x0020_Name', title='AIND Project Name')
-    ap2nd_inj: Optional[str] = Field(default=None, alias='AP2ndInj', title='Burr 2 A/P')
-    app_author: Optional[str] = Field(default=None, alias='AppAuthor', title='App Created By')
-    app_editor: Optional[str] = Field(default=None, alias='AppEditor', title='App Modified By')
-    attachments: Optional[str] = Field(default=None, alias='Attachments', title='Attachments')
-    author: Optional[str] = Field(default=None, alias='Author', title='Created By')
-    behavior: Annotated[Behavior, WrapValidator(optional_enum)] = Field(default='No', alias='Behavior', title='Behavior')
-    behavior_x0020__autotrain: Annotated[BehaviorAutotrainCurriculum, WrapValidator(optional_enum)] = Field(default=None, alias='Behavior_x0020_Autotrain_x0020_C', title='Behavior Autotrain Curriculum')
-    behavior_x0020__complete: Optional[str] = Field(default=None, alias='Behavior_x0020_Complete', title='Behavior Complete')
-    behavior_x0020__curriculu: Annotated[BehaviorCurriculumVersion, WrapValidator(optional_enum)] = Field(default=None, alias='Behavior_x0020_Curriculum_x0020_', title='Behavior Curriculum Version')
-    behavior_x0020__destinati: Annotated[BehaviorDestination, WrapValidator(optional_enum)] = Field(default=None, alias='behavior_x0020_Destination', title='Behavior Destination')
-    behavior_x0020__fiber_x00: Annotated[BehaviorFiberPhotometry, WrapValidator(optional_enum)] = Field(default=None, alias='Behavior_x0020_Fiber_x0020_Photo', title='Behavior Fiber Photometry')
-    behavior_x0020__first_x00: Annotated[BehaviorFirstVideoRecordingStage, WrapValidator(optional_enum)] = Field(default=None, alias='Behavior_x0020_First_x0020_Video', title='Behavior First Video Recording Stage')
-    behavior_x0020__first_x00_001: Annotated[BehaviorFirstFipStage, WrapValidator(optional_enum)] = Field(default=None, alias='Behavior_x0020_First_x0020_FIP_x', title='Behavior First FIP Stage')
-    behavior_x0020__platform: Annotated[BehaviorPlatform, WrapValidator(optional_enum)] = Field(default=None, alias='Behavior_x0020_Platform', title='Behavior Platform')
-    behavior_x0020__type: Annotated[BehaviorType, WrapValidator(optional_enum)] = Field(default='Select...', alias='Behavior_x0020_Type', title='Behavior Type')
-    behavior_x0020_fip_x0020: Annotated[BehaviorFipMode, WrapValidator(optional_enum)] = Field(default=None, alias='Behavior_x0020_FIP_x0020_Mode', title='Behavior FIP Mode')
-    black_x0020__cement: Annotated[BlackCement, WrapValidator(optional_enum)] = Field(default='No', alias='Black_x0020_Cement', title='Black Cement')
-    breg2_lamb: Optional[str] = Field(default=None, alias='Breg2Lamb', title='Bregma to Lambda')
-    burr1_x0020__injection_x0: Annotated[Burr1InjectionDevice, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr1_x0020_Injection_x0020_Devi', title='Burr1 Injection Device')
-    burr1_x0020__perform_x002: Annotated[Burr1PerformDuring, WrapValidator(optional_enum)] = Field(default='Initial Surgery', alias='Burr1_x0020_Perform_x0020_During', title='Burr1 Perform During')
-    burr1_x0020__virus_x0020: Annotated[Burr1VirusBiosafteyLevelBsl, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr1_x0020_Virus_x0020_Biosafte', title='Burr1 Virus Biosaftey Level (BSL)', description='BSL & Material injected. If other PI must provide material in requestor comments.')
-    burr2_x0020__injection_x0: Annotated[Burr2InjectionDevice, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr2_x0020_Injection_x0020_Devi', title='Burr2 Injection Device')
-    burr2_x0020__perform_x002: Annotated[Burr2PerformDuring, WrapValidator(optional_enum)] = Field(default='Initial Surgery', alias='Burr2_x0020_Perform_x0020_During', title='Burr2 Perform During')
-    burr2_x0020__status: Annotated[Burr2Status, WrapValidator(optional_enum)] = Field(default=None, alias='Burr2_x0020_Status', title='Burr2 Status')
-    burr2_x0020__virus_x0020: Annotated[Burr2VirusBiosafteyLevelBsl, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr2_x0020_Virus_x0020_Biosafte', title='Burr2 Virus Biosaftey Level (BSL)', description='BSL & Material injected. If other PI must provide material in requestor comments.')
-    burr3_x0020__injection_x0: Annotated[Burr3InjectionDevice, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr3_x0020_Injection_x0020_Devi', title='Burr3 Injection Device')
-    burr3_x0020__perform_x002: Annotated[Burr3PerformDuring, WrapValidator(optional_enum)] = Field(default='Initial Surgery', alias='Burr3_x0020_Perform_x0020_During', title='Burr3 Perform During')
-    burr3_x0020__status: Annotated[Burr3Status, WrapValidator(optional_enum)] = Field(default=None, alias='Burr3_x0020_Status', title='Burr3 Status')
-    burr3_x0020__virus_x0020: Annotated[Burr3VirusBiosafetyLevelBsl, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr3_x0020_Virus_x0020_Biosafet', title='Burr3 Virus Biosafety Level (BSL)', description='BSL & Material injected. If other PI must provide material in requestor comments.')
-    burr3_x0020_a_x002f_p: Optional[str] = Field(default=None, alias='Burr3_x0020_A_x002f_P', title='Burr3 A/P')
-    burr3_x0020_d_x002f_v: Optional[str] = Field(default=None, alias='Burr3_x0020_D_x002f_V', title='Burr3 D/V 1')
-    burr3_x0020_m_x002f_l: Optional[str] = Field(default=None, alias='Burr3_x0020_M_x002f_L', title='Burr3 M/L')
-    burr4_x0020__injection_x0: Annotated[Burr4InjectionDevice, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr4_x0020_Injection_x0020_Devi', title='Burr4 Injection Device')
-    burr4_x0020__perform_x002: Annotated[Burr4PerformDuring, WrapValidator(optional_enum)] = Field(default='Initial Surgery', alias='Burr4_x0020_Perform_x0020_During', title='Burr4 Perform During')
-    burr4_x0020__status: Annotated[Burr4Status, WrapValidator(optional_enum)] = Field(default=None, alias='Burr4_x0020_Status', title='Burr4 Status')
-    burr4_x0020__virus_x0020: Annotated[Burr4VirusBiosafteyLevelBsl, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr4_x0020_Virus_x0020_Biosafte', title='Burr4 Virus Biosaftey Level (BSL)', description='BSL & Material injected. If other PI must provide material in requestor comments.')
-    burr4_x0020_a_x002f_p: Optional[str] = Field(default=None, alias='Burr4_x0020_A_x002f_P', title='Burr4 A/P')
-    burr4_x0020_d_x002f_v: Optional[str] = Field(default=None, alias='Burr4_x0020_D_x002f_V', title='Burr4 D/V 1')
-    burr4_x0020_m_x002f_l: Optional[str] = Field(default=None, alias='Burr4_x0020_M_x002f_L', title='Burr4 M/L')
-    burr5_x0020__injection_x0: Annotated[Burr5InjectionDevice, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr5_x0020_Injection_x0020_Devi', title='Burr5 Injection Device')
-    burr5_x0020__perform_x002: Annotated[Burr5PerformDuring, WrapValidator(optional_enum)] = Field(default='Initial Surgery', alias='Burr5_x0020_Perform_x0020_During', title='Burr5 Perform During')
-    burr5_x0020__status: Annotated[Burr5Status, WrapValidator(optional_enum)] = Field(default=None, alias='Burr5_x0020_Status', title='Burr5 Status')
-    burr5_x0020__virus_x0020: Annotated[Burr5VirusBiosafteyLevelBsl, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr5_x0020_Virus_x0020_Biosafte', title='Burr5 Virus Biosaftey Level (BSL)')
-    burr6_x0020__injection_x0: Annotated[Burr6InjectionDevice, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr6_x0020_Injection_x0020_Devi', title='Burr6 Injection Device')
-    burr6_x0020__perform_x002: Annotated[Burr6PerformDuring, WrapValidator(optional_enum)] = Field(default='Initial Surgery', alias='Burr6_x0020_Perform_x0020_During', title='Burr6 Perform During', description='')
-    burr6_x0020__status: Annotated[Burr6Status, WrapValidator(optional_enum)] = Field(default=None, alias='Burr6_x0020_Status', title='Burr6 Status')
-    burr6_x0020__virus_x0020: Annotated[Burr6VirusBiosafteyLevelBsl, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr6_x0020_Virus_x0020_Biosafte', title='Burr6 Virus Biosaftey Level (BSL)')
-    burr_x0020_1_x0020__fiber: Annotated[Burr1FiberType, WrapValidator(optional_enum)] = Field(default='Standard (provided by NSB)', alias='Burr_x0020_1_x0020_Fiber_x0020_t', title='Burr 1 Fiber type')
-    burr_x0020_1_x0020__grid: Optional[str] = Field(default=None, alias='Burr_x0020_1_x0020_Grid_x0020_Sp', title='Burr 1 Grid Spacing (um)')
-    burr_x0020_1_x0020__injec: Optional[str] = Field(default=None, alias='Burr_x0020_1_x0020_Injectable_x0', title='Burr 1 Injectable Material 1')
-    burr_x0020_1_x0020__injec_001: Optional[str] = Field(default=None, alias='Burr_x0020_1_x0020_Injectable_x00', title='Burr 1 Injectable Material 2')
-    burr_x0020_1_x0020__injec_002: Optional[str] = Field(default=None, alias='Burr_x0020_1_x0020_Injectable_x01', title='Burr 1 Injectable Material 3')
-    burr_x0020_1_x0020__injec_003: Optional[str] = Field(default=None, alias='Burr_x0020_1_x0020_Injectable_x02', title='Burr 1 Injectable Material 4')
-    burr_x0020_1_x0020__injec_004: Optional[str] = Field(default=None, alias='Burr_x0020_1_x0020_Injectable_x03', title='Burr 1 Injectable Material 1 Titer')
-    burr_x0020_1_x0020__injec_005: Optional[str] = Field(default=None, alias='Burr_x0020_1_x0020_Injectable_x04', title='Burr 1 Injectable Material 2 Titer')
-    burr_x0020_1_x0020__injec_006: Optional[str] = Field(default=None, alias='Burr_x0020_1_x0020_Injectable_x05', title='Burr 1 Injectable Material 3 Titer')
-    burr_x0020_1_x0020__injec_007: Optional[str] = Field(default=None, alias='Burr_x0020_1_x0020_Injectable_x06', title='Burr 1 Injectable Material 4 Titer')
-    burr_x0020_1_x0020__inten: Annotated[Burr1IntendedCcfTarget, WrapValidator(optional_enum)] = Field(default=None, alias='Burr_x0020_1_x0020_Intended_x002', title='Burr 1 Intended CCF Target', description='Intended CCF target of burr 1 coordinates')
-    burr_x0020_1_x0020__spina: Annotated[Burr1SpinalLocation, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr_x0020_1_x0020_Spinal_x0020_', title='Burr 1 Spinal Location')
-    burr_x0020_1_x0020_d_x002: Optional[str] = Field(default=None, alias='Burr_x0020_1_x0020_D_x002f_V_x00', title='Burr 1 D/V 3')
-    burr_x0020_1_x0020_dv_x00: Optional[str] = Field(default=None, alias='Burr_x0020_1_x0020_DV_x0020_2', title='Burr 1 D/V 2')
-    burr_x0020_1_x0020_intend: Annotated[Burr1IntendedMeasurementRed, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_1_x0020_intended_x0020', title='Burr 1 intended measurement red')
-    burr_x0020_1_x0020_intend_001: Annotated[Burr1IntendedMeasurementGreen, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_1_x0020_intended_x0021', title='Burr 1 intended measurement green')
-    burr_x0020_1_x0020_intend_002: Annotated[Burr1IntendedMeasurementBlue, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_1_x0020_intended_x0022', title='Burr 1 intended measurement blue')
-    burr_x0020_1_x0020_intend_003: Annotated[Burr1IntendedMeasurementIsosbestic, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_1_x0020_intended_x0023', title='Burr 1 intended measurement isosbestic')
-    burr_x0020_2_x0020__fiber: Annotated[Burr2FiberType, WrapValidator(optional_enum)] = Field(default='Standard (Provided by NSB)', alias='Burr_x0020_2_x0020_Fiber_x0020_T', title='Burr 2 Fiber Type')
-    burr_x0020_2_x0020__injec: Optional[str] = Field(default=None, alias='Burr_x0020_2_x0020_Injectable_x0', title='Burr 2 Injectable Material 1')
-    burr_x0020_2_x0020__injec_001: Optional[str] = Field(default=None, alias='Burr_x0020_2_x0020_Injectable_x00', title='Burr 2 Injectable Material 2')
-    burr_x0020_2_x0020__injec_002: Optional[str] = Field(default=None, alias='Burr_x0020_2_x0020_Injectable_x01', title='Burr 2 Injectable Material 3')
-    burr_x0020_2_x0020__injec_003: Optional[str] = Field(default=None, alias='Burr_x0020_2_x0020_Injectable_x02', title='Burr 2 Injectable Material 4')
-    burr_x0020_2_x0020__injec_004: Optional[str] = Field(default=None, alias='Burr_x0020_2_x0020_Injectable_x03', title='Burr 2 Injectable Material 1 Titer')
-    burr_x0020_2_x0020__injec_005: Optional[str] = Field(default=None, alias='Burr_x0020_2_x0020_Injectable_x04', title='Burr 2 Injectable Material 2 Titer')
-    burr_x0020_2_x0020__injec_006: Optional[str] = Field(default=None, alias='Burr_x0020_2_x0020_Injectable_x05', title='Burr 2 Injectable Material 3 Titer')
-    burr_x0020_2_x0020__injec_007: Optional[str] = Field(default=None, alias='Burr_x0020_2_x0020_Injectable_x06', title='Burr 2 Injectable Material 4 Titer')
-    burr_x0020_2_x0020__inten: Annotated[Burr2IntendedCcfTarget, WrapValidator(optional_enum)] = Field(default=None, alias='Burr_x0020_2_x0020_Intended_x002', title='Burr 2 Intended CCF Target')
-    burr_x0020_2_x0020__spina: Annotated[Burr2SpinalLocation, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr_x0020_2_x0020_Spinal_x0020_', title='Burr 2 Spinal Location')
-    burr_x0020_2_x0020_d_x002: Optional[str] = Field(default=None, alias='Burr_x0020_2_x0020_D_x002f_V_x00', title='Burr 2 D/V 2')
-    burr_x0020_2_x0020_d_x002_001: Optional[str] = Field(default=None, alias='Burr_x0020_2_x0020_D_x002f_V_x000', title='Burr 2 D/V 3')
-    burr_x0020_2_x0020_intend: Annotated[Burr2IntendedMeasurementRed, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_2_x0020_intended_x0020', title='Burr 2 intended measurement red')
-    burr_x0020_2_x0020_intend_001: Annotated[Burr2IntendedMeasurementGreen, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_2_x0020_intended_x0021', title='Burr 2 intended measurement green')
-    burr_x0020_2_x0020_intend_002: Annotated[Burr2IntendedMeasurementBlue, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_2_x0020_intended_x0022', title='Burr 2 intended measurement blue')
-    burr_x0020_2_x0020_intend_003: Annotated[Burr2IntendedMeasurementIsosbestic, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_2_x0020_intended_x0023', title='Burr 2 intended measurement isosbestic')
-    burr_x0020_3_x0020__angle: Optional[str] = Field(default=None, alias='Burr_x0020_3_x0020_Angle', title='Burr 3 Angle')
-    burr_x0020_3_x0020__fiber: Annotated[Burr3FiberType, WrapValidator(optional_enum)] = Field(default='Standard (Provided by NSB)', alias='Burr_x0020_3_x0020_Fiber_x0020_T', title='Burr 3 Fiber Type')
-    burr_x0020_3_x0020__hemis: Annotated[Burr3Hemisphere, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr_x0020_3_x0020_Hemisphere', title='Burr 3 Hemisphere')
-    burr_x0020_3_x0020__injec: Optional[str] = Field(default=None, alias='Burr_x0020_3_x0020_Injectable_x0', title='Burr 3 Injectable Material 1')
-    burr_x0020_3_x0020__injec_001: Optional[str] = Field(default=None, alias='Burr_x0020_3_x0020_Injectable_x00', title='Burr 3 Injectable Material 2')
-    burr_x0020_3_x0020__injec_002: Optional[str] = Field(default=None, alias='Burr_x0020_3_x0020_Injectable_x01', title='Burr 3 Injectable Material 3')
-    burr_x0020_3_x0020__injec_003: Optional[str] = Field(default=None, alias='Burr_x0020_3_x0020_Injectable_x02', title='Burr 3 Injectable Material 4')
-    burr_x0020_3_x0020__injec_004: Optional[str] = Field(default=None, alias='Burr_x0020_3_x0020_Injectable_x03', title='Burr 3 Injectable Material 1 Titer')
-    burr_x0020_3_x0020__injec_005: Optional[str] = Field(default=None, alias='Burr_x0020_3_x0020_Injectable_x04', title='Burr 3 Injectable Material 2 Titer')
-    burr_x0020_3_x0020__injec_006: Optional[str] = Field(default=None, alias='Burr_x0020_3_x0020_Injectable_x06', title='Burr 3 Injectable Material 3 Titer')
-    burr_x0020_3_x0020__injec_007: Optional[str] = Field(default=None, alias='Burr_x0020_3_x0020_Injectable_x05', title='Burr 3 Injectable Material 4 Titer')
-    burr_x0020_3_x0020__inten: Annotated[Burr3IntendedCcfTarget, WrapValidator(optional_enum)] = Field(default=None, alias='Burr_x0020_3_x0020_Intended_x002', title='Burr 3 Intended CCF Target')
-    burr_x0020_3_x0020_d_x002: Optional[str] = Field(default=None, alias='Burr_x0020_3_x0020_D_x002f_V_x00', title='Burr 3 D/V 2')
-    burr_x0020_3_x0020_d_x002_001: Optional[str] = Field(default=None, alias='Burr_x0020_3_x0020_D_x002f_V_x000', title='Burr 3 D/V 3')
-    burr_x0020_3_x0020_intend: Annotated[Burr3IntendedMeasurementRed, WrapValidator(optional_enum)] = Field(default='Enter Choice #1', alias='Burr_x0020_3_x0020_intended_x0020', title='Burr 3 intended measurement red')
-    burr_x0020_3_x0020_intend_001: Annotated[Burr3IntendedMeasurementGreen, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_3_x0020_intended_x0021', title='Burr 3 intended measurement green')
-    burr_x0020_3_x0020_intend_002: Annotated[Burr3IntendedMeasurementBlue, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_3_x0020_intended_x0022', title='Burr 3 intended measurement blue')
-    burr_x0020_3_x0020_intend_003: Annotated[Burr3IntendedMeasurementIsosbestic, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_3_x0020_intended_x0023', title='Burr 3 intended measurement isosbestic')
-    burr_x0020_4_x0020__angle: Optional[str] = Field(default=None, alias='Burr_x0020_4_x0020_Angle', title='Burr 4 Angle')
-    burr_x0020_4_x0020__fiber: Annotated[Burr4FiberType, WrapValidator(optional_enum)] = Field(default='Standard (Provided by NSB)', alias='Burr_x0020_4_x0020_Fiber_x0020_T', title='Burr 4 Fiber Type')
-    burr_x0020_4_x0020__hemis: Annotated[Burr4Hemisphere, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr_x0020_4_x0020_Hemisphere', title='Burr 4 Hemisphere')
-    burr_x0020_4_x0020__injec: Optional[str] = Field(default=None, alias='Burr_x0020_4_x0020_Injectable_x0', title='Burr 4 Injectable Material 1')
-    burr_x0020_4_x0020__injec_001: Optional[str] = Field(default=None, alias='Burr_x0020_4_x0020_Injectable_x00', title='Burr 4 Injectable Material 2')
-    burr_x0020_4_x0020__injec_002: Optional[str] = Field(default=None, alias='Burr_x0020_4_x0020_Injectable_x01', title='Burr 4 Injectable Material 3')
-    burr_x0020_4_x0020__injec_003: Optional[str] = Field(default=None, alias='Burr_x0020_4_x0020_Injectable_x02', title='Burr 4 Injectable Material 4')
-    burr_x0020_4_x0020__injec_004: Optional[str] = Field(default=None, alias='Burr_x0020_4_x0020_Injectable_x03', title='Burr 4 Injectable Material 1 Titer')
-    burr_x0020_4_x0020__injec_005: Optional[str] = Field(default=None, alias='Burr_x0020_4_x0020_Injectable_x04', title='Burr 4 Injectable Material 2 Titer')
-    burr_x0020_4_x0020__injec_006: Optional[str] = Field(default=None, alias='Burr_x0020_4_x0020_Injectable_x05', title='Burr 4 Injectable Material 3 Titer')
-    burr_x0020_4_x0020__injec_007: Optional[str] = Field(default=None, alias='Burr_x0020_4_x0020_Injectable_x06', title='Burr 4 Injectable Material 4 Titer')
-    burr_x0020_4_x0020__inten: Annotated[Burr4IntendedCcfTarget, WrapValidator(optional_enum)] = Field(default=None, alias='Burr_x0020_4_x0020_Intended_x002', title='Burr 4 Intended CCF Target')
-    burr_x0020_4_x0020_d_x002: Optional[str] = Field(default=None, alias='Burr_x0020_4_x0020_D_x002f_V_x00', title='Burr 4 D/V 2')
-    burr_x0020_4_x0020_d_x002_001: Optional[str] = Field(default=None, alias='Burr_x0020_4_x0020_D_x002f_V_x000', title='Burr 4 D/V 3')
-    burr_x0020_4_x0020_intend: Annotated[Burr4IntendedMeasurementRed, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_4_x0020_intended_x0020', title='Burr 4 intended measurement red')
-    burr_x0020_4_x0020_intend_001: Annotated[Burr4IntendedMeasurementGreen, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_4_x0020_intended_x0021', title='Burr 4 intended measurement green')
-    burr_x0020_4_x0020_intend_002: Annotated[Burr4IntendedMeasurementBlue, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_4_x0020_intended_x0022', title='Burr 4 intended measurement blue')
-    burr_x0020_4_x0020_intend_003: Optional[Burr4IntendedMeasurementIsosbestic] = Field(default='N/A', alias='Burr_x0020_4_x0020_intended_x0023', title='Burr 4 intended measurement isosbestic')
-    burr_x0020_5_x0020__angle: Optional[str] = Field(default=None, alias='Burr_x0020_5_x0020_Angle', title='Burr 5 Angle')
-    burr_x0020_5_x0020__fiber: Annotated[Burr5FiberType, WrapValidator(optional_enum)] = Field(default='Standard (provided by NSB)', alias='Burr_x0020_5_x0020_Fiber_x0020_t', title='Burr 5 Fiber type')
-    burr_x0020_5_x0020__hemis: Annotated[Burr5Hemisphere, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr_x0020_5_x0020_Hemisphere', title='Burr 5 Hemisphere')
-    burr_x0020_5_x0020__injec: Optional[str] = Field(default=None, alias='Burr_x0020_5_x0020_Injectable_x0', title='Burr 5 Injectable Material 1')
-    burr_x0020_5_x0020__injec_001: Optional[str] = Field(default=None, alias='Burr_x0020_5_x0020_Injectable_x00', title='Burr 5 Injectable Material 2')
-    burr_x0020_5_x0020__injec_002: Optional[str] = Field(default=None, alias='Burr_x0020_5_x0020_Injectable_x01', title='Burr 5 Injectable Material 3')
-    burr_x0020_5_x0020__injec_003: Optional[str] = Field(default=None, alias='Burr_x0020_5_x0020_Injectable_x02', title='Burr 5 Injectable Material 4')
-    burr_x0020_5_x0020__injec_004: Optional[str] = Field(default=None, alias='Burr_x0020_5_x0020_Injectable_x03', title='Burr 5 Injectable Material 1 Titer')
-    burr_x0020_5_x0020__injec_005: Optional[str] = Field(default=None, alias='Burr_x0020_5_x0020_Injectable_x04', title='Burr 5 Injectable Material 2 Titer')
-    burr_x0020_5_x0020__injec_006: Optional[str] = Field(default=None, alias='Burr_x0020_5_x0020_Injectable_x05', title='Burr 5 Injectable Material 3 Titer')
-    burr_x0020_5_x0020__injec_007: Optional[str] = Field(default=None, alias='Burr_x0020_5_x0020_Injectable_x06', title='Burr 5 Injectable Material 4 Titer')
-    burr_x0020_5_x0020__inten: Annotated[Burr5IntendedCcfTarget, WrapValidator(optional_enum)] = Field(default=None, alias='Burr_x0020_5_x0020_Intended_x002', title='Burr 5 Intended CCF Target')
-    burr_x0020_5_x0020_a_x002: Optional[str] = Field(default=None, alias='Burr_x0020_5_x0020_A_x002f_P', title='Burr 5 A/P')
-    burr_x0020_5_x0020_d_x002: Optional[str] = Field(default=None, alias='Burr_x0020_5_x0020_D_x002f_V_x00', title='Burr 5 D/V 1')
-    burr_x0020_5_x0020_d_x002_001: Optional[str] = Field(default=None, alias='Burr_x0020_5_x0020_D_x002f_V_x000', title='Burr 5 D/V 2')
-    burr_x0020_5_x0020_d_x002_002: Optional[str] = Field(default=None, alias='Burr_x0020_5_x0020_D_x002f_V_x001', title='Burr 5 D/V 3')
-    burr_x0020_5_x0020_intend: Annotated[Burr5IntendedMeasurementRed, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_5_x0020_intended_x0020', title='Burr 5 intended measurement red')
-    burr_x0020_5_x0020_intend_001: Annotated[Burr5IntendedMeasurementGreen, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_5_x0020_intended_x0021', title='Burr 5 intended measurement green')
-    burr_x0020_5_x0020_intend_002: Annotated[Burr5IntendedMeasurementBlue, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_5_x0020_intended_x0022', title='Burr 5 intended measurement blue')
-    burr_x0020_5_x0020_intend_003: Annotated[Burr5IntendedMeasurementIsosbestic, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_5_x0020_intended_x0023', title='Burr 5 intended measurement isosbestic')
-    burr_x0020_5_x0020_m_x002: Optional[str] = Field(default=None, alias='Burr_x0020_5_x0020_M_x002f_L', title='Burr 5 M/L')
-    burr_x0020_6_x0020__angle: Optional[str] = Field(default=None, alias='Burr_x0020_6_x0020_Angle', title='Burr 6 Angle')
-    burr_x0020_6_x0020__fiber: Annotated[Burr6FiberType, WrapValidator(optional_enum)] = Field(default='Standard (provided by NSB)', alias='Burr_x0020_6_x0020_Fiber_x0020_t', title='Burr 6 Fiber type')
-    burr_x0020_6_x0020__hemis: Annotated[Burr6Hemisphere, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr_x0020_6_x0020_Hemisphere', title='Burr 6 Hemisphere')
-    burr_x0020_6_x0020__injec: Optional[str] = Field(default=None, alias='Burr_x0020_6_x0020_Injectable_x0', title='Burr 6 Injectable Material 1')
-    burr_x0020_6_x0020__injec_001: Optional[str] = Field(default=None, alias='Burr_x0020_6_x0020_Injectable_x00', title='Burr 6 Injectable Material 2')
-    burr_x0020_6_x0020__injec_002: Optional[str] = Field(default=None, alias='Burr_x0020_6_x0020_Injectable_x01', title='Burr 6 Injectable Material 3')
-    burr_x0020_6_x0020__injec_003: Optional[str] = Field(default=None, alias='Burr_x0020_6_x0020_Injectable_x02', title='Burr 6 Injectable Material 4')
-    burr_x0020_6_x0020__injec_004: Optional[str] = Field(default=None, alias='Burr_x0020_6_x0020_Injectable_x03', title='Burr 6 Injectable Material 1 Titer')
-    burr_x0020_6_x0020__injec_005: Optional[str] = Field(default=None, alias='Burr_x0020_6_x0020_Injectable_x04', title='Burr 6 Injectable Material 2 Titer')
-    burr_x0020_6_x0020__injec_006: Optional[str] = Field(default=None, alias='Burr_x0020_6_x0020_Injectable_x05', title='Burr 6 Injectable Material 3 Titer')
-    burr_x0020_6_x0020__injec_007: Optional[str] = Field(default=None, alias='Burr_x0020_6_x0020_Injectable_x06', title='Burr 6 Injectable Material 4 Titer')
-    burr_x0020_6_x0020__inten: Annotated[Burr6IntendedCcfTarget, WrapValidator(optional_enum)] = Field(default=None, alias='Burr_x0020_6_x0020_Intended_x002', title='Burr 6 Intended CCF Target')
-    burr_x0020_6_x0020_a_x002: Optional[str] = Field(default=None, alias='Burr_x0020_6_x0020_A_x002f_P', title='Burr 6 A/P')
-    burr_x0020_6_x0020_d_x002: Optional[str] = Field(default=None, alias='Burr_x0020_6_x0020_D_x002f_V_x00', title='Burr 6 D/V 1')
-    burr_x0020_6_x0020_d_x002_001: Optional[str] = Field(default=None, alias='Burr_x0020_6_x0020_D_x002f_V_x000', title='Burr 6 D/V 2')
-    burr_x0020_6_x0020_d_x002_002: Optional[str] = Field(default=None, alias='Burr_x0020_6_x0020_D_x002f_V_x001', title='Burr 6 D/V 3')
-    burr_x0020_6_x0020_intend: Annotated[Burr6IntendedMeasurementRed, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_6_x0020_intended_x0020', title='Burr 6 intended measurement red')
-    burr_x0020_6_x0020_intend_001: Annotated[Burr6IntendedMeasurementGreen, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_6_x0020_intended_x0021', title='Burr 6 intended measurement green')
-    burr_x0020_6_x0020_intend_002: Annotated[Burr6IntendedMeasurementBlue, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_6_x0020_intended_x0022', title='Burr 6 intended measurement blue')
-    burr_x0020_6_x0020_intend_003: Annotated[Burr6IntendedMeasurementIsosbestic, WrapValidator(optional_enum)] = Field(default='N/A', alias='Burr_x0020_6_x0020_intended_x0023', title='Burr 6 intended measurement isosbestic')
-    burr_x0020_6_x0020_m_x002: Optional[str] = Field(default=None, alias='Burr_x0020_6_x0020_M_x002f_L', title='Burr 6 M/L')
-    burr_x0020__hole_x0020_1: Annotated[Burr1Status, WrapValidator(optional_enum)] = Field(default=None, alias='Burr_x0020_Hole_x0020_1_x0020_st', title='Burr1 Status')
-    burr_x0020_hole_x0020_1: Annotated[BurrHole1, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr_x0020_hole_x0020_1', title='Burr hole 1')
-    burr_x0020_hole_x0020_2: Annotated[BurrHole2, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr_x0020_hole_x0020_2', title='Burr hole 2')
-    burr_x0020_hole_x0020_3: Annotated[BurrHole3, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr_x0020_hole_x0020_3', title='Burr hole 3')
-    burr_x0020_hole_x0020_4: Annotated[BurrHole4, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr_x0020_hole_x0020_4', title='Burr hole 4')
-    burr_x0020_hole_x0020_5: Annotated[BurrHole5, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr_x0020_hole_x0020_5', title='Burr hole 5')
-    burr_x0020_hole_x0020_6: Annotated[BurrHole6, WrapValidator(optional_enum)] = Field(default='Select...', alias='Burr_x0020_hole_x0020_6', title='Burr hole 6')
-    care_x0020__moduele: Annotated[CareModuele, WrapValidator(optional_enum)] = Field(default='Select...', alias='Care_x0020_Moduele', title='Care Moduele')
-    color_tag: Optional[str] = Field(default=None, alias='_ColorTag', title='Color Tag')
-    com_coplanar: Annotated[Laceration, WrapValidator(optional_enum)] = Field(default='Select...', alias='ComCoplanar', title='Laceration')
-    com_sinusbleed: Annotated[SinusBleed, WrapValidator(optional_enum)] = Field(default='Select...', alias='ComSinusbleed', title='Sinus Bleed')
-    com_swelling: Annotated[EdemaSwelling, WrapValidator(optional_enum)] = Field(default='Select...', alias='ComSwelling', title='Edema (Swelling)')
-    compliance_asset_id: Optional[str] = Field(default=None, alias='ComplianceAssetId', title='Compliance Asset Id')
-    content_type: Optional[str] = Field(default=None, alias='ContentType', title='Content Type')
-    contusion: Annotated[ContusionHematoma, WrapValidator(optional_enum)] = Field(default='Select...', alias='Contusion', title='Contusion/Hematoma')
-    craniotomy_type: Annotated[CraniotomyType, WrapValidator(optional_enum)] = Field(default=None, alias='CraniotomyType', title='Craniotomy Type')
-    craniotomy_x0020__perform: Annotated[CraniotomyPerformDuring, WrapValidator(optional_enum)] = Field(default='Initial Surgery', alias='Craniotomy_x0020_Perform_x0020_D', title='Craniotomy Perform During')
-    created: Optional[str] = Field(default=None, alias='Created', title='Created')
-    date1st_injection: Optional[str] = Field(default=None, alias='Date1stInjection', title='Date of Follow up Surgery')
-    date_range_start: Optional[str] = Field(default=None, alias='DateRangeStart', title='DateRangeStart')
-    date_x0020_of_x0020__birt: Optional[str] = Field(default=None, alias='Date_x0020_of_x0020_Birth', title='Date of Birth')
-    date_x0020_of_x0020__surg: Optional[str] = Field(default=None, alias='Date_x0020_of_x0020_Surgery', title='Date of Initial Surgery')
-    doc_icon: Optional[str] = Field(default=None, alias='DocIcon', title='Type')
-    dv2nd_inj: Optional[str] = Field(default=None, alias='DV2ndInj', title='Burr 2 D/V 1')
-    edit: Optional[str] = Field(default=None, alias='Edit', title='Edit')
-    editor: Optional[str] = Field(default=None, alias='Editor', title='Modified By')
-    fiber_implant1_dv: Optional[str] = Field(default=None, alias='FiberImplant1DV', title='Fiber Implant1 D/V')
-    fiber_implant2_dv: Optional[str] = Field(default=None, alias='FiberImplant2DV', title='Fiber Implant2 D/V')
-    fiber_x0020__implant1_x00: Annotated[FiberImplant1Length, WrapValidator(optional_enum)] = Field(default='Select...', alias='Fiber_x0020_Implant1_x0020_Lengt', title='Fiber Implant1 Length')
-    fiber_x0020__implant2_x00: Annotated[FiberImplant2Length, WrapValidator(optional_enum)] = Field(default='Select...', alias='Fiber_x0020_Implant2_x0020_Lengt', title='Fiber Implant2 Length')
-    fiber_x0020__implant3_x00: Annotated[FiberImplant3Length, WrapValidator(optional_enum)] = Field(default='Select...', alias='Fiber_x0020_Implant3_x0020_Lengt', title='Fiber Implant3 Length')
-    fiber_x0020__implant3_x00_001: Optional[str] = Field(default=None, alias='Fiber_x0020_Implant3_x0020_D_x00', title='Fiber Implant3 D/V')
-    fiber_x0020__implant4_x00: Annotated[FiberImplant4Length, WrapValidator(optional_enum)] = Field(default='Select...', alias='Fiber_x0020_Implant4_x0020_Lengt', title='Fiber Implant4 Length')
-    fiber_x0020__implant4_x00_001: Optional[str] = Field(default=None, alias='Fiber_x0020_Implant4_x0020_D_x00', title='Fiber Implant4 D/V')
-    fiber_x0020__implant5_x00: Annotated[FiberImplant5Length, WrapValidator(optional_enum)] = Field(default='Select...', alias='Fiber_x0020_Implant5_x0020_Lengt', title='Fiber Implant5 Length')
-    fiber_x0020__implant5_x00_001: Optional[str] = Field(default=None, alias='Fiber_x0020_Implant5_x0020_D_x00', title='Fiber Implant5 D/V')
-    fiber_x0020__implant6_x00: Annotated[FiberImplant6Length, WrapValidator(optional_enum)] = Field(default='Select...', alias='Fiber_x0020_Implant6_x0020_Lengt', title='Fiber Implant6 Length')
-    fiber_x0020__implant6_x00_001: Optional[str] = Field(default=None, alias='Fiber_x0020_Implant6_x0020_D_x00', title='Fiber Implant6 D/V')
-    first_inj_recovery: Optional[str] = Field(default=None, alias='FirstInjRecovery', title='Follow up Recovery')
-    first_injection_iso_durat: Optional[str] = Field(default=None, alias='FirstInjectionIsoDuration', title='Follow up Iso Duration')
-    first_injection_weight_af: Optional[str] = Field(default=None, alias='FirstInjectionWeightAfter', title='Follow up Weight After')
-    first_injection_weight_be: Optional[str] = Field(default=None, alias='FirstInjectionWeightBefor', title='Follow up Weight Before')
-    folder_child_count: Optional[str] = Field(default=None, alias='FolderChildCount', title='Folder Child Count')
-    headpost: Annotated[Headpost, WrapValidator(optional_enum)] = Field(default='Select...', alias='Headpost', title='Headpost')
-    headpost_type: Annotated[Well, WrapValidator(optional_enum)] = Field(default='Select...', alias='HeadpostType', title='Well')
-    headpost_x0020__perform_x: Annotated[HeadpostPerformDuring, WrapValidator(optional_enum)] = Field(default='Initial Surgery', alias='Headpost_x0020_Perform_x0020_Dur', title='Headpost Perform During')
-    hemisphere2nd_inj: Annotated[Burr2Hemisphere, WrapValidator(optional_enum)] = Field(default='Select...', alias='Hemisphere2ndInj', title='Burr 2 Hemisphere')
-    hp_iso_level: Optional[str] = Field(default=None, alias='HPIsoLevel', title='Initial Iso Level')
-    hp_recovery: Optional[str] = Field(default=None, alias='HPRecovery', title='Initial Recovery')
-    hp_surgeon_comments: Optional[str] = Field(default=None, alias='HPSurgeonComments', title='Surgeon Comments')
-    hp_work_station: Annotated[InitialWorkStation, WrapValidator(optional_enum)] = Field(default='Select...', alias='HpWorkStation', title='Initial Work Station')
-    iacuc_x0020__protocol_x00: Annotated[IacucProtocol, WrapValidator(optional_enum)] = Field(default='Select...', alias='IACUC_x0020_Protocol_x0020__x002', title='IACUC Protocol', description='Create a secondary List for Protocols and link to drugs')
-    id: Optional[str] = Field(default=None, alias='ID', title='ID')
-    implant_id_coverslip_type: Annotated[ImplantIdCoverslipType, WrapValidator(optional_enum)] = Field(default=None, alias='ImplantIDCoverslipType', title='Implant ID/Coverslip type')
-    inj1_alternating_time: Optional[str] = Field(default=None, alias='Inj1AlternatingTime', title='Inj1AlternatingTime')
-    inj1_angle_v2: Optional[str] = Field(default=None, alias='Inj1Angle_v2', title='Burr 1 Angle')
-    inj1_current: Optional[str] = Field(default=None, alias='Inj1Current', title='Inj1Current')
-    inj1_ionto_time: Optional[str] = Field(default=None, alias='Inj1IontoTime', title='Inj1IontoTime')
-    inj1_storage_location: Optional[str] = Field(default=None, alias='Inj1StorageLocation', title='Inj1StorageLocation')
-    inj1_type: Annotated[Inj1Type, WrapValidator(optional_enum)] = Field(default='Select...', alias='Inj1Type', title='Inj1Type')
-    inj1_virus_strain_rt: Optional[str] = Field(default=None, alias='Inj1VirusStrain_rt', title='Inj1VirusStrain_rt')
-    inj1volperdepth: Optional[str] = Field(default=None, alias='inj1volperdepth', title='inj1volperdepth')
-    inj2_alternating_time: Optional[str] = Field(default=None, alias='Inj2AlternatingTime', title='Inj2AlternatingTime')
-    inj2_angle_v2: Optional[str] = Field(default=None, alias='Inj2Angle_v2', title='Burr 2 Angle')
-    inj2_current: Optional[str] = Field(default=None, alias='Inj2Current', title='Inj2Current')
-    inj2_ionto_time: Optional[str] = Field(default=None, alias='Inj2IontoTime', title='Inj2IontoTime')
-    inj2_storage_location: Optional[str] = Field(default=None, alias='Inj2StorageLocation', title='Inj2StorageLocation')
-    inj2_type: Annotated[Inj2Type, WrapValidator(optional_enum)] = Field(default='Select...', alias='Inj2Type', title='Inj2Type')
-    inj2_virus_strain_rt: Optional[str] = Field(default=None, alias='Inj2VirusStrain_rt', title='Inj2VirusStrain_rt')
-    inj2volperdepth: Optional[str] = Field(default=None, alias='inj2volperdepth', title='inj2volperdepth')
-    inj3_alternating_time: Optional[str] = Field(default=None, alias='Inj3AlternatingTime', title='Inj3AlternatingTime')
-    inj3_current: Optional[str] = Field(default=None, alias='Inj3Current', title='Inj3Current')
-    inj3_ionto_time: Optional[str] = Field(default=None, alias='Inj3IontoTime', title='Inj3IontoTime')
-    inj3_storage_location: Optional[str] = Field(default=None, alias='Inj3StorageLocation', title='Inj3StorageLocation')
-    inj3_type: Annotated[Inj3Type, WrapValidator(optional_enum)] = Field(default='Select...', alias='Inj3Type', title='Inj3Type')
-    inj3ret_setting: Annotated[Inj3Retsetting, WrapValidator(optional_enum)] = Field(default='Off', alias='Inj3retSetting', title='Inj3retSetting')
-    inj3volperdepth: Optional[str] = Field(default=None, alias='Inj3volperdepth', title='Inj3volperdepth')
-    inj4_alternating_time: Optional[str] = Field(default=None, alias='Inj4AlternatingTime', title='Inj4AlternatingTime')
-    inj4_current: Optional[str] = Field(default=None, alias='Inj4Current', title='Inj4Current')
-    inj4_ionto_time: Optional[str] = Field(default=None, alias='Inj4IontoTime', title='Inj4IontoTime')
-    inj4_storage_location: Optional[str] = Field(default=None, alias='Inj4StorageLocation', title='Inj4StorageLocation')
-    inj4_type: Annotated[Inj4Type, WrapValidator(optional_enum)] = Field(default='Select...', alias='Inj4Type', title='Inj4Type')
-    inj4_virus_strain_rt: Optional[str] = Field(default=None, alias='Inj4VirusStrain_rt', title='Inj4VirusStrain_rt')
-    inj4ret_setting: Annotated[Inj4Retsetting, WrapValidator(optional_enum)] = Field(default='Off', alias='Inj4retSetting', title='Inj4retSetting')
-    inj4volperdepth: Optional[str] = Field(default=None, alias='Inj4volperdepth', title='Inj4volperdepth')
-    inj5_alternating_time: Optional[str] = Field(default=None, alias='Inj5AlternatingTime', title='Inj5AlternatingTime')
-    inj5_current: Optional[str] = Field(default=None, alias='Inj5Current', title='Inj5Current')
-    inj5_ionto_time: Optional[str] = Field(default=None, alias='Inj5IontoTime', title='Inj5IontoTime')
-    inj5_storage_location: Optional[str] = Field(default=None, alias='Inj5StorageLocation', title='Inj5StorageLocation')
-    inj5_type: Annotated[Inj5Type, WrapValidator(optional_enum)] = Field(default='Select...', alias='Inj5Type', title='Inj5Type')
-    inj5_virus_strain_rt: Optional[str] = Field(default=None, alias='Inj5VirusStrain_rt', title='Inj5VirusStrain_rt')
-    inj5ret_setting: Annotated[Inj5Retsetting, WrapValidator(optional_enum)] = Field(default='Off', alias='Inj5retSetting', title='Inj5retSetting')
-    inj5volperdepth: Optional[str] = Field(default=None, alias='inj5volperdepth', title='inj5volperdepth')
-    inj6_alternating_time: Optional[str] = Field(default=None, alias='Inj6AlternatingTime', title='Inj6AlternatingTime')
-    inj6_current: Optional[str] = Field(default=None, alias='Inj6Current', title='Inj6Current')
-    inj6_ionto_time: Optional[str] = Field(default=None, alias='Inj6IontoTime', title='Inj6IontoTime')
-    inj6_storage_location: Optional[str] = Field(default=None, alias='Inj6StorageLocation', title='Inj6StorageLocation')
-    inj6_type: Annotated[Inj6Type, WrapValidator(optional_enum)] = Field(default='Select...', alias='Inj6Type', title='Inj6Type')
-    inj6_virus_strain_rt: Optional[str] = Field(default=None, alias='Inj6VirusStrain_rt', title='Inj6VirusStrain_rt')
-    inj6ret_setting: Annotated[Inj6Retsetting, WrapValidator(optional_enum)] = Field(default='Off', alias='Inj6retSetting', title='Inj6retSetting')
-    inj6volperdepth: Optional[str] = Field(default=None, alias='inj6volperdepth', title='inj6volperdepth')
-    inj_virus_strain_rt: Optional[str] = Field(default=None, alias='InjVirusStrain_rt', title='Inj3VirusStrain_rt')
-    ionto_number_inj1: Annotated[InitialIontoNumber, WrapValidator(optional_enum)] = Field(default='Select...', alias='IontoNumberInj1', title='Initial Ionto Number')
-    ionto_number_inj2: Annotated[FolowUpIontoNumber, WrapValidator(optional_enum)] = Field(default='Select...', alias='IontoNumberInj2', title='Folow up Ionto Number')
-    is_record: Optional[str] = Field(default=None, alias='_IsRecord', title='Item is a Record')
-    iso_x0020__on: Optional[str] = Field(default=None, alias='Iso_x0020_On', title='Initial Iso Duration')
-    item_child_count: Optional[str] = Field(default=None, alias='ItemChildCount', title='Item Child Count')
-    lab_tracks_x0020__group: Optional[str] = Field(default=None, alias='LabTracks_x0020_Group', title='LabTracks Group')
-    lab_tracks_x0020__request: Optional[str] = Field(default=None, alias='LabTracks_x0020_Requestor', title='LabTracks Requestor', description='Who requested the animal in LabTracks')
-    lab_tracks_x0020_id1: Optional[str] = Field(default=None, alias='LabTracks_x0020_ID1', title='LabTracks ID')
-    li_ms_x0020__required: Annotated[LimsRequired, WrapValidator(optional_enum)] = Field(default='Select...', alias='LIMs_x0020_Required', title='LIMS Required', description='Is LIMS or SLIMS Entry required')
-    light_cycle: Annotated[Lightcycle, WrapValidator(optional_enum)] = Field(default=None, alias='LightCycle', title='LightCycle')
-    lims_project: Annotated[Limsproject, WrapValidator(optional_enum)] = Field(default=None, alias='LIMSProject', title='LIMSProject')
-    lims_taskflow: Annotated[Limstaskflow, WrapValidator(optional_enum)] = Field(default=None, alias='LIMSTaskflow', title='LIMSTaskflow')
-    link_title: Optional[str] = Field(default=None, alias='LinkTitle', title='Title')
-    link_title_no_menu: Optional[str] = Field(default=None, alias='LinkTitleNoMenu', title='Title')
-    long_requestor_comments: Optional[str] = Field(default=None, alias='LongRequestorComments', title='Requestor Comments')
-    ml2nd_inj: Optional[str] = Field(default=None, alias='ML2ndInj', title='Burr 2 M/L')
-    modified: Optional[str] = Field(default=None, alias='Modified', title='Modified')
-    nanoject_number_inj10: Annotated[InitialNanojectNumber, WrapValidator(optional_enum)] = Field(default='Select...', alias='NanojectNumberInj10', title='Initial Nanoject Number')
-    nanoject_number_inj2: Annotated[FollowUpNanojectNumber, WrapValidator(optional_enum)] = Field(default='Select...', alias='NanojectNumberInj2', title='Follow up Nanoject Number')
-    non_x002d_nsb_x0020__surg: Optional[bool] = Field(default='0', alias='Non_x002d_NSB_x0020_Surgeon', title='Non-NSB Surgeon', description='Is this surgery going to be performed by NSB or someone else?')
-    pedigree_name: Optional[str] = Field(default=None, alias='PedigreeName', title='Pedigree Name')
-    pi: Optional[str] = Field(default=None, alias='PI', title='PI', description='Requesting Investigator')
-    procedure: Annotated[Procedure, WrapValidator(optional_enum)] = Field(default='Select...', alias='Procedure', title='Procedure', description='Procedure, Specific T3')
-    procedure_x0020__family: Annotated[ProcedureCategory, WrapValidator(optional_enum)] = Field(default='Select...', alias='Procedure_x0020_Family', title='Procedure Category', description='Procedure Family T1')
-    procedure_x0020__slots: Annotated[ProcedureSlots, WrapValidator(optional_enum)] = Field(default='Select...', alias='Procedure_x0020_Slots', title='Procedure Slots', description='Sinlge or mutpile surgical slots')
-    procedure_x0020_t2: Annotated[PhysiologyType, WrapValidator(optional_enum)] = Field(default='Select...', alias='Procedure_x0020_T2', title='Physiology Type', description='Procedure Imaging paradigm T2')
-    project_id: Annotated[Projectid, WrapValidator(optional_enum)] = Field(default=None, alias='ProjectID', title='ProjectID')
-    protocol: Annotated[Protocol, WrapValidator(optional_enum)] = Field(default='Select...', alias='Protocol', title='Protocol')
-    ret_setting0: Annotated[Inj1Retsetting, WrapValidator(optional_enum)] = Field(default='Off', alias='retSetting0', title='Inj1retSetting')
-    ret_setting1: Annotated[Inj2Retsetting, WrapValidator(optional_enum)] = Field(default='Off', alias='retSetting1', title='Inj2retSetting')
-    round1_inj_isolevel: Optional[str] = Field(default=None, alias='Round1InjIsolevel', title='Follow up Iso Level')
-    sex: Annotated[Sex, WrapValidator(optional_enum)] = Field(default='Select...', alias='Sex', title='Sex')
-    surgery_status: Annotated[SurgeryStatus, WrapValidator(optional_enum)] = Field(default='New', alias='SurgeryStatus', title='Surgery Status')
-    test1: Optional[str] = Field(default=None, alias='Test1', title='Initial Surgeon')
-    test_x0020_1st_x0020__rou: Optional[str] = Field(default=None, alias='TEST_x0020_1st_x0020_Round_x0020', title='Follow up Surgeon')
-    thermistor: Annotated[Thermistor, WrapValidator(optional_enum)] = Field(default='No', alias='Thermistor', title='Thermistor')
-    title: Optional[str] = Field(default=None, alias='Title', title='Title')
-    ui_version_string: Optional[str] = Field(default=None, alias='_UIVersionString', title='Version')
-    virus_x0020__hemisphere: Annotated[Burr1Hemisphere, WrapValidator(optional_enum)] = Field(default='Select...', alias='Virus_x0020_Hemisphere', title='Burr 1 Hemisphere')
-    virus_x0020_a_x002f_p: Optional[str] = Field(default=None, alias='Virus_x0020_A_x002f_P', title='Burr 1 A/P')
-    virus_x0020_d_x002f_v: Optional[str] = Field(default=None, alias='Virus_x0020_D_x002f_V', title='Burr  1 D/V 1')
-    virus_x0020_m_x002f_l: Optional[str] = Field(default=None, alias='Virus_x0020_M_x002f_L', title='Burr  1 M/L')
-    weight_x0020_after_x0020: Optional[str] = Field(default=None, alias='Weight_x0020_after_x0020_Surgery', title='Initial Weight after')
-    weight_x0020_before_x0020: Optional[str] = Field(default=None, alias='Weight_x0020_before_x0020_Surger', title='Initial Weight before')
-    work_station1st_injection: Annotated[FollowUpWorkstation, WrapValidator(optional_enum)] = Field(default='Select...', alias='WorkStation1stInjection', title='Follow up Workstation')
-    x0023__x0020_of_x0020__bu: Annotated[OfBurrHoles, WrapValidator(optional_enum)] = Field(default='Select...', alias='_x0023__x0020_of_x0020_Burr_x002', title='# of Burr Holes')
+    age_x0020_at_x0020__injec: Optional[str] = Field(
+        default=None,
+        alias="Age_x0020_at_x0020_Injection",
+        title="Age at Injection 1",
+    )
+    aind_x0020__project_x0020: Annotated[
+        AindProjectName, WrapValidator(optional_enum)
+    ] = Field(
+        default=None,
+        alias="AIND_x0020_Project_x0020_Name",
+        title="AIND Project Name",
+    )
+    ap2nd_inj: Optional[str] = Field(
+        default=None, alias="AP2ndInj", title="Burr 2 A/P"
+    )
+    app_author: Optional[str] = Field(
+        default=None, alias="AppAuthor", title="App Created By"
+    )
+    app_editor: Optional[str] = Field(
+        default=None, alias="AppEditor", title="App Modified By"
+    )
+    attachments: Optional[str] = Field(
+        default=None, alias="Attachments", title="Attachments"
+    )
+    author: Optional[str] = Field(
+        default=None, alias="Author", title="Created By"
+    )
+    behavior: Annotated[Behavior, WrapValidator(optional_enum)] = Field(
+        default="No", alias="Behavior", title="Behavior"
+    )
+    behavior_x0020__autotrain: Annotated[
+        BehaviorAutotrainCurriculum, WrapValidator(optional_enum)
+    ] = Field(
+        default=None,
+        alias="Behavior_x0020_Autotrain_x0020_C",
+        title="Behavior Autotrain Curriculum",
+    )
+    behavior_x0020__complete: Optional[str] = Field(
+        default=None,
+        alias="Behavior_x0020_Complete",
+        title="Behavior Complete",
+    )
+    behavior_x0020__curriculu: Annotated[
+        BehaviorCurriculumVersion, WrapValidator(optional_enum)
+    ] = Field(
+        default=None,
+        alias="Behavior_x0020_Curriculum_x0020_",
+        title="Behavior Curriculum Version",
+    )
+    behavior_x0020__destinati: Annotated[
+        BehaviorDestination, WrapValidator(optional_enum)
+    ] = Field(
+        default=None,
+        alias="behavior_x0020_Destination",
+        title="Behavior Destination",
+    )
+    behavior_x0020__fiber_x00: Annotated[
+        BehaviorFiberPhotometry, WrapValidator(optional_enum)
+    ] = Field(
+        default=None,
+        alias="Behavior_x0020_Fiber_x0020_Photo",
+        title="Behavior Fiber Photometry",
+    )
+    behavior_x0020__first_x00: Annotated[
+        BehaviorFirstVideoRecordingStage, WrapValidator(optional_enum)
+    ] = Field(
+        default=None,
+        alias="Behavior_x0020_First_x0020_Video",
+        title="Behavior First Video Recording Stage",
+    )
+    behavior_x0020__first_x00_001: Annotated[
+        BehaviorFirstFipStage, WrapValidator(optional_enum)
+    ] = Field(
+        default=None,
+        alias="Behavior_x0020_First_x0020_FIP_x",
+        title="Behavior First FIP Stage",
+    )
+    behavior_x0020__platform: Annotated[
+        BehaviorPlatform, WrapValidator(optional_enum)
+    ] = Field(
+        default=None,
+        alias="Behavior_x0020_Platform",
+        title="Behavior Platform",
+    )
+    behavior_x0020__type: Annotated[
+        BehaviorType, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...", alias="Behavior_x0020_Type", title="Behavior Type"
+    )
+    behavior_x0020_fip_x0020: Annotated[
+        BehaviorFipMode, WrapValidator(optional_enum)
+    ] = Field(
+        default=None,
+        alias="Behavior_x0020_FIP_x0020_Mode",
+        title="Behavior FIP Mode",
+    )
+    black_x0020__cement: Annotated[
+        BlackCement, WrapValidator(optional_enum)
+    ] = Field(default="No", alias="Black_x0020_Cement", title="Black Cement")
+    breg2_lamb: Optional[str] = Field(
+        default=None, alias="Breg2Lamb", title="Bregma to Lambda"
+    )
+    burr1_x0020__injection_x0: Annotated[
+        Burr1InjectionDevice, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr1_x0020_Injection_x0020_Devi",
+        title="Burr1 Injection Device",
+    )
+    burr1_x0020__perform_x002: Annotated[
+        Burr1PerformDuring, WrapValidator(optional_enum)
+    ] = Field(
+        default="Initial Surgery",
+        alias="Burr1_x0020_Perform_x0020_During",
+        title="Burr1 Perform During",
+    )
+    burr1_x0020__virus_x0020: Annotated[
+        Burr1VirusBiosafteyLevelBsl, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr1_x0020_Virus_x0020_Biosafte",
+        title="Burr1 Virus Biosaftey Level (BSL)",
+        description="BSL & Material injected. If other PI must provide material in requestor comments.",
+    )
+    burr2_x0020__injection_x0: Annotated[
+        Burr2InjectionDevice, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr2_x0020_Injection_x0020_Devi",
+        title="Burr2 Injection Device",
+    )
+    burr2_x0020__perform_x002: Annotated[
+        Burr2PerformDuring, WrapValidator(optional_enum)
+    ] = Field(
+        default="Initial Surgery",
+        alias="Burr2_x0020_Perform_x0020_During",
+        title="Burr2 Perform During",
+    )
+    burr2_x0020__status: Annotated[
+        Burr2Status, WrapValidator(optional_enum)
+    ] = Field(default=None, alias="Burr2_x0020_Status", title="Burr2 Status")
+    burr2_x0020__virus_x0020: Annotated[
+        Burr2VirusBiosafteyLevelBsl, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr2_x0020_Virus_x0020_Biosafte",
+        title="Burr2 Virus Biosaftey Level (BSL)",
+        description="BSL & Material injected. If other PI must provide material in requestor comments.",
+    )
+    burr3_x0020__injection_x0: Annotated[
+        Burr3InjectionDevice, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr3_x0020_Injection_x0020_Devi",
+        title="Burr3 Injection Device",
+    )
+    burr3_x0020__perform_x002: Annotated[
+        Burr3PerformDuring, WrapValidator(optional_enum)
+    ] = Field(
+        default="Initial Surgery",
+        alias="Burr3_x0020_Perform_x0020_During",
+        title="Burr3 Perform During",
+    )
+    burr3_x0020__status: Annotated[
+        Burr3Status, WrapValidator(optional_enum)
+    ] = Field(default=None, alias="Burr3_x0020_Status", title="Burr3 Status")
+    burr3_x0020__virus_x0020: Annotated[
+        Burr3VirusBiosafetyLevelBsl, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr3_x0020_Virus_x0020_Biosafet",
+        title="Burr3 Virus Biosafety Level (BSL)",
+        description="BSL & Material injected. If other PI must provide material in requestor comments.",
+    )
+    burr3_x0020_a_x002f_p: Optional[str] = Field(
+        default=None, alias="Burr3_x0020_A_x002f_P", title="Burr3 A/P"
+    )
+    burr3_x0020_d_x002f_v: Optional[str] = Field(
+        default=None, alias="Burr3_x0020_D_x002f_V", title="Burr3 D/V 1"
+    )
+    burr3_x0020_m_x002f_l: Optional[str] = Field(
+        default=None, alias="Burr3_x0020_M_x002f_L", title="Burr3 M/L"
+    )
+    burr4_x0020__injection_x0: Annotated[
+        Burr4InjectionDevice, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr4_x0020_Injection_x0020_Devi",
+        title="Burr4 Injection Device",
+    )
+    burr4_x0020__perform_x002: Annotated[
+        Burr4PerformDuring, WrapValidator(optional_enum)
+    ] = Field(
+        default="Initial Surgery",
+        alias="Burr4_x0020_Perform_x0020_During",
+        title="Burr4 Perform During",
+    )
+    burr4_x0020__status: Annotated[
+        Burr4Status, WrapValidator(optional_enum)
+    ] = Field(default=None, alias="Burr4_x0020_Status", title="Burr4 Status")
+    burr4_x0020__virus_x0020: Annotated[
+        Burr4VirusBiosafteyLevelBsl, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr4_x0020_Virus_x0020_Biosafte",
+        title="Burr4 Virus Biosaftey Level (BSL)",
+        description="BSL & Material injected. If other PI must provide material in requestor comments.",
+    )
+    burr4_x0020_a_x002f_p: Optional[str] = Field(
+        default=None, alias="Burr4_x0020_A_x002f_P", title="Burr4 A/P"
+    )
+    burr4_x0020_d_x002f_v: Optional[str] = Field(
+        default=None, alias="Burr4_x0020_D_x002f_V", title="Burr4 D/V 1"
+    )
+    burr4_x0020_m_x002f_l: Optional[str] = Field(
+        default=None, alias="Burr4_x0020_M_x002f_L", title="Burr4 M/L"
+    )
+    burr5_x0020__injection_x0: Annotated[
+        Burr5InjectionDevice, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr5_x0020_Injection_x0020_Devi",
+        title="Burr5 Injection Device",
+    )
+    burr5_x0020__perform_x002: Annotated[
+        Burr5PerformDuring, WrapValidator(optional_enum)
+    ] = Field(
+        default="Initial Surgery",
+        alias="Burr5_x0020_Perform_x0020_During",
+        title="Burr5 Perform During",
+    )
+    burr5_x0020__status: Annotated[
+        Burr5Status, WrapValidator(optional_enum)
+    ] = Field(default=None, alias="Burr5_x0020_Status", title="Burr5 Status")
+    burr5_x0020__virus_x0020: Annotated[
+        Burr5VirusBiosafteyLevelBsl, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr5_x0020_Virus_x0020_Biosafte",
+        title="Burr5 Virus Biosaftey Level (BSL)",
+    )
+    burr6_x0020__injection_x0: Annotated[
+        Burr6InjectionDevice, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr6_x0020_Injection_x0020_Devi",
+        title="Burr6 Injection Device",
+    )
+    burr6_x0020__perform_x002: Annotated[
+        Burr6PerformDuring, WrapValidator(optional_enum)
+    ] = Field(
+        default="Initial Surgery",
+        alias="Burr6_x0020_Perform_x0020_During",
+        title="Burr6 Perform During",
+        description="",
+    )
+    burr6_x0020__status: Annotated[
+        Burr6Status, WrapValidator(optional_enum)
+    ] = Field(default=None, alias="Burr6_x0020_Status", title="Burr6 Status")
+    burr6_x0020__virus_x0020: Annotated[
+        Burr6VirusBiosafteyLevelBsl, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr6_x0020_Virus_x0020_Biosafte",
+        title="Burr6 Virus Biosaftey Level (BSL)",
+    )
+    burr_x0020_1_x0020__fiber: Annotated[
+        Burr1FiberType, WrapValidator(optional_enum)
+    ] = Field(
+        default="Standard (provided by NSB)",
+        alias="Burr_x0020_1_x0020_Fiber_x0020_t",
+        title="Burr 1 Fiber type",
+    )
+    burr_x0020_1_x0020__grid: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_Grid_x0020_Sp",
+        title="Burr 1 Grid Spacing (um)",
+    )
+    burr_x0020_1_x0020__injec: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_Injectable_x0",
+        title="Burr 1 Injectable Material 1",
+    )
+    burr_x0020_1_x0020__injec_001: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_Injectable_x00",
+        title="Burr 1 Injectable Material 2",
+    )
+    burr_x0020_1_x0020__injec_002: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_Injectable_x01",
+        title="Burr 1 Injectable Material 3",
+    )
+    burr_x0020_1_x0020__injec_003: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_Injectable_x02",
+        title="Burr 1 Injectable Material 4",
+    )
+    burr_x0020_1_x0020__injec_004: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_Injectable_x03",
+        title="Burr 1 Injectable Material 1 Titer",
+    )
+    burr_x0020_1_x0020__injec_005: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_Injectable_x04",
+        title="Burr 1 Injectable Material 2 Titer",
+    )
+    burr_x0020_1_x0020__injec_006: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_Injectable_x05",
+        title="Burr 1 Injectable Material 3 Titer",
+    )
+    burr_x0020_1_x0020__injec_007: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_Injectable_x06",
+        title="Burr 1 Injectable Material 4 Titer",
+    )
+    burr_x0020_1_x0020__inten: Annotated[
+        Burr1IntendedCcfTarget, WrapValidator(optional_enum)
+    ] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_Intended_x002",
+        title="Burr 1 Intended CCF Target",
+        description="Intended CCF target of burr 1 coordinates",
+    )
+    burr_x0020_1_x0020__spina: Annotated[
+        Burr1SpinalLocation, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr_x0020_1_x0020_Spinal_x0020_",
+        title="Burr 1 Spinal Location",
+    )
+    burr_x0020_1_x0020_d_x002: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_D_x002f_V_x00",
+        title="Burr 1 D/V 3",
+    )
+    burr_x0020_1_x0020_dv_x00: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_DV_x0020_2",
+        title="Burr 1 D/V 2",
+    )
+    burr_x0020_1_x0020_intend: Annotated[
+        Burr1IntendedMeasurementRed, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_1_x0020_intended_x0020",
+        title="Burr 1 intended measurement red",
+    )
+    burr_x0020_1_x0020_intend_001: Annotated[
+        Burr1IntendedMeasurementGreen, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_1_x0020_intended_x0021",
+        title="Burr 1 intended measurement green",
+    )
+    burr_x0020_1_x0020_intend_002: Annotated[
+        Burr1IntendedMeasurementBlue, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_1_x0020_intended_x0022",
+        title="Burr 1 intended measurement blue",
+    )
+    burr_x0020_1_x0020_intend_003: Annotated[
+        Burr1IntendedMeasurementIsosbestic, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_1_x0020_intended_x0023",
+        title="Burr 1 intended measurement isosbestic",
+    )
+    burr_x0020_2_x0020__fiber: Annotated[
+        Burr2FiberType, WrapValidator(optional_enum)
+    ] = Field(
+        default="Standard (Provided by NSB)",
+        alias="Burr_x0020_2_x0020_Fiber_x0020_T",
+        title="Burr 2 Fiber Type",
+    )
+    burr_x0020_2_x0020__injec: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_Injectable_x0",
+        title="Burr 2 Injectable Material 1",
+    )
+    burr_x0020_2_x0020__injec_001: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_Injectable_x00",
+        title="Burr 2 Injectable Material 2",
+    )
+    burr_x0020_2_x0020__injec_002: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_Injectable_x01",
+        title="Burr 2 Injectable Material 3",
+    )
+    burr_x0020_2_x0020__injec_003: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_Injectable_x02",
+        title="Burr 2 Injectable Material 4",
+    )
+    burr_x0020_2_x0020__injec_004: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_Injectable_x03",
+        title="Burr 2 Injectable Material 1 Titer",
+    )
+    burr_x0020_2_x0020__injec_005: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_Injectable_x04",
+        title="Burr 2 Injectable Material 2 Titer",
+    )
+    burr_x0020_2_x0020__injec_006: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_Injectable_x05",
+        title="Burr 2 Injectable Material 3 Titer",
+    )
+    burr_x0020_2_x0020__injec_007: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_Injectable_x06",
+        title="Burr 2 Injectable Material 4 Titer",
+    )
+    burr_x0020_2_x0020__inten: Annotated[
+        Burr2IntendedCcfTarget, WrapValidator(optional_enum)
+    ] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_Intended_x002",
+        title="Burr 2 Intended CCF Target",
+    )
+    burr_x0020_2_x0020__spina: Annotated[
+        Burr2SpinalLocation, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr_x0020_2_x0020_Spinal_x0020_",
+        title="Burr 2 Spinal Location",
+    )
+    burr_x0020_2_x0020_d_x002: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_D_x002f_V_x00",
+        title="Burr 2 D/V 2",
+    )
+    burr_x0020_2_x0020_d_x002_001: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_D_x002f_V_x000",
+        title="Burr 2 D/V 3",
+    )
+    burr_x0020_2_x0020_intend: Annotated[
+        Burr2IntendedMeasurementRed, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_2_x0020_intended_x0020",
+        title="Burr 2 intended measurement red",
+    )
+    burr_x0020_2_x0020_intend_001: Annotated[
+        Burr2IntendedMeasurementGreen, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_2_x0020_intended_x0021",
+        title="Burr 2 intended measurement green",
+    )
+    burr_x0020_2_x0020_intend_002: Annotated[
+        Burr2IntendedMeasurementBlue, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_2_x0020_intended_x0022",
+        title="Burr 2 intended measurement blue",
+    )
+    burr_x0020_2_x0020_intend_003: Annotated[
+        Burr2IntendedMeasurementIsosbestic, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_2_x0020_intended_x0023",
+        title="Burr 2 intended measurement isosbestic",
+    )
+    burr_x0020_3_x0020__angle: Optional[str] = Field(
+        default=None, alias="Burr_x0020_3_x0020_Angle", title="Burr 3 Angle"
+    )
+    burr_x0020_3_x0020__fiber: Annotated[
+        Burr3FiberType, WrapValidator(optional_enum)
+    ] = Field(
+        default="Standard (Provided by NSB)",
+        alias="Burr_x0020_3_x0020_Fiber_x0020_T",
+        title="Burr 3 Fiber Type",
+    )
+    burr_x0020_3_x0020__hemis: Annotated[
+        Burr3Hemisphere, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr_x0020_3_x0020_Hemisphere",
+        title="Burr 3 Hemisphere",
+    )
+    burr_x0020_3_x0020__injec: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_Injectable_x0",
+        title="Burr 3 Injectable Material 1",
+    )
+    burr_x0020_3_x0020__injec_001: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_Injectable_x00",
+        title="Burr 3 Injectable Material 2",
+    )
+    burr_x0020_3_x0020__injec_002: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_Injectable_x01",
+        title="Burr 3 Injectable Material 3",
+    )
+    burr_x0020_3_x0020__injec_003: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_Injectable_x02",
+        title="Burr 3 Injectable Material 4",
+    )
+    burr_x0020_3_x0020__injec_004: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_Injectable_x03",
+        title="Burr 3 Injectable Material 1 Titer",
+    )
+    burr_x0020_3_x0020__injec_005: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_Injectable_x04",
+        title="Burr 3 Injectable Material 2 Titer",
+    )
+    burr_x0020_3_x0020__injec_006: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_Injectable_x06",
+        title="Burr 3 Injectable Material 3 Titer",
+    )
+    burr_x0020_3_x0020__injec_007: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_Injectable_x05",
+        title="Burr 3 Injectable Material 4 Titer",
+    )
+    burr_x0020_3_x0020__inten: Annotated[
+        Burr3IntendedCcfTarget, WrapValidator(optional_enum)
+    ] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_Intended_x002",
+        title="Burr 3 Intended CCF Target",
+    )
+    burr_x0020_3_x0020_d_x002: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_D_x002f_V_x00",
+        title="Burr 3 D/V 2",
+    )
+    burr_x0020_3_x0020_d_x002_001: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_D_x002f_V_x000",
+        title="Burr 3 D/V 3",
+    )
+    burr_x0020_3_x0020_intend: Annotated[
+        Burr3IntendedMeasurementRed, WrapValidator(optional_enum)
+    ] = Field(
+        default="Enter Choice #1",
+        alias="Burr_x0020_3_x0020_intended_x0020",
+        title="Burr 3 intended measurement red",
+    )
+    burr_x0020_3_x0020_intend_001: Annotated[
+        Burr3IntendedMeasurementGreen, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_3_x0020_intended_x0021",
+        title="Burr 3 intended measurement green",
+    )
+    burr_x0020_3_x0020_intend_002: Annotated[
+        Burr3IntendedMeasurementBlue, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_3_x0020_intended_x0022",
+        title="Burr 3 intended measurement blue",
+    )
+    burr_x0020_3_x0020_intend_003: Annotated[
+        Burr3IntendedMeasurementIsosbestic, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_3_x0020_intended_x0023",
+        title="Burr 3 intended measurement isosbestic",
+    )
+    burr_x0020_4_x0020__angle: Optional[str] = Field(
+        default=None, alias="Burr_x0020_4_x0020_Angle", title="Burr 4 Angle"
+    )
+    burr_x0020_4_x0020__fiber: Annotated[
+        Burr4FiberType, WrapValidator(optional_enum)
+    ] = Field(
+        default="Standard (Provided by NSB)",
+        alias="Burr_x0020_4_x0020_Fiber_x0020_T",
+        title="Burr 4 Fiber Type",
+    )
+    burr_x0020_4_x0020__hemis: Annotated[
+        Burr4Hemisphere, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr_x0020_4_x0020_Hemisphere",
+        title="Burr 4 Hemisphere",
+    )
+    burr_x0020_4_x0020__injec: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_Injectable_x0",
+        title="Burr 4 Injectable Material 1",
+    )
+    burr_x0020_4_x0020__injec_001: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_Injectable_x00",
+        title="Burr 4 Injectable Material 2",
+    )
+    burr_x0020_4_x0020__injec_002: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_Injectable_x01",
+        title="Burr 4 Injectable Material 3",
+    )
+    burr_x0020_4_x0020__injec_003: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_Injectable_x02",
+        title="Burr 4 Injectable Material 4",
+    )
+    burr_x0020_4_x0020__injec_004: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_Injectable_x03",
+        title="Burr 4 Injectable Material 1 Titer",
+    )
+    burr_x0020_4_x0020__injec_005: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_Injectable_x04",
+        title="Burr 4 Injectable Material 2 Titer",
+    )
+    burr_x0020_4_x0020__injec_006: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_Injectable_x05",
+        title="Burr 4 Injectable Material 3 Titer",
+    )
+    burr_x0020_4_x0020__injec_007: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_Injectable_x06",
+        title="Burr 4 Injectable Material 4 Titer",
+    )
+    burr_x0020_4_x0020__inten: Annotated[
+        Burr4IntendedCcfTarget, WrapValidator(optional_enum)
+    ] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_Intended_x002",
+        title="Burr 4 Intended CCF Target",
+    )
+    burr_x0020_4_x0020_d_x002: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_D_x002f_V_x00",
+        title="Burr 4 D/V 2",
+    )
+    burr_x0020_4_x0020_d_x002_001: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_D_x002f_V_x000",
+        title="Burr 4 D/V 3",
+    )
+    burr_x0020_4_x0020_intend: Annotated[
+        Burr4IntendedMeasurementRed, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_4_x0020_intended_x0020",
+        title="Burr 4 intended measurement red",
+    )
+    burr_x0020_4_x0020_intend_001: Annotated[
+        Burr4IntendedMeasurementGreen, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_4_x0020_intended_x0021",
+        title="Burr 4 intended measurement green",
+    )
+    burr_x0020_4_x0020_intend_002: Annotated[
+        Burr4IntendedMeasurementBlue, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_4_x0020_intended_x0022",
+        title="Burr 4 intended measurement blue",
+    )
+    burr_x0020_4_x0020_intend_003: Optional[
+        Burr4IntendedMeasurementIsosbestic
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_4_x0020_intended_x0023",
+        title="Burr 4 intended measurement isosbestic",
+    )
+    burr_x0020_5_x0020__angle: Optional[str] = Field(
+        default=None, alias="Burr_x0020_5_x0020_Angle", title="Burr 5 Angle"
+    )
+    burr_x0020_5_x0020__fiber: Annotated[
+        Burr5FiberType, WrapValidator(optional_enum)
+    ] = Field(
+        default="Standard (provided by NSB)",
+        alias="Burr_x0020_5_x0020_Fiber_x0020_t",
+        title="Burr 5 Fiber type",
+    )
+    burr_x0020_5_x0020__hemis: Annotated[
+        Burr5Hemisphere, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr_x0020_5_x0020_Hemisphere",
+        title="Burr 5 Hemisphere",
+    )
+    burr_x0020_5_x0020__injec: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_Injectable_x0",
+        title="Burr 5 Injectable Material 1",
+    )
+    burr_x0020_5_x0020__injec_001: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_Injectable_x00",
+        title="Burr 5 Injectable Material 2",
+    )
+    burr_x0020_5_x0020__injec_002: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_Injectable_x01",
+        title="Burr 5 Injectable Material 3",
+    )
+    burr_x0020_5_x0020__injec_003: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_Injectable_x02",
+        title="Burr 5 Injectable Material 4",
+    )
+    burr_x0020_5_x0020__injec_004: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_Injectable_x03",
+        title="Burr 5 Injectable Material 1 Titer",
+    )
+    burr_x0020_5_x0020__injec_005: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_Injectable_x04",
+        title="Burr 5 Injectable Material 2 Titer",
+    )
+    burr_x0020_5_x0020__injec_006: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_Injectable_x05",
+        title="Burr 5 Injectable Material 3 Titer",
+    )
+    burr_x0020_5_x0020__injec_007: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_Injectable_x06",
+        title="Burr 5 Injectable Material 4 Titer",
+    )
+    burr_x0020_5_x0020__inten: Annotated[
+        Burr5IntendedCcfTarget, WrapValidator(optional_enum)
+    ] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_Intended_x002",
+        title="Burr 5 Intended CCF Target",
+    )
+    burr_x0020_5_x0020_a_x002: Optional[str] = Field(
+        default=None, alias="Burr_x0020_5_x0020_A_x002f_P", title="Burr 5 A/P"
+    )
+    burr_x0020_5_x0020_d_x002: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_D_x002f_V_x00",
+        title="Burr 5 D/V 1",
+    )
+    burr_x0020_5_x0020_d_x002_001: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_D_x002f_V_x000",
+        title="Burr 5 D/V 2",
+    )
+    burr_x0020_5_x0020_d_x002_002: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_D_x002f_V_x001",
+        title="Burr 5 D/V 3",
+    )
+    burr_x0020_5_x0020_intend: Annotated[
+        Burr5IntendedMeasurementRed, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_5_x0020_intended_x0020",
+        title="Burr 5 intended measurement red",
+    )
+    burr_x0020_5_x0020_intend_001: Annotated[
+        Burr5IntendedMeasurementGreen, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_5_x0020_intended_x0021",
+        title="Burr 5 intended measurement green",
+    )
+    burr_x0020_5_x0020_intend_002: Annotated[
+        Burr5IntendedMeasurementBlue, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_5_x0020_intended_x0022",
+        title="Burr 5 intended measurement blue",
+    )
+    burr_x0020_5_x0020_intend_003: Annotated[
+        Burr5IntendedMeasurementIsosbestic, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_5_x0020_intended_x0023",
+        title="Burr 5 intended measurement isosbestic",
+    )
+    burr_x0020_5_x0020_m_x002: Optional[str] = Field(
+        default=None, alias="Burr_x0020_5_x0020_M_x002f_L", title="Burr 5 M/L"
+    )
+    burr_x0020_6_x0020__angle: Optional[str] = Field(
+        default=None, alias="Burr_x0020_6_x0020_Angle", title="Burr 6 Angle"
+    )
+    burr_x0020_6_x0020__fiber: Annotated[
+        Burr6FiberType, WrapValidator(optional_enum)
+    ] = Field(
+        default="Standard (provided by NSB)",
+        alias="Burr_x0020_6_x0020_Fiber_x0020_t",
+        title="Burr 6 Fiber type",
+    )
+    burr_x0020_6_x0020__hemis: Annotated[
+        Burr6Hemisphere, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr_x0020_6_x0020_Hemisphere",
+        title="Burr 6 Hemisphere",
+    )
+    burr_x0020_6_x0020__injec: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_Injectable_x0",
+        title="Burr 6 Injectable Material 1",
+    )
+    burr_x0020_6_x0020__injec_001: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_Injectable_x00",
+        title="Burr 6 Injectable Material 2",
+    )
+    burr_x0020_6_x0020__injec_002: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_Injectable_x01",
+        title="Burr 6 Injectable Material 3",
+    )
+    burr_x0020_6_x0020__injec_003: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_Injectable_x02",
+        title="Burr 6 Injectable Material 4",
+    )
+    burr_x0020_6_x0020__injec_004: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_Injectable_x03",
+        title="Burr 6 Injectable Material 1 Titer",
+    )
+    burr_x0020_6_x0020__injec_005: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_Injectable_x04",
+        title="Burr 6 Injectable Material 2 Titer",
+    )
+    burr_x0020_6_x0020__injec_006: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_Injectable_x05",
+        title="Burr 6 Injectable Material 3 Titer",
+    )
+    burr_x0020_6_x0020__injec_007: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_Injectable_x06",
+        title="Burr 6 Injectable Material 4 Titer",
+    )
+    burr_x0020_6_x0020__inten: Annotated[
+        Burr6IntendedCcfTarget, WrapValidator(optional_enum)
+    ] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_Intended_x002",
+        title="Burr 6 Intended CCF Target",
+    )
+    burr_x0020_6_x0020_a_x002: Optional[str] = Field(
+        default=None, alias="Burr_x0020_6_x0020_A_x002f_P", title="Burr 6 A/P"
+    )
+    burr_x0020_6_x0020_d_x002: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_D_x002f_V_x00",
+        title="Burr 6 D/V 1",
+    )
+    burr_x0020_6_x0020_d_x002_001: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_D_x002f_V_x000",
+        title="Burr 6 D/V 2",
+    )
+    burr_x0020_6_x0020_d_x002_002: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_D_x002f_V_x001",
+        title="Burr 6 D/V 3",
+    )
+    burr_x0020_6_x0020_intend: Annotated[
+        Burr6IntendedMeasurementRed, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_6_x0020_intended_x0020",
+        title="Burr 6 intended measurement red",
+    )
+    burr_x0020_6_x0020_intend_001: Annotated[
+        Burr6IntendedMeasurementGreen, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_6_x0020_intended_x0021",
+        title="Burr 6 intended measurement green",
+    )
+    burr_x0020_6_x0020_intend_002: Annotated[
+        Burr6IntendedMeasurementBlue, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_6_x0020_intended_x0022",
+        title="Burr 6 intended measurement blue",
+    )
+    burr_x0020_6_x0020_intend_003: Annotated[
+        Burr6IntendedMeasurementIsosbestic, WrapValidator(optional_enum)
+    ] = Field(
+        default="N/A",
+        alias="Burr_x0020_6_x0020_intended_x0023",
+        title="Burr 6 intended measurement isosbestic",
+    )
+    burr_x0020_6_x0020_m_x002: Optional[str] = Field(
+        default=None, alias="Burr_x0020_6_x0020_M_x002f_L", title="Burr 6 M/L"
+    )
+    burr_x0020__hole_x0020_1: Annotated[
+        Burr1Status, WrapValidator(optional_enum)
+    ] = Field(
+        default=None,
+        alias="Burr_x0020_Hole_x0020_1_x0020_st",
+        title="Burr1 Status",
+    )
+    burr_x0020_hole_x0020_1: Annotated[
+        BurrHole1, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr_x0020_hole_x0020_1",
+        title="Burr hole 1",
+    )
+    burr_x0020_hole_x0020_2: Annotated[
+        BurrHole2, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr_x0020_hole_x0020_2",
+        title="Burr hole 2",
+    )
+    burr_x0020_hole_x0020_3: Annotated[
+        BurrHole3, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr_x0020_hole_x0020_3",
+        title="Burr hole 3",
+    )
+    burr_x0020_hole_x0020_4: Annotated[
+        BurrHole4, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr_x0020_hole_x0020_4",
+        title="Burr hole 4",
+    )
+    burr_x0020_hole_x0020_5: Annotated[
+        BurrHole5, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr_x0020_hole_x0020_5",
+        title="Burr hole 5",
+    )
+    burr_x0020_hole_x0020_6: Annotated[
+        BurrHole6, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Burr_x0020_hole_x0020_6",
+        title="Burr hole 6",
+    )
+    care_x0020__moduele: Annotated[
+        CareModuele, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...", alias="Care_x0020_Moduele", title="Care Moduele"
+    )
+    color_tag: Optional[str] = Field(
+        default=None, alias="_ColorTag", title="Color Tag"
+    )
+    com_coplanar: Annotated[Laceration, WrapValidator(optional_enum)] = Field(
+        default="Select...", alias="ComCoplanar", title="Laceration"
+    )
+    com_sinusbleed: Annotated[SinusBleed, WrapValidator(optional_enum)] = (
+        Field(default="Select...", alias="ComSinusbleed", title="Sinus Bleed")
+    )
+    com_swelling: Annotated[EdemaSwelling, WrapValidator(optional_enum)] = (
+        Field(
+            default="Select...", alias="ComSwelling", title="Edema (Swelling)"
+        )
+    )
+    compliance_asset_id: Optional[str] = Field(
+        default=None, alias="ComplianceAssetId", title="Compliance Asset Id"
+    )
+    content_type: Optional[str] = Field(
+        default=None, alias="ContentType", title="Content Type"
+    )
+    contusion: Annotated[ContusionHematoma, WrapValidator(optional_enum)] = (
+        Field(
+            default="Select...", alias="Contusion", title="Contusion/Hematoma"
+        )
+    )
+    craniotomy_type: Annotated[
+        CraniotomyType, WrapValidator(optional_enum)
+    ] = Field(default=None, alias="CraniotomyType", title="Craniotomy Type")
+    craniotomy_x0020__perform: Annotated[
+        CraniotomyPerformDuring, WrapValidator(optional_enum)
+    ] = Field(
+        default="Initial Surgery",
+        alias="Craniotomy_x0020_Perform_x0020_D",
+        title="Craniotomy Perform During",
+    )
+    created: Optional[str] = Field(
+        default=None, alias="Created", title="Created"
+    )
+    date1st_injection: Optional[str] = Field(
+        default=None,
+        alias="Date1stInjection",
+        title="Date of Follow up Surgery",
+    )
+    date_range_start: Optional[str] = Field(
+        default=None, alias="DateRangeStart", title="DateRangeStart"
+    )
+    date_x0020_of_x0020__birt: Optional[str] = Field(
+        default=None, alias="Date_x0020_of_x0020_Birth", title="Date of Birth"
+    )
+    date_x0020_of_x0020__surg: Optional[str] = Field(
+        default=None,
+        alias="Date_x0020_of_x0020_Surgery",
+        title="Date of Initial Surgery",
+    )
+    doc_icon: Optional[str] = Field(
+        default=None, alias="DocIcon", title="Type"
+    )
+    dv2nd_inj: Optional[str] = Field(
+        default=None, alias="DV2ndInj", title="Burr 2 D/V 1"
+    )
+    edit: Optional[str] = Field(default=None, alias="Edit", title="Edit")
+    editor: Optional[str] = Field(
+        default=None, alias="Editor", title="Modified By"
+    )
+    fiber_implant1_dv: Optional[str] = Field(
+        default=None, alias="FiberImplant1DV", title="Fiber Implant1 D/V"
+    )
+    fiber_implant2_dv: Optional[str] = Field(
+        default=None, alias="FiberImplant2DV", title="Fiber Implant2 D/V"
+    )
+    fiber_x0020__implant1_x00: Annotated[
+        FiberImplant1Length, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Fiber_x0020_Implant1_x0020_Lengt",
+        title="Fiber Implant1 Length",
+    )
+    fiber_x0020__implant2_x00: Annotated[
+        FiberImplant2Length, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Fiber_x0020_Implant2_x0020_Lengt",
+        title="Fiber Implant2 Length",
+    )
+    fiber_x0020__implant3_x00: Annotated[
+        FiberImplant3Length, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Fiber_x0020_Implant3_x0020_Lengt",
+        title="Fiber Implant3 Length",
+    )
+    fiber_x0020__implant3_x00_001: Optional[str] = Field(
+        default=None,
+        alias="Fiber_x0020_Implant3_x0020_D_x00",
+        title="Fiber Implant3 D/V",
+    )
+    fiber_x0020__implant4_x00: Annotated[
+        FiberImplant4Length, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Fiber_x0020_Implant4_x0020_Lengt",
+        title="Fiber Implant4 Length",
+    )
+    fiber_x0020__implant4_x00_001: Optional[str] = Field(
+        default=None,
+        alias="Fiber_x0020_Implant4_x0020_D_x00",
+        title="Fiber Implant4 D/V",
+    )
+    fiber_x0020__implant5_x00: Annotated[
+        FiberImplant5Length, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Fiber_x0020_Implant5_x0020_Lengt",
+        title="Fiber Implant5 Length",
+    )
+    fiber_x0020__implant5_x00_001: Optional[str] = Field(
+        default=None,
+        alias="Fiber_x0020_Implant5_x0020_D_x00",
+        title="Fiber Implant5 D/V",
+    )
+    fiber_x0020__implant6_x00: Annotated[
+        FiberImplant6Length, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Fiber_x0020_Implant6_x0020_Lengt",
+        title="Fiber Implant6 Length",
+    )
+    fiber_x0020__implant6_x00_001: Optional[str] = Field(
+        default=None,
+        alias="Fiber_x0020_Implant6_x0020_D_x00",
+        title="Fiber Implant6 D/V",
+    )
+    first_inj_recovery: Optional[str] = Field(
+        default=None, alias="FirstInjRecovery", title="Follow up Recovery"
+    )
+    first_injection_iso_durat: Optional[str] = Field(
+        default=None,
+        alias="FirstInjectionIsoDuration",
+        title="Follow up Iso Duration",
+    )
+    first_injection_weight_af: Optional[str] = Field(
+        default=None,
+        alias="FirstInjectionWeightAfter",
+        title="Follow up Weight After",
+    )
+    first_injection_weight_be: Optional[str] = Field(
+        default=None,
+        alias="FirstInjectionWeightBefor",
+        title="Follow up Weight Before",
+    )
+    folder_child_count: Optional[str] = Field(
+        default=None, alias="FolderChildCount", title="Folder Child Count"
+    )
+    headpost: Annotated[Headpost, WrapValidator(optional_enum)] = Field(
+        default="Select...", alias="Headpost", title="Headpost"
+    )
+    headpost_type: Annotated[Well, WrapValidator(optional_enum)] = Field(
+        default="Select...", alias="HeadpostType", title="Well"
+    )
+    headpost_x0020__perform_x: Annotated[
+        HeadpostPerformDuring, WrapValidator(optional_enum)
+    ] = Field(
+        default="Initial Surgery",
+        alias="Headpost_x0020_Perform_x0020_Dur",
+        title="Headpost Perform During",
+    )
+    hemisphere2nd_inj: Annotated[
+        Burr2Hemisphere, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Hemisphere2ndInj",
+        title="Burr 2 Hemisphere",
+    )
+    hp_iso_level: Optional[str] = Field(
+        default=None, alias="HPIsoLevel", title="Initial Iso Level"
+    )
+    hp_recovery: Optional[str] = Field(
+        default=None, alias="HPRecovery", title="Initial Recovery"
+    )
+    hp_surgeon_comments: Optional[str] = Field(
+        default=None, alias="HPSurgeonComments", title="Surgeon Comments"
+    )
+    hp_work_station: Annotated[
+        InitialWorkStation, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="HpWorkStation",
+        title="Initial Work Station",
+    )
+    iacuc_x0020__protocol_x00: Annotated[
+        IacucProtocol, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="IACUC_x0020_Protocol_x0020__x002",
+        title="IACUC Protocol",
+        description="Create a secondary List for Protocols and link to drugs",
+    )
+    id: Optional[str] = Field(default=None, alias="ID", title="ID")
+    implant_id_coverslip_type: Annotated[
+        ImplantIdCoverslipType, WrapValidator(optional_enum)
+    ] = Field(
+        default=None,
+        alias="ImplantIDCoverslipType",
+        title="Implant ID/Coverslip type",
+    )
+    inj1_alternating_time: Optional[str] = Field(
+        default=None, alias="Inj1AlternatingTime", title="Inj1AlternatingTime"
+    )
+    inj1_angle_v2: Optional[str] = Field(
+        default=None, alias="Inj1Angle_v2", title="Burr 1 Angle"
+    )
+    inj1_current: Optional[str] = Field(
+        default=None, alias="Inj1Current", title="Inj1Current"
+    )
+    inj1_ionto_time: Optional[str] = Field(
+        default=None, alias="Inj1IontoTime", title="Inj1IontoTime"
+    )
+    inj1_storage_location: Optional[str] = Field(
+        default=None, alias="Inj1StorageLocation", title="Inj1StorageLocation"
+    )
+    inj1_type: Annotated[Inj1Type, WrapValidator(optional_enum)] = Field(
+        default="Select...", alias="Inj1Type", title="Inj1Type"
+    )
+    inj1_virus_strain_rt: Optional[str] = Field(
+        default=None, alias="Inj1VirusStrain_rt", title="Inj1VirusStrain_rt"
+    )
+    inj1volperdepth: Optional[str] = Field(
+        default=None, alias="inj1volperdepth", title="inj1volperdepth"
+    )
+    inj2_alternating_time: Optional[str] = Field(
+        default=None, alias="Inj2AlternatingTime", title="Inj2AlternatingTime"
+    )
+    inj2_angle_v2: Optional[str] = Field(
+        default=None, alias="Inj2Angle_v2", title="Burr 2 Angle"
+    )
+    inj2_current: Optional[str] = Field(
+        default=None, alias="Inj2Current", title="Inj2Current"
+    )
+    inj2_ionto_time: Optional[str] = Field(
+        default=None, alias="Inj2IontoTime", title="Inj2IontoTime"
+    )
+    inj2_storage_location: Optional[str] = Field(
+        default=None, alias="Inj2StorageLocation", title="Inj2StorageLocation"
+    )
+    inj2_type: Annotated[Inj2Type, WrapValidator(optional_enum)] = Field(
+        default="Select...", alias="Inj2Type", title="Inj2Type"
+    )
+    inj2_virus_strain_rt: Optional[str] = Field(
+        default=None, alias="Inj2VirusStrain_rt", title="Inj2VirusStrain_rt"
+    )
+    inj2volperdepth: Optional[str] = Field(
+        default=None, alias="inj2volperdepth", title="inj2volperdepth"
+    )
+    inj3_alternating_time: Optional[str] = Field(
+        default=None, alias="Inj3AlternatingTime", title="Inj3AlternatingTime"
+    )
+    inj3_current: Optional[str] = Field(
+        default=None, alias="Inj3Current", title="Inj3Current"
+    )
+    inj3_ionto_time: Optional[str] = Field(
+        default=None, alias="Inj3IontoTime", title="Inj3IontoTime"
+    )
+    inj3_storage_location: Optional[str] = Field(
+        default=None, alias="Inj3StorageLocation", title="Inj3StorageLocation"
+    )
+    inj3_type: Annotated[Inj3Type, WrapValidator(optional_enum)] = Field(
+        default="Select...", alias="Inj3Type", title="Inj3Type"
+    )
+    inj3ret_setting: Annotated[
+        Inj3Retsetting, WrapValidator(optional_enum)
+    ] = Field(default="Off", alias="Inj3retSetting", title="Inj3retSetting")
+    inj3volperdepth: Optional[str] = Field(
+        default=None, alias="Inj3volperdepth", title="Inj3volperdepth"
+    )
+    inj4_alternating_time: Optional[str] = Field(
+        default=None, alias="Inj4AlternatingTime", title="Inj4AlternatingTime"
+    )
+    inj4_current: Optional[str] = Field(
+        default=None, alias="Inj4Current", title="Inj4Current"
+    )
+    inj4_ionto_time: Optional[str] = Field(
+        default=None, alias="Inj4IontoTime", title="Inj4IontoTime"
+    )
+    inj4_storage_location: Optional[str] = Field(
+        default=None, alias="Inj4StorageLocation", title="Inj4StorageLocation"
+    )
+    inj4_type: Annotated[Inj4Type, WrapValidator(optional_enum)] = Field(
+        default="Select...", alias="Inj4Type", title="Inj4Type"
+    )
+    inj4_virus_strain_rt: Optional[str] = Field(
+        default=None, alias="Inj4VirusStrain_rt", title="Inj4VirusStrain_rt"
+    )
+    inj4ret_setting: Annotated[
+        Inj4Retsetting, WrapValidator(optional_enum)
+    ] = Field(default="Off", alias="Inj4retSetting", title="Inj4retSetting")
+    inj4volperdepth: Optional[str] = Field(
+        default=None, alias="Inj4volperdepth", title="Inj4volperdepth"
+    )
+    inj5_alternating_time: Optional[str] = Field(
+        default=None, alias="Inj5AlternatingTime", title="Inj5AlternatingTime"
+    )
+    inj5_current: Optional[str] = Field(
+        default=None, alias="Inj5Current", title="Inj5Current"
+    )
+    inj5_ionto_time: Optional[str] = Field(
+        default=None, alias="Inj5IontoTime", title="Inj5IontoTime"
+    )
+    inj5_storage_location: Optional[str] = Field(
+        default=None, alias="Inj5StorageLocation", title="Inj5StorageLocation"
+    )
+    inj5_type: Annotated[Inj5Type, WrapValidator(optional_enum)] = Field(
+        default="Select...", alias="Inj5Type", title="Inj5Type"
+    )
+    inj5_virus_strain_rt: Optional[str] = Field(
+        default=None, alias="Inj5VirusStrain_rt", title="Inj5VirusStrain_rt"
+    )
+    inj5ret_setting: Annotated[
+        Inj5Retsetting, WrapValidator(optional_enum)
+    ] = Field(default="Off", alias="Inj5retSetting", title="Inj5retSetting")
+    inj5volperdepth: Optional[str] = Field(
+        default=None, alias="inj5volperdepth", title="inj5volperdepth"
+    )
+    inj6_alternating_time: Optional[str] = Field(
+        default=None, alias="Inj6AlternatingTime", title="Inj6AlternatingTime"
+    )
+    inj6_current: Optional[str] = Field(
+        default=None, alias="Inj6Current", title="Inj6Current"
+    )
+    inj6_ionto_time: Optional[str] = Field(
+        default=None, alias="Inj6IontoTime", title="Inj6IontoTime"
+    )
+    inj6_storage_location: Optional[str] = Field(
+        default=None, alias="Inj6StorageLocation", title="Inj6StorageLocation"
+    )
+    inj6_type: Annotated[Inj6Type, WrapValidator(optional_enum)] = Field(
+        default="Select...", alias="Inj6Type", title="Inj6Type"
+    )
+    inj6_virus_strain_rt: Optional[str] = Field(
+        default=None, alias="Inj6VirusStrain_rt", title="Inj6VirusStrain_rt"
+    )
+    inj6ret_setting: Annotated[
+        Inj6Retsetting, WrapValidator(optional_enum)
+    ] = Field(default="Off", alias="Inj6retSetting", title="Inj6retSetting")
+    inj6volperdepth: Optional[str] = Field(
+        default=None, alias="inj6volperdepth", title="inj6volperdepth"
+    )
+    inj_virus_strain_rt: Optional[str] = Field(
+        default=None, alias="InjVirusStrain_rt", title="Inj3VirusStrain_rt"
+    )
+    ionto_number_inj1: Annotated[
+        InitialIontoNumber, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="IontoNumberInj1",
+        title="Initial Ionto Number",
+    )
+    ionto_number_inj2: Annotated[
+        FolowUpIontoNumber, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="IontoNumberInj2",
+        title="Folow up Ionto Number",
+    )
+    is_record: Optional[str] = Field(
+        default=None, alias="_IsRecord", title="Item is a Record"
+    )
+    iso_x0020__on: Optional[str] = Field(
+        default=None, alias="Iso_x0020_On", title="Initial Iso Duration"
+    )
+    item_child_count: Optional[str] = Field(
+        default=None, alias="ItemChildCount", title="Item Child Count"
+    )
+    lab_tracks_x0020__group: Optional[str] = Field(
+        default=None, alias="LabTracks_x0020_Group", title="LabTracks Group"
+    )
+    lab_tracks_x0020__request: Optional[str] = Field(
+        default=None,
+        alias="LabTracks_x0020_Requestor",
+        title="LabTracks Requestor",
+        description="Who requested the animal in LabTracks",
+    )
+    lab_tracks_x0020_id1: Optional[str] = Field(
+        default=None, alias="LabTracks_x0020_ID1", title="LabTracks ID"
+    )
+    li_ms_x0020__required: Annotated[
+        LimsRequired, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="LIMs_x0020_Required",
+        title="LIMS Required",
+        description="Is LIMS or SLIMS Entry required",
+    )
+    light_cycle: Annotated[Lightcycle, WrapValidator(optional_enum)] = Field(
+        default=None, alias="LightCycle", title="LightCycle"
+    )
+    lims_project: Annotated[Limsproject, WrapValidator(optional_enum)] = Field(
+        default=None, alias="LIMSProject", title="LIMSProject"
+    )
+    lims_taskflow: Annotated[Limstaskflow, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="LIMSTaskflow", title="LIMSTaskflow")
+    )
+    link_title: Optional[str] = Field(
+        default=None, alias="LinkTitle", title="Title"
+    )
+    link_title_no_menu: Optional[str] = Field(
+        default=None, alias="LinkTitleNoMenu", title="Title"
+    )
+    long_requestor_comments: Optional[str] = Field(
+        default=None, alias="LongRequestorComments", title="Requestor Comments"
+    )
+    ml2nd_inj: Optional[str] = Field(
+        default=None, alias="ML2ndInj", title="Burr 2 M/L"
+    )
+    modified: Optional[str] = Field(
+        default=None, alias="Modified", title="Modified"
+    )
+    nanoject_number_inj10: Annotated[
+        InitialNanojectNumber, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="NanojectNumberInj10",
+        title="Initial Nanoject Number",
+    )
+    nanoject_number_inj2: Annotated[
+        FollowUpNanojectNumber, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="NanojectNumberInj2",
+        title="Follow up Nanoject Number",
+    )
+    non_x002d_nsb_x0020__surg: Optional[bool] = Field(
+        default="0",
+        alias="Non_x002d_NSB_x0020_Surgeon",
+        title="Non-NSB Surgeon",
+        description="Is this surgery going to be performed by NSB or someone else?",
+    )
+    pedigree_name: Optional[str] = Field(
+        default=None, alias="PedigreeName", title="Pedigree Name"
+    )
+    pi: Optional[str] = Field(
+        default=None,
+        alias="PI",
+        title="PI",
+        description="Requesting Investigator",
+    )
+    procedure: Annotated[Procedure, WrapValidator(optional_enum)] = Field(
+        default="Select...",
+        alias="Procedure",
+        title="Procedure",
+        description="Procedure, Specific T3",
+    )
+    procedure_x0020__family: Annotated[
+        ProcedureCategory, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Procedure_x0020_Family",
+        title="Procedure Category",
+        description="Procedure Family T1",
+    )
+    procedure_x0020__slots: Annotated[
+        ProcedureSlots, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Procedure_x0020_Slots",
+        title="Procedure Slots",
+        description="Sinlge or mutpile surgical slots",
+    )
+    procedure_x0020_t2: Annotated[
+        PhysiologyType, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Procedure_x0020_T2",
+        title="Physiology Type",
+        description="Procedure Imaging paradigm T2",
+    )
+    project_id: Annotated[Projectid, WrapValidator(optional_enum)] = Field(
+        default=None, alias="ProjectID", title="ProjectID"
+    )
+    protocol: Annotated[Protocol, WrapValidator(optional_enum)] = Field(
+        default="Select...", alias="Protocol", title="Protocol"
+    )
+    ret_setting0: Annotated[Inj1Retsetting, WrapValidator(optional_enum)] = (
+        Field(default="Off", alias="retSetting0", title="Inj1retSetting")
+    )
+    ret_setting1: Annotated[Inj2Retsetting, WrapValidator(optional_enum)] = (
+        Field(default="Off", alias="retSetting1", title="Inj2retSetting")
+    )
+    round1_inj_isolevel: Optional[str] = Field(
+        default=None, alias="Round1InjIsolevel", title="Follow up Iso Level"
+    )
+    sex: Annotated[Sex, WrapValidator(optional_enum)] = Field(
+        default="Select...", alias="Sex", title="Sex"
+    )
+    surgery_status: Annotated[SurgeryStatus, WrapValidator(optional_enum)] = (
+        Field(default="New", alias="SurgeryStatus", title="Surgery Status")
+    )
+    test1: Optional[str] = Field(
+        default=None, alias="Test1", title="Initial Surgeon"
+    )
+    test_x0020_1st_x0020__rou: Optional[str] = Field(
+        default=None,
+        alias="TEST_x0020_1st_x0020_Round_x0020",
+        title="Follow up Surgeon",
+    )
+    thermistor: Annotated[Thermistor, WrapValidator(optional_enum)] = Field(
+        default="No", alias="Thermistor", title="Thermistor"
+    )
+    title: Optional[str] = Field(default=None, alias="Title", title="Title")
+    ui_version_string: Optional[str] = Field(
+        default=None, alias="_UIVersionString", title="Version"
+    )
+    virus_x0020__hemisphere: Annotated[
+        Burr1Hemisphere, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="Virus_x0020_Hemisphere",
+        title="Burr 1 Hemisphere",
+    )
+    virus_x0020_a_x002f_p: Optional[str] = Field(
+        default=None, alias="Virus_x0020_A_x002f_P", title="Burr 1 A/P"
+    )
+    virus_x0020_d_x002f_v: Optional[str] = Field(
+        default=None, alias="Virus_x0020_D_x002f_V", title="Burr  1 D/V 1"
+    )
+    virus_x0020_m_x002f_l: Optional[str] = Field(
+        default=None, alias="Virus_x0020_M_x002f_L", title="Burr  1 M/L"
+    )
+    weight_x0020_after_x0020: Optional[str] = Field(
+        default=None,
+        alias="Weight_x0020_after_x0020_Surgery",
+        title="Initial Weight after",
+    )
+    weight_x0020_before_x0020: Optional[str] = Field(
+        default=None,
+        alias="Weight_x0020_before_x0020_Surger",
+        title="Initial Weight before",
+    )
+    work_station1st_injection: Annotated[
+        FollowUpWorkstation, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="WorkStation1stInjection",
+        title="Follow up Workstation",
+    )
+    x0023__x0020_of_x0020__bu: Annotated[
+        OfBurrHoles, WrapValidator(optional_enum)
+    ] = Field(
+        default="Select...",
+        alias="_x0023__x0020_of_x0020_Burr_x002",
+        title="# of Burr Holes",
+    )
