@@ -4570,16 +4570,15 @@ class WindowPlacment(str, Enum):
     POSTERIOR = "Posterior"
     SELECT = "Select..."
 
-
 class NSBList(BaseModel, extra="allow"):
     """Fields in SharePoint list."""
 
-    age_x0020_at_x0020__injec: Optional[str] = Field(
+    age_at_injection: Optional[str] = Field(
         default=None,
         alias="Age_x0020_at_x0020_Injection",
         title="Age at Injection 1",
     )
-    aind_x0020__project_x0020: Annotated[
+    aind_project_name: Annotated[
         AindProjectName, WrapValidator(optional_enum)
     ] = Field(
         default=None,
@@ -4604,93 +4603,95 @@ class NSBList(BaseModel, extra="allow"):
     behavior: Annotated[Behavior, WrapValidator(optional_enum)] = Field(
         default="No", alias="Behavior", title="Behavior"
     )
-    behavior_x0020__autotrain: Annotated[
+    behavior_autotrain_c: Annotated[
         BehaviorAutotrainCurriculum, WrapValidator(optional_enum)
     ] = Field(
         default=None,
         alias="Behavior_x0020_Autotrain_x0020_C",
         title="Behavior Autotrain Curriculum",
     )
-    behavior_x0020__complete: Optional[str] = Field(
+    behavior_complete: Optional[str] = Field(
         default=None,
         alias="Behavior_x0020_Complete",
         title="Behavior Complete",
     )
-    behavior_x0020__curriculu: Annotated[
+    behavior_curriculum: Annotated[
         BehaviorCurriculumVersion, WrapValidator(optional_enum)
     ] = Field(
         default=None,
         alias="Behavior_x0020_Curriculum_x0020_",
         title="Behavior Curriculum Version",
     )
-    behavior_x0020__destinati: Annotated[
+    behavior_destination: Annotated[
         BehaviorDestination, WrapValidator(optional_enum)
     ] = Field(
         default=None,
         alias="behavior_x0020_Destination",
         title="Behavior Destination",
     )
-    behavior_x0020__fiber_x00: Annotated[
+    behavior_fiber_photo: Annotated[
         BehaviorFiberPhotometry, WrapValidator(optional_enum)
     ] = Field(
         default=None,
         alias="Behavior_x0020_Fiber_x0020_Photo",
         title="Behavior Fiber Photometry",
     )
-    behavior_x0020__first_x00: Annotated[
+    behavior_first_video: Annotated[
         BehaviorFirstVideoRecordingStage, WrapValidator(optional_enum)
     ] = Field(
         default=None,
         alias="Behavior_x0020_First_x0020_Video",
         title="Behavior First Video Recording Stage",
     )
-    behavior_x0020__first_x00_001: Annotated[
+    behavior_first_fip_x: Annotated[
         BehaviorFirstFipStage, WrapValidator(optional_enum)
     ] = Field(
         default=None,
         alias="Behavior_x0020_First_x0020_FIP_x",
         title="Behavior First FIP Stage",
     )
-    behavior_x0020__platform: Annotated[
+    behavior_platform: Annotated[
         BehaviorPlatform, WrapValidator(optional_enum)
     ] = Field(
         default=None,
         alias="Behavior_x0020_Platform",
         title="Behavior Platform",
     )
-    behavior_x0020__type: Annotated[
-        BehaviorType, WrapValidator(optional_enum)
-    ] = Field(
-        default="Select...", alias="Behavior_x0020_Type", title="Behavior Type"
+    behavior_type: Annotated[BehaviorType, WrapValidator(optional_enum)] = (
+        Field(
+            default="Select...",
+            alias="Behavior_x0020_Type",
+            title="Behavior Type",
+        )
     )
-    behavior_x0020_fip_x0020: Annotated[
+    behavior_fip_mode: Annotated[
         BehaviorFipMode, WrapValidator(optional_enum)
     ] = Field(
         default=None,
         alias="Behavior_x0020_FIP_x0020_Mode",
         title="Behavior FIP Mode",
     )
-    black_x0020__cement: Annotated[
-        BlackCement, WrapValidator(optional_enum)
-    ] = Field(default="No", alias="Black_x0020_Cement", title="Black Cement")
+    black_cement: Annotated[BlackCement, WrapValidator(optional_enum)] = (
+        Field(default="No", alias="Black_x0020_Cement", title="Black Cement")
+    )
     breg2_lamb: Optional[str] = Field(
         default=None, alias="Breg2Lamb", title="Bregma to Lambda"
     )
-    burr1_x0020__injection_x0: Annotated[
+    burr1_injection_devi: Annotated[
         Burr1InjectionDevice, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Burr1_x0020_Injection_x0020_Devi",
         title="Burr1 Injection Device",
     )
-    burr1_x0020__perform_x002: Annotated[
+    burr1_perform_during: Annotated[
         Burr1PerformDuring, WrapValidator(optional_enum)
     ] = Field(
         default="Initial Surgery",
         alias="Burr1_x0020_Perform_x0020_During",
         title="Burr1 Perform During",
     )
-    burr1_x0020__virus_x0020: Annotated[
+    burr1_virus_biosafte: Annotated[
         Burr1VirusBiosafteyLevelBsl, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
@@ -4698,24 +4699,24 @@ class NSBList(BaseModel, extra="allow"):
         title="Burr1 Virus Biosaftey Level (BSL)",
         description="BSL & Material injected. If other PI must provide material in requestor comments.",
     )
-    burr2_x0020__injection_x0: Annotated[
+    burr2_injection_devi: Annotated[
         Burr2InjectionDevice, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Burr2_x0020_Injection_x0020_Devi",
         title="Burr2 Injection Device",
     )
-    burr2_x0020__perform_x002: Annotated[
+    burr2_perform_during: Annotated[
         Burr2PerformDuring, WrapValidator(optional_enum)
     ] = Field(
         default="Initial Surgery",
         alias="Burr2_x0020_Perform_x0020_During",
         title="Burr2 Perform During",
     )
-    burr2_x0020__status: Annotated[
-        Burr2Status, WrapValidator(optional_enum)
-    ] = Field(default=None, alias="Burr2_x0020_Status", title="Burr2 Status")
-    burr2_x0020__virus_x0020: Annotated[
+    burr2_status: Annotated[Burr2Status, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="Burr2_x0020_Status", title="Burr2 Status")
+    )
+    burr2_virus_biosafte: Annotated[
         Burr2VirusBiosafteyLevelBsl, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
@@ -4723,24 +4724,24 @@ class NSBList(BaseModel, extra="allow"):
         title="Burr2 Virus Biosaftey Level (BSL)",
         description="BSL & Material injected. If other PI must provide material in requestor comments.",
     )
-    burr3_x0020__injection_x0: Annotated[
+    burr3_injection_devi: Annotated[
         Burr3InjectionDevice, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Burr3_x0020_Injection_x0020_Devi",
         title="Burr3 Injection Device",
     )
-    burr3_x0020__perform_x002: Annotated[
+    burr3_perform_during: Annotated[
         Burr3PerformDuring, WrapValidator(optional_enum)
     ] = Field(
         default="Initial Surgery",
         alias="Burr3_x0020_Perform_x0020_During",
         title="Burr3 Perform During",
     )
-    burr3_x0020__status: Annotated[
-        Burr3Status, WrapValidator(optional_enum)
-    ] = Field(default=None, alias="Burr3_x0020_Status", title="Burr3 Status")
-    burr3_x0020__virus_x0020: Annotated[
+    burr3_status: Annotated[Burr3Status, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="Burr3_x0020_Status", title="Burr3 Status")
+    )
+    burr3_virus_biosafet: Annotated[
         Burr3VirusBiosafetyLevelBsl, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
@@ -4748,33 +4749,33 @@ class NSBList(BaseModel, extra="allow"):
         title="Burr3 Virus Biosafety Level (BSL)",
         description="BSL & Material injected. If other PI must provide material in requestor comments.",
     )
-    burr3_x0020_a_x002f_p: Optional[str] = Field(
+    burr3_a_p: Optional[str] = Field(
         default=None, alias="Burr3_x0020_A_x002f_P", title="Burr3 A/P"
     )
-    burr3_x0020_d_x002f_v: Optional[str] = Field(
+    burr3_d_v: Optional[str] = Field(
         default=None, alias="Burr3_x0020_D_x002f_V", title="Burr3 D/V 1"
     )
-    burr3_x0020_m_x002f_l: Optional[str] = Field(
+    burr3_m_l: Optional[str] = Field(
         default=None, alias="Burr3_x0020_M_x002f_L", title="Burr3 M/L"
     )
-    burr4_x0020__injection_x0: Annotated[
+    burr4_injection_devi: Annotated[
         Burr4InjectionDevice, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Burr4_x0020_Injection_x0020_Devi",
         title="Burr4 Injection Device",
     )
-    burr4_x0020__perform_x002: Annotated[
+    burr4_perform_during: Annotated[
         Burr4PerformDuring, WrapValidator(optional_enum)
     ] = Field(
         default="Initial Surgery",
         alias="Burr4_x0020_Perform_x0020_During",
         title="Burr4 Perform During",
     )
-    burr4_x0020__status: Annotated[
-        Burr4Status, WrapValidator(optional_enum)
-    ] = Field(default=None, alias="Burr4_x0020_Status", title="Burr4 Status")
-    burr4_x0020__virus_x0020: Annotated[
+    burr4_status: Annotated[Burr4Status, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="Burr4_x0020_Status", title="Burr4 Status")
+    )
+    burr4_virus_biosafte: Annotated[
         Burr4VirusBiosafteyLevelBsl, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
@@ -4782,47 +4783,47 @@ class NSBList(BaseModel, extra="allow"):
         title="Burr4 Virus Biosaftey Level (BSL)",
         description="BSL & Material injected. If other PI must provide material in requestor comments.",
     )
-    burr4_x0020_a_x002f_p: Optional[str] = Field(
+    burr4_a_p: Optional[str] = Field(
         default=None, alias="Burr4_x0020_A_x002f_P", title="Burr4 A/P"
     )
-    burr4_x0020_d_x002f_v: Optional[str] = Field(
+    burr4_d_v: Optional[str] = Field(
         default=None, alias="Burr4_x0020_D_x002f_V", title="Burr4 D/V 1"
     )
-    burr4_x0020_m_x002f_l: Optional[str] = Field(
+    burr4_m_l: Optional[str] = Field(
         default=None, alias="Burr4_x0020_M_x002f_L", title="Burr4 M/L"
     )
-    burr5_x0020__injection_x0: Annotated[
+    burr5_injection_devi: Annotated[
         Burr5InjectionDevice, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Burr5_x0020_Injection_x0020_Devi",
         title="Burr5 Injection Device",
     )
-    burr5_x0020__perform_x002: Annotated[
+    burr5_perform_during: Annotated[
         Burr5PerformDuring, WrapValidator(optional_enum)
     ] = Field(
         default="Initial Surgery",
         alias="Burr5_x0020_Perform_x0020_During",
         title="Burr5 Perform During",
     )
-    burr5_x0020__status: Annotated[
-        Burr5Status, WrapValidator(optional_enum)
-    ] = Field(default=None, alias="Burr5_x0020_Status", title="Burr5 Status")
-    burr5_x0020__virus_x0020: Annotated[
+    burr5_status: Annotated[Burr5Status, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="Burr5_x0020_Status", title="Burr5 Status")
+    )
+    burr5_virus_biosafte: Annotated[
         Burr5VirusBiosafteyLevelBsl, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Burr5_x0020_Virus_x0020_Biosafte",
         title="Burr5 Virus Biosaftey Level (BSL)",
     )
-    burr6_x0020__injection_x0: Annotated[
+    burr6_injection_devi: Annotated[
         Burr6InjectionDevice, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Burr6_x0020_Injection_x0020_Devi",
         title="Burr6 Injection Device",
     )
-    burr6_x0020__perform_x002: Annotated[
+    burr6_perform_during: Annotated[
         Burr6PerformDuring, WrapValidator(optional_enum)
     ] = Field(
         default="Initial Surgery",
@@ -4830,69 +4831,69 @@ class NSBList(BaseModel, extra="allow"):
         title="Burr6 Perform During",
         description="",
     )
-    burr6_x0020__status: Annotated[
-        Burr6Status, WrapValidator(optional_enum)
-    ] = Field(default=None, alias="Burr6_x0020_Status", title="Burr6 Status")
-    burr6_x0020__virus_x0020: Annotated[
+    burr6_status: Annotated[Burr6Status, WrapValidator(optional_enum)] = (
+        Field(default=None, alias="Burr6_x0020_Status", title="Burr6 Status")
+    )
+    burr6_virus_biosafte: Annotated[
         Burr6VirusBiosafteyLevelBsl, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Burr6_x0020_Virus_x0020_Biosafte",
         title="Burr6 Virus Biosaftey Level (BSL)",
     )
-    burr_x0020_1_x0020__fiber: Annotated[
+    burr_1_fiber_t: Annotated[
         Burr1FiberType, WrapValidator(optional_enum)
     ] = Field(
         default="Standard (provided by NSB)",
         alias="Burr_x0020_1_x0020_Fiber_x0020_t",
         title="Burr 1 Fiber type",
     )
-    burr_x0020_1_x0020__grid: Optional[str] = Field(
+    burr_1_grid_sp: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_1_x0020_Grid_x0020_Sp",
         title="Burr 1 Grid Spacing (um)",
     )
-    burr_x0020_1_x0020__injec: Optional[str] = Field(
-        default=None,
-        alias="Burr_x0020_1_x0020_Injectable_x0",
-        title="Burr 1 Injectable Material 1",
-    )
-    burr_x0020_1_x0020__injec_001: Optional[str] = Field(
+    burr_1_injectable_x00: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_1_x0020_Injectable_x00",
         title="Burr 1 Injectable Material 2",
     )
-    burr_x0020_1_x0020__injec_002: Optional[str] = Field(
+    burr_1_injectable_x01: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_1_x0020_Injectable_x01",
         title="Burr 1 Injectable Material 3",
     )
-    burr_x0020_1_x0020__injec_003: Optional[str] = Field(
+    burr_1_injectable_x02: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_1_x0020_Injectable_x02",
         title="Burr 1 Injectable Material 4",
     )
-    burr_x0020_1_x0020__injec_004: Optional[str] = Field(
+    burr_1_injectable_x03: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_1_x0020_Injectable_x03",
         title="Burr 1 Injectable Material 1 Titer",
     )
-    burr_x0020_1_x0020__injec_005: Optional[str] = Field(
+    burr_1_injectable_x04: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_1_x0020_Injectable_x04",
         title="Burr 1 Injectable Material 2 Titer",
     )
-    burr_x0020_1_x0020__injec_006: Optional[str] = Field(
+    burr_1_injectable_x05: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_1_x0020_Injectable_x05",
         title="Burr 1 Injectable Material 3 Titer",
     )
-    burr_x0020_1_x0020__injec_007: Optional[str] = Field(
+    burr_1_injectable_x06: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_1_x0020_Injectable_x06",
         title="Burr 1 Injectable Material 4 Titer",
     )
-    burr_x0020_1_x0020__inten: Annotated[
+    burr_1_injectable_x0: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_1_x0020_Injectable_x0",
+        title="Burr 1 Injectable Material 1",
+    )
+    burr_1_intended: Annotated[
         Burr1IntendedCcfTarget, WrapValidator(optional_enum)
     ] = Field(
         default=None,
@@ -4900,633 +4901,623 @@ class NSBList(BaseModel, extra="allow"):
         title="Burr 1 Intended CCF Target",
         description="Intended CCF target of burr 1 coordinates",
     )
-    burr_x0020_1_x0020__spina: Annotated[
+    burr_1_spinal: Annotated[
         Burr1SpinalLocation, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Burr_x0020_1_x0020_Spinal_x0020_",
         title="Burr 1 Spinal Location",
     )
-    burr_x0020_1_x0020_d_x002: Optional[str] = Field(
+    burr_1_d_v_x00: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_1_x0020_D_x002f_V_x00",
         title="Burr 1 D/V 3",
     )
-    burr_x0020_1_x0020_dv_x00: Optional[str] = Field(
+    burr_1_dv_2: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_1_x0020_DV_x0020_2",
         title="Burr 1 D/V 2",
     )
-    burr_x0020_1_x0020_intend: Annotated[
+    burr_1_intended_x0020: Annotated[
         Burr1IntendedMeasurementRed, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_1_x0020_intended_x0020",
         title="Burr 1 intended measurement red",
     )
-    burr_x0020_1_x0020_intend_001: Annotated[
+    burr_1_intended_x0021: Annotated[
         Burr1IntendedMeasurementGreen, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_1_x0020_intended_x0021",
         title="Burr 1 intended measurement green",
     )
-    burr_x0020_1_x0020_intend_002: Annotated[
+    burr_1_intended_x0022: Annotated[
         Burr1IntendedMeasurementBlue, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_1_x0020_intended_x0022",
         title="Burr 1 intended measurement blue",
     )
-    burr_x0020_1_x0020_intend_003: Annotated[
+    burr_1_intended_x0023: Annotated[
         Burr1IntendedMeasurementIsosbestic, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_1_x0020_intended_x0023",
         title="Burr 1 intended measurement isosbestic",
     )
-    burr_x0020_2_x0020__fiber: Annotated[
+    burr_2_fiber_t: Annotated[
         Burr2FiberType, WrapValidator(optional_enum)
     ] = Field(
         default="Standard (Provided by NSB)",
         alias="Burr_x0020_2_x0020_Fiber_x0020_T",
         title="Burr 2 Fiber Type",
     )
-    burr_x0020_2_x0020__injec: Optional[str] = Field(
-        default=None,
-        alias="Burr_x0020_2_x0020_Injectable_x0",
-        title="Burr 2 Injectable Material 1",
-    )
-    burr_x0020_2_x0020__injec_001: Optional[str] = Field(
+    burr_2_injectable_x00: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_2_x0020_Injectable_x00",
         title="Burr 2 Injectable Material 2",
     )
-    burr_x0020_2_x0020__injec_002: Optional[str] = Field(
+    burr_2_injectable_x01: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_2_x0020_Injectable_x01",
         title="Burr 2 Injectable Material 3",
     )
-    burr_x0020_2_x0020__injec_003: Optional[str] = Field(
+    burr_2_injectable_x02: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_2_x0020_Injectable_x02",
         title="Burr 2 Injectable Material 4",
     )
-    burr_x0020_2_x0020__injec_004: Optional[str] = Field(
+    burr_2_injectable_x03: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_2_x0020_Injectable_x03",
         title="Burr 2 Injectable Material 1 Titer",
     )
-    burr_x0020_2_x0020__injec_005: Optional[str] = Field(
+    burr_2_injectable_x04: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_2_x0020_Injectable_x04",
         title="Burr 2 Injectable Material 2 Titer",
     )
-    burr_x0020_2_x0020__injec_006: Optional[str] = Field(
+    burr_2_injectable_x05: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_2_x0020_Injectable_x05",
         title="Burr 2 Injectable Material 3 Titer",
     )
-    burr_x0020_2_x0020__injec_007: Optional[str] = Field(
+    burr_2_injectable_x06: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_2_x0020_Injectable_x06",
         title="Burr 2 Injectable Material 4 Titer",
     )
-    burr_x0020_2_x0020__inten: Annotated[
+    burr_2_injectable_x0: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_Injectable_x0",
+        title="Burr 2 Injectable Material 1",
+    )
+    burr_2_intended: Annotated[
         Burr2IntendedCcfTarget, WrapValidator(optional_enum)
     ] = Field(
         default=None,
         alias="Burr_x0020_2_x0020_Intended_x002",
         title="Burr 2 Intended CCF Target",
     )
-    burr_x0020_2_x0020__spina: Annotated[
+    burr_2_spinal: Annotated[
         Burr2SpinalLocation, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Burr_x0020_2_x0020_Spinal_x0020_",
         title="Burr 2 Spinal Location",
     )
-    burr_x0020_2_x0020_d_x002: Optional[str] = Field(
-        default=None,
-        alias="Burr_x0020_2_x0020_D_x002f_V_x00",
-        title="Burr 2 D/V 2",
-    )
-    burr_x0020_2_x0020_d_x002_001: Optional[str] = Field(
+    burr_2_d_v_x000: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_2_x0020_D_x002f_V_x000",
         title="Burr 2 D/V 3",
     )
-    burr_x0020_2_x0020_intend: Annotated[
+    burr_2_d_v_x00: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_2_x0020_D_x002f_V_x00",
+        title="Burr 2 D/V 2",
+    )
+    burr_2_intended_x0020: Annotated[
         Burr2IntendedMeasurementRed, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_2_x0020_intended_x0020",
         title="Burr 2 intended measurement red",
     )
-    burr_x0020_2_x0020_intend_001: Annotated[
+    burr_2_intended_x0021: Annotated[
         Burr2IntendedMeasurementGreen, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_2_x0020_intended_x0021",
         title="Burr 2 intended measurement green",
     )
-    burr_x0020_2_x0020_intend_002: Annotated[
+    burr_2_intended_x0022: Annotated[
         Burr2IntendedMeasurementBlue, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_2_x0020_intended_x0022",
         title="Burr 2 intended measurement blue",
     )
-    burr_x0020_2_x0020_intend_003: Annotated[
+    burr_2_intended_x0023: Annotated[
         Burr2IntendedMeasurementIsosbestic, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_2_x0020_intended_x0023",
         title="Burr 2 intended measurement isosbestic",
     )
-    burr_x0020_3_x0020__angle: Optional[str] = Field(
+    burr_3_angle: Optional[str] = Field(
         default=None, alias="Burr_x0020_3_x0020_Angle", title="Burr 3 Angle"
     )
-    burr_x0020_3_x0020__fiber: Annotated[
+    burr_3_fiber_t: Annotated[
         Burr3FiberType, WrapValidator(optional_enum)
     ] = Field(
         default="Standard (Provided by NSB)",
         alias="Burr_x0020_3_x0020_Fiber_x0020_T",
         title="Burr 3 Fiber Type",
     )
-    burr_x0020_3_x0020__hemis: Annotated[
+    burr_3_hemisphere: Annotated[
         Burr3Hemisphere, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Burr_x0020_3_x0020_Hemisphere",
         title="Burr 3 Hemisphere",
     )
-    burr_x0020_3_x0020__injec: Optional[str] = Field(
-        default=None,
-        alias="Burr_x0020_3_x0020_Injectable_x0",
-        title="Burr 3 Injectable Material 1",
-    )
-    burr_x0020_3_x0020__injec_001: Optional[str] = Field(
+    burr_3_injectable_x00: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_3_x0020_Injectable_x00",
         title="Burr 3 Injectable Material 2",
     )
-    burr_x0020_3_x0020__injec_002: Optional[str] = Field(
+    burr_3_injectable_x01: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_3_x0020_Injectable_x01",
         title="Burr 3 Injectable Material 3",
     )
-    burr_x0020_3_x0020__injec_003: Optional[str] = Field(
+    burr_3_injectable_x02: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_3_x0020_Injectable_x02",
         title="Burr 3 Injectable Material 4",
     )
-    burr_x0020_3_x0020__injec_004: Optional[str] = Field(
+    burr_3_injectable_x03: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_3_x0020_Injectable_x03",
         title="Burr 3 Injectable Material 1 Titer",
     )
-    burr_x0020_3_x0020__injec_005: Optional[str] = Field(
+    burr_3_injectable_x04: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_3_x0020_Injectable_x04",
         title="Burr 3 Injectable Material 2 Titer",
     )
-    burr_x0020_3_x0020__injec_006: Optional[str] = Field(
-        default=None,
-        alias="Burr_x0020_3_x0020_Injectable_x06",
-        title="Burr 3 Injectable Material 3 Titer",
-    )
-    burr_x0020_3_x0020__injec_007: Optional[str] = Field(
+    burr_3_injectable_x05: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_3_x0020_Injectable_x05",
         title="Burr 3 Injectable Material 4 Titer",
     )
-    burr_x0020_3_x0020__inten: Annotated[
+    burr_3_injectable_x06: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_Injectable_x06",
+        title="Burr 3 Injectable Material 3 Titer",
+    )
+    burr_3_injectable_x0: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_Injectable_x0",
+        title="Burr 3 Injectable Material 1",
+    )
+    burr_3_intended: Annotated[
         Burr3IntendedCcfTarget, WrapValidator(optional_enum)
     ] = Field(
         default=None,
         alias="Burr_x0020_3_x0020_Intended_x002",
         title="Burr 3 Intended CCF Target",
     )
-    burr_x0020_3_x0020_d_x002: Optional[str] = Field(
-        default=None,
-        alias="Burr_x0020_3_x0020_D_x002f_V_x00",
-        title="Burr 3 D/V 2",
-    )
-    burr_x0020_3_x0020_d_x002_001: Optional[str] = Field(
+    burr_3_d_v_x000: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_3_x0020_D_x002f_V_x000",
         title="Burr 3 D/V 3",
     )
-    burr_x0020_3_x0020_intend: Annotated[
+    burr_3_d_v_x00: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_3_x0020_D_x002f_V_x00",
+        title="Burr 3 D/V 2",
+    )
+    burr_3_intended_x0020: Annotated[
         Burr3IntendedMeasurementRed, WrapValidator(optional_enum)
     ] = Field(
         default="Enter Choice #1",
         alias="Burr_x0020_3_x0020_intended_x0020",
         title="Burr 3 intended measurement red",
     )
-    burr_x0020_3_x0020_intend_001: Annotated[
+    burr_3_intended_x0021: Annotated[
         Burr3IntendedMeasurementGreen, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_3_x0020_intended_x0021",
         title="Burr 3 intended measurement green",
     )
-    burr_x0020_3_x0020_intend_002: Annotated[
+    burr_3_intended_x0022: Annotated[
         Burr3IntendedMeasurementBlue, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_3_x0020_intended_x0022",
         title="Burr 3 intended measurement blue",
     )
-    burr_x0020_3_x0020_intend_003: Annotated[
+    burr_3_intended_x0023: Annotated[
         Burr3IntendedMeasurementIsosbestic, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_3_x0020_intended_x0023",
         title="Burr 3 intended measurement isosbestic",
     )
-    burr_x0020_4_x0020__angle: Optional[str] = Field(
+    burr_4_angle: Optional[str] = Field(
         default=None, alias="Burr_x0020_4_x0020_Angle", title="Burr 4 Angle"
     )
-    burr_x0020_4_x0020__fiber: Annotated[
+    burr_4_fiber_t: Annotated[
         Burr4FiberType, WrapValidator(optional_enum)
     ] = Field(
         default="Standard (Provided by NSB)",
         alias="Burr_x0020_4_x0020_Fiber_x0020_T",
         title="Burr 4 Fiber Type",
     )
-    burr_x0020_4_x0020__hemis: Annotated[
+    burr_4_hemisphere: Annotated[
         Burr4Hemisphere, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Burr_x0020_4_x0020_Hemisphere",
         title="Burr 4 Hemisphere",
     )
-    burr_x0020_4_x0020__injec: Optional[str] = Field(
-        default=None,
-        alias="Burr_x0020_4_x0020_Injectable_x0",
-        title="Burr 4 Injectable Material 1",
-    )
-    burr_x0020_4_x0020__injec_001: Optional[str] = Field(
+    burr_4_injectable_x00: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_4_x0020_Injectable_x00",
         title="Burr 4 Injectable Material 2",
     )
-    burr_x0020_4_x0020__injec_002: Optional[str] = Field(
+    burr_4_injectable_x01: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_4_x0020_Injectable_x01",
         title="Burr 4 Injectable Material 3",
     )
-    burr_x0020_4_x0020__injec_003: Optional[str] = Field(
+    burr_4_injectable_x02: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_4_x0020_Injectable_x02",
         title="Burr 4 Injectable Material 4",
     )
-    burr_x0020_4_x0020__injec_004: Optional[str] = Field(
+    burr_4_injectable_x03: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_4_x0020_Injectable_x03",
         title="Burr 4 Injectable Material 1 Titer",
     )
-    burr_x0020_4_x0020__injec_005: Optional[str] = Field(
+    burr_4_injectable_x04: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_4_x0020_Injectable_x04",
         title="Burr 4 Injectable Material 2 Titer",
     )
-    burr_x0020_4_x0020__injec_006: Optional[str] = Field(
+    burr_4_injectable_x05: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_4_x0020_Injectable_x05",
         title="Burr 4 Injectable Material 3 Titer",
     )
-    burr_x0020_4_x0020__injec_007: Optional[str] = Field(
+    burr_4_injectable_x06: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_4_x0020_Injectable_x06",
         title="Burr 4 Injectable Material 4 Titer",
     )
-    burr_x0020_4_x0020__inten: Annotated[
+    burr_4_injectable_x0: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_Injectable_x0",
+        title="Burr 4 Injectable Material 1",
+    )
+    burr_4_intended: Annotated[
         Burr4IntendedCcfTarget, WrapValidator(optional_enum)
     ] = Field(
         default=None,
         alias="Burr_x0020_4_x0020_Intended_x002",
         title="Burr 4 Intended CCF Target",
     )
-    burr_x0020_4_x0020_d_x002: Optional[str] = Field(
-        default=None,
-        alias="Burr_x0020_4_x0020_D_x002f_V_x00",
-        title="Burr 4 D/V 2",
-    )
-    burr_x0020_4_x0020_d_x002_001: Optional[str] = Field(
+    burr_4_d_v_x000: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_4_x0020_D_x002f_V_x000",
         title="Burr 4 D/V 3",
     )
-    burr_x0020_4_x0020_intend: Annotated[
+    burr_4_d_v_x00: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_4_x0020_D_x002f_V_x00",
+        title="Burr 4 D/V 2",
+    )
+    burr_4_intended_x0020: Annotated[
         Burr4IntendedMeasurementRed, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_4_x0020_intended_x0020",
         title="Burr 4 intended measurement red",
     )
-    burr_x0020_4_x0020_intend_001: Annotated[
+    burr_4_intended_x0021: Annotated[
         Burr4IntendedMeasurementGreen, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_4_x0020_intended_x0021",
         title="Burr 4 intended measurement green",
     )
-    burr_x0020_4_x0020_intend_002: Annotated[
+    burr_4_intended_x0022: Annotated[
         Burr4IntendedMeasurementBlue, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_4_x0020_intended_x0022",
         title="Burr 4 intended measurement blue",
     )
-    burr_x0020_4_x0020_intend_003: Optional[
-        Burr4IntendedMeasurementIsosbestic
+    burr_4_intended_x0023: Annotated[
+        Burr4IntendedMeasurementIsosbestic, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_4_x0020_intended_x0023",
         title="Burr 4 intended measurement isosbestic",
     )
-    burr_x0020_5_x0020__angle: Optional[str] = Field(
+    burr_5_angle: Optional[str] = Field(
         default=None, alias="Burr_x0020_5_x0020_Angle", title="Burr 5 Angle"
     )
-    burr_x0020_5_x0020__fiber: Annotated[
+    burr_5_fiber_t: Annotated[
         Burr5FiberType, WrapValidator(optional_enum)
     ] = Field(
         default="Standard (provided by NSB)",
         alias="Burr_x0020_5_x0020_Fiber_x0020_t",
         title="Burr 5 Fiber type",
     )
-    burr_x0020_5_x0020__hemis: Annotated[
+    burr_5_hemisphere: Annotated[
         Burr5Hemisphere, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Burr_x0020_5_x0020_Hemisphere",
         title="Burr 5 Hemisphere",
     )
-    burr_x0020_5_x0020__injec: Optional[str] = Field(
-        default=None,
-        alias="Burr_x0020_5_x0020_Injectable_x0",
-        title="Burr 5 Injectable Material 1",
-    )
-    burr_x0020_5_x0020__injec_001: Optional[str] = Field(
+    burr_5_injectable_x00: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_5_x0020_Injectable_x00",
         title="Burr 5 Injectable Material 2",
     )
-    burr_x0020_5_x0020__injec_002: Optional[str] = Field(
+    burr_5_injectable_x01: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_5_x0020_Injectable_x01",
         title="Burr 5 Injectable Material 3",
     )
-    burr_x0020_5_x0020__injec_003: Optional[str] = Field(
+    burr_5_injectable_x02: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_5_x0020_Injectable_x02",
         title="Burr 5 Injectable Material 4",
     )
-    burr_x0020_5_x0020__injec_004: Optional[str] = Field(
+    burr_5_injectable_x03: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_5_x0020_Injectable_x03",
         title="Burr 5 Injectable Material 1 Titer",
     )
-    burr_x0020_5_x0020__injec_005: Optional[str] = Field(
+    burr_5_injectable_x04: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_5_x0020_Injectable_x04",
         title="Burr 5 Injectable Material 2 Titer",
     )
-    burr_x0020_5_x0020__injec_006: Optional[str] = Field(
+    burr_5_injectable_x05: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_5_x0020_Injectable_x05",
         title="Burr 5 Injectable Material 3 Titer",
     )
-    burr_x0020_5_x0020__injec_007: Optional[str] = Field(
+    burr_5_injectable_x06: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_5_x0020_Injectable_x06",
         title="Burr 5 Injectable Material 4 Titer",
     )
-    burr_x0020_5_x0020__inten: Annotated[
+    burr_5_injectable_x0: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_Injectable_x0",
+        title="Burr 5 Injectable Material 1",
+    )
+    burr_5_intended: Annotated[
         Burr5IntendedCcfTarget, WrapValidator(optional_enum)
     ] = Field(
         default=None,
         alias="Burr_x0020_5_x0020_Intended_x002",
         title="Burr 5 Intended CCF Target",
     )
-    burr_x0020_5_x0020_a_x002: Optional[str] = Field(
+    burr_5_a_p: Optional[str] = Field(
         default=None, alias="Burr_x0020_5_x0020_A_x002f_P", title="Burr 5 A/P"
     )
-    burr_x0020_5_x0020_d_x002: Optional[str] = Field(
-        default=None,
-        alias="Burr_x0020_5_x0020_D_x002f_V_x00",
-        title="Burr 5 D/V 1",
-    )
-    burr_x0020_5_x0020_d_x002_001: Optional[str] = Field(
+    burr_5_d_v_x000: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_5_x0020_D_x002f_V_x000",
         title="Burr 5 D/V 2",
     )
-    burr_x0020_5_x0020_d_x002_002: Optional[str] = Field(
+    burr_5_d_v_x001: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_5_x0020_D_x002f_V_x001",
         title="Burr 5 D/V 3",
     )
-    burr_x0020_5_x0020_intend: Annotated[
+    burr_5_d_v_x00: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_5_x0020_D_x002f_V_x00",
+        title="Burr 5 D/V 1",
+    )
+    burr_5_intended_x0020: Annotated[
         Burr5IntendedMeasurementRed, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_5_x0020_intended_x0020",
         title="Burr 5 intended measurement red",
     )
-    burr_x0020_5_x0020_intend_001: Annotated[
+    burr_5_intended_x0021: Annotated[
         Burr5IntendedMeasurementGreen, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_5_x0020_intended_x0021",
         title="Burr 5 intended measurement green",
     )
-    burr_x0020_5_x0020_intend_002: Annotated[
+    burr_5_intended_x0022: Annotated[
         Burr5IntendedMeasurementBlue, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_5_x0020_intended_x0022",
         title="Burr 5 intended measurement blue",
     )
-    burr_x0020_5_x0020_intend_003: Annotated[
+    burr_5_intended_x0023: Annotated[
         Burr5IntendedMeasurementIsosbestic, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_5_x0020_intended_x0023",
         title="Burr 5 intended measurement isosbestic",
     )
-    burr_x0020_5_x0020_m_x002: Optional[str] = Field(
+    burr_5_m_l: Optional[str] = Field(
         default=None, alias="Burr_x0020_5_x0020_M_x002f_L", title="Burr 5 M/L"
     )
-    burr_x0020_6_x0020__angle: Optional[str] = Field(
+    burr_6_angle: Optional[str] = Field(
         default=None, alias="Burr_x0020_6_x0020_Angle", title="Burr 6 Angle"
     )
-    burr_x0020_6_x0020__fiber: Annotated[
+    burr_6_fiber_t: Annotated[
         Burr6FiberType, WrapValidator(optional_enum)
     ] = Field(
         default="Standard (provided by NSB)",
         alias="Burr_x0020_6_x0020_Fiber_x0020_t",
         title="Burr 6 Fiber type",
     )
-    burr_x0020_6_x0020__hemis: Annotated[
+    burr_6_hemisphere: Annotated[
         Burr6Hemisphere, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Burr_x0020_6_x0020_Hemisphere",
         title="Burr 6 Hemisphere",
     )
-    burr_x0020_6_x0020__injec: Optional[str] = Field(
-        default=None,
-        alias="Burr_x0020_6_x0020_Injectable_x0",
-        title="Burr 6 Injectable Material 1",
-    )
-    burr_x0020_6_x0020__injec_001: Optional[str] = Field(
+    burr_6_injectable_x00: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_6_x0020_Injectable_x00",
         title="Burr 6 Injectable Material 2",
     )
-    burr_x0020_6_x0020__injec_002: Optional[str] = Field(
+    burr_6_injectable_x01: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_6_x0020_Injectable_x01",
         title="Burr 6 Injectable Material 3",
     )
-    burr_x0020_6_x0020__injec_003: Optional[str] = Field(
+    burr_6_injectable_x02: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_6_x0020_Injectable_x02",
         title="Burr 6 Injectable Material 4",
     )
-    burr_x0020_6_x0020__injec_004: Optional[str] = Field(
+    burr_6_injectable_x03: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_6_x0020_Injectable_x03",
         title="Burr 6 Injectable Material 1 Titer",
     )
-    burr_x0020_6_x0020__injec_005: Optional[str] = Field(
+    burr_6_injectable_x04: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_6_x0020_Injectable_x04",
         title="Burr 6 Injectable Material 2 Titer",
     )
-    burr_x0020_6_x0020__injec_006: Optional[str] = Field(
+    burr_6_injectable_x05: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_6_x0020_Injectable_x05",
         title="Burr 6 Injectable Material 3 Titer",
     )
-    burr_x0020_6_x0020__injec_007: Optional[str] = Field(
+    burr_6_injectable_x06: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_6_x0020_Injectable_x06",
         title="Burr 6 Injectable Material 4 Titer",
     )
-    burr_x0020_6_x0020__inten: Annotated[
+    burr_6_injectable_x0: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_Injectable_x0",
+        title="Burr 6 Injectable Material 1",
+    )
+    burr_6_intended: Annotated[
         Burr6IntendedCcfTarget, WrapValidator(optional_enum)
     ] = Field(
         default=None,
         alias="Burr_x0020_6_x0020_Intended_x002",
         title="Burr 6 Intended CCF Target",
     )
-    burr_x0020_6_x0020_a_x002: Optional[str] = Field(
+    burr_6_a_p: Optional[str] = Field(
         default=None, alias="Burr_x0020_6_x0020_A_x002f_P", title="Burr 6 A/P"
     )
-    burr_x0020_6_x0020_d_x002: Optional[str] = Field(
-        default=None,
-        alias="Burr_x0020_6_x0020_D_x002f_V_x00",
-        title="Burr 6 D/V 1",
-    )
-    burr_x0020_6_x0020_d_x002_001: Optional[str] = Field(
+    burr_6_d_v_x000: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_6_x0020_D_x002f_V_x000",
         title="Burr 6 D/V 2",
     )
-    burr_x0020_6_x0020_d_x002_002: Optional[str] = Field(
+    burr_6_d_v_x001: Optional[str] = Field(
         default=None,
         alias="Burr_x0020_6_x0020_D_x002f_V_x001",
         title="Burr 6 D/V 3",
     )
-    burr_x0020_6_x0020_intend: Annotated[
+    burr_6_d_v_x00: Optional[str] = Field(
+        default=None,
+        alias="Burr_x0020_6_x0020_D_x002f_V_x00",
+        title="Burr 6 D/V 1",
+    )
+    burr_6_intended_x0020: Annotated[
         Burr6IntendedMeasurementRed, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_6_x0020_intended_x0020",
         title="Burr 6 intended measurement red",
     )
-    burr_x0020_6_x0020_intend_001: Annotated[
+    burr_6_intended_x0021: Annotated[
         Burr6IntendedMeasurementGreen, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_6_x0020_intended_x0021",
         title="Burr 6 intended measurement green",
     )
-    burr_x0020_6_x0020_intend_002: Annotated[
+    burr_6_intended_x0022: Annotated[
         Burr6IntendedMeasurementBlue, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_6_x0020_intended_x0022",
         title="Burr 6 intended measurement blue",
     )
-    burr_x0020_6_x0020_intend_003: Annotated[
+    burr_6_intended_x0023: Annotated[
         Burr6IntendedMeasurementIsosbestic, WrapValidator(optional_enum)
     ] = Field(
         default="N/A",
         alias="Burr_x0020_6_x0020_intended_x0023",
         title="Burr 6 intended measurement isosbestic",
     )
-    burr_x0020_6_x0020_m_x002: Optional[str] = Field(
+    burr_6_m_l: Optional[str] = Field(
         default=None, alias="Burr_x0020_6_x0020_M_x002f_L", title="Burr 6 M/L"
     )
-    burr_x0020__hole_x0020_1: Annotated[
-        Burr1Status, WrapValidator(optional_enum)
-    ] = Field(
-        default=None,
-        alias="Burr_x0020_Hole_x0020_1_x0020_st",
-        title="Burr1 Status",
+    burr_hole_1_st: Annotated[Burr1Status, WrapValidator(optional_enum)] = (
+        Field(
+            default=None,
+            alias="Burr_x0020_Hole_x0020_1_x0020_st",
+            title="Burr1 Status",
+        )
     )
-    burr_x0020_hole_x0020_1: Annotated[
-        BurrHole1, WrapValidator(optional_enum)
-    ] = Field(
+    burr_hole_1: Annotated[BurrHole1, WrapValidator(optional_enum)] = Field(
         default="Select...",
         alias="Burr_x0020_hole_x0020_1",
         title="Burr hole 1",
     )
-    burr_x0020_hole_x0020_2: Annotated[
-        BurrHole2, WrapValidator(optional_enum)
-    ] = Field(
+    burr_hole_2: Annotated[BurrHole2, WrapValidator(optional_enum)] = Field(
         default="Select...",
         alias="Burr_x0020_hole_x0020_2",
         title="Burr hole 2",
     )
-    burr_x0020_hole_x0020_3: Annotated[
-        BurrHole3, WrapValidator(optional_enum)
-    ] = Field(
+    burr_hole_3: Annotated[BurrHole3, WrapValidator(optional_enum)] = Field(
         default="Select...",
         alias="Burr_x0020_hole_x0020_3",
         title="Burr hole 3",
     )
-    burr_x0020_hole_x0020_4: Annotated[
-        BurrHole4, WrapValidator(optional_enum)
-    ] = Field(
+    burr_hole_4: Annotated[BurrHole4, WrapValidator(optional_enum)] = Field(
         default="Select...",
         alias="Burr_x0020_hole_x0020_4",
         title="Burr hole 4",
     )
-    burr_x0020_hole_x0020_5: Annotated[
-        BurrHole5, WrapValidator(optional_enum)
-    ] = Field(
+    burr_hole_5: Annotated[BurrHole5, WrapValidator(optional_enum)] = Field(
         default="Select...",
         alias="Burr_x0020_hole_x0020_5",
         title="Burr hole 5",
     )
-    burr_x0020_hole_x0020_6: Annotated[
-        BurrHole6, WrapValidator(optional_enum)
-    ] = Field(
+    burr_hole_6: Annotated[BurrHole6, WrapValidator(optional_enum)] = Field(
         default="Select...",
         alias="Burr_x0020_hole_x0020_6",
         title="Burr hole 6",
     )
-    care_x0020__moduele: Annotated[
-        CareModuele, WrapValidator(optional_enum)
-    ] = Field(
-        default="Select...", alias="Care_x0020_Moduele", title="Care Moduele"
+    care_moduele: Annotated[CareModuele, WrapValidator(optional_enum)] = (
+        Field(
+            default="Select...",
+            alias="Care_x0020_Moduele",
+            title="Care Moduele",
+        )
     )
     color_tag: Optional[str] = Field(
         default=None, alias="_ColorTag", title="Color Tag"
@@ -5553,16 +5544,16 @@ class NSBList(BaseModel, extra="allow"):
             default="Select...", alias="Contusion", title="Contusion/Hematoma"
         )
     )
-    craniotomy_type: Annotated[
-        CraniotomyType, WrapValidator(optional_enum)
-    ] = Field(default=None, alias="CraniotomyType", title="Craniotomy Type")
-    craniotomy_x0020__perform: Annotated[
+    craniotomy_perform_d: Annotated[
         CraniotomyPerformDuring, WrapValidator(optional_enum)
     ] = Field(
         default="Initial Surgery",
         alias="Craniotomy_x0020_Perform_x0020_D",
         title="Craniotomy Perform During",
     )
+    craniotomy_type: Annotated[
+        CraniotomyType, WrapValidator(optional_enum)
+    ] = Field(default=None, alias="CraniotomyType", title="Craniotomy Type")
     created: Optional[str] = Field(
         default=None, alias="Created", title="Created"
     )
@@ -5571,16 +5562,16 @@ class NSBList(BaseModel, extra="allow"):
         alias="Date1stInjection",
         title="Date of Follow up Surgery",
     )
-    date_range_start: Optional[str] = Field(
-        default=None, alias="DateRangeStart", title="DateRangeStart"
-    )
-    date_x0020_of_x0020__birt: Optional[str] = Field(
+    date_of_birth: Optional[str] = Field(
         default=None, alias="Date_x0020_of_x0020_Birth", title="Date of Birth"
     )
-    date_x0020_of_x0020__surg: Optional[str] = Field(
+    date_of_surgery: Optional[str] = Field(
         default=None,
         alias="Date_x0020_of_x0020_Surgery",
         title="Date of Initial Surgery",
+    )
+    date_range_start: Optional[str] = Field(
+        default=None, alias="DateRangeStart", title="DateRangeStart"
     )
     doc_icon: Optional[str] = Field(
         default=None, alias="DocIcon", title="Type"
@@ -5592,73 +5583,73 @@ class NSBList(BaseModel, extra="allow"):
     editor: Optional[str] = Field(
         default=None, alias="Editor", title="Modified By"
     )
-    fiber_implant1_dv: Optional[str] = Field(
-        default=None, alias="FiberImplant1DV", title="Fiber Implant1 D/V"
-    )
-    fiber_implant2_dv: Optional[str] = Field(
-        default=None, alias="FiberImplant2DV", title="Fiber Implant2 D/V"
-    )
-    fiber_x0020__implant1_x00: Annotated[
+    fiber_implant1_lengt: Annotated[
         FiberImplant1Length, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Fiber_x0020_Implant1_x0020_Lengt",
         title="Fiber Implant1 Length",
     )
-    fiber_x0020__implant2_x00: Annotated[
+    fiber_implant2_lengt: Annotated[
         FiberImplant2Length, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Fiber_x0020_Implant2_x0020_Lengt",
         title="Fiber Implant2 Length",
     )
-    fiber_x0020__implant3_x00: Annotated[
+    fiber_implant3_lengt: Annotated[
         FiberImplant3Length, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Fiber_x0020_Implant3_x0020_Lengt",
         title="Fiber Implant3 Length",
     )
-    fiber_x0020__implant3_x00_001: Optional[str] = Field(
+    fiber_implant3_d_x00: Optional[str] = Field(
         default=None,
         alias="Fiber_x0020_Implant3_x0020_D_x00",
         title="Fiber Implant3 D/V",
     )
-    fiber_x0020__implant4_x00: Annotated[
+    fiber_implant4_lengt: Annotated[
         FiberImplant4Length, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Fiber_x0020_Implant4_x0020_Lengt",
         title="Fiber Implant4 Length",
     )
-    fiber_x0020__implant4_x00_001: Optional[str] = Field(
+    fiber_implant4_d_x00: Optional[str] = Field(
         default=None,
         alias="Fiber_x0020_Implant4_x0020_D_x00",
         title="Fiber Implant4 D/V",
     )
-    fiber_x0020__implant5_x00: Annotated[
+    fiber_implant5_lengt: Annotated[
         FiberImplant5Length, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Fiber_x0020_Implant5_x0020_Lengt",
         title="Fiber Implant5 Length",
     )
-    fiber_x0020__implant5_x00_001: Optional[str] = Field(
+    fiber_implant5_d_x00: Optional[str] = Field(
         default=None,
         alias="Fiber_x0020_Implant5_x0020_D_x00",
         title="Fiber Implant5 D/V",
     )
-    fiber_x0020__implant6_x00: Annotated[
+    fiber_implant6_lengt: Annotated[
         FiberImplant6Length, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Fiber_x0020_Implant6_x0020_Lengt",
         title="Fiber Implant6 Length",
     )
-    fiber_x0020__implant6_x00_001: Optional[str] = Field(
+    fiber_implant6_d_x00: Optional[str] = Field(
         default=None,
         alias="Fiber_x0020_Implant6_x0020_D_x00",
         title="Fiber Implant6 D/V",
+    )
+    fiber_implant1_dv: Optional[str] = Field(
+        default=None, alias="FiberImplant1DV", title="Fiber Implant1 D/V"
+    )
+    fiber_implant2_dv: Optional[str] = Field(
+        default=None, alias="FiberImplant2DV", title="Fiber Implant2 D/V"
     )
     first_inj_recovery: Optional[str] = Field(
         default=None, alias="FirstInjRecovery", title="Follow up Recovery"
@@ -5684,15 +5675,15 @@ class NSBList(BaseModel, extra="allow"):
     headpost: Annotated[Headpost, WrapValidator(optional_enum)] = Field(
         default="Select...", alias="Headpost", title="Headpost"
     )
-    headpost_type: Annotated[Well, WrapValidator(optional_enum)] = Field(
-        default="Select...", alias="HeadpostType", title="Well"
-    )
-    headpost_x0020__perform_x: Annotated[
+    headpost_perform_dur: Annotated[
         HeadpostPerformDuring, WrapValidator(optional_enum)
     ] = Field(
         default="Initial Surgery",
         alias="Headpost_x0020_Perform_x0020_Dur",
         title="Headpost Perform During",
+    )
+    headpost_type: Annotated[Well, WrapValidator(optional_enum)] = Field(
+        default="Select...", alias="HeadpostType", title="Well"
     )
     hemisphere2nd_inj: Annotated[
         Burr2Hemisphere, WrapValidator(optional_enum)
@@ -5717,13 +5708,13 @@ class NSBList(BaseModel, extra="allow"):
         alias="HpWorkStation",
         title="Initial Work Station",
     )
-    iacuc_x0020__protocol_x00: Annotated[
-        IacucProtocol, WrapValidator(optional_enum)
-    ] = Field(
-        default="Select...",
-        alias="IACUC_x0020_Protocol_x0020__x002",
-        title="IACUC Protocol",
-        description="Create a secondary List for Protocols and link to drugs",
+    iacuc_protocol: Annotated[IacucProtocol, WrapValidator(optional_enum)] = (
+        Field(
+            default="Select...",
+            alias="IACUC_x0020_Protocol_x0020__x002",
+            title="IACUC Protocol",
+            description="Create a secondary List for Protocols and link to drugs",
+        )
     )
     id: Optional[str] = Field(default=None, alias="ID", title="ID")
     implant_id_coverslip_type: Annotated[
@@ -5894,31 +5885,31 @@ class NSBList(BaseModel, extra="allow"):
     is_record: Optional[str] = Field(
         default=None, alias="_IsRecord", title="Item is a Record"
     )
-    iso_x0020__on: Optional[str] = Field(
+    iso_on: Optional[str] = Field(
         default=None, alias="Iso_x0020_On", title="Initial Iso Duration"
     )
     item_child_count: Optional[str] = Field(
         default=None, alias="ItemChildCount", title="Item Child Count"
     )
-    lab_tracks_x0020__group: Optional[str] = Field(
+    lab_tracks_group: Optional[str] = Field(
         default=None, alias="LabTracks_x0020_Group", title="LabTracks Group"
     )
-    lab_tracks_x0020__request: Optional[str] = Field(
+    lab_tracks_requestor: Optional[str] = Field(
         default=None,
         alias="LabTracks_x0020_Requestor",
         title="LabTracks Requestor",
         description="Who requested the animal in LabTracks",
     )
-    lab_tracks_x0020_id1: Optional[str] = Field(
+    lab_tracks_id1: Optional[str] = Field(
         default=None, alias="LabTracks_x0020_ID1", title="LabTracks ID"
     )
-    li_ms_x0020__required: Annotated[
-        LimsRequired, WrapValidator(optional_enum)
-    ] = Field(
-        default="Select...",
-        alias="LIMs_x0020_Required",
-        title="LIMS Required",
-        description="Is LIMS or SLIMS Entry required",
+    li_ms_required: Annotated[LimsRequired, WrapValidator(optional_enum)] = (
+        Field(
+            default="Select...",
+            alias="LIMs_x0020_Required",
+            title="LIMS Required",
+            description="Is LIMS or SLIMS Entry required",
+        )
     )
     light_cycle: Annotated[Lightcycle, WrapValidator(optional_enum)] = Field(
         default=None, alias="LightCycle", title="LightCycle"
@@ -5958,11 +5949,16 @@ class NSBList(BaseModel, extra="allow"):
         alias="NanojectNumberInj2",
         title="Follow up Nanoject Number",
     )
-    non_x002d_nsb_x0020__surg: Optional[bool] = Field(
+    non_x002d_nsb_surgeon: Optional[bool] = Field(
         default="0",
         alias="Non_x002d_NSB_x0020_Surgeon",
         title="Non-NSB Surgeon",
         description="Is this surgery going to be performed by NSB or someone else?",
+    )
+    of_burr: Annotated[OfBurrHoles, WrapValidator(optional_enum)] = Field(
+        default="Select...",
+        alias="_x0023__x0020_of_x0020_Burr_x002",
+        title="# of Burr Holes",
     )
     pedigree_name: Optional[str] = Field(
         default=None, alias="PedigreeName", title="Pedigree Name"
@@ -5979,7 +5975,7 @@ class NSBList(BaseModel, extra="allow"):
         title="Procedure",
         description="Procedure, Specific T3",
     )
-    procedure_x0020__family: Annotated[
+    procedure_family: Annotated[
         ProcedureCategory, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
@@ -5987,7 +5983,7 @@ class NSBList(BaseModel, extra="allow"):
         title="Procedure Category",
         description="Procedure Family T1",
     )
-    procedure_x0020__slots: Annotated[
+    procedure_slots: Annotated[
         ProcedureSlots, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
@@ -5995,13 +5991,13 @@ class NSBList(BaseModel, extra="allow"):
         title="Procedure Slots",
         description="Sinlge or mutpile surgical slots",
     )
-    procedure_x0020_t2: Annotated[
-        PhysiologyType, WrapValidator(optional_enum)
-    ] = Field(
-        default="Select...",
-        alias="Procedure_x0020_T2",
-        title="Physiology Type",
-        description="Procedure Imaging paradigm T2",
+    procedure_t2: Annotated[PhysiologyType, WrapValidator(optional_enum)] = (
+        Field(
+            default="Select...",
+            alias="Procedure_x0020_T2",
+            title="Physiology Type",
+            description="Procedure Imaging paradigm T2",
+        )
     )
     project_id: Annotated[Projectid, WrapValidator(optional_enum)] = Field(
         default=None, alias="ProjectID", title="ProjectID"
@@ -6027,7 +6023,7 @@ class NSBList(BaseModel, extra="allow"):
     test1: Optional[str] = Field(
         default=None, alias="Test1", title="Initial Surgeon"
     )
-    test_x0020_1st_x0020__rou: Optional[str] = Field(
+    test_1st_round_x0020: Optional[str] = Field(
         default=None,
         alias="TEST_x0020_1st_x0020_Round_x0020",
         title="Follow up Surgeon",
@@ -6039,28 +6035,28 @@ class NSBList(BaseModel, extra="allow"):
     ui_version_string: Optional[str] = Field(
         default=None, alias="_UIVersionString", title="Version"
     )
-    virus_x0020__hemisphere: Annotated[
+    virus_hemisphere: Annotated[
         Burr1Hemisphere, WrapValidator(optional_enum)
     ] = Field(
         default="Select...",
         alias="Virus_x0020_Hemisphere",
         title="Burr 1 Hemisphere",
     )
-    virus_x0020_a_x002f_p: Optional[str] = Field(
+    virus_a_p: Optional[str] = Field(
         default=None, alias="Virus_x0020_A_x002f_P", title="Burr 1 A/P"
     )
-    virus_x0020_d_x002f_v: Optional[str] = Field(
+    virus_d_v: Optional[str] = Field(
         default=None, alias="Virus_x0020_D_x002f_V", title="Burr  1 D/V 1"
     )
-    virus_x0020_m_x002f_l: Optional[str] = Field(
+    virus_m_l: Optional[str] = Field(
         default=None, alias="Virus_x0020_M_x002f_L", title="Burr  1 M/L"
     )
-    weight_x0020_after_x0020: Optional[str] = Field(
+    weight_after_surgery: Optional[str] = Field(
         default=None,
         alias="Weight_x0020_after_x0020_Surgery",
         title="Initial Weight after",
     )
-    weight_x0020_before_x0020: Optional[str] = Field(
+    weight_before_surger: Optional[str] = Field(
         default=None,
         alias="Weight_x0020_before_x0020_Surger",
         title="Initial Weight before",
@@ -6071,11 +6067,4 @@ class NSBList(BaseModel, extra="allow"):
         default="Select...",
         alias="WorkStation1stInjection",
         title="Follow up Workstation",
-    )
-    x0023__x0020_of_x0020__bu: Annotated[
-        OfBurrHoles, WrapValidator(optional_enum)
-    ] = Field(
-        default="Select...",
-        alias="_x0023__x0020_of_x0020_Burr_x002",
-        title="# of Burr Holes",
     )
