@@ -64,7 +64,6 @@ class SlimsImagingHandler(SlimsTableHandler):
         for node in root_nodes:
             spim_data = SlimsSpimData()
             node_des = descendants(g, node)
-            n_subject_id = None
             exp_run_created_on = get_attr_or_none(
                 g.nodes[node]["row"], "xprn_createdOn"
             )
@@ -77,8 +76,6 @@ class SlimsImagingHandler(SlimsTableHandler):
                         row, "cntn_cf_parentBarcode"
                     )
                     n_specimen_id = get_attr_or_none(row, "cntn_barCode")
-                    if subject_id is not None and subject_id != n_subject_id:
-                        break
                     spim_data.subject_id = n_subject_id
                     spim_data.specimen_id = n_specimen_id
                 if table_name == "SOP":
@@ -143,7 +140,7 @@ class SlimsImagingHandler(SlimsTableHandler):
                     )
                     spim_data.date_performed = date_performed
                     spim_data.experimenter_name = user
-            if subject_id is None or subject_id == n_subject_id:
+            if subject_id is None or subject_id == spim_data.subject_id:
                 spim_data_list.append(spim_data)
         return spim_data_list
 
