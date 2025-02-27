@@ -16,6 +16,7 @@ from aind_metadata_service.sharepoint.client import (
     SharePointClient,
     SharepointSettings,
 )
+from pydantic import SecretStr
 from tests import PYD_VERSION
 
 if os.getenv("LOG_LEVEL"):  # pragma: no cover
@@ -68,68 +69,77 @@ INJECTION_MATERIALS_PATH = (
 class TestSharepointSettings(unittest.TestCase):
     """Class to test methods for SharepointSettings."""
 
-    EXAMPLE_ENV_VAR1 = {
-        "NSB_SHAREPOINT_URL": "some_url",
-        "LAS_SHAREPOINT_URL": "some_other_url",
-        "NSB_2019_LIST": "some_list_2019",
-        "NSB_2023_LIST": "some_list_2023",
-        "LAS_2020_LIST": "some_list_2020",
-        "SHAREPOINT_USER": "some_user",
-        "SHAREPOINT_PASSWORD": "some_password",
+    EXAMPLE_ENV_VAR = {
+        "SHAREPOINT_AIND_SITE_ID": "aind_site_123",
+        "SHAREPOINT_LAS_SITE_ID": "las_site_456",
+        "SHAREPOINT_NSB_2019_LIST_ID": "nsb_2019",
+        "SHAREPOINT_NSB_2023_LIST_ID": "nsb_2023",
+        "SHAREPOINT_LAS_2020_LIST_ID": "las_2020",
+        "SHAREPOINT_CLIENT_ID": "client_id",
+        "SHAREPOINT_CLIENT_SECRET": "client_secret",
+        "SHAREPOINT_TENANT_ID": "tenant_id",
     }
 
-    @patch.dict(os.environ, EXAMPLE_ENV_VAR1, clear=True)
+    @patch.dict(os.environ, EXAMPLE_ENV_VAR, clear=True)
     def test_settings_set_from_env_vars(self):
         """Tests that the settings can be set from env vars."""
         settings1 = SharepointSettings()
-        settings2 = SharepointSettings(nsb_sharepoint_url="some_other_url")
-
-        self.assertEqual("some_url", settings1.nsb_sharepoint_url)
-        self.assertEqual("some_other_url", settings1.las_sharepoint_url)
-        self.assertEqual("some_list_2019", settings1.nsb_2019_list)
-        self.assertEqual("some_list_2023", settings1.nsb_2023_list)
-        self.assertEqual("some_list_2020", settings1.las_2020_list)
-        self.assertEqual("some_user", settings1.sharepoint_user)
-        self.assertEqual(
-            "some_password",
-            settings1.sharepoint_password.get_secret_value(),
-        )
-        self.assertEqual("some_other_url", settings2.nsb_sharepoint_url)
-        self.assertEqual("some_list_2019", settings2.nsb_2019_list)
-        self.assertEqual("some_list_2023", settings2.nsb_2023_list)
-        self.assertEqual("some_user", settings2.sharepoint_user)
-        self.assertEqual(
-            "some_password",
-            settings2.sharepoint_password.get_secret_value(),
-        )
+        settings2 = SharepointSettings(aind_site_id="other_site")
+        self.assertEqual("aind_site_123", settings1.aind_site_id)
+        self.assertEqual("las_site_456", settings1.las_site_id)
+        self.assertEqual("nsb_2019", settings1.nsb_2019_list_id)
+        self.assertEqual("nsb_2023", settings1.nsb_2023_list_id)
+        self.assertEqual("las_2020", settings1.las_2020_list_id)
+        self.assertEqual("client_id", settings1.client_id)
+        self.assertEqual("client_secret", settings1.client_secret.get_secret_value())
+        self.assertEqual("tenant_id", settings1.tenant_id)
+        self.assertEqual("other_site", settings2.aind_site_id)
+        self.assertEqual("las_site_456", settings2.las_site_id)
 
     @patch.dict(os.environ, {}, clear=True)
     def test_settings_errors(self):
         """Tests that errors are raised if settings are incorrect."""
 
         with self.assertRaises(ValueError) as e:
-            SharepointSettings(nsb_sharepoint_url="some_url")
+            SharepointSettings(aind_site_id="aind_site_only")
 
         expected_error_message = (
-            "3 validation errors for SharepointSettings\n"
-            "las_sharepoint_url\n"
-            "  Field required [type=missing,"
-            " input_value={'nsb_sharepoint_url': 'some_url'},"
-            " input_type=dict]\n"
-            "    For further information visit"
-            f" https://errors.pydantic.dev/{PYD_VERSION}/v/missing\n"
-            "sharepoint_user\n"
-            "  Field required [type=missing,"
-            " input_value={'nsb_sharepoint_url': 'some_url'},"
-            " input_type=dict]\n"
-            "    For further information visit"
-            f" https://errors.pydantic.dev/{PYD_VERSION}/v/missing\n"
-            "sharepoint_password\n"
-            "  Field required"
-            " [type=missing, input_value={'nsb_sharepoint_url': 'some_url'},"
-            " input_type=dict]\n"
-            "    For further information visit"
-            f" https://errors.pydantic.dev/{PYD_VERSION}/v/missing"
+            "7 validation errors for SharepointSettings\n"
+            "las_site_id\n"
+            "  Field required [type=missing, input_value={'aind_site_id': "
+            "'aind_site_only'}, input_type=dict]\n"
+            "    For further information visit "
+            f"https://errors.pydantic.dev/{PYD_VERSION}/v/missing\n"
+            "nsb_2019_list_id\n"
+            "  Field required [type=missing, input_value={'aind_site_id': "
+            "'aind_site_only'}, input_type=dict]\n"
+            "    For further information visit "
+            f"https://errors.pydantic.dev/{PYD_VERSION}/v/missing\n"
+            "nsb_2023_list_id\n"
+            "  Field required [type=missing, input_value={'aind_site_id': "
+            "'aind_site_only'}, input_type=dict]\n"
+            "    For further information visit "
+            f"https://errors.pydantic.dev/{PYD_VERSION}/v/missing\n"
+            "las_2020_list_id\n"
+            "  Field required [type=missing, input_value={'aind_site_id': "
+            "'aind_site_only'}, input_type=dict]\n"
+            "    For further information visit "
+            f"https://errors.pydantic.dev/{PYD_VERSION}/v/missing\n"
+            "client_id\n"
+            "  Field required [type=missing, input_value={'aind_site_id': "
+            "'aind_site_only'}, input_type=dict]\n"
+            "    For further information visit "
+            f"https://errors.pydantic.dev/{PYD_VERSION}/v/missing\n"
+            "client_secret\n"
+            "  Field required [type=missing, input_value={'aind_site_id': "
+            "'aind_site_only'}, input_type=dict]\n"
+            "    For further information visit "
+            f"https://errors.pydantic.dev/{PYD_VERSION}/v/missing\n"
+            "tenant_id\n"
+            "  Field required [type=missing, input_value={'aind_site_id': "
+            "'aind_site_only'}, input_type=dict]\n"
+            "    For further information visit "
+            f"https://errors.pydantic.dev/{PYD_VERSION}/v/missing"
         )
 
         self.assertEqual(expected_error_message, repr(e.exception))
@@ -144,6 +154,19 @@ class TestSharepointClient(unittest.TestCase):
         cls.list_items_2019 = cls._load_json_files(year="2019")
         cls.list_items_2023 = cls._load_json_files(year="2023")
         cls.list_items_2020 = cls._load_json_files(year="2020")
+
+        cls.client = SharePointClient(
+            aind_site_id="aind_site_123",
+            las_site_id="las_site_456",
+            nsb_2019_list_id="nsb_2019",
+            nsb_2023_list_id="nsb_2023",
+            las_2020_list_id="las_2020",
+            client_id="client_id",
+            client_secret=SecretStr("client_secret"),
+            tenant_id="tenant_id",
+        )
+        # Patch get_access_token so that header construction works without real HTTP calls.
+        cls.client.get_access_token = MagicMock(return_value="fake-token")
 
     @staticmethod
     def _load_json_files(year: str) -> List[Tuple[dict, dict, str]]:
@@ -169,140 +192,79 @@ class TestSharepointClient(unittest.TestCase):
             list_items.sort(key=lambda x: x[2])
         return list_items
 
-    @patch("aind_metadata_service.sharepoint.client.ClientContext")
-    def test_empty_response(self, mock_sharepoint_client: MagicMock):
+    def test_empty_response(self):
         """Tests that an empty response is generated if no data returned
         from NSB datatbases"""
-        client = SharePointClient(
-            nsb_site_url="some_url",
-            las_site_url="some_other_url",
-            client_id="some_client_id",
-            client_secret="some_client_secret",
-            nsb_2019_list_title="some_list_title2019",
-            nsb_2023_list_title="some_list_title2023",
-            las_2020_list_title="some_list_title2020",
-        )
-        model_response = client.get_procedure_info(
-            subject_id="12345", list_title="some_list_title2019"
-        )
-        json_response = model_response.map_to_json_response()
-        mock_sharepoint_client.assert_called()
-        self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
-        self.assertEqual(
-            StatusCodes.NO_DATA_FOUND.value, json_response.status_code
-        )
+        with patch.object(self.client, "_fetch_list_items", return_value={"value": []}):
+            response = self.client.get_procedure_info(subject_id="12345", list_id="nsb_2019")
 
-    @patch("aind_metadata_service.sharepoint.client.ClientContext")
-    def test_data_mapped(self, mock_sharepoint_client: MagicMock):
+        self.assertEqual(StatusCodes.DB_RESPONDED, response.status_code)
+        self.assertEqual([], response.aind_models)
+        json_response = response.map_to_json_response()
+        self.assertEqual(StatusCodes.NO_DATA_FOUND.value, json_response.status_code)
+
+    def test_data_mapped(self):
         """Tests that 200 response returned correctly."""
+        list_item_2019_raw = self.list_items_2019[0][0]
+        list_item_2023_raw = self.list_items_2023[0][0]
+        expected_mapped_2019 = self.list_items_2019[0][1]
+        expected_mapped_2023 = self.list_items_2023[0][1]
 
-        inner_mock = MagicMock()
-        mock_sharepoint_client.return_value.with_credentials.return_value = (
-            inner_mock
-        )
-        mock_list_views = MagicMock()
-        inner_mock.web.lists.get_by_title.return_value.views = mock_list_views
-        mock_list_items = MagicMock()
-        mock_list_views.get_by_title.return_value.get_items.return_value = (
-            mock_list_items
-        )
-        list_item_2019_1 = self.list_items_2019[0][0]
-        list_item_2023_1 = self.list_items_2023[0][0]
-        mock_list_item2019 = MagicMock()
-        mock_list_item2023 = MagicMock()
-        mock_list_item2019.to_json.return_value = list_item_2019_1
-        mock_list_item2023.to_json.return_value = list_item_2023_1
-        mock_list_items.filter.side_effect = [
-            [mock_list_item2019],
-            [mock_list_item2023],
-        ]
+        # Patch _fetch_list_items to simulate the Graph API response.
+        with patch.object(
+            self.client,
+            "_fetch_list_items",
+            side_effect=[
+                {"value": [{"fields": list_item_2019_raw}]},
+                {"value": [{"fields": list_item_2023_raw}]},
+            ],
+        ):
+            with patch.object(
+                self.client,
+                "_extract_procedures_from_response",
+                side_effect=[expected_mapped_2019, expected_mapped_2023],
+            ):
+                response2019 = self.client.get_procedure_info(
+                    subject_id="12345", list_id="nsb_2019"
+                )
+                response2023 = self.client.get_procedure_info(
+                    subject_id="12345", list_id="nsb_2023"
+                )
 
-        client = SharePointClient(
-            nsb_site_url="some_url",
-            las_site_url="some_other_url",
-            client_id="some_client_id",
-            client_secret="some_client_secret",
-            nsb_2019_list_title="some_list_title2019",
-            nsb_2023_list_title="some_list_title2023",
-            las_2020_list_title="some_list_title2020",
-        )
-
-        expected_subject_procedures = []
-        expected_subject_procedures.extend(self.list_items_2019[0][1])
-        expected_subject_procedures.extend(self.list_items_2023[0][1])
-        response2019 = client.get_procedure_info(
-            subject_id="12345", list_title="some_list_title2019"
-        )
-        response2023 = client.get_procedure_info(
-            subject_id="12345", list_title="some_list_title2023"
-        )
-        merged_responses = client.merge_responses([response2019, response2023])
-        json_response = merged_responses.map_to_json_response()
+        merged_response = self.client.merge_responses([response2019, response2023])
+        json_response = merged_response.map_to_json_response()
         actual_content = json.loads(json_response.body.decode("utf-8"))
-        actual_subject_procedures = actual_content["data"][
-            "subject_procedures"
-        ]
+        actual_subject_procedures = actual_content["data"]["subject_procedures"]
+        expected_subject_procedures = expected_mapped_2019 + expected_mapped_2023
         expected_subject_procedures.sort(key=lambda x: str(x))
         actual_subject_procedures.sort(key=lambda x: str(x))
-        self.assertEqual(
-            StatusCodes.DB_RESPONDED, merged_responses.status_code
-        )
-        # Most of the models are missing required fields not in NSB
+        self.assertEqual(StatusCodes.DB_RESPONDED, merged_response.status_code)
         self.assertEqual(406, json_response.status_code)
-        self.assertEqual(
-            expected_subject_procedures, actual_subject_procedures
-        )
+        self.assertEqual(expected_subject_procedures, actual_subject_procedures)
 
-    @patch("aind_metadata_service.sharepoint.client.ClientContext")
-    def test_las_data_mapped(self, mock_sharepoint_client: MagicMock):
+    def test_las_data_mapped(self):
         """Tests that 200 response returned correctly."""
-        inner_mock = MagicMock()
-        mock_sharepoint_client.return_value.with_credentials.return_value = (
-            inner_mock
-        )
-        mock_list_view = MagicMock()
-        inner_mock.web.lists.get_by_title.return_value = mock_list_view
-        mock_l_items = MagicMock()
+        list_item_2020_raw = self.list_items_2020[0][0]
+        expected_mapped_2020 = self.list_items_2020[0][1]
 
-        list_item_2020_1 = self.list_items_2020[0][0]
-        mock_list_item2020 = MagicMock()
-        mock_list_item2020.to_json.return_value = list_item_2020_1
-
-        mock_get = MagicMock()
-        mock_l_items.paged.return_value.top.return_value.get.return_value = (
-            mock_get
-        )
-
-        mock_get.filter.return_value.execute_query.side_effect = [
-            [mock_list_item2020],
-        ]
-        mock_list_view.items = mock_l_items
-
-        client = SharePointClient(
-            nsb_site_url="some_url",
-            las_site_url="some_other_url",
-            client_id="some_client_id",
-            client_secret="some_client_secret",
-            nsb_2019_list_title="some_list_title2019",
-            nsb_2023_list_title="some_list_title2023",
-            las_2020_list_title="some_list_title2020",
-        )
-        expected_subject_procedures = [self.list_items_2020[0][1]]
-        response2020 = client.get_procedure_info(
-            subject_id="000000", list_title="some_list_title2020"
-        )
-        json_response = response2020.map_to_json_response()
+        # Patch _fetch_list_items to simulate the Graph API response for LAS.
+        with patch.object(
+            self.client,
+            "_fetch_list_items",
+            return_value={"value": [{"fields": list_item_2020_raw}]}
+        ):
+            with patch.object(
+                self.client,
+                "_extract_procedures_from_response",
+                return_value=expected_mapped_2020
+            ):
+                response = self.client.get_procedure_info(subject_id="000000", list_id="las_2020")
+        self.assertEqual(StatusCodes.DB_RESPONDED, response.status_code)
+        json_response = response.map_to_json_response()
         actual_content = json.loads(json_response.body.decode("utf-8"))
-        actual_subject_procedures = actual_content["data"][
-            "subject_procedures"
-        ]
-        expected_subject_procedures.sort(key=lambda x: str(x))
-        actual_subject_procedures.sort(key=lambda x: str(x))
-        self.assertEqual(StatusCodes.DB_RESPONDED, response2020.status_code)
+        actual_subject_procedures = actual_content["data"]["subject_procedures"]
+        self.assertEqual(expected_mapped_2020, actual_subject_procedures)
         self.assertEqual(406, json_response.status_code)
-        self.assertEqual(
-            expected_subject_procedures, actual_subject_procedures
-        )
 
     @patch("aind_metadata_service.sharepoint.client.ClientContext")
     def test_merge_valid_empty_procedures(

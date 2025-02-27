@@ -68,6 +68,7 @@ class HeadPost(Enum):
     LC = "LC"
     DHC = "DHC"
 
+
 class HeadPostType(Enum):
     """Enum class for HeadPostType"""
 
@@ -191,6 +192,7 @@ class HeadPostInfo:
             well_part_number=well_part_number,
         )
 
+
 class MappedNSBList:
     """Mapped Fields in SharePoint list."""
 
@@ -306,7 +308,7 @@ class MappedNSBList:
     ) -> Optional[Decimal]:
         """Parse string representation of concentration into Decimal."""
         return None if con_str is None else Decimal(str(float(con_str)))
-    
+
     @property
     def aind_age_at_injection(self) -> Optional[Decimal]:
         """Maps age_at_injection to aind model."""
@@ -2029,7 +2031,7 @@ class MappedNSBList:
                 self._nsb.burr_3_hemisphere.RIGHT: Side.RIGHT,
             }.get(self._nsb.burr_3_hemisphere, None)
         )
-    
+
     @property
     def aind_burr_3_injectable_x0(self) -> Optional[str]:
         """Maps burr_3_injectable_x0 to aind model."""
@@ -4236,7 +4238,12 @@ class MappedNSBList:
     @property
     def aind_fiber_implant1_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant1_lengt to aind model"""
-        return self._parse_fiber_length_mm_str(self._nsb.fiber_implant1_lengt)
+        return (
+            None if self._nsb.fiber_implant1_lengt is None
+            else self._parse_fiber_length_mm_str(
+                self._nsb.fiber_implant1_lengt.value
+            )
+        )
 
     @property
     def aind_fiber_implant2_dv(self) -> Optional[Decimal]:
@@ -4246,7 +4253,12 @@ class MappedNSBList:
     @property
     def aind_fiber_implant2_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant2_lengt to aind model"""
-        return self._parse_fiber_length_mm_str(self._nsb.fiber_implant2_lengt)
+        return (
+            None if self._nsb.fiber_implant2_lengt is None 
+            else self._parse_fiber_length_mm_str(
+                self._nsb.fiber_implant2_lengt.value
+            )
+        )
 
     @property
     def aind_fiber_implant3_d_x00(self) -> Optional[Decimal]:
@@ -4256,7 +4268,12 @@ class MappedNSBList:
     @property
     def aind_fiber_implant3_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant3_lengt to aind model"""
-        return self._parse_fiber_length_mm_str(self._nsb.fiber_implant3_lengt)
+        return (
+            None if self._nsb.fiber_implant3_lengt is None
+            else self._parse_fiber_length_mm_str(
+                self._nsb.fiber_implant3_lengt.value
+            )
+        )
 
     @property
     def aind_fiber_implant4_d_x00(self) -> Optional[Decimal]:
@@ -4266,7 +4283,12 @@ class MappedNSBList:
     @property
     def aind_fiber_implant4_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant4_lengt to aind model"""
-        return self._parse_fiber_length_mm_str(self._nsb.fiber_implant4_lengt)
+        return (
+            None if self._nsb.fiber_implant4_lengt is None
+            else self._parse_fiber_length_mm_str(
+                self._nsb.fiber_implant4_lengt.value
+            )
+        )
 
     @property
     def aind_fiber_implant5_d_x00(self) -> Optional[Decimal]:
@@ -4276,7 +4298,12 @@ class MappedNSBList:
     @property
     def aind_fiber_implant5_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant5_lengt to aind model"""
-        return self._parse_fiber_length_mm_str(self._nsb.fiber_implant5_lengt)
+        return (
+            None if self._nsb.fiber_implant5_lengt is None
+            else self._parse_fiber_length_mm_str(
+                self._nsb.fiber_implant5_lengt.value
+            )
+        )
 
     @property
     def aind_fiber_implant6_d_x00(self) -> Optional[Decimal]:
@@ -4286,7 +4313,12 @@ class MappedNSBList:
     @property
     def aind_fiber_implant6_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant6_lengt to aind model"""
-        return self._parse_fiber_length_mm_str(self._nsb.fiber_implant6_lengt)
+        return (
+            None if self._nsb.fiber_implant6_lengt is None
+            else self._parse_fiber_length_mm_str(
+                self._nsb.fiber_implant6_lengt.value
+            )
+        )
 
     @property
     def aind_first_inj_recovery(self) -> Optional[Decimal]:
@@ -4319,7 +4351,7 @@ class MappedNSBList:
     @property
     def aind_headpost(self) -> Optional[HeadPost]:
         """Maps headpost to aind model."""
-        # TODO: update mapping for DHC 
+        # TODO: update mapping for DHC
         return (
             None
             if self._nsb.headpost is None
@@ -4339,7 +4371,7 @@ class MappedNSBList:
                 self._nsb.headpost.OTHER_ADD_DETAILS_IN_REQU: None,
             }.get(self._nsb.headpost, None)
         )
-    
+
     @property
     def aind_headpost_perform_dur(self) -> Optional[During]:
         """Maps headpost_perform_dur to aind model"""
@@ -4368,7 +4400,7 @@ class MappedNSBList:
                 self._nsb.headpost_type.WHC_2_P: HeadPostType.WHC_2P,
                 self._nsb.headpost_type.WHC_NP: HeadPostType.WHC_NP,
                 self._nsb.headpost_type.WHC_NP_ZIRCONIA: HeadPostType.WHC_NP_ZIRCONIA,
-                self._nsb.headpost_type.AI_STRAIGHT_BAR_WELL: HeadPostType. AI_STRAIGHT_BAR_WELL,
+                self._nsb.headpost_type.AI_STRAIGHT_BAR_WELL: HeadPostType.AI_STRAIGHT_BAR_WELL,
                 self._nsb.headpost_type.LC_WELL: None,
                 self._nsb.headpost_type.DHC_WELL: None,
                 self._nsb.headpost_type.MOTOR__CTX_SLAP2_WELL: None,
@@ -4389,7 +4421,7 @@ class MappedNSBList:
                 self._nsb.hemisphere2nd_inj.RIGHT: Side.RIGHT,
             }.get(self._nsb.hemisphere2nd_inj, None)
         )
-    
+
     @property
     def aind_hp_iso_level(self) -> Optional[Decimal]:
         """Maps hp_iso_level to aind model"""
@@ -4408,17 +4440,20 @@ class MappedNSBList:
     @property
     def aind_hp_work_station(self) -> Optional[str]:
         return (
-            None if self._nsb.hp_work_station is None or self._nsb.hp_work_station == ws.SELECT
+            None
+            if self._nsb.hp_work_station is None
+            or self._nsb.hp_work_station == self._nsb.hp_work_station.SELECT
             else self._nsb.hp_work_station.value
         )
+
     @property
     def aind_iacuc_protocol(self) -> Optional[Any]:
         """Maps iacuc_protocol to aind model."""
         return (
             None
-            if self._nsb.iacuc_protocol is None or self._nsb.iacuc_protocol == self._nsb.iacuc_protocol.SELECT
+            if self._nsb.iacuc_protocol is None
+            or self._nsb.iacuc_protocol == self._nsb.iacuc_protocol.SELECT
             else self._nsb.iacuc_protocol.value
-
         )
 
     @property
@@ -4431,7 +4466,9 @@ class MappedNSBList:
         """Maps implant_id_coverslip_type to aind model"""
         return (
             None
-            if self._nsb.implant_id_coverslip_type is None or self._nsb.implant_id_coverslip_type == self._nsb.implant_id_coverslip_type.SELECT
+            if self._nsb.implant_id_coverslip_type is None
+            or self._nsb.implant_id_coverslip_type
+            == self._nsb.implant_id_coverslip_type.SELECT
             else self._nsb.implant_id_coverslip_type
         )
 
@@ -4755,18 +4792,23 @@ class MappedNSBList:
     def aind_ionto_number_inj1(self) -> Optional[Any]:
         """Maps ionto_number_inj1 to aind model."""
         return (
-            None 
-            if self._nsb.ionto_number_inj1 is None or self._nsb.ionto_number_inj1 == self._nsb.ionto_number_inj1.SELECT or self._nsb.ionto_number_inj1 == self._nsb.ionto_number_inj1.N_A 
+            None
+            if self._nsb.ionto_number_inj1 is None
+            or self._nsb.ionto_number_inj1
+            == self._nsb.ionto_number_inj1.SELECT
+            or self._nsb.ionto_number_inj1 == self._nsb.ionto_number_inj1.N_A
             else self._nsb.ionto_number_inj1.value
         )
-
 
     @property
     def aind_ionto_number_inj2(self) -> Optional[Any]:
         """Maps ionto_number_inj2 to aind model."""
         return (
-            None 
-            if self._nsb.ionto_number_inj2 is None or self._nsb.ionto_number_inj2 == self._nsb.ionto_number_inj2.SELECT or self._nsb.ionto_number_inj2 == self._nsb.ionto_number_inj2.N_A 
+            None
+            if self._nsb.ionto_number_inj2 is None
+            or self._nsb.ionto_number_inj2
+            == self._nsb.ionto_number_inj2.SELECT
+            or self._nsb.ionto_number_inj2 == self._nsb.ionto_number_inj2.N_A
             else self._nsb.ionto_number_inj2.value
         )
 
@@ -5166,7 +5208,11 @@ class MappedNSBList:
         """Maps nanoject_number_inj10 to aind model."""
         return (
             None
-            if self._nsb.nanoject_number_inj10 is None or self._nsb.nanoject_number_inj10 == self._nsb.nanoject_number_inj10.SELECT or self._nsb.nanoject_number_inj10 == self._nsb.nanoject_number_inj10.N_A
+            if self._nsb.nanoject_number_inj10 is None
+            or self._nsb.nanoject_number_inj10
+            == self._nsb.nanoject_number_inj10.SELECT
+            or self._nsb.nanoject_number_inj10
+            == self._nsb.nanoject_number_inj10.N_A
             else self._nsb.nanoject_number_inj10.value
         )
 
@@ -5175,7 +5221,11 @@ class MappedNSBList:
         """Maps nanoject_number_inj2 to aind model."""
         return (
             None
-            if self._nsb.nanoject_number_inj2 is None or self._nsb.nanoject_number_inj2 == self._nsb.nanoject_number_inj2.SELECT or self._nsb.nanoject_number_inj2 == self._nsb.nanoject_number_inj2.N_A
+            if self._nsb.nanoject_number_inj2 is None
+            or self._nsb.nanoject_number_inj2
+            == self._nsb.nanoject_number_inj2.SELECT
+            or self._nsb.nanoject_number_inj2
+            == self._nsb.nanoject_number_inj2.N_A
             else self._nsb.nanoject_number_inj2.value
         )
 
@@ -5215,7 +5265,7 @@ class MappedNSBList:
     def aind_procedure(self) -> Optional[NSBProcedure]:
         """Maps procedure to aind model"""
         return self._nsb.procedure
-    
+
     @property
     def aind_procedure_family(self) -> Optional[NSBProcedureCategory]:
         """Maps procedure_family to aind model"""
@@ -5523,10 +5573,12 @@ class MappedNSBList:
         """Maps work_station1st_injection to aind model."""
         return (
             None
-            if self._nsb.work_station1st_injection is None or self._nsb.work_station1st_injection == self._nsb.work_station1st_injection.SELECT
+            if self._nsb.work_station1st_injection is None
+            or self._nsb.work_station1st_injection
+            == self._nsb.work_station1st_injection.SELECT
             else self._nsb.work_station1st_injection.value
         )
-    
+
     # Additional Properties
     @property
     def aind_experimenter_full_name(self) -> str:
@@ -5537,6 +5589,7 @@ class MappedNSBList:
             else f"NSB-{self.aind_author_id}"
         )
 
+    # TODO: support new Procedures (DHC, EMG Array, Grid Injections, Testes, Oviduct)
     def has_hp_procedure(self) -> bool:
         """Is there a headpost procedure?"""
         return self.aind_procedure in {
@@ -5546,6 +5599,11 @@ class MappedNSBList:
             NSBProcedure.INJECTION_FIBER_OPTIC_IMP,
             NSBProcedure.ISIGUIDED_INJECTION_WITH,
             NSBProcedure.STEREOTAXIC_INJECTION_WIT,
+            # Adding new names for supported HPs
+            NSBProcedure.SX_11_19_HP__ONLY,
+            NSBProcedure.SX_11_19_HP__TRANSCRANIAL,
+            NSBProcedure.SX_21__INJECTION__FIBER,
+            NSBProcedure.SX_26_ISI_GUIDED__INJECTI,
         }
 
     def has_cran_procedure(self) -> bool:
@@ -5559,6 +5617,18 @@ class MappedNSBList:
             NSBProcedure.VISUAL_CTX_NP,
             NSBProcedure.VISUAL_CTX_2_P,
             NSBProcedure.WHC_NP,
+            # Adding new names for supported Craniotomies
+            NSBProcedure.SX_1__VISUAL__CTX_2_P,
+            NSBProcedure.SX_2__FRONTAL__CTX_2_P,
+            NSBProcedure.SX_3__MOTOR__CTX_2_P,
+            NSBProcedure.SX_4_WHC_2_P,
+            NSBProcedure.SX_5_INJ__VISUAL__CTX_2_P,
+            NSBProcedure.SX_6__GRID_INJ_6_OR_9__VI,
+            NSBProcedure.SX_8_INJ__MOTOR__CTX_2_P,
+            NSBProcedure.SX_9__GRID_INJ_6_OR_9__MO,
+            NSBProcedure.SX_14__VISUAL__CTX_NP,
+            NSBProcedure.SX_15_WHC_NP,
+            NSBProcedure.SX_16_INJ_WHC_NP,
         }
 
     def surgery_during_info(
