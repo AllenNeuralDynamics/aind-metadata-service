@@ -265,14 +265,11 @@ class MappedNSBList:
         else:
             return None
 
-    def _parse_fiber_length_mm_str(self, fiber_length_str: Optional[str]):
+    def _parse_fiber_length_mm_str(self, fiber_length_str: str):
         """Parses length of fiber length strings"""
-        if fiber_length_str is not None:
-            parsed_string = re.search(self.LENGTH_MM_REGEX, fiber_length_str)
-            if parsed_string:
-                return self._parse_basic_decimal_str(parsed_string.group(1))
-            else:
-                return None
+        parsed_string = re.search(self.LENGTH_MM_REGEX, fiber_length_str)
+        if parsed_string:
+            return self._parse_basic_decimal_str(parsed_string.group(1))
         else:
             return None
 
@@ -4239,7 +4236,8 @@ class MappedNSBList:
     def aind_fiber_implant1_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant1_lengt to aind model"""
         return (
-            None if self._nsb.fiber_implant1_lengt is None
+            None
+            if self._nsb.fiber_implant1_lengt is None
             else self._parse_fiber_length_mm_str(
                 self._nsb.fiber_implant1_lengt.value
             )
@@ -4254,7 +4252,8 @@ class MappedNSBList:
     def aind_fiber_implant2_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant2_lengt to aind model"""
         return (
-            None if self._nsb.fiber_implant2_lengt is None 
+            None
+            if self._nsb.fiber_implant2_lengt is None
             else self._parse_fiber_length_mm_str(
                 self._nsb.fiber_implant2_lengt.value
             )
@@ -4269,7 +4268,8 @@ class MappedNSBList:
     def aind_fiber_implant3_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant3_lengt to aind model"""
         return (
-            None if self._nsb.fiber_implant3_lengt is None
+            None
+            if self._nsb.fiber_implant3_lengt is None
             else self._parse_fiber_length_mm_str(
                 self._nsb.fiber_implant3_lengt.value
             )
@@ -4284,7 +4284,8 @@ class MappedNSBList:
     def aind_fiber_implant4_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant4_lengt to aind model"""
         return (
-            None if self._nsb.fiber_implant4_lengt is None
+            None
+            if self._nsb.fiber_implant4_lengt is None
             else self._parse_fiber_length_mm_str(
                 self._nsb.fiber_implant4_lengt.value
             )
@@ -4299,7 +4300,8 @@ class MappedNSBList:
     def aind_fiber_implant5_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant5_lengt to aind model"""
         return (
-            None if self._nsb.fiber_implant5_lengt is None
+            None
+            if self._nsb.fiber_implant5_lengt is None
             else self._parse_fiber_length_mm_str(
                 self._nsb.fiber_implant5_lengt.value
             )
@@ -4314,7 +4316,8 @@ class MappedNSBList:
     def aind_fiber_implant6_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant6_lengt to aind model"""
         return (
-            None if self._nsb.fiber_implant6_lengt is None
+            None
+            if self._nsb.fiber_implant6_lengt is None
             else self._parse_fiber_length_mm_str(
                 self._nsb.fiber_implant6_lengt.value
             )

@@ -3,7 +3,7 @@
 from datetime import datetime
 from enum import Enum, EnumMeta
 from typing import Optional, Annotated
-from pydantic import BaseModel, Extra, Field, WrapValidator
+from pydantic import BaseModel, Field, WrapValidator
 from aind_metadata_service.sharepoint.utils import optional_enum
 
 
@@ -83,7 +83,10 @@ class Projectid(Enum, metaclass=EnumMeta):
     N_121_01_023_20_MSP__TEMP = (
         "121-01-023-20 MSP Templeton - Testing Theories of Consciousness"
     )
-    N_121_01_025_20_MSP_U01 = "121-01-025-20 MSP U01 Bridging Function, Connectivity, & Transcriptomics"
+    N_121_01_025_20_MSP_U01 = (
+        "121-01-025-20 MSP U01 Bridging Function, Connectivity, & "
+        "Transcriptomics"
+    )
     N_121_01_026_20_MSP__TEMP = (
         "121-01-026-20 MSP Templeton Measuring Distinct Conscious State"
     )
@@ -203,11 +206,13 @@ class Protocol(Enum, metaclass=EnumMeta):
     N_2119__TRAINING_AND_QUAL = (
         "2119 - Training and qualification of animal users"
     )
-    N_2201__INTERROGATING_PRO = "2201 - Interrogating projections and gene expression of neurons by in situ sequencing"
+    N_2201__INTERROGATING_PRO = "2201 - Interrogating projections and gene "
+    "expression of neurons by in situ sequencing"
     N_2202__TESTING_AA_VS_IN = (
         "2202 - Testing AAVs in Parkinson's mouse models"
     )
-    N_2204__PRIMARY_NEURON_AN = "2204 - Primary neuron and brain slice culture from postnatal rodent brain"
+    N_2204__PRIMARY_NEURON_AN = "2204 - Primary neuron and brain slice "
+    "culture from postnatal rodent brain"
     N_2205__OPTIMIZATION_AND = (
         "2205 - Optimization and validation of viral vectors"
     )
@@ -220,7 +225,10 @@ class Protocol(Enum, metaclass=EnumMeta):
         "2304 - Neurosurgery & Behavior Training Protocol"
     )
     N_2305__IN__VIVO__BRAIN = "2305 - In Vivo Brain Stimulation"
-    N_2306__PATCH_SEQ_CHARACT = "2306 - Patch-seq characterization of mouse neurons in acute brain slices for cross-species comparison studies"
+    N_2306__PATCH_SEQ_CHARACT = (
+        "2306 - Patch-seq characterization of mouse neurons in acute brain "
+        "slices for cross-species comparison studies"
+    )
     N_2307__DISSECTING_THE_NE = (
         "2307 - Dissecting the neural circuits of adaptive control of behavior"
     )
@@ -245,14 +253,27 @@ class Protocol(Enum, metaclass=EnumMeta):
     N_2413__NEUROPHYSIOLOGY_O = (
         "2413 - Neurophysiology of Naturalistic Learning"
     )
-    N_2414__ELECTROPHYSIOLOGI = "2414 - Electrophysiological and optical interrogation of brain-wide neural circuits in the mouse"
-    N_2415__OPTOPHYSIOLOGICAL = "2415 - Optophysiological analysis of brain-wide neural circuits in the mouse"
+    N_2414__ELECTROPHYSIOLOGI = (
+        "2414 - Electrophysiological and optical interrogation of brain-wide "
+        "neural circuits in the mouse"
+    )
+    N_2415__OPTOPHYSIOLOGICAL = (
+        "2415 - Optophysiological analysis of brain-wide neural circuits "
+        "in the mouse"
+    )
     N_2416__ANATOMICAL_ANALYS = (
         "2416 - Anatomical analysis of brain-wide neural circuits in the mouse"
     )
-    N_2417__CHARACTERIZATION = "2417 - Characterization of transcriptomic cell type activation and their molecular adaptations that occur during psychedelic, antidepressants, and antipsychotic drug use"
+    N_2417__CHARACTERIZATION = (
+        "2417 - Characterization of transcriptomic cell type activation and "
+        "their molecular adaptations that occur during psychedelic, "
+        "antidepressants, and antipsychotic drug use"
+    )
     N_2418__IN__VITRO__SINGLE = "2418 - In Vitro Single Cell Characterization"
-    N_2427__OPEN_SCOPE__MINDS = "2427 - OpenScope Mindscope animal protocol for Optical Physiology and Neuropixel"
+    N_2427__OPEN_SCOPE__MINDS = (
+        "2427 - OpenScope Mindscope animal protocol for Optical Physiology "
+        "and Neuropixel"
+    )
 
 
 class Lightcycle(Enum, metaclass=EnumMeta):
@@ -1901,11 +1922,17 @@ class Burr1IntendedCcfTarget(Enum, metaclass=EnumMeta):
     VPL__VENTRAL_POSTEROLATER = (
         "VPL - Ventral posterolateral nucleus of the thalamus"
     )
-    VP_LPC__VENTRAL_POSTEROLA = "VPLpc - Ventral posterolateral nucleus of the thalamus parvicellular part"
+    VP_LPC__VENTRAL_POSTEROLA = (
+        "VPLpc - Ventral posterolateral nucleus of the thalamus "
+        "parvicellular part"
+    )
     VPM__VENTRAL_POSTEROMEDIA = (
         "VPM - Ventral posteromedial nucleus of the thalamus"
     )
-    VP_MPC__VENTRAL_POSTEROME = "VPMpc - Ventral posteromedial nucleus of the thalamus parvicellular part"
+    VP_MPC__VENTRAL_POSTEROME = (
+        "VPMpc - Ventral posteromedial nucleus of the thalamus "
+        "parvicellular part"
+    )
     PO_T__POSTERIOR_TRIANGULA = "PoT - Posterior triangular thalamic nucleus"
     SPF__SUBPARAFASCICULAR_NU = "SPF - Subparafascicular nucleus"
     SPA__SUBPARAFASCICULAR_AR = "SPA - Subparafascicular area"
@@ -2283,11 +2310,17 @@ class Burr2IntendedCcfTarget(Enum, metaclass=EnumMeta):
     VPL__VENTRAL_POSTEROLATER = (
         "VPL - Ventral posterolateral nucleus of the thalamus"
     )
-    VP_LPC__VENTRAL_POSTEROLA = "VPLpc - Ventral posterolateral nucleus of the thalamus parvicellular part"
+    VP_LPC__VENTRAL_POSTEROLA = (
+        "VPLpc - Ventral posterolateral nucleus of the thalamus "
+        "parvicellular part"
+    )
     VPM__VENTRAL_POSTEROMEDIA = (
         "VPM - Ventral posteromedial nucleus of the thalamus"
     )
-    VP_MPC__VENTRAL_POSTEROME = "VPMpc - Ventral posteromedial nucleus of the thalamus parvicellular part"
+    VP_MPC__VENTRAL_POSTEROME = (
+        "VPMpc - Ventral posteromedial nucleus of the thalamus "
+        "parvicellular part"
+    )
     PO_T__POSTERIOR_TRIANGULA = "PoT - Posterior triangular thalamic nucleus"
     SPF__SUBPARAFASCICULAR_NU = "SPF - Subparafascicular nucleus"
     SPA__SUBPARAFASCICULAR_AR = "SPA - Subparafascicular area"
@@ -2665,11 +2698,17 @@ class Burr3IntendedCcfTarget(Enum, metaclass=EnumMeta):
     VPL__VENTRAL_POSTEROLATER = (
         "VPL - Ventral posterolateral nucleus of the thalamus"
     )
-    VP_LPC__VENTRAL_POSTEROLA = "VPLpc - Ventral posterolateral nucleus of the thalamus parvicellular part"
+    VP_LPC__VENTRAL_POSTEROLA = (
+        "VPLpc - Ventral posterolateral nucleus of the thalamus "
+        "parvicellular part"
+    )
     VPM__VENTRAL_POSTEROMEDIA = (
         "VPM - Ventral posteromedial nucleus of the thalamus"
     )
-    VP_MPC__VENTRAL_POSTEROME = "VPMpc - Ventral posteromedial nucleus of the thalamus parvicellular part"
+    VP_MPC__VENTRAL_POSTEROME = (
+        "VPMpc - Ventral posteromedial nucleus of the thalamus "
+        "parvicellular part"
+    )
     PO_T__POSTERIOR_TRIANGULA = "PoT - Posterior triangular thalamic nucleus"
     SPF__SUBPARAFASCICULAR_NU = "SPF - Subparafascicular nucleus"
     SPA__SUBPARAFASCICULAR_AR = "SPA - Subparafascicular area"
@@ -3047,11 +3086,17 @@ class Burr4IntendedCcfTarget(Enum, metaclass=EnumMeta):
     VPL__VENTRAL_POSTEROLATER = (
         "VPL - Ventral posterolateral nucleus of the thalamus"
     )
-    VP_LPC__VENTRAL_POSTEROLA = "VPLpc - Ventral posterolateral nucleus of the thalamus parvicellular part"
+    VP_LPC__VENTRAL_POSTEROLA = (
+        "VPLpc - Ventral posterolateral nucleus of the thalamus "
+        "parvicellular part"
+    )
     VPM__VENTRAL_POSTEROMEDIA = (
         "VPM - Ventral posteromedial nucleus of the thalamus"
     )
-    VP_MPC__VENTRAL_POSTEROME = "VPMpc - Ventral posteromedial nucleus of the thalamus parvicellular part"
+    VP_MPC__VENTRAL_POSTEROME = (
+        "VPMpc - Ventral posteromedial nucleus of the thalamus "
+        "parvicellular part"
+    )
     PO_T__POSTERIOR_TRIANGULA = "PoT - Posterior triangular thalamic nucleus"
     SPF__SUBPARAFASCICULAR_NU = "SPF - Subparafascicular nucleus"
     SPA__SUBPARAFASCICULAR_AR = "SPA - Subparafascicular area"
@@ -3429,11 +3474,17 @@ class Burr5IntendedCcfTarget(Enum, metaclass=EnumMeta):
     VPL__VENTRAL_POSTEROLATER = (
         "VPL - Ventral posterolateral nucleus of the thalamus"
     )
-    VP_LPC__VENTRAL_POSTEROLA = "VPLpc - Ventral posterolateral nucleus of the thalamus parvicellular part"
+    VP_LPC__VENTRAL_POSTEROLA = (
+        "VPLpc - Ventral posterolateral nucleus of the"
+        " thalamus parvicellular part"
+    )
     VPM__VENTRAL_POSTEROMEDIA = (
         "VPM - Ventral posteromedial nucleus of the thalamus"
     )
-    VP_MPC__VENTRAL_POSTEROME = "VPMpc - Ventral posteromedial nucleus of the thalamus parvicellular part"
+    VP_MPC__VENTRAL_POSTEROME = (
+        "VPMpc - Ventral posteromedial nucleus of the "
+        "thalamus parvicellular part"
+    )
     PO_T__POSTERIOR_TRIANGULA = "PoT - Posterior triangular thalamic nucleus"
     SPF__SUBPARAFASCICULAR_NU = "SPF - Subparafascicular nucleus"
     SPA__SUBPARAFASCICULAR_AR = "SPA - Subparafascicular area"
@@ -3811,11 +3862,17 @@ class Burr6IntendedCcfTarget(Enum, metaclass=EnumMeta):
     VPL__VENTRAL_POSTEROLATER = (
         "VPL - Ventral posterolateral nucleus of the thalamus"
     )
-    VP_LPC__VENTRAL_POSTEROLA = "VPLpc - Ventral posterolateral nucleus of the thalamus parvicellular part"
+    VP_LPC__VENTRAL_POSTEROLA = (
+        "VPLpc - Ventral posterolateral nucleus of the thalamus "
+        "parvicellular part"
+    )
     VPM__VENTRAL_POSTEROMEDIA = (
         "VPM - Ventral posteromedial nucleus of the thalamus"
     )
-    VP_MPC__VENTRAL_POSTEROME = "VPMpc - Ventral posteromedial nucleus of the thalamus parvicellular part"
+    VVP_MPC__VENTRAL_POSTEROME = (
+        "VPMpc - Ventral posteromedial nucleus of the thalamus "
+        "parvicellular part"
+    )
     PO_T__POSTERIOR_TRIANGULA = "PoT - Posterior triangular thalamic nucleus"
     SPF__SUBPARAFASCICULAR_NU = "SPF - Subparafascicular nucleus"
     SPA__SUBPARAFASCICULAR_AR = "SPA - Subparafascicular area"
@@ -4603,7 +4660,7 @@ class NSBList(BaseModel, extra="allow"):
     author: Optional[str] = Field(
         default=None, alias="Author", title="Created By"
     )
-    # author id an editor id were removed. added fields for backwards compatibility
+    # author id an editor id were removed. backwards compatibility
     author_id: Optional[int] = Field(default=None, alias="AuthorId")
     editor_id: Optional[int] = Field(default=None, alias="EditorId")
     behavior: Annotated[Behavior, WrapValidator(optional_enum)] = Field(
@@ -4703,7 +4760,10 @@ class NSBList(BaseModel, extra="allow"):
         default=None,
         alias="Burr1_x0020_Virus_x0020_Biosafte",
         title="Burr1 Virus Biosaftey Level (BSL)",
-        description="BSL & Material injected. If other PI must provide material in requestor comments.",
+        description=(
+            "BSL & Material injected."
+            "If other PI must provide material in requestor comments."
+        ),
     )
     burr2_injection_devi: Annotated[
         Burr2InjectionDevice, WrapValidator(optional_enum)
@@ -4728,7 +4788,10 @@ class NSBList(BaseModel, extra="allow"):
         default=None,
         alias="Burr2_x0020_Virus_x0020_Biosafte",
         title="Burr2 Virus Biosaftey Level (BSL)",
-        description="BSL & Material injected. If other PI must provide material in requestor comments.",
+        description=(
+            "BSL & Material injected."
+            "If other PI must provide material in requestor comments."
+        ),
     )
     burr3_injection_devi: Annotated[
         Burr3InjectionDevice, WrapValidator(optional_enum)
@@ -4753,7 +4816,10 @@ class NSBList(BaseModel, extra="allow"):
         default=None,
         alias="Burr3_x0020_Virus_x0020_Biosafet",
         title="Burr3 Virus Biosafety Level (BSL)",
-        description="BSL & Material injected. If other PI must provide material in requestor comments.",
+        description=(
+            "BSL & Material injected."
+            "If other PI must provide material in requestor comments."
+        ),
     )
     burr3_a_p: Optional[float] = Field(
         default=None, alias="Burr3_x0020_A_x002f_P", title="Burr3 A/P"
@@ -4787,7 +4853,10 @@ class NSBList(BaseModel, extra="allow"):
         default=None,
         alias="Burr4_x0020_Virus_x0020_Biosafte",
         title="Burr4 Virus Biosaftey Level (BSL)",
-        description="BSL & Material injected. If other PI must provide material in requestor comments.",
+        description=(
+            "BSL & Material injected."
+            "If other PI must provide material in requestor comments."
+        ),
     )
     burr4_a_p: Optional[float] = Field(
         default=None, alias="Burr4_x0020_A_x002f_P", title="Burr4 A/P"
@@ -5533,9 +5602,7 @@ class NSBList(BaseModel, extra="allow"):
         Field(default=None, alias="ComSinusbleed", title="Sinus Bleed")
     )
     com_swelling: Annotated[EdemaSwelling, WrapValidator(optional_enum)] = (
-        Field(
-            default=None, alias="ComSwelling", title="Edema (Swelling)"
-        )
+        Field(default=None, alias="ComSwelling", title="Edema (Swelling)")
     )
     compliance_asset_id: Optional[str] = Field(
         default=None, alias="ComplianceAssetId", title="Compliance Asset Id"
@@ -5544,9 +5611,7 @@ class NSBList(BaseModel, extra="allow"):
         default=None, alias="ContentType", title="Content Type"
     )
     contusion: Annotated[ContusionHematoma, WrapValidator(optional_enum)] = (
-        Field(
-            default=None, alias="Contusion", title="Contusion/Hematoma"
-        )
+        Field(default=None, alias="Contusion", title="Contusion/Hematoma")
     )
     craniotomy_perform_d: Annotated[
         CraniotomyPerformDuring, WrapValidator(optional_enum)
@@ -5717,7 +5782,9 @@ class NSBList(BaseModel, extra="allow"):
             default="Select...",
             alias="IACUC_x0020_Protocol_x0020__x002",
             title="IACUC Protocol",
-            description="Create a secondary List for Protocols and link to drugs",
+            description=(
+                "Create a secondary List for Protocols and link to drugs"
+            ),
         )
     )
     id: Optional[float] = Field(default=None, alias="ID", title="ID")
@@ -5957,7 +6024,9 @@ class NSBList(BaseModel, extra="allow"):
         default="0",
         alias="Non_x002d_NSB_x0020_Surgeon",
         title="Non-NSB Surgeon",
-        description="Is this surgery going to be performed by NSB or someone else?",
+        description=(
+            "Is this surgery going to be performed by NSB or someone else?"
+        ),
     )
     of_burr: Annotated[OfBurrHoles, WrapValidator(optional_enum)] = Field(
         default=None,

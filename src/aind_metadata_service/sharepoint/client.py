@@ -21,6 +21,8 @@ from aind_metadata_service.sharepoint.nsb2023 import (
 
 
 class SharepointSettings(BaseSettings):
+    """Settings needed to connect to Sharepoint database"""
+
     aind_site_id: str = Field(
         title="AIND Site ID",
         description="Site ID of the AIND SharePoint site.",
@@ -55,11 +57,16 @@ class SharepointSettings(BaseSettings):
     )
 
     class Config:
+        """Set env prefix and forbid extra fields."""
+        
         env_prefix = "SHAREPOINT_"
         extra = "forbid"
 
 
 class SharePointClient:
+    """This class contains the API to connect to Sharepoint Database."""
+
+    # Microsoft Graph API Default values
     GRAPH_API_URL = "https://graph.microsoft.com/v1.0"
     SCOPE = "https://graph.microsoft.com/.default"
 
@@ -74,6 +81,27 @@ class SharePointClient:
         client_secret: SecretStr,
         tenant_id: str,
     ) -> None:
+        """
+        Initailize the SharePointClient with the required parameters.
+        Parameters
+        ----------
+        aind_site_id : str
+            Sharepoint Site ID for AIND Domain
+        las_site_id : str
+            Sharepoint Site ID for LAS Domain
+        nsb_2019_list_id : str
+            List ID for NSB 2019 procedures
+        nsb_2023_list_id : str
+            List ID for NSB 2023 procedures
+        las_2020_list_id : str
+            List ID for LAS 2020 procedures
+        client_id : str
+            Client ID for the principal account
+        client_secret : SecretStr
+            Client Secret for the principal account
+        tenant_id : str
+            Tenant ID for the principal account
+        """
         self.aind_site_id = aind_site_id
         self.las_site_id = las_site_id
         self.nsb_2019_list_id = nsb_2019_list_id
@@ -82,7 +110,10 @@ class SharePointClient:
         self.client_id = client_id
         self.client_secret = client_secret
         self.tenant_id = tenant_id
-        self.token_url = f"https://login.microsoftonline.com/{self.tenant_id}/oauth2/v2.0/token"
+        self.token_url = (
+            f"https://login.microsoftonline.com/{self.tenant_id}/"
+            "oauth2/v2.0/token"
+        )
         self._access_token: Optional[str] = None
 
     @classmethod
@@ -160,7 +191,7 @@ class SharePointClient:
         self, subject_id: str, list_id: str
     ) -> ModelResponse:
         """
-        Retrieve procedure info from the specified SharePoint list based on subject_id.
+        Retrieve procedure info from specified SharePoint list by subject_id.
         Chooses the proper mapper depending on which list is queried.
         """
         try:
@@ -206,7 +237,7 @@ class SharePointClient:
                     response=response,
                     model_cls=LASList,
                     mapper_cls=MappedLASList,
-                    subject_id=subject_id
+                    subject_id=subject_id,
                 )
             else:
                 raise Exception(f"Unknown SharePoint List: {list_id}")
@@ -224,10 +255,14 @@ class SharePointClient:
 
     @staticmethod
     def _extract_procedures_from_response(
-        response: dict, model_cls: type, mapper_cls: type, subject_id: Optional[str] = None
+        response: dict,
+        model_cls: type,
+        mapper_cls: type,
+        subject_id: Optional[str] = None,
     ) -> List[Surgery]:
         """
-        Extract procedures from a raw Graph API response using the provided model and mapper classes.
+        Extract procedures from a raw Graph API response using
+        the provided model and mapper classes.
         """
         list_of_procedures = []
         for item in response.get("value", []):

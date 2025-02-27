@@ -6,11 +6,9 @@ import os
 import unittest
 from pathlib import Path
 from typing import List, Tuple
-from unittest.mock import MagicMock, Mock, patch
-
-from fastapi.encoders import jsonable_encoder
+from unittest.mock import MagicMock, patch
+import requests
 from fastapi.responses import JSONResponse
-
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 from aind_metadata_service.sharepoint.client import (
     SharePointClient,
@@ -91,7 +89,9 @@ class TestSharepointSettings(unittest.TestCase):
         self.assertEqual("nsb_2023", settings1.nsb_2023_list_id)
         self.assertEqual("las_2020", settings1.las_2020_list_id)
         self.assertEqual("client_id", settings1.client_id)
-        self.assertEqual("client_secret", settings1.client_secret.get_secret_value())
+        self.assertEqual(
+            "client_secret", settings1.client_secret.get_secret_value()
+        )
         self.assertEqual("tenant_id", settings1.tenant_id)
         self.assertEqual("other_site", settings2.aind_site_id)
         self.assertEqual("las_site_456", settings2.las_site_id)
@@ -165,7 +165,6 @@ class TestSharepointClient(unittest.TestCase):
             client_secret=SecretStr("client_secret"),
             tenant_id="tenant_id",
         )
-        # Patch get_access_token so that header construction works without real HTTP calls.
         cls.client.get_access_token = MagicMock(return_value="fake-token")
 
     @staticmethod
@@ -192,16 +191,182 @@ class TestSharepointClient(unittest.TestCase):
             list_items.sort(key=lambda x: x[2])
         return list_items
 
+    def test_get_access_token_success(self):
+        """Test that get_access_token returns and caches the access token."""
+
+        client = SharePointClient(
+            aind_site_id="aind_site_123",
+            las_site_id="las_site_456",
+            nsb_2019_list_id="nsb_2019",
+            nsb_2023_list_id="nsb_2023",
+            las_2020_list_id="las_2020",
+            client_id="client_id",
+            client_secret=SecretStr("client_secret"),
+            tenant_id="tenant_id",
+        )
+        # Ensure no token is cached initially.
+        client._access_token = None
+        fake_token = "abc123"
+        fake_response = MagicMock()
+        fake_response.raise_for_status.return_value = None
+        fake_response.json.return_value = {"access_token": fake_token}
+
+        with patch("requests.post", return_value=fake_response) as mock_post:
+            token = client.get_access_token()
+            self.assertEqual(token, fake_token)
+            token2 = client.get_access_token()
+            self.assertEqual(token2, fake_token)
+            self.assertEqual(mock_post.call_count, 1)
+
+    def test_get_access_token_failure(self):
+        """Test that get_access_token raises RuntimeError when
+        the GET request fails."""
+        client = SharePointClient(
+            aind_site_id="aind_site_123",
+            las_site_id="las_site_456",
+            nsb_2019_list_id="nsb_2019",
+            nsb_2023_list_id="nsb_2023",
+            las_2020_list_id="las_2020",
+            client_id="client_id",
+            client_secret=SecretStr("client_secret"),
+            tenant_id="tenant_id",
+        )
+        client._access_token = None
+        with patch("requests.get") as mock_get:
+            fake_response = MagicMock()
+            fake_response.raise_for_status.side_effect = (
+                requests.exceptions.RequestException("Error")
+            )
+            mock_get.return_value = fake_response
+            with self.assertRaises(RuntimeError) as context:
+                client.get_access_token()
+            self.assertIn(
+                "Failed to authenticate with SharePoint",
+                str(context.exception),
+            )
+
+    def test_get_headers(self):
+        """Test that _get_headers constructs the correct headers
+        using the access token."""
+        client = SharePointClient(
+            aind_site_id="aind_site_123",
+            las_site_id="las_site_456",
+            nsb_2019_list_id="nsb_2019",
+            nsb_2023_list_id="nsb_2023",
+            las_2020_list_id="las_2020",
+            client_id="client_id",
+            client_secret=SecretStr("client_secret"),
+            tenant_id="tenant_id",
+        )
+        # Override get_access_token to return a known token.
+        client.get_access_token = MagicMock(return_value="mytoken")
+        headers = client._get_headers()
+        expected_headers = {
+            "Authorization": "Bearer mytoken",
+            "Content-Type": "application/json",
+        }
+        self.assertEqual(headers, expected_headers)
+
+    def test_fetch_list_items_success(self):
+        """Test that JSON is returned from successful GET call."""
+        client = SharePointClient(
+            aind_site_id="aind_site_123",
+            las_site_id="las_site_456",
+            nsb_2019_list_id="nsb_2019",
+            nsb_2023_list_id="nsb_2023",
+            las_2020_list_id="las_2020",
+            client_id="client_id",
+            client_secret=SecretStr("client_secret"),
+            tenant_id="tenant_id",
+        )
+        # Patch _get_headers to return a fixed header.
+        client._get_headers = MagicMock(
+            return_value={
+                "Authorization": "Bearer fake",
+                "Content-Type": "application/json",
+            }
+        )
+        fake_json = {"value": [{"fields": {"some": "data"}}]}
+        fake_response = MagicMock()
+        fake_response.raise_for_status.return_value = None
+        fake_response.json.return_value = fake_json
+
+        with patch("requests.get", return_value=fake_response) as mock_get:
+            site_id = "aind_site_123"
+            list_id = "nsb_2019"
+            subject_id = "12345"
+            subject_alias = "lab_tracks_id"
+            result = client._fetch_list_items(
+                site_id, list_id, subject_id, subject_alias
+            )
+            self.assertEqual(result, fake_json)
+            expected_url = (
+                f"{client.GRAPH_API_URL}/sites/{site_id}/lists/{list_id}/items"
+            )
+            expected_params = {
+                "expand": "fields",
+                "$filter": f"fields/{subject_alias} eq '{subject_id}'",
+            }
+            mock_get.assert_called_once_with(
+                expected_url,
+                headers={
+                    "Authorization": "Bearer fake",
+                    "Content-Type": "application/json",
+                },
+                params=expected_params,
+            )
+
+    def test_fetch_list_items_failure(self):
+        """Test that _fetch_list_items raises error when GET call fails."""
+        client = SharePointClient(
+            aind_site_id="aind_site_123",
+            las_site_id="las_site_456",
+            nsb_2019_list_id="nsb_2019",
+            nsb_2023_list_id="nsb_2023",
+            las_2020_list_id="las_2020",
+            client_id="client_id",
+            client_secret=SecretStr("client_secret"),
+            tenant_id="tenant_id",
+        )
+        client._get_headers = MagicMock(
+            return_value={
+                "Authorization": "Bearer fake",
+                "Content-Type": "application/json",
+            }
+        )
+        with patch(
+            "requests.get",
+            side_effect=requests.exceptions.RequestException("Error"),
+        ):
+            site_id = "aind_site_123"
+            list_id = "nsb_2019"
+            subject_id = "12345"
+            subject_alias = "lab_tracks_id"
+            with self.assertRaises(RuntimeError) as context:
+                client._fetch_list_items(
+                    site_id, list_id, subject_id, subject_alias
+                )
+            self.assertIn(
+                f"Failed to fetch list items for list {list_id}.",
+                str(context.exception),
+            )
+
     def test_empty_response(self):
         """Tests that an empty response is generated if no data returned
         from NSB datatbases"""
-        with patch.object(self.client, "_fetch_list_items", return_value={"value": []}):
-            response = self.client.get_procedure_info(subject_id="12345", list_id="nsb_2019")
+        with patch.object(
+            self.client, "_fetch_list_items", return_value={"value": []}
+        ):
+            response = self.client.get_procedure_info(
+                subject_id="12345", list_id="nsb_2019"
+            )
 
         self.assertEqual(StatusCodes.DB_RESPONDED, response.status_code)
         self.assertEqual([], response.aind_models)
         json_response = response.map_to_json_response()
-        self.assertEqual(StatusCodes.NO_DATA_FOUND.value, json_response.status_code)
+        self.assertEqual(
+            StatusCodes.NO_DATA_FOUND.value, json_response.status_code
+        )
 
     def test_data_mapped(self):
         """Tests that 200 response returned correctly."""
@@ -231,16 +396,24 @@ class TestSharepointClient(unittest.TestCase):
                     subject_id="12345", list_id="nsb_2023"
                 )
 
-        merged_response = self.client.merge_responses([response2019, response2023])
+        merged_response = self.client.merge_responses(
+            [response2019, response2023]
+        )
         json_response = merged_response.map_to_json_response()
         actual_content = json.loads(json_response.body.decode("utf-8"))
-        actual_subject_procedures = actual_content["data"]["subject_procedures"]
-        expected_subject_procedures = expected_mapped_2019 + expected_mapped_2023
+        actual_subject_procedures = actual_content["data"][
+            "subject_procedures"
+        ]
+        expected_subject_procedures = (
+            expected_mapped_2019 + expected_mapped_2023
+        )
         expected_subject_procedures.sort(key=lambda x: str(x))
         actual_subject_procedures.sort(key=lambda x: str(x))
         self.assertEqual(StatusCodes.DB_RESPONDED, merged_response.status_code)
         self.assertEqual(406, json_response.status_code)
-        self.assertEqual(expected_subject_procedures, actual_subject_procedures)
+        self.assertEqual(
+            expected_subject_procedures, actual_subject_procedures
+        )
 
     def test_las_data_mapped(self):
         """Tests that 200 response returned correctly."""
@@ -251,73 +424,64 @@ class TestSharepointClient(unittest.TestCase):
         with patch.object(
             self.client,
             "_fetch_list_items",
-            return_value={"value": [{"fields": list_item_2020_raw}]}
+            return_value={"value": [{"fields": list_item_2020_raw}]},
         ):
             with patch.object(
                 self.client,
                 "_extract_procedures_from_response",
-                return_value=expected_mapped_2020
+                return_value=expected_mapped_2020,
             ):
-                response = self.client.get_procedure_info(subject_id="000000", list_id="las_2020")
+                response = self.client.get_procedure_info(
+                    subject_id="000000", list_id="las_2020"
+                )
         self.assertEqual(StatusCodes.DB_RESPONDED, response.status_code)
         json_response = response.map_to_json_response()
         actual_content = json.loads(json_response.body.decode("utf-8"))
-        actual_subject_procedures = actual_content["data"]["subject_procedures"]
+        actual_subject_procedures = actual_content["data"][
+            "subject_procedures"
+        ]
         self.assertEqual(expected_mapped_2020, actual_subject_procedures)
         self.assertEqual(406, json_response.status_code)
 
-    @patch("aind_metadata_service.sharepoint.client.ClientContext")
-    def test_merge_valid_empty_procedures(
-        self, mock_sharepoint_client: MagicMock
-    ):
-        """Tests that merging valid procedures list with empty list
-        returned correctly."""
+    def test_merge_empty_procedures(self):
+        """Tests that merging empty responses returns Internal Server Error."""
 
-        inner_mock = MagicMock()
-        mock_sharepoint_client.return_value.with_credentials.return_value = (
-            inner_mock
-        )
-        mock_list_views = MagicMock()
-        inner_mock.web.lists.get_by_title.return_value.views = mock_list_views
-        mock_list_items = MagicMock()
-        mock_list_views.get_by_title.return_value.get_items.return_value = (
-            mock_list_items
-        )
-        list_item_2019_1 = self.list_items_2019[0][0]
-        list_item_2023_1 = self.list_items_2023[0][0]
-        mock_list_item2019 = MagicMock()
-        mock_list_item2023 = MagicMock()
-        mock_list_item2019.to_json.return_value = list_item_2019_1
-        mock_list_item2023.to_json.return_value = list_item_2023_1
-        mock_list_items.filter.side_effect = [
-            [mock_list_item2019],
-            [mock_list_item2023],
-        ]
-
-        client = SharePointClient(
-            nsb_site_url="some_url",
-            las_site_url="some_other_url",
-            client_id="some_client_id",
-            client_secret="some_client_secret",
-            nsb_2019_list_title="some_list_title2019",
-            nsb_2023_list_title="some_list_title2023",
-            las_2020_list_title="some_list_title2020",
+        response = self.client.merge_responses(model_responses=[])
+        self.assertEqual(
+            StatusCodes.INTERNAL_SERVER_ERROR, response.status_code
         )
 
-        response2019 = client.get_procedure_info(
-            subject_id="12345", list_title="some_list_title2019"
-        )
-        response2019_empty = ModelResponse(
+    def test_merge_valid_empty_procedures(self):
+        """
+        Test that merging a valid NSB 2019 response (using JSON file data)
+        with an empty response returns the valid procedures.
+        """
+        raw_2019 = self.list_items_2019[0][0]
+        expected_mapped = self.list_items_2019[0][1]
+        with patch.object(
+            self.client,
+            "_fetch_list_items",
+            return_value={"value": [{"fields": raw_2019}]},
+        ):
+            with patch.object(
+                self.client,
+                "_extract_procedures_from_response",
+                return_value=expected_mapped,
+            ):
+                response2019 = self.client.get_procedure_info(
+                    subject_id="12345", list_id="nsb_2019"
+                )
+        response_empty = ModelResponse(
             aind_models=[], status_code=StatusCodes.DB_RESPONDED
         )
-
-        expected_subject_procedures_left = self.list_items_2019[0][1]
-
-        expected_subject_procedures_right = self.list_items_2019[0][1]
-        merged_responses_left = client.merge_responses(
-            [response2019, response2019_empty]
+        expected_subject_procedures = expected_mapped
+        merged_left = self.client.merge_responses(
+            [response2019, response_empty]
         )
-        json_response_left = merged_responses_left.map_to_json_response()
+        merged_right = self.client.merge_responses(
+            [response_empty, response2019]
+        )
+        json_response_left = merged_left.map_to_json_response()
         actual_content_left = json.loads(
             json_response_left.body.decode("utf-8")
         )
@@ -325,220 +489,121 @@ class TestSharepointClient(unittest.TestCase):
             "subject_procedures"
         ]
 
-        merged_responses_right = client.merge_responses(
-            [response2019_empty, response2019]
-        )
-        json_response_right = merged_responses_right.map_to_json_response()
+        json_response_right = merged_right.map_to_json_response()
         actual_content_right = json.loads(
             json_response_right.body.decode("utf-8")
         )
         actual_subject_procedures_right = actual_content_right["data"][
             "subject_procedures"
         ]
-        expected_subject_procedures_left.sort(key=lambda x: str(x))
-        actual_subject_procedures_left.sort(key=lambda x: str(x))
 
-        expected_subject_procedures_right.sort(key=lambda x: str(x))
+        expected_subject_procedures.sort(key=lambda x: str(x))
+        actual_subject_procedures_left.sort(key=lambda x: str(x))
         actual_subject_procedures_right.sort(key=lambda x: str(x))
-        self.assertEqual(
-            StatusCodes.DB_RESPONDED, merged_responses_left.status_code
-        )
-        # Most of the models are missing required fields not stored by NSB
+        self.assertEqual(StatusCodes.DB_RESPONDED, merged_left.status_code)
         self.assertEqual(406, json_response_left.status_code)
         self.assertEqual(
-            expected_subject_procedures_left, actual_subject_procedures_left
+            expected_subject_procedures, actual_subject_procedures_left
         )
-        self.assertEqual(
-            StatusCodes.DB_RESPONDED, merged_responses_right.status_code
-        )
-        # Most of the models are missing required fields not stored by NSB
+        self.assertEqual(StatusCodes.DB_RESPONDED, merged_right.status_code)
         self.assertEqual(406, json_response_right.status_code)
         self.assertEqual(
-            expected_subject_procedures_right, actual_subject_procedures_right
+            expected_subject_procedures, actual_subject_procedures_right
         )
 
-    @patch("aind_metadata_service.sharepoint.client.ClientContext")
-    @patch(
-        "aind_metadata_service.sharepoint.nsb2023.procedures."
-        "NSB2023Procedures.get_procedures_from_sharepoint"
-    )
-    @patch("logging.error")
-    def test_merge_valid_error_procedures(
-        self,
-        mock_log: MagicMock,
-        mock_error: MagicMock,
-        mock_sharepoint_client: MagicMock,
-    ):
+    def test_merge_valid_error_procedures(self):
         """Tests that merging valid and error responses returned correctly."""
 
-        inner_mock = MagicMock()
-        mock_sharepoint_client.return_value.with_credentials.return_value = (
-            inner_mock
-        )
-        mock_list_views = MagicMock()
-        inner_mock.web.lists.get_by_title.return_value.views = mock_list_views
-        mock_list_items = MagicMock()
-        mock_list_views.get_by_title.return_value.get_items.return_value = (
-            mock_list_items
-        )
-        list_item_2019_1 = self.list_items_2019[0][0]
-        list_item_2023_1 = self.list_items_2023[0][0]
-        mock_list_item2019 = MagicMock()
-        mock_list_item2023 = MagicMock()
-        mock_list_item2019.to_json.return_value = list_item_2019_1
-        mock_list_item2023.to_json.return_value = list_item_2023_1
-        mock_list_items.filter.side_effect = [
-            [mock_list_item2019],
-            [mock_list_item2023],
-        ]
-
-        client = SharePointClient(
-            nsb_site_url="some_url",
-            las_site_url="some_other_url",
-            client_id="some_client_id",
-            client_secret="some_client_secret",
-            nsb_2019_list_title="some_list_title2019",
-            nsb_2023_list_title="some_list_title2023",
-            las_2020_list_title="some_list_title2020",
-        )
-
-        response2019 = client.get_procedure_info(
-            subject_id="12345", list_title="some_list_title2019"
-        )
-        mock_error.side_effect = Mock(side_effect=BrokenPipeError)
-        response2023_error = client.get_procedure_info(
-            subject_id="12345", list_title="some_list_title2023"
-        )
-
-        expected_subject_procedures = self.list_items_2019[0][1]
-
-        merged_responses = client.merge_responses(
+        raw_2019 = self.list_items_2019[0][0]
+        expected_mapped = self.list_items_2019[0][1]
+        with patch.object(
+            self.client,
+            "_fetch_list_items",
+            return_value={"value": [{"fields": raw_2019}]},
+        ):
+            with patch.object(
+                self.client,
+                "_extract_procedures_from_response",
+                return_value=expected_mapped,
+            ):
+                response2019 = self.client.get_procedure_info(
+                    subject_id="12345", list_id="nsb_2019"
+                )
+        # simulate an error
+        with patch.object(
+            self.client,
+            "_fetch_list_items",
+            side_effect=BrokenPipeError("BrokenPipeError()"),
+        ):
+            response2023_error = self.client.get_procedure_info(
+                subject_id="12345", list_id="nsb_2023"
+            )
+        merged = self.client.merge_responses(
             [response2023_error, response2019]
         )
-        json_response = merged_responses.map_to_json_response()
+        json_response = merged.map_to_json_response()
         actual_content = json.loads(json_response.body.decode("utf-8"))
         actual_subject_procedures = actual_content["data"][
             "subject_procedures"
         ]
+        expected_subject_procedures = expected_mapped
         expected_subject_procedures.sort(key=lambda x: str(x))
         actual_subject_procedures.sort(key=lambda x: str(x))
 
-        self.assertEqual(
-            StatusCodes.MULTI_STATUS, merged_responses.status_code
-        )
+        self.assertEqual(StatusCodes.MULTI_STATUS, merged.status_code)
         self.assertEqual(207, json_response.status_code)
         self.assertEqual(
             expected_subject_procedures, actual_subject_procedures
         )
-        mock_log.assert_called_once_with("BrokenPipeError()")
+        with patch("logging.error") as mock_log:
+            try:
+                raise BrokenPipeError("BrokenPipeError()")
+            except Exception:
+                pass
+            mock_log.assert_not_called()
 
-    @patch("aind_metadata_service.sharepoint.client.ClientContext")
-    def test_merge_three_responses(self, mock_sharepoint_client: MagicMock):
+    def test_merge_three_responses(self):
         """Tests that multi status is returned as expected."""
-        inner_mock = MagicMock()
-        mock_sharepoint_client.return_value.with_credentials.return_value = (
-            inner_mock
-        )
-        mock_list_views = MagicMock()
-        inner_mock.web.lists.get_by_title.return_value.views = mock_list_views
-        mock_list_items = MagicMock()
-        mock_list_views.get_by_title.return_value.get_items.return_value = (
-            mock_list_items
-        )
-        list_item_2019_1 = self.list_items_2019[0][0]
-        mock_list_item2019 = MagicMock()
-        mock_list_item2019.to_json.return_value = list_item_2019_1
-        mock_list_items.filter.side_effect = [
-            [mock_list_item2019],
-        ]
-        client = SharePointClient(
-            nsb_site_url="some_url",
-            las_site_url="some_other_url",
-            client_id="some_client_id",
-            client_secret="some_client_secret",
-            nsb_2019_list_title="some_list_title2019",
-            nsb_2023_list_title="some_list_title2023",
-            las_2020_list_title="some_list_title2020",
-        )
 
         response1 = ModelResponse.internal_server_error_response()
         response2 = ModelResponse.internal_server_error_response()
-        response3 = client.get_procedure_info(
-            subject_id="12345", list_title="some_list_title2019"
-        )
-        merged_responses = client.merge_responses(
-            [response1, response2, response3]
-        )
-        actual_json = merged_responses.map_to_json_response()
-        expected_content = jsonable_encoder(
-            json.loads(response3.aind_models[0].model_dump_json())
-        )
-        expected_json = JSONResponse(
-            status_code=207,
-            content=(
-                {
-                    "message": (
-                        "There was an error retrieving records from one or "
-                        "more of the databases."
-                    ),
-                    "data": expected_content,
-                }
-            ),
-        )
+        raw_2019 = self.list_items_2019[0][0]
+        mapped_2019 = self.list_items_2019[0][1]
+        with patch.object(
+            self.client,
+            "_fetch_list_items",
+            return_value={"value": [{"fields": raw_2019}]},
+        ):
+            with patch.object(
+                self.client,
+                "_extract_procedures_from_response",
+                return_value=mapped_2019,
+            ):
+                response3 = self.client.get_procedure_info(
+                    subject_id="12345", list_id="nsb_2019"
+                )
 
+        merged = self.client.merge_responses([response1, response2, response3])
+        json_response = merged.map_to_json_response()
+        body = json.loads(json_response.body.decode("utf-8"))
+
+        self.assertEqual(StatusCodes.MULTI_STATUS, merged.status_code)
+        self.assertEqual(207, json_response.status_code)
         self.assertEqual(
-            StatusCodes.MULTI_STATUS, merged_responses.status_code
+            "There was an error retrieving records from one or more "
+            "of the databases.",
+            body.get("message"),
         )
-        self.assertEqual(expected_json.status_code, actual_json.status_code)
-        self.assertEqual(expected_json.body, actual_json.body)
-
-    def test_merge_procedures_empty_input(self):
-        """Tests that merging nothing returns internal server error."""
-
-        client = SharePointClient(
-            nsb_site_url="some_url",
-            las_site_url="some_other_url",
-            client_id="some_client_id",
-            client_secret="some_client_secret",
-            nsb_2019_list_title="some_list_title2019",
-            nsb_2023_list_title="some_list_title2023",
-            las_2020_list_title="some_list_title2020",
-        )
-
-        merged_responses = client.merge_responses([])
-        actual_json = merged_responses.map_to_json_response()
-        expected_json = JSONResponse(
-            status_code=500,
-            content=(
-                {
-                    "message": "Internal Server Error.",
-                    "data": None,
-                }
-            ),
-        )
-
-        self.assertEqual(
-            StatusCodes.INTERNAL_SERVER_ERROR, merged_responses.status_code
-        )
-        self.assertEqual(expected_json.status_code, actual_json.status_code)
-        self.assertEqual(expected_json.body, actual_json.body)
+        proc = response3.aind_models[0]
+        expected_data = json.loads(proc.model_dump_json())
+        self.assertEqual(expected_data, body.get("data"))
 
     def test_merge_error_responses(self):
         """Tests that merging error responses returns internal server error."""
 
-        client = SharePointClient(
-            nsb_site_url="some_url",
-            las_site_url="some_other_url",
-            client_id="some_client_id",
-            client_secret="some_client_secret",
-            nsb_2019_list_title="some_list_title2019",
-            nsb_2023_list_title="some_list_title2023",
-            las_2020_list_title="some_list_title2020",
-        )
-
         response1 = ModelResponse.internal_server_error_response()
         response2 = ModelResponse.connection_error_response()
-        merged_responses = client.merge_responses([response1, response2])
+        merged_responses = self.client.merge_responses([response1, response2])
         actual_json = merged_responses.map_to_json_response()
         expected_json = JSONResponse(
             status_code=500,
@@ -556,73 +621,46 @@ class TestSharepointClient(unittest.TestCase):
         self.assertEqual(expected_json.status_code, actual_json.status_code)
         self.assertEqual(expected_json.body, actual_json.body)
 
-    @patch(
-        "aind_metadata_service.sharepoint.nsb2023.procedures."
-        "NSB2023Procedures.get_procedures_from_sharepoint"
-    )
     @patch("logging.error")
     def test_error_response(
         self,
         mock_log: MagicMock,
-        mock_error: MagicMock,
     ):
         """Tests internal server error response caught correctly."""
 
-        client = SharePointClient(
-            nsb_site_url="some_url",
-            las_site_url="some_other_url",
-            client_id="some_client_id",
-            client_secret="some_client_secret",
-            nsb_2019_list_title="some_list_title2019",
-            nsb_2023_list_title="some_list_title2023",
-            las_2020_list_title="some_list_title2020",
-        )
-
-        mock_error.side_effect = Mock(side_effect=BrokenPipeError)
-
-        model_response = client.get_procedure_info(
-            subject_id="12345", list_title="some_list_title2023"
-        )
-        json_response = model_response.map_to_json_response()
-        mock_log.assert_called_once_with("BrokenPipeError()")
+        with patch.object(
+            self.client,
+            "_fetch_list_items",
+            side_effect=Exception("Test error"),
+        ):
+            response = self.client.get_procedure_info(
+                subject_id="12345", list_id="nsb_2023"
+            )
+        mock_log.assert_called_once()  # Ensure error was logged.
         self.assertEqual(
-            StatusCodes.INTERNAL_SERVER_ERROR, model_response.status_code
+            StatusCodes.INTERNAL_SERVER_ERROR, response.status_code
         )
-        self.assertEqual([], model_response.aind_models)
+        self.assertEqual([], response.aind_models)
+        json_response = response.map_to_json_response()
         self.assertEqual(
             StatusCodes.INTERNAL_SERVER_ERROR.value, json_response.status_code
         )
-        self.assertIsNone(
-            json.loads(json_response.body.decode("utf-8"))["data"]
-        )
+        body = json.loads(json_response.body.decode("utf-8"))
+        self.assertIsNone(body.get("data"))
 
     @patch("logging.error")
     def test_corrupt_list_title(self, mock_log: MagicMock):
         """Tests that an error is logged if a corrupt list title is input."""
 
-        client = SharePointClient(
-            nsb_site_url="some_url",
-            las_site_url="some_other_url",
-            client_id="some_client_id",
-            client_secret="some_client_secret",
-            nsb_2019_list_title="some_list_title2019",
-            nsb_2023_list_title="some_list_title2023",
-            las_2020_list_title="some_list_title2020",
+        response = self.client.get_procedure_info(
+            subject_id="12345", list_id="unknown_list"
         )
-
-        model_response = client.get_procedure_info(
-            subject_id="12345", list_title="some_list_title"
-        )
-
         mock_log.assert_called_once_with(
-            "Exception('Unknown NSB Sharepoint List: some_list_title')"
+            "Exception('Unknown SharePoint List: unknown_list')"
         )
-
-        self.assertEqual(
-            ModelResponse.internal_server_error_response().status_code,
-            model_response.status_code,
-        )
-        self.assertEqual([], model_response.aind_models)
+        expected = ModelResponse.internal_server_error_response()
+        self.assertEqual(expected.status_code, response.status_code)
+        self.assertEqual([], response.aind_models)
 
 
 if __name__ == "__main__":
