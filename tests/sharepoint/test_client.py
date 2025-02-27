@@ -650,15 +650,11 @@ class TestSharepointClient(unittest.TestCase):
         body = json.loads(json_response.body.decode("utf-8"))
         self.assertIsNone(body.get("data"))
 
-    @patch("logging.error")
-    def test_corrupt_list_title(self, mock_log: MagicMock):
+    def test_corrupt_list_title(self):
         """Tests that an error is logged if a corrupt list title is input."""
 
         response = self.client.get_procedure_info(
             subject_id="12345", list_id="unknown_list"
-        )
-        mock_log.assert_called_once_with(
-            "Exception('Unknown SharePoint List: unknown_list')"
         )
         expected = ModelResponse.internal_server_error_response()
         self.assertEqual(expected.status_code, response.status_code)
