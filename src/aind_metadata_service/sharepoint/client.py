@@ -58,7 +58,7 @@ class SharepointSettings(BaseSettings):
 
     class Config:
         """Set env prefix and forbid extra fields."""
-        
+
         env_prefix = "SHAREPOINT_"
         extra = "forbid"
 
@@ -185,7 +185,7 @@ class SharePointClient:
             )
             raise RuntimeError(
                 f"Failed to fetch list items for list {list_id}."
-            )
+            ) # Raised error will be caught by InternalServerError
 
     def get_procedure_info(
         self, subject_id: str, list_id: str
@@ -240,7 +240,7 @@ class SharePointClient:
                     subject_id=subject_id,
                 )
             else:
-                raise Exception(f"Unknown SharePoint List: {list_id}")
+                return ModelResponse.internal_server_error_response()
             procedures = self._handle_response_from_sharepoint(
                 subject_id=subject_id, subject_procedures=subj_procedures
             )
@@ -250,7 +250,6 @@ class SharePointClient:
             )
         except Exception as e:
             logging.error(repr(e))
-            print(e)
             return ModelResponse.internal_server_error_response()
 
     @staticmethod
