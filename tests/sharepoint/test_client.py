@@ -7,14 +7,16 @@ import unittest
 from pathlib import Path
 from typing import List, Tuple
 from unittest.mock import MagicMock, patch
+
 import requests
 from fastapi.responses import JSONResponse
+from pydantic import SecretStr
+
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 from aind_metadata_service.sharepoint.client import (
     SharePointClient,
     SharepointSettings,
 )
-from pydantic import SecretStr
 from tests import PYD_VERSION
 
 if os.getenv("LOG_LEVEL"):  # pragma: no cover

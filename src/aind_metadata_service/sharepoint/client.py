@@ -1,9 +1,9 @@
 """Module to create client to connect to sharepoint database"""
 
 import logging
-import requests
 from typing import List, Optional
 
+import requests
 from aind_data_schema.core.procedures import Procedures, Surgery
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings
@@ -11,12 +11,12 @@ from pydantic_settings import BaseSettings
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 from aind_metadata_service.sharepoint.las2020 import LASList, MappedLASList
 from aind_metadata_service.sharepoint.nsb2019 import (
-    NSB2019List,
     MappedNSB2019List,
+    NSB2019List,
 )
 from aind_metadata_service.sharepoint.nsb2023 import (
-    NSB2023List,
     MappedNSB2023List,
+    NSB2023List,
 )
 
 
@@ -185,7 +185,7 @@ class SharePointClient:
             )
             raise RuntimeError(
                 f"Failed to fetch list items for list {list_id}."
-            ) # Raised error will be caught by InternalServerError
+            )
 
     def get_procedure_info(
         self, subject_id: str, list_id: str

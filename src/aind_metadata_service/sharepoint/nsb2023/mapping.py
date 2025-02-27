@@ -4442,6 +4442,7 @@ class MappedNSBList:
 
     @property
     def aind_hp_work_station(self) -> Optional[str]:
+        """Maps hp_work_station to aind model"""
         return (
             None
             if self._nsb.hp_work_station is None

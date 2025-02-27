@@ -2,8 +2,7 @@
 
 from typing import Any, Optional
 
-from pydantic import ValidationError
-from pydantic import ValidatorFunctionWrapHandler
+from pydantic import ValidationError, ValidatorFunctionWrapHandler
 
 
 def optional_enum(

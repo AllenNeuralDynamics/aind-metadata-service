@@ -2,8 +2,10 @@
 
 from datetime import datetime
 from enum import Enum, EnumMeta
-from typing import Optional, Annotated
+from typing import Annotated, Optional
+
 from pydantic import BaseModel, Field, WrapValidator
+
 from aind_metadata_service.sharepoint.utils import optional_enum
 
 
