@@ -5,7 +5,7 @@ from typing import List, Optional
 
 import requests
 from aind_data_schema.core.procedures import Procedures, Surgery
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings
 
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
@@ -55,6 +55,35 @@ class SharepointSettings(BaseSettings):
         title="Tenant ID",
         description="Tenant ID for the principal account.",
     )
+    graph_api_url: str = Field(
+        title="Graph API URL",
+        description="URL for the Microsoft Graph API.",
+        default="https://graph.microsoft.com/v1.0",
+    )
+    scope: str = Field(
+        title="Scope",
+        description="Scope for the Microsoft Graph API.",
+        default="https://graph.microsoft.com/.default",
+    )
+    token_url: str = Field(
+        None,
+        title="Token URL",
+        description="URL for the Microsoft Identity Platform.",
+    )
+
+    @field_validator("token_url", mode="before")
+    def set_token_url(cls, v, info):
+        """Sets token_url from tenant_id if not provided."""
+        if v is not None:
+            return v
+        tenant_id = info.data.get("tenant_id")
+        if not tenant_id:
+            raise ValueError(
+                "tenant_id must be provided to generate token_url"
+            )
+        return (
+            f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token"
+        )
 
     class Config:
         """Set env prefix and forbid extra fields."""
@@ -66,10 +95,6 @@ class SharepointSettings(BaseSettings):
 class SharePointClient:
     """This class contains the API to connect to Sharepoint Database."""
 
-    # Microsoft Graph API Default values
-    GRAPH_API_URL = "https://graph.microsoft.com/v1.0"
-    SCOPE = "https://graph.microsoft.com/.default"
-
     def __init__(
         self,
         aind_site_id: str,
@@ -80,6 +105,9 @@ class SharePointClient:
         client_id: str,
         client_secret: SecretStr,
         tenant_id: str,
+        graph_api_url: str,
+        scope: str,
+        token_url: str,
     ) -> None:
         """
         Initailize the SharePointClient with the required parameters.
@@ -101,6 +129,12 @@ class SharePointClient:
             Client Secret for the principal account
         tenant_id : str
             Tenant ID for the principal account
+        graph_api_url : str
+            URL for the Microsoft Graph API
+        scope : str
+            Scope for the Microsoft Graph API
+        token_url : str
+            URL for the Microsoft Identity
         """
         self.aind_site_id = aind_site_id
         self.las_site_id = las_site_id
@@ -110,10 +144,9 @@ class SharePointClient:
         self.client_id = client_id
         self.client_secret = client_secret
         self.tenant_id = tenant_id
-        self.token_url = (
-            f"https://login.microsoftonline.com/{self.tenant_id}/"
-            "oauth2/v2.0/token"
-        )
+        self.token_url = token_url
+        self.graph_api_url = graph_api_url
+        self.scope = scope
         self._access_token: Optional[str] = None
 
     @classmethod
@@ -130,6 +163,9 @@ class SharePointClient:
             client_id=settings.client_id,
             client_secret=settings.client_secret,
             tenant_id=settings.tenant_id,
+            graph_api_url=settings.graph_api_url,
+            scope=settings.scope,
+            token_url=settings.token_url,
         )
 
     def get_access_token(self) -> str:
@@ -140,7 +176,7 @@ class SharePointClient:
             "grant_type": "client_credentials",
             "client_id": self.client_id,
             "client_secret": self.client_secret.get_secret_value(),
-            "scope": self.SCOPE,
+            "scope": self.scope,
         }
         try:
             response = requests.post(self.token_url, data=payload)
@@ -173,7 +209,7 @@ class SharePointClient:
         }
         try:
             response = requests.get(
-                f"{self.GRAPH_API_URL}/sites/{site_id}/lists/{list_id}/items",
+                f"{self.graph_api_url}/sites/{site_id}/lists/{list_id}/items",
                 headers=self._get_headers(),
                 params=params,
             )

@@ -11,7 +11,6 @@ from unittest.mock import MagicMock, patch
 import requests
 from fastapi.responses import JSONResponse
 from pydantic import SecretStr
-
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 from aind_metadata_service.sharepoint.client import (
     SharePointClient,
@@ -97,6 +96,16 @@ class TestSharepointSettings(unittest.TestCase):
         self.assertEqual("tenant_id", settings1.tenant_id)
         self.assertEqual("other_site", settings2.aind_site_id)
         self.assertEqual("las_site_456", settings2.las_site_id)
+        self.assertEqual(
+            "https://graph.microsoft.com/v1.0", settings1.graph_api_url
+        )
+        self.assertEqual(
+            "https://graph.microsoft.com/.default", settings1.scope
+        )
+        self.assertEqual(
+            "https://login.microsoftonline.com/tenant_id/oauth2/v2.0/token",
+            settings1.token_url,
+        )
 
     @patch.dict(os.environ, {}, clear=True)
     def test_settings_errors(self):
@@ -105,8 +114,9 @@ class TestSharepointSettings(unittest.TestCase):
         with self.assertRaises(ValueError) as e:
             SharepointSettings(aind_site_id="aind_site_only")
 
+        print("TEST ERROR", repr(e.exception))
         expected_error_message = (
-            "7 validation errors for SharepointSettings\n"
+            "8 validation errors for SharepointSettings\n"
             "las_site_id\n"
             "  Field required [type=missing, input_value={'aind_site_id': "
             "'aind_site_only'}, input_type=dict]\n"
@@ -141,7 +151,12 @@ class TestSharepointSettings(unittest.TestCase):
             "  Field required [type=missing, input_value={'aind_site_id': "
             "'aind_site_only'}, input_type=dict]\n"
             "    For further information visit "
-            f"https://errors.pydantic.dev/{PYD_VERSION}/v/missing"
+            f"https://errors.pydantic.dev/{PYD_VERSION}/v/missing\n"
+            "token_url\n"
+            "  Value error, tenant_id must be provided to generate token_url "
+            "[type=value_error, input_value=None, input_type=NoneType]\n"
+            "    For further information visit "
+            f"https://errors.pydantic.dev/{PYD_VERSION}/v/value_error"
         )
 
         self.assertEqual(expected_error_message, repr(e.exception))
@@ -156,8 +171,7 @@ class TestSharepointClient(unittest.TestCase):
         cls.list_items_2019 = cls._load_json_files(year="2019")
         cls.list_items_2023 = cls._load_json_files(year="2023")
         cls.list_items_2020 = cls._load_json_files(year="2020")
-
-        cls.client = SharePointClient(
+        cls.settings = SharepointSettings(
             aind_site_id="aind_site_123",
             las_site_id="las_site_456",
             nsb_2019_list_id="nsb_2019",
@@ -166,7 +180,11 @@ class TestSharepointClient(unittest.TestCase):
             client_id="client_id",
             client_secret=SecretStr("client_secret"),
             tenant_id="tenant_id",
+            graph_api_url="https://graph.microsoft.com/v1.0",
+            scope="https://graph.microsoft.com/.default",
+            token_url="some_url",
         )
+        cls.client = SharePointClient.from_settings(cls.settings)
         cls.client.get_access_token = MagicMock(return_value="fake-token")
 
     @staticmethod
@@ -196,16 +214,7 @@ class TestSharepointClient(unittest.TestCase):
     def test_get_access_token_success(self):
         """Test that get_access_token returns and caches the access token."""
 
-        client = SharePointClient(
-            aind_site_id="aind_site_123",
-            las_site_id="las_site_456",
-            nsb_2019_list_id="nsb_2019",
-            nsb_2023_list_id="nsb_2023",
-            las_2020_list_id="las_2020",
-            client_id="client_id",
-            client_secret=SecretStr("client_secret"),
-            tenant_id="tenant_id",
-        )
+        client = SharePointClient.from_settings(self.settings)
         # Ensure no token is cached initially.
         client._access_token = None
         fake_token = "abc123"
@@ -223,16 +232,7 @@ class TestSharepointClient(unittest.TestCase):
     def test_get_access_token_failure(self):
         """Test that get_access_token raises RuntimeError when
         the GET request fails."""
-        client = SharePointClient(
-            aind_site_id="aind_site_123",
-            las_site_id="las_site_456",
-            nsb_2019_list_id="nsb_2019",
-            nsb_2023_list_id="nsb_2023",
-            las_2020_list_id="las_2020",
-            client_id="client_id",
-            client_secret=SecretStr("client_secret"),
-            tenant_id="tenant_id",
-        )
+        client = SharePointClient.from_settings(self.settings)
         client._access_token = None
         with patch("requests.get") as mock_get:
             fake_response = MagicMock()
@@ -250,17 +250,7 @@ class TestSharepointClient(unittest.TestCase):
     def test_get_headers(self):
         """Test that _get_headers constructs the correct headers
         using the access token."""
-        client = SharePointClient(
-            aind_site_id="aind_site_123",
-            las_site_id="las_site_456",
-            nsb_2019_list_id="nsb_2019",
-            nsb_2023_list_id="nsb_2023",
-            las_2020_list_id="las_2020",
-            client_id="client_id",
-            client_secret=SecretStr("client_secret"),
-            tenant_id="tenant_id",
-        )
-        # Override get_access_token to return a known token.
+        client = SharePointClient.from_settings(self.settings)
         client.get_access_token = MagicMock(return_value="mytoken")
         headers = client._get_headers()
         expected_headers = {
@@ -271,16 +261,7 @@ class TestSharepointClient(unittest.TestCase):
 
     def test_fetch_list_items_success(self):
         """Test that JSON is returned from successful GET call."""
-        client = SharePointClient(
-            aind_site_id="aind_site_123",
-            las_site_id="las_site_456",
-            nsb_2019_list_id="nsb_2019",
-            nsb_2023_list_id="nsb_2023",
-            las_2020_list_id="las_2020",
-            client_id="client_id",
-            client_secret=SecretStr("client_secret"),
-            tenant_id="tenant_id",
-        )
+        client = SharePointClient.from_settings(self.settings)
         # Patch _get_headers to return a fixed header.
         client._get_headers = MagicMock(
             return_value={
@@ -303,7 +284,7 @@ class TestSharepointClient(unittest.TestCase):
             )
             self.assertEqual(result, fake_json)
             expected_url = (
-                f"{client.GRAPH_API_URL}/sites/{site_id}/lists/{list_id}/items"
+                f"{client.graph_api_url}/sites/{site_id}/lists/{list_id}/items"
             )
             expected_params = {
                 "expand": "fields",
@@ -320,16 +301,7 @@ class TestSharepointClient(unittest.TestCase):
 
     def test_fetch_list_items_failure(self):
         """Test that _fetch_list_items raises error when GET call fails."""
-        client = SharePointClient(
-            aind_site_id="aind_site_123",
-            las_site_id="las_site_456",
-            nsb_2019_list_id="nsb_2019",
-            nsb_2023_list_id="nsb_2023",
-            las_2020_list_id="las_2020",
-            client_id="client_id",
-            client_secret=SecretStr("client_secret"),
-            tenant_id="tenant_id",
-        )
+        client = SharePointClient.from_settings(self.settings)
         client._get_headers = MagicMock(
             return_value={
                 "Authorization": "Bearer fake",
