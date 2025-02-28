@@ -8,7 +8,7 @@ from typing import List, Optional, Tuple
 
 from networkx import DiGraph, descendants
 from pydantic import BaseModel
-from slims.criteria import equals
+from slims.criteria import equals, is_one_of
 
 from aind_metadata_service.slims.table_handler import (
     SlimsTableHandler,
@@ -57,13 +57,10 @@ class SlimsHistologyHandler(SlimsTableHandler):
           A directed graph of the SLIMS records and a list of the root nodes.
 
         """
-        # sample_rows = self.client.fetch(
-        #     table="Content",
-        #     criteria=equals("cntn_cf_parentBarcode", specimen_id)
-        # )
         experiment_template_rows = self.client.fetch(
             table="ExperimentTemplate",
-            criteria=equals("xptm_name", "SPIM Histology"),
+            criteria=is_one_of(
+                "xptm_name", ["SmartSPIM Labeling", "SmartSPIM Delipidation", "SmartSPIM Refractive Index Matching"]),
         )
         exp_run_rows = self.get_rows_from_foreign_table(
             input_table="ExperimentTemplate",
@@ -71,7 +68,6 @@ class SlimsHistologyHandler(SlimsTableHandler):
             input_table_cols=["xptm_pk"],
             foreign_table="ExperimentRun",
             foreign_table_col="xprn_fk_experimentTemplate",
-            # extra_criteria=date_criteria,
         )
         G = DiGraph()
         root_nodes = []
@@ -84,7 +80,6 @@ class SlimsHistologyHandler(SlimsTableHandler):
             )
             root_nodes.append(f"{row.table_name()}.{row.pk()}")
 
-        # include washes
         exp_run_step_rows = self.get_rows_from_foreign_table(
             input_table="ExperimentRun",
             input_rows=exp_run_rows,
@@ -103,7 +98,7 @@ class SlimsHistologyHandler(SlimsTableHandler):
             graph=G,
         )
 
-        exp_run_step_content_rows = self.get_rows_from_foreign_table(
+        _ = self.get_rows_from_foreign_table(
             input_table="ExperimentRunStep",
             input_rows=exp_run_step_rows,
             input_table_cols=["xprs_pk"],
@@ -126,6 +121,14 @@ class SlimsHistologyHandler(SlimsTableHandler):
             input_table_cols=["cntn_cf_fk_reagentCatalogNumber"],
             foreign_table="ReferenceDataRecord",
             foreign_table_col="rdrc_pk",
+            graph=G,
+        )
+        _ = self.get_rows_from_foreign_table(
+            input_table="ReferenceDataRecord",
+            input_rows=reference_data_rows,
+            input_table_cols=["rdrc_cf_fk_manufacturer"],
+            foreign_table="Source",
+            foreign_table_col="sorc_pk",
             graph=G,
         )
         return G, root_nodes
