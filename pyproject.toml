@@ -43,8 +43,9 @@ server = [
     'fastapi==0.115.0',
     'uvicorn[standard]==0.31.0',
     'python-dateutil',
-    'aind-slims-api==0.1.19',
-    'azure-identity==1.15.0'
+    'aind-slims-api==0.1.21',
+    'azure-identity==1.15.0',
+    'networkx'
 ]
 
 client = [
@@ -97,5 +98,5 @@ line_length = 79
 profile = "black"
 
 [tool.interrogate]
-exclude = ["setup.py", "docs", "build"]
+exclude = ["setup.py", "docs", "build", "env"]
 fail-under = 100

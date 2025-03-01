@@ -1,6 +1,9 @@
 """Module for slims client"""
 
+import json
 import logging
+from datetime import datetime
+from typing import Optional, Union
 
 from aind_data_schema.core.instrument import Instrument
 from aind_data_schema.core.procedures import Procedures
@@ -12,6 +15,7 @@ from aind_slims_api.operations import (
     fetch_ecephys_sessions,
     fetch_histology_procedures,
 )
+from fastapi.responses import JSONResponse
 from pydantic import Extra, Field, SecretStr
 from pydantic_settings import BaseSettings
 from requests.models import Response
@@ -20,6 +24,8 @@ from slims.criteria import equals
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
+from aind_metadata_service.slims.imaging.handler import SlimsImagingHandler
+from aind_metadata_service.slims.imaging.mapping import SlimsSpimMapper
 from aind_metadata_service.slims.procedures.mapping import SlimsHistologyMapper
 from aind_metadata_service.slims.sessions.mapping import SlimsSessionMapper
 
@@ -200,3 +206,80 @@ class SlimsHandler:
         except Exception as e:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
+
+    @staticmethod
+    def _parse_date(
+        date_str: Optional[str],
+    ) -> Union[Optional[datetime], ModelResponse]:
+        """Parse a date_str to datetime object or return a Bad Request
+        response"""
+        if date_str is None:
+            return None
+        else:
+            try:
+                dt = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+                return dt
+            except ValueError:
+                return ModelResponse.bad_request_error_response(
+                    message=f"{date_str} is not valid ISOFormat!"
+                )
+
+    def get_slims_imaging_response(
+        self,
+        subject_id: Optional[str],
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> JSONResponse:
+        """
+
+        Parameters
+        ----------
+        subject_id : str | None
+        start_date : str | None
+          Optional ISO Format datetime string
+        end_date :  str | None
+          Optional ISO Format datetime string
+        Returns
+        -------
+        JSONResponse
+
+        """
+        if subject_id is not None and subject_id == "":
+            return ModelResponse.bad_request_error_response(
+                message="subject_id cannot be an empty string!"
+            ).map_to_json_response()
+        parsed_start_date = self._parse_date(start_date)
+        if isinstance(parsed_start_date, ModelResponse):
+            return parsed_start_date.map_to_json_response()
+        parsed_end_date = self._parse_date(end_date)
+        if isinstance(parsed_end_date, ModelResponse):
+            return parsed_end_date.map_to_json_response()
+        try:
+            slims_imaging_handler = SlimsImagingHandler(client=self.client.db)
+            slims_spim_data = slims_imaging_handler.get_spim_data_from_slims(
+                subject_id=subject_id,
+                start_date_greater_than_or_equal=parsed_start_date,
+                end_date_less_than_or_equal=parsed_end_date,
+            )
+            spim_data = SlimsSpimMapper(
+                slims_spim_data=slims_spim_data
+            ).map_info_from_slims()
+            if len(spim_data) == 0:
+                m = ModelResponse.no_data_found_error_response()
+                return m.map_to_json_response()
+            response = JSONResponse(
+                status_code=StatusCodes.VALID_DATA.value,
+                content=(
+                    {
+                        "message": "Data from SLIMS",
+                        "data": [
+                            json.loads(m.model_dump_json()) for m in spim_data
+                        ],
+                    }
+                ),
+            )
+            return response
+        except Exception as e:
+            logging.exception(e)
+            m = ModelResponse.internal_server_error_response()
+            return m.map_to_json_response()

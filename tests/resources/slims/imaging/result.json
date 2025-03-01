@@ -1,0 +1,194 @@
+[
+   {
+      "pk": 1581,
+      "tableName": "Result",
+      "columns": [
+         {
+            "name": "rslt_cf_datePerformed",
+            "value": 1739301420000,
+            "datatype": "DATE",
+            "title": "Date Performed"
+         },
+         {
+            "name": "rslt_cf_fk_operator",
+            "value": 56,
+            "displayValue": "Person R",
+            "datatype": "FOREIGN_KEY",
+            "title": "Operator"
+         },
+         {
+            "name": "rslt_cf_sampleRefractiveIndex",
+            "value": 1.557,
+            "datatype": "FLOAT",
+            "title": "Sample Refractive Index"
+         },
+         {
+            "name": "rslt_cf_sampleImmersionMedium",
+            "value": "Ethyl Cinnamate",
+            "datatype": "STRING",
+            "title": "Sample Immersion Medium"
+         },
+         {
+            "name": "rslt_cf_chamberRefractiveIndex",
+            "value": 1.557,
+            "datatype": "FLOAT",
+            "title": "Chamber Refractive Index"
+         },
+         {
+            "name": "rslt_cf_chamberImmersionMedium",
+            "value": "Ethyl Cinnamate",
+            "datatype": "STRING",
+            "title": "Chamber Immersion Medium"
+         },
+         {
+            "name": "rslt_cf_fk_spimBrainOrientation",
+            "value": 1624,
+            "displayValue": "Horizontal, Superior; AP",
+            "datatype": "FOREIGN_KEY",
+            "title": "SPIM Brain Orientation"
+         },
+         {
+            "name": "rslt_cf_fk_instrumentJson",
+            "value": 40,
+            "displayValue": "440_SmartSPIM1_20240327",
+            "datatype": "FOREIGN_KEY",
+            "title": "Instrument JSON"
+         },
+         {
+            "name": "rslt_fk_experimentRunStep",
+            "value": 60060,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run step"
+         }
+      ]
+   },
+   {
+      "pk": 1611,
+      "tableName": "Result",
+      "columns": [
+         {
+            "name": "rslt_cf_datePerformed",
+            "value": 1739383260000,
+            "datatype": "DATE",
+            "title": "Date Performed"
+         },
+         {
+            "name": "rslt_cf_fk_operator",
+            "value": 56,
+            "displayValue": "Person R",
+            "datatype": "FOREIGN_KEY",
+            "title": "Operator"
+         },
+         {
+            "name": "rslt_cf_sampleRefractiveIndex",
+            "value": 1.557,
+            "datatype": "FLOAT",
+            "title": "Sample Refractive Index"
+         },
+         {
+            "name": "rslt_cf_sampleImmersionMedium",
+            "value": "Ethyl Cinnamate",
+            "datatype": "STRING",
+            "title": "Sample Immersion Medium"
+         },
+         {
+            "name": "rslt_cf_chamberRefractiveIndex",
+            "value": 1.557,
+            "datatype": "FLOAT",
+            "title": "Chamber Refractive Index"
+         },
+         {
+            "name": "rslt_cf_chamberImmersionMedium",
+            "value": "Ethyl Cinnamate",
+            "datatype": "STRING",
+            "title": "Chamber Immersion Medium"
+         },
+         {
+            "name": "rslt_cf_fk_spimBrainOrientation",
+            "value": 1624,
+            "displayValue": "Horizontal, Superior; AP",
+            "datatype": "FOREIGN_KEY",
+            "title": "SPIM Brain Orientation"
+         },
+         {
+            "name": "rslt_cf_fk_instrumentJson",
+            "value": 40,
+            "displayValue": "440_SmartSPIM1_20240327",
+            "datatype": "FOREIGN_KEY",
+            "title": "Instrument JSON"
+         },
+         {
+            "name": "rslt_fk_experimentRunStep",
+            "value": 60063,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run step"
+         }
+      ]
+   },
+   {
+      "pk": 1644,
+      "tableName": "Result",
+      "columns": [
+         {
+            "name": "rslt_cf_datePerformed",
+            "value": 1739398380000,
+            "datatype": "DATE",
+            "title": "Date Performed"
+         },
+         {
+            "name": "rslt_cf_fk_operator",
+            "value": 56,
+            "displayValue": "Person R",
+            "datatype": "FOREIGN_KEY",
+            "title": "Operator"
+         },
+         {
+            "name": "rslt_cf_sampleRefractiveIndex",
+            "value": 1.557,
+            "datatype": "FLOAT",
+            "title": "Sample Refractive Index"
+         },
+         {
+            "name": "rslt_cf_sampleImmersionMedium",
+            "value": "Ethyl Cinnamate",
+            "datatype": "STRING",
+            "title": "Sample Immersion Medium"
+         },
+         {
+            "name": "rslt_cf_chamberRefractiveIndex",
+            "value": 1.557,
+            "datatype": "FLOAT",
+            "title": "Chamber Refractive Index"
+         },
+         {
+            "name": "rslt_cf_chamberImmersionMedium",
+            "value": "Ethyl Cinnamate",
+            "datatype": "STRING",
+            "title": "Chamber Immersion Medium"
+         },
+         {
+            "name": "rslt_cf_fk_spimBrainOrientation",
+            "value": 1624,
+            "displayValue": "Horizontal, Superior; AP",
+            "datatype": "FOREIGN_KEY",
+            "title": "SPIM Brain Orientation"
+         },
+         {
+            "name": "rslt_cf_fk_instrumentJson",
+            "value": 40,
+            "displayValue": "440_SmartSPIM1_20240327",
+            "datatype": "FOREIGN_KEY",
+            "title": "Instrument JSON"
+         },
+         {
+            "name": "rslt_fk_experimentRunStep",
+            "value": 60066,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run step"
+         }
+      ]
+   }
+]

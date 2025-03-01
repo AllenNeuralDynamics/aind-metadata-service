@@ -1,0 +1,62 @@
+[
+   {
+      "pk": 29,
+      "tableName": "ExperimentRunStepContent",
+      "columns": [
+         {
+            "name": "xrsc_fk_content",
+            "value": 233,
+            "displayValue": "740610",
+            "datatype": "FOREIGN_KEY",
+            "title": "Content"
+         },
+         {
+            "name": "xrsc_fk_experimentRunStep",
+            "value": 60059,
+            "displayValue": "Select content from queue",
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run step"
+         }
+      ]
+   },
+   {
+      "pk": 30,
+      "tableName": "ExperimentRunStepContent",
+      "columns": [
+         {
+            "name": "xrsc_fk_content",
+            "value": 235,
+            "displayValue": "744742",
+            "datatype": "FOREIGN_KEY",
+            "title": "Content"
+         },
+         {
+            "name": "xrsc_fk_experimentRunStep",
+            "value": 60062,
+            "displayValue": "Select content from queue",
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run step"
+         }
+      ]
+   },
+   {
+      "pk": 31,
+      "tableName": "ExperimentRunStepContent",
+      "columns": [
+         {
+            "name": "xrsc_fk_content",
+            "value": 234,
+            "displayValue": "744744",
+            "datatype": "FOREIGN_KEY",
+            "title": "Content"
+         },
+         {
+            "name": "xrsc_fk_experimentRunStep",
+            "value": 60065,
+            "displayValue": "Select content from queue",
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run step"
+         }
+      ]
+   }
+]

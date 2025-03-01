@@ -1,0 +1,20 @@
+[
+   {
+      "pk": 56,
+      "tableName": "User",
+      "columns": [
+         {
+            "name": "user_fullName",
+            "value": "Person R",
+            "datatype": "STRING",
+            "title": "Full name"
+         },
+         {
+            "name": "user_pk",
+            "value": 56,
+            "datatype": "INTEGER",
+            "title": "user_pk"
+         }
+      ]
+   }
+]

@@ -96,6 +96,15 @@ class ModelResponse(Generic[T]):
             message="No Data Found.",
         )
 
+    @classmethod
+    def bad_request_error_response(cls, message="Bad Request."):
+        """Bad Request Error"""
+        return cls(
+            status_code=StatusCodes.BAD_REQUEST,
+            aind_models=[],
+            message=message,
+        )
+
     @staticmethod
     def _validate_model(model) -> Optional[str]:
         """Helper method to validate a model and return validation errors."""
@@ -186,6 +195,11 @@ class ModelResponse(Generic[T]):
         elif self.status_code == StatusCodes.INTERNAL_SERVER_ERROR:
             response = JSONResponse(
                 status_code=StatusCodes.INTERNAL_SERVER_ERROR.value,
+                content=({"message": self.message, "data": None}),
+            )
+        elif self.status_code == StatusCodes.BAD_REQUEST:
+            response = JSONResponse(
+                status_code=StatusCodes.BAD_REQUEST.value,
                 content=({"message": self.message, "data": None}),
             )
         else:

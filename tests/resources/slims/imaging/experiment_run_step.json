@@ -1,0 +1,194 @@
+[
+   {
+      "pk": 60059,
+      "tableName": "ExperimentRunStep",
+      "columns": [
+         {
+            "name": "xprs_pk",
+            "value": 60059,
+            "datatype": "INTEGER",
+            "title": "xprs_pk"
+         },
+         {
+            "name": "xprs_fk_experimentRun",
+            "value": 40015,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run"
+         }
+      ]
+   },
+   {
+      "pk": 60060,
+      "tableName": "ExperimentRunStep",
+      "columns": [
+         {
+            "name": "xprs_pk",
+            "value": 60060,
+            "datatype": "INTEGER",
+            "title": "xprs_pk"
+         },
+         {
+            "name": "xprs_fk_experimentRun",
+            "value": 40015,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run"
+         }
+      ]
+   },
+   {
+      "pk": 60061,
+      "tableName": "ExperimentRunStep",
+      "columns": [
+         {
+            "name": "xprs_cf_fk_protocol",
+            "value": 18,
+            "displayValue": "Imaging cleared mouse brains on SmartSPIM",
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol"
+         },
+         {
+            "name": "xprs_pk",
+            "value": 60061,
+            "datatype": "INTEGER",
+            "title": "xprs_pk"
+         },
+         {
+            "name": "xprs_fk_experimentRun",
+            "value": 40015,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run"
+         }
+      ]
+   },
+   {
+      "pk": 60062,
+      "tableName": "ExperimentRunStep",
+      "columns": [
+         {
+            "name": "xprs_pk",
+            "value": 60062,
+            "datatype": "INTEGER",
+            "title": "xprs_pk"
+         },
+         {
+            "name": "xprs_fk_experimentRun",
+            "value": 40016,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run"
+         }
+      ]
+   },
+   {
+      "pk": 60063,
+      "tableName": "ExperimentRunStep",
+      "columns": [
+         {
+            "name": "xprs_pk",
+            "value": 60063,
+            "datatype": "INTEGER",
+            "title": "xprs_pk"
+         },
+         {
+            "name": "xprs_fk_experimentRun",
+            "value": 40016,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run"
+         }
+      ]
+   },
+   {
+      "pk": 60064,
+      "tableName": "ExperimentRunStep",
+      "columns": [
+         {
+            "name": "xprs_cf_fk_protocol",
+            "value": 18,
+            "displayValue": "Imaging cleared mouse brains on SmartSPIM",
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol"
+         },
+         {
+            "name": "xprs_pk",
+            "value": 60064,
+            "datatype": "INTEGER",
+            "title": "xprs_pk"
+         },
+         {
+            "name": "xprs_fk_experimentRun",
+            "value": 40016,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run"
+         }
+      ]
+   },
+   {
+      "pk": 60065,
+      "tableName": "ExperimentRunStep",
+      "columns": [
+         {
+            "name": "xprs_pk",
+            "value": 60065,
+            "datatype": "INTEGER",
+            "title": "xprs_pk"
+         },
+         {
+            "name": "xprs_fk_experimentRun",
+            "value": 40017,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run"
+         }
+      ]
+   },
+   {
+      "pk": 60066,
+      "tableName": "ExperimentRunStep",
+      "columns": [
+         {
+            "name": "xprs_pk",
+            "value": 60066,
+            "datatype": "INTEGER",
+            "title": "xprs_pk"
+         },
+         {
+            "name": "xprs_fk_experimentRun",
+            "value": 40017,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run"
+         }
+      ]
+   },
+   {
+      "pk": 60067,
+      "tableName": "ExperimentRunStep",
+      "columns": [
+         {
+            "name": "xprs_cf_fk_protocol",
+            "value": 18,
+            "displayValue": "Imaging cleared mouse brains on SmartSPIM",
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol"
+         },
+         {
+            "name": "xprs_pk",
+            "value": 60067,
+            "datatype": "INTEGER",
+            "title": "xprs_pk"
+         },
+         {
+            "name": "xprs_fk_experimentRun",
+            "value": 40017,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run"
+         }
+      ]
+   }
+]
