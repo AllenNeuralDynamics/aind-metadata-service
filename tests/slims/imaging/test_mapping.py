@@ -88,7 +88,9 @@ class TestSlimsSpimMapper(unittest.TestCase):
                     "Laser = 639; Emission Filter = 667/30",
                 ],
                 stitching_channels="Laser = 639, Emission Filter = 667/30",
-                ccf_registration_channels="Laser = 639, Emission Filter = 667/30",
+                ccf_registration_channels=(
+                    "Laser = 639, Emission Filter = 667/30"
+                ),
                 cell_segmentation_channels=None,
             )
         ]
@@ -123,7 +125,9 @@ class TestSlimsSpimMapper(unittest.TestCase):
                     "Laser = 639; Emission Filter = 667/30",
                 ],
                 stitching_channels="Laser = 639, Emission Filter = 667/30",
-                ccf_registration_channels="Laser = 639, Emission Filter = 667/30",
+                ccf_registration_channels=(
+                    "Laser = 639, Emission Filter = 667/30"
+                ),
                 cell_segmentation_channels=None,
             )
         ]
