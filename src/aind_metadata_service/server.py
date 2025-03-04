@@ -22,10 +22,11 @@ from aind_metadata_service.labtracks.client import (
 from aind_metadata_service.mgi.client import MgiClient, MgiSettings
 from aind_metadata_service.mgi.mapping import MgiMapper
 from aind_metadata_service.response_handler import EtlResponse
-from aind_metadata_service.sharepoint.client import (
-    SharePointClient,
-    SharepointSettings,
-)
+
+# from aind_metadata_service.sharepoint.client import (
+#     SharePointClient,
+#     SharepointSettings,
+# )
 from aind_metadata_service.slims.client import SlimsHandler, SlimsSettings
 from aind_metadata_service.smartsheet.client import (
     SmartSheetClient,
@@ -53,7 +54,7 @@ SMARTSHEET_PROTOCOLS_TOKEN = os.getenv("SMARTSHEET_API_TOKEN")
 
 # TODO: Move client instantiation when the server starts instead of creating
 #  one for each request?
-sharepoint_settings = SharepointSettings()
+# sharepoint_settings = SharepointSettings()
 labtracks_settings = LabTracksSettings()
 tars_settings = AzureSettings()
 slims_settings = SlimsSettings()
@@ -287,81 +288,81 @@ async def retrieve_injection_materials(prep_lot_number):
     return model_response.map_to_json_response()
 
 
-@app.get("/procedures/{subject_id}")
-async def retrieve_procedures(subject_id):
-    """
-    Retrieves procedure info from SharePoint and Labtracks servers
-    """
-    sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
-    lb_client = LabTracksClient.from_settings(labtracks_settings)
-    lb_response = await run_in_threadpool(
-        lb_client.get_procedures_info, subject_id=subject_id
-    )
-    sp2019_response = await run_in_threadpool(
-        sharepoint_client.get_procedure_info,
-        subject_id=subject_id,
-        list_title=sharepoint_settings.nsb_2019_list,
-    )
-    sp2023_response = await run_in_threadpool(
-        sharepoint_client.get_procedure_info,
-        subject_id=subject_id,
-        list_title=sharepoint_settings.nsb_2023_list,
-    )
-    las2020_response = await run_in_threadpool(
-        sharepoint_client.get_procedure_info,
-        subject_id=subject_id,
-        list_title=sharepoint_settings.las_2020_list,
-    )
-    # merge subject procedures
-    merged_response = sharepoint_client.merge_responses(
-        [
-            lb_response,
-            sp2019_response,
-            sp2023_response,
-            las2020_response,
-        ]
-    )
-    # integrate TARS response
-    mapper = TarsResponseHandler()
-    viruses = mapper.get_virus_strains(merged_response)
-    tars_mapping = {}
-    for virus_strain in viruses:
-        tars_response = await retrieve_injection_materials(
-            prep_lot_number=virus_strain
-        )
-        tars_mapping[virus_strain] = tars_response
-    integrated_response = mapper.integrate_injection_materials(
-        response=merged_response, tars_mapping=tars_mapping
-    )
-    # integrate protocols from smartsheet
-    smart_sheet_response = await run_in_threadpool(
-        protocols_smart_sheet_client.get_sheet
-    )
-    protocols_integrator = ProtocolsIntegrator()
-    protocols_list = protocols_integrator.get_protocols_list(
-        integrated_response
-    )
-    protocols_mapping = {}
-    for protocol_name in protocols_list:
-        mapper = ProtocolsMapper(
-            smart_sheet_response=smart_sheet_response, input_id=protocol_name
-        )
-        model_response = mapper.get_model_response()
-        protocols_mapping[protocol_name] = (
-            model_response.map_to_json_response()
-        )
-    integrated_response = protocols_integrator.integrate_protocols(
-        response=integrated_response, protocols_mapping=protocols_mapping
-    )
-    # merge specimen procedures
-    slims_response = await run_in_threadpool(
-        slims_client.get_specimen_procedures_model_response,
-        specimen_id=subject_id,
-    )
-    merged_response = sharepoint_client.merge_responses(
-        [integrated_response, slims_response]
-    )
-    return merged_response.map_to_json_response()
+# @app.get("/procedures/{subject_id}")
+# async def retrieve_procedures(subject_id):
+#     """
+#     Retrieves procedure info from SharePoint and Labtracks servers
+#     """
+#     sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
+#     lb_client = LabTracksClient.from_settings(labtracks_settings)
+#     lb_response = await run_in_threadpool(
+#         lb_client.get_procedures_info, subject_id=subject_id
+#     )
+#     sp2019_response = await run_in_threadpool(
+#         sharepoint_client.get_procedure_info,
+#         subject_id=subject_id,
+#         list_title=sharepoint_settings.nsb_2019_list,
+#     )
+#     sp2023_response = await run_in_threadpool(
+#         sharepoint_client.get_procedure_info,
+#         subject_id=subject_id,
+#         list_title=sharepoint_settings.nsb_2023_list,
+#     )
+#     las2020_response = await run_in_threadpool(
+#         sharepoint_client.get_procedure_info,
+#         subject_id=subject_id,
+#         list_title=sharepoint_settings.las_2020_list,
+#     )
+#     # merge subject procedures
+#     merged_response = sharepoint_client.merge_responses(
+#         [
+#             lb_response,
+#             sp2019_response,
+#             sp2023_response,
+#             las2020_response,
+#         ]
+#     )
+#     # integrate TARS response
+#     mapper = TarsResponseHandler()
+#     viruses = mapper.get_virus_strains(merged_response)
+#     tars_mapping = {}
+#     for virus_strain in viruses:
+#         tars_response = await retrieve_injection_materials(
+#             prep_lot_number=virus_strain
+#         )
+#         tars_mapping[virus_strain] = tars_response
+#     integrated_response = mapper.integrate_injection_materials(
+#         response=merged_response, tars_mapping=tars_mapping
+#     )
+#     # integrate protocols from smartsheet
+#     smart_sheet_response = await run_in_threadpool(
+#         protocols_smart_sheet_client.get_sheet
+#     )
+#     protocols_integrator = ProtocolsIntegrator()
+#     protocols_list = protocols_integrator.get_protocols_list(
+#         integrated_response
+#     )
+#     protocols_mapping = {}
+#     for protocol_name in protocols_list:
+#         mapper = ProtocolsMapper(
+#             smart_sheet_response=smart_sheet_response, input_id=protocol_name
+#         )
+#         model_response = mapper.get_model_response()
+#         protocols_mapping[protocol_name] = (
+#             model_response.map_to_json_response()
+#         )
+#     integrated_response = protocols_integrator.integrate_protocols(
+#         response=integrated_response, protocols_mapping=protocols_mapping
+#     )
+#     # merge specimen procedures
+#     slims_response = await run_in_threadpool(
+#         slims_client.get_specimen_procedures_model_response,
+#         specimen_id=subject_id,
+#     )
+#     merged_response = sharepoint_client.merge_responses(
+#         [integrated_response, slims_response]
+#     )
+#     return merged_response.map_to_json_response()
 
 
 @app.get(

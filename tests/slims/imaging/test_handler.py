@@ -55,6 +55,10 @@ class TestSlimsImagingHandler(unittest.TestCase):
             result_json = json.load(f)
         with open(RESOURCES_DIR / "sop.json", "r") as f:
             sop_json = json.load(f)
+        with open(RESOURCES_DIR / "order_content.json", "r") as f:
+            order_content_json = json.load(f)
+        with open(RESOURCES_DIR / "order.json", "r") as f:
+            order_json = json.load(f)
 
         content = [form_record(j) for j in content_json]
         experiment_run = [form_record(j) for j in experiment_run_json]
@@ -72,6 +76,8 @@ class TestSlimsImagingHandler(unittest.TestCase):
         ]
         result = [form_record(j) for j in result_json]
         sop = [form_record(j) for j in sop_json]
+        order_content = [form_record(j) for j in order_content_json]
+        order = [form_record(j) for j in order_json]
         cls.fetch_side_effect = [
             experiment_template,
             experiment_run,
@@ -81,6 +87,8 @@ class TestSlimsImagingHandler(unittest.TestCase):
             result,
             content,
             reference_data_record,
+            order_content,
+            order,
         ]
 
     @patch("slims.slims.Slims")
@@ -123,6 +131,8 @@ class TestSlimsImagingHandler(unittest.TestCase):
             ("Result.1611", "ReferenceDataRecord.1624"),
             ("Result.1644", "ReferenceDataRecord.40"),
             ("Result.1644", "ReferenceDataRecord.1624"),
+            ("Content.235", "OrderContent.32"),
+            ("OrderContent.32", "Order.21"),
         ]
 
         self.assertEqual(expected_root_nodes, root_nodes)
@@ -162,6 +172,14 @@ class TestSlimsImagingHandler(unittest.TestCase):
                 z_direction="Superior to Inferior",
                 y_direction="Anterior to Posterior",
                 x_direction="Left to Right",
+                imaging_channels=[
+                    "Laser = 488; Emission Filter = 525/45",
+                    "Laser = 561; Emission Filter = 593/40",
+                    "Laser = 639; Emission Filter = 667/30",
+                ],
+                stitching_channels="Laser = 639, Emission Filter = 667/30",
+                ccf_registration_channels="Laser = 639, Emission Filter = 667/30",
+                cell_segmentation_channels=None,
             )
         ]
         self.assertEqual(expected_spim_data, spim_data)

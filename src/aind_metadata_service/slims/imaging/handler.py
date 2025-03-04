@@ -34,6 +34,10 @@ class SlimsSpimData(BaseModel):
     z_direction: Optional[str] = None
     y_direction: Optional[str] = None
     x_direction: Optional[str] = None
+    imaging_channels: Optional[List[str]] = None
+    stitching_channels: Optional[str] = None
+    ccf_registration_channels: Optional[str] = None
+    cell_segmentation_channels: Optional[List[str]] = None
 
 
 class SlimsImagingHandler(SlimsTableHandler):
@@ -140,6 +144,25 @@ class SlimsImagingHandler(SlimsTableHandler):
                     )
                     spim_data.date_performed = date_performed
                     spim_data.experimenter_name = user
+                if (
+                    table_name == "Order"
+                    and get_attr_or_none(
+                        row, "ordr_fk_orderType", "displayValue"
+                    )
+                    == "SmartSPIM Histology and Imaging"
+                ):
+                    spim_data.imaging_channels = get_attr_or_none(
+                        row, "ordr_cf_fluorescenceChannels_Imaging"
+                    )
+                    spim_data.stitching_channels = get_attr_or_none(
+                        row, "ordr_cf_fluorescenceChannels_Stitching"
+                    )
+                    spim_data.ccf_registration_channels = get_attr_or_none(
+                        row, "ordr_cf_fluorescenceChannels_CcfRegistration"
+                    )
+                    spim_data.cell_segmentation_channels = get_attr_or_none(
+                        row, "ordr_cf_fluorescenceChannels_CellSegmentation"
+                    )
             if subject_id is None or subject_id == spim_data.subject_id:
                 spim_data_list.append(spim_data)
         return spim_data_list
@@ -229,7 +252,7 @@ class SlimsImagingHandler(SlimsTableHandler):
             graph=G,
         )
 
-        _ = self.get_rows_from_foreign_table(
+        content_rows = self.get_rows_from_foreign_table(
             input_table="ExperimentRunStepContent",
             input_rows=exp_run_step_content_rows,
             input_table_cols=["xrsc_fk_content"],
@@ -247,6 +270,23 @@ class SlimsImagingHandler(SlimsTableHandler):
             ],
             foreign_table="ReferenceDataRecord",
             foreign_table_col="rdrc_pk",
+            graph=G,
+        )
+        # Add Orders
+        order_content_rows = self.get_rows_from_foreign_table(
+            input_table="Content",
+            input_rows=content_rows,
+            input_table_cols=["cntn_pk"],
+            foreign_table="OrderContent",
+            foreign_table_col="rdcn_fk_content",
+            graph=G,
+        )
+        _ = self.get_rows_from_foreign_table(
+            input_table="OrderContent",
+            input_rows=order_content_rows,
+            input_table_cols=["rdcn_fk_order"],
+            foreign_table="Order",
+            foreign_table_col="ordr_pk",
             graph=G,
         )
 
