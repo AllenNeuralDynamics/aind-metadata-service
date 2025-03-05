@@ -93,7 +93,7 @@ class TestNSB2023Parsers(TestCase):
             attr = getattr(cls, k)
             if isinstance(attr, property):
                 props.append(getattr(mapped_model, k))
-        self.assertEqual(254, len(props))
+        self.assertEqual(313, len(props))
 
     def test_parse_basic_float_str(self):
         """Tests parsing of basic float strings"""
