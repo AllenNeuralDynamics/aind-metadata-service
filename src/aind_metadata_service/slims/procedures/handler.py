@@ -14,11 +14,8 @@ from aind_metadata_service.slims.table_handler import (
     SlimsTableHandler,
     get_attr_or_none,
 )
-
-# class AntibodyData(BaseModel):
-#     """Consolidated antibody data for immunolabeling procedures."""
-#     immunolabel_class: Optional[str] = None  # e.g. "PRIMARY" or "SECONDARY"
-#     mass: Optional[float] = None
+import matplotlib.pyplot as plt
+import networkx as nx
 
 class SlimsReagentData(BaseModel):
     """Expected Model that needs to be extracted from SLIMS."""
@@ -29,6 +26,7 @@ class SlimsReagentData(BaseModel):
 class SlimsWashData(BaseModel):
     """Expected Model that needs to be extracted from SLIMS."""
     wash_name: Optional[str] = None
+    wash_type: Optional[str] = None
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
     modified_by: Optional[str] = None
@@ -39,22 +37,10 @@ class SlimsHistologyData(BaseModel):
 
     experiment_run_created_on: Optional[int] = None
     specimen_id: Optional[str] = None
+    subject_id: Optional[str] = None
     protocol_id: Optional[str] = None
     protocol_name: Optional[str] = None
     washes: Optional[List[SlimsWashData]] = None
-
-
-
-
-    # procedure_type: Optional[str] = None # experiment template name 
-    # procedure_name: Optional[str] = None # protocol name
-    # start_date: Optional[int] = None # experiment step start time (first step start time)
-    # end_date: Optional[int] = None # experiment step end time (last step end time)
-    # experimenters: Optional[List[str]] = None # 
-    # protocol_ids: List[str] = []
-    # reagents: Optional[List[ReagentData]] = None
-    # antibodies: Optional[List[AntibodyData]] = None
-
 
 class SlimsHistologyHandler(SlimsTableHandler):
     """Class to handle getting SPIM Histology Procedures info from SLIMS."""
@@ -96,6 +82,17 @@ class SlimsHistologyHandler(SlimsTableHandler):
                     histology_data.protocol_id = stop_link # protocol link
                     histology_data.protocol_name = stop_name # procedure name
                 if (
+                    table_name == "Content"
+                    and get_attr_or_none(
+                        row, "cntn_fk_category", "displayValue"
+                    )
+                    == "Samples"
+                    ):
+                    n_specimen_id = get_attr_or_none(row, "cntn_barCode")
+                    n_subject_id = get_attr_or_none(row, "cntn_cf_parentBarcode")
+                    histology_data.specimen_id = n_specimen_id
+                    histology_data.subject_id = n_subject_id
+                if (
                     table_name == "ExperimentRunStep"
                     and get_attr_or_none(
                         row, "xprs_name"
@@ -118,36 +115,41 @@ class SlimsHistologyHandler(SlimsTableHandler):
                     # TODO: check prod field names
                     wash_data = SlimsWashData()
                     wash_data.wash_name = get_attr_or_none(row, "xprs_name")
-                    wash_data.start_time = get_attr_or_none(row, "xprs_cf_sbipDelipidationWash1Start")
-                    wash_data.end_time = get_attr_or_none(row, "xprs_cf_sbipDelipidationWash6End")
-                    wash_data.modified_by = get_attr_or_none(row, "modified_by")
-                    # histology_data.washes.append(wash_data)
-                if (
-                    table_name == "Content"
-                    and get_attr_or_none(
-                        row, "cntn_fk_category", "displayValue"
-                    )
-                    == "Samples"
-                ):
-                    n_specimen_id = get_attr_or_none(row, "cntn_barCode")
-                    n_subject_id = get_attr_or_none(row, "cntn_cf_parentBarcode")
-                    histology_data.specimen_id = n_specimen_id
-                    histology_data.subject_id = n_subject_id
-                if (
-                    table_name == "Content"
-                    and get_attr_or_none(
-                        row, "cntn_fk_category", "displayValue"
-                    )
-                    == "Reagents, Externally Manufactured"
-                    or get_attr_or_none(row, "cntn_fk_category", "displayValue")
-                    == "Reagents, Internally Produced"
-                ):
-                    n_reagent_lot_number = get_attr_or_none(row, "cntn_cf_lotNumber")
-                    # TODO: check if name and source can be retrieved from display values properly
-                    n_reagent_name = get_attr_or_none(row, "cntn_cf_fk_reagentCatalogNumber", "displayValue")
-                    n_reagent_source = get_attr_or_none(row, "cntn_fk_source", "displayValue")
-                # TODO: figure out how to go through the different nodes, might need to be nested loop?
-                # TODO: OR have some field that links the reagent to the wash, nested loop would defeat purpose of graph
+                    wash_data.wash_type = get_attr_or_none(row, "xprs_cf_spimWashType")
+                    wash_data.start_time = get_attr_or_none(row, "xprs_cf_startTime")
+                    wash_data.end_time = get_attr_or_none(row, "xprs_cf_endTime")
+                    wash_data.modified_by = get_attr_or_none(row, "xprs_modifiedBy")
+                    reagents = []
+                    for c in descendants(g, n):
+                        table_name = g.nodes[c]["table_name"]
+                        crow = g.nodes[c]["row"]
+                        if (
+                            table_name == "Content"
+                            and get_attr_or_none(
+                                crow, "cntn_fk_category", "displayValue"
+                            ) in ["Reagents, Externally Manufactured", "Reagents, Internally Produced"]
+                        ):
+                            n_reagent_lot_number = get_attr_or_none(crow, "cntn_cf_lotNumber")
+                            # TODO: check if name and source can be retrieved from display values properly
+                            n_reagent_name = get_attr_or_none(crow, "cntn_cf_fk_reagentCatalogNumber", "displayValue")
+                            n_reagent_source = get_attr_or_none(crow, "cntn_fk_source", "displayValue")
+                            reagent_data = SlimsReagentData(
+                                name=n_reagent_name,
+                                source=n_reagent_source,
+                                lot_number=n_reagent_lot_number,
+                            )
+                            reagents.append(reagent_data)
+                    wash_data.reagents = reagents if reagents else None
+
+                    if histology_data.washes is None:
+                        histology_data.washes = []
+                    histology_data.washes.append(wash_data)
+            
+            if subject_id is None or subject_id == histology_data.subject_id:
+                histology_data_list.append(histology_data)
+            
+        return histology_data_list
+
                 
 
     def _get_graph(self) -> Tuple[DiGraph, List[str]]:
@@ -207,6 +209,7 @@ class SlimsHistologyHandler(SlimsTableHandler):
             foreign_table_col="xrsc_fk_experimentRunStep",
             graph=G,
         )
+        # TODO: check if this is necessary 
         _ = self.get_rows_from_foreign_table(
             input_table="ExperimentRunStepContent",
             input_rows=exp_run_step_content_rows,
@@ -216,10 +219,11 @@ class SlimsHistologyHandler(SlimsTableHandler):
             graph=G,
         )
         # reagents 
+        # TODO: check that get_rows can handle a column with list value
         reagent_content_rows = self.get_rows_from_foreign_table(
             input_table="ExperimentRunStep",
             input_rows=exp_run_step_rows,
-            input_table_cols=["xprs_cf_fk_reagent_multiselect"],
+            input_table_cols=["xprs_cf_fk_reagent"],
             foreign_table="Content",
             foreign_table_col="cntn_pk",
             graph=G,
@@ -242,178 +246,36 @@ class SlimsHistologyHandler(SlimsTableHandler):
             graph=G,
         )
         return G, root_nodes
+    
+    def get_spim_data_from_slims(
+        self,
+        subject_id: Optional[str] = None,
+    ) -> List[SlimsHistologyData]:
+        """
 
-    # def _parse_graph(self, g: DiGraph, root_nodes: List[str], specimen_id: str) -> List[SlimsHistologyData]:
-    #     """
-    #     Traverse the graph to extract the necessary values and map them into SlimsHistologyData records.
-    #     Handles both immunolabeling (which creates one record per wash) and other procedure types (aggregated per block).
-    #     """
-    #     procedures: List[SlimsHistologyData] = []
-        
-    #     # Iterate over each block (each root corresponds to an ExperimentRunStepContent block).
-    #     for root in root_nodes:
-    #         # Find the associated ExperimentRunStep (child of the content node).
-    #         exp_run_step = None
-    #         exp_run_step_node = None
-    #         for child in g.successors(root):
-    #             if g.nodes[child]["table_name"] == "ExperimentRunStep":
-    #                 exp_run_step = g.nodes[child]["row"]
-    #                 exp_run_step_node = child
-    #                 break
-    #         if not exp_run_step or not exp_run_step_node:
-    #             continue
-            
-    #         # Extract ExperimentTemplate and ProtocolSOP (if available)
-    #         experiment_template = None
-    #         protocol = None
-    #         for child in g.successors(exp_run_step_node):
-    #             node_data = g.nodes[child]
-    #             if node_data["table_name"] == "ExperimentTemplate":
-    #                 experiment_template = node_data["row"]
-    #             elif node_data["table_name"] == "ProtocolRunStep":
-    #                 # Look for ProtocolSOP under ProtocolRunStep.
-    #                 for pr_child in g.successors(child):
-    #                     if g.nodes[pr_child]["table_name"] == "ProtocolSOP":
-    #                         protocol = g.nodes[pr_child]["row"]
-            
-    #         # Gather all WashRunStep nodes from exp_run_step children.
-    #         washes = []
-    #         for child in g.successors(exp_run_step_node):
-    #             if g.nodes[child]["table_name"] == "WashRunStep":
-    #                 wash_step = g.nodes[child]["row"]
-    #                 # For each wash, collect reagents by checking its successors.
-    #                 reagents = []
-    #                 # Also capture antibody info if applicable.
-    #                 antibody: Optional[AntibodyData] = None
-    #                 for wash_child in g.successors(child):
-    #                     if g.nodes[wash_child]["table_name"] == "ReagentContent":
-    #                         reagent_content = g.nodes[wash_child]["row"]
-    #                         # Attempt to fetch details and source from the reagent subtree.
-    #                         details = None
-    #                         source = None
-    #                         for rc_child in g.successors(wash_child):
-    #                             if g.nodes[rc_child]["table_name"] == "ReagentDetailsRdrc":
-    #                                 details = g.nodes[rc_child]["row"]
-    #                                 for det_child in g.successors(rc_child):
-    #                                     if g.nodes[det_child]["table_name"] == "Source":
-    #                                         source = g.nodes[det_child]["row"]
-    #                         reagents.append({
-    #                             "content": reagent_content,
-    #                             "details": details,
-    #                             "source": source
-    #                         })
-    #                 washes.append({
-    #                     "wash_step": wash_step,
-    #                     "reagents": reagents
-    #                 })
-            
-    #         # Determine procedure type from the experiment template name.
-    #         template_name = getattr(experiment_template, "name", None) if experiment_template else None
-    #         procedure_type = _map_procedure_type(template_name) if template_name else None
-    #         if not procedure_type:
-    #             continue  # Skip if we cannot determine a procedure type.
-            
-    #         # Extract protocol link if available.
-    #         protocol_link = None
-    #         if protocol and getattr(protocol, "link", None):
-    #             protocol_link = _extract_protocol_link(getattr(protocol, "link"))
-            
-    #         # Depending on procedure type, map into one or more SlimsHistologyData records.
-    #         if procedure_type == "IMMUNOLABELING":
-    #             # For immunolabeling, create one record per wash that qualifies.
-    #             for wash in washes:
-    #                 wash_step = wash.get("wash_step")
-    #                 if not wash_step:
-    #                     continue
-    #                 # Determine if this wash corresponds to an antibody wash based on wash name.
-    #                 wash_name = getattr(wash_step, "wash_name", None)
-    #                 immunolabel_class = None
-    #                 if wash_name == "PRIMARY_ANTIBODY_WASH":
-    #                     immunolabel_class = "PRIMARY"
-    #                 elif wash_name == "SECONDARY_ANTIBODY_WASH":
-    #                     immunolabel_class = "SECONDARY"
-    #                 if not immunolabel_class:
-    #                     continue  # Skip washes that are not antibody washes.
-                    
-    #                 # Create antibody data from the wash.
-    #                 mass = getattr(wash_step, "mass", None)
-    #                 antibody = AntibodyData(
-    #                     immunolabel_class=immunolabel_class,
-    #                     mass=float(mass) if mass is not None else None
-    #                 )
-                    
-    #                 # Use the wash start and end times.
-    #                 start_time: Optional[datetime] = getattr(wash_step, "start_time", None)
-    #                 end_time: Optional[datetime] = getattr(wash_step, "end_time", None)
-                    
-    #                 proc = SlimsHistologyData(
-    #                     specimen_id=specimen_id,
-    #                     procedure_type=procedure_type,
-    #                     procedure_name=getattr(protocol, "name", None) if protocol else None,
-    #                     start_date=start_time.date() if start_time else None,
-    #                     end_date=end_time.date() if end_time else None,
-    #                     experimenters=[getattr(wash_step, "modified_by", None)] if getattr(wash_step, "modified_by", None) else None,
-    #                     protocol_ids=[protocol_link] if protocol_link else [],
-    #                     antibodies=[antibody],
-    #                     reagents=None
-    #                 )
-    #                 procedures.append(proc)
-    #         else:
-    #             # For non-immunolabeling procedures, aggregate washes.
-    #             wash_start_dates = []
-    #             wash_end_dates = []
-    #             expers = []
-    #             reagent_list = []
-    #             for wash in washes:
-    #                 wash_step = wash.get("wash_step")
-    #                 if not wash_step:
-    #                     continue
-    #                 start_time: Optional[datetime] = getattr(wash_step, "start_time", None)
-    #                 end_time: Optional[datetime] = getattr(wash_step, "end_time", None)
-    #                 if start_time:
-    #                     wash_start_dates.append(start_time.date())
-    #                 if end_time:
-    #                     wash_end_dates.append(end_time.date())
-    #                 mod_by = getattr(wash_step, "modified_by", None)
-    #                 if mod_by:
-    #                     expers.append(mod_by)
-    #                 # Aggregate reagents from this wash.
-    #                 for r in wash.get("reagents", []):
-    #                     reagent_content = r.get("content")
-    #                     details = r.get("details")
-    #                     source = r.get("source")
-    #                     reagent_obj = ReagentData(
-    #                         name=getattr(details, "name", None) if details else None,
-    #                         source=getattr(source, "name", None) if source else None,
-    #                         lot_number=getattr(reagent_content, "lot_number", None) if reagent_content else None,
-    #                     )
-    #                     reagent_list.append(reagent_obj)
-    #             start_date = min(wash_start_dates) if wash_start_dates else None
-    #             end_date = max(wash_end_dates) if wash_end_dates else None
-    #             # Remove duplicates from experimenters.
-    #             unique_exps = list({exp for exp in expers if exp})
-    #             proc = SlimsHistologyData(
-    #                 specimen_id=specimen_id,
-    #                 procedure_type=procedure_type,
-    #                 procedure_name=getattr(protocol, "name", None) if protocol else None,
-    #                 start_date=start_date,
-    #                 end_date=end_date,
-    #                 experimenters=unique_exps if unique_exps else None,
-    #                 protocol_ids=[protocol_link] if protocol_link else [],
-    #                 reagents=reagent_list if reagent_list else None,
-    #                 antibodies=None
-    #             )
-    #             procedures.append(proc)
-    #     return procedures
+        Parameters
+        ----------
+        subject_id : str | None
+          Labtracks ID of mouse. If None, then no filter will be performed.
 
-    # def get_histology_data(self, specimen_id: str) -> List[SlimsHistologyData]:
-    #     """
-    #     Public method to retrieve histology procedures for a given specimen_id.
-    #     Returns a list of SlimsHistologyData records.
-    #     Raises:
-    #         ValueError: if specimen_id is empty.
-    #     """
-    #     if not specimen_id:
-    #         raise ValueError("specimen_id must not be empty!")
-    #     graph, root_nodes = self._get_graph(specimen_id)
-    #     return self._parse_graph(graph, root_nodes, specimen_id)
+        Returns
+        -------
+        List[SlimsSpimData]
+
+        Raises
+        ------
+        ValueError
+          The subject_id cannot be an empty string.
+
+        """
+
+        if subject_id is not None and len(subject_id) == 0:
+            raise ValueError("subject_id must not be empty!")
+
+        G, root_nodes = self._get_graph()
+        nx.draw(G, with_labels=True)
+        plt.show()
+        spim_data = self._parse_graph(
+            g=G, root_nodes=root_nodes, subject_id=subject_id
+        )
+        return spim_data
