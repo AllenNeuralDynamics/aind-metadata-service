@@ -31,6 +31,10 @@ class SpimData(BaseModel):
     z_direction: Optional[str] = None
     y_direction: Optional[str] = None
     x_direction: Optional[str] = None
+    imaging_channels: Optional[List[str]] = []
+    stitching_channels: Optional[str] = None
+    ccf_registration_channels: Optional[str] = None
+    cell_segmentation_channels: Optional[List[str]] = []
 
     @field_validator("protocol_id")
     def parse_html(cls, v: Optional[str]) -> Optional[str]:

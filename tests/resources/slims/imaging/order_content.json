@@ -1,0 +1,28 @@
+[
+    {
+       "pk": 32,
+       "tableName": "OrderContent",
+       "columns": [
+        {
+            "datatype": "FOREIGN_KEY",
+            "name": "rdcn_fk_order",
+            "title": "Order",
+            "value": 21,
+            "foreignTable": "Order",
+            "displayValue": null,
+            "displayField": "ordr_barCode",
+            "foreignDisplayColumn": "ordr_barCode"
+            },
+            {
+            "datatype": "FOREIGN_KEY",
+            "name": "rdcn_fk_content",
+            "title": "Content",
+            "value": 235,
+            "foreignTable": "Content",
+            "displayValue": "744742",
+            "displayField": "cntn_id",
+            "foreignDisplayColumn": "cntn_id"
+            }
+       ]
+    }
+ ]
