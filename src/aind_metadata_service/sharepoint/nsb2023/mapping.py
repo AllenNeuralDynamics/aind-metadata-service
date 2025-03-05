@@ -44,6 +44,9 @@ class BurrHoleProcedure(Enum):
     INJECTION = "Injection"
     FIBER_IMPLANT = "Fiber Implant"
     INJECTION_FIBER_IMPLANT = "Injection and Fiber Implant"
+    SPINAL_INJECTION = "Spinal Injection"
+    GRID_INJECTION_9 = "9 Grid Injection"
+    GRID_INJECTION_6 = "6 Grid Injection"
 
 
 class During(Enum):
@@ -70,7 +73,7 @@ class HeadPost(Enum):
 
 
 class HeadPostType(Enum):
-    """Enum class for HeadPostType"""
+    """Enum class for HeadPostType (Well)"""
 
     NEUROPIXEL = "Neuropixel"
     MESOSCOPE = "Mesoscope"
@@ -80,7 +83,10 @@ class HeadPostType(Enum):
     WHC_2P = "WHC 2P"
     WHC_NP_ZIRCONIA = "WHC NP (Zirconia)"
     AI_STRAIGHT_BAR_WELL = "AI Straight bar Well"
-
+    LC_WELL = "LC well"
+    DHC_WELL = "DHC well"
+    MOTOR_CTX_SLAP2_WELL = "Motor Ctx SLAP2 well"
+    VISUAL_CTX_SLAP2_WELL = "Visual Ctx SLAP2 well"
 
 class InjectionType(Enum):
     """Enum class for Injection Types"""
@@ -157,8 +163,7 @@ class HeadPostInfo:
         cls, hp: Optional[HeadPost], hp_type: Optional[HeadPostType]
     ):
         """Construct HeadPostInfo2023 from headpost and headpost_type"""
-        # TODO: mappings for Headpost: Zirconia, Full ring, Lshaped
-        # TODO: mappings for HeadpostType: straight bar well, zirconia
+        # TODO: map part numbers for new headframe and well types
         headframe_type = None if hp is None else hp.value
         well_type = None if hp_type is None else hp_type.value
         if hp == HeadPost.VISUAL_CTX:
@@ -3952,9 +3957,9 @@ class MappedNSBList:
             else {
                 self._nsb.burr_hole_1.SELECT: None,
                 self._nsb.burr_hole_1.STEREOTAXIC_INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_hole_1.SPINAL_INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_hole_1.N_9_GRID_INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_hole_1.N_6_GRID_INJECTION: BurrHoleProcedure.INJECTION,
+                self._nsb.burr_hole_1.SPINAL_INJECTION: BurrHoleProcedure.SPINAL_INJECTION,
+                self._nsb.burr_hole_1.N_9_GRID_INJECTION: BurrHoleProcedure.GRID_INJECTION_9,
+                self._nsb.burr_hole_1.N_6_GRID_INJECTION: BurrHoleProcedure.GRID_INJECTION_6,
                 self._nsb.burr_hole_1.FIBER_IMPLANT: BurrHoleProcedure.FIBER_IMPLANT,
                 self._nsb.burr_hole_1.STEREOTAXIC_INJECTION_F: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
                 self._nsb.burr_hole_1.INJECTION: BurrHoleProcedure.INJECTION,
@@ -3982,7 +3987,7 @@ class MappedNSBList:
             else {
                 self._nsb.burr_hole_2.SELECT: None,
                 self._nsb.burr_hole_2.STEREOTAXIC_INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_hole_2.SPINAL_INJECTION: BurrHoleProcedure.INJECTION,
+                self._nsb.burr_hole_2.SPINAL_INJECTION: BurrHoleProcedure.SPINAL_INJECTION,
                 self._nsb.burr_hole_2.FIBER_IMPLANT: BurrHoleProcedure.FIBER_IMPLANT,
                 self._nsb.burr_hole_2.STEREOTAXIC_INJECTION__F: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
                 self._nsb.burr_hole_2.INJECTION: BurrHoleProcedure.INJECTION,
@@ -4404,10 +4409,10 @@ class MappedNSBList:
                 self._nsb.headpost_type.WHC_NP: HeadPostType.WHC_NP,
                 self._nsb.headpost_type.WHC_NP_ZIRCONIA: HeadPostType.WHC_NP_ZIRCONIA,
                 self._nsb.headpost_type.AI_STRAIGHT_BAR_WELL: HeadPostType.AI_STRAIGHT_BAR_WELL,
-                self._nsb.headpost_type.LC_WELL: None,
-                self._nsb.headpost_type.DHC_WELL: None,
-                self._nsb.headpost_type.MOTOR__CTX_SLAP2_WELL: None,
-                self._nsb.headpost_type.VISUAL__CTX_SLAP2_WELL: None,
+                self._nsb.headpost_type.LC_WELL: HeadPostType.LC_WELL,
+                self._nsb.headpost_type.DHC_WELL: HeadPostType.DHC_WELL,
+                self._nsb.headpost_type.MOTOR__CTX_SLAP2_WELL: HeadPostType.MOTOR_CTX_SLAP2_WELL,
+                self._nsb.headpost_type.VISUAL__CTX_SLAP2_WELL: HeadPostType.VISUAL_CTX_SLAP2_WELL,
                 self._nsb.headpost_type.OTHER_SEE_REQUESTOR_COMM: None,
             }.get(self._nsb.headpost_type, None)
         )
@@ -6377,21 +6382,5 @@ class MappedNSBList:
                 procedures=other_procedures,
             )
             surgeries.append(other_surgery)
-
-        # generic surgery model if non-procedure info is available
-        if (
-            len(other_procedures) == 0
-            and len(initial_procedures) == 0
-            and self.aind_date_of_surgery
-        ):
-            generic_surgery = Surgery.model_construct(
-                start_date=self.aind_date_of_surgery,
-                experimenter_full_name=experimenter_full_name,
-                iacuc_protocol=iacuc_protocol,
-                animal_weight_prior=self.aind_weight_before_surger,
-                animal_weight_post=self.aind_weight_after_surgery,
-                procedures=[],
-            )
-            surgeries.append(generic_surgery)
 
         return surgeries
