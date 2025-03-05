@@ -72,7 +72,7 @@ class SlimsHistologyHandler(SlimsTableHandler):
             exp_run_created_on = get_attr_or_none(
                 g.nodes[node]["row"], "xprn_createdOn"
             )
-            histology_data.experiment_run_created_on = exp_run_created_on # might not need this 
+            histology_data.experiment_run_created_on = exp_run_created_on
             for n in node_des:
                 table_name = g.nodes[n]["table_name"]
                 row = g.nodes[n]["row"]
@@ -87,7 +87,7 @@ class SlimsHistologyHandler(SlimsTableHandler):
                         row, "cntn_fk_category", "displayValue"
                     )
                     == "Samples"
-                    ):
+                ):
                     n_specimen_id = get_attr_or_none(row, "cntn_barCode")
                     n_subject_id = get_attr_or_none(row, "cntn_cf_parentBarcode")
                     histology_data.specimen_id = n_specimen_id
@@ -120,41 +120,43 @@ class SlimsHistologyHandler(SlimsTableHandler):
                     wash_data.end_time = get_attr_or_none(row, "xprs_cf_endTime")
                     wash_data.modified_by = get_attr_or_none(row, "xprs_modifiedBy")
                     reagents = []
-                    for c in descendants(g, n):
-                        table_name = g.nodes[c]["table_name"]
-                        crow = g.nodes[c]["row"]
-                        if (
-                            table_name == "Content"
-                            and get_attr_or_none(
-                                crow, "cntn_fk_category", "displayValue"
-                            ) in ["Reagents, Externally Manufactured", "Reagents, Internally Produced"]
-                        ):
-                            n_reagent_lot_number = get_attr_or_none(crow, "cntn_cf_lotNumber")
-                            # TODO: check if name and source can be retrieved from display values properly
-                            n_reagent_name = get_attr_or_none(crow, "cntn_cf_fk_reagentCatalogNumber", "displayValue")
-                            n_reagent_source = get_attr_or_none(crow, "cntn_fk_source", "displayValue")
-                            reagent_data = SlimsReagentData(
-                                name=n_reagent_name,
-                                source=n_reagent_source,
-                                lot_number=n_reagent_lot_number,
-                            )
-                            reagents.append(reagent_data)
+                    # TODO: need to retrieve reagents 
+                    # for c in descendants(g, n):
+                    #     table_name = g.nodes[c]["table_name"]
+                    #     crow = g.nodes[c]["row"]
+                    #     if (
+                    #         table_name == "Content"
+                    #         and get_attr_or_none(
+                    #             crow, "cntn_fk_category", "displayValue"
+                    #         ) in ["Reagents, Externally Manufactured", "Reagents, Internally Produced"]
+                    #     ):
+                    #         n_reagent_lot_number = get_attr_or_none(crow, "cntn_cf_lotNumber")
+                    #         # TODO: check if name and source can be retrieved from display values properly
+                    #         n_reagent_name = get_attr_or_none(crow, "cntn_cf_fk_reagentCatalogNumber", "displayValue")
+                    #         n_reagent_source = get_attr_or_none(crow, "cntn_fk_source", "displayValue")
+                    #         reagent_data = SlimsReagentData(
+                    #             name=n_reagent_name,
+                    #             source=n_reagent_source,
+                    #             lot_number=n_reagent_lot_number,
+                    #         )
+                    #         reagents.append(reagent_data)
                     wash_data.reagents = reagents if reagents else None
 
                     if histology_data.washes is None:
                         histology_data.washes = []
                     histology_data.washes.append(wash_data)
-            
+
             if subject_id is None or subject_id == histology_data.subject_id:
+                print("Adding subject_id to histology_data_list: ", subject_id)
                 histology_data_list.append(histology_data)
-            
+
         return histology_data_list
 
                 
 
     def _get_graph(self) -> Tuple[DiGraph, List[str]]:
         """
-        Generate a Graph of the records from SLIMS for imaging experiment runs.
+        Generate a Graph of the records from SLIMS for histology experiment runs.
         Returns
         -------
         Tuple[DiGraph, List[str]]
@@ -273,9 +275,8 @@ class SlimsHistologyHandler(SlimsTableHandler):
             raise ValueError("subject_id must not be empty!")
 
         G, root_nodes = self._get_graph()
-        nx.draw(G, with_labels=True)
-        plt.show()
         spim_data = self._parse_graph(
             g=G, root_nodes=root_nodes, subject_id=subject_id
         )
+
         return spim_data
