@@ -300,17 +300,17 @@ async def retrieve_procedures(subject_id):
     sp2019_response = await run_in_threadpool(
         sharepoint_client.get_procedure_info,
         subject_id=subject_id,
-        list_title=sharepoint_settings.nsb_2019_list,
+        list_id=sharepoint_settings.nsb_2019_list_id,
     )
     sp2023_response = await run_in_threadpool(
         sharepoint_client.get_procedure_info,
         subject_id=subject_id,
-        list_title=sharepoint_settings.nsb_2023_list,
+        list_id=sharepoint_settings.nsb_2023_list_id,
     )
     las2020_response = await run_in_threadpool(
         sharepoint_client.get_procedure_info,
         subject_id=subject_id,
-        list_title=sharepoint_settings.las_2020_list,
+        list_id=sharepoint_settings.las_2020_list_id,
     )
     # merge subject procedures
     merged_response = sharepoint_client.merge_responses(

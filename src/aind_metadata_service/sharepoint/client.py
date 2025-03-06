@@ -3,150 +3,280 @@
 import logging
 from typing import List, Optional
 
-from aind_data_schema.core.procedures import Procedures
-from office365.runtime.auth.client_credential import ClientCredential
-from office365.sharepoint.client_context import ClientContext
-from pydantic import Field, SecretStr
+import requests
+from aind_data_schema.core.procedures import Procedures, Surgery
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings
 
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
-from aind_metadata_service.sharepoint.las2020.procedures import (
-    LAS2020Procedures,
+from aind_metadata_service.sharepoint.las2020 import LASList, MappedLASList
+from aind_metadata_service.sharepoint.nsb2019 import (
+    MappedNSB2019List,
+    NSB2019List,
 )
-from aind_metadata_service.sharepoint.nsb2019.procedures import (
-    NSB2019Procedures,
-)
-from aind_metadata_service.sharepoint.nsb2023.procedures import (
-    NSB2023Procedures,
+from aind_metadata_service.sharepoint.nsb2023 import (
+    MappedNSB2023List,
+    NSB2023List,
 )
 
 
 class SharepointSettings(BaseSettings):
     """Settings needed to connect to Sharepoint database"""
 
-    nsb_sharepoint_url: str = Field(
-        title="NSB Sharepoint URL",
-        description="URL of the NSB sharepoint lists.",
+    aind_site_id: str = Field(
+        title="AIND Site ID",
+        description="Site ID of the AIND SharePoint site.",
     )
-    las_sharepoint_url: str = Field(
-        title="LAS Sharepoint URL",
-        description="URL of the LAS sharepoint lists.",
+    las_site_id: str = Field(
+        title="LAS Site ID",
+        description="Site ID of the LAS SharePoint site.",
     )
-    nsb_2019_list: str = Field(
-        default="SWR 2019-2022",
-        title="NSB 2019 List",
-        description="List name for Neurosurgery and Behavior 2019 database.",
+    nsb_2019_list_id: str = Field(
+        title="NSB 2019 List ID",
+        description="List ID for NSB 2019 procedures.",
     )
-    nsb_2023_list: str = Field(
-        default="SWR 2023-Present",
-        title="NSB 2023 List",
-        description="List name for Neurosurgery and Behavior 2023 database.",
+    nsb_2023_list_id: str = Field(
+        title="NSB 2023 List ID",
+        description="List ID for NSB 2023 procedures.",
     )
-    las_2020_list: str = Field(
-        default="NSPRequest2020",
-        title="LAS 2020 List",
-        description="List name for LAS Non-surgical Procedures 2020 database.",
+    las_2020_list_id: str = Field(
+        title="LAS 2020 List ID",
+        description="List ID for LAS 2020 procedures.",
     )
-    sharepoint_user: str = Field(title="NSB User", description="NSB Username.")
-    sharepoint_password: SecretStr = Field(
-        title="NSB Password", description="Password."
+    client_id: str = Field(
+        title="Client ID",
+        description="Client ID for the principal account.",
     )
+    client_secret: SecretStr = Field(
+        title="Client Secret",
+        description="Client Secret for the principal account.",
+    )
+    tenant_id: str = Field(
+        title="Tenant ID",
+        description="Tenant ID for the principal account.",
+    )
+    graph_api_url: str = Field(
+        title="Graph API URL",
+        description="URL for the Microsoft Graph API.",
+        default="https://graph.microsoft.com/v1.0",
+    )
+    scope: str = Field(
+        title="Scope",
+        description="Scope for the Microsoft Graph API.",
+        default="https://graph.microsoft.com/.default",
+    )
+    token_url: str = Field(
+        None,
+        title="Token URL",
+        description="URL for the Microsoft Identity Platform.",
+    )
+
+    @field_validator("token_url", mode="before")
+    def set_token_url(cls, v, info):
+        """Sets token_url from tenant_id if not provided."""
+        if v is not None:
+            return v
+        tenant_id = info.data.get("tenant_id")
+        if not tenant_id:
+            raise ValueError(
+                "tenant_id must be provided to generate token_url"
+            )
+        return (
+            f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token"
+        )
+
+    class Config:
+        """Set env prefix and forbid extra fields."""
+
+        env_prefix = "SHAREPOINT_"
+        extra = "forbid"
 
 
 class SharePointClient:
-    """This class contains the api to connect to SharePoint db."""
+    """This class contains the API to connect to Sharepoint Database."""
 
     def __init__(
         self,
-        nsb_site_url: str,
-        las_site_url: str,
+        aind_site_id: str,
+        las_site_id: str,
+        nsb_2019_list_id: str,
+        nsb_2023_list_id: str,
+        las_2020_list_id: str,
         client_id: str,
-        client_secret: str,
-        nsb_2019_list_title: str,
-        nsb_2023_list_title: str,
-        las_2020_list_title: str,
+        client_secret: SecretStr,
+        tenant_id: str,
+        graph_api_url: str,
+        scope: str,
+        token_url: str,
     ) -> None:
         """
-        Initialize a client
+        Initailize the SharePointClient with the required parameters.
         Parameters
         ----------
-        nsb_site_url : str
-           sharepoint site url for nsb procedures
-        las_site_url : str
-           sharepoint site url for las procedures
+        aind_site_id : str
+            Sharepoint Site ID for AIND Domain
+        las_site_id : str
+            Sharepoint Site ID for LAS Domain
+        nsb_2019_list_id : str
+            List ID for NSB 2019 procedures
+        nsb_2023_list_id : str
+            List ID for NSB 2023 procedures
+        las_2020_list_id : str
+            List ID for LAS 2020 procedures
         client_id : str
-            username for principal account to access sharepoint
-        client_secret : str
-            password for principal account to access sharepoint
-        nsb_2019_list_title : str
-            Title for nsb 2019 list
-        nsb_2023_list_title : str
-            Title for nsb 2023 list
-        las_2020_list_title : str
-            Title for las 2020 list
+            Client ID for the principal account
+        client_secret : SecretStr
+            Client Secret for the principal account
+        tenant_id : str
+            Tenant ID for the principal account
+        graph_api_url : str
+            URL for the Microsoft Graph API
+        scope : str
+            Scope for the Microsoft Graph API
+        token_url : str
+            URL for the Microsoft Identity
         """
+        self.aind_site_id = aind_site_id
+        self.las_site_id = las_site_id
+        self.nsb_2019_list_id = nsb_2019_list_id
+        self.nsb_2023_list_id = nsb_2023_list_id
+        self.las_2020_list_id = las_2020_list_id
         self.client_id = client_id
         self.client_secret = client_secret
-        self.credentials = ClientCredential(self.client_id, self.client_secret)
-        self.nsb_site_url = nsb_site_url
-        self.las_site_url = las_site_url
-        self.nsb_2019_list_title = nsb_2019_list_title
-        self.nsb_2023_list_title = nsb_2023_list_title
-        self.las_2020_list_title = las_2020_list_title
-
-    def get_client_context(self, site_url):
-        """Construct client context with principal account"""
-        return ClientContext(site_url).with_credentials(self.credentials)
+        self.tenant_id = tenant_id
+        self.token_url = token_url
+        self.graph_api_url = graph_api_url
+        self.scope = scope
+        self._access_token: Optional[str] = None
 
     @classmethod
     def from_settings(cls, settings: SharepointSettings):
-        """Construct client from settings object."""
+        """
+        Create a SharePointClient instance from a SharepointSettings object.
+        """
         return cls(
-            nsb_site_url=settings.nsb_sharepoint_url,
-            las_site_url=settings.las_sharepoint_url,
-            client_id=settings.sharepoint_user,
-            client_secret=settings.sharepoint_password.get_secret_value(),
-            nsb_2019_list_title=settings.nsb_2019_list,
-            nsb_2023_list_title=settings.nsb_2023_list,
-            las_2020_list_title=settings.las_2020_list,
+            aind_site_id=settings.aind_site_id,
+            las_site_id=settings.las_site_id,
+            nsb_2019_list_id=settings.nsb_2019_list_id,
+            nsb_2023_list_id=settings.nsb_2023_list_id,
+            las_2020_list_id=settings.las_2020_list_id,
+            client_id=settings.client_id,
+            client_secret=settings.client_secret,
+            tenant_id=settings.tenant_id,
+            graph_api_url=settings.graph_api_url,
+            scope=settings.scope,
+            token_url=settings.token_url,
         )
 
+    def get_access_token(self) -> str:
+        """Obtain an OAuth access token from Microsoft Identity Platform."""
+        if self._access_token:
+            return self._access_token
+        payload = {
+            "grant_type": "client_credentials",
+            "client_id": self.client_id,
+            "client_secret": self.client_secret.get_secret_value(),
+            "scope": self.scope,
+        }
+        try:
+            response = requests.post(self.token_url, data=payload)
+            response.raise_for_status()
+            self._access_token = response.json().get("access_token")
+            return self._access_token
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Error obtaining access token: {e}")
+            raise RuntimeError("Failed to authenticate with SharePoint.")
+
+    def _get_headers(self) -> dict:
+        """Construct the request headers using the access token."""
+        token = self.get_access_token()
+        return {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
+        }
+
+    def _fetch_list_items(
+        self, site_id: str, list_id: str, subject_id: str, subject_alias: str
+    ) -> dict:
+        """
+        Fetch items from a SharePoint list using the Graph API.
+        Adjust the query parameters as needed.
+        Parat
+        """
+        params = {
+            "expand": "fields",
+            "$filter": f"fields/{subject_alias} eq '{subject_id}'",
+        }
+        try:
+            response = requests.get(
+                f"{self.graph_api_url}/sites/{site_id}/lists/{list_id}/items",
+                headers=self._get_headers(),
+                params=params,
+            )
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            logging.error(
+                f"Error fetching list items from list {list_id}: {e}"
+            )
+            raise RuntimeError(
+                f"Failed to fetch list items for list {list_id}."
+            )
+
     def get_procedure_info(
-        self, subject_id: str, list_title: str
+        self, subject_id: str, list_id: str
     ) -> ModelResponse:
         """
-        Primary interface. Maps a subject_id to a response.
-        Parameters
-        ----------
-        subject_id : str
-          ID of the subject being queried for.
-        list_title: str
-          Title of the sharepoint list to retrieve Procedures records
-
-        Returns
-        -------
-        ModelResponse
-          Either an internal_error response or a ModelResponse with a list
-          of Procedures models
-
+        Retrieve procedure info from specified SharePoint list by subject_id.
+        Chooses the proper mapper depending on which list is queried.
         """
         try:
-            if list_title == self.nsb_2019_list_title:
-                ctx = self.get_client_context(site_url=self.nsb_site_url)
-                mapper = NSB2019Procedures()
-            elif list_title == self.nsb_2023_list_title:
-                ctx = self.get_client_context(site_url=self.nsb_site_url)
-                mapper = NSB2023Procedures()
-            elif list_title == self.las_2020_list_title:
-                ctx = self.get_client_context(site_url=self.las_site_url)
-                mapper = LAS2020Procedures()
+            if list_id == self.nsb_2019_list_id:
+                subject_alias = NSB2019List.model_fields.get(
+                    "lab_tracks_id"
+                ).alias
+                response = self._fetch_list_items(
+                    site_id=self.aind_site_id,
+                    list_id=list_id,
+                    subject_id=subject_id,
+                    subject_alias=subject_alias,
+                )
+                subj_procedures = self._extract_procedures_from_response(
+                    response=response,
+                    model_cls=NSB2019List,
+                    mapper_cls=MappedNSB2019List,
+                )
+            elif list_id == self.nsb_2023_list_id:
+                subject_alias = NSB2023List.model_fields.get(
+                    "lab_tracks_id1"
+                ).alias
+                response = self._fetch_list_items(
+                    site_id=self.aind_site_id,
+                    list_id=list_id,
+                    subject_id=subject_id,
+                    subject_alias=subject_alias,
+                )
+                subj_procedures = self._extract_procedures_from_response(
+                    response=response,
+                    model_cls=NSB2023List,
+                    mapper_cls=MappedNSB2023List,
+                )
+            elif list_id == self.las_2020_list_id:
+                subject_alias = LASList.model_fields.get("title").alias
+                response = self._fetch_list_items(
+                    site_id=self.las_site_id,
+                    list_id=list_id,
+                    subject_id=subject_id,
+                    subject_alias=subject_alias,
+                )
+                subj_procedures = self._extract_procedures_from_response(
+                    response=response,
+                    model_cls=LASList,
+                    mapper_cls=MappedLASList,
+                    subject_id=subject_id,
+                )
             else:
-                raise Exception(f"Unknown NSB Sharepoint List: {list_title}")
-            subj_procedures = mapper.get_procedures_from_sharepoint(
-                subject_id=subject_id,
-                client_context=ctx,
-                list_title=list_title,
-            )
+                return ModelResponse.internal_server_error_response()
             procedures = self._handle_response_from_sharepoint(
                 subject_id=subject_id, subject_procedures=subj_procedures
             )
@@ -159,24 +289,32 @@ class SharePointClient:
             return ModelResponse.internal_server_error_response()
 
     @staticmethod
+    def _extract_procedures_from_response(
+        response: dict,
+        model_cls: type,
+        mapper_cls: type,
+        subject_id: Optional[str] = None,
+    ) -> List[Surgery]:
+        """
+        Extract procedures from a raw Graph API response using
+        the provided model and mapper classes.
+        """
+        list_of_procedures = []
+        for item in response.get("value", []):
+            model = model_cls.model_validate(item["fields"])
+            mapped_model = mapper_cls(model)
+            if model_cls == LASList:
+                procedures = mapped_model.get_procedure(subject_id)
+            else:
+                procedures = mapped_model.get_procedure()
+            list_of_procedures.extend(procedures)
+        return list_of_procedures
+
+    @staticmethod
     def _handle_response_from_sharepoint(
         subject_id: str, subject_procedures: Optional[list] = None
     ) -> Optional[Procedures]:
-        """
-        Maps the response from SharePoint into a Procedures model
-        Parameters
-        ----------
-        subject_id : str
-          ID of the subject being queried for.
-        subject_procedures: Optional[list]
-          An optional list of subject_procedures.
-
-        Returns
-        -------
-        Optional[Procedures]
-          A Procedures model if subject_procedures, else None.
-
-        """
+        """Map the raw procedures response into a Procedures model."""
         if subject_procedures:
             procedures = Procedures.model_construct(subject_id=subject_id)
             procedures.subject_procedures = subject_procedures
@@ -184,27 +322,15 @@ class SharePointClient:
         else:
             return None
 
-    @staticmethod
     def _merge_procedures(
-        left_procedures: List[Procedures], right_procedures: List[Procedures]
+        self,
+        left_procedures: List[Procedures],
+        right_procedures: List[Procedures],
     ) -> List[Procedures]:
-        """
-        Merges two lists of Procedures. Given the way the lists are
-        constructed, the length of the lists will either be 0 or 1.
-        Parameters
-        ----------
-        left_procedures : List[Procedures]
-        right_procedures : List[Procedures]
-
-        Returns
-        -------
-        List[Procedures]
-          Single model with the subject_procedures merged from both lists.
-
-        """
-        if len(left_procedures) == 0:
+        """Merge two lists of Procedures."""
+        if not left_procedures:
             return right_procedures
-        elif len(right_procedures) == 0:
+        elif not right_procedures:
             return left_procedures
         else:
             subject_id = left_procedures[0].subject_id
@@ -229,19 +355,7 @@ class SharePointClient:
         left_model_response: ModelResponse[Procedures],
         right_model_response: ModelResponse[Procedures],
     ) -> ModelResponse[Procedures]:
-        """
-        Merges two ModelResponses of Procedures type.
-        Parameters
-        ----------
-        left_model_response : ModelResponse[Procedures]
-        right_model_response : ModelResponse[Procedures]
-
-        Returns
-        -------
-        ModelResponse[Procedures]
-          A merged response.
-
-        """
+        """Merge two ModelResponse objects containing Procedures."""
         if (
             left_model_response.status_code.value >= 500
             and right_model_response.status_code.value >= 500
@@ -302,23 +416,13 @@ class SharePointClient:
         self, model_responses: List[ModelResponse[Procedures]]
     ) -> ModelResponse[Procedures]:
         """
-        Merges a list of ModelResponses into a single ModelResponse using a
-        left-scan operation.
-        Parameters
-        ----------
-        model_responses : List[ModelResponse[Procedures]]
-
-        Returns
-        -------
-        ModelResponse[Procedures]
-
+        Merge a list of ModelResponses into a single response.
         """
-        if len(model_responses) == 0:
+        if not model_responses:
             return ModelResponse.internal_server_error_response()
-        else:
-            model_response = model_responses[0]
-            for next_response in model_responses[1:]:
-                model_response = self._merge_two_responses(
-                    model_response, next_response
-                )
-            return model_response
+        model_response = model_responses[0]
+        for next_response in model_responses[1:]:
+            model_response = self._merge_two_responses(
+                model_response, next_response
+            )
+        return model_response
