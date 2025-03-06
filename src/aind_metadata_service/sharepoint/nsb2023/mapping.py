@@ -36,8 +36,7 @@ from aind_metadata_service.sharepoint.nsb2023.models import (
     ProcedureCategory as NSBProcedureCategory,
 )
 from aind_metadata_service.sharepoint.nsb2023.models import WindowPlacment
-
-
+from pydantic import BaseModel
 class BurrHoleProcedure(Enum):
     """Enum class for BurrHoleProcedure"""
 
@@ -196,7 +195,14 @@ class HeadPostInfo:
             well_type=well_type,
             well_part_number=well_part_number,
         )
+class IntendedMeasurementInfo(BaseModel):
+    """Container for Intended Measurement Info"""
 
+    fiber_name: Optional[str] = None
+    intended_measurement_R: Optional[str] = None
+    intended_measurement_G: Optional[str] = None
+    intended_measurement_B: Optional[str] = None
+    intended_measurement_Iso: Optional[str] = None
 
 class MappedNSBList:
     """Mapped Fields in SharePoint list."""
@@ -6067,6 +6073,14 @@ class MappedNSBList:
             probe.ophys_probe.name = f"Fiber_{probe_index}"
 
         return None
+    
+    def get_intended_measurement(self) -> List[IntendedMeasurementInfo]:
+        """Get a List of Intended Measurements"""
+
+        #TODO: assign fiber probe name from fiber implant
+        # fiber_name = assign_fiber_probe_names(self.get_procedure())
+        # go through burr holes and fill in the intended measurements
+        # should it be in burr hole info? or just its own model? 
 
     def get_procedure(self) -> List[Surgery]:
         """Get a List of Surgeries"""

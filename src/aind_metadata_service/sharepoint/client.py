@@ -222,6 +222,42 @@ class SharePointClient:
             raise RuntimeError(
                 f"Failed to fetch list items for list {list_id}."
             )
+        
+    def get_intended_measurement_info(
+            self, subject_id: str
+    ):
+        """
+        Retrieve intended measurement info from specified NSB 2023 list by subject_id.
+        """
+        try:
+            subject_alias = NSB2023List.model_fields.get(
+                "lab_tracks_id1"
+            ).alias
+            response = self._fetch_list_items(
+                site_id=self.aind_site_id,
+                list_id=self.nsb_2023_list_id,
+                subject_id=subject_id,
+                subject_alias=subject_alias,
+            )
+            intended_measurements = []
+            # TODO: method to extract intended measurements from response
+            # TODO: into some model 
+            # subj_procedures = self._extract_procedures_from_response(
+            #     response=response,
+            #     model_cls=NSB2023List,
+            #     mapper_cls=MappedNSB2023List,
+            # )
+            # procedures = self._handle_response_from_sharepoint(
+            #     subject_id=subject_id, subject_procedures=subj_procedures
+            # )
+            # procedures = [] if procedures is None else [procedures]
+            # might not need model response class
+            return ModelResponse(
+                aind_models=intended_measurements, status_code=StatusCodes.DB_RESPONDED
+            )
+        except Exception as e:
+            logging.error(repr(e))
+            return ModelResponse.internal_server_error_response()
 
     def get_procedure_info(
         self, subject_id: str, list_id: str
