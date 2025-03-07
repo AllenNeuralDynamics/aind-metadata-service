@@ -20,6 +20,7 @@ from requests.models import Response
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.models import SpimImagingInformation
 from aind_metadata_service.slims.client import SlimsHandler, SlimsSettings
+from aind_metadata_service.slims.histology.handler import SlimsHistologyData
 from aind_metadata_service.slims.imaging.handler import SlimsSpimData
 
 RESOURCES_DIR = (
@@ -342,60 +343,6 @@ class TestSlimsHandler(unittest.TestCase):
         response = self.handler.get_sessions_model_response("test_id")
         self.assertEqual(response.status_code, StatusCodes.NO_DATA_FOUND)
 
-    @patch("aind_metadata_service.slims.client.SlimsHistologyMapper")
-    @patch("aind_metadata_service.slims.client.fetch_histology_procedures")
-    def test_get_specimen_procedures_model_response_success(
-        self, mock_fetch_procedures, mock_mapper
-    ):
-        """Tests that sessions data is fetched as expected."""
-        mock_fetch_procedures.return_value = self.slims_procedures
-        mock_mapper_instance = mock_mapper.return_value
-        mock_mapper_instance.map_specimen_procedures.return_value = (
-            self.expected_procedures
-        )
-        response = self.handler.get_specimen_procedures_model_response(
-            "test_id"
-        )
-        self.assertEqual(
-            response.aind_models[0].specimen_procedures,
-            self.expected_procedures,
-        )
-        self.assertEqual(response.status_code, StatusCodes.DB_RESPONDED)
-
-    @patch("aind_metadata_service.slims.client.fetch_histology_procedures")
-    def test_get_specimen_procedures_model_response_no_data(
-        self, mock_fetch_procedures
-    ):
-        """Tests no data found response."""
-        mock_fetch_procedures.return_value = []
-        response = self.handler.get_specimen_procedures_model_response(
-            "test_id"
-        )
-
-        self.assertEqual(response.status_code, StatusCodes.NO_DATA_FOUND)
-
-    @patch("aind_metadata_service.slims.client.fetch_histology_procedures")
-    def test_get_specimen_procedures_model_response_unexpected_error(
-        self, mock_fetch_procedures
-    ):
-        """Tests internal server error.""" ""
-        mock_fetch_procedures.side_effect = Exception("Unexpected error")
-        response = self.handler.get_specimen_procedures_model_response(
-            "test_id"
-        )
-        self.assertEqual(
-            response.status_code, StatusCodes.INTERNAL_SERVER_ERROR
-        )
-
-    def test_get_specimen_procedures_model_response_not_found(self):
-        """Test response when SlimsRecordNotFound is raised."""
-        self.mock_client.fetch_model.side_effect = SlimsRecordNotFound
-
-        response = self.handler.get_specimen_procedures_model_response(
-            "test_id"
-        )
-        self.assertEqual(response.status_code, StatusCodes.NO_DATA_FOUND)
-
     def test_parse_date(self):
         """Tests _parse_date method"""
 
@@ -484,6 +431,84 @@ class TestSlimsHandler(unittest.TestCase):
         """Tests get_slims_imaging_response when an error happens"""
         mock_slims_get.side_effect = Exception("An error occurred.")
         response = self.handler.get_slims_imaging_response(
+            subject_id="744743",
+            start_date=None,
+            end_date=None,
+        )
+        self.assertEqual(500, response.status_code)
+        mock_log_exception.assert_called_once()
+
+    def test_get_slims_histology_response_bad_subject_id(self):
+        """Empty subject_id should return Bad Request"""
+        response = self.handler.get_slims_histology_response(
+            subject_id="", start_date=None, end_date=None
+        )
+        self.assertEqual(StatusCodes.BAD_REQUEST.value, response.status_code)
+
+    def test_get_slims_histology_response_bad_start_date(self):
+        """Bad start date should return Bad Request"""
+        response = self.handler.get_slims_histology_response(
+            subject_id=None, start_date="2020/02/10", end_date=None
+        )
+        self.assertEqual(StatusCodes.BAD_REQUEST.value, response.status_code)
+
+    def test_get_slims_histology_response_bad_end_date(self):
+        """Bad end date should return Bad Request"""
+        response = self.handler.get_slims_histology_response(
+            subject_id=None,
+            start_date=None,
+            end_date="2020/02/10",
+        )
+        self.assertEqual(StatusCodes.BAD_REQUEST.value, response.status_code)
+
+    @patch(
+        "aind_metadata_service.slims.histology.handler.SlimsHistologyHandler"
+        ".get_hist_data_from_slims"
+    )
+    def test_get_slims_histology_response(self, mock_slims_get: MagicMock):
+        """Tests get_slims_histology_response success"""
+        mock_slims_get.return_value = [
+            SlimsHistologyData(
+                experiment_run_created_on=1739383241200,
+                specimen_id="BRN00000018",
+                subject_id="744742",
+                date_performed=1739383260000,
+            )
+        ]
+        response = self.handler.get_slims_histology_response(
+            subject_id="744742",
+            start_date=None,
+            end_date=None,
+        )
+        self.assertEqual(200, response.status_code)
+
+    @patch(
+        "aind_metadata_service.slims.histology.handler.SlimsHistologyHandler"
+        ".get_hist_data_from_slims"
+    )
+    def test_get_slims_histology_response_empty(
+        self, mock_slims_get: MagicMock
+    ):
+        """Tests get_slims_histology_response when no data returned"""
+        mock_slims_get.return_value = []
+        response = self.handler.get_slims_histology_response(
+            subject_id="744743",
+            start_date=None,
+            end_date=None,
+        )
+        self.assertEqual(404, response.status_code)
+
+    @patch("logging.exception")
+    @patch(
+        "aind_metadata_service.slims.histology.handler.SlimsHistologyHandler"
+        ".get_hist_data_from_slims"
+    )
+    def test_get_slims_histology_response_error(
+        self, mock_slims_get: MagicMock, mock_log_exception: MagicMock
+    ):
+        """Tests get_slims_histology_response when an error happens"""
+        mock_slims_get.side_effect = Exception("An error occurred.")
+        response = self.handler.get_slims_histology_response(
             subject_id="744743",
             start_date=None,
             end_date=None,

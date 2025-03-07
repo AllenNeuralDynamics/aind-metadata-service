@@ -2,8 +2,12 @@
 
 import unittest
 from datetime import datetime, timezone
+from unittest.mock import MagicMock, patch
 
-from aind_metadata_service.slims.table_handler import SlimsTableHandler
+from aind_metadata_service.slims.table_handler import (
+    SlimsTableHandler,
+    parse_html,
+)
 
 
 # TODO: Add more tests
@@ -62,6 +66,32 @@ class TestSlimsTableHandler(unittest.TestCase):
         }
 
         self.assertEqual(expected_criteria, criteria.to_dict())
+
+    def test_parse_html(self):
+        """Tests parse html"""
+        protocol_html = '<a href="https://example.com">Example</a>'
+        output = parse_html(protocol_html)
+        self.assertEqual("https://example.com", output)
+
+    def test_parse_malformed_html(self):
+        """Tests parse_html when malformed string"""
+        protocol_html = "<a>Missing Href</a>"
+        output = parse_html(protocol_html)
+        self.assertIsNone(output)
+
+    def test_parse_non_html(self):
+        """Tests parse_html when regular string passed in"""
+        protocol_html = "Not in HTML"
+        output = parse_html(protocol_html)
+        self.assertEqual("Not in HTML", output)
+
+    @patch("logging.warning")
+    def test_parse_error(self, mock_log_warn: MagicMock):
+        """Tests parse_html when regular string passed in"""
+
+        output = parse_html(123)  # type: ignore
+        self.assertIsNone(output)
+        mock_log_warn.assert_called_once()
 
 
 if __name__ == "__main__":

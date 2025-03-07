@@ -245,6 +245,32 @@ async def retrieve_smartspim_imaging(
     return response
 
 
+@app.get("/slims/histology")
+async def retrieve_slims_histology(
+    subject_id: Optional[str] = Query(None, alias="subject_id"),
+    start_date_gte: Optional[str] = Query(
+        None,
+        alias="start_date_gte",
+        description="Experiment run created on or after. (ISO format)",
+    ),
+    end_date_lte: Optional[str] = Query(
+        None,
+        alias="end_date_lte",
+        description="Experiment run created on or before. (ISO format)",
+    ),
+):
+    """
+    Retrieves Histology data from SLIMS server
+    """
+    response = await run_in_threadpool(
+        slims_client.get_slims_histology_response,
+        subject_id=subject_id,
+        start_date=start_date_gte,
+        end_date=end_date_lte,
+    )
+    return response
+
+
 @app.get("/subject/{subject_id}")
 async def retrieve_subject(subject_id):
     """
@@ -353,15 +379,7 @@ async def retrieve_procedures(subject_id):
     integrated_response = protocols_integrator.integrate_protocols(
         response=integrated_response, protocols_mapping=protocols_mapping
     )
-    # merge specimen procedures
-    slims_response = await run_in_threadpool(
-        slims_client.get_specimen_procedures_model_response,
-        specimen_id=subject_id,
-    )
-    merged_response = sharepoint_client.merge_responses(
-        [integrated_response, slims_response]
-    )
-    return merged_response.map_to_json_response()
+    return integrated_response.map_to_json_response()
 
 
 @app.get(

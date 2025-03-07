@@ -2,6 +2,8 @@
 Module to handle fetching data from slims
 """
 
+import logging
+import xml.etree.ElementTree as ET
 from datetime import datetime
 from typing import Any, List, Optional, Union
 
@@ -16,6 +18,20 @@ from slims.criteria import (
 )
 from slims.internal import Record
 from slims.slims import Slims
+
+
+def parse_html(v: Optional[str]) -> Optional[str]:
+    """Parse link from html tag"""
+    if v is None:
+        return None
+    try:
+        root = ET.fromstring(v)
+        return root.get("href")
+    except ET.ParseError:
+        return v
+    except Exception as e:
+        logging.warning(f"An exception occurred parsing link {v}: {e}")
+        return None
 
 
 def get_attr_or_none(
@@ -99,8 +115,9 @@ class SlimsTableHandler:
             date_criteria = None
         return date_criteria
 
+    # TODO: refactor this to make it simpler
     @staticmethod
-    def _update_graph(
+    def _update_graph(  # noqa: C901
         foreign_table: str,
         foreign_rows: List[Record],
         foreign_table_col: str,
@@ -154,6 +171,16 @@ class SlimsTableHandler:
                             f"{row.table_name()}.{row.pk()}",
                             f"{foreign_table}.{foreign_table_pk}",
                         )
+                    elif isinstance(foreign_table_pk, list):
+                        for f_pk in foreign_table_pk:
+                            if (
+                                g.nodes.get(f"{foreign_table}.{f_pk}")
+                                is not None
+                            ):
+                                g.add_edge(
+                                    f"{row.table_name()}.{row.pk()}",
+                                    f"{foreign_table}.{f_pk}",
+                                )
         else:
             for row in foreign_rows:
                 input_table_pk = get_attr_or_none(row, foreign_table_col)
@@ -167,6 +194,7 @@ class SlimsTableHandler:
                         f"{row.table_name()}.{row.pk()}",
                     )
 
+    # TODO: Allow for multiple input tables
     def get_rows_from_foreign_table(
         self,
         input_table: str,
