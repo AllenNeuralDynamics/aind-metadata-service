@@ -52,6 +52,16 @@ class TestSlimsSpimMapper(unittest.TestCase):
                 z_direction="Superior to Inferior",
                 y_direction="Anterior to Posterior",
                 x_direction="Left to Right",
+                imaging_channels=[
+                    "Laser = 488; Emission Filter = 525/45",
+                    "Laser = 561; Emission Filter = 593/40",
+                    "Laser = 639; Emission Filter = 667/30",
+                ],
+                stitching_channels="Laser = 639, Emission Filter = 667/30",
+                ccf_registration_channels=(
+                    "Laser = 639, Emission Filter = 667/30"
+                ),
+                cell_segmentation_channels=None,
             )
         ]
         mapper = SlimsSpimMapper(slims_spim_data=slims_spim_data)
@@ -79,6 +89,16 @@ class TestSlimsSpimMapper(unittest.TestCase):
                 z_direction="Superior to Inferior",
                 y_direction="Anterior to Posterior",
                 x_direction="Left to Right",
+                imaging_channels=[
+                    "Laser = 488; Emission Filter = 525/45",
+                    "Laser = 561; Emission Filter = 593/40",
+                    "Laser = 639; Emission Filter = 667/30",
+                ],
+                stitching_channels="Laser = 639, Emission Filter = 667/30",
+                ccf_registration_channels=(
+                    "Laser = 639, Emission Filter = 667/30"
+                ),
+                cell_segmentation_channels=None,
             )
         ]
 
