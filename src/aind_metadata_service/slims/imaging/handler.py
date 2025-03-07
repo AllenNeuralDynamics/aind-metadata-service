@@ -299,13 +299,16 @@ class SlimsImagingHandler(SlimsTableHandler):
         end_date_less_than_or_equal: Optional[datetime] = None,
     ) -> List[SlimsSpimData]:
         """
+        Get SPIM data from SLIMS.
 
         Parameters
         ----------
         subject_id : str | None
           Labtracks ID of mouse. If None, then no filter will be performed.
-        start_date_greater_than_or_equal :
-        end_date_less_than_or_equal :
+        start_date_greater_than_or_equal : datetime | None
+          Filter experiment runs that were created on or after this datetime.
+        end_date_less_than_or_equal : datetime | None
+          Filter experiment runs that were created on or before this datetime.
 
         Returns
         -------

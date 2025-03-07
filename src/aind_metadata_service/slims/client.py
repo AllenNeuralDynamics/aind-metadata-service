@@ -6,15 +6,11 @@ from datetime import datetime
 from typing import Optional, Union
 
 from aind_data_schema.core.instrument import Instrument
-from aind_data_schema.core.procedures import Procedures
 from aind_data_schema.core.rig import Rig
 from aind_slims_api import SlimsClient
 from aind_slims_api.exceptions import SlimsRecordNotFound
 from aind_slims_api.models.instrument import SlimsInstrumentRdrc
-from aind_slims_api.operations import (
-    fetch_ecephys_sessions,
-    fetch_histology_procedures,
-)
+from aind_slims_api.operations import fetch_ecephys_sessions
 from fastapi.responses import JSONResponse
 from pydantic import Extra, Field, SecretStr
 from pydantic_settings import BaseSettings
@@ -24,9 +20,10 @@ from slims.criteria import equals
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
+from aind_metadata_service.slims.histology.handler import SlimsHistologyHandler
+from aind_metadata_service.slims.histology.mapping import SlimsHistologyMapper
 from aind_metadata_service.slims.imaging.handler import SlimsImagingHandler
 from aind_metadata_service.slims.imaging.mapping import SlimsSpimMapper
-from aind_metadata_service.slims.procedures.mapping import SlimsHistologyMapper
 from aind_metadata_service.slims.sessions.mapping import SlimsSessionMapper
 
 
@@ -178,34 +175,67 @@ class SlimsHandler:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
 
-    def get_specimen_procedures_model_response(
-        self, specimen_id: str
-    ) -> ModelResponse:
+    def get_slims_histology_response(
+        self,
+        subject_id: Optional[str],
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> JSONResponse:
         """
-        Fetches specimen procedures for a given specimen ID from SLIMS.
+
+        Parameters
+        ----------
+        subject_id : str | None
+        start_date : str | None
+          Optional ISO Format datetime string
+        end_date :  str | None
+          Optional ISO Format datetime string
+        Returns
+        -------
+        JSONResponse
+
         """
+        if subject_id is not None and subject_id == "":
+            return ModelResponse.bad_request_error_response(
+                message="subject_id cannot be an empty string!"
+            ).map_to_json_response()
+        parsed_start_date = self._parse_date(start_date)
+        if isinstance(parsed_start_date, ModelResponse):
+            return parsed_start_date.map_to_json_response()
+        parsed_end_date = self._parse_date(end_date)
+        if isinstance(parsed_end_date, ModelResponse):
+            return parsed_end_date.map_to_json_response()
         try:
-            procs = fetch_histology_procedures(
-                specimen_id=specimen_id, client=self.client
+            slims_histology_handler = SlimsHistologyHandler(
+                client=self.client.db
             )
-            if procs:
-                mapper = SlimsHistologyMapper()
-                mapped_procedures = mapper.map_specimen_procedures(
-                    procs, specimen_id
-                )
-                procedures = Procedures.model_construct(subject_id=specimen_id)
-                procedures.specimen_procedures = mapped_procedures
-                return ModelResponse(
-                    aind_models=[procedures],
-                    status_code=StatusCodes.DB_RESPONDED,
-                )
-            else:
-                return ModelResponse.no_data_found_error_response()
-        except SlimsRecordNotFound:
-            return ModelResponse.no_data_found_error_response()
+            slims_hist_data = slims_histology_handler.get_hist_data_from_slims(
+                subject_id=subject_id,
+                start_date_greater_than_or_equal=parsed_start_date,
+                end_date_less_than_or_equal=parsed_end_date,
+            )
+            hist_data = SlimsHistologyMapper(
+                slims_hist_data=slims_hist_data
+            ).map_info_from_slims()
+            if len(hist_data) == 0:
+                m = ModelResponse.no_data_found_error_response()
+                return m.map_to_json_response()
+            response = JSONResponse(
+                status_code=StatusCodes.VALID_DATA.value,
+                content=(
+                    {
+                        "message": "Data from SLIMS",
+                        "data": [
+                            json.loads(m.model_dump_json()) for m in hist_data
+                        ],
+                    }
+                ),
+            )
+            return response
         except Exception as e:
-            logging.error(repr(e))
-            return ModelResponse.internal_server_error_response()
+            logging.exception(e)
+            m = ModelResponse.internal_server_error_response()
+            return m.map_to_json_response()
 
     @staticmethod
     def _parse_date(

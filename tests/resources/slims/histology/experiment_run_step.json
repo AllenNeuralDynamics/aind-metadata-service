@@ -1,0 +1,215 @@
+[
+   {
+      "pk": 60027,
+      "tableName": "ExperimentRunStep",
+      "columns": [
+         {
+            "name": "xprs_name",
+            "value": "Select content from queue",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "xprs_modifiedBy",
+            "value": "PersonM",
+            "datatype": "STRING",
+            "title": "Modified by"
+         },
+         {
+            "name": "xprs_fk_experimentRun",
+            "value": 40007,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run"
+         },
+         {
+            "name": "xprs_pk",
+            "value": 60027,
+            "datatype": "INTEGER",
+            "title": "xprs_pk"
+         }
+      ]
+   },
+   {
+      "pk": 60028,
+      "tableName": "ExperimentRunStep",
+      "columns": [
+         {
+            "name": "xprs_name",
+            "value": "Protocol",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "xprs_cf_fk_protocol",
+            "value": 24,
+            "displayValue": "Refractive Index Matching - Ethyl Cinnamate (UNPUBLISHED)",
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol"
+         },
+         {
+            "name": "xprs_modifiedBy",
+            "value": "PersonM",
+            "datatype": "STRING",
+            "title": "Modified by"
+         },
+         {
+            "name": "xprs_fk_experimentRun",
+            "value": 40007,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run"
+         },
+         {
+            "name": "xprs_pk",
+            "value": 60028,
+            "datatype": "INTEGER",
+            "title": "xprs_pk"
+         }
+      ]
+   },
+   {
+      "pk": 60029,
+      "tableName": "ExperimentRunStep",
+      "columns": [
+         {
+            "name": "xprs_name",
+            "value": "Refractive Index Matching Wash",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "xprs_cf_spimWashType",
+            "value": "Refractive Index Matching",
+            "displayValue": "Refractive Index Matching",
+            "datatype": "ENUM",
+            "title": "SPIM wash type"
+         },
+         {
+            "name": "xprs_cf_fk_reagent",
+            "value": [
+               138
+            ],
+            "datatype": "MULTIPLE_FOREIGN_KEY",
+            "title": "Reagent"
+         },
+         {
+            "name": "xprs_cf_startTime",
+            "value": 1737744000000,
+            "datatype": "DATE",
+            "title": "Start time"
+         },
+         {
+            "name": "xprs_cf_endTime",
+            "value": 1738003200000,
+            "datatype": "DATE",
+            "title": "End time"
+         },
+         {
+            "name": "xprs_modifiedBy",
+            "value": "PersonM",
+            "datatype": "STRING",
+            "title": "Modified by"
+         },
+         {
+            "name": "xprs_fk_experimentRun",
+            "value": 40007,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run"
+         },
+         {
+            "name": "xprs_pk",
+            "value": 60029,
+            "datatype": "INTEGER",
+            "title": "xprs_pk"
+         }
+      ]
+   },
+   {
+      "pk": 60030,
+      "tableName": "ExperimentRunStep",
+      "columns": [
+         {
+            "name": "xprs_name",
+            "value": "Refractive Index Matching Wash 2",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "xprs_cf_spimWashType",
+            "value": null,
+            "datatype": "ENUM",
+            "title": "SPIM wash type"
+         },
+         {
+            "name": "xprs_cf_fk_reagent",
+            "value": [],
+            "datatype": "MULTIPLE_FOREIGN_KEY",
+            "title": "Reagent"
+         },
+         {
+            "name": "xprs_cf_startTime",
+            "value": null,
+            "datatype": "DATE",
+            "title": "Start time"
+         },
+         {
+            "name": "xprs_cf_endTime",
+            "value": null,
+            "datatype": "DATE",
+            "title": "End time"
+         },
+         {
+            "name": "xprs_modifiedBy",
+            "value": "PersonM",
+            "datatype": "STRING",
+            "title": "Modified by"
+         },
+         {
+            "name": "xprs_fk_experimentRun",
+            "value": 40007,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run"
+         },
+         {
+            "name": "xprs_pk",
+            "value": 60030,
+            "datatype": "INTEGER",
+            "title": "xprs_pk"
+         }
+      ]
+   },
+   {
+      "pk": 60031,
+      "tableName": "ExperimentRunStep",
+      "columns": [
+         {
+            "name": "xprs_name",
+            "value": "Send Whole Brain to SPIM Imaging Workflow",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "xprs_modifiedBy",
+            "value": "PersonM",
+            "datatype": "STRING",
+            "title": "Modified by"
+         },
+         {
+            "name": "xprs_fk_experimentRun",
+            "value": 40007,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run"
+         },
+         {
+            "name": "xprs_pk",
+            "value": 60031,
+            "datatype": "INTEGER",
+            "title": "xprs_pk"
+         }
+      ]
+   }
+]

@@ -1,0 +1,22 @@
+[
+   {
+      "pk": 9,
+      "tableName": "ExperimentRunStepContent",
+      "columns": [
+         {
+            "name": "xrsc_fk_experimentRunStep",
+            "value": 60027,
+            "displayValue": "Select content from queue",
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run step"
+         },
+         {
+            "name": "xrsc_fk_content",
+            "value": 166,
+            "displayValue": "754372",
+            "datatype": "FOREIGN_KEY",
+            "title": "Content"
+         }
+      ]
+   }
+]

@@ -1,0 +1,128 @@
+[
+   {
+      "pk": 38,
+      "tableName": "ExperimentTemplate",
+      "columns": [
+         {
+            "name": "xptm_name",
+            "value": "SmartSPIM Delipidation",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "xptm_pk",
+            "value": 38,
+            "datatype": "INTEGER",
+            "title": "xptm_pk"
+         }
+      ]
+   },
+   {
+      "pk": 39,
+      "tableName": "ExperimentTemplate",
+      "columns": [
+         {
+            "name": "xptm_name",
+            "value": "SmartSPIM Labeling",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "xptm_pk",
+            "value": 39,
+            "datatype": "INTEGER",
+            "title": "xptm_pk"
+         }
+      ]
+   },
+   {
+      "pk": 40,
+      "tableName": "ExperimentTemplate",
+      "columns": [
+         {
+            "name": "xptm_name",
+            "value": "SmartSPIM Refractive Index Matching",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "xptm_pk",
+            "value": 40,
+            "datatype": "INTEGER",
+            "title": "xptm_pk"
+         }
+      ]
+   },
+   {
+      "pk": 47,
+      "tableName": "ExperimentTemplate",
+      "columns": [
+         {
+            "name": "xptm_name",
+            "value": "SmartSPIM Refractive Index Matching",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "xptm_pk",
+            "value": 47,
+            "datatype": "INTEGER",
+            "title": "xptm_pk"
+         }
+      ]
+   },
+   {
+      "pk": 49,
+      "tableName": "ExperimentTemplate",
+      "columns": [
+         {
+            "name": "xptm_name",
+            "value": "SmartSPIM Delipidation",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "xptm_pk",
+            "value": 49,
+            "datatype": "INTEGER",
+            "title": "xptm_pk"
+         }
+      ]
+   },
+   {
+      "pk": 51,
+      "tableName": "ExperimentTemplate",
+      "columns": [
+         {
+            "name": "xptm_name",
+            "value": "SmartSPIM Labeling",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "xptm_pk",
+            "value": 51,
+            "datatype": "INTEGER",
+            "title": "xptm_pk"
+         }
+      ]
+   },
+   {
+      "pk": 43,
+      "tableName": "ExperimentTemplate",
+      "columns": [
+         {
+            "name": "xptm_name",
+            "value": "SmartSPIM Refractive Index Matching",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "xptm_pk",
+            "value": 43,
+            "datatype": "INTEGER",
+            "title": "xptm_pk"
+         }
+      ]
+   }
+]
