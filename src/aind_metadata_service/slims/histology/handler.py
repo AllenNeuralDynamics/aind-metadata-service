@@ -238,7 +238,7 @@ class SlimsHistologyHandler(SlimsTableHandler):
             histology_data.washes = washes
             if subject_id is None or subject_id == histology_data.subject_id:
                 histology_data_list.append(histology_data)
-            return histology_data_list
+        return histology_data_list
 
     def _get_graph(
         self,
