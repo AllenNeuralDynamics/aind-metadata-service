@@ -7,7 +7,6 @@ from aind_data_schema.core.data_description import Funding
 from aind_data_schema.core.procedures import ViralMaterial
 from pydantic import BaseModel, Field, field_validator
 
-
 class ProtocolInformation(BaseModel):
     """Protocol information that will be returned to the user that requests
     information from the Protocols SmartSheet"""
@@ -36,7 +35,7 @@ class FundingInformation(Funding):
 
     investigators: Optional[str] = Field(default=None)
 
-
+# TODO: remove this as its not being used
 class SpimImagingInformation(BaseModel):
     """SmartSPIM Imaging information that will be returned to the user that
     requests information from the SmartSPIM Imaging SLIMS Workflow"""
@@ -73,3 +72,14 @@ class ViralMaterialInformation(ViralMaterial):
     """Viral Material with Stock Titer from SLIMS"""
 
     stock_titer: Optional[int] = Field(default=None)
+
+
+class IntendedMeasurementInformation(BaseModel):
+    """Intended Measurement information that will be returned to the user that
+    requests information from the NSB2023 Sharepoint."""
+
+    fiber_name: Optional[str] = None
+    intended_measurement_R: Optional[str] = None
+    intended_measurement_G: Optional[str] = None
+    intended_measurement_B: Optional[str] = None
+    intended_measurement_Iso: Optional[str] = None

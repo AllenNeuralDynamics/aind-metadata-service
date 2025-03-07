@@ -36,6 +36,7 @@ from aind_metadata_service.sharepoint.nsb2023.models import (
     ProcedureCategory as NSBProcedureCategory,
 )
 from aind_metadata_service.sharepoint.nsb2023.models import WindowPlacment
+# from aind_metadata_service.models import IntendedMeasurementInformation
 from pydantic import BaseModel
 class BurrHoleProcedure(Enum):
     """Enum class for BurrHoleProcedure"""
@@ -100,7 +101,19 @@ class FiberType(Enum):
     STANDARD = "Standard"
     CUSTOM = "Custom (specs in comment)."
 
+class BurrIntendedMeasurement(Enum):
+    """Enum class for Burr Intended Measurement"""
 
+    DOPAMINE = "dopamine"
+    SEROTONIN = "serotonin"
+    NOREPINEPHRINE = "norepinephrine"
+    ACETYLCHOLINE = "acetylcholine"
+    HISTAMINE = "histamine"
+    GLUTAMATE = "glutamate"
+    GABA = "GABA"
+    CALCIUM = "calcium"
+    VOLTAGE = "voltage"
+    CONTROL = "control"
 @dataclass
 class SurgeryDuringInfo:
     """Container for information related to surgeries during initial or
@@ -145,6 +158,10 @@ class BurrHoleInfo:
     fiber_implant_depth: Optional[Decimal] = None
     fiber_type: Optional[FiberType] = None
     fiber_implant_length: Optional[Decimal] = None
+    intended_measurement_r: Optional[str] = None
+    intended_measurement_g: Optional[str] = None
+    intended_measurement_b: Optional[str] = None
+    intended_measurement_iso: Optional[str] = None
 
 
 @dataclass
@@ -195,10 +212,13 @@ class HeadPostInfo:
             well_type=well_type,
             well_part_number=well_part_number,
         )
-class IntendedMeasurementInfo(BaseModel):
-    """Container for Intended Measurement Info"""
 
-    fiber_name: Optional[str] = None
+@dataclass
+class IntendedMeasurementandCoords:
+    """Data container used for fiber name assignment."""
+
+    coordinate_ap: Optional[Decimal] = None
+    coordinate_ml: Optional[Decimal] = None
     intended_measurement_R: Optional[str] = None
     intended_measurement_G: Optional[str] = None
     intended_measurement_B: Optional[str] = None
@@ -1414,89 +1434,46 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_1_intended_x0020(self) -> Optional[Any]:
+    def aind_burr_1_intended_x0020(self) -> Optional[str]:
         """Maps burr_1_intended_x0020 to aind model."""
+        intended = getattr(self._nsb, "burr_1_intended_x0020", None)
         return (
             None
-            if self._nsb.burr_1_intended_x0020 is None
-            else {
-                self._nsb.burr_1_intended_x0020.N_A: None,
-                self._nsb.burr_1_intended_x0020.DOPAMINE: None,
-                self._nsb.burr_1_intended_x0020.SEROTONIN: None,
-                self._nsb.burr_1_intended_x0020.NOREPINEPHRINE: None,
-                self._nsb.burr_1_intended_x0020.ACETYLCHOLINE: None,
-                self._nsb.burr_1_intended_x0020.HISTAMINE: None,
-                self._nsb.burr_1_intended_x0020.GLUTAMATE: None,
-                self._nsb.burr_1_intended_x0020.GABA: None,
-                self._nsb.burr_1_intended_x0020.CALCIUM: None,
-                self._nsb.burr_1_intended_x0020.VOLTAGE: None,
-                self._nsb.burr_1_intended_x0020.CONTROL: None,
-            }.get(self._nsb.burr_1_intended_x0020, None)
+            if intended is None or intended == getattr(self._nsb.burr_1_intended_x0020, "N_A", None)
+            else intended.value
         )
 
     @property
-    def aind_burr_1_intended_x0021(self) -> Optional[Any]:
+    def aind_burr_1_intended_x0021(self) -> Optional[str]:
         """Maps burr_1_intended_x0021 to aind model."""
+        intended = getattr(self._nsb, "burr_1_intended_x0021", None)
         return (
             None
-            if self._nsb.burr_1_intended_x0021 is None
-            else {
-                self._nsb.burr_1_intended_x0021.N_A: None,
-                self._nsb.burr_1_intended_x0021.DOPAMINE: None,
-                self._nsb.burr_1_intended_x0021.SEROTONIN: None,
-                self._nsb.burr_1_intended_x0021.NOREPINEPHRINE: None,
-                self._nsb.burr_1_intended_x0021.ACETYLCHOLINE: None,
-                self._nsb.burr_1_intended_x0021.HISTAMINE: None,
-                self._nsb.burr_1_intended_x0021.GLUTAMATE: None,
-                self._nsb.burr_1_intended_x0021.GABA: None,
-                self._nsb.burr_1_intended_x0021.CALCIUM: None,
-                self._nsb.burr_1_intended_x0021.VOLTAGE: None,
-                self._nsb.burr_1_intended_x0021.CONTROL: None,
-            }.get(self._nsb.burr_1_intended_x0021, None)
+            if intended is None or intended == getattr(self._nsb.burr_1_intended_x0021, "N_A", None)
+            else intended.value
         )
 
     @property
-    def aind_burr_1_intended_x0022(self) -> Optional[Any]:
+    def aind_burr_1_intended_x0022(self) -> Optional[str]:
         """Maps burr_1_intended_x0022 to aind model."""
+        intended = getattr(self._nsb, "burr_1_intended_x0022", None)
         return (
             None
-            if self._nsb.burr_1_intended_x0022 is None
-            else {
-                self._nsb.burr_1_intended_x0022.N_A: None,
-                self._nsb.burr_1_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_1_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_1_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_1_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_1_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_1_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_1_intended_x0022.GABA: None,
-                self._nsb.burr_1_intended_x0022.CALCIUM: None,
-                self._nsb.burr_1_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_1_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_1_intended_x0022, None)
+            if intended is None or intended == getattr(self._nsb.burr_1_intended_x0022, "N_A", None)
+            else intended.value
         )
 
     @property
-    def aind_burr_1_intended_x0023(self) -> Optional[Any]:
+    def aind_burr_1_intended_x0023(self) -> Optional[str]:
         """Maps burr_1_intended_x0023 to aind model."""
+        intended = getattr(self._nsb, "burr_1_intended_x0023", None)
         return (
             None
-            if self._nsb.burr_1_intended_x0023 is None
-            else {
-                self._nsb.burr_1_intended_x0023.N_A: None,
-                self._nsb.burr_1_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_1_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_1_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_1_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_1_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_1_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_1_intended_x0023.GABA: None,
-                self._nsb.burr_1_intended_x0023.CALCIUM: None,
-                self._nsb.burr_1_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_1_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_1_intended_x0023, None)
+            if intended is None or intended == getattr(self._nsb.burr_1_intended_x0023, "N_A", None)
+            else intended.value
         )
 
+    # WORK IN PROGRESS HERE
     @property
     def aind_burr_1_spinal(self) -> Optional[Any]:
         """Maps burr_1_spinal to aind model."""
@@ -5759,6 +5736,10 @@ class MappedNSBList:
                 fiber_implant_depth=self.aind_fiber_implant1_dv,
                 fiber_type=self.aind_burr_1_fiber_t,
                 fiber_implant_length=self.aind_fiber_implant1_lengt,
+                intended_measurement_r=self.aind_burr_1_intended_x0020,
+                intended_measurement_g=self.aind_burr_1_intended_x0021,
+                intended_measurement_b=self.aind_burr_1_intended_x0022,
+                intended_measurement_iso=self.aind_burr_1_intended_x0023,
             )
         elif burr_hole_num == 2:
             coordinate_depth = self._map_burr_hole_dv(
@@ -5799,6 +5780,10 @@ class MappedNSBList:
                 fiber_implant_depth=self.aind_fiber_implant2_dv,
                 fiber_type=self.aind_burr_2_fiber_t,
                 fiber_implant_length=self.aind_fiber_implant2_lengt,
+                intended_measurement_r=self.aind_burr_2_intended_x0020,
+                intended_measurement_g=self.aind_burr_2_intended_x0021,
+                intended_measurement_b=self.aind_burr_2_intended_x0022,
+                intended_measurement_iso=self.aind_burr_2_intended_x0023,
             )
         elif burr_hole_num == 3:
             coordinate_depth = self._map_burr_hole_dv(
@@ -5839,6 +5824,10 @@ class MappedNSBList:
                 fiber_implant_depth=self.aind_fiber_implant3_d_x00,
                 fiber_type=self.aind_burr_3_fiber_t,
                 fiber_implant_length=self.aind_fiber_implant3_lengt,
+                intended_measurement_r=self.aind_burr_3_intended_x0020,
+                intended_measurement_g=self.aind_burr_3_intended_x0021,
+                intended_measurement_b=self.aind_burr_3_intended_x0022,
+                intended_measurement_iso=self.aind_burr_3_intended_x0023,
             )
         elif burr_hole_num == 4:
             coordinate_depth = self._map_burr_hole_dv(
@@ -5879,6 +5868,10 @@ class MappedNSBList:
                 fiber_implant_depth=self.aind_fiber_implant4_d_x00,
                 fiber_type=self.aind_burr_4_fiber_t,
                 fiber_implant_length=self.aind_fiber_implant4_lengt,
+                intended_measurement_r=self.aind_burr_4_intended_x0020,
+                intended_measurement_g=self.aind_burr_4_intended_x0021,
+                intended_measurement_b=self.aind_burr_4_intended_x0022,
+                intended_measurement_iso=self.aind_burr_4_intended_x0023,
             )
         elif burr_hole_num == 5:
             coordinate_depth = self._map_burr_hole_dv(
@@ -5919,6 +5912,10 @@ class MappedNSBList:
                 fiber_implant_depth=self.aind_fiber_implant5_d_x00,
                 fiber_type=self.aind_burr_5_fiber_t,
                 fiber_implant_length=self.aind_fiber_implant5_lengt,
+                intended_measurement_r=self.aind_burr_5_intended_x0020,
+                intended_measurement_g=self.aind_burr_5_intended_x0021,
+                intended_measurement_b=self.aind_burr_5_intended_x0022,
+                intended_measurement_iso=self.aind_burr_5_intended_x0023,
             )
         elif burr_hole_num == 6:
             coordinate_depth = self._map_burr_hole_dv(
@@ -5959,6 +5956,10 @@ class MappedNSBList:
                 fiber_implant_depth=self.aind_fiber_implant6_d_x00,
                 fiber_type=self.aind_burr_6_fiber_t,
                 fiber_implant_length=self.aind_fiber_implant6_lengt,
+                intended_measurement_r=self.aind_burr_6_intended_x0020,
+                intended_measurement_g=self.aind_burr_6_intended_x0021,
+                intended_measurement_b=self.aind_burr_6_intended_x0022,
+                intended_measurement_iso=self.aind_burr_6_intended_x0023,
             )
         else:
             return BurrHoleInfo()
@@ -6074,13 +6075,91 @@ class MappedNSBList:
 
         return None
     
-    def get_intended_measurement(self) -> List[IntendedMeasurementInfo]:
+    def _get_intended_measurements(
+            sp_measurement_data: List[IntendedMeasurementandCoords]
+        ) -> List[IntendedMeasurementInformation]:
+        """
+        Parses intended measurements from NSB data
+        """
+        """Assigns fiber name for intended measurement by coordinate info"""
+
+        intended_measurments = []
+        sorted_data = sorted(
+            sp_measurement_data,
+            key=lambda measurement: (
+                -float(measurement.coordinate_ap),
+                float(measurement.coordinate_ml),
+            )
+        )
+        for index, data in enumerate(sorted_data):
+            # measurement.intended_measurement.fiber_name = f"Fiber_{index}"
+            # fiber_name = f"Fiber_{index}"
+            intended_measurments.append(
+                IntendedMeasurementInfo(
+                    fiber_name=f"Fiber_{index}",
+                    intended_measurement_R=data.intended_measurement_R,
+                    intended_measurement_B=data.intended_measurement_B,
+                    intended_measurement_G=data.intended_measurement_G,
+                    intended_measurement_Iso=data.intended_measurement_Iso
+                )
+            )
+        return intended_measurments
+    
+    def get_intended_measurement(self) -> List[IntendedMeasurementInformation]:
         """Get a List of Intended Measurements"""
 
-        #TODO: assign fiber probe name from fiber implant
-        # fiber_name = assign_fiber_probe_names(self.get_procedure())
-        # go through burr holes and fill in the intended measurements
-        # should it be in burr hole info? or just its own model? 
+        all_intended_measurements = []
+        initial_measurements = [] #
+        followup_measurements = []
+        for burr_hole_num in range(1, 7):
+            # TODO: check if we need this type check, or if we should check procedues list
+            if getattr(self, f"aind_burr_hole_{burr_hole_num}") in {
+                BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+                BurrHoleProcedure.FIBER_IMPLANT
+            }:
+                burr_hole_info = self.burr_hole_info(
+                    burr_hole_num=burr_hole_num
+                )
+                if burr_hole_info.during == During.INITIAL:
+                    initial_measurements.append(
+                        IntendedMeasurementandCoords(
+                            intended_measurement_R=burr_hole_info.intended_measurement_r,
+                            intended_measurement_B=burr_hole_info.intended_measurement_b,
+                            intended_measurement_G=burr_hole_info.intended_measurement_g,
+                            intended_measurement_Iso=burr_hole_info.intended_measurement_iso,
+                            coordinate_ap=burr_hole_info.coordinate_ap,
+                            coordinate_ml=burr_hole_info.coordinate_ml
+                        )
+                    )
+                elif burr_hole_info.during == During.FOLLOW_UP:
+                    followup_measurements.append(
+                        IntendedMeasurementandCoords(
+                            intended_measurement_R=burr_hole_info.intended_measurement_r,
+                            intended_measurement_B=burr_hole_info.intended_measurement_b,
+                            intended_measurement_G=burr_hole_info.intended_measurement_g,
+                            intended_measurement_Iso=burr_hole_info.intended_measurement_iso,
+                            coordinate_ap=burr_hole_info.coordinate_ap,
+                            coordinate_ml=burr_hole_info.coordinate_ml
+                        )
+                    )
+                else:
+                    # skip fiber name assignments from coords
+                    all_intended_measurements.append(
+                        IntendedMeasurementInformation(
+                            intended_measurement_R=burr_hole_info.intended_measurement_r,
+                            intended_measurement_B=burr_hole_info.intended_measurement_b,
+                            intended_measurement_G=burr_hole_info.intended_measurement_g,
+                            intended_measurement_Iso=burr_hole_info.intended_measurement_iso,
+                )
+                    )
+        all_intended_measurements.extend(
+           self._get_intended_measurements(initial_measurements)
+        )
+        all_intended_measurements.extend(
+            self._get_intended_measurements(followup_measurements)
+        )
+        return all_intended_measurements
+
 
     def get_procedure(self) -> List[Surgery]:
         """Get a List of Surgeries"""
