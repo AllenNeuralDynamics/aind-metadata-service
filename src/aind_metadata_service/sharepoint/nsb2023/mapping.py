@@ -36,7 +36,7 @@ from aind_metadata_service.sharepoint.nsb2023.models import (
     ProcedureCategory as NSBProcedureCategory,
 )
 from aind_metadata_service.sharepoint.nsb2023.models import WindowPlacment
-# from aind_metadata_service.models import IntendedMeasurementInformation
+from aind_metadata_service.models import IntendedMeasurementInformation
 from pydantic import BaseModel
 class BurrHoleProcedure(Enum):
     """Enum class for BurrHoleProcedure"""
@@ -215,7 +215,7 @@ class HeadPostInfo:
 
 @dataclass
 class IntendedMeasurementandCoords:
-    """Data container used for fiber name assignment."""
+    """Data container used for intended measurements."""
 
     coordinate_ap: Optional[Decimal] = None
     coordinate_ml: Optional[Decimal] = None
@@ -1439,17 +1439,18 @@ class MappedNSBList:
         intended = getattr(self._nsb, "burr_1_intended_x0020", None)
         return (
             None
-            if intended is None or intended == getattr(self._nsb.burr_1_intended_x0020, "N_A", None)
+            if intended is None
+            or intended.value == getattr(intended, "N_A", None)
             else intended.value
         )
-
+        
     @property
     def aind_burr_1_intended_x0021(self) -> Optional[str]:
         """Maps burr_1_intended_x0021 to aind model."""
         intended = getattr(self._nsb, "burr_1_intended_x0021", None)
         return (
             None
-            if intended is None or intended == getattr(self._nsb.burr_1_intended_x0021, "N_A", None)
+            if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
         )
 
@@ -1459,7 +1460,7 @@ class MappedNSBList:
         intended = getattr(self._nsb, "burr_1_intended_x0022", None)
         return (
             None
-            if intended is None or intended == getattr(self._nsb.burr_1_intended_x0022, "N_A", None)
+            if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
         )
 
@@ -1469,11 +1470,10 @@ class MappedNSBList:
         intended = getattr(self._nsb, "burr_1_intended_x0023", None)
         return (
             None
-            if intended is None or intended == getattr(self._nsb.burr_1_intended_x0023, "N_A", None)
+            if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
         )
 
-    # WORK IN PROGRESS HERE
     @property
     def aind_burr_1_spinal(self) -> Optional[Any]:
         """Maps burr_1_spinal to aind model."""
@@ -1875,87 +1875,43 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_2_intended_x0020(self) -> Optional[Any]:
+    def aind_burr_2_intended_x0020(self) -> Optional[str]:
         """Maps burr_2_intended_x0020 to aind model."""
+        intended = getattr(self._nsb, "burr_2_intended_x0020", None)
         return (
-            None
-            if self._nsb.burr_2_intended_x0020 is None
-            else {
-                self._nsb.burr_2_intended_x0020.N_A: None,
-                self._nsb.burr_2_intended_x0020.DOPAMINE: None,
-                self._nsb.burr_2_intended_x0020.SEROTONIN: None,
-                self._nsb.burr_2_intended_x0020.NOREPINEPHRINE: None,
-                self._nsb.burr_2_intended_x0020.ACETYLCHOLINE: None,
-                self._nsb.burr_2_intended_x0020.HISTAMINE: None,
-                self._nsb.burr_2_intended_x0020.GLUTAMATE: None,
-                self._nsb.burr_2_intended_x0020.GABA: None,
-                self._nsb.burr_2_intended_x0020.CALCIUM: None,
-                self._nsb.burr_2_intended_x0020.VOLTAGE: None,
-                self._nsb.burr_2_intended_x0020.CONTROL: None,
-            }.get(self._nsb.burr_2_intended_x0020, None)
+            None if intended is None
+            or intended == getattr(intended, "N_A", None)
+            else  intended.value
         )
 
     @property
-    def aind_burr_2_intended_x0021(self) -> Optional[Any]:
+    def aind_burr_2_intended_x0021(self) -> Optional[str]:
         """Maps burr_2_intended_x0021 to aind model."""
+        intended = getattr(self._nsb, "burr_2_intended_x0021", None)
         return (
-            None
-            if self._nsb.burr_2_intended_x0021 is None
-            else {
-                self._nsb.burr_2_intended_x0021.N_A: None,
-                self._nsb.burr_2_intended_x0021.DOPAMINE: None,
-                self._nsb.burr_2_intended_x0021.SEROTONIN: None,
-                self._nsb.burr_2_intended_x0021.NOREPINEPHRINE: None,
-                self._nsb.burr_2_intended_x0021.ACETYLCHOLINE: None,
-                self._nsb.burr_2_intended_x0021.HISTAMINE: None,
-                self._nsb.burr_2_intended_x0021.GLUTAMATE: None,
-                self._nsb.burr_2_intended_x0021.GABA: None,
-                self._nsb.burr_2_intended_x0021.CALCIUM: None,
-                self._nsb.burr_2_intended_x0021.VOLTAGE: None,
-                self._nsb.burr_2_intended_x0021.CONTROL: None,
-            }.get(self._nsb.burr_2_intended_x0021, None)
+            None if intended is None
+            or intended == getattr(intended, "N_A", None)
+            else  intended.value
         )
 
     @property
-    def aind_burr_2_intended_x0022(self) -> Optional[Any]:
+    def aind_burr_2_intended_x0022(self) -> Optional[str]:
         """Maps burr_2_intended_x0022 to aind model."""
+        intended = getattr(self._nsb, "burr_2_intended_x0022", None)
         return (
-            None
-            if self._nsb.burr_2_intended_x0022 is None
-            else {
-                self._nsb.burr_2_intended_x0022.N_A: None,
-                self._nsb.burr_2_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_2_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_2_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_2_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_2_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_2_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_2_intended_x0022.GABA: None,
-                self._nsb.burr_2_intended_x0022.CALCIUM: None,
-                self._nsb.burr_2_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_2_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_2_intended_x0022, None)
+            None if intended is None
+            or intended == getattr(intended, "N_A", None)
+            else  intended.value
         )
 
     @property
-    def aind_burr_2_intended_x0023(self) -> Optional[Any]:
+    def aind_burr_2_intended_x0023(self) -> Optional[str]:
         """Maps burr_2_intended_x0023 to aind model."""
+        intended = getattr(self._nsb, "burr_2_intended_x0023", None)
         return (
-            None
-            if self._nsb.burr_2_intended_x0023 is None
-            else {
-                self._nsb.burr_2_intended_x0023.N_A: None,
-                self._nsb.burr_2_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_2_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_2_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_2_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_2_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_2_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_2_intended_x0023.GABA: None,
-                self._nsb.burr_2_intended_x0023.CALCIUM: None,
-                self._nsb.burr_2_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_2_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_2_intended_x0023, None)
+            None if intended is None
+            or intended == getattr(intended, "N_A", None)
+            else  intended.value
         )
 
     @property
@@ -2377,79 +2333,43 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_3_intended_x0020(self) -> Optional[Any]:
+    def aind_burr_3_intended_x0020(self) -> Optional[str]:
         """Maps burr_3_intended_x0020 to aind model."""
+        intended = getattr(self._nsb, "burr_3_intended_x0020", None)
         return (
-            None
-            if self._nsb.burr_3_intended_x0020 is None
-            else {
-                self._nsb.burr_3_intended_x0020.ENTER__CHOICE_1: None,
-                self._nsb.burr_3_intended_x0020.ENTER__CHOICE_2: None,
-                self._nsb.burr_3_intended_x0020.ENTER__CHOICE_3: None,
-            }.get(self._nsb.burr_3_intended_x0020, None)
+            None if intended is None
+            or intended == getattr(intended, "N_A", None)
+            else intended.value
         )
 
     @property
-    def aind_burr_3_intended_x0021(self) -> Optional[Any]:
+    def aind_burr_3_intended_x0021(self) -> Optional[str]:
         """Maps burr_3_intended_x0021 to aind model."""
+        intended = getattr(self._nsb, "burr_3_intended_x0021", None)
         return (
-            None
-            if self._nsb.burr_3_intended_x0021 is None
-            else {
-                self._nsb.burr_3_intended_x0021.N_A: None,
-                self._nsb.burr_3_intended_x0021.DOPAMINE: None,
-                self._nsb.burr_3_intended_x0021.SEROTONIN: None,
-                self._nsb.burr_3_intended_x0021.NOREPINEPHRINE: None,
-                self._nsb.burr_3_intended_x0021.ACETYLCHOLINE: None,
-                self._nsb.burr_3_intended_x0021.HISTAMINE: None,
-                self._nsb.burr_3_intended_x0021.GLUTAMATE: None,
-                self._nsb.burr_3_intended_x0021.GABA: None,
-                self._nsb.burr_3_intended_x0021.CALCIUM: None,
-                self._nsb.burr_3_intended_x0021.VOLTAGE: None,
-                self._nsb.burr_3_intended_x0021.CONTROL: None,
-            }.get(self._nsb.burr_3_intended_x0021, None)
+            None if intended is None
+            or intended == getattr(intended, "N_A", None)
+            else intended.value
         )
 
     @property
     def aind_burr_3_intended_x0022(self) -> Optional[Any]:
         """Maps burr_3_intended_x0022 to aind model."""
+        intended = getattr(self._nsb, "burr_3_intended_x0022", None)
         return (
-            None
-            if self._nsb.burr_3_intended_x0022 is None
-            else {
-                self._nsb.burr_3_intended_x0022.N_A: None,
-                self._nsb.burr_3_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_3_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_3_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_3_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_3_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_3_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_3_intended_x0022.GABA: None,
-                self._nsb.burr_3_intended_x0022.CALCIUM: None,
-                self._nsb.burr_3_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_3_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_3_intended_x0022, None)
+            None if intended is None
+            or intended == getattr(intended, "N_A", None)
+            else intended.value
         )
 
     @property
-    def aind_burr_3_intended_x0023(self) -> Optional[Any]:
+    def aind_burr_3_intended_x0023(self) -> Optional[str]:
         """Maps burr_3_intended_x0023 to aind model."""
+        intended = getattr(self._nsb, "burr_3_intended_x0023", None)
         return (
-            None
-            if self._nsb.burr_3_intended_x0023 is None
-            else {
-                self._nsb.burr_3_intended_x0023.N_A: None,
-                self._nsb.burr_3_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_3_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_3_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_3_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_3_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_3_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_3_intended_x0023.GABA: None,
-                self._nsb.burr_3_intended_x0023.CALCIUM: None,
-                self._nsb.burr_3_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_3_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_3_intended_x0023, None)
+            None if intended is None
+            or intended == getattr(intended, "N_A", None)
+            else intended.value
         )
 
     @property
@@ -2852,87 +2772,43 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_4_intended_x0020(self) -> Optional[Any]:
+    def aind_burr_4_intended_x0020(self) -> Optional[str]:
         """Maps burr_4_intended_x0020 to aind model."""
+        intended = getattr(self._nsb, "burr_4_intended_x0020", None)
         return (
-            None
-            if self._nsb.burr_4_intended_x0020 is None
-            else {
-                self._nsb.burr_4_intended_x0020.N_A: None,
-                self._nsb.burr_4_intended_x0020.DOPAMINE: None,
-                self._nsb.burr_4_intended_x0020.SEROTONIN: None,
-                self._nsb.burr_4_intended_x0020.NOREPINEPHRINE: None,
-                self._nsb.burr_4_intended_x0020.ACETYLCHOLINE: None,
-                self._nsb.burr_4_intended_x0020.HISTAMINE: None,
-                self._nsb.burr_4_intended_x0020.GLUTAMATE: None,
-                self._nsb.burr_4_intended_x0020.GABA: None,
-                self._nsb.burr_4_intended_x0020.CALCIUM: None,
-                self._nsb.burr_4_intended_x0020.VOLTAGE: None,
-                self._nsb.burr_4_intended_x0020.CONTROL: None,
-            }.get(self._nsb.burr_4_intended_x0020, None)
+            None if intended is None
+            or intended == getattr(intended, "N_A", None)
+            else intended.value
         )
 
     @property
-    def aind_burr_4_intended_x0021(self) -> Optional[Any]:
+    def aind_burr_4_intended_x0021(self) -> Optional[str]:
         """Maps burr_4_intended_x0021 to aind model."""
+        intended = getattr(self._nsb, "burr_4_intended_x0021", None)
         return (
-            None
-            if self._nsb.burr_4_intended_x0021 is None
-            else {
-                self._nsb.burr_4_intended_x0021.N_A: None,
-                self._nsb.burr_4_intended_x0021.DOPAMINE: None,
-                self._nsb.burr_4_intended_x0021.SEROTONIN: None,
-                self._nsb.burr_4_intended_x0021.NOREPINEPHRINE: None,
-                self._nsb.burr_4_intended_x0021.ACETYLCHOLINE: None,
-                self._nsb.burr_4_intended_x0021.HISTAMINE: None,
-                self._nsb.burr_4_intended_x0021.GLUTAMATE: None,
-                self._nsb.burr_4_intended_x0021.GABA: None,
-                self._nsb.burr_4_intended_x0021.CALCIUM: None,
-                self._nsb.burr_4_intended_x0021.VOLTAGE: None,
-                self._nsb.burr_4_intended_x0021.CONTROL: None,
-            }.get(self._nsb.burr_4_intended_x0021, None)
+            None if intended is None
+            or intended == getattr(intended, "N_A", None)
+            else intended.value
         )
 
     @property
-    def aind_burr_4_intended_x0022(self) -> Optional[Any]:
+    def aind_burr_4_intended_x0022(self) -> Optional[str]:
         """Maps burr_4_intended_x0022 to aind model."""
+        intended = getattr(self._nsb, "burr_4_intended_x0022", None)
         return (
-            None
-            if self._nsb.burr_4_intended_x0022 is None
-            else {
-                self._nsb.burr_4_intended_x0022.N_A: None,
-                self._nsb.burr_4_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_4_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_4_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_4_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_4_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_4_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_4_intended_x0022.GABA: None,
-                self._nsb.burr_4_intended_x0022.CALCIUM: None,
-                self._nsb.burr_4_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_4_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_4_intended_x0022, None)
+            None if intended is None
+            or intended == getattr(intended, "N_A", None)
+            else intended.value
         )
 
     @property
-    def aind_burr_4_intended_x0023(self) -> Optional[Any]:
+    def aind_burr_4_intended_x0023(self) -> Optional[str]:
         """Maps burr_4_intended_x0023 to aind model."""
+        intended = getattr(self._nsb, "burr_4_intended_x0023", None)
         return (
-            None
-            if self._nsb.burr_4_intended_x0023 is None
-            else {
-                self._nsb.burr_4_intended_x0023.N_A: None,
-                self._nsb.burr_4_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_4_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_4_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_4_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_4_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_4_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_4_intended_x0023.GABA: None,
-                self._nsb.burr_4_intended_x0023.CALCIUM: None,
-                self._nsb.burr_4_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_4_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_4_intended_x0023, None)
+            None if intended is None
+            or intended == getattr(intended, "N_A", None)
+            else intended.value
         )
 
     @property
@@ -3345,87 +3221,43 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_5_intended_x0020(self) -> Optional[Any]:
+    def aind_burr_5_intended_x0020(self) -> Optional[str]:
         """Maps burr_5_intended_x0020 to aind model."""
+        intended = getattr(self._nsb, "burr_5_intended_x0020", None)
         return (
-            None
-            if self._nsb.burr_5_intended_x0020 is None
-            else {
-                self._nsb.burr_5_intended_x0020.N_A: None,
-                self._nsb.burr_5_intended_x0020.DOPAMINE: None,
-                self._nsb.burr_5_intended_x0020.SEROTONIN: None,
-                self._nsb.burr_5_intended_x0020.NOREPINEPHRINE: None,
-                self._nsb.burr_5_intended_x0020.ACETYLCHOLINE: None,
-                self._nsb.burr_5_intended_x0020.HISTAMINE: None,
-                self._nsb.burr_5_intended_x0020.GLUTAMATE: None,
-                self._nsb.burr_5_intended_x0020.GABA: None,
-                self._nsb.burr_5_intended_x0020.CALCIUM: None,
-                self._nsb.burr_5_intended_x0020.VOLTAGE: None,
-                self._nsb.burr_5_intended_x0020.CONTROL: None,
-            }.get(self._nsb.burr_5_intended_x0020, None)
+            None if intended is None
+            or intended == getattr(intended, "N_A", None)
+            else intended.value
         )
 
     @property
-    def aind_burr_5_intended_x0021(self) -> Optional[Any]:
+    def aind_burr_5_intended_x0021(self) -> Optional[str]:
         """Maps burr_5_intended_x0021 to aind model."""
+        intended = getattr(self._nsb, "burr_5_intended_x0021", None)
         return (
-            None
-            if self._nsb.burr_5_intended_x0021 is None
-            else {
-                self._nsb.burr_5_intended_x0021.N_A: None,
-                self._nsb.burr_5_intended_x0021.DOPAMINE: None,
-                self._nsb.burr_5_intended_x0021.SEROTONIN: None,
-                self._nsb.burr_5_intended_x0021.NOREPINEPHRINE: None,
-                self._nsb.burr_5_intended_x0021.ACETYLCHOLINE: None,
-                self._nsb.burr_5_intended_x0021.HISTAMINE: None,
-                self._nsb.burr_5_intended_x0021.GLUTAMATE: None,
-                self._nsb.burr_5_intended_x0021.GABA: None,
-                self._nsb.burr_5_intended_x0021.CALCIUM: None,
-                self._nsb.burr_5_intended_x0021.VOLTAGE: None,
-                self._nsb.burr_5_intended_x0021.CONTROL: None,
-            }.get(self._nsb.burr_5_intended_x0021, None)
+            None if intended is None
+            or intended == getattr(intended, "N_A", None)
+            else intended.value
         )
 
     @property
-    def aind_burr_5_intended_x0022(self) -> Optional[Any]:
+    def aind_burr_5_intended_x0022(self) -> Optional[str]:
         """Maps burr_5_intended_x0022 to aind model."""
+        intended = getattr(self._nsb, "burr_5_intended_x0022", None)
         return (
-            None
-            if self._nsb.burr_5_intended_x0022 is None
-            else {
-                self._nsb.burr_5_intended_x0022.N_A: None,
-                self._nsb.burr_5_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_5_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_5_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_5_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_5_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_5_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_5_intended_x0022.GABA: None,
-                self._nsb.burr_5_intended_x0022.CALCIUM: None,
-                self._nsb.burr_5_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_5_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_5_intended_x0022, None)
+            None if intended is None
+            or intended == getattr(intended, "N_A", None)
+            else intended.value
         )
 
     @property
-    def aind_burr_5_intended_x0023(self) -> Optional[Any]:
+    def aind_burr_5_intended_x0023(self) -> Optional[str]:
         """Maps burr_5_intended_x0023 to aind model."""
+        intended = getattr(self._nsb, "burr_5_intended_x0023", None)
         return (
-            None
-            if self._nsb.burr_5_intended_x0023 is None
-            else {
-                self._nsb.burr_5_intended_x0023.N_A: None,
-                self._nsb.burr_5_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_5_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_5_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_5_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_5_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_5_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_5_intended_x0023.GABA: None,
-                self._nsb.burr_5_intended_x0023.CALCIUM: None,
-                self._nsb.burr_5_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_5_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_5_intended_x0023, None)
+            None if intended is None
+            or intended == getattr(intended, "N_A", None)
+            else intended.value
         )
 
     @property
@@ -3843,87 +3675,44 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_6_intended_x0020(self) -> Optional[Any]:
+    def aind_burr_6_intended_x0020(self) -> Optional[str]:
         """Maps burr_6_intended_x0020 to aind model."""
+        intended = getattr(self._nsb, "burr_6_intended_x0020", None)
         return (
-            None
-            if self._nsb.burr_6_intended_x0020 is None
-            else {
-                self._nsb.burr_6_intended_x0020.N_A: None,
-                self._nsb.burr_6_intended_x0020.DOPAMINE: None,
-                self._nsb.burr_6_intended_x0020.SEROTONIN: None,
-                self._nsb.burr_6_intended_x0020.NOREPINEPHRINE: None,
-                self._nsb.burr_6_intended_x0020.ACETYLCHOLINE: None,
-                self._nsb.burr_6_intended_x0020.HISTAMINE: None,
-                self._nsb.burr_6_intended_x0020.GLUTAMATE: None,
-                self._nsb.burr_6_intended_x0020.GABA: None,
-                self._nsb.burr_6_intended_x0020.CALCIUM: None,
-                self._nsb.burr_6_intended_x0020.VOLTAGE: None,
-                self._nsb.burr_6_intended_x0020.CONTROL: None,
-            }.get(self._nsb.burr_6_intended_x0020, None)
+            None if intended is None
+            or intended == getattr(intended, "N_A", None)
+            else intended.value
         )
+       
 
     @property
-    def aind_burr_6_intended_x0021(self) -> Optional[Any]:
+    def aind_burr_6_intended_x0021(self) -> Optional[str]:
         """Maps burr_6_intended_x0021 to aind model."""
+        intended = getattr(self._nsb, "burr_6_intended_x0021", None)
         return (
-            None
-            if self._nsb.burr_6_intended_x0021 is None
-            else {
-                self._nsb.burr_6_intended_x0021.N_A: None,
-                self._nsb.burr_6_intended_x0021.DOPAMINE: None,
-                self._nsb.burr_6_intended_x0021.SEROTONIN: None,
-                self._nsb.burr_6_intended_x0021.NOREPINEPHRINE: None,
-                self._nsb.burr_6_intended_x0021.ACETYLCHOLINE: None,
-                self._nsb.burr_6_intended_x0021.HISTAMINE: None,
-                self._nsb.burr_6_intended_x0021.GLUTAMATE: None,
-                self._nsb.burr_6_intended_x0021.GABA: None,
-                self._nsb.burr_6_intended_x0021.CALCIUM: None,
-                self._nsb.burr_6_intended_x0021.VOLTAGE: None,
-                self._nsb.burr_6_intended_x0021.CONTROL: None,
-            }.get(self._nsb.burr_6_intended_x0021, None)
+            None if intended is None
+            or intended == getattr(intended, "N_A", None)
+            else intended.value
         )
 
     @property
-    def aind_burr_6_intended_x0022(self) -> Optional[Any]:
+    def aind_burr_6_intended_x0022(self) -> Optional[str]:
         """Maps burr_6_intended_x0022 to aind model."""
+        intended = getattr(self._nsb, "burr_6_intended_x0022", None)
         return (
-            None
-            if self._nsb.burr_6_intended_x0022 is None
-            else {
-                self._nsb.burr_6_intended_x0022.N_A: None,
-                self._nsb.burr_6_intended_x0022.DOPAMINE: None,
-                self._nsb.burr_6_intended_x0022.SEROTONIN: None,
-                self._nsb.burr_6_intended_x0022.NOREPINEPHRINE: None,
-                self._nsb.burr_6_intended_x0022.ACETYLCHOLINE: None,
-                self._nsb.burr_6_intended_x0022.HISTAMINE: None,
-                self._nsb.burr_6_intended_x0022.GLUTAMATE: None,
-                self._nsb.burr_6_intended_x0022.GABA: None,
-                self._nsb.burr_6_intended_x0022.CALCIUM: None,
-                self._nsb.burr_6_intended_x0022.VOLTAGE: None,
-                self._nsb.burr_6_intended_x0022.CONTROL: None,
-            }.get(self._nsb.burr_6_intended_x0022, None)
+            None if intended is None
+            or intended == getattr(intended, "N_A", None)
+            else intended.value
         )
 
     @property
-    def aind_burr_6_intended_x0023(self) -> Optional[Any]:
+    def aind_burr_6_intended_x0023(self) -> Optional[str]:
         """Maps burr_6_intended_x0023 to aind model."""
+        intended = getattr(self._nsb, "burr_6_intended_x0023", None)
         return (
-            None
-            if self._nsb.burr_6_intended_x0023 is None
-            else {
-                self._nsb.burr_6_intended_x0023.N_A: None,
-                self._nsb.burr_6_intended_x0023.DOPAMINE: None,
-                self._nsb.burr_6_intended_x0023.SEROTONIN: None,
-                self._nsb.burr_6_intended_x0023.NOREPINEPHRINE: None,
-                self._nsb.burr_6_intended_x0023.ACETYLCHOLINE: None,
-                self._nsb.burr_6_intended_x0023.HISTAMINE: None,
-                self._nsb.burr_6_intended_x0023.GLUTAMATE: None,
-                self._nsb.burr_6_intended_x0023.GABA: None,
-                self._nsb.burr_6_intended_x0023.CALCIUM: None,
-                self._nsb.burr_6_intended_x0023.VOLTAGE: None,
-                self._nsb.burr_6_intended_x0023.CONTROL: None,
-            }.get(self._nsb.burr_6_intended_x0023, None)
+            None if intended is None 
+            or intended == getattr(intended, "N_A", None)
+            else intended.value
         )
 
     @property
@@ -6075,6 +5864,7 @@ class MappedNSBList:
 
         return None
     
+    @staticmethod
     def _get_intended_measurements(
             sp_measurement_data: List[IntendedMeasurementandCoords]
         ) -> List[IntendedMeasurementInformation]:
@@ -6092,10 +5882,8 @@ class MappedNSBList:
             )
         )
         for index, data in enumerate(sorted_data):
-            # measurement.intended_measurement.fiber_name = f"Fiber_{index}"
-            # fiber_name = f"Fiber_{index}"
             intended_measurments.append(
-                IntendedMeasurementInfo(
+                IntendedMeasurementInformation(
                     fiber_name=f"Fiber_{index}",
                     intended_measurement_R=data.intended_measurement_R,
                     intended_measurement_B=data.intended_measurement_B,
@@ -6105,7 +5893,7 @@ class MappedNSBList:
             )
         return intended_measurments
     
-    def get_intended_measurement(self) -> List[IntendedMeasurementInformation]:
+    def get_intended_measurements(self) -> List[IntendedMeasurementInformation]:
         """Get a List of Intended Measurements"""
 
         all_intended_measurements = []
@@ -6143,7 +5931,7 @@ class MappedNSBList:
                         )
                     )
                 else:
-                    # skip fiber name assignments from coords
+                    # skip fiber name assignment if no During info
                     all_intended_measurements.append(
                         IntendedMeasurementInformation(
                             intended_measurement_R=burr_hole_info.intended_measurement_r,

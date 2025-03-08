@@ -240,18 +240,11 @@ class SharePointClient:
                 subject_alias=subject_alias,
             )
             intended_measurements = []
-            # TODO: method to extract intended measurements from response
-            # TODO: into some model 
-            # subj_procedures = self._extract_procedures_from_response(
-            #     response=response,
-            #     model_cls=NSB2023List,
-            #     mapper_cls=MappedNSB2023List,
-            # )
-            # procedures = self._handle_response_from_sharepoint(
-            #     subject_id=subject_id, subject_procedures=subj_procedures
-            # )
-            # procedures = [] if procedures is None else [procedures]
-            # might not need model response class
+            for item in response.get("value", []):
+                model = NSB2023List.model_validate(item["fields"])
+                mapped_model = MappedNSB2023List(model)
+                intended_measurements.extend(mapped_model.get_intended_measurements())
+            
             return ModelResponse(
                 aind_models=intended_measurements, status_code=StatusCodes.DB_RESPONDED
             )

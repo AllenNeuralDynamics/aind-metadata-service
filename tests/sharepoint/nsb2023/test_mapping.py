@@ -165,6 +165,5 @@ class TestNSB2023Parsers(TestCase):
         mapper = MappedNSBList(nsb=nsb_model)
         self.assertEqual(BurrHoleInfo(), mapper.burr_hole_info(7))
 
-
 if __name__ == "__main__":
     unittest_main()
