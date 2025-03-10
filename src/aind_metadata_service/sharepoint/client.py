@@ -222,12 +222,10 @@ class SharePointClient:
             raise RuntimeError(
                 f"Failed to fetch list items for list {list_id}."
             )
-        
-    def get_intended_measurement_info(
-            self, subject_id: str
-    ):
+
+    def get_intended_measurement_info(self, subject_id: str):
         """
-        Retrieve intended measurement info from specified NSB 2023 list by subject_id.
+        Retrieve intended measurement info from NSB 2023 list by subject_id.
         """
         try:
             subject_alias = NSB2023List.model_fields.get(
@@ -243,10 +241,13 @@ class SharePointClient:
             for item in response.get("value", []):
                 model = NSB2023List.model_validate(item["fields"])
                 mapped_model = MappedNSB2023List(model)
-                intended_measurements.extend(mapped_model.get_intended_measurements())
-            
+                intended_measurements.extend(
+                    mapped_model.get_intended_measurements()
+                )
+
             return ModelResponse(
-                aind_models=intended_measurements, status_code=StatusCodes.DB_RESPONDED
+                aind_models=intended_measurements,
+                status_code=StatusCodes.DB_RESPONDED,
             )
         except Exception as e:
             logging.error(repr(e))

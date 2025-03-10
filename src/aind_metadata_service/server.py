@@ -287,16 +287,17 @@ async def retrieve_injection_materials(prep_lot_number):
     # TODO: move molecules call to here
     return model_response.map_to_json_response()
 
+
 @app.get("/intended_measurements/{subject_id}")
 async def retrieve_intended_measurements(subject_id):
     """
     Retrieves intended measurements from SLIMS server
     """
     model_response = await run_in_threadpool(
-        sharepoint_client.get_intended_measurement_info,
-        subject_id=subject_id
+        sharepoint_client.get_intended_measurement_info, subject_id=subject_id
     )
     return model_response.map_to_json_response()
+
 
 @app.get("/procedures/{subject_id}")
 async def retrieve_procedures(subject_id):

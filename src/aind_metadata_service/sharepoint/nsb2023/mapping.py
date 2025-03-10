@@ -27,7 +27,9 @@ from aind_data_schema.core.procedures import (
 )
 from aind_data_schema.core.subject import Sex
 from aind_data_schema_models.organizations import Organization
+from pydantic import BaseModel
 
+from aind_metadata_service.models import IntendedMeasurementInformation
 from aind_metadata_service.sharepoint.nsb2023.models import NSBList
 from aind_metadata_service.sharepoint.nsb2023.models import (
     Procedure as NSBProcedure,
@@ -36,8 +38,8 @@ from aind_metadata_service.sharepoint.nsb2023.models import (
     ProcedureCategory as NSBProcedureCategory,
 )
 from aind_metadata_service.sharepoint.nsb2023.models import WindowPlacment
-from aind_metadata_service.models import IntendedMeasurementInformation
-from pydantic import BaseModel
+
+
 class BurrHoleProcedure(Enum):
     """Enum class for BurrHoleProcedure"""
 
@@ -88,6 +90,7 @@ class HeadPostType(Enum):
     MOTOR_CTX_SLAP2_WELL = "Motor Ctx SLAP2 well"
     VISUAL_CTX_SLAP2_WELL = "Visual Ctx SLAP2 well"
 
+
 class InjectionType(Enum):
     """Enum class for Injection Types"""
 
@@ -100,6 +103,7 @@ class FiberType(Enum):
 
     STANDARD = "Standard"
     CUSTOM = "Custom (specs in comment)."
+
 
 class BurrIntendedMeasurement(Enum):
     """Enum class for Burr Intended Measurement"""
@@ -114,6 +118,8 @@ class BurrIntendedMeasurement(Enum):
     CALCIUM = "calcium"
     VOLTAGE = "voltage"
     CONTROL = "control"
+
+
 @dataclass
 class SurgeryDuringInfo:
     """Container for information related to surgeries during initial or
@@ -213,6 +219,7 @@ class HeadPostInfo:
             well_part_number=well_part_number,
         )
 
+
 @dataclass
 class IntendedMeasurementandCoords:
     """Data container used for intended measurements."""
@@ -223,6 +230,7 @@ class IntendedMeasurementandCoords:
     intended_measurement_G: Optional[str] = None
     intended_measurement_B: Optional[str] = None
     intended_measurement_Iso: Optional[str] = None
+
 
 class MappedNSBList:
     """Mapped Fields in SharePoint list."""
@@ -1443,7 +1451,7 @@ class MappedNSBList:
             or intended.value == getattr(intended, "N_A", None)
             else intended.value
         )
-        
+
     @property
     def aind_burr_1_intended_x0021(self) -> Optional[str]:
         """Maps burr_1_intended_x0021 to aind model."""
@@ -1879,9 +1887,9 @@ class MappedNSBList:
         """Maps burr_2_intended_x0020 to aind model."""
         intended = getattr(self._nsb, "burr_2_intended_x0020", None)
         return (
-            None if intended is None
-            or intended == getattr(intended, "N_A", None)
-            else  intended.value
+            None
+            if intended is None or intended == getattr(intended, "N_A", None)
+            else intended.value
         )
 
     @property
@@ -1889,9 +1897,9 @@ class MappedNSBList:
         """Maps burr_2_intended_x0021 to aind model."""
         intended = getattr(self._nsb, "burr_2_intended_x0021", None)
         return (
-            None if intended is None
-            or intended == getattr(intended, "N_A", None)
-            else  intended.value
+            None
+            if intended is None or intended == getattr(intended, "N_A", None)
+            else intended.value
         )
 
     @property
@@ -1899,9 +1907,9 @@ class MappedNSBList:
         """Maps burr_2_intended_x0022 to aind model."""
         intended = getattr(self._nsb, "burr_2_intended_x0022", None)
         return (
-            None if intended is None
-            or intended == getattr(intended, "N_A", None)
-            else  intended.value
+            None
+            if intended is None or intended == getattr(intended, "N_A", None)
+            else intended.value
         )
 
     @property
@@ -1909,9 +1917,9 @@ class MappedNSBList:
         """Maps burr_2_intended_x0023 to aind model."""
         intended = getattr(self._nsb, "burr_2_intended_x0023", None)
         return (
-            None if intended is None
-            or intended == getattr(intended, "N_A", None)
-            else  intended.value
+            None
+            if intended is None or intended == getattr(intended, "N_A", None)
+            else intended.value
         )
 
     @property
@@ -2337,8 +2345,8 @@ class MappedNSBList:
         """Maps burr_3_intended_x0020 to aind model."""
         intended = getattr(self._nsb, "burr_3_intended_x0020", None)
         return (
-            None if intended is None
-            or intended == getattr(intended, "N_A", None)
+            None
+            if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
         )
 
@@ -2347,8 +2355,8 @@ class MappedNSBList:
         """Maps burr_3_intended_x0021 to aind model."""
         intended = getattr(self._nsb, "burr_3_intended_x0021", None)
         return (
-            None if intended is None
-            or intended == getattr(intended, "N_A", None)
+            None
+            if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
         )
 
@@ -2357,8 +2365,8 @@ class MappedNSBList:
         """Maps burr_3_intended_x0022 to aind model."""
         intended = getattr(self._nsb, "burr_3_intended_x0022", None)
         return (
-            None if intended is None
-            or intended == getattr(intended, "N_A", None)
+            None
+            if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
         )
 
@@ -2367,8 +2375,8 @@ class MappedNSBList:
         """Maps burr_3_intended_x0023 to aind model."""
         intended = getattr(self._nsb, "burr_3_intended_x0023", None)
         return (
-            None if intended is None
-            or intended == getattr(intended, "N_A", None)
+            None
+            if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
         )
 
@@ -2776,8 +2784,8 @@ class MappedNSBList:
         """Maps burr_4_intended_x0020 to aind model."""
         intended = getattr(self._nsb, "burr_4_intended_x0020", None)
         return (
-            None if intended is None
-            or intended == getattr(intended, "N_A", None)
+            None
+            if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
         )
 
@@ -2786,8 +2794,8 @@ class MappedNSBList:
         """Maps burr_4_intended_x0021 to aind model."""
         intended = getattr(self._nsb, "burr_4_intended_x0021", None)
         return (
-            None if intended is None
-            or intended == getattr(intended, "N_A", None)
+            None
+            if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
         )
 
@@ -2796,8 +2804,8 @@ class MappedNSBList:
         """Maps burr_4_intended_x0022 to aind model."""
         intended = getattr(self._nsb, "burr_4_intended_x0022", None)
         return (
-            None if intended is None
-            or intended == getattr(intended, "N_A", None)
+            None
+            if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
         )
 
@@ -2806,8 +2814,8 @@ class MappedNSBList:
         """Maps burr_4_intended_x0023 to aind model."""
         intended = getattr(self._nsb, "burr_4_intended_x0023", None)
         return (
-            None if intended is None
-            or intended == getattr(intended, "N_A", None)
+            None
+            if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
         )
 
@@ -3225,8 +3233,8 @@ class MappedNSBList:
         """Maps burr_5_intended_x0020 to aind model."""
         intended = getattr(self._nsb, "burr_5_intended_x0020", None)
         return (
-            None if intended is None
-            or intended == getattr(intended, "N_A", None)
+            None
+            if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
         )
 
@@ -3235,8 +3243,8 @@ class MappedNSBList:
         """Maps burr_5_intended_x0021 to aind model."""
         intended = getattr(self._nsb, "burr_5_intended_x0021", None)
         return (
-            None if intended is None
-            or intended == getattr(intended, "N_A", None)
+            None
+            if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
         )
 
@@ -3245,8 +3253,8 @@ class MappedNSBList:
         """Maps burr_5_intended_x0022 to aind model."""
         intended = getattr(self._nsb, "burr_5_intended_x0022", None)
         return (
-            None if intended is None
-            or intended == getattr(intended, "N_A", None)
+            None
+            if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
         )
 
@@ -3255,8 +3263,8 @@ class MappedNSBList:
         """Maps burr_5_intended_x0023 to aind model."""
         intended = getattr(self._nsb, "burr_5_intended_x0023", None)
         return (
-            None if intended is None
-            or intended == getattr(intended, "N_A", None)
+            None
+            if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
         )
 
@@ -3679,19 +3687,18 @@ class MappedNSBList:
         """Maps burr_6_intended_x0020 to aind model."""
         intended = getattr(self._nsb, "burr_6_intended_x0020", None)
         return (
-            None if intended is None
-            or intended == getattr(intended, "N_A", None)
+            None
+            if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
         )
-       
 
     @property
     def aind_burr_6_intended_x0021(self) -> Optional[str]:
         """Maps burr_6_intended_x0021 to aind model."""
         intended = getattr(self._nsb, "burr_6_intended_x0021", None)
         return (
-            None if intended is None
-            or intended == getattr(intended, "N_A", None)
+            None
+            if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
         )
 
@@ -3700,8 +3707,8 @@ class MappedNSBList:
         """Maps burr_6_intended_x0022 to aind model."""
         intended = getattr(self._nsb, "burr_6_intended_x0022", None)
         return (
-            None if intended is None
-            or intended == getattr(intended, "N_A", None)
+            None
+            if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
         )
 
@@ -3710,8 +3717,8 @@ class MappedNSBList:
         """Maps burr_6_intended_x0023 to aind model."""
         intended = getattr(self._nsb, "burr_6_intended_x0023", None)
         return (
-            None if intended is None 
-            or intended == getattr(intended, "N_A", None)
+            None
+            if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
         )
 
@@ -5863,11 +5870,11 @@ class MappedNSBList:
             probe.ophys_probe.name = f"Fiber_{probe_index}"
 
         return None
-    
+
     @staticmethod
     def _get_intended_measurements(
-            sp_measurement_data: List[IntendedMeasurementandCoords]
-        ) -> List[IntendedMeasurementInformation]:
+        sp_measurement_data: List[IntendedMeasurementandCoords],
+    ) -> List[IntendedMeasurementInformation]:
         """
         Parses intended measurements from NSB data
         """
@@ -5879,7 +5886,7 @@ class MappedNSBList:
             key=lambda measurement: (
                 -float(measurement.coordinate_ap),
                 float(measurement.coordinate_ml),
-            )
+            ),
         )
         for index, data in enumerate(sorted_data):
             intended_measurments.append(
@@ -5888,22 +5895,24 @@ class MappedNSBList:
                     intended_measurement_R=data.intended_measurement_R,
                     intended_measurement_B=data.intended_measurement_B,
                     intended_measurement_G=data.intended_measurement_G,
-                    intended_measurement_Iso=data.intended_measurement_Iso
+                    intended_measurement_Iso=data.intended_measurement_Iso,
                 )
             )
         return intended_measurments
-    
-    def get_intended_measurements(self) -> List[IntendedMeasurementInformation]:
+
+    def get_intended_measurements(
+        self,
+    ) -> List[IntendedMeasurementInformation]:
         """Get a List of Intended Measurements"""
 
         all_intended_measurements = []
-        initial_measurements = [] #
+        initial_measurements = []  #
         followup_measurements = []
         for burr_hole_num in range(1, 7):
             # TODO: check if we need this type check, or if we should check procedues list
             if getattr(self, f"aind_burr_hole_{burr_hole_num}") in {
                 BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
-                BurrHoleProcedure.FIBER_IMPLANT
+                BurrHoleProcedure.FIBER_IMPLANT,
             }:
                 burr_hole_info = self.burr_hole_info(
                     burr_hole_num=burr_hole_num
@@ -5916,7 +5925,7 @@ class MappedNSBList:
                             intended_measurement_G=burr_hole_info.intended_measurement_g,
                             intended_measurement_Iso=burr_hole_info.intended_measurement_iso,
                             coordinate_ap=burr_hole_info.coordinate_ap,
-                            coordinate_ml=burr_hole_info.coordinate_ml
+                            coordinate_ml=burr_hole_info.coordinate_ml,
                         )
                     )
                 elif burr_hole_info.during == During.FOLLOW_UP:
@@ -5927,7 +5936,7 @@ class MappedNSBList:
                             intended_measurement_G=burr_hole_info.intended_measurement_g,
                             intended_measurement_Iso=burr_hole_info.intended_measurement_iso,
                             coordinate_ap=burr_hole_info.coordinate_ap,
-                            coordinate_ml=burr_hole_info.coordinate_ml
+                            coordinate_ml=burr_hole_info.coordinate_ml,
                         )
                     )
                 else:
@@ -5938,16 +5947,15 @@ class MappedNSBList:
                             intended_measurement_B=burr_hole_info.intended_measurement_b,
                             intended_measurement_G=burr_hole_info.intended_measurement_g,
                             intended_measurement_Iso=burr_hole_info.intended_measurement_iso,
-                )
+                        )
                     )
         all_intended_measurements.extend(
-           self._get_intended_measurements(initial_measurements)
+            self._get_intended_measurements(initial_measurements)
         )
         all_intended_measurements.extend(
             self._get_intended_measurements(followup_measurements)
         )
         return all_intended_measurements
-
 
     def get_procedure(self) -> List[Surgery]:
         """Get a List of Surgeries"""

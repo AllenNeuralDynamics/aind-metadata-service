@@ -7,6 +7,7 @@ from aind_data_schema.core.data_description import Funding
 from aind_data_schema.core.procedures import ViralMaterial
 from pydantic import BaseModel, Field, field_validator
 
+
 class ProtocolInformation(BaseModel):
     """Protocol information that will be returned to the user that requests
     information from the Protocols SmartSheet"""
@@ -34,6 +35,7 @@ class FundingInformation(Funding):
     information from the Funding SmartSheet"""
 
     investigators: Optional[str] = Field(default=None)
+
 
 # TODO: remove this as its not being used
 class SpimImagingInformation(BaseModel):

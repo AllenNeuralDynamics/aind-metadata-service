@@ -4171,6 +4171,7 @@ class Burr3IntendedMeasurementRed(Enum, metaclass=EnumMeta):
     VOLTAGE = "voltage"
     CONTROL = "control"
 
+
 class Burr4IntendedMeasurementRed(Enum, metaclass=EnumMeta):
     """Enum class for Burr 4 intended measurement red."""
 
