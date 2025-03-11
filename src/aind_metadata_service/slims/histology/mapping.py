@@ -15,9 +15,15 @@ from aind_metadata_service.slims.histology.handler import (
 )
 from aind_metadata_service.slims.table_handler import parse_html
 from aind_data_schema_models.organizations import Organization
-from aind_data_schema.core.procedures import SpecimenProcedure, Antibody, ImmunolabelClass, Reagent
+from aind_data_schema.core.procedures import (
+    SpecimenProcedure,
+    Antibody,
+    ImmunolabelClass,
+    Reagent,
+)
 from fastapi.responses import JSONResponse
 import json
+
 
 class WashData(BaseModel):
     """Expected Model that needs to be extracted from SLIMS."""
@@ -29,6 +35,7 @@ class WashData(BaseModel):
     modified_by: Optional[str] = None
     reagents: List[SlimsReagentData] = []
     mass: Optional[float] = None
+
 
 class HistologyData(BaseModel):
     """Expected Model that needs to be extracted from SLIMS."""
@@ -69,6 +76,7 @@ class HistologyData(BaseModel):
             self.procedure_type = None
         return self
 
+
 class SlimsHistologyMapper:
     """Mapper class for Slims histology procedures"""
 
@@ -105,45 +113,51 @@ class SlimsHistologyMapper:
             if data.procedure_type is None:
                 continue
             elif data.procedure_type == SpecimenProcedureType.IMMUNOLABELING:
-                immunolabeling_procedures = self._map_immunolabeling_procedure(data)
+                immunolabeling_procedures = self._map_immunolabeling_procedure(
+                    data
+                )
                 specimen_procedures.extend(immunolabeling_procedures)
             else:
                 pass
-                specimen_procedures.append(
-                    self._map_specimen_procedure(data)
-                )
+                specimen_procedures.append(self._map_specimen_procedure(data))
         return specimen_procedures
-    
-    def _map_specimen_procedure(self, data: HistologyData) -> SpecimenProcedure:
+
+    def _map_specimen_procedure(
+        self, data: HistologyData
+    ) -> SpecimenProcedure:
         """Maps histology data to SpecimenProcedure model"""
         # Implement mapping logic here
-        reagents = [reagent for wash in data.washes for reagent in wash.reagents]
+        reagents = [
+            reagent for wash in data.washes for reagent in wash.reagents
+        ]
         start_time = data.washes[0].start_time
         end_time = self._get_last_valid_end_time(data.washes)
-        return (
-            SpecimenProcedure.model_construct(
-                specimen_id=data.subject_id, # Use Subject ID instead of SLIMS Specimen ID
-                procedure_type=data.procedure_type,
-                protocol_id=data.protocol_id,
-                procedure_name=data.protocol_name if getattr(data, "protocol_name", None) else data.procedure_name,
-                experimenter_full_name=data.washes[0].modified_by,
-                start_date=start_time.date() if start_time else None,
-                end_date=end_time.date() if end_time else None,
-                reagents=self._map_reagents(reagents),
-            )
+        return SpecimenProcedure.model_construct(
+            specimen_id=data.subject_id,  # Use Subject ID instead of SLIMS Specimen ID
+            procedure_type=data.procedure_type,
+            protocol_id=data.protocol_id,
+            procedure_name=(
+                data.protocol_name
+                if getattr(data, "protocol_name", None)
+                else data.procedure_name
+            ),
+            experimenter_full_name=data.washes[0].modified_by,
+            start_date=start_time.date() if start_time else None,
+            end_date=end_time.date() if end_time else None,
+            reagents=self._map_reagents(reagents),
         )
-    
+
     def _map_reagents(self, reagents: List[SlimsReagentData]) -> List[Reagent]:
         """Maps reagent data from slims to Reagent models"""
         return [
-        Reagent.model_construct(
-            name=reagent.name,
-            source=Organization.from_name(reagent.source),
-            lot_number=reagent.lot_number,
-        )
-        for reagent in reagents
-    ]
-    
+            Reagent.model_construct(
+                name=reagent.name,
+                source=Organization.from_name(reagent.source),
+                lot_number=reagent.lot_number,
+            )
+            for reagent in reagents
+        ]
+
     @staticmethod
     def _get_last_valid_end_time(washes: List[WashData]) -> Optional[datetime]:
         """Get the last valid end time from a list of washes"""
@@ -152,17 +166,25 @@ class SlimsHistologyMapper:
                 return wash.end_time
         return None
 
-    def _map_immunolabeling_procedure(self, data: HistologyData) -> List[SpecimenProcedure]:
+    def _map_immunolabeling_procedure(
+        self, data: HistologyData
+    ) -> List[SpecimenProcedure]:
         """Maps histology data to SpecimenProcedure"""
         immunolabeling_procedures = []
         for wash in data.washes:
             immunolabeling_procedures.append(
                 SpecimenProcedure.model_construct(
-                    specimen_id=data.subject_id, # Use Subject ID instead of SLIMS Specimen ID
+                    specimen_id=data.subject_id,  # Use Subject ID instead of SLIMS Specimen ID
                     procedure_type=data.procedure_type,
                     protocol_id=data.protocol_id,
-                    procedure_name=data.protocol_name if getattr(data, "protocol_name", None) else data.procedure_name,
-                    start_date=wash.start_time.date() if wash.start_time else None,
+                    procedure_name=(
+                        data.protocol_name
+                        if getattr(data, "protocol_name", None)
+                        else data.procedure_name
+                    ),
+                    start_date=(
+                        wash.start_time.date() if wash.start_time else None
+                    ),
                     end_date=wash.end_time.date() if wash.end_time else None,
                     experimenter_full_name=wash.modified_by,
                     antibodies=self._map_antibody(wash),
@@ -183,4 +205,3 @@ class SlimsHistologyMapper:
             immunolabel_class=label,
             mass=wash.mass,
         )
-        

@@ -388,6 +388,7 @@ async def retrieve_procedures(subject_id):
     )
     return merged_response.map_to_json_response()
 
+
 @app.get(
     "/favicon.ico",
     include_in_schema=False,

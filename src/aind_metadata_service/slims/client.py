@@ -176,9 +176,9 @@ class SlimsHandler:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
 
-    def get_slims_histology_procedures_model_response(
+    def get_histology_procedures_model_response(
         self,
-        subject_id: Optional[str],
+        subject_id: str,
     ) -> ModelResponse:
         """
         Parameters
@@ -209,8 +209,9 @@ class SlimsHandler:
             else:
                 return ModelResponse.no_data_found_error_response()
         except Exception as e:
+            logging.error(e)
             return ModelResponse.internal_server_error_response()
-        
+
     def get_slims_histology_response(
         self,
         subject_id: Optional[str],

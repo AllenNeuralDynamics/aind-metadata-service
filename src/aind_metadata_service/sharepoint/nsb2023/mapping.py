@@ -88,6 +88,7 @@ class HeadPostType(Enum):
     MOTOR_CTX_SLAP2_WELL = "Motor Ctx SLAP2 well"
     VISUAL_CTX_SLAP2_WELL = "Visual Ctx SLAP2 well"
 
+
 class InjectionType(Enum):
     """Enum class for Injection Types"""
 

@@ -11,7 +11,6 @@ from aind_data_schema.core.instrument import Instrument
 from aind_data_schema.core.rig import Rig
 from aind_slims_api.exceptions import SlimsRecordNotFound
 from aind_slims_api.models.instrument import SlimsInstrumentRdrc
-from aind_slims_api.operations import SPIMHistologyExpBlock
 from aind_slims_api.operations.ecephys_session import (
     EcephysSession as SlimsEcephysSession,
 )
@@ -53,15 +52,14 @@ class TestSlimsHandler(unittest.TestCase):
             SlimsEcephysSession.model_validate(slims_data1),
         ]
         self.expected_sessions = [expected_data1]
-        with open(RAW_DIR / "histology_procedures_response.json") as f:
-            slims_data2 = json.load(f)
-        with open(MAPPED_DIR / "specimen_procedures.json") as f:
-            expected_data2 = json.load(f)
-        self.slims_procedures = [
-            SPIMHistologyExpBlock.model_validate(block)
-            for block in slims_data2
+        with open(RESOURCES_DIR / "histology" / "slims_hist_data.json") as f:
+            slims_hist_data_json = json.load(f)
+        with open(RESOURCES_DIR / "histology" / "expected_histology_procedures.json") as f:
+            self.expected_procedures_json = json.load(f)
+        self.slims_hist_data = [
+            SlimsHistologyData.model_validate(data)
+            for data in slims_hist_data_json
         ]
-        self.expected_procedures = expected_data2
         with open(RAW_DIR / "imaging_metadata_response.json") as f:
             slims_data3 = json.load(f)
         slims_data4 = slims_data3.copy()
@@ -507,6 +505,7 @@ class TestSlimsHandler(unittest.TestCase):
         self, mock_slims_get: MagicMock, mock_log_exception: MagicMock
     ):
         """Tests get_slims_histology_response when an error happens"""
+        print("TEST ERROR")
         mock_slims_get.side_effect = Exception("An error occurred.")
         response = self.handler.get_slims_histology_response(
             subject_id="744743",
@@ -516,6 +515,18 @@ class TestSlimsHandler(unittest.TestCase):
         self.assertEqual(500, response.status_code)
         mock_log_exception.assert_called_once()
 
+    @patch(
+        "aind_metadata_service.slims.histology.handler.SlimsHistologyHandler"
+        ".get_hist_data_from_slims"
+    )
+    def get_histology_procedures_model_response(self, mock_slims_get):
+        """Tests get_histology_procedures_model_response success"""
+        print("TESTING NEW THING")
+        mock_slims_get.return_value = self.slims_hist_data
+        response = self.handler.get_histology_procedures_model_response(subject_id="744742")
+        print("RESPONSE", response)
+        self.assertEqual(200, response.status_code)
+        # self.assertIsInstance(response, ModelResponse)
 
 if __name__ == "__main__":
     unittest.main()
