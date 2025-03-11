@@ -379,8 +379,14 @@ async def retrieve_procedures(subject_id):
     integrated_response = protocols_integrator.integrate_protocols(
         response=integrated_response, protocols_mapping=protocols_mapping
     )
-    return integrated_response.map_to_json_response()
-
+    slims_response = await run_in_threadpool(
+        slims_client.get_slims_histology_procedures_model_response,
+        subject_id=subject_id,
+    )
+    merged_response = sharepoint_client.merge_responses(
+        [integrated_response, slims_response]
+    )
+    return merged_response.map_to_json_response()
 
 @app.get(
     "/favicon.ico",

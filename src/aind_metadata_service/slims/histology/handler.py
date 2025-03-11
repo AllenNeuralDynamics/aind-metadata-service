@@ -33,7 +33,7 @@ class SlimsWashData(BaseModel):
     end_time: Optional[int] = None
     modified_by: Optional[str] = None
     reagents: List[SlimsReagentData] = []
-
+    mass: Optional[float] = None
 
 class SlimsHistologyData(BaseModel):
     """Expected Model that needs to be extracted from SLIMS."""
@@ -121,6 +121,9 @@ class SlimsHistologyHandler(SlimsTableHandler):
         )
         wash_data.modified_by = get_attr_or_none(
             exp_run_step_row, "xprs_modifiedBy"
+        )
+        wash_data.mass = get_attr_or_none(
+            exp_run_step_row, "xprs_cf_mass"
         )
         wash_data_successors = g.successors(exp_run_step)
         records = [g.nodes[n]["row"] for n in wash_data_successors]

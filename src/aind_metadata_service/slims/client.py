@@ -7,6 +7,7 @@ from typing import Optional, Union
 
 from aind_data_schema.core.instrument import Instrument
 from aind_data_schema.core.rig import Rig
+from aind_data_schema.core.procedures import Procedures
 from aind_slims_api import SlimsClient
 from aind_slims_api.exceptions import SlimsRecordNotFound
 from aind_slims_api.models.instrument import SlimsInstrumentRdrc
@@ -175,6 +176,41 @@ class SlimsHandler:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
 
+    def get_slims_histology_procedures_model_response(
+        self,
+        subject_id: Optional[str],
+    ) -> ModelResponse:
+        """
+        Parameters
+        ----------
+        subject_id : str | None
+        Returns
+        -------
+        JSONResponse
+
+        """
+        try:
+            slims_histology_handler = SlimsHistologyHandler(
+                client=self.client.db
+            )
+            slims_hist_data = slims_histology_handler.get_hist_data_from_slims(
+                subject_id=subject_id,
+            )
+            if slims_hist_data:
+                mapped_histology_procedures = SlimsHistologyMapper(
+                    slims_hist_data=slims_hist_data
+                ).map_slims_info_to_specimen_procedures()
+                procedures = Procedures.model_construct(subject_id=subject_id)
+                procedures.specimen_procedures = mapped_histology_procedures
+                return ModelResponse(
+                    aind_models=[procedures],
+                    status_code=StatusCodes.DB_RESPONDED,
+                )
+            else:
+                return ModelResponse.no_data_found_error_response()
+        except Exception as e:
+            return ModelResponse.internal_server_error_response()
+        
     def get_slims_histology_response(
         self,
         subject_id: Optional[str],
