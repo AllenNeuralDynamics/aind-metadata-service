@@ -529,7 +529,6 @@ class TestSlimsHandler(unittest.TestCase):
         response = self.handler.get_histology_procedures_model_response(
             subject_id="744742"
         )
-        print(response)
         self.assertEqual(StatusCodes.DB_RESPONDED, response.status_code)
         self.assertIsInstance(response.aind_models[0], Procedures)
 

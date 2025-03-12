@@ -100,8 +100,6 @@ class SlimsHistologyMapper:
 
     def map_slims_info_to_specimen_procedures(self) -> List[SpecimenProcedure]:
         """Maps response from slims into SpecimenProcedure models"""
-        # content = response.body.decode("utf-8")
-        # response_data = json.loads(content)["data"]
         hist_data = [
             HistologyData.model_validate(m.model_dump())
             for m in self.slims_hist_data
@@ -123,7 +121,6 @@ class SlimsHistologyMapper:
         self, data: HistologyData
     ) -> SpecimenProcedure:
         """Maps histology data to SpecimenProcedure model"""
-        # Implement mapping logic here
         reagents = [
             reagent for wash in data.washes for reagent in wash.reagents
         ]
@@ -191,7 +188,7 @@ class SlimsHistologyMapper:
 
     def _map_antibody(self, wash: WashData) -> Optional[Antibody]:
         """Maps immunolabeling antibody"""
-        # TODO: check if fluor data is in the reagents
+        # TODO: add fluor data once in SLIMS
         if wash.wash_name == "Primary Antibody Wash":
             label = ImmunolabelClass.PRIMARY
         elif wash.wash_name == "Secondary Antibody Wash":
