@@ -380,7 +380,7 @@ async def retrieve_procedures(subject_id):
         response=integrated_response, protocols_mapping=protocols_mapping
     )
     slims_response = await run_in_threadpool(
-        slims_client.get_slims_histology_procedures_model_response,
+        slims_client.get_histology_procedures_model_response,
         subject_id=subject_id,
     )
     merged_response = sharepoint_client.merge_responses(

@@ -209,7 +209,7 @@ class SlimsHandler:
             else:
                 return ModelResponse.no_data_found_error_response()
         except Exception as e:
-            logging.error(e)
+            logging.exception(e)
             return ModelResponse.internal_server_error_response()
 
     def get_slims_histology_response(

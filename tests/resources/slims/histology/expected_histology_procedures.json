@@ -1,4 +1,5 @@
-[{
+[
+    {
         "procedure_type": "Delipidation",
         "procedure_name": "iDISCO: Dichloromethane Whole Mouse Brain Delipidation",
         "specimen_id": "744742",
@@ -38,8 +39,8 @@
         "procedure_type": "Immunolabeling",
         "procedure_name": "SmartSPIM Labeling",
         "specimen_id": "744742",
-        "start_date": null,
-        "end_date": null,
+        "start_date": "2025-02-04",
+        "end_date": "2025-02-05",
         "experimenter_full_name": "PersonM",
         "protocol_id": null,
         "reagents": [],
@@ -60,8 +61,8 @@
         "procedure_type": "Immunolabeling",
         "procedure_name": "SmartSPIM Labeling",
         "specimen_id": "744742",
-        "start_date": null,
-        "end_date": null,
+        "start_date": "2025-02-04",
+        "end_date": "2025-02-05",
         "experimenter_full_name": "PersonM",
         "protocol_id": null,
         "reagents": [],

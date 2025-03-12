@@ -21,8 +21,6 @@ from aind_data_schema.core.procedures import (
     ImmunolabelClass,
     Reagent,
 )
-from fastapi.responses import JSONResponse
-import json
 
 
 class WashData(BaseModel):
@@ -118,7 +116,6 @@ class SlimsHistologyMapper:
                 )
                 specimen_procedures.extend(immunolabeling_procedures)
             else:
-                pass
                 specimen_procedures.append(self._map_specimen_procedure(data))
         return specimen_procedures
 
@@ -133,7 +130,7 @@ class SlimsHistologyMapper:
         start_time = data.washes[0].start_time
         end_time = self._get_last_valid_end_time(data.washes)
         return SpecimenProcedure.model_construct(
-            specimen_id=data.subject_id,  # Use Subject ID instead of SLIMS Specimen ID
+            specimen_id=data.subject_id,
             procedure_type=data.procedure_type,
             protocol_id=data.protocol_id,
             procedure_name=(
@@ -169,12 +166,12 @@ class SlimsHistologyMapper:
     def _map_immunolabeling_procedure(
         self, data: HistologyData
     ) -> List[SpecimenProcedure]:
-        """Maps histology data to SpecimenProcedure"""
+        """Maps histology data to SpecimenProcedure."""
         immunolabeling_procedures = []
         for wash in data.washes:
             immunolabeling_procedures.append(
                 SpecimenProcedure.model_construct(
-                    specimen_id=data.subject_id,  # Use Subject ID instead of SLIMS Specimen ID
+                    specimen_id=data.subject_id,
                     procedure_type=data.procedure_type,
                     protocol_id=data.protocol_id,
                     procedure_name=(
@@ -199,8 +196,6 @@ class SlimsHistologyMapper:
             label = ImmunolabelClass.PRIMARY
         elif wash.wash_name == "Secondary Antibody Wash":
             label = ImmunolabelClass.SECONDARY
-        else:
-            return None
         return Antibody.model_construct(
             immunolabel_class=label,
             mass=wash.mass,

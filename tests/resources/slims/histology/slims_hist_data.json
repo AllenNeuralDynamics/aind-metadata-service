@@ -64,8 +64,8 @@
             {
                 "wash_name": "Primary Antibody Wash",
                 "wash_type": null,
-                "start_time": null,
-                "end_time": null,
+                "start_time": 1738688400000,
+                "end_time": 1738781400000,
                 "modified_by": "PersonM",
                 "reagents": [],
                 "mass": 10.2
@@ -73,8 +73,8 @@
             {
                 "wash_name": "Secondary Antibody Wash",
                 "wash_type": null,
-                "start_time": null,
-                "end_time": null,
+                "start_time": 1738688400000,
+                "end_time": 1738781400000,
                 "modified_by": "PersonM",
                 "reagents": [],
                 "mass": null
