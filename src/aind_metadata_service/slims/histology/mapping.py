@@ -14,6 +14,13 @@ from aind_metadata_service.slims.histology.handler import (
     SlimsReagentData,
 )
 from aind_metadata_service.slims.table_handler import parse_html
+from aind_data_schema_models.organizations import Organization
+from aind_data_schema.core.procedures import (
+    SpecimenProcedure,
+    Antibody,
+    ImmunolabelClass,
+    Reagent,
+)
 
 
 class WashData(BaseModel):
@@ -25,6 +32,7 @@ class WashData(BaseModel):
     end_time: Optional[datetime] = None
     modified_by: Optional[str] = None
     reagents: List[SlimsReagentData] = []
+    mass: Optional[float] = None
 
 
 class HistologyData(BaseModel):
@@ -89,3 +97,103 @@ class SlimsHistologyMapper:
             reverse=True,
         )
         return hist_data
+
+    def map_slims_info_to_specimen_procedures(self) -> List[SpecimenProcedure]:
+        """Maps response from slims into SpecimenProcedure models"""
+        hist_data = [
+            HistologyData.model_validate(m.model_dump())
+            for m in self.slims_hist_data
+        ]
+        specimen_procedures = []
+        for data in hist_data:
+            if data.procedure_type is None:
+                continue
+            elif data.procedure_type == SpecimenProcedureType.IMMUNOLABELING:
+                immunolabeling_procedures = self._map_immunolabeling_procedure(
+                    data
+                )
+                specimen_procedures.extend(immunolabeling_procedures)
+            else:
+                specimen_procedures.append(self._map_specimen_procedure(data))
+        return specimen_procedures
+
+    def _map_specimen_procedure(
+        self, data: HistologyData
+    ) -> SpecimenProcedure:
+        """Maps histology data to SpecimenProcedure model"""
+        reagents = [
+            reagent for wash in data.washes for reagent in wash.reagents
+        ]
+        start_time = data.washes[0].start_time
+        end_time = self._get_last_valid_end_time(data.washes)
+        return SpecimenProcedure.model_construct(
+            specimen_id=data.subject_id,
+            procedure_type=data.procedure_type,
+            protocol_id=data.protocol_id,
+            procedure_name=(
+                data.protocol_name
+                if getattr(data, "protocol_name", None)
+                else data.procedure_name
+            ),
+            experimenter_full_name=data.washes[0].modified_by,
+            start_date=start_time.date() if start_time else None,
+            end_date=end_time.date() if end_time else None,
+            reagents=self._map_reagents(reagents),
+        )
+
+    def _map_reagents(self, reagents: List[SlimsReagentData]) -> List[Reagent]:
+        """Maps reagent data from slims to Reagent models"""
+        return [
+            Reagent.model_construct(
+                name=reagent.name,
+                source=Organization.from_name(reagent.source),
+                lot_number=reagent.lot_number,
+            )
+            for reagent in reagents
+        ]
+
+    @staticmethod
+    def _get_last_valid_end_time(washes: List[WashData]) -> Optional[datetime]:
+        """Get the last valid end time from a list of washes"""
+        for wash in reversed(washes):
+            if wash.wash_type and wash.end_time:
+                return wash.end_time
+        return None
+
+    def _map_immunolabeling_procedure(
+        self, data: HistologyData
+    ) -> List[SpecimenProcedure]:
+        """Maps histology data to SpecimenProcedure."""
+        immunolabeling_procedures = []
+        for wash in data.washes:
+            immunolabeling_procedures.append(
+                SpecimenProcedure.model_construct(
+                    specimen_id=data.subject_id,
+                    procedure_type=data.procedure_type,
+                    protocol_id=data.protocol_id,
+                    procedure_name=(
+                        data.protocol_name
+                        if getattr(data, "protocol_name", None)
+                        else data.procedure_name
+                    ),
+                    start_date=(
+                        wash.start_time.date() if wash.start_time else None
+                    ),
+                    end_date=wash.end_time.date() if wash.end_time else None,
+                    experimenter_full_name=wash.modified_by,
+                    antibodies=self._map_antibody(wash),
+                )
+            )
+        return immunolabeling_procedures
+
+    def _map_antibody(self, wash: WashData) -> Optional[Antibody]:
+        """Maps immunolabeling antibody"""
+        # TODO: add fluor data once in SLIMS
+        if wash.wash_name == "Primary Antibody Wash":
+            label = ImmunolabelClass.PRIMARY
+        elif wash.wash_name == "Secondary Antibody Wash":
+            label = ImmunolabelClass.SECONDARY
+        return Antibody.model_construct(
+            immunolabel_class=label,
+            mass=wash.mass,
+        )

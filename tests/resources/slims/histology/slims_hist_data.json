@@ -1,0 +1,109 @@
+[
+    {
+        "procedure_name": "SmartSPIM Delipidation",
+        "experiment_run_created_on": 1738885742478,
+        "specimen_id": "BRN00000018",
+        "subject_id": "744742",
+        "protocol_id": "https://www.protocols.io/edit/refractive-index-matching-ethyl-cinnamate-cukpwuvn",
+        "protocol_name": "iDISCO: Dichloromethane Whole Mouse Brain Delipidation",
+        "washes": [
+            {
+                "wash_name": "Wash 1",
+                "wash_type": "Methanol Gradient",
+                "start_time": 1738688400000,
+                "end_time": 1738710000000,
+                "modified_by": "PersonM",
+                "reagents": [
+                    {
+                        "name": "34860-1L-R",
+                        "source": null,
+                        "lot_number": "SHBR4455"
+                    }
+                ],
+                "mass": null
+            },
+            {
+                "wash_name": "Wash 2",
+                "wash_type": "Methanol + DCM",
+                "start_time": 1738710000000,
+                "end_time": 1738781400000,
+                "modified_by": "PersonM",
+                "reagents": [
+                    {
+                        "name": "270997-1L",
+                        "source": null,
+                        "lot_number": "SHBQ9167"
+                    },
+                    {
+                        "name": "34860-1L-R",
+                        "source": null,
+                        "lot_number": "SHBR4455"
+                    }
+                ],
+                "mass": null
+            },
+            {
+                "wash_name": "Wash 3",
+                "wash_type": null,
+                "start_time": null,
+                "end_time": null,
+                "modified_by": "PersonM",
+                "reagents": [],
+                "mass": null
+            }
+        ]
+    },
+    {
+        "procedure_name": "SmartSPIM Labeling",
+        "experiment_run_created_on": 1738885935396,
+        "specimen_id": "BRN00000018",
+        "subject_id": "744742",
+        "protocol_id": null,
+        "protocol_name": null,
+        "washes": [
+            {
+                "wash_name": "Primary Antibody Wash",
+                "wash_type": null,
+                "start_time": 1738688400000,
+                "end_time": 1738781400000,
+                "modified_by": "PersonM",
+                "reagents": [],
+                "mass": 10.2
+            },
+            {
+                "wash_name": "Secondary Antibody Wash",
+                "wash_type": null,
+                "start_time": 1738688400000,
+                "end_time": 1738781400000,
+                "modified_by": "PersonM",
+                "reagents": [],
+                "mass": null
+            }
+        ]
+    },
+    {
+        "procedure_name": "SmartSPIM Refractive Index Matching",
+        "experiment_run_created_on": 1738885974738,
+        "specimen_id": "BRN00000018",
+        "subject_id": "744742",
+        "protocol_id": null,
+        "protocol_name": null,
+        "washes": [
+            {
+                "wash_name": "Refractive Index Matching Wash",
+                "wash_type": "Refractive Index Matching",
+                "start_time": 1738784100000,
+                "end_time": 1738956900000,
+                "modified_by": "PersonM",
+                "reagents": [
+                    {
+                        "name": "112372-100G",
+                        "source": null,
+                        "lot_number": "stbk5149"
+                    }
+                ],
+                "mass": null
+            }
+        ]
+    }
+]

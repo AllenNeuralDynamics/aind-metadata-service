@@ -4,11 +4,10 @@ import os
 import unittest
 from datetime import datetime, timezone
 from pathlib import Path
-
+import json
 from aind_data_schema_models.specimen_procedure_types import (
     SpecimenProcedureType,
 )
-
 from aind_metadata_service.slims.histology.handler import (
     SlimsHistologyData,
     SlimsReagentData,
@@ -68,9 +67,25 @@ class TestHistData(unittest.TestCase):
 class TestSlimsHistologyMapper(unittest.TestCase):
     """Tests methods in SlimsHistMapper class"""
 
+    def setUp(self):
+        """Set up test data"""
+        with open(f"{RESOURCES_DIR}/slims_hist_data.json", "r") as f:
+            slims_hist_data_json = json.load(f)
+        self.slims_hist_data = [
+            SlimsHistologyData.model_validate(data)
+            for data in slims_hist_data_json
+        ]
+        with open(
+            f"{RESOURCES_DIR}/expected_histology_procedures.json", "r"
+        ) as f:
+            self.expected_procedures_json = json.load(f)
+        self.mapper = SlimsHistologyMapper(
+            slims_hist_data=self.slims_hist_data
+        )
+
     def test_map_info_from_slims(self):
         """Tests map_info_from_slims method."""
-        slims_hist_data = [
+        slims_hist_data = slims_hist_data = [
             SlimsHistologyData(
                 procedure_name="SmartSPIM Refractive Index Matching",
                 experiment_run_created_on=1738175075574,
@@ -146,6 +161,42 @@ class TestSlimsHistologyMapper(unittest.TestCase):
         ]
 
         self.assertEqual(expected_output[0], output[0])
+
+    def test_map_specimen_procedures(self):
+        """Tests that specimen procedures are mapped correctly"""
+
+        mapper = SlimsHistologyMapper(slims_hist_data=self.slims_hist_data)
+        mapped_procedures = mapper.map_slims_info_to_specimen_procedures()
+        mapped_procedures_json = [
+            proc.model_dump_json() for proc in mapped_procedures
+        ]
+        mapped_procedures_json_parsed = [
+            json.loads(json_str) for json_str in mapped_procedures_json
+        ]
+        self.assertEqual(len(mapped_procedures), 4)
+        self.assertEqual(
+            mapped_procedures_json_parsed, self.expected_procedures_json
+        )
+
+    def test_get_last_valid_end_time_edge_case(self):
+        """Test returns None when no washes have end_time."""
+        washes = [
+            WashData(wash_type="Type1", end_time=None),
+            WashData(wash_type="Type2", end_time=None),
+            WashData(wash_type=None, end_time=None),
+        ]
+        result = self.mapper._get_last_valid_end_time(washes)
+        self.assertIsNone(result)
+
+    def test_map_slims_info_to_specimen_procedures_edge_case(self):
+        """
+        Tests that specimen procedures are not created unless
+        a valid specimen procedure type is found."""
+        slims_hist_data = SlimsHistologyData(
+            procedure_name="Some Other Procedure"
+        )
+        mapper = SlimsHistologyMapper(slims_hist_data=[slims_hist_data])
+        self.assertEqual(mapper.map_slims_info_to_specimen_procedures(), [])
 
 
 if __name__ == "__main__":
