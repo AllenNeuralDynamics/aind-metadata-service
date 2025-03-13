@@ -4159,9 +4159,17 @@ class Burr2IntendedMeasurementRed(Enum, metaclass=EnumMeta):
 class Burr3IntendedMeasurementRed(Enum, metaclass=EnumMeta):
     """Enum class for Burr 3 intended measurement red."""
 
-    ENTER__CHOICE_1 = "Enter Choice #1"
-    ENTER__CHOICE_2 = "Enter Choice #2"
-    ENTER__CHOICE_3 = "Enter Choice #3"
+    N_A = "N/A"
+    DOPAMINE = "dopamine"
+    SEROTONIN = "serotonin"
+    NOREPINEPHRINE = "norepinephrine"
+    ACETYLCHOLINE = "acetylcholine"
+    HISTAMINE = "histamine"
+    GLUTAMATE = "glutamate"
+    GABA = "GABA"
+    CALCIUM = "calcium"
+    VOLTAGE = "voltage"
+    CONTROL = "control"
 
 
 class Burr4IntendedMeasurementRed(Enum, metaclass=EnumMeta):

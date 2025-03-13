@@ -11,6 +11,7 @@ from unittest.mock import MagicMock, patch
 import requests
 from fastapi.responses import JSONResponse
 from pydantic import SecretStr
+
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 from aind_metadata_service.sharepoint.client import (
     SharePointClient,
@@ -59,9 +60,15 @@ sorted(MAPPED_ITEM_FILE_NAMES_2020)
 MAPPED_FILE_PATHS_2020 = [
     DIR_MAP_2020 / str(f) for f in MAPPED_ITEM_FILE_NAMES_2020
 ]
-
 INJECTION_MATERIALS_PATH = (
     TEST_DIR / "resources" / "tars" / "mapped_materials.json"
+)
+INTENDED_MEASUREMENTS_PATH = (
+    TEST_DIR
+    / "resources"
+    / "sharepoint"
+    / "nsb2023"
+    / "nsb2023_intended_measurements.json"
 )
 
 
@@ -114,7 +121,6 @@ class TestSharepointSettings(unittest.TestCase):
         with self.assertRaises(ValueError) as e:
             SharepointSettings(aind_site_id="aind_site_only")
 
-        print("TEST ERROR", repr(e.exception))
         expected_error_message = (
             "8 validation errors for SharepointSettings\n"
             "las_site_id\n"
@@ -186,6 +192,8 @@ class TestSharepointClient(unittest.TestCase):
         )
         cls.client = SharePointClient.from_settings(cls.settings)
         cls.client.get_access_token = MagicMock(return_value="fake-token")
+        with open(INTENDED_MEASUREMENTS_PATH) as f:
+            cls.intended_measurements = json.load(f)
 
     @staticmethod
     def _load_json_files(year: str) -> List[Tuple[dict, dict, str]]:
@@ -416,6 +424,72 @@ class TestSharepointClient(unittest.TestCase):
         ]
         self.assertEqual(expected_mapped_2020, actual_subject_procedures)
         self.assertEqual(406, json_response.status_code)
+
+    def test_intended_measurement_data_mapped(self):
+        """Tests that 200 response returned correctly."""
+        list_item_raw = self.intended_measurements
+        expected_mapped_data = [
+            {
+                "fiber_name": None,
+                "intended_measurement_R": "acetylcholine",
+                "intended_measurement_G": "calcium",
+                "intended_measurement_B": "GABA",
+                "intended_measurement_Iso": "control",
+            },
+            {
+                "fiber_name": "Fiber_0",
+                "intended_measurement_R": "acetylcholine",
+                "intended_measurement_G": "dopamine",
+                "intended_measurement_B": "GABA",
+                "intended_measurement_Iso": "control",
+            },
+            {
+                "fiber_name": "Fiber_1",
+                "intended_measurement_R": "acetylcholine",
+                "intended_measurement_G": "dopamine",
+                "intended_measurement_B": "glutamate",
+                "intended_measurement_Iso": "control",
+            },
+            {
+                "fiber_name": "Fiber_0",
+                "intended_measurement_R": "norepinephrine",
+                "intended_measurement_G": "calcium",
+                "intended_measurement_B": "glutamate",
+                "intended_measurement_Iso": "voltage",
+            },
+        ]
+        with patch.object(
+            self.client,
+            "_fetch_list_items",
+            return_value={"value": [{"fields": list_item_raw}]},
+        ):
+            with patch.object(
+                self.client,
+                "_extract_procedures_from_response",
+                return_value=expected_mapped_data,
+            ):
+                response = self.client.get_intended_measurement_info(
+                    subject_id="000000"
+                )
+        self.assertEqual(StatusCodes.DB_RESPONDED, response.status_code)
+        json_response = response.map_to_json_response()
+        actual_content = json.loads(json_response.body.decode("utf-8"))
+        self.assertEqual(expected_mapped_data, actual_content["data"])
+        self.assertEqual(300, json_response.status_code)
+
+    def test_get_intended_measurement_info_error(self):
+        """Tests internal server error response caught correctly."""
+        with patch.object(
+            self.client,
+            "_fetch_list_items",
+            side_effect=BrokenPipeError("BrokenPipeError()"),
+        ):
+            response2023_error = self.client.get_intended_measurement_info(
+                subject_id="12345"
+            )
+        self.assertEqual(
+            response2023_error.status_code, StatusCodes.INTERNAL_SERVER_ERROR
+        )
 
     def test_merge_empty_procedures(self):
         """Tests that merging empty responses returns Internal Server Error."""

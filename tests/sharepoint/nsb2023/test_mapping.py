@@ -27,6 +27,13 @@ if os.getenv("LOG_LEVEL"):  # pragma: no cover
 TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / ".." / ".."
 DIR_RAW = TEST_DIR / "resources" / "sharepoint" / "nsb2023" / "raw"
 DIR_MAP = TEST_DIR / "resources" / "sharepoint" / "nsb2023" / "mapped"
+INTENDED_RAW = (
+    TEST_DIR
+    / "resources"
+    / "sharepoint"
+    / "nsb2023"
+    / "nsb2023_intended_measurements.json"
+)
 LIST_ITEM_FILE_NAMES = os.listdir(DIR_RAW)
 sorted(LIST_ITEM_FILE_NAMES)
 LIST_ITEM_FILE_PATHS = [DIR_RAW / str(f) for f in LIST_ITEM_FILE_NAMES]
@@ -42,6 +49,8 @@ class TestNSB2023Parsers(TestCase):
     def setUpClass(cls):
         """Load json files before running tests."""
         cls.list_items = cls._load_json_files()
+        with open(INTENDED_RAW) as f:
+            cls.intended = json.load(f)
 
     @staticmethod
     def _load_json_files() -> List[Tuple[dict, dict, str]]:
@@ -61,8 +70,8 @@ class TestNSB2023Parsers(TestCase):
             list_items.sort(key=lambda x: x[2])
         return list_items
 
-    def test_parser(self):
-        """Checks that raw data is parsed correctly"""
+    def test_procedures_parser(self):
+        """Checks that raw procedures data is parsed correctly"""
         for list_item in self.list_items:
             raw_data = list_item[0]
             expected_mapped_data = list_item[1]
@@ -80,6 +89,50 @@ class TestNSB2023Parsers(TestCase):
             self.assertEqual(
                 expected_mapped_data, mapped_procedure_json_parsed
             )
+
+    def test_intended_measurements_parser(self):
+        """Checks that raw fiber data is parsed correctly."""
+        raw_data = self.intended
+        expected_mapped_data = [
+            {
+                "fiber_name": None,
+                "intended_measurement_R": "acetylcholine",
+                "intended_measurement_G": "calcium",
+                "intended_measurement_B": "GABA",
+                "intended_measurement_Iso": "control",
+            },
+            {
+                "fiber_name": "Fiber_0",
+                "intended_measurement_R": "acetylcholine",
+                "intended_measurement_G": "dopamine",
+                "intended_measurement_B": "GABA",
+                "intended_measurement_Iso": "control",
+            },
+            {
+                "fiber_name": "Fiber_1",
+                "intended_measurement_R": "acetylcholine",
+                "intended_measurement_G": "dopamine",
+                "intended_measurement_B": "glutamate",
+                "intended_measurement_Iso": "control",
+            },
+            {
+                "fiber_name": "Fiber_0",
+                "intended_measurement_R": "norepinephrine",
+                "intended_measurement_G": "calcium",
+                "intended_measurement_B": "glutamate",
+                "intended_measurement_Iso": "voltage",
+            },
+        ]
+        nsb_model = NSBList.model_validate(raw_data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        mapped_intended = mapper.get_intended_measurements()
+        mapped_intended_json = [
+            model.model_dump_json() for model in mapped_intended
+        ]
+        mapped_intended_json_parsed = [
+            json.loads(json_str) for json_str in mapped_intended_json
+        ]
+        self.assertEqual(expected_mapped_data, mapped_intended_json_parsed)
 
     def test_properties(self):
         """Tests that the properties are parsed correctly."""
