@@ -61,7 +61,7 @@ aws sts get-caller-identity
 If your AWS credentials are already configured on your machine (`~/.aws/credentials` on Linux/macOS or `%USERPROFILE%\.aws\credentials` on Windows), you can mount your credentials directly into the container:
 1. Run the container with AWS credentials mounted:
 ```
-docker run -v ~/.aws:/root/.aws -e AWS_PROFILE=default -p 8000:8000 aind-metadata-service
+docker run -v ~/.aws:/root/.aws -e AWS_PROFILE=default -e AIND_METADATA_SERVICE_PARAM_PREFIX={param name} -p 8000:8000 aind-metadata-service
 ```
 This allows the container to use your locally configured AWS credentials without needing to pass them explicitly. If you have more than 1 AWS_PROFILE configuration, set the name accordingly.
 2. To check if AWS credentials are working inside the container:
