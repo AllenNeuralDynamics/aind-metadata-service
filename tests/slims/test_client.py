@@ -8,8 +8,8 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from aind_data_schema.core.instrument import Instrument
-from aind_data_schema.core.rig import Rig
 from aind_data_schema.core.procedures import Procedures
+from aind_data_schema.core.rig import Rig
 from aind_slims_api.exceptions import SlimsRecordNotFound
 from aind_slims_api.models.instrument import SlimsInstrumentRdrc
 from aind_slims_api.operations.ecephys_session import (
