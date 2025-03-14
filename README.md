@@ -22,54 +22,32 @@ Installing `pyodbc`.
 ```
 
 ## Running Locally with Docker
-#### Option 1: Using AWS Credentials from `.env` file
-To run the service locally using Docker, follow these steps: 
-1. Ensure you have Docker installed and running
-2. Create a .env file with required environment variables, including AWS Credentials
+#### Option 1: Using AWS Credentials from Local Machine
+If your AWS credentials are already configured on your machine (`~/.aws/credentials` on Linux/macOS or `%USERPROFILE%\.aws\credentials` on Windows), you can mount your credentials directly into the container:
+1. Run the container with AWS credentials mounted:
 ```
-AWS_ACCESS_KEY_ID=your-access-key
-AWS_SECRET_ACCESS_KEY=your-secret-key
-AWS_REGION=us-west-2
-AIND_METADATA_SERVICE_PARAM_PREFIX=/your-app/credentials
+docker run -v ~/.aws:/root/.aws -e AWS_PROFILE=default -e AIND_METADATA_SERVICE_PARAM={param name} -p 8000:8000 aind-metadata-service
 ```
-3. Build the docker image:
-```
-docker build -t aind-metadata-service:latest .
-```
-4. Run the container using the .env file:
-```
-docker run --env-file .env -p 8000:8000 aind-metadata-service
-```
+This allows the container to use your locally configured AWS credentials without needing to pass them explicitly.
+
+- If you encounter issues where your AWS parameter path is incorrectly expanded (e.g., `C:/Program Files/Git/...`), use `MSYS_NO_PATHCONV=1` to prevent automatic path conversion:
+
 This will start the service on port `8000`. You can access it at:
 ```
 http://localhost:8000
 ```
-5. Check Logs (if needed);
+
+2. Check Logs (if needed);
 ```
 docker logs -f $(docker ps -q --filter ancestor=aind-metadata-service)
 ```
-6. To run an interactive session inside the container: 
-```
-docker run -it --env-file .env --entrypoint /bin/bash aind-metadata-service
-```
-Once inside, you can manually test AWS connectivity:
-```
-aws sts get-caller-identity
-```
-
-#### Option 2: Using Configured AWS Credentials from Local Machine
-If your AWS credentials are already configured on your machine (`~/.aws/credentials` on Linux/macOS or `%USERPROFILE%\.aws\credentials` on Windows), you can mount your credentials directly into the container:
-1. Run the container with AWS credentials mounted:
-```
-docker run -v ~/.aws:/root/.aws -e AWS_PROFILE=default -e AIND_METADATA_SERVICE_PARAM_PREFIX={param name} -p 8000:8000 aind-metadata-service
-```
-This allows the container to use your locally configured AWS credentials without needing to pass them explicitly. If you have more than 1 AWS_PROFILE configuration, set the name accordingly.
-2. To check if AWS credentials are working inside the container:
+3. To check if AWS credentials are working inside the container:
 ```
 docker run -it --entrypoint /bin/bash aind-metadata-service
 aws sts get-caller-identity
 ```
 If the above command returns valid AWS account details, your credentials are correctly configured.
+
 ### Client Installation
 
 Can be pip installed with `pip install aind-metadata-service[client]`
