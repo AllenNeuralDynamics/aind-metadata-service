@@ -24,6 +24,27 @@ from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 class TestAindMetadataServiceClient(unittest.TestCase):
     """Tests the AindMetadataServiceClient class methods"""
 
+    def test_client_initialization(self) -> None:
+        """Tests different client initialization options"""
+
+        # Test with default parameters
+        client = AindMetadataServiceClient()
+        self.assertEqual(client.domain, AindMetadataServiceClient.PROD_URL)
+
+        # Test with use_dev=True
+        dev_client = AindMetadataServiceClient(use_dev=True)
+        self.assertEqual(dev_client.domain, AindMetadataServiceClient.DEV_URL)
+
+        # Test with custom_domain
+        custom_client = AindMetadataServiceClient(custom_domain="custom_url")
+        self.assertEqual(custom_client.domain, "custom_url")
+
+        # Test with both use_dev=True and custom_domain (custom_domain should take precedence)
+        both_client = AindMetadataServiceClient(
+            use_dev=True, custom_domain="custom_url"
+        )
+        self.assertEqual(both_client.domain, "custom_url")
+
     @mock.patch("requests.get")
     def test_get_subject(self, mock_get: MagicMock) -> None:
         """Tests the get_subject method"""
