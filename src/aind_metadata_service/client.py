@@ -1,6 +1,7 @@
 """Module for client library."""
 
 from enum import Enum
+from typing import Optional, Dict, Any
 
 import requests
 
@@ -23,19 +24,43 @@ class StatusCodes(Enum):
 class AindMetadataServiceClient:
     """Class to handle client api calls to the service."""
 
-    def __init__(self, domain: str):
+    PROD_URL = "http://aind-metadata-service"
+    DEV_URL = "http://aind-metadata-service-dev"
+
+    def __init__(
+        self, use_dev: bool = False, custom_domain: Optional[str] = None
+    ):
         """
         Class constructor
+
         Parameters
         ----------
-        domain : str
-          url of the domain
+        use_dev : bool, default=False
+            If True, use the development endpoint, otherwise use production
+        custom_domain : str, optional
+            If provided, overrides both prod and dev URLs with a custom domain
         """
+        if custom_domain:
+            self.domain = custom_domain
+        else:
+            self.domain = self.DEV_URL if use_dev else self.PROD_URL
 
-        self.domain = domain
         self.subject_url = f"{self.domain}/subject"
         self.procedures_url = f"{self.domain}/procedures"
-        self.injection_materials_url = f"{self.domain}/injection_materials"
+        self.injection_materials_url = (
+            f"{self.domain}/tars_injection_materials"
+        )
+        self.intended_measurements_url = f"{self.domain}/intended_measurements"
+        self.ecephys_sessions_url = (
+            f"{self.domain}/ecephys_sessions_by_subject"
+        )
+        self.protocols_url = f"{self.domain}/protocols"
+        self.mgi_allele_url = f"{self.domain}/mgi_allele"
+        self.perfusions_url = f"{self.domain}/perfusions"
+        self.funding_url = f"{self.domain}/funding"
+        self.project_names_url = f"{self.domain}/project_names"
+        self.smartspim_imaging_url = f"{self.domain}/slims/smartspim_imaging"
+        self.histology_url = f"{self.domain}/slims/histology"
 
     def get_subject(self, subject_id: str) -> requests.Response:
         """
@@ -69,4 +94,207 @@ class AindMetadataServiceClient:
         """
         url = "/".join([self.procedures_url, subject_id])
         with requests.get(url, params={}) as response:
+            return response
+
+    def get_intended_measurements(self, subject_id: str) -> requests.Response:
+        """
+        Retrieve intended measurements for a subject from the server
+        Parameters
+        ----------
+        subject_id : str
+          id of the subject
+
+        Returns
+        -------
+        requests.Response
+
+        """
+        url = "/".join([self.intended_measurements_url, subject_id])
+        with requests.get(url, params={}) as response:
+            return response
+
+    def get_injection_materials(
+        self, prep_lot_number: str
+    ) -> requests.Response:
+        """
+        Retrieve injection materials from the server
+        Parameters
+        ----------
+        prep_lot_number : str
+          preparation lot number
+
+        Returns
+        -------
+        requests.Response
+
+        """
+        url = "/".join([self.injection_materials_url, prep_lot_number])
+        with requests.get(url, params={}) as response:
+            return response
+
+    def get_ecephys_sessions(self, subject_id: str) -> requests.Response:
+        """
+        Retrieve ecephys sessions for a subject from the server
+        Parameters
+        ----------
+        subject_id : str
+          id of the subject
+
+        Returns
+        -------
+        requests.Response
+
+        """
+        url = "/".join([self.ecephys_sessions_url, subject_id])
+        with requests.get(url, params={}) as response:
+            return response
+
+    def get_protocols(self, protocol_name: str) -> requests.Response:
+        """
+        Retrieve protocols information from the server
+        Parameters
+        ----------
+        protocol_name : str
+          name of the protocol
+
+        Returns
+        -------
+        requests.Response
+
+        """
+        url = "/".join([self.protocols_url, protocol_name])
+        with requests.get(url, params={}) as response:
+            return response
+
+    def get_mgi_allele(self, allele_name: str) -> requests.Response:
+        """
+        Retrieve MGI allele information from the server
+        Parameters
+        ----------
+        allele_name : str
+          name of the allele
+
+        Returns
+        -------
+        requests.Response
+
+        """
+        url = "/".join([self.mgi_allele_url, allele_name])
+        with requests.get(url, params={}) as response:
+            return response
+
+    def get_perfusions(self, subject_id: str) -> requests.Response:
+        """
+        Retrieve perfusion information for a subject from the server
+        Parameters
+        ----------
+        subject_id : str
+          id of the subject
+
+        Returns
+        -------
+        requests.Response
+
+        """
+        url = "/".join([self.perfusions_url, subject_id])
+        with requests.get(url, params={}) as response:
+            return response
+
+    def get_funding(self, project_name: str) -> requests.Response:
+        """
+        Retrieve funding information for a project from the server
+        Parameters
+        ----------
+        project_name : str
+          name of the project
+
+        Returns
+        -------
+        requests.Response
+
+        """
+        url = "/".join([self.funding_url, project_name])
+        with requests.get(url, params={}) as response:
+            return response
+
+    def get_project_names(self) -> requests.Response:
+        """
+        Retrieve all project names from the server
+
+        Returns
+        -------
+        requests.Response
+
+        """
+        with requests.get(self.project_names_url, params={}) as response:
+            return response
+
+    def get_smartspim_imaging(
+        self,
+        subject_id: Optional[str] = None,
+        start_date_gte: Optional[str] = None,
+        end_date_lte: Optional[str] = None,
+    ) -> requests.Response:
+        """
+        Retrieve SmartSPIM imaging data from the server
+
+        Parameters
+        ----------
+        subject_id : str, optional
+          id of the subject
+        start_date_gte : str, optional
+          start date (ISO format)
+        end_date_lte : str, optional
+          end date (ISO format)
+
+        Returns
+        -------
+        requests.Response
+
+        """
+        params = {}
+        if subject_id:
+            params["subject_id"] = subject_id
+        if start_date_gte:
+            params["start_date_gte"] = start_date_gte
+        if end_date_lte:
+            params["end_date_lte"] = end_date_lte
+
+        with requests.get(
+            self.smartspim_imaging_url, params=params
+        ) as response:
+            return response
+
+    def get_histology(
+        self,
+        subject_id: Optional[str] = None,
+        start_date_gte: Optional[str] = None,
+        end_date_lte: Optional[str] = None,
+    ) -> requests.Response:
+        """
+        Retrieve histology data from the server
+
+        Parameters
+        ----------
+        subject_id : str, optional
+          id of the subject
+        start_date_gte : str, optional
+          start date (ISO format)
+        end_date_lte : str, optional
+          end date (ISO format)
+
+        Returns
+        -------
+        requests.Response
+
+        """
+        params = {}
+        if subject_id:
+            params["subject_id"] = subject_id
+        if start_date_gte:
+            params["start_date_gte"] = start_date_gte
+        if end_date_lte:
+            params["end_date_lte"] = end_date_lte
+
+        with requests.get(self.histology_url, params=params) as response:
             return response

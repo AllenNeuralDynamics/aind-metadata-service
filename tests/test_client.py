@@ -62,7 +62,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_get.return_value.__enter__.return_value = mock_response
 
-        ams_client = AindMetadataServiceClient(domain="some_url")
+        ams_client = AindMetadataServiceClient(custom_domain="some_url")
 
         response = ams_client.get_subject(mock_subject_id)
 
@@ -94,13 +94,149 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_get.return_value.__enter__.return_value = mock_response
 
-        ams_client = AindMetadataServiceClient(domain="some_url")
+        ams_client = AindMetadataServiceClient(custom_domain="some_url")
 
         response = ams_client.get_procedures(mock_subject_id)
 
         mock_get.assert_has_calls(
             [
                 call("some_url/procedures/00000", params={}),
+                call().__enter__(),
+                call().__exit__(None, None, None),
+            ]
+        )
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(mock_response.json(), response.json())
+
+    @mock.patch("requests.get")
+    def test_get_intended_measurements(self, mock_get: MagicMock) -> None:
+        """Tests the get_intended_measurements method"""
+
+        mock_subject_id = "00000"
+        mock_response = requests.Response()
+        mock_response.status_code = 200
+        mock_response._content = (
+            b'{"status_code": 200, "message": "Success", "data": ['
+            b'{"fiber_name": "Fiber_0", '
+            b'"intended_measurement_R": "acetylcholine", '
+            b'"intended_measurement_G": "dopamine", '
+            b'"intended_measurement_B": "GABA", '
+            b'"intended_measurement_Iso": "control"}'
+            b"]}"
+        )
+
+        mock_get.return_value.__enter__.return_value = mock_response
+
+        ams_client = AindMetadataServiceClient(custom_domain="some_url")
+
+        response = ams_client.get_intended_measurements(mock_subject_id)
+
+        mock_get.assert_has_calls(
+            [
+                call("some_url/intended_measurements/00000", params={}),
+                call().__enter__(),
+                call().__exit__(None, None, None),
+            ]
+        )
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(mock_response.json(), response.json())
+
+    @mock.patch("requests.get")
+    def test_get_injection_materials(self, mock_get: MagicMock) -> None:
+        """Tests the get_injection_materials method"""
+
+        mock_prep_lot_number = "VT123"
+        mock_response = requests.Response()
+        mock_response.status_code = 200
+        mock_response._content = (
+            b'{"status_code": 200, "message": "Success", "data": {'
+            b'"prep_lot_number": "VT123", '
+            b'"viral_titer": "2.5e12", '
+            b'"material_type": "AAV"'
+            b"}}"
+        )
+
+        mock_get.return_value.__enter__.return_value = mock_response
+
+        ams_client = AindMetadataServiceClient(custom_domain="some_url")
+
+        response = ams_client.get_injection_materials(mock_prep_lot_number)
+
+        mock_get.assert_has_calls(
+            [
+                call("some_url/tars_injection_materials/VT123", params={}),
+                call().__enter__(),
+                call().__exit__(None, None, None),
+            ]
+        )
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(mock_response.json(), response.json())
+
+    @mock.patch("requests.get")
+    def test_get_smartspim_imaging(self, mock_get: MagicMock) -> None:
+        """Tests the get_smartspim_imaging method with parameters"""
+
+        mock_response = requests.Response()
+        mock_response.status_code = 200
+        mock_response._content = (
+            b'{"status_code": 200, "message": "Success", "data": {'
+            b'"data": "test imaging data"'
+            b"}}"
+        )
+
+        mock_get.return_value.__enter__.return_value = mock_response
+
+        ams_client = AindMetadataServiceClient(custom_domain="some_url")
+
+        # Test with parameters
+        response = ams_client.get_smartspim_imaging(
+            subject_id="123456",
+            start_date_gte="2023-01-01",
+            end_date_lte="2023-12-31",
+        )
+
+        mock_get.assert_has_calls(
+            [
+                call(
+                    "some_url/slims/smartspim_imaging",
+                    params={
+                        "subject_id": "123456",
+                        "start_date_gte": "2023-01-01",
+                        "end_date_lte": "2023-12-31",
+                    },
+                ),
+                call().__enter__(),
+                call().__exit__(None, None, None),
+            ]
+        )
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(mock_response.json(), response.json())
+
+    @mock.patch("requests.get")
+    def test_get_project_names(self, mock_get: MagicMock) -> None:
+        """Tests the get_project_names method"""
+
+        mock_response = requests.Response()
+        mock_response.status_code = 200
+        mock_response._content = (
+            b'{"status_code": 200, "message": "Success", "data": ['
+            b'"Project-A", "Project-B", "Project-C"'
+            b"]}"
+        )
+
+        mock_get.return_value.__enter__.return_value = mock_response
+
+        ams_client = AindMetadataServiceClient(custom_domain="some_url")
+
+        response = ams_client.get_project_names()
+
+        mock_get.assert_has_calls(
+            [
+                call("some_url/project_names", params={}),
                 call().__enter__(),
                 call().__exit__(None, None, None),
             ]
