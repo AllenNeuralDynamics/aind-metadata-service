@@ -17,6 +17,7 @@ from aind_data_schema.core.subject import (
 )
 from aind_data_schema_models.organizations import Organization
 
+from aind_metadata_service import constants
 from aind_metadata_service.client import AindMetadataServiceClient
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 
@@ -29,11 +30,11 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         # Test with default parameters
         client = AindMetadataServiceClient()
-        self.assertEqual(client.domain, AindMetadataServiceClient.PROD_URL)
+        self.assertEqual(client.domain, constants.METADATA_SERVICE_PROD_URL)
 
         # Test with use_dev=True
         dev_client = AindMetadataServiceClient(use_dev=True)
-        self.assertEqual(dev_client.domain, AindMetadataServiceClient.DEV_URL)
+        self.assertEqual(dev_client.domain, constants.METADATA_SERVICE_DEV_URL)
 
         # Test with custom_domain
         custom_client = AindMetadataServiceClient(custom_domain="custom_url")
