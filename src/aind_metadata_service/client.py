@@ -32,14 +32,17 @@ class AindMetadataServiceClient:
         ----------
         domain : str
             The domain/base URL of the metadata service
-            Examples: "http://aind-metadata-service" or "http://aind-metadata-service-dev"
+            Examples:
+            * Allen internal prod server: "http://aind-metadata-service"
+            * Allen internal dev server: "http://aind-metadata-service-dev"
         """
+
         if not domain:
             raise ValueError(
                 "You must specify the server domain. "
                 "If you're onsite at the Allen Institute, "
-                "the production domain is http://aind-metadata-service "
-                "and the development domain is http://aind-metadata-service-dev"
+                "the production domain is http://aind-metadata-service"
+                "and the dev domain is http://aind-metadata-service-dev"
             )
 
         self.domain = domain
