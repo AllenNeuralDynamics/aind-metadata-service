@@ -37,14 +37,14 @@ class AindMetadataServiceClient:
             * Allen internal dev: "http://aind-metadata-service-dev"
 
             Example:
-            >>> client = AindMetadataServiceClient("http://aind-metadata-service")
+            >>> client = AindMetadataServiceClient("http://aind-metadata-service") # noqa: E501
         """
         if not domain:
             raise ValueError(
                 "You must specify the server domain. "
                 "If you're onsite at the Allen Institute, "
                 "the production domain is http://aind-metadata-service "
-                "and the development domain is http://aind-metadata-service-dev"
+                "and the dev domain is http://aind-metadata-service-dev"
             )
 
         self.domain = domain
