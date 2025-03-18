@@ -39,7 +39,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
         custom_client = AindMetadataServiceClient(custom_domain="custom_url")
         self.assertEqual(custom_client.domain, "custom_url")
 
-        # Test with both use_dev=True and custom_domain (custom_domain should take precedence)
+        # Test with both use_dev=True and custom_domain
         both_client = AindMetadataServiceClient(
             use_dev=True, custom_domain="custom_url"
         )
