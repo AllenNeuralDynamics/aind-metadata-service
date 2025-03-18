@@ -103,3 +103,39 @@ There are 6 possible status code responses for aind-metadata-service:
 - **503**: failed to connect to labtracks/sharepoint servers.
 - **500**: successfully connected to labtracks/sharepoint, but some other server error occurred.
 These status codes are defined in StatusCodes enum in response_handler.py
+
+# Development Setup
+
+After cloning the repository, install the package in development mode with all dev dependencies:
+
+```bash
+pip install -e ".[dev]"
+```
+
+## Code Style and Linting
+
+This project uses pre-commit hooks to maintain consistent code style and quality. The hooks include:
+- flake8 for style guide enforcement and linting
+- black for code formatting
+- isort for import sorting
+- Additional checks for common issues
+
+To set up the pre-commit hooks:
+
+```bash
+# Install pre-commit (already included in dev dependencies)
+pre-commit install
+```
+
+The hooks will run automatically on every commit. You can also run them manually on all files:
+
+```bash
+pre-commit run --all-files
+```
+
+Code style specifications:
+- Line length: 79 characters
+- Python version: 3.10+
+- Style guide: PEP 8 (enforced by flake8)
+- Code formatting: black
+- Import ordering: isort
