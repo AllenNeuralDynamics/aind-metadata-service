@@ -6,8 +6,8 @@ from datetime import datetime
 from typing import Optional, Union
 
 from aind_data_schema.core.instrument import Instrument
-from aind_data_schema.core.procedures import Procedures
 from aind_data_schema.core.rig import Rig
+from aind_data_schema.core.procedures import Procedures
 from aind_slims_api import SlimsClient
 from aind_slims_api.exceptions import SlimsRecordNotFound
 from aind_slims_api.models.instrument import SlimsInstrumentRdrc

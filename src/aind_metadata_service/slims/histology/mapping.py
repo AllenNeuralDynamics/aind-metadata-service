@@ -3,13 +3,6 @@
 from datetime import datetime
 from typing import List, Optional
 
-from aind_data_schema.core.procedures import (
-    Antibody,
-    ImmunolabelClass,
-    Reagent,
-    SpecimenProcedure,
-)
-from aind_data_schema_models.organizations import Organization
 from aind_data_schema_models.specimen_procedure_types import (
     SpecimenProcedureType,
 )
@@ -21,6 +14,13 @@ from aind_metadata_service.slims.histology.handler import (
     SlimsReagentData,
 )
 from aind_metadata_service.slims.table_handler import parse_html
+from aind_data_schema_models.organizations import Organization
+from aind_data_schema.core.procedures import (
+    SpecimenProcedure,
+    Antibody,
+    ImmunolabelClass,
+    Reagent,
+)
 
 
 class WashData(BaseModel):

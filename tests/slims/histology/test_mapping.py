@@ -1,15 +1,13 @@
 """Tests methods in mapping module"""
 
-import json
 import os
 import unittest
 from datetime import datetime, timezone
 from pathlib import Path
-
+import json
 from aind_data_schema_models.specimen_procedure_types import (
     SpecimenProcedureType,
 )
-
 from aind_metadata_service.slims.histology.handler import (
     SlimsHistologyData,
     SlimsReagentData,
