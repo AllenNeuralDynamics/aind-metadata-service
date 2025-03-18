@@ -97,7 +97,6 @@ protocols_smart_sheet_client = SmartSheetClient(
 slims_client = SlimsHandler(settings=slims_settings)
 tars_client = TarsClient(azure_settings=tars_settings)
 mgi_client = MgiClient(settings=mgi_settings)
-sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
 
 template_directory = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "templates")
@@ -319,6 +318,7 @@ async def retrieve_intended_measurements(subject_id):
     """
     Retrieves intended measurements from SLIMS server
     """
+    sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
     model_response = await run_in_threadpool(
         sharepoint_client.get_intended_measurement_info, subject_id=subject_id
     )
@@ -334,6 +334,7 @@ async def retrieve_procedures(subject_id):
     lb_response = await run_in_threadpool(
         lb_client.get_procedures_info, subject_id=subject_id
     )
+    sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
     sp2019_response = await run_in_threadpool(
         sharepoint_client.get_procedure_info,
         subject_id=subject_id,
