@@ -5,6 +5,8 @@ from typing import Optional
 
 import requests
 
+from aind_metadata_service import constants
+
 
 class StatusCodes(Enum):
     """Enum class of status codes"""
@@ -24,9 +26,6 @@ class StatusCodes(Enum):
 class AindMetadataServiceClient:
     """Class to handle client api calls to the service."""
 
-    PROD_URL = "http://aind-metadata-service"
-    DEV_URL = "http://aind-metadata-service-dev"
-
     def __init__(
         self, use_dev: bool = False, custom_domain: Optional[str] = None
     ):
@@ -43,24 +42,34 @@ class AindMetadataServiceClient:
         if custom_domain:
             self.domain = custom_domain
         else:
-            self.domain = self.DEV_URL if use_dev else self.PROD_URL
+            self.domain = (
+                constants.METADATA_SERVICE_DEV_URL
+                if use_dev
+                else constants.METADATA_SERVICE_PROD_URL
+            )
 
-        self.subject_url = f"{self.domain}/subject"
-        self.procedures_url = f"{self.domain}/procedures"
+        self.subject_url = f"{self.domain}/{constants.SUBJECT_PATH}"
+        self.procedures_url = f"{self.domain}/{constants.PROCEDURES_PATH}"
         self.injection_materials_url = (
-            f"{self.domain}/tars_injection_materials"
+            f"{self.domain}/{constants.INJECTION_MATERIALS_PATH}"
         )
-        self.intended_measurements_url = f"{self.domain}/intended_measurements"
+        self.intended_measurements_url = (
+            f"{self.domain}/{constants.INTENDED_MEASUREMENTS_PATH}"
+        )
         self.ecephys_sessions_url = (
-            f"{self.domain}/ecephys_sessions_by_subject"
+            f"{self.domain}/{constants.ECEPHYS_SESSIONS_PATH}"
         )
-        self.protocols_url = f"{self.domain}/protocols"
-        self.mgi_allele_url = f"{self.domain}/mgi_allele"
-        self.perfusions_url = f"{self.domain}/perfusions"
-        self.funding_url = f"{self.domain}/funding"
-        self.project_names_url = f"{self.domain}/project_names"
-        self.smartspim_imaging_url = f"{self.domain}/slims/smartspim_imaging"
-        self.histology_url = f"{self.domain}/slims/histology"
+        self.protocols_url = f"{self.domain}/{constants.PROTOCOLS_PATH}"
+        self.mgi_allele_url = f"{self.domain}/{constants.MGI_ALLELE_PATH}"
+        self.perfusions_url = f"{self.domain}/{constants.PERFUSIONS_PATH}"
+        self.funding_url = f"{self.domain}/{constants.FUNDING_PATH}"
+        self.project_names_url = (
+            f"{self.domain}/{constants.PROJECT_NAMES_PATH}"
+        )
+        self.smartspim_imaging_url = (
+            f"{self.domain}/{constants.SMARTSPIM_IMAGING_PATH}"
+        )
+        self.histology_url = f"{self.domain}/{constants.HISTOLOGY_PATH}"
 
     def get_subject(self, subject_id: str) -> requests.Response:
         """
