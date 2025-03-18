@@ -24,25 +24,27 @@ class StatusCodes(Enum):
 class AindMetadataServiceClient:
     """Class to handle client api calls to the service."""
 
-    def __init__(self, domain: str):
+    def __init__(self, domain: str = None):
         """
-        Class constructor
+        Initialize client with required domain parameter.
 
         Parameters
         ----------
         domain : str
-            The domain/base URL of the metadata service
-            Examples:
-            * Allen internal prod server: "http://aind-metadata-service"
-            * Allen internal dev server: "http://aind-metadata-service-dev"
-        """
+            REQUIRED. The domain/base URL of the metadata service.
+            Common values:
+            * Allen internal prod: "http://aind-metadata-service"
+            * Allen internal dev: "http://aind-metadata-service-dev"
 
+            Example:
+            >>> client = AindMetadataServiceClient("http://aind-metadata-service")
+        """
         if not domain:
             raise ValueError(
                 "You must specify the server domain. "
                 "If you're onsite at the Allen Institute, "
-                "the production domain is http://aind-metadata-service"
-                "and the dev domain is http://aind-metadata-service-dev"
+                "the production domain is http://aind-metadata-service "
+                "and the development domain is http://aind-metadata-service-dev"
             )
 
         self.domain = domain
