@@ -5,8 +5,6 @@ from typing import Optional
 
 import requests
 
-from aind_metadata_service import constants
-
 
 class StatusCodes(Enum):
     """Enum class of status codes"""
@@ -26,50 +24,42 @@ class StatusCodes(Enum):
 class AindMetadataServiceClient:
     """Class to handle client api calls to the service."""
 
-    def __init__(
-        self, use_dev: bool = False, custom_domain: Optional[str] = None
-    ):
+    def __init__(self, domain: str):
         """
         Class constructor
 
         Parameters
         ----------
-        use_dev : bool, default=False
-            If True, use the development endpoint, otherwise use production
-        custom_domain : str, optional
-            If provided, overrides both prod and dev URLs with a custom domain
+        domain : str
+            The domain/base URL of the metadata service
+            Examples: "http://aind-metadata-service" or "http://aind-metadata-service-dev"
         """
-        if custom_domain:
-            self.domain = custom_domain
-        else:
-            self.domain = (
-                constants.METADATA_SERVICE_DEV_URL
-                if use_dev
-                else constants.METADATA_SERVICE_PROD_URL
+        if not domain:
+            raise ValueError(
+                "You must specify the server domain. "
+                "If you're onsite at the Allen Institute, "
+                "the production domain is http://aind-metadata-service "
+                "and the development domain is http://aind-metadata-service-dev"
             )
 
-        self.subject_url = f"{self.domain}/{constants.SUBJECT_PATH}"
-        self.procedures_url = f"{self.domain}/{constants.PROCEDURES_PATH}"
+        self.domain = domain
+
+        self.subject_url = f"{self.domain}/subject"
+        self.procedures_url = f"{self.domain}/procedures"
         self.injection_materials_url = (
-            f"{self.domain}/{constants.INJECTION_MATERIALS_PATH}"
+            f"{self.domain}/tars_injection_materials"
         )
-        self.intended_measurements_url = (
-            f"{self.domain}/{constants.INTENDED_MEASUREMENTS_PATH}"
-        )
+        self.intended_measurements_url = f"{self.domain}/intended_measurements"
         self.ecephys_sessions_url = (
-            f"{self.domain}/{constants.ECEPHYS_SESSIONS_PATH}"
+            f"{self.domain}/ecephys_sessions_by_subject"
         )
-        self.protocols_url = f"{self.domain}/{constants.PROTOCOLS_PATH}"
-        self.mgi_allele_url = f"{self.domain}/{constants.MGI_ALLELE_PATH}"
-        self.perfusions_url = f"{self.domain}/{constants.PERFUSIONS_PATH}"
-        self.funding_url = f"{self.domain}/{constants.FUNDING_PATH}"
-        self.project_names_url = (
-            f"{self.domain}/{constants.PROJECT_NAMES_PATH}"
-        )
-        self.smartspim_imaging_url = (
-            f"{self.domain}/{constants.SMARTSPIM_IMAGING_PATH}"
-        )
-        self.histology_url = f"{self.domain}/{constants.HISTOLOGY_PATH}"
+        self.protocols_url = f"{self.domain}/protocols"
+        self.mgi_allele_url = f"{self.domain}/mgi_allele"
+        self.perfusions_url = f"{self.domain}/perfusions"
+        self.funding_url = f"{self.domain}/funding"
+        self.project_names_url = f"{self.domain}/project_names"
+        self.smartspim_imaging_url = f"{self.domain}/slims/smartspim_imaging"
+        self.histology_url = f"{self.domain}/slims/histology"
 
     def get_subject(self, subject_id: str) -> requests.Response:
         """

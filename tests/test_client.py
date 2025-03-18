@@ -17,7 +17,6 @@ from aind_data_schema.core.subject import (
 )
 from aind_data_schema_models.organizations import Organization
 
-from aind_metadata_service import constants
 from aind_metadata_service.client import AindMetadataServiceClient
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 
@@ -26,25 +25,15 @@ class TestAindMetadataServiceClient(unittest.TestCase):
     """Tests the AindMetadataServiceClient class methods"""
 
     def test_client_initialization(self) -> None:
-        """Tests different client initialization options"""
+        """Tests client initialization options"""
 
-        # Test with default parameters
-        client = AindMetadataServiceClient()
-        self.assertEqual(client.domain, constants.METADATA_SERVICE_PROD_URL)
+        # Test with required domain parameter
+        client = AindMetadataServiceClient(domain="http://test-domain")
+        self.assertEqual(client.domain, "http://test-domain")
 
-        # Test with use_dev=True
-        dev_client = AindMetadataServiceClient(use_dev=True)
-        self.assertEqual(dev_client.domain, constants.METADATA_SERVICE_DEV_URL)
-
-        # Test with custom_domain
-        custom_client = AindMetadataServiceClient(custom_domain="custom_url")
-        self.assertEqual(custom_client.domain, "custom_url")
-
-        # Test with both use_dev=True and custom_domain
-        both_client = AindMetadataServiceClient(
-            use_dev=True, custom_domain="custom_url"
-        )
-        self.assertEqual(both_client.domain, "custom_url")
+        # Test with empty domain (should raise error)
+        with self.assertRaises(ValueError):
+            AindMetadataServiceClient(domain="")
 
     @mock.patch("requests.get")
     def test_get_subject(self, mock_get: MagicMock) -> None:
@@ -84,7 +73,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_get.return_value.__enter__.return_value = mock_response
 
-        ams_client = AindMetadataServiceClient(custom_domain="some_url")
+        ams_client = AindMetadataServiceClient(domain="some_url")
 
         response = ams_client.get_subject(mock_subject_id)
 
@@ -116,7 +105,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_get.return_value.__enter__.return_value = mock_response
 
-        ams_client = AindMetadataServiceClient(custom_domain="some_url")
+        ams_client = AindMetadataServiceClient(domain="some_url")
 
         response = ams_client.get_procedures(mock_subject_id)
 
@@ -150,7 +139,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_get.return_value.__enter__.return_value = mock_response
 
-        ams_client = AindMetadataServiceClient(custom_domain="some_url")
+        ams_client = AindMetadataServiceClient(domain="some_url")
 
         response = ams_client.get_intended_measurements(mock_subject_id)
 
@@ -182,7 +171,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_get.return_value.__enter__.return_value = mock_response
 
-        ams_client = AindMetadataServiceClient(custom_domain="some_url")
+        ams_client = AindMetadataServiceClient(domain="some_url")
 
         response = ams_client.get_injection_materials(mock_prep_lot_number)
 
@@ -214,7 +203,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_get.return_value.__enter__.return_value = mock_response
 
-        ams_client = AindMetadataServiceClient(custom_domain="some_url")
+        ams_client = AindMetadataServiceClient(domain="some_url")
 
         response = ams_client.get_ecephys_sessions(mock_subject_id)
 
@@ -246,7 +235,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_get.return_value.__enter__.return_value = mock_response
 
-        ams_client = AindMetadataServiceClient(custom_domain="some_url")
+        ams_client = AindMetadataServiceClient(domain="some_url")
 
         response = ams_client.get_protocols(mock_protocol_name)
 
@@ -278,7 +267,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_get.return_value.__enter__.return_value = mock_response
 
-        ams_client = AindMetadataServiceClient(custom_domain="some_url")
+        ams_client = AindMetadataServiceClient(domain="some_url")
 
         response = ams_client.get_mgi_allele(mock_allele_name)
 
@@ -310,7 +299,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_get.return_value.__enter__.return_value = mock_response
 
-        ams_client = AindMetadataServiceClient(custom_domain="some_url")
+        ams_client = AindMetadataServiceClient(domain="some_url")
 
         response = ams_client.get_perfusions(mock_subject_id)
 
@@ -342,7 +331,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_get.return_value.__enter__.return_value = mock_response
 
-        ams_client = AindMetadataServiceClient(custom_domain="some_url")
+        ams_client = AindMetadataServiceClient(domain="some_url")
 
         response = ams_client.get_funding(mock_project_name)
 
@@ -371,7 +360,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_get.return_value.__enter__.return_value = mock_response
 
-        ams_client = AindMetadataServiceClient(custom_domain="some_url")
+        ams_client = AindMetadataServiceClient(domain="some_url")
 
         # Test with parameters
         response = ams_client.get_smartspim_imaging(
@@ -412,7 +401,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_get.return_value.__enter__.return_value = mock_response
 
-        ams_client = AindMetadataServiceClient(custom_domain="some_url")
+        ams_client = AindMetadataServiceClient(domain="some_url")
 
         # Test with parameters
         response = ams_client.get_histology(
@@ -453,7 +442,7 @@ class TestAindMetadataServiceClient(unittest.TestCase):
 
         mock_get.return_value.__enter__.return_value = mock_response
 
-        ams_client = AindMetadataServiceClient(custom_domain="some_url")
+        ams_client = AindMetadataServiceClient(domain="some_url")
 
         response = ams_client.get_project_names()
 

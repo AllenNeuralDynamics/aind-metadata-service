@@ -65,11 +65,10 @@ The client provides a simple interface to the API:
 ```python
 from aind_metadata_service.client import AindMetadataServiceClient
 
-# Initialize client (defaults to production)
-client = AindMetadataServiceClient()
-
-# Get data (dev environment or custom URL if needed)
-# client = AindMetadataServiceClient(use_dev=True)  # or custom_domain="https://my-api.org"
+# Initialize client with the server domain
+# If you're at the Allen Institute, use one of these domains:
+client = AindMetadataServiceClient(domain="http://aind-metadata-service")  # production
+# client = AindMetadataServiceClient(domain="http://aind-metadata-service-dev")  # development
 
 # Subject and procedures
 subject_data = client.get_subject("775745").json()
