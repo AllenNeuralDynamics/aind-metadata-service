@@ -24,6 +24,7 @@ from aind_metadata_service.tars.mapping import (
 )
 from aind_data_schema_models.pid_names import PIDName
 
+
 class TestTarsResponseHandler(unittest.TestCase):
     """Class to test methods of TarsResponseHandler"""
 
@@ -238,7 +239,9 @@ class TestTarsResponseHandler(unittest.TestCase):
             name="rAAV-MGT_789",
             tars_identifiers=tars_virus_identifiers,
             stock_titer=413000000000,
-            addgene_id=PIDName(name="54321", registry_identifier="Addgene_54321"),
+            addgene_id=PIDName(
+                name="54321", registry_identifier="Addgene_54321"
+            ),
         )
         self.assertIsInstance(injection_material, ViralMaterial)
         self.assertEqual(injection_material, expected_injection_material)

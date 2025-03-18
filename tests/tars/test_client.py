@@ -6,6 +6,7 @@ from datetime import date
 from unittest.mock import MagicMock, Mock, patch
 
 from aind_data_schema.core.procedures import TarsVirusIdentifiers
+from aind_data_schema_models.pid_names import PIDName
 
 from aind_metadata_service.models import ViralMaterialInformation
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
@@ -77,6 +78,9 @@ class TestTarsClient(unittest.TestCase):
             name="rAAV-MGT_789",
             tars_identifiers=tars_virus_identifiers,
             stock_titer=413000000000,
+            addgene_id=PIDName(
+                name="54321", registry_identifier="Addgene_54321"
+            ),
         )
 
         mock_credential.return_value.get_token.return_value = (
@@ -287,6 +291,8 @@ class TestTarsClient(unittest.TestCase):
                                 },
                             ],
                             "fullName": "rAAV-MGT_789",
+                            "addgeneId": "54321",
+                            "rrId": "Addgene_54321",
                         }
                     ],
                 }

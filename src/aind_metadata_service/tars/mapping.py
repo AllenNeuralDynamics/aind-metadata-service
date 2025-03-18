@@ -22,6 +22,7 @@ from aind_metadata_service.response_handler import ModelResponse
 from dataclasses import dataclass
 from aind_data_schema_models.pid_names import PIDName
 
+
 class ViralPrepTypes(Enum):
     """Enum of Viral Prep Type options in TARS"""
 
@@ -53,13 +54,16 @@ class PrepProtocols(Enum):
     PHP_SOP_UW = "PHPeB-SOP-UW"
     HGT1 = "HGT#1.0"
 
+
 @dataclass
 class TarsVirusInformation:
     """Dataclass to store virus information"""
 
     name: Optional[str]
     plasmid_alias: Optional[str]
-    addgene_id: Optional[PIDName]
+    addgene_id: Optional[str]
+    rrid: Optional[str]
+
 
 class TarsResponseHandler:
     """This class will contain methods to handle the response from TARS"""
@@ -139,7 +143,7 @@ class TarsResponseHandler:
     def map_info_from_virus_response(
         self, virus: dict
     ) -> TarsVirusInformation:
-        """Maps name and plasmid name from virus response"""
+        """Maps name, plasmid, and addgene from virus response"""
         names = []
         plasmid_aliases = []
         addgene_ids = []
@@ -157,9 +161,13 @@ class TarsResponseHandler:
         name = "; ".join(names) if names else None
         plasmid_alias = "; ".join(plasmid_aliases) if plasmid_aliases else None
         addgene_id = "; ".join(addgene_ids) if addgene_ids else None
-        rrids = "; ".join(rrids) if rrids else None
-        return TarsVirusInformation(name=name, plasmid_alias=plasmid_alias, addgene_id=PIDName(name=addgene_id, registry_identifier=rrids))
-
+        rrid = "; ".join(rrids) if rrids else None
+        return TarsVirusInformation(
+            name=name,
+            plasmid_alias=plasmid_alias,
+            addgene_id=addgene_id,
+            rrid=rrid,
+        )
 
     def map_lot_to_injection_material(
         self, viral_prep_lot: dict, virus: dict, virus_tars_id: str
@@ -182,10 +190,12 @@ class TarsResponseHandler:
             .get("viralPrepType", {})
             .get("name", "")
         )
-        virus_info = self.map_info_from_virus_response(
-            virus
-        )
-
+        virus_info = self.map_info_from_virus_response(virus)
+        addgene_id = None
+        if virus_info.addgene_id:
+            addgene_id = PIDName(
+                name=virus_info.addgene_id, registry_identifier=virus_info.rrid
+            )
         try:
             tars_virus_identifiers = TarsVirusIdentifiers(
                 virus_tars_id=virus_tars_id,
@@ -201,7 +211,7 @@ class TarsResponseHandler:
                 stock_titer=self.map_stock_titer(
                     viral_prep_lot.get("titers", None)
                 ),
-                addgene_id=virus_info.addgene_id,
+                addgene_id=addgene_id,
             )
         except ValidationError:
             tars_virus_identifiers = TarsVirusIdentifiers.model_construct(
@@ -218,7 +228,7 @@ class TarsResponseHandler:
                 stock_titer=self.map_stock_titer(
                     viral_prep_lot.get("titers", None)
                 ),
-                addgene_id=virus_info.addgene_id,
+                addgene_id=addgene_id,
             )
 
     @staticmethod
