@@ -38,32 +38,55 @@ pip install -e .[dev]
 
 There are several libraries used to run linters, check documentation, and run tests.
 
-- Please test your changes using the **coverage** library, which will run the tests and log a coverage report:
+The following checks are enforced through GitHub Actions CI:
+- **flake8** to check that code is up to standards (no unused imports, etc.)
+- **interrogate** to check documentation coverage
+- **coverage** for 100% test coverage requirement
 
-```
+Checks should ideally be run locally before pushing to github:
+
+Test your changes using the **coverage** library, which will run the tests and log a coverage report:
+```bash
 coverage run -m unittest discover && coverage report
 ```
 
-- Use **interrogate** to check that modules, methods, etc. have been documented thoroughly:
+Use **interrogate** to check that modules, methods, etc. have been documented thoroughly:
+```bash
+interrogate --verbose .
+```
 
-```
-interrogate .
-```
-
-- Use **flake8** to check that code is up to standards (no unused imports, etc.):
-```
+Use **flake8** to check that code is up to standards (no unused imports, etc.):
+```bash
 flake8 .
 ```
 
-- Use **black** to automatically format the code into PEP standards:
-```
+Additional recommended but optional tools:
+
+Use **black** to automatically format the code into PEP standards:
+```bash
 black .
 ```
 
-- Use **isort** to automatically sort import statements:
-```
+Use **isort** to automatically sort import statements:
+```bash
 isort .
 ```
+
+#### Optional: Pre-commit Hooks
+
+To automatically run style checks before each commit (recommended but optional):
+
+```bash
+# Install pre-commit (already included in dev dependencies)
+pre-commit install
+```
+
+The hooks will run automatically on each commit, but can be bypassed with `git commit --no-verify` if needed.
+
+Code style specifications:
+- Line length: 79 characters
+- Python version: 3.10+
+- Style guide: PEP 8 (enforced by flake8)
 
 ### Pull requests
 
@@ -86,7 +109,7 @@ where scope (optional) describes the packages affected by the code changes and t
 ### Documentation
 To generate the rst files source files for documentation, run
 ```
-sphinx-apidoc -o doc_template/source/ src 
+sphinx-apidoc -o doc_template/source/ src
 ```
 Then to create the documentation html files, run
 ```
@@ -96,46 +119,10 @@ More info on sphinx installation can be found here: https://www.sphinx-doc.org/e
 
 ### Responses
 There are 6 possible status code responses for aind-metadata-service:
-- **200**: successfully retrieved valid data without any problems. 
+- **200**: successfully retrieved valid data without any problems.
 - **406**: successfully retrieved some data, but failed to validate against pydantic models.
 - **404**: found no data that matches query.
 - **300**: queried the server, but more items were returned than expected.
 - **503**: failed to connect to labtracks/sharepoint servers.
 - **500**: successfully connected to labtracks/sharepoint, but some other server error occurred.
 These status codes are defined in StatusCodes enum in response_handler.py
-
-# Development Setup
-
-After cloning the repository, install the package in development mode with all dev dependencies:
-
-```bash
-pip install -e ".[dev]"
-```
-
-## Code Style and Linting
-
-This project uses pre-commit hooks to maintain consistent code style and quality. The hooks include:
-- flake8 for style guide enforcement and linting
-- black for code formatting
-- isort for import sorting
-- Additional checks for common issues
-
-To set up the pre-commit hooks:
-
-```bash
-# Install pre-commit (already included in dev dependencies)
-pre-commit install
-```
-
-The hooks will run automatically on every commit. You can also run them manually on all files:
-
-```bash
-pre-commit run --all-files
-```
-
-Code style specifications:
-- Line length: 79 characters
-- Python version: 3.10+
-- Style guide: PEP 8 (enforced by flake8)
-- Code formatting: black
-- Import ordering: isort
