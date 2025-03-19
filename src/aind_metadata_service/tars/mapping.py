@@ -3,6 +3,7 @@
 import json
 import logging
 import re
+from dataclasses import dataclass
 from datetime import date, datetime
 from enum import Enum
 from typing import Dict, List, Optional
@@ -13,6 +14,7 @@ from aind_data_schema.core.procedures import (
     ViralMaterial,
     VirusPrepType,
 )
+from aind_data_schema_models.pid_names import BaseName, PIDName
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
@@ -51,6 +53,16 @@ class PrepProtocols(Enum):
     MGT1 = "MGT#1.0"
     PHP_SOP_UW = "PHPeB-SOP-UW"
     HGT1 = "HGT#1.0"
+
+
+@dataclass
+class TarsVirusInformation:
+    """Dataclass to store virus information"""
+
+    name: Optional[str]
+    plasmid_alias: Optional[str]
+    addgene_id: Optional[str]
+    rrid: Optional[str]
 
 
 class TarsResponseHandler:
@@ -128,21 +140,34 @@ class TarsResponseHandler:
             return int(titers[0]["result"])
         return None
 
-    def map_name_and_plasmid_from_virus_response(
+    def map_info_from_virus_response(
         self, virus: dict
-    ) -> tuple[Optional[str], Optional[str]]:
-        """Maps name and plasmid name from virus response"""
+    ) -> TarsVirusInformation:
+        """Maps name, plasmid, and addgene from virus response"""
         names = []
         plasmid_aliases = []
+        addgene_ids = []
+        rrids = []
         for molecule in virus.get("molecules", []):
             if molecule.get("fullName"):
                 names.append(molecule["fullName"])
             plasmid_name = self.map_plasmid_name(molecule.get("aliases", []))
             if plasmid_name:
                 plasmid_aliases.append(plasmid_name)
+            if molecule.get("addgeneId"):
+                addgene_ids.append(molecule["addgeneId"])
+            if molecule.get("rrId"):
+                rrids.append(molecule["rrId"])
         name = "; ".join(names) if names else None
         plasmid_alias = "; ".join(plasmid_aliases) if plasmid_aliases else None
-        return name, plasmid_alias
+        addgene_id = "; ".join(addgene_ids) if addgene_ids else None
+        rrid = "; ".join(rrids) if rrids else None
+        return TarsVirusInformation(
+            name=name,
+            plasmid_alias=plasmid_alias,
+            addgene_id=addgene_id,
+            rrid=rrid,
+        )
 
     def map_lot_to_injection_material(
         self, viral_prep_lot: dict, virus: dict, virus_tars_id: str
@@ -165,40 +190,47 @@ class TarsResponseHandler:
             .get("viralPrepType", {})
             .get("name", "")
         )
-        name, plasmid_alias = self.map_name_and_plasmid_from_virus_response(
-            virus
-        )
+        virus_info = self.map_info_from_virus_response(virus)
+        addgene_id = None
+        if virus_info.addgene_id:
+            addgene_id = PIDName(
+                name=virus_info.name,
+                registry=BaseName(name=virus_info.rrid),
+                registry_identifier=virus_info.addgene_id,
+            )
         try:
             tars_virus_identifiers = TarsVirusIdentifiers(
                 virus_tars_id=virus_tars_id,
-                plasmid_tars_alias=plasmid_alias,
+                plasmid_tars_alias=virus_info.plasmid_alias,
                 prep_lot_number=prep_lot_number,
                 prep_date=prep_date,
                 prep_type=prep_type,
                 prep_protocol=prep_protocol,
             )
             return ViralMaterialInformation(
-                name=name,
+                name=virus_info.name,
                 tars_identifiers=tars_virus_identifiers,
                 stock_titer=self.map_stock_titer(
                     viral_prep_lot.get("titers", None)
                 ),
+                addgene_id=addgene_id,
             )
         except ValidationError:
             tars_virus_identifiers = TarsVirusIdentifiers.model_construct(
                 virus_tars_id=virus_tars_id,
-                plasmid_tars_alias=plasmid_alias,
+                plasmid_tars_alias=virus_info.plasmid_alias,
                 prep_lot_number=prep_lot_number,
                 prep_date=prep_date,
                 prep_type=prep_type,
                 prep_protocol=prep_protocol,
             )
             return ViralMaterialInformation.model_construct(
-                name=name,
+                name=virus_info.name,
                 tars_identifiers=tars_virus_identifiers,
                 stock_titer=self.map_stock_titer(
                     viral_prep_lot.get("titers", None)
                 ),
+                addgene_id=addgene_id,
             )
 
     @staticmethod
