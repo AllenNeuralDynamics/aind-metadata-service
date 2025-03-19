@@ -31,9 +31,13 @@ class TestAindMetadataServiceClient(unittest.TestCase):
         client = AindMetadataServiceClient(domain="http://test-domain")
         self.assertEqual(client.domain, "http://test-domain")
 
-        # Test with empty domain (should raise error)
-        with self.assertRaises(ValueError):
-            AindMetadataServiceClient(domain="")
+        # Test with no domain (should raise error)
+        with self.assertRaises(TypeError) as e:
+            AindMetadataServiceClient()
+        self.assertIn("You must specify the server domain.", str(e.exception))
+
+        # Test with empty domain
+        client = AindMetadataServiceClient(domain="")
 
     @mock.patch("requests.get")
     def test_get_subject(self, mock_get: MagicMock) -> None:
