@@ -1,10 +1,8 @@
 """Starts and runs a Flask Service"""
 
-import json
 import os
 from typing import Optional
 
-import boto3
 from aind_metadata_mapper.bergamo.session import BergamoEtl
 from aind_metadata_mapper.bergamo.session import (
     JobSettings as BergamoJobSettings,
