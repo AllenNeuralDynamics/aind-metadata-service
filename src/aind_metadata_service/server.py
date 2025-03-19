@@ -1,8 +1,10 @@
 """Starts and runs a Flask Service"""
 
+import json
 import os
 from typing import Optional
 
+import boto3
 from aind_metadata_mapper.bergamo.session import BergamoEtl
 from aind_metadata_mapper.bergamo.session import (
     JobSettings as BergamoJobSettings,
@@ -41,8 +43,6 @@ from aind_metadata_service.smartsheet.protocols.mapping import (
 )
 from aind_metadata_service.tars.client import AzureSettings, TarsClient
 from aind_metadata_service.tars.mapping import TarsResponseHandler
-import boto3
-import json
 
 PARAM_NAME = os.getenv("AIND_METADATA_SERVICE_PARAM")
 

@@ -3,6 +3,7 @@
 import json
 import logging
 import re
+from dataclasses import dataclass
 from datetime import date, datetime
 from enum import Enum
 from typing import Dict, List, Optional
@@ -13,14 +14,13 @@ from aind_data_schema.core.procedures import (
     ViralMaterial,
     VirusPrepType,
 )
+from aind_data_schema_models.pid_names import BaseName, PIDName
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.models import ViralMaterialInformation
 from aind_metadata_service.response_handler import ModelResponse
-from dataclasses import dataclass
-from aind_data_schema_models.pid_names import PIDName
 
 
 class ViralPrepTypes(Enum):
@@ -194,7 +194,9 @@ class TarsResponseHandler:
         addgene_id = None
         if virus_info.addgene_id:
             addgene_id = PIDName(
-                name=virus_info.addgene_id, registry_identifier=virus_info.rrid
+                name=virus_info.name,
+                registry=BaseName(name=virus_info.rrid),
+                registry_identifier=virus_info.addgene_id,
             )
         try:
             tars_virus_identifiers = TarsVirusIdentifiers(
