@@ -9,7 +9,7 @@ REST service to retrieve metadata from databases.
 
 ### Server Installation
 
-Can be pip installed using `pip install aind-metadata-service[server]`.
+Can be pip installed using `pip install "aind-metadata-service[server]"`.
 
 Installing `pyodbc`.
 - You may need to install `unixodbc-dev`. You can follow this [https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver16](link) for instructions depending on your os.
@@ -23,13 +23,56 @@ Installing `pyodbc`.
 
 ### Client Installation
 
-Can be pip installed with `pip install aind-metadata-service[client]`
+Installing the client allows you to interact with the metadata service programmatically.
+
+The client can be installed with pip:
+
+```bash
+pip install "aind-metadata-service[client]"
+```
+
+#### Using the client
+
+The client provides a simple interface to the API:
+
+```python
+from aind_metadata_service.client import AindMetadataServiceClient
+
+# Initialize client with the server domain
+# If you're at the Allen Institute, use one of these domains:
+client = AindMetadataServiceClient(domain="http://aind-metadata-service")  # production
+# client = AindMetadataServiceClient(domain="http://aind-metadata-service-dev")  # development
+
+# Subject and procedures
+subject_data = client.get_subject("775745").json()
+procedures_data = client.get_procedures("775745").json()
+
+# Intended measurements and other data
+measurements = client.get_intended_measurements("775745").json()
+injection_materials = client.get_injection_materials("VT3214G").json()
+ecephys_sessions = client.get_ecephys_sessions("775745").json()
+perfusions = client.get_perfusions("775745").json()
+
+# Protocol and funding information 
+protocol_info = client.get_protocols("Protocol-123").json()
+funding_info = client.get_funding("Project-ABC").json()
+project_names = client.get_project_names().json()
+
+# SLIMS data
+imaging_data = client.get_smartspim_imaging(
+    subject_id="775745",
+    start_date_gte="2023-01-01",
+    end_date_lte="2023-12-31"
+).json()
+
+histology_data = client.get_histology(subject_id="775745").json()
+```
 
 ### For Development
 
 In the root directory, run
 ```
-pip install -e .[dev]
+pip install -e ".[dev]"
 ```
 
 ## Contributing
@@ -103,3 +146,4 @@ There are 6 possible status code responses for aind-metadata-service:
 - **503**: failed to connect to labtracks/sharepoint servers.
 - **500**: successfully connected to labtracks/sharepoint, but some other server error occurred.
 These status codes are defined in StatusCodes enum in response_handler.py
+
