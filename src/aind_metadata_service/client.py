@@ -21,10 +21,25 @@ class StatusCodes(Enum):
     BAD_REQUEST = 400
 
 
-class AindMetadataServiceClient:
+class CustomClientMeta(type):
+    """Metaclass to write custom error message for class constructor."""
+
+    def __call__(cls, *args, **kwargs):
+        """On init"""
+        if not args and not kwargs:
+            raise TypeError(
+                "You must specify the server domain. "
+                "If you're onsite at the Allen Institute, "
+                "the production domain is http://aind-metadata-service "
+                "and the dev domain is http://aind-metadata-service-dev"
+            )
+        return super().__call__(*args, **kwargs)
+
+
+class AindMetadataServiceClient(metaclass=CustomClientMeta):
     """Class to handle client api calls to the service."""
 
-    def __init__(self, domain: str = None):
+    def __init__(self, domain: str):
         """
         Initialize client with required domain parameter.
 
@@ -39,13 +54,6 @@ class AindMetadataServiceClient:
             Example:
             >>> client = AindMetadataServiceClient("http://aind-metadata-service") # noqa: E501
         """
-        if not domain:
-            raise ValueError(
-                "You must specify the server domain. "
-                "If you're onsite at the Allen Institute, "
-                "the production domain is http://aind-metadata-service "
-                "and the dev domain is http://aind-metadata-service-dev"
-            )
 
         self.domain = domain
 
