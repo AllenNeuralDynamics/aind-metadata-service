@@ -44,63 +44,31 @@ from aind_metadata_service.smartsheet.protocols.mapping import (
 from aind_metadata_service.tars.client import AzureSettings, TarsClient
 from aind_metadata_service.tars.mapping import TarsResponseHandler
 
-PARAM_NAME = os.getenv("AIND_METADATA_SERVICE_PARAM")
+SMARTSHEET_FUNDING_ID = os.getenv("SMARTSHEET_FUNDING_ID")
+SMARTSHEET_FUNDING_TOKEN = os.getenv("SMARTSHEET_API_TOKEN")
 
+SMARTSHEET_PERFUSIONS_ID = os.getenv("SMARTSHEET_PERFUSIONS_ID")
+SMARTSHEET_PERFUSIONS_TOKEN = os.getenv("SMARTSHEET_API_TOKEN")
 
-def get_parameter_value(param_name: str) -> dict:
-    """Returns the value of a parameter from AWS param store."""
-    ssm_client = boto3.client("ssm")
-    response = ssm_client.get_parameter(Name=param_name, WithDecryption=True)
-    return json.loads(response["Parameter"]["Value"])
+SMARTSHEET_PROTOCOLS_ID = os.getenv("SMARTSHEET_PROTOCOLS_ID")
+SMARTSHEET_PROTOCOLS_TOKEN = os.getenv("SMARTSHEET_API_TOKEN")
 
-
-credentials = get_parameter_value(param_name=PARAM_NAME)
-
-sharepoint_settings = SharepointSettings(
-    aind_site_id=credentials.get("SHAREPOINT_AIND_SITE_ID"),
-    las_site_id=credentials.get("SHAREPOINT_LAS_SITE_ID"),
-    nsb_2019_list_id=credentials.get("SHAREPOINT_NSB_2019_LIST_ID"),
-    nsb_2023_list_id=credentials.get("SHAREPOINT_NSB_2023_LIST_ID"),
-    las_2020_list_id=credentials.get("SHAREPOINT_LAS_2020_LIST_ID"),
-    client_id=credentials.get("SHAREPOINT_CLIENT_ID"),
-    client_secret=credentials.get("SHAREPOINT_CLIENT_SECRET"),
-    tenant_id=credentials.get("SHAREPOINT_TENANT_ID"),
-)
-labtracks_settings = LabTracksSettings(
-    odbc_driver=credentials.get("ODBC_DRIVER"),
-    labtracks_server=credentials.get("LABTRACKS_SERVER"),
-    labtracks_database=credentials.get("LABTRACKS_DATABASE"),
-    labtracks_user=credentials.get("LABTRACKS_USER"),
-    labtracks_password=credentials.get("LABTRACKS_PASSWORD"),
-    labtracks_port=credentials.get("LABTRACKS_PORT"),
-)
-
-tars_settings = AzureSettings(
-    tenant_id=credentials.get("TARS_TENANT_ID"),
-    client_id=credentials.get("TARS_CLIENT_ID"),
-    client_secret=credentials.get("TARS_CLIENT_SECRET"),
-    scope=credentials.get("TARS_SCOPE"),
-    resource=credentials.get("TARS_RESOURCE"),
-)
-
-slims_settings = SlimsSettings(
-    username=credentials.get("SLIMS_USERNAME"),
-    password=credentials.get("SLIMS_PASSWORD"),
-    host=credentials.get("SLIMS_HOST"),
-    db=credentials.get("SLIMS_DB"),
-)
+# TODO: Move client instantiation when the server starts instead of creating
+#  one for each request?
+sharepoint_settings = SharepointSettings()
+labtracks_settings = LabTracksSettings()
+tars_settings = AzureSettings()
+slims_settings = SlimsSettings()
 
 funding_smartsheet_settings = SmartsheetSettings(
-    access_token=credentials.get("SMARTSHEET_API_TOKEN"),
-    sheet_id=credentials.get("SMARTSHEET_FUNDING_ID"),
+    access_token=SMARTSHEET_FUNDING_TOKEN, sheet_id=SMARTSHEET_FUNDING_ID
 )
 perfusions_smartsheet_settings = SmartsheetSettings(
-    access_token=credentials.get("SMARTSHEET_API_TOKEN"),
-    sheet_id=credentials.get("SMARTSHEET_PERFUSIONS_ID"),
+    access_token=SMARTSHEET_PERFUSIONS_TOKEN, sheet_id=SMARTSHEET_PERFUSIONS_ID
 )
+
 protocols_smartsheet_settings = SmartsheetSettings(
-    access_token=credentials.get("SMARTSHEET_API_TOKEN"),
-    sheet_id=credentials.get("SMARTSHEET_PROTOCOLS_ID"),
+    access_token=SMARTSHEET_PROTOCOLS_TOKEN, sheet_id=SMARTSHEET_PROTOCOLS_ID
 )
 
 mgi_settings = MgiSettings()
@@ -131,7 +99,6 @@ protocols_smart_sheet_client = SmartSheetClient(
 slims_client = SlimsHandler(settings=slims_settings)
 tars_client = TarsClient(azure_settings=tars_settings)
 mgi_client = MgiClient(settings=mgi_settings)
-sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
 
 template_directory = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "templates")
@@ -353,6 +320,7 @@ async def retrieve_intended_measurements(subject_id):
     """
     Retrieves intended measurements from SLIMS server
     """
+    sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
     model_response = await run_in_threadpool(
         sharepoint_client.get_intended_measurement_info, subject_id=subject_id
     )
@@ -368,6 +336,7 @@ async def retrieve_procedures(subject_id):
     lb_response = await run_in_threadpool(
         lb_client.get_procedures_info, subject_id=subject_id
     )
+    sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
     sp2019_response = await run_in_threadpool(
         sharepoint_client.get_procedure_info,
         subject_id=subject_id,
