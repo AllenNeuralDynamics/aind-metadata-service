@@ -195,13 +195,33 @@ class SharePointClient:
             "Content-Type": "application/json",
         }
 
+    def _fetch_all_list_items(self, site_id: str, list_id: str) -> list:
+        """
+        Fetch all items from a SharePoint list using the Graph API.
+        Implements pagination for large lists correctly.
+        """
+        url = f"{self.graph_api_url}/sites/{site_id}/lists/{list_id}/items"
+        params = {"expand": "fields", "$top": 5000}
+        all_items = []
+
+        while url:
+            response = requests.get(url, headers=self._get_headers(), params=params if "?" not in url else None)
+            response.raise_for_status()
+            data = response.json()
+            all_items.extend(data.get("value", []))
+
+            # Use @odata.nextLink for pagination
+            url = data.get("@odata.nextLink")
+
+        logging.info(f"Total items retrieved {len(all_items)} for {list_id}")
+        return all_items
+        
     def _fetch_list_items(
         self, site_id: str, list_id: str, subject_id: str, subject_alias: str
     ) -> dict:
         """
         Fetch items from a SharePoint list using the Graph API.
-        Adjust the query parameters as needed.
-        Parat
+        Handles simple filtering by subject_id.
         """
         params = {
             "expand": "fields",
@@ -222,6 +242,17 @@ class SharePointClient:
             raise RuntimeError(
                 f"Failed to fetch list items for list {list_id}."
             )
+        
+    def _filter_items_by_substring(self, items: list, subject_id: str, subject_alias: str) -> dict:
+        """
+        Filters a list of SharePoint items based on a substring search in a specific field.
+        """
+        filtered_items = [
+            item for item in items
+            if subject_id.lower() in item["fields"].get(subject_alias, "").lower()
+        ]
+        logging.info(f"Filtered {len(filtered_items)} items with '{subject_id}' in '{subject_alias}'")
+        return {"value": filtered_items}  # Return filtered results
 
     def get_intended_measurement_info(self, subject_id: str):
         """
@@ -293,9 +324,11 @@ class SharePointClient:
                 )
             elif list_id == self.las_2020_list_id:
                 subject_alias = LASList.model_fields.get("title").alias
-                response = self._fetch_list_items(
-                    site_id=self.las_site_id,
-                    list_id=list_id,
+                all_items = self._fetch_all_list_items(
+                    site_id=self.las_site_id, list_id=list_id
+                )
+                response = self._filter_items_by_substring(
+                    items=all_items,
                     subject_id=subject_id,
                     subject_alias=subject_alias,
                 )
@@ -334,7 +367,8 @@ class SharePointClient:
             model = model_cls.model_validate(item["fields"])
             mapped_model = mapper_cls(model)
             if model_cls == LASList:
-                procedures = mapped_model.get_procedure(subject_id)
+                procedure = mapped_model.get_procedure(subject_id)
+                procedures = [procedure] if procedure else []
             else:
                 procedures = mapped_model.get_procedure()
             list_of_procedures.extend(procedures)

@@ -332,7 +332,40 @@ class TestSharepointClient(unittest.TestCase):
                 f"Failed to fetch list items for list {list_id}.",
                 str(context.exception),
             )
+    
+    # TODO:fix this test, and add a test for _fetch_all_list_items failure
+    def test_fetch_all_list_items_success(self):
+        """Test that list is returned from successful GET call."""
+        client = SharePointClient.from_settings(self.settings)
+        # Patch _get_headers to return a fixed header.
+        client._get_headers = MagicMock(
+            return_value={
+                "Authorization": "Bearer fake",
+                "Content-Type": "application/json",
+            }
+        )
+        fake_json = [{"fields": {"some": "data"}}]
+        fake_response = MagicMock()
+        fake_response.raise_for_status.return_value = None
+        fake_response.json.return_value = {"value": fake_json}
 
+        with patch("requests.get", return_value=fake_response) as mock_get:
+            site_id = "aind_site_123"
+            list_id = "las_2020"
+            result = client._fetch_all_list_items(site_id, list_id)
+            self.assertEqual(result, fake_json)
+            expected_url = (
+                f"{client.graph_api_url}/sites/{site_id}/lists/{list_id}/items"
+            )
+            mock_get.assert_called_once_with(
+                expected_url,
+                headers={
+                    "Authorization": "Bearer fake",
+                    "Content-Type": "application/json",
+                },
+            )
+
+    # TODO: tests for _filter_items_by_substring
     def test_empty_response(self):
         """Tests that an empty response is generated if no data returned
         from NSB datatbases"""
@@ -404,18 +437,24 @@ class TestSharepointClient(unittest.TestCase):
 
         # Patch _fetch_list_items to simulate the Graph API response for LAS.
         with patch.object(
-            self.client,
-            "_fetch_list_items",
-            return_value={"value": [{"fields": list_item_2020_raw}]},
-        ):
+        self.client,
+        "_fetch_all_list_items",
+        return_value=[list_item_2020_raw],
+    ):
             with patch.object(
                 self.client,
-                "_extract_procedures_from_response",
-                return_value=expected_mapped_2020,
+                "_filter_items_by_substring",
+                return_value={"value": [{"fields": list_item_2020_raw}]},
             ):
-                response = self.client.get_procedure_info(
-                    subject_id="000000", list_id="las_2020"
-                )
+                with patch.object(
+                    self.client,
+                    "_extract_procedures_from_response",
+                    return_value=expected_mapped_2020,
+                ):
+                    response = self.client.get_procedure_info(
+                        subject_id="000000", list_id="las_2020"
+                    )
+
         self.assertEqual(StatusCodes.DB_RESPONDED, response.status_code)
         json_response = response.map_to_json_response()
         actual_content = json.loads(json_response.body.decode("utf-8"))
