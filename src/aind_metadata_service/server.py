@@ -348,7 +348,7 @@ async def retrieve_procedures(subject_id):
     sp2025_response = await run_in_threadpool(
         sharepoint_client.get_procedure_info,
         subject_id=subject_id,
-        list_id=sharepoint_settings.nsb_2025_list_id,
+        list_id=sharepoint_settings.nsb_present_list_id,
     )
     las2020_response = await run_in_threadpool(
         sharepoint_client.get_procedure_info,
