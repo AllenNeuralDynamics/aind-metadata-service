@@ -28,8 +28,10 @@ from aind_metadata_service.sharepoint.client import (
 )
 from aind_metadata_service.slims.client import SlimsHandler, SlimsSettings
 from aind_metadata_service.smartsheet.client import (
+    FundingSmartsheetSettings,
+    PerfusionsSmartsheetSettings,
+    ProtocolsSmartsheetSettings,
     SmartSheetClient,
-    SmartsheetSettings,
 )
 from aind_metadata_service.smartsheet.funding.mapping import FundingMapper
 from aind_metadata_service.smartsheet.perfusions.mapping import (
@@ -41,67 +43,17 @@ from aind_metadata_service.smartsheet.protocols.mapping import (
 )
 from aind_metadata_service.tars.client import AzureSettings, TarsClient
 from aind_metadata_service.tars.mapping import TarsResponseHandler
-import boto3
-import json
 
-PARAM_NAME = os.getenv("AIND_METADATA_SERVICE_PARAM")
+sharepoint_settings = SharepointSettings()
+labtracks_settings = LabTracksSettings()
 
+tars_settings = AzureSettings()
 
-def get_parameter_value(param_name: str) -> dict:
-    """Returns the value of a parameter from AWS param store."""
-    ssm_client = boto3.client("ssm")
-    response = ssm_client.get_parameter(Name=param_name, WithDecryption=True)
-    return json.loads(response["Parameter"]["Value"])
+slims_settings = SlimsSettings()
 
-
-credentials = get_parameter_value(param_name=PARAM_NAME)
-
-sharepoint_settings = SharepointSettings(
-    aind_site_id=credentials.get("SHAREPOINT_AIND_SITE_ID"),
-    las_site_id=credentials.get("SHAREPOINT_LAS_SITE_ID"),
-    nsb_2019_list_id=credentials.get("SHAREPOINT_NSB_2019_LIST_ID"),
-    nsb_2023_list_id=credentials.get("SHAREPOINT_NSB_2023_LIST_ID"),
-    las_2020_list_id=credentials.get("SHAREPOINT_LAS_2020_LIST_ID"),
-    client_id=credentials.get("SHAREPOINT_CLIENT_ID"),
-    client_secret=credentials.get("SHAREPOINT_CLIENT_SECRET"),
-    tenant_id=credentials.get("SHAREPOINT_TENANT_ID"),
-)
-labtracks_settings = LabTracksSettings(
-    odbc_driver=credentials.get("ODBC_DRIVER"),
-    labtracks_server=credentials.get("LABTRACKS_SERVER"),
-    labtracks_database=credentials.get("LABTRACKS_DATABASE"),
-    labtracks_user=credentials.get("LABTRACKS_USER"),
-    labtracks_password=credentials.get("LABTRACKS_PASSWORD"),
-    labtracks_port=credentials.get("LABTRACKS_PORT"),
-)
-
-tars_settings = AzureSettings(
-    tenant_id=credentials.get("TARS_TENANT_ID"),
-    client_id=credentials.get("TARS_CLIENT_ID"),
-    client_secret=credentials.get("TARS_CLIENT_SECRET"),
-    scope=credentials.get("TARS_SCOPE"),
-    resource=credentials.get("TARS_RESOURCE"),
-)
-
-slims_settings = SlimsSettings(
-    username=credentials.get("SLIMS_USERNAME"),
-    password=credentials.get("SLIMS_PASSWORD"),
-    host=credentials.get("SLIMS_HOST"),
-    db=credentials.get("SLIMS_DB"),
-)
-
-funding_smartsheet_settings = SmartsheetSettings(
-    access_token=credentials.get("SMARTSHEET_API_TOKEN"),
-    sheet_id=credentials.get("SMARTSHEET_FUNDING_ID"),
-)
-perfusions_smartsheet_settings = SmartsheetSettings(
-    access_token=credentials.get("SMARTSHEET_API_TOKEN"),
-    sheet_id=credentials.get("SMARTSHEET_PERFUSIONS_ID"),
-)
-protocols_smartsheet_settings = SmartsheetSettings(
-    access_token=credentials.get("SMARTSHEET_API_TOKEN"),
-    sheet_id=credentials.get("SMARTSHEET_PROTOCOLS_ID"),
-)
+funding_smartsheet_settings = FundingSmartsheetSettings()
+perfusions_smartsheet_settings = PerfusionsSmartsheetSettings()
+protocols_smartsheet_settings = ProtocolsSmartsheetSettings()
 
 mgi_settings = MgiSettings()
 

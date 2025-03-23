@@ -2,6 +2,7 @@
 
 import json
 import logging
+import os
 from datetime import datetime
 from typing import Optional, Union
 
@@ -13,14 +14,15 @@ from aind_slims_api.exceptions import SlimsRecordNotFound
 from aind_slims_api.models.instrument import SlimsInstrumentRdrc
 from aind_slims_api.operations import fetch_ecephys_sessions
 from fastapi.responses import JSONResponse
-from pydantic import Extra, Field, SecretStr
-from pydantic_settings import BaseSettings
+from pydantic import Field, SecretStr
+from pydantic_settings import SettingsConfigDict
 from requests.models import Response
 from slims import criteria
 from slims.criteria import equals
 
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
+from aind_metadata_service.settings import ParameterStoreBaseSettings
 from aind_metadata_service.slims.histology.handler import SlimsHistologyHandler
 from aind_metadata_service.slims.histology.mapping import SlimsHistologyMapper
 from aind_metadata_service.slims.imaging.handler import SlimsImagingHandler
@@ -28,20 +30,20 @@ from aind_metadata_service.slims.imaging.mapping import SlimsSpimMapper
 from aind_metadata_service.slims.sessions.mapping import SlimsSessionMapper
 
 
-class SlimsSettings(BaseSettings):
+class SlimsSettings(ParameterStoreBaseSettings):
     """Configuration class. Mostly a wrapper around smartsheet.Smartsheet
     class constructor arguments."""
+
+    model_config = SettingsConfigDict(
+        env_prefix="SLIMS_",
+        extra="ignore",
+        aws_param_store_name=os.getenv("AWS_PARAM_STORE_NAME"),
+    )
 
     username: str = Field(..., description="User name")
     password: SecretStr = Field(..., description="Password")
     host: str = Field(..., description="host")
     db: str = Field(default="slims", description="Database")
-
-    class Config:
-        """Set env prefix and forbid extra fields."""
-
-        env_prefix = "SLIMS_"
-        extra = Extra.forbid
 
 
 class SlimsHandler:

@@ -2,15 +2,17 @@
 
 import json
 import logging
+import os
 from typing import List, Optional, Union
 
 import requests
 from aind_data_schema.core.procedures import Procedures, Surgery
 from pydantic import BaseModel, Field, SecretStr, field_validator
-from pydantic_settings import BaseSettings
+from pydantic_settings import SettingsConfigDict
 
 from aind_metadata_service.models import IntendedMeasurementInformation
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
+from aind_metadata_service.settings import ParameterStoreBaseSettings
 from aind_metadata_service.sharepoint.las2020 import LASList, MappedLASList
 from aind_metadata_service.sharepoint.nsb2019 import (
     MappedNSB2019List,
@@ -22,8 +24,14 @@ from aind_metadata_service.sharepoint.nsb2023 import (
 )
 
 
-class SharepointSettings(BaseSettings):
+class SharepointSettings(ParameterStoreBaseSettings):
     """Settings needed to connect to Sharepoint database"""
+
+    model_config = SettingsConfigDict(
+        env_prefix="SHAREPOINT_",
+        extra="ignore",
+        aws_param_store_name=os.getenv("AWS_PARAM_STORE_NAME"),
+    )
 
     aind_site_id: str = Field(
         title="AIND Site ID",
@@ -71,7 +79,7 @@ class SharepointSettings(BaseSettings):
         description="Scope for the Microsoft Graph API.",
         default="https://graph.microsoft.com/.default",
     )
-    token_url: str = Field(
+    token_url: Optional[str] = Field(
         None,
         title="Token URL",
         description="URL for the Microsoft Identity Platform.",
@@ -90,12 +98,6 @@ class SharepointSettings(BaseSettings):
         return (
             f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token"
         )
-
-    class Config:
-        """Set env prefix and forbid extra fields."""
-
-        env_prefix = "SHAREPOINT_"
-        extra = "forbid"
 
 
 class SharePointClient:

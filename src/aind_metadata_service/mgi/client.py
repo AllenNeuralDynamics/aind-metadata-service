@@ -1,28 +1,30 @@
 """Module to handle retrieving information from MGI"""
 
 import logging
+import os
 import re
 from typing import Any, List, Optional, Union
 
 import requests
-from pydantic import BaseModel, Extra, Field, HttpUrl
-from pydantic_settings import BaseSettings
+from pydantic import BaseModel, Field, HttpUrl
+from pydantic_settings import SettingsConfigDict
 
 from aind_metadata_service.response_handler import ModelResponse
+from aind_metadata_service.settings import ParameterStoreBaseSettings
 
 
-class MgiSettings(BaseSettings):
+class MgiSettings(ParameterStoreBaseSettings):
     """Settings required for endpoint"""
+
+    model_config = SettingsConfigDict(
+        env_prefix="MGI_",
+        extra="ignore",
+        aws_param_store_name=os.getenv("AWS_PARAM_STORE_NAME"),
+    )
 
     url: HttpUrl = Field(
         default="https://www.informatics.jax.org//quicksearch/alleleBucket"
     )
-
-    class Config:
-        """Set env prefix and forbid extra fields."""
-
-        env_prefix = "MGI_"
-        extra = Extra.forbid
 
 
 class MgiSummaryRow(BaseModel):
