@@ -261,7 +261,7 @@ class SharePointClient:
                 status_code=StatusCodes.DB_RESPONDED,
             )
         except Exception as e:
-            logging.error(f"Error in get_intended_measurement_info {e}")
+            logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
 
     @staticmethod
@@ -358,7 +358,7 @@ class SharePointClient:
                 aind_models=procedures, status_code=StatusCodes.DB_RESPONDED
             )
         except Exception as e:
-            logging.error(f"Error in get_procedure_info: {e}")
+            logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
 
     @staticmethod
