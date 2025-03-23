@@ -80,6 +80,7 @@ class TestSharepointSettings(unittest.TestCase):
         "SHAREPOINT_LAS_SITE_ID": "las_site_456",
         "SHAREPOINT_NSB_2019_LIST_ID": "nsb_2019",
         "SHAREPOINT_NSB_2023_LIST_ID": "nsb_2023",
+        "SHAREPOINT_NSB_PRESENT_LIST_ID": "nsb_present",
         "SHAREPOINT_LAS_2020_LIST_ID": "las_2020",
         "SHAREPOINT_CLIENT_ID": "client_id",
         "SHAREPOINT_CLIENT_SECRET": "client_secret",
@@ -95,6 +96,7 @@ class TestSharepointSettings(unittest.TestCase):
         self.assertEqual("las_site_456", settings1.las_site_id)
         self.assertEqual("nsb_2019", settings1.nsb_2019_list_id)
         self.assertEqual("nsb_2023", settings1.nsb_2023_list_id)
+        self.assertEqual("nsb_present", settings1.nsb_present_list_id)
         self.assertEqual("las_2020", settings1.las_2020_list_id)
         self.assertEqual("client_id", settings1.client_id)
         self.assertEqual(
@@ -122,7 +124,7 @@ class TestSharepointSettings(unittest.TestCase):
             SharepointSettings(aind_site_id="aind_site_only")
 
         expected_error_message = (
-            "8 validation errors for SharepointSettings\n"
+            "9 validation errors for SharepointSettings\n"
             "las_site_id\n"
             "  Field required [type=missing, input_value={'aind_site_id': "
             "'aind_site_only'}, input_type=dict]\n"
@@ -134,6 +136,11 @@ class TestSharepointSettings(unittest.TestCase):
             "    For further information visit "
             f"https://errors.pydantic.dev/{PYD_VERSION}/v/missing\n"
             "nsb_2023_list_id\n"
+            "  Field required [type=missing, input_value={'aind_site_id': "
+            "'aind_site_only'}, input_type=dict]\n"
+            "    For further information visit "
+            f"https://errors.pydantic.dev/{PYD_VERSION}/v/missing\n"
+            "nsb_present_list_id\n"
             "  Field required [type=missing, input_value={'aind_site_id': "
             "'aind_site_only'}, input_type=dict]\n"
             "    For further information visit "
@@ -182,6 +189,7 @@ class TestSharepointClient(unittest.TestCase):
             las_site_id="las_site_456",
             nsb_2019_list_id="nsb_2019",
             nsb_2023_list_id="nsb_2023",
+            nsb_present_list_id="nsb_present",
             las_2020_list_id="las_2020",
             client_id="client_id",
             client_secret=SecretStr("client_secret"),
@@ -364,12 +372,17 @@ class TestSharepointClient(unittest.TestCase):
             side_effect=[
                 {"value": [{"fields": list_item_2019_raw}]},
                 {"value": [{"fields": list_item_2023_raw}]},
+                {"value": [{"fields": list_item_2023_raw}]},
             ],
         ):
             with patch.object(
                 self.client,
                 "_extract_procedures_from_response",
-                side_effect=[expected_mapped_2019, expected_mapped_2023],
+                side_effect=[
+                    expected_mapped_2019,
+                    expected_mapped_2023,
+                    expected_mapped_2023,
+                ],
             ):
                 response2019 = self.client.get_procedure_info(
                     subject_id="12345", list_id="nsb_2019"
@@ -377,15 +390,18 @@ class TestSharepointClient(unittest.TestCase):
                 response2023 = self.client.get_procedure_info(
                     subject_id="12345", list_id="nsb_2023"
                 )
-
+                response2025 = self.client.get_procedure_info(
+                    subject_id="12345", list_id="nsb_present"
+                )
         merged_response = self.client.merge_responses(
-            [response2019, response2023]
+            [response2019, response2023, response2025]
         )
         json_response = merged_response.map_to_json_response()
         actual_content = json.loads(json_response.body.decode("utf-8"))
         actual_subject_procedures = actual_content["data"][
             "subject_procedures"
         ]
+        # Duplicate models should be removed
         expected_subject_procedures = (
             expected_mapped_2019 + expected_mapped_2023
         )
@@ -705,6 +721,21 @@ class TestSharepointClient(unittest.TestCase):
         expected = ModelResponse.internal_server_error_response()
         self.assertEqual(expected.status_code, response.status_code)
         self.assertEqual([], response.aind_models)
+
+    def test_handle_duplicates(self):
+        """Tests that duplicates are removed as expected."""
+        # Test duplicate dictionaries
+        item1 = {"id": 1, "name": "Alice"}
+        item2 = {"name": "Alice", "id": 1}
+        item3 = {"id": 2, "name": "Bob"}
+        result = self.client._handle_duplicates([item1, item2, item3])
+        self.assertEqual(result, [item1, item3])
+
+        # Test unsupported item type
+        with self.assertRaises(TypeError) as context:
+            self.client._handle_duplicates([{"id": 1}, 42])
+
+        self.assertIn("Unsupported item type", str(context.exception))
 
 
 if __name__ == "__main__":
