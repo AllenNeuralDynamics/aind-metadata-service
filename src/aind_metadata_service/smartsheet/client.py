@@ -2,25 +2,32 @@
 methods to retrieve data."""
 
 import logging
+import os
 from typing import Optional
 
-from pydantic import Extra, Field, SecretStr
-from pydantic_settings import BaseSettings
+from pydantic import Field, SecretStr
+from pydantic_settings import SettingsConfigDict
 from smartsheet import Smartsheet
 from starlette.responses import JSONResponse
 
 from aind_metadata_service import __version__
 from aind_metadata_service.client import StatusCodes
+from aind_metadata_service.settings import ParameterStoreBaseSettings
 
 
-class SmartsheetSettings(BaseSettings):
+class SmartsheetSettings(ParameterStoreBaseSettings):
     """Configuration class. Mostly a wrapper around smartsheet.Smartsheet
     class constructor arguments."""
 
-    access_token: SecretStr = Field(
+    model_config = SettingsConfigDict(
+        env_prefix="SMARTSHEET_",
+        extra="ignore",
+    )
+
+    api_token: SecretStr = Field(
         ..., description="API token can be created in Smartsheet UI"
     )
-    sheet_id: int = Field(
+    id: int = Field(
         ...,
         description=(
             "Sheet ID to query. Can be found in Smartsheet under "
@@ -38,11 +45,35 @@ class SmartsheetSettings(BaseSettings):
         default=8, description="Maximum connection pool size."
     )
 
-    class Config:
-        """Set env prefix and forbid extra fields."""
 
-        env_prefix = "SMARTSHEET_"
-        extra = Extra.forbid
+class FundingSmartsheetSettings(SmartsheetSettings):
+    """Settings for the funding smartsheet"""
+
+    model_config = SettingsConfigDict(
+        env_prefix="SMARTSHEET_FUNDING_",
+        extra="ignore",
+        aws_param_store_name=os.getenv("AWS_PARAM_STORE_NAME"),
+    )
+
+
+class ProtocolsSmartsheetSettings(SmartsheetSettings):
+    """Settings for the protocols smartsheet"""
+
+    model_config = SettingsConfigDict(
+        env_prefix="SMARTSHEET_PROTOCOLS_",
+        extra="ignore",
+        aws_param_store_name=os.getenv("AWS_PARAM_STORE_NAME"),
+    )
+
+
+class PerfusionsSmartsheetSettings(SmartsheetSettings):
+    """Settings for the perfusions smartsheet"""
+
+    model_config = SettingsConfigDict(
+        env_prefix="SMARTSHEET_PERFUSIONS_",
+        extra="ignore",
+        aws_param_store_name=os.getenv("AWS_PARAM_STORE_NAME"),
+    )
 
 
 class SmartSheetClient:
@@ -61,7 +92,7 @@ class SmartSheetClient:
             user_agent=self.smartsheet_settings.user_agent,
             max_connections=self.smartsheet_settings.max_connections,
             access_token=(
-                self.smartsheet_settings.access_token.get_secret_value()
+                self.smartsheet_settings.api_token.get_secret_value()
             ),
         )
 
@@ -69,7 +100,7 @@ class SmartSheetClient:
         """Retrieve the sheet defined by the settings sheet_id."""
         try:
             smartsheet_response = self.smartsheet_client.Sheets.get_sheet(
-                self.smartsheet_settings.sheet_id
+                self.smartsheet_settings.id
             )
             smartsheet_json = smartsheet_response.to_json()
             return JSONResponse(

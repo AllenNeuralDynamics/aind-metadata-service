@@ -16,7 +16,7 @@ from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
 from aind_metadata_service.smartsheet.client import (
     SmartSheetClient,
-    SmartsheetSettings,
+    PerfusionsSmartsheetSettings,
 )
 from aind_metadata_service.smartsheet.perfusions.mapping import (
     PerfusionsMapper,
@@ -64,8 +64,8 @@ class TestSmartsheetPerfusionsClient(unittest.TestCase):
     def test_mapping(self, mock_get_sheet: MagicMock):
         """Tests successful sheet return response"""
         mock_get_sheet.return_value.to_json.return_value = self.example_sheet
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+        settings = PerfusionsSmartsheetSettings(
+            api_token="abc-123", id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
@@ -81,8 +81,8 @@ class TestSmartsheetPerfusionsClient(unittest.TestCase):
     def test_mapping_empty_response(self, mock_get_sheet: MagicMock):
         """Tests successful sheet return response"""
         mock_get_sheet.return_value.to_json.return_value = None
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+        settings = PerfusionsSmartsheetSettings(
+            api_token="abc-123", id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
@@ -106,8 +106,8 @@ class TestSmartsheetPerfusionsClient(unittest.TestCase):
             raise Exception("Something went wrong")
 
         type(mock_get_sheet.return_value).to_json = mock_get_sheet_error
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+        settings = PerfusionsSmartsheetSettings(
+            api_token="abc-123", id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
@@ -142,8 +142,8 @@ class TestSmartsheetPerfusionsClient(unittest.TestCase):
         mock_get_perfusions_list.side_effect = MagicMock(
             side_effect=Exception("Mapping Error")
         )
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+        settings = PerfusionsSmartsheetSettings(
+            api_token="abc-123", id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
@@ -173,8 +173,8 @@ class TestSmartsheetPerfusionsClient(unittest.TestCase):
         mock_sheet = json.dumps(mock_sheet_contents)
 
         mock_get_sheet.return_value.to_json.return_value = mock_sheet
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+        settings = PerfusionsSmartsheetSettings(
+            api_token="abc-123", id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
@@ -196,8 +196,8 @@ class TestSmartsheetPerfusionsClient(unittest.TestCase):
         mock_sheet = json.dumps(mock_sheet_contents)
 
         mock_get_sheet.return_value.to_json.return_value = mock_sheet
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+        settings = PerfusionsSmartsheetSettings(
+            api_token="abc-123", id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
@@ -218,8 +218,8 @@ class TestSmartsheetPerfusionsClient(unittest.TestCase):
         mock_sheet = json.dumps(mock_sheet_contents)
 
         mock_get_sheet.return_value.to_json.return_value = mock_sheet
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+        settings = PerfusionsSmartsheetSettings(
+            api_token="abc-123", id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
@@ -236,8 +236,8 @@ class TestSmartsheetPerfusionsClient(unittest.TestCase):
     def test_mapping_no_data_found(self, mock_get_sheet: MagicMock):
         """Tests response no data for the subject id is discovered"""
         mock_get_sheet.return_value.to_json.return_value = self.example_sheet
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+        settings = PerfusionsSmartsheetSettings(
+            api_token="abc-123", id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
