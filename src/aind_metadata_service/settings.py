@@ -148,7 +148,7 @@ class ParameterStoreBaseSettings(BaseSettings):
     ) -> Tuple[PydanticBaseSettingsSource, ...]:
         """If the param store name is set as an env var, pull from there."""
 
-        if cls.model_config.get("aws_param_store_name") is None:
+        if settings_cls.model_config.get("aws_param_store_name") is None:
             return (
                 init_settings,
                 env_settings,
