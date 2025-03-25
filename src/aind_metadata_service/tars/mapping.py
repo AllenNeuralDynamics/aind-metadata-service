@@ -195,7 +195,7 @@ class TarsResponseHandler:
         if virus_info.addgene_id:
             addgene_id = PIDName(
                 name=virus_info.name,
-                registry=BaseName(name=virus_info.rrid),
+                registry=BaseName(name=virus_info.rrid) if virus_info.rrid else None,
                 registry_identifier=virus_info.addgene_id,
             )
         try:
