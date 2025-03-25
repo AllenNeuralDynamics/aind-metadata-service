@@ -357,8 +357,8 @@ class SharePointClient:
                     mapper_cls=MappedNSB2019List,
                 )
                 logging.info(
-                    f"Found {len(subj_procedures)} items from nsb 2019-2022 for"
-                    f" {subject_id}"
+                    f"Found {len(subj_procedures)} items from nsb 2019-2022"
+                    f" for {subject_id}"
                 )
             elif list_id == self.nsb_2023_list_id:
                 logging.info(f"Pulling data from nsb 2023 for {subject_id}")
@@ -377,8 +377,8 @@ class SharePointClient:
                     mapper_cls=MappedNSB2023List,
                 )
                 logging.info(
-                    f"Found {len(subj_procedures)} items from nsb 2023-2024 archive"
-                    f" for {subject_id}"
+                    f"Found {len(subj_procedures)} items from nsb 2023-2024"
+                    f" archive for {subject_id}"
                 )
             elif list_id == self.nsb_present_list_id:
                 # NSB Present List uses same schema as NSB 2023 List
