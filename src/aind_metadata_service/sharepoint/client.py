@@ -1,12 +1,13 @@
 """Module to create client to connect to sharepoint database"""
 
 import logging
-from typing import List, Optional
+from typing import List, Optional, Iterator
 
 import requests
 from aind_data_schema.core.procedures import Procedures, Surgery
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings
+from requests import Session
 
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
 from aind_metadata_service.sharepoint.las2020 import LASList, MappedLASList
@@ -195,27 +196,59 @@ class SharePointClient:
             "Content-Type": "application/json",
         }
 
-    def _fetch_all_list_items(self, site_id: str, list_id: str) -> list:
+    @staticmethod
+    def _paginate(url: str, params: dict, session: Session) -> Iterator[dict]:
         """
-        Fetch all items from a SharePoint list using the Graph API.
-        Implements pagination for large lists correctly.
+
+        Parameters
+        ----------
+        url : str
+        params : dict
+        session : Session
+
+        Returns
+        -------
+        Iterator[dict]
+
+        """
+        while True:
+            response = session.get(url, params=params)
+            response.raise_for_status()
+            for result in response.json().get("value", []):
+                yield result
+
+            if not response.json().get("@odata.nextLink"):
+                return
+
+            url = response.json().get("@odata.nextLink")
+            params = None
+
+    def _fetch_all_list_items(
+            self,
+            site_id: str,
+            list_id: str,
+            subject_id: str
+    ) -> list:
+        """
+        Fetch all items from a LAS SharePoint list using the Graph API.
+        Implements pagination for large lists correctly. Filters by
+        Retro-Orbital Injections.
         """
         url = f"{self.graph_api_url}/sites/{site_id}/lists/{list_id}/items"
-        params = {"expand": "fields", "$top": 5000}
+        params = {
+            "expand": "fields",
+            "$filter": "fields/ReqPro1 eq 'Retro-Orbital Injection'"
+        }
+        headers = self._get_headers()
         all_items = []
-
-        while url:
-            response = requests.get(url, headers=self._get_headers(), params=params if "?" not in url else None)
-            response.raise_for_status()
-            data = response.json()
-            all_items.extend(data.get("value", []))
-
-            # Use @odata.nextLink for pagination
-            url = data.get("@odata.nextLink")
-
-        logging.info(f"Total items retrieved {len(all_items)} for {list_id}")
+        with Session() as session:
+            session.headers.update(headers)
+            paginator = self._paginate(url=url, params=params, session=session)
+            for item in paginator:
+                if subject_id in item.get("fields", dict()).get("Title", ""):
+                    all_items.append(item)
         return all_items
-        
+
     def _fetch_list_items(
         self, site_id: str, list_id: str, subject_id: str, subject_alias: str
     ) -> dict:
@@ -242,17 +275,6 @@ class SharePointClient:
             raise RuntimeError(
                 f"Failed to fetch list items for list {list_id}."
             )
-        
-    def _filter_items_by_substring(self, items: list, subject_id: str, subject_alias: str) -> dict:
-        """
-        Filters a list of SharePoint items based on a substring search in a specific field.
-        """
-        filtered_items = [
-            item for item in items
-            if subject_id.lower() in item["fields"].get(subject_alias, "").lower()
-        ]
-        logging.info(f"Filtered {len(filtered_items)} items with '{subject_id}' in '{subject_alias}'")
-        return {"value": filtered_items}  # Return filtered results
 
     def get_intended_measurement_info(self, subject_id: str):
         """
@@ -293,6 +315,7 @@ class SharePointClient:
         """
         try:
             if list_id == self.nsb_2019_list_id:
+                logging.info(f"Pulling data from nsb 2019 for {subject_id}")
                 subject_alias = NSB2019List.model_fields.get(
                     "lab_tracks_id"
                 ).alias
@@ -307,7 +330,12 @@ class SharePointClient:
                     model_cls=NSB2019List,
                     mapper_cls=MappedNSB2019List,
                 )
+                logging.info(
+                    f"Found {len(subj_procedures)} items from nsb 2019 for"
+                    f" {subject_id}"
+                )
             elif list_id == self.nsb_2023_list_id:
+                logging.info(f"Pulling data from nsb 2023 for {subject_id}")
                 subject_alias = NSB2023List.model_fields.get(
                     "lab_tracks_id1"
                 ).alias
@@ -322,21 +350,26 @@ class SharePointClient:
                     model_cls=NSB2023List,
                     mapper_cls=MappedNSB2023List,
                 )
-            elif list_id == self.las_2020_list_id:
-                subject_alias = LASList.model_fields.get("title").alias
-                all_items = self._fetch_all_list_items(
-                    site_id=self.las_site_id, list_id=list_id
+                logging.info(
+                    f"Found {len(subj_procedures)} items from nsb 2023 for"
+                    f" {subject_id}"
                 )
-                response = self._filter_items_by_substring(
-                    items=all_items,
-                    subject_id=subject_id,
-                    subject_alias=subject_alias,
+            elif list_id == self.las_2020_list_id:
+                logging.info(f"Pulling data from LAS 2020 for {subject_id}")
+                all_items = self._fetch_all_list_items(
+                    site_id=self.las_site_id,
+                    list_id=list_id,
+                    subject_id=subject_id
                 )
                 subj_procedures = self._extract_procedures_from_response(
-                    response=response,
+                    response={"value": all_items},
                     model_cls=LASList,
                     mapper_cls=MappedLASList,
                     subject_id=subject_id,
+                )
+                logging.info(
+                    f"Found {len(subj_procedures)} items from las 2020 for"
+                    f" {subject_id}"
                 )
             else:
                 return ModelResponse.internal_server_error_response()
