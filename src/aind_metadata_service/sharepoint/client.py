@@ -224,10 +224,7 @@ class SharePointClient:
             params = None
 
     def _fetch_all_list_items(
-            self,
-            site_id: str,
-            list_id: str,
-            subject_id: str
+        self, site_id: str, list_id: str, subject_id: str
     ) -> list:
         """
         Fetch all items from a LAS SharePoint list using the Graph API.
@@ -237,7 +234,7 @@ class SharePointClient:
         url = f"{self.graph_api_url}/sites/{site_id}/lists/{list_id}/items"
         params = {
             "expand": "fields",
-            "$filter": "fields/ReqPro1 eq 'Retro-Orbital Injection'"
+            "$filter": "fields/ReqPro1 eq 'Retro-Orbital Injection'",
         }
         headers = self._get_headers()
         all_items = []
@@ -359,7 +356,7 @@ class SharePointClient:
                 all_items = self._fetch_all_list_items(
                     site_id=self.las_site_id,
                     list_id=list_id,
-                    subject_id=subject_id
+                    subject_id=subject_id,
                 )
                 subj_procedures = self._extract_procedures_from_response(
                     response={"value": all_items},

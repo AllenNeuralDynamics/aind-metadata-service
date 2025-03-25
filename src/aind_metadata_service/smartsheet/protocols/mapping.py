@@ -180,7 +180,9 @@ class ProtocolsIntegrator:
                 if (
                     isinstance(subject_procedure, Surgery)
                     and hasattr(subject_procedure, "experimenter_full_name")
-                    and getattr(subject_procedure, "experimenter_full_name", None)
+                    and getattr(
+                        subject_procedure, "experimenter_full_name", None
+                    )
                     and "NSB" in subject_procedure.experimenter_full_name
                 ):
                     protocol_name = ProtocolNames.SURGERY.value

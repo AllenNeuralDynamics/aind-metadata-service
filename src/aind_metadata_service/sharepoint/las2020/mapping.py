@@ -289,7 +289,7 @@ class MappedLASList:
             if self._las.author_id is None
             else f"LAS-{str(self._las.author_id)}"
         )
-    
+
     @property
     def aind_author_lookup_id(self) -> Optional[str]:
         """Maps author_lookup_id to aind model"""
@@ -2226,7 +2226,11 @@ class MappedLASList:
                     )
                     subject_procedures.append(ro_injection)
         if subject_procedures:
-            name = self.aind_author_id if self.aind_author_id else self.aind_author_lookup_id
+            name = (
+                self.aind_author_id
+                if self.aind_author_id
+                else self.aind_author_lookup_id
+            )
             return Surgery.model_construct(
                 experimenter_full_name=name,
                 iacuc_protocol=self.aind_protocol,
