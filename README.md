@@ -32,7 +32,7 @@ docker build . -t aind-metadata-service-local:latest
 If your AWS credentials are already configured on your machine (`~/.aws/credentials` on Linux/macOS or `%USERPROFILE%\.aws\credentials` on Windows), you can mount your credentials directly into the container:
 1. Run the container with AWS credentials mounted:
 ```bash
-docker run -v ~/.aws:/root/.aws -e AWS_PROFILE={profile} -e AIND_METADATA_SERVICE_PARAM={param name} -p 58350:58350 -p 5000:5000 aind-metadata-service-local:latest
+docker run -v ~/.aws:/root/.aws -e AWS_PROFILE={profile} -e AWS_PARAM_STORE_NAME={param name} -p 58350:58350 -p 5000:5000 aind-metadata-service-local:latest
 ```
 This allows the container to use your locally configured AWS credentials without needing to pass them explicitly.
 
