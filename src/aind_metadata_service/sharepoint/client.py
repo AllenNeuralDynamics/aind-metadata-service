@@ -2,15 +2,18 @@
 
 import json
 import logging
-from typing import List, Optional, Union
+import os
+from typing import List, Optional, Union, Iterator
 
 import requests
 from aind_data_schema.core.procedures import Procedures, Surgery
 from pydantic import BaseModel, Field, SecretStr, field_validator
-from pydantic_settings import BaseSettings
+from pydantic_settings import SettingsConfigDict
+from requests import Session
 
 from aind_metadata_service.models import IntendedMeasurementInformation
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
+from aind_metadata_service.settings import ParameterStoreBaseSettings
 from aind_metadata_service.sharepoint.las2020 import LASList, MappedLASList
 from aind_metadata_service.sharepoint.nsb2019 import (
     MappedNSB2019List,
@@ -22,8 +25,14 @@ from aind_metadata_service.sharepoint.nsb2023 import (
 )
 
 
-class SharepointSettings(BaseSettings):
+class SharepointSettings(ParameterStoreBaseSettings):
     """Settings needed to connect to Sharepoint database"""
+
+    model_config = SettingsConfigDict(
+        env_prefix="SHAREPOINT_",
+        extra="ignore",
+        aws_param_store_name=os.getenv("AWS_PARAM_STORE_NAME"),
+    )
 
     aind_site_id: str = Field(
         title="AIND Site ID",
@@ -71,7 +80,7 @@ class SharepointSettings(BaseSettings):
         description="Scope for the Microsoft Graph API.",
         default="https://graph.microsoft.com/.default",
     )
-    token_url: str = Field(
+    token_url: Optional[str] = Field(
         None,
         title="Token URL",
         description="URL for the Microsoft Identity Platform.",
@@ -90,12 +99,6 @@ class SharepointSettings(BaseSettings):
         return (
             f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token"
         )
-
-    class Config:
-        """Set env prefix and forbid extra fields."""
-
-        env_prefix = "SHAREPOINT_"
-        extra = "forbid"
 
 
 class SharePointClient:
@@ -206,13 +209,62 @@ class SharePointClient:
             "Content-Type": "application/json",
         }
 
+    @staticmethod
+    def _paginate(url: str, params: dict, session: Session) -> Iterator[dict]:
+        """
+
+        Parameters
+        ----------
+        url : str
+        params : dict
+        session : Session
+
+        Returns
+        -------
+        Iterator[dict]
+
+        """
+        while True:
+            response = session.get(url, params=params)
+            response.raise_for_status()
+            for result in response.json().get("value", []):
+                yield result
+
+            if not response.json().get("@odata.nextLink"):
+                return
+
+            url = response.json().get("@odata.nextLink")
+            params = None
+
+    def _fetch_all_list_items(
+        self, site_id: str, list_id: str, subject_id: str
+    ) -> list:
+        """
+        Fetch all items from a LAS SharePoint list using the Graph API.
+        Implements pagination for large lists correctly. Filters by
+        Retro-Orbital Injections.
+        """
+        url = f"{self.graph_api_url}/sites/{site_id}/lists/{list_id}/items"
+        params = {
+            "expand": "fields",
+            "$filter": "fields/ReqPro1 eq 'Retro-Orbital Injection'",
+        }
+        headers = self._get_headers()
+        all_items = []
+        with Session() as session:
+            session.headers.update(headers)
+            paginator = self._paginate(url=url, params=params, session=session)
+            for item in paginator:
+                if subject_id in item.get("fields", dict()).get("Title", ""):
+                    all_items.append(item)
+        return all_items
+
     def _fetch_list_items(
         self, site_id: str, list_id: str, subject_id: str, subject_alias: str
     ) -> dict:
         """
         Fetch items from a SharePoint list using the Graph API.
-        Adjust the query parameters as needed.
-        Parat
+        Handles simple filtering by subject_id.
         """
         params = {
             "expand": "fields",
@@ -261,7 +313,7 @@ class SharePointClient:
                 status_code=StatusCodes.DB_RESPONDED,
             )
         except Exception as e:
-            logging.error(f"Error in get_intended_measurement_info {e}")
+            logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
 
     @staticmethod
@@ -289,6 +341,7 @@ class SharePointClient:
         """
         try:
             if list_id == self.nsb_2019_list_id:
+                logging.info(f"Pulling data from nsb 2019 for {subject_id}")
                 subject_alias = NSB2019List.model_fields.get(
                     "lab_tracks_id"
                 ).alias
@@ -303,7 +356,12 @@ class SharePointClient:
                     model_cls=NSB2019List,
                     mapper_cls=MappedNSB2019List,
                 )
+                logging.info(
+                    f"Found {len(subj_procedures)} items from nsb 2019-2022"
+                    f" for {subject_id}"
+                )
             elif list_id == self.nsb_2023_list_id:
+                logging.info(f"Pulling data from nsb 2023 for {subject_id}")
                 subject_alias = NSB2023List.model_fields.get(
                     "lab_tracks_id1"
                 ).alias
@@ -317,6 +375,10 @@ class SharePointClient:
                     response=response,
                     model_cls=NSB2023List,
                     mapper_cls=MappedNSB2023List,
+                )
+                logging.info(
+                    f"Found {len(subj_procedures)} items from nsb 2023-2024"
+                    f" archive for {subject_id}"
                 )
             elif list_id == self.nsb_present_list_id:
                 # NSB Present List uses same schema as NSB 2023 List
@@ -334,19 +396,26 @@ class SharePointClient:
                     model_cls=NSB2023List,
                     mapper_cls=MappedNSB2023List,
                 )
+                logging.info(
+                    f"Found {len(subj_procedures)} items from nsb 2023-present"
+                    f" for {subject_id}"
+                )
             elif list_id == self.las_2020_list_id:
-                subject_alias = LASList.model_fields.get("title").alias
-                response = self._fetch_list_items(
+                logging.info(f"Pulling data from LAS 2020 for {subject_id}")
+                all_items = self._fetch_all_list_items(
                     site_id=self.las_site_id,
                     list_id=list_id,
                     subject_id=subject_id,
-                    subject_alias=subject_alias,
                 )
                 subj_procedures = self._extract_procedures_from_response(
-                    response=response,
+                    response={"value": all_items},
                     model_cls=LASList,
                     mapper_cls=MappedLASList,
                     subject_id=subject_id,
+                )
+                logging.info(
+                    f"Found {len(subj_procedures)} items from las 2020 for"
+                    f" {subject_id}"
                 )
             else:
                 return ModelResponse.internal_server_error_response()
@@ -358,7 +427,7 @@ class SharePointClient:
                 aind_models=procedures, status_code=StatusCodes.DB_RESPONDED
             )
         except Exception as e:
-            logging.error(f"Error in get_procedure_info: {e}")
+            logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
 
     @staticmethod
@@ -377,7 +446,8 @@ class SharePointClient:
             model = model_cls.model_validate(item["fields"])
             mapped_model = mapper_cls(model)
             if model_cls == LASList:
-                procedures = mapped_model.get_procedure(subject_id)
+                procedure = mapped_model.get_procedure(subject_id)
+                procedures = [procedure] if procedure else []
             else:
                 procedures = mapped_model.get_procedure()
             list_of_procedures.extend(procedures)

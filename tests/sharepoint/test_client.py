@@ -6,7 +6,7 @@ import os
 import unittest
 from pathlib import Path
 from typing import List, Tuple
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, call
 
 import requests
 from fastapi.responses import JSONResponse
@@ -341,6 +341,88 @@ class TestSharepointClient(unittest.TestCase):
                 str(context.exception),
             )
 
+    def test_fetch_all_list_items_success(self):
+        """Test that list is returned from successful GET call."""
+
+        client = SharePointClient.from_settings(self.settings)
+        client._get_headers = MagicMock(
+            return_value={
+                "Authorization": "Bearer fake",
+                "Content-Type": "application/json",
+            }
+        )
+        fake_paginated_items = [
+            {"fields": {"Title": "000000 000001", "some": "data"}},
+            {"fields": {"Title": "111111", "some": "data2"}},
+            {"fields": {"Title": "000000 000002", "some": "data3"}},
+        ]
+        with patch.object(
+            client, "_paginate", return_value=iter(fake_paginated_items)
+        ) as mock_paginate:
+            site_id = "aind_site_123"
+            list_id = "las_2020"
+            subject_id = "000000"
+
+            result = client._fetch_all_list_items(
+                site_id=site_id, list_id=list_id, subject_id=subject_id
+            )
+            expected_result = [
+                {"fields": {"Title": "000000 000001", "some": "data"}},
+                {"fields": {"Title": "000000 000002", "some": "data3"}},
+            ]
+            self.assertEqual(result, expected_result)
+
+            expected_url = (
+                f"{client.graph_api_url}/sites/{site_id}/lists/{list_id}/items"
+            )
+            expected_params = {
+                "expand": "fields",
+                "$filter": "fields/ReqPro1 eq 'Retro-Orbital Injection'",
+            }
+            mock_paginate.assert_called_once()
+            called_kwargs = mock_paginate.call_args.kwargs
+            self.assertEqual(called_kwargs.get("url"), expected_url)
+            self.assertEqual(called_kwargs.get("params"), expected_params)
+            self.assertIn("session", called_kwargs)
+
+    def test_paginate(self):
+        """Tests that _paginate properly iterates through paginated data."""
+
+        client = SharePointClient.from_settings(self.settings)
+        initial_url = (
+            f"{client.graph_api_url}/sites/aind_site_123/lists/las_2020/items"
+        )
+        initial_params = {
+            "expand": "fields",
+            "$filter": "fields/ReqPro1 eq 'Retro-Orbital Injection'",
+        }
+        fake_response1 = MagicMock()
+        fake_response1.raise_for_status.return_value = None
+        fake_response1.json.return_value = {
+            "value": [{"id": 1}, {"id": 2}],
+            "@odata.nextLink": f"{initial_url}?page=2",
+        }
+        # response from the second page
+        fake_response2 = MagicMock()
+        fake_response2.raise_for_status.return_value = None
+        fake_response2.json.return_value = {
+            "value": [{"id": 3}],
+        }
+        fake_session = MagicMock()
+        fake_session.get.side_effect = [fake_response1, fake_response2]
+        results = list(
+            SharePointClient._paginate(
+                initial_url, initial_params, fake_session
+            )
+        )
+        expected_results = [{"id": 1}, {"id": 2}, {"id": 3}]
+        self.assertEqual(results, expected_results)
+        expected_calls = [
+            call(initial_url, params=initial_params),
+            call(f"{initial_url}?page=2", params=None),
+        ]
+        fake_session.get.assert_has_calls(expected_calls)
+
     def test_empty_response(self):
         """Tests that an empty response is generated if no data returned
         from NSB datatbases"""
@@ -421,8 +503,8 @@ class TestSharepointClient(unittest.TestCase):
         # Patch _fetch_list_items to simulate the Graph API response for LAS.
         with patch.object(
             self.client,
-            "_fetch_list_items",
-            return_value={"value": [{"fields": list_item_2020_raw}]},
+            "_fetch_all_list_items",
+            return_value=[list_item_2020_raw],
         ):
             with patch.object(
                 self.client,
@@ -432,6 +514,7 @@ class TestSharepointClient(unittest.TestCase):
                 response = self.client.get_procedure_info(
                     subject_id="000000", list_id="las_2020"
                 )
+
         self.assertEqual(StatusCodes.DB_RESPONDED, response.status_code)
         json_response = response.map_to_json_response()
         actual_content = json.loads(json_response.body.decode("utf-8"))

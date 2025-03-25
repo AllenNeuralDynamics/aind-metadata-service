@@ -721,6 +721,9 @@ class LASList(BaseModel, extra="allow"):
         default=None, alias="AfternoonPF", title="AfternoonPF"
     )
     author_id: Optional[int] = Field(default=None, alias="AuthorId")
+    author_lookup_id: Optional[int] = Field(
+        default=None, alias="AuthorLookupId"
+    )
     bc_age: Optional[str] = Field(default=None, alias="BCAge", title="BCAge")
     bc_genotypes: Optional[str] = Field(
         default=None, alias="BCGenotypes", title="BCGenotypes"

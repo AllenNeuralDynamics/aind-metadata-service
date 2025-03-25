@@ -16,7 +16,7 @@ from aind_metadata_service.models import FundingInformation
 from aind_metadata_service.response_handler import ModelResponse
 from aind_metadata_service.smartsheet.client import (
     SmartSheetClient,
-    SmartsheetSettings,
+    FundingSmartsheetSettings,
 )
 from aind_metadata_service.smartsheet.funding.mapping import FundingMapper
 from aind_metadata_service.smartsheet.models import SheetFields, SheetRow
@@ -47,8 +47,8 @@ class TestSmartsheetFundingClient(unittest.TestCase):
     def test_mapping(self, mock_get_sheet: MagicMock):
         """Tests successful sheet return response"""
         mock_get_sheet.return_value.to_json.return_value = self.example_sheet
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=6011951083638660
+        settings = FundingSmartsheetSettings(
+            api_token="abc-123", id=6011951083638660
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
@@ -87,8 +87,8 @@ class TestSmartsheetFundingClient(unittest.TestCase):
     def test_mapping_empty_response(self, mock_get_sheet: MagicMock):
         """Tests empty response when no project name found"""
         mock_get_sheet.return_value.to_json.return_value = None
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=6011951083638660
+        settings = FundingSmartsheetSettings(
+            api_token="abc-123", id=6011951083638660
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
@@ -107,8 +107,8 @@ class TestSmartsheetFundingClient(unittest.TestCase):
         mock_get_sheet.return_value.to_json.return_value = (
             self.example_corrupt_sheet
         )
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=6011951083638660
+        settings = FundingSmartsheetSettings(
+            api_token="abc-123", id=6011951083638660
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
@@ -129,8 +129,8 @@ class TestSmartsheetFundingClient(unittest.TestCase):
         )
 
         mock_get_sheet.return_value.to_json.return_value = incorrect_sheet
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=6011951083638660
+        settings = FundingSmartsheetSettings(
+            api_token="abc-123", id=6011951083638660
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
@@ -162,8 +162,8 @@ class TestSmartsheetFundingClient(unittest.TestCase):
             raise Exception("Something went wrong")
 
         type(mock_get_sheet.return_value).to_json = mock_get_sheet_error
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=6011951083638660
+        settings = FundingSmartsheetSettings(
+            api_token="abc-123", id=6011951083638660
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
@@ -199,8 +199,8 @@ class TestSmartsheetFundingClient(unittest.TestCase):
             side_effect=Exception("Mapping Error")
         )
         mock_get_sheet.return_value.to_json.return_value = self.example_sheet
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=6011951083638660
+        settings = FundingSmartsheetSettings(
+            api_token="abc-123", id=6011951083638660
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
@@ -222,8 +222,8 @@ class TestSmartsheetFundingClient(unittest.TestCase):
     def test_get_project_names_success(self, mock_get_sheet: MagicMock):
         """Tests successful sheet return response of project names"""
         mock_get_sheet.return_value.to_json.return_value = self.example_sheet
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=6011951083638660
+        settings = FundingSmartsheetSettings(
+            api_token="abc-123", id=6011951083638660
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
@@ -269,8 +269,8 @@ class TestSmartsheetFundingClient(unittest.TestCase):
             raise Exception("Something went wrong")
 
         type(mock_get_sheet.return_value).to_json = mock_get_sheet_error
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=6011951083638660
+        settings = FundingSmartsheetSettings(
+            api_token="abc-123", id=6011951083638660
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()

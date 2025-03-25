@@ -22,7 +22,7 @@ class TestLabTracksSettings(unittest.TestCase):
     """Class to test methods for LabTracksSettings."""
 
     EXAMPLE_ENV_VAR1 = {
-        "ODBC_DRIVER": "some_driver",
+        "LABTRACKS_ODBC_DRIVER": "some_driver",
         "LABTRACKS_SERVER": "abc.1234",
         "LABTRACKS_PORT": "8080",
         "LABTRACKS_DATABASE": "some_db",
@@ -34,25 +34,25 @@ class TestLabTracksSettings(unittest.TestCase):
     def test_settings_set_from_env_vars(self):
         """Tests that the settings can be set from env vars."""
         settings1 = LabTracksSettings()
-        settings2 = LabTracksSettings(labtracks_database="some_other_db")
+        settings2 = LabTracksSettings(database="some_other_db")
 
         self.assertEqual("some_driver", settings1.odbc_driver)
-        self.assertEqual("abc.1234", settings1.labtracks_server)
-        self.assertEqual("8080", settings1.labtracks_port)
-        self.assertEqual("some_user", settings1.labtracks_user)
-        self.assertEqual("some_db", settings1.labtracks_database)
+        self.assertEqual("abc.1234", settings1.server)
+        self.assertEqual("8080", settings1.port)
+        self.assertEqual("some_user", settings1.user)
+        self.assertEqual("some_db", settings1.database)
         self.assertEqual(
             "some_password",
-            settings1.labtracks_password.get_secret_value(),
+            settings1.password.get_secret_value(),
         )
         self.assertEqual("some_driver", settings2.odbc_driver)
-        self.assertEqual("abc.1234", settings2.labtracks_server)
-        self.assertEqual("8080", settings2.labtracks_port)
-        self.assertEqual("some_user", settings2.labtracks_user)
-        self.assertEqual("some_other_db", settings2.labtracks_database)
+        self.assertEqual("abc.1234", settings2.server)
+        self.assertEqual("8080", settings2.port)
+        self.assertEqual("some_user", settings2.user)
+        self.assertEqual("some_other_db", settings2.database)
         self.assertEqual(
             "some_password",
-            settings2.labtracks_password.get_secret_value(),
+            settings2.password.get_secret_value(),
         )
 
     @patch.dict(os.environ, {}, clear=True)
@@ -62,25 +62,25 @@ class TestLabTracksSettings(unittest.TestCase):
         with self.assertRaises(ValueError) as e:
             LabTracksSettings(
                 odbc_driver="some_driver",
-                labtracks_server="some_server",
-                labtracks_port="8080",
-                labtracks_database="some_db",
+                server="some_server",
+                port="8080",
+                database="some_db",
             )
 
         expected_error_message = (
             "2 validation errors for LabTracksSettings\n"
-            "labtracks_user\n"
+            "user\n"
             "  Field required [type=missing, input_value="
-            "{'odbc_driver': 'some_dri...ks_database': 'some_db'},"
+            "{'odbc_driver': 'some_dri..., 'database': 'some_db'},"
             " input_type=dict]\n"
             "    For further information visit"
             f" https://errors.pydantic.dev/{PYD_VERSION}/v/missing\n"
-            "labtracks_password\n"
+            "password\n"
             "  Field required [type=missing, input_value="
-            "{'odbc_driver': 'some_dri...ks_database': 'some_db'},"
+            "{'odbc_driver': 'some_dri..., 'database': 'some_db'},"
             " input_type=dict]\n"
-            "    For further information visit"
-            f" https://errors.pydantic.dev/{PYD_VERSION}/v/missing"
+            "    For further information visit "
+            f"https://errors.pydantic.dev/{PYD_VERSION}/v/missing"
         )
 
         self.assertEqual(expected_error_message, repr(e.exception))

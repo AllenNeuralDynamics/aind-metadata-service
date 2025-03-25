@@ -1,6 +1,7 @@
 """Module to create clients to connect to labtracks database."""
 
 import logging
+import os
 from enum import Enum
 from typing import List, Optional
 from xml.etree import ElementTree as ET
@@ -22,7 +23,7 @@ from aind_data_schema.core.subject import (
 )
 from aind_data_schema_models.organizations import Organization
 from pydantic import Field, SecretStr
-from pydantic_settings import BaseSettings
+from pydantic_settings import SettingsConfigDict
 
 from aind_metadata_service.labtracks.query_builder import (
     LabTracksQueries,
@@ -30,27 +31,32 @@ from aind_metadata_service.labtracks.query_builder import (
     TaskSetQueryColumns,
 )
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
+from aind_metadata_service.settings import ParameterStoreBaseSettings
 
 
-class LabTracksSettings(BaseSettings):
+class LabTracksSettings(ParameterStoreBaseSettings):
     """Settings needed to connect to LabTracks Database"""
+
+    model_config = SettingsConfigDict(
+        env_prefix="LABTRACKS_",
+        extra="ignore",
+        aws_param_store_name=os.getenv("AWS_PARAM_STORE_NAME"),
+    )
 
     odbc_driver: str = Field(
         title="Driver", description="ODBC Driver used to connect to LabTracks."
     )
-    labtracks_server: str = Field(
+    server: str = Field(
         title="Server", description="Host address of the LabTracks Server."
     )
-    labtracks_port: str = Field(
+    port: str = Field(
         title="Port", description="Port number of the LabTracks Server"
     )
-    labtracks_database: str = Field(
+    database: str = Field(
         title="Database", description="Name of the database."
     )
-    labtracks_user: str = Field(title="User", description="Username.")
-    labtracks_password: SecretStr = Field(
-        title="Password", description="Password."
-    )
+    user: str = Field(title="User", description="Username.")
+    password: SecretStr = Field(title="Password", description="Password.")
 
 
 class LabTracksClient:
@@ -102,11 +108,11 @@ class LabTracksClient:
         """Construct client from settings object."""
         return cls(
             driver=settings.odbc_driver,
-            server=settings.labtracks_server,
-            port=settings.labtracks_port,
-            db=settings.labtracks_database,
-            user=settings.labtracks_user,
-            password=settings.labtracks_password.get_secret_value(),
+            server=settings.server,
+            port=settings.port,
+            db=settings.database,
+            user=settings.user,
+            password=settings.password.get_secret_value(),
         )
 
     def create_session(self) -> pyodbc.Connection:
