@@ -1,15 +1,19 @@
 """Module to create client to connect to sharepoint database"""
 
+import json
 import logging
-from typing import List, Optional, Iterator
+import os
+from typing import List, Optional, Union, Iterator
 
 import requests
 from aind_data_schema.core.procedures import Procedures, Surgery
-from pydantic import Field, SecretStr, field_validator
-from pydantic_settings import BaseSettings
+from pydantic import BaseModel, Field, SecretStr, field_validator
+from pydantic_settings import SettingsConfigDict
 from requests import Session
 
+from aind_metadata_service.models import IntendedMeasurementInformation
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
+from aind_metadata_service.settings import ParameterStoreBaseSettings
 from aind_metadata_service.sharepoint.las2020 import LASList, MappedLASList
 from aind_metadata_service.sharepoint.nsb2019 import (
     MappedNSB2019List,
@@ -21,8 +25,14 @@ from aind_metadata_service.sharepoint.nsb2023 import (
 )
 
 
-class SharepointSettings(BaseSettings):
+class SharepointSettings(ParameterStoreBaseSettings):
     """Settings needed to connect to Sharepoint database"""
+
+    model_config = SettingsConfigDict(
+        env_prefix="SHAREPOINT_",
+        extra="ignore",
+        aws_param_store_name=os.getenv("AWS_PARAM_STORE_NAME"),
+    )
 
     aind_site_id: str = Field(
         title="AIND Site ID",
@@ -33,12 +43,16 @@ class SharepointSettings(BaseSettings):
         description="Site ID of the LAS SharePoint site.",
     )
     nsb_2019_list_id: str = Field(
-        title="NSB 2019 List ID",
-        description="List ID for NSB 2019 procedures.",
+        title="NSB 2019-2022 Archive List ID",
+        description="List ID for NSB 2019-2022 procedures.",
     )
     nsb_2023_list_id: str = Field(
-        title="NSB 2023 List ID",
-        description="List ID for NSB 2023 procedures.",
+        title="NSB 2023-2024 Archive List ID",
+        description="List ID for NSB 2023-2024 Archive procedures.",
+    )
+    nsb_present_list_id: str = Field(
+        title="NSB 2023-Present List ID",
+        description="List ID for NSB Present procedures.",
     )
     las_2020_list_id: str = Field(
         title="LAS 2020 List ID",
@@ -66,7 +80,7 @@ class SharepointSettings(BaseSettings):
         description="Scope for the Microsoft Graph API.",
         default="https://graph.microsoft.com/.default",
     )
-    token_url: str = Field(
+    token_url: Optional[str] = Field(
         None,
         title="Token URL",
         description="URL for the Microsoft Identity Platform.",
@@ -86,12 +100,6 @@ class SharepointSettings(BaseSettings):
             f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token"
         )
 
-    class Config:
-        """Set env prefix and forbid extra fields."""
-
-        env_prefix = "SHAREPOINT_"
-        extra = "forbid"
-
 
 class SharePointClient:
     """This class contains the API to connect to Sharepoint Database."""
@@ -102,6 +110,7 @@ class SharePointClient:
         las_site_id: str,
         nsb_2019_list_id: str,
         nsb_2023_list_id: str,
+        nsb_present_list_id: str,
         las_2020_list_id: str,
         client_id: str,
         client_secret: SecretStr,
@@ -119,9 +128,11 @@ class SharePointClient:
         las_site_id : str
             Sharepoint Site ID for LAS Domain
         nsb_2019_list_id : str
-            List ID for NSB 2019 procedures
+            List ID for NSB 2019-2022 procedures
         nsb_2023_list_id : str
-            List ID for NSB 2023 procedures
+            List ID for NSB 2023-2024 Archive procedures
+        nsb_present_list_id : str
+            List ID for NSB 2023-Present procedures
         las_2020_list_id : str
             List ID for LAS 2020 procedures
         client_id : str
@@ -141,6 +152,7 @@ class SharePointClient:
         self.las_site_id = las_site_id
         self.nsb_2019_list_id = nsb_2019_list_id
         self.nsb_2023_list_id = nsb_2023_list_id
+        self.nsb_present_list_id = nsb_present_list_id
         self.las_2020_list_id = las_2020_list_id
         self.client_id = client_id
         self.client_secret = client_secret
@@ -160,6 +172,7 @@ class SharePointClient:
             las_site_id=settings.las_site_id,
             nsb_2019_list_id=settings.nsb_2019_list_id,
             nsb_2023_list_id=settings.nsb_2023_list_id,
+            nsb_present_list_id=settings.nsb_present_list_id,
             las_2020_list_id=settings.las_2020_list_id,
             client_id=settings.client_id,
             client_secret=settings.client_secret,
@@ -275,33 +288,49 @@ class SharePointClient:
 
     def get_intended_measurement_info(self, subject_id: str):
         """
-        Retrieve intended measurement info from NSB 2023 list by subject_id.
+        Retrieve intended measurement info from NSB 2023-2024 Archive
+        and NSB 2023-Present list by subject_id.
         """
         try:
             subject_alias = NSB2023List.model_fields.get(
                 "lab_tracks_id1"
             ).alias
-            response = self._fetch_list_items(
-                site_id=self.aind_site_id,
-                list_id=self.nsb_2023_list_id,
-                subject_id=subject_id,
-                subject_alias=subject_alias,
-            )
-            intended_measurements = []
-            for item in response.get("value", []):
-                model = NSB2023List.model_validate(item["fields"])
-                mapped_model = MappedNSB2023List(model)
-                intended_measurements.extend(
-                    mapped_model.get_intended_measurements()
+            measurements = []
+            for list_id in [self.nsb_2023_list_id, self.nsb_present_list_id]:
+                response = self._fetch_list_items(
+                    site_id=self.aind_site_id,
+                    list_id=list_id,
+                    subject_id=subject_id,
+                    subject_alias=subject_alias,
                 )
+                measurements.extend(
+                    self._extract_intended_measurements_from_response(response)
+                )
+            unique_measurements = self._handle_duplicates(measurements)
 
             return ModelResponse(
-                aind_models=intended_measurements,
+                aind_models=unique_measurements,
                 status_code=StatusCodes.DB_RESPONDED,
             )
         except Exception as e:
-            logging.error(f"Error in get_intended_measurement_info {e}")
+            logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
+
+    @staticmethod
+    def _extract_intended_measurements_from_response(
+        response: dict,
+    ) -> List[IntendedMeasurementInformation]:
+        """
+        Extract intended measurements from a raw Graph API response
+        using the NSB 2023 model and mapper classes.
+        """
+        return [
+            measurement
+            for item in response.get("value", [])
+            for measurement in MappedNSB2023List(
+                NSB2023List.model_validate(item["fields"])
+            ).get_intended_measurements()
+        ]
 
     def get_procedure_info(
         self, subject_id: str, list_id: str
@@ -328,7 +357,7 @@ class SharePointClient:
                     mapper_cls=MappedNSB2019List,
                 )
                 logging.info(
-                    f"Found {len(subj_procedures)} items from nsb 2019 for"
+                    f"Found {len(subj_procedures)} items from nsb 2019-2022 for"
                     f" {subject_id}"
                 )
             elif list_id == self.nsb_2023_list_id:
@@ -348,8 +377,28 @@ class SharePointClient:
                     mapper_cls=MappedNSB2023List,
                 )
                 logging.info(
-                    f"Found {len(subj_procedures)} items from nsb 2023 for"
-                    f" {subject_id}"
+                    f"Found {len(subj_procedures)} items from nsb 2023-2024 archive"
+                    f" for {subject_id}"
+                )
+            elif list_id == self.nsb_present_list_id:
+                # NSB Present List uses same schema as NSB 2023 List
+                subject_alias = NSB2023List.model_fields.get(
+                    "lab_tracks_id1"
+                ).alias
+                response = self._fetch_list_items(
+                    site_id=self.aind_site_id,
+                    list_id=list_id,
+                    subject_id=subject_id,
+                    subject_alias=subject_alias,
+                )
+                subj_procedures = self._extract_procedures_from_response(
+                    response=response,
+                    model_cls=NSB2023List,
+                    mapper_cls=MappedNSB2023List,
+                )
+                logging.info(
+                    f"Found {len(subj_procedures)} items from nsb 2023-present"
+                    f" for {subject_id}"
                 )
             elif list_id == self.las_2020_list_id:
                 logging.info(f"Pulling data from LAS 2020 for {subject_id}")
@@ -378,7 +427,7 @@ class SharePointClient:
                 aind_models=procedures, status_code=StatusCodes.DB_RESPONDED
             )
         except Exception as e:
-            logging.error(f"Error in get_procedure_info: {e}")
+            logging.error(repr(e))
             return ModelResponse.internal_server_error_response()
 
     @staticmethod
@@ -405,8 +454,32 @@ class SharePointClient:
         return list_of_procedures
 
     @staticmethod
+    def _handle_duplicates(
+        items: List[Union[dict, BaseModel]]
+    ) -> List[Union[dict, BaseModel]]:
+        """Remove duplicates from a list of dictionaries or pydantic models."""
+
+        seen = set()
+        unique = []
+
+        for item in items:
+            if isinstance(item, BaseModel):
+                identifier = json.dumps(
+                    item.model_dump(), sort_keys=True, default=str
+                )
+            elif isinstance(item, dict):
+                identifier = json.dumps(item, sort_keys=True, default=str)
+            else:
+                raise TypeError(f"Unsupported item type: {type(item)}")
+
+            if identifier not in seen:
+                seen.add(identifier)
+                unique.append(item)
+
+        return unique
+
     def _handle_response_from_sharepoint(
-        subject_id: str, subject_procedures: Optional[list] = None
+        self, subject_id: str, subject_procedures: Optional[list] = None
     ) -> Optional[Procedures]:
         """Map the raw procedures response into a Procedures model."""
         if subject_procedures:
@@ -432,6 +505,9 @@ class SharePointClient:
                 left_procedures[0].subject_procedures
                 + right_procedures[0].subject_procedures
             )
+            unique_subject_procedures = self._handle_duplicates(
+                new_subject_procedures
+            )
             new_specimen_procedures = (
                 left_procedures[0].specimen_procedures
                 + right_procedures[0].specimen_procedures
@@ -439,7 +515,7 @@ class SharePointClient:
             return [
                 Procedures.model_construct(
                     subject_id=subject_id,
-                    subject_procedures=new_subject_procedures,
+                    subject_procedures=unique_subject_procedures,
                     specimen_procedures=new_specimen_procedures,
                 )
             ]

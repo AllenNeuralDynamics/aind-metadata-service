@@ -28,8 +28,10 @@ from aind_metadata_service.sharepoint.client import (
 )
 from aind_metadata_service.slims.client import SlimsHandler, SlimsSettings
 from aind_metadata_service.smartsheet.client import (
+    FundingSmartsheetSettings,
+    PerfusionsSmartsheetSettings,
+    ProtocolsSmartsheetSettings,
     SmartSheetClient,
-    SmartsheetSettings,
 )
 from aind_metadata_service.smartsheet.funding.mapping import FundingMapper
 from aind_metadata_service.smartsheet.perfusions.mapping import (
@@ -42,32 +44,16 @@ from aind_metadata_service.smartsheet.protocols.mapping import (
 from aind_metadata_service.tars.client import AzureSettings, TarsClient
 from aind_metadata_service.tars.mapping import TarsResponseHandler
 
-SMARTSHEET_FUNDING_ID = os.getenv("SMARTSHEET_FUNDING_ID")
-SMARTSHEET_FUNDING_TOKEN = os.getenv("SMARTSHEET_API_TOKEN")
-
-SMARTSHEET_PERFUSIONS_ID = os.getenv("SMARTSHEET_PERFUSIONS_ID")
-SMARTSHEET_PERFUSIONS_TOKEN = os.getenv("SMARTSHEET_API_TOKEN")
-
-SMARTSHEET_PROTOCOLS_ID = os.getenv("SMARTSHEET_PROTOCOLS_ID")
-SMARTSHEET_PROTOCOLS_TOKEN = os.getenv("SMARTSHEET_API_TOKEN")
-
-# TODO: Move client instantiation when the server starts instead of creating
-#  one for each request?
 sharepoint_settings = SharepointSettings()
 labtracks_settings = LabTracksSettings()
+
 tars_settings = AzureSettings()
+
 slims_settings = SlimsSettings()
 
-funding_smartsheet_settings = SmartsheetSettings(
-    access_token=SMARTSHEET_FUNDING_TOKEN, sheet_id=SMARTSHEET_FUNDING_ID
-)
-perfusions_smartsheet_settings = SmartsheetSettings(
-    access_token=SMARTSHEET_PERFUSIONS_TOKEN, sheet_id=SMARTSHEET_PERFUSIONS_ID
-)
-
-protocols_smartsheet_settings = SmartsheetSettings(
-    access_token=SMARTSHEET_PROTOCOLS_TOKEN, sheet_id=SMARTSHEET_PROTOCOLS_ID
-)
+funding_smartsheet_settings = FundingSmartsheetSettings()
+perfusions_smartsheet_settings = PerfusionsSmartsheetSettings()
+protocols_smartsheet_settings = ProtocolsSmartsheetSettings()
 
 mgi_settings = MgiSettings()
 
@@ -97,6 +83,7 @@ protocols_smart_sheet_client = SmartSheetClient(
 slims_client = SlimsHandler(settings=slims_settings)
 tars_client = TarsClient(azure_settings=tars_settings)
 mgi_client = MgiClient(settings=mgi_settings)
+sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
 
 template_directory = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "templates")
@@ -318,7 +305,6 @@ async def retrieve_intended_measurements(subject_id):
     """
     Retrieves intended measurements from SLIMS server
     """
-    sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
     model_response = await run_in_threadpool(
         sharepoint_client.get_intended_measurement_info, subject_id=subject_id
     )
@@ -334,7 +320,6 @@ async def retrieve_procedures(subject_id):
     lb_response = await run_in_threadpool(
         lb_client.get_procedures_info, subject_id=subject_id
     )
-    sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
     sp2019_response = await run_in_threadpool(
         sharepoint_client.get_procedure_info,
         subject_id=subject_id,
@@ -344,6 +329,11 @@ async def retrieve_procedures(subject_id):
         sharepoint_client.get_procedure_info,
         subject_id=subject_id,
         list_id=sharepoint_settings.nsb_2023_list_id,
+    )
+    sp2025_response = await run_in_threadpool(
+        sharepoint_client.get_procedure_info,
+        subject_id=subject_id,
+        list_id=sharepoint_settings.nsb_present_list_id,
     )
     las2020_response = await run_in_threadpool(
         sharepoint_client.get_procedure_info,
@@ -356,6 +346,7 @@ async def retrieve_procedures(subject_id):
             lb_response,
             sp2019_response,
             sp2023_response,
+            sp2025_response,
             las2020_response,
         ]
     )
