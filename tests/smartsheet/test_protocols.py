@@ -22,8 +22,8 @@ from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.models import ProtocolInformation
 from aind_metadata_service.response_handler import ModelResponse
 from aind_metadata_service.smartsheet.client import (
-    SmartSheetClient,
     ProtocolsSmartsheetSettings,
+    SmartSheetClient,
 )
 from aind_metadata_service.smartsheet.protocols.mapping import (
     ProtocolsIntegrator,
