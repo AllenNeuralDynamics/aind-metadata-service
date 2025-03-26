@@ -1,0 +1,21 @@
+[
+   {
+      "pk": 1664,
+      "tableName": "ReferenceDataRecord",
+      "columns": [
+         {
+            "name": "rdrc_cf_fk_manufacturer",
+            "value": 66,
+            "displayValue": "Sigma-Aldrich",
+            "datatype": "FOREIGN_KEY",
+            "title": "Manufacturer"
+         },
+         {
+            "name": "rdrc_pk",
+            "value": 1664,
+            "datatype": "INTEGER",
+            "title": "rdrc_pk"
+         }
+      ]
+   }
+]

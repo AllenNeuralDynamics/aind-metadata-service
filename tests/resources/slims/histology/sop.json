@@ -1,0 +1,26 @@
+[
+   {
+      "pk": 24,
+      "tableName": "Sop",
+      "columns": [
+         {
+            "name": "stop_name",
+            "value": "Refractive Index Matching - Ethyl Cinnamate (UNPUBLISHED)",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "stop_link",
+            "value": "<a href=\"https://www.protocols.io/edit/refractive-index-matching-ethyl-cinnamate-cukpwuvn\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">Refractive Index Matching - Ethyl Cinnamate</a>",
+            "datatype": "STRING",
+            "title": "Link"
+         },
+         {
+            "name": "stop_pk",
+            "value": 24,
+            "datatype": "INTEGER",
+            "title": "stop_pk"
+         }
+      ]
+   }
+]

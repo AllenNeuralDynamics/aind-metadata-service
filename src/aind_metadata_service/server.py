@@ -28,8 +28,10 @@ from aind_metadata_service.sharepoint.client import (
 )
 from aind_metadata_service.slims.client import SlimsHandler, SlimsSettings
 from aind_metadata_service.smartsheet.client import (
+    FundingSmartsheetSettings,
+    PerfusionsSmartsheetSettings,
+    ProtocolsSmartsheetSettings,
     SmartSheetClient,
-    SmartsheetSettings,
 )
 from aind_metadata_service.smartsheet.funding.mapping import FundingMapper
 from aind_metadata_service.smartsheet.perfusions.mapping import (
@@ -42,32 +44,16 @@ from aind_metadata_service.smartsheet.protocols.mapping import (
 from aind_metadata_service.tars.client import AzureSettings, TarsClient
 from aind_metadata_service.tars.mapping import TarsResponseHandler
 
-SMARTSHEET_FUNDING_ID = os.getenv("SMARTSHEET_FUNDING_ID")
-SMARTSHEET_FUNDING_TOKEN = os.getenv("SMARTSHEET_API_TOKEN")
-
-SMARTSHEET_PERFUSIONS_ID = os.getenv("SMARTSHEET_PERFUSIONS_ID")
-SMARTSHEET_PERFUSIONS_TOKEN = os.getenv("SMARTSHEET_API_TOKEN")
-
-SMARTSHEET_PROTOCOLS_ID = os.getenv("SMARTSHEET_PROTOCOLS_ID")
-SMARTSHEET_PROTOCOLS_TOKEN = os.getenv("SMARTSHEET_API_TOKEN")
-
-# TODO: Move client instantiation when the server starts instead of creating
-#  one for each request?
 sharepoint_settings = SharepointSettings()
 labtracks_settings = LabTracksSettings()
+
 tars_settings = AzureSettings()
+
 slims_settings = SlimsSettings()
 
-funding_smartsheet_settings = SmartsheetSettings(
-    access_token=SMARTSHEET_FUNDING_TOKEN, sheet_id=SMARTSHEET_FUNDING_ID
-)
-perfusions_smartsheet_settings = SmartsheetSettings(
-    access_token=SMARTSHEET_PERFUSIONS_TOKEN, sheet_id=SMARTSHEET_PERFUSIONS_ID
-)
-
-protocols_smartsheet_settings = SmartsheetSettings(
-    access_token=SMARTSHEET_PROTOCOLS_TOKEN, sheet_id=SMARTSHEET_PROTOCOLS_ID
-)
+funding_smartsheet_settings = FundingSmartsheetSettings()
+perfusions_smartsheet_settings = PerfusionsSmartsheetSettings()
+protocols_smartsheet_settings = ProtocolsSmartsheetSettings()
 
 mgi_settings = MgiSettings()
 
@@ -245,6 +231,32 @@ async def retrieve_smartspim_imaging(
     return response
 
 
+@app.get("/slims/histology")
+async def retrieve_slims_histology(
+    subject_id: Optional[str] = Query(None, alias="subject_id"),
+    start_date_gte: Optional[str] = Query(
+        None,
+        alias="start_date_gte",
+        description="Experiment run created on or after. (ISO format)",
+    ),
+    end_date_lte: Optional[str] = Query(
+        None,
+        alias="end_date_lte",
+        description="Experiment run created on or before. (ISO format)",
+    ),
+):
+    """
+    Retrieves Histology data from SLIMS server
+    """
+    response = await run_in_threadpool(
+        slims_client.get_slims_histology_response,
+        subject_id=subject_id,
+        start_date=start_date_gte,
+        end_date=end_date_lte,
+    )
+    return response
+
+
 @app.get("/subject/{subject_id}")
 async def retrieve_subject(subject_id):
     """
@@ -287,6 +299,18 @@ async def retrieve_injection_materials(prep_lot_number):
     return model_response.map_to_json_response()
 
 
+@app.get("/intended_measurements/{subject_id}")
+async def retrieve_intended_measurements(subject_id):
+    """
+    Retrieves intended measurements from SLIMS server
+    """
+    sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
+    model_response = await run_in_threadpool(
+        sharepoint_client.get_intended_measurement_info, subject_id=subject_id
+    )
+    return model_response.map_to_json_response()
+
+
 @app.get("/procedures/{subject_id}")
 async def retrieve_procedures(subject_id):
     """
@@ -300,17 +324,22 @@ async def retrieve_procedures(subject_id):
     sp2019_response = await run_in_threadpool(
         sharepoint_client.get_procedure_info,
         subject_id=subject_id,
-        list_title=sharepoint_settings.nsb_2019_list,
+        list_id=sharepoint_settings.nsb_2019_list_id,
     )
     sp2023_response = await run_in_threadpool(
         sharepoint_client.get_procedure_info,
         subject_id=subject_id,
-        list_title=sharepoint_settings.nsb_2023_list,
+        list_id=sharepoint_settings.nsb_2023_list_id,
+    )
+    sp2025_response = await run_in_threadpool(
+        sharepoint_client.get_procedure_info,
+        subject_id=subject_id,
+        list_id=sharepoint_settings.nsb_present_list_id,
     )
     las2020_response = await run_in_threadpool(
         sharepoint_client.get_procedure_info,
         subject_id=subject_id,
-        list_title=sharepoint_settings.las_2020_list,
+        list_id=sharepoint_settings.las_2020_list_id,
     )
     # merge subject procedures
     merged_response = sharepoint_client.merge_responses(
@@ -318,6 +347,7 @@ async def retrieve_procedures(subject_id):
             lb_response,
             sp2019_response,
             sp2023_response,
+            sp2025_response,
             las2020_response,
         ]
     )
@@ -353,10 +383,9 @@ async def retrieve_procedures(subject_id):
     integrated_response = protocols_integrator.integrate_protocols(
         response=integrated_response, protocols_mapping=protocols_mapping
     )
-    # merge specimen procedures
     slims_response = await run_in_threadpool(
-        slims_client.get_specimen_procedures_model_response,
-        specimen_id=subject_id,
+        slims_client.get_histology_procedures_model_response,
+        subject_id=subject_id,
     )
     merged_response = sharepoint_client.merge_responses(
         [integrated_response, slims_response]

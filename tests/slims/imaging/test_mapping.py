@@ -5,7 +5,6 @@ import unittest
 from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
-from unittest.mock import MagicMock, patch
 
 from aind_metadata_service.slims.imaging.handler import SlimsSpimData
 from aind_metadata_service.slims.imaging.mapping import (
@@ -21,35 +20,6 @@ RESOURCES_DIR = (
     / "slims"
     / "imaging"
 )
-
-
-class TestSpimData(unittest.TestCase):
-    """Tests validators in SpimData model"""
-
-    def test_parse_html(self):
-        """Tests parse html"""
-        protocol_html = '<a href="https://example.com">Example</a>'
-        output = SpimData.parse_html(protocol_html)
-        self.assertEqual("https://example.com", output)
-
-    def test_parse_malformed_html(self):
-        """Tests parse_html when malformed string"""
-        protocol_html = "<a>Missing Href</a>"
-        output = SpimData.parse_html(protocol_html)
-        self.assertIsNone(output)
-
-    def test_parse_non_html(self):
-        """Tests parse_html when regular string passed in"""
-        protocol_html = "Not in HTML"
-        output = SpimData.parse_html(protocol_html)
-        self.assertEqual("Not in HTML", output)
-
-    @patch("logging.warning")
-    def test_parse_error(self, mock_log_warn: MagicMock):
-        """Tests parse_html when regular string passed in"""
-        output = SpimData.parse_html(123)
-        self.assertIsNone(output)
-        mock_log_warn.assert_called_once()
 
 
 class TestSlimsSpimMapper(unittest.TestCase):
@@ -82,6 +52,16 @@ class TestSlimsSpimMapper(unittest.TestCase):
                 z_direction="Superior to Inferior",
                 y_direction="Anterior to Posterior",
                 x_direction="Left to Right",
+                imaging_channels=[
+                    "Laser = 488; Emission Filter = 525/45",
+                    "Laser = 561; Emission Filter = 593/40",
+                    "Laser = 639; Emission Filter = 667/30",
+                ],
+                stitching_channels="Laser = 639, Emission Filter = 667/30",
+                ccf_registration_channels=(
+                    "Laser = 639, Emission Filter = 667/30"
+                ),
+                cell_segmentation_channels=None,
             )
         ]
         mapper = SlimsSpimMapper(slims_spim_data=slims_spim_data)
@@ -109,6 +89,16 @@ class TestSlimsSpimMapper(unittest.TestCase):
                 z_direction="Superior to Inferior",
                 y_direction="Anterior to Posterior",
                 x_direction="Left to Right",
+                imaging_channels=[
+                    "Laser = 488; Emission Filter = 525/45",
+                    "Laser = 561; Emission Filter = 593/40",
+                    "Laser = 639; Emission Filter = 667/30",
+                ],
+                stitching_channels="Laser = 639, Emission Filter = 667/30",
+                ccf_registration_channels=(
+                    "Laser = 639, Emission Filter = 667/30"
+                ),
+                cell_segmentation_channels=None,
             )
         ]
 

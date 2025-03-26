@@ -22,8 +22,8 @@ from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.models import ProtocolInformation
 from aind_metadata_service.response_handler import ModelResponse
 from aind_metadata_service.smartsheet.client import (
+    ProtocolsSmartsheetSettings,
     SmartSheetClient,
-    SmartsheetSettings,
 )
 from aind_metadata_service.smartsheet.protocols.mapping import (
     ProtocolsIntegrator,
@@ -56,8 +56,8 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
     def test_get_sheet_success(self, mock_get_sheet: MagicMock):
         """Tests successful sheet return response"""
         mock_get_sheet.return_value.to_json.return_value = self.example_sheet
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+        settings = ProtocolsSmartsheetSettings(
+            api_token="abc-123", id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         sheet_response = client.get_sheet()
@@ -77,8 +77,8 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
         mock_get_sheet.side_effect = MagicMock(
             side_effect=Exception("Error connecting to server")
         )
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+        settings = ProtocolsSmartsheetSettings(
+            api_token="abc-123", id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         response = client.get_sheet()
@@ -94,8 +94,8 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
     def test_mapping(self, mock_get_sheet: MagicMock):
         """Tests successful sheet return response"""
         mock_get_sheet.return_value.to_json.return_value = self.example_sheet
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+        settings = ProtocolsSmartsheetSettings(
+            api_token="abc-123", id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
@@ -126,8 +126,8 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
     def test_mapping_empty_response(self, mock_get_sheet: MagicMock):
         """Tests empty return response"""
         mock_get_sheet.return_value.to_json.return_value = None
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+        settings = ProtocolsSmartsheetSettings(
+            api_token="abc-123", id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
@@ -151,8 +151,8 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
         )
 
         mock_get_sheet.return_value.to_json.return_value = self.example_sheet
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+        settings = ProtocolsSmartsheetSettings(
+            api_token="abc-123", id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()
@@ -193,8 +193,8 @@ class TestSmartsheetProtocolsClient(unittest.TestCase):
             side_effect=Exception("Mapping Error")
         )
         mock_get_sheet.return_value.to_json.return_value = self.example_sheet
-        settings = SmartsheetSettings(
-            access_token="abc-123", sheet_id=7478444220698500
+        settings = ProtocolsSmartsheetSettings(
+            api_token="abc-123", id=7478444220698500
         )
         client = SmartSheetClient(smartsheet_settings=settings)
         smart_sheet_response = client.get_sheet()

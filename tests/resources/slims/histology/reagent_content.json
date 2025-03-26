@@ -1,0 +1,53 @@
+[
+   {
+      "pk": 138,
+      "tableName": "Content",
+      "columns": [
+         {
+            "name": "cntn_fk_category",
+            "value": 11,
+            "displayValue": "Reagents, Externally Manufactured",
+            "datatype": "FOREIGN_KEY",
+            "title": "Category"
+         },
+         {
+            "name": "cntn_cf_fk_reagentCatalogNumber",
+            "value": 1664,
+            "displayValue": "112372-100G",
+            "datatype": "FOREIGN_KEY",
+            "title": "Reagent REF number"
+         },
+         {
+            "name": "cntn_cf_lotNumber",
+            "value": "stbk5149",
+            "datatype": "STRING",
+            "title": "Lot number"
+         },
+         {
+            "name": "cntn_barCode",
+            "value": "rgntEX00000020",
+            "datatype": "STRING",
+            "title": "Barcode"
+         },
+         {
+            "name": "cntn_fk_source",
+            "value": null,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Source"
+         },
+         {
+            "name": "cntn_cf_parentBarcode",
+            "value": "N/A - no parent",
+            "datatype": "STRING",
+            "title": "Parent barcode"
+         },
+         {
+            "name": "cntn_pk",
+            "value": 138,
+            "datatype": "INTEGER",
+            "title": "cntn_pk"
+         }
+      ]
+   }
+]
