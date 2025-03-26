@@ -15,8 +15,8 @@ from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.models import FundingInformation
 from aind_metadata_service.response_handler import ModelResponse
 from aind_metadata_service.smartsheet.client import (
-    SmartSheetClient,
     FundingSmartsheetSettings,
+    SmartSheetClient,
 )
 from aind_metadata_service.smartsheet.funding.mapping import FundingMapper
 from aind_metadata_service.smartsheet.models import SheetFields, SheetRow

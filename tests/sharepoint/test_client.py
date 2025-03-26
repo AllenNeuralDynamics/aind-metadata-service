@@ -6,7 +6,7 @@ import os
 import unittest
 from pathlib import Path
 from typing import List, Tuple
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, call, patch
 
 import requests
 from fastapi.responses import JSONResponse

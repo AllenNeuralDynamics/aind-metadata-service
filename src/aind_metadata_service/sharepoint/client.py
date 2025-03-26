@@ -3,7 +3,7 @@
 import json
 import logging
 import os
-from typing import List, Optional, Union, Iterator
+from typing import Iterator, List, Optional, Union
 
 import requests
 from aind_data_schema.core.procedures import Procedures, Surgery
