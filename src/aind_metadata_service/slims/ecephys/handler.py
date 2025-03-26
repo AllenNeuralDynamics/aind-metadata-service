@@ -3,7 +3,7 @@ Module to handle fetching ephys session data from slims and parsing it to a mode
 """
 
 from datetime import datetime
-from decimal import Decimal
+from decimal import float
 from typing import List, Optional, Tuple
 
 from networkx import DiGraph, descendants
@@ -17,8 +17,42 @@ from aind_metadata_service.slims.table_handler import (
 
 class SlimsStreamModule(BaseModel):
     """Stream Module"""
+    
+    implant_hole: Optional[str] = None
+    assembly_name: Optional[str] = None
+    probe_name: Optional[str] = None
+    primary_target_structure: Optional[str] = None
+    secondary_target_structures: Optional[str] = None
+    arc_angle: Optional[float] = None
+    module_angle: Optional[float] = None
+    rotation_angle: Optional[float] = None
+    coordinate_transform: Optional[str] = None
+    ccf_coordinate_ap: Optional[float] = None
+    ccf_coordinate_ml: Optional[float] = None
+    ccf_coordinate_dv: Optional[float] = None
+    ccf_version: Optional[str] = None
+    bregma_target_ap: Optional[float] = None
+    bregma_target_ml: Optional[float] = None
+    bregma_target_dv: Optional[float] = None
+    surface_z: Optional[float] = None
+    manipulator_x: Optional[float] = None
+    manipulator_y: Optional[float] = None
+    manipulator_z: Optional[float] = None
+    dye: Optional[str] = None
 
-    # TODO: reward delivery
+# TODO: check if this needs to be nested, or if it can just be in ephys dict directly
+class SlimsRewardSpouts(BaseModel):
+    """Reward Spouts"""
+    
+    spout_side: Optional[str] = None
+    starting_position: Optional[str] = None
+    variable_position: Optional[bool] = None
+class SlimsRewardDelivery(BaseModel):
+    """Reward Delivery"""
+    
+    reward_solution: Optional[str] = None
+    other_reward_solution: Optional[str] = None
+    reward_spouts: Optional[List[SlimsRewardSpouts]] = None
 
 class SlimsEcephysData(BaseModel):
     """Expected Model that needs to be extracted from SLIMS"""
@@ -31,15 +65,18 @@ class SlimsEcephysData(BaseModel):
     session_type: Optional[str] = None
     device_calibrations: Optional[str] = None
     mouse_platform_name: Optional[str] = None
-    active_mouse_platform: Optional[str] = None
+    active_mouse_platform: Optional[bool] = None
     # mouse session 
     session_name: Optional[str] = None
     animal_weight_prior: Optional[float] = None
     animal_weight_after: Optional[float] = None
     reward_consumed: Optional[float] = None
-    reward_consumed_units: Optional[str] = None
+    reward_consumed_unit: Optional[str] = None
     stimulus_epochs: Optional[str] = None # attachment? 
     link_to_stimulus_epochs: Optional[str] = None
+    # reward delivery
+    reward_solution: Optional[str] = None
+    other_reward_solution: Optional[str] = None
     # streams
     stream_modalities: Optional[list] = None
     stream_modules: Optional[list] = None
@@ -47,7 +84,7 @@ class SlimsEcephysData(BaseModel):
     camera_names: Optional[list] = None
 
 
-class SlimsEcephys(SlimsTableHandler):
+class SlimsEcephysHandler(SlimsTableHandler):
     """Class to handle getting Ephys Session info from SLIMS."""
 
     @staticmethod
@@ -71,108 +108,90 @@ class SlimsEcephys(SlimsTableHandler):
 
         """
 
-        spim_data_list = []
+        ephys_data_list = []
         for node in root_nodes:
-            spim_data = SlimsSpimData()
+            ephys_data = SlimsEcephysData()
             node_des = descendants(g, node)
             exp_run_created_on = get_attr_or_none(
                 g.nodes[node]["row"], "xprn_createdOn"
             )
-            spim_data.experiment_run_created_on = exp_run_created_on
+            ephys_data.experiment_run_created_on = exp_run_created_on
             for n in node_des:
                 table_name = g.nodes[n]["table_name"]
                 row = g.nodes[n]["row"]
                 if table_name == "Content":
-                    n_subject_id = get_attr_or_none(
-                        row, "cntn_cf_parentBarcode"
-                    )
-                    n_specimen_id = get_attr_or_none(row, "cntn_barCode")
-                    spim_data.subject_id = n_subject_id
-                    spim_data.specimen_id = n_specimen_id
-                if table_name == "SOP":
-                    stop_link = get_attr_or_none(row, "stop_link")
-                    stop_name = get_attr_or_none(row, "stop_name")
-                    spim_data.protocol_id = stop_link
-                    spim_data.protocol_name = stop_name
+                    n_subject_id = get_attr_or_none(row, "cntn_barCode")
+                    ephys_data.subject_id = n_subject_id
                 if (
-                    table_name == "ReferenceDataRecord"
-                    and get_attr_or_none(
-                        row, "rdrc_fk_referenceDataType", "displayValue"
-                    )
-                    == "SPIM Brain Orientation"
-                ):
-                    z_direction = get_attr_or_none(row, "rdrc_cf_zDirection")
-                    x_direction = get_attr_or_none(row, "rdrc_cf_xDirection")
-                    y_direction = get_attr_or_none(row, "rdrc_cf_yDirection")
-                    spim_data.z_direction = z_direction
-                    spim_data.x_direction = x_direction
-                    spim_data.y_direction = y_direction
+                    table_name == "ExperimentRunStep" and get_attr_or_none(row, "xprs_name") == "Group of Sessions"):
+                    ephys_data.operator = get_attr_or_none(row, "xprs_cf_fk_operator", "displayValue")
+                    ephys_data.session_type = get_attr_or_none(row, "xprs_cf_sessionType")
+                    ephys_data.mouse_platform_name = get_attr_or_none(row, "xprs_cf_mousePlatformName")
+                    ephys_data.active_mouse_platform = get_attr_or_none(row, "xprs_cf_activeMousePlatform")
+                    ephys_data.instrument = get_attr_or_none(row, "xprs_cf_fk_instrumentJson", "displayValue")
+                    # device calibrations
                 if (
-                    table_name == "ReferenceDataRecord"
-                    and get_attr_or_none(
-                        row, "rdrc_fk_referenceDataType", "displayValue"
-                    )
-                    == "AIND Instruments"
+                    table_name == "Result" and get_attr_or_none(row, "test_label") == "Mouse Session"
                 ):
-                    instrument_name = get_attr_or_none(row, "rdrc_name")
-                    spim_data.instrument_id = instrument_name
-                if table_name == "Result":
-                    user = get_attr_or_none(
-                        row, "rslt_cf_fk_operator", "displayValue"
-                    )
-                    chamber_immersion_medium = get_attr_or_none(
-                        row, "rslt_cf_chamberImmersionMedium"
-                    )
-                    sample_immersion_medium = get_attr_or_none(
-                        row, "rslt_cf_sampleImmersionMedium"
-                    )
-                    chamber_refractive_index = get_attr_or_none(
-                        row, "rslt_cf_chamberRefractiveIndex"
-                    )
-                    sample_refractive_index = get_attr_or_none(
-                        row, "rslt_cf_sampleRefractiveIndex"
-                    )
-                    date_performed = get_attr_or_none(
-                        row, "rslt_cf_datePerformed"
-                    )
-                    spim_data.chamber_immersion_medium = (
-                        chamber_immersion_medium
-                    )
-                    spim_data.chamber_refractive_index = (
-                        None
-                        if chamber_refractive_index is None
-                        else Decimal(str(chamber_refractive_index))
-                    )
-                    spim_data.sample_immersion_medium = sample_immersion_medium
-                    spim_data.sample_refractive_index = (
-                        None
-                        if sample_refractive_index is None
-                        else Decimal(str(sample_refractive_index))
-                    )
-                    spim_data.date_performed = date_performed
-                    spim_data.experimenter_name = user
+                    ephys_data.session_name = get_attr_or_none(row, "rslt_cf_sessionName")
+                    ephys_data.animal_weight_prior = get_attr_or_none(row, "rslt_cf_animalWeightPrior")
+                    ephys_data.animal_weight_after = get_attr_or_none(row, "rslt_cf_animalWeightPost")
+                    ephys_data.reward_consumed = get_attr_or_none(row, "rslt_cf_rewardConsumedvolume") # field name in sandbox
+                    ephys_data.reward_consumed_unit = get_attr_or_none(row, "rslt_cf_rewardConsumedvolume", "unit") # TODO: check this, its getting g?
+                    # stimulus epochs (attachment vs link)
                 if (
-                    table_name == "Order"
-                    and get_attr_or_none(
-                        row, "ordr_fk_orderType", "displayValue"
-                    )
-                    == "SmartSPIM Histology and Imaging"
+                    table_name == "ReferenceDataRecord" and get_attr_or_none(row, "rdrc_fk_referenceDataType", "displayValue") == "Reward Delivery"
+                ): 
+                    ephys_data.reward_solution = get_attr_or_none(row, "rdrc_cf_rewardSolution")
+                    ephys_data.other_reward_solution = get_attr_or_none(row, "rdrc_cf_specifyRewardSolution") # only in prod instance
+                # TODO: check that reward spouts are being added to the graph correctly
+                if (
+                    table_name == "ReferenceDataRecord" and get_attr_or_none(row, "rdrc_fk_referenceDataType", "displayValue") == "Reward Spouts"
                 ):
-                    spim_data.imaging_channels = get_attr_or_none(
-                        row, "ordr_cf_fluorescenceChannels_Imaging"
+                    spout_side = get_attr_or_none(row, "rdrc_cf_spoutSide")
+                    starting_position = get_attr_or_none(row, "rdrc_cf_startingPosition")
+                    variable_position = get_attr_or_none(row, "rdrc_cf_variablePosition")
+                    reward_spout = SlimsRewardSpouts(spout_side=spout_side, starting_position=starting_position, variable_position=variable_position)
+                    print(reward_spout)
+                if (
+                    table_name == "Result" and get_attr_or_none(row, "test_label") == "Streams"
+                ):
+                    ephys_data.stream_modalities = get_attr_or_none(row, "rslt_cf_streamModalities")
+                    ephys_data.daq_names = get_attr_or_none(row, "rslt_cf_daqNames")
+                    ephys_data.camera_names = get_attr_or_none(row, "rslt_cf_cameraNames2") # sandbox, check name in prod
+                    # headframe registration? 
+                if (
+                    table_name == "ReferenceDataRecord" and get_attr_or_none(row, "rdrc_fk_referenceDataType", "displayValue") == "Dome Module"
+                ):
+                    stream_module = SlimsStreamModule(
+                        implant_hole=get_attr_or_none(row, "rdrc_cf_bsl"),
+                        assembly_name=get_attr_or_none(row, "rdrc_cf_assemblyName"),
+                        probe_name=get_attr_or_none(row, "rdrc_cf_probeName"),
+                        primary_target_structure=get_attr_or_none(row, "rdrc_cf_primaryTargetStructure", "displayValue"),
+                        secondary_target_structures=get_attr_or_none(row, "rdrc_cf_secondaryTargetStructures", "displayValue"),
+                        arc_angle=get_attr_or_none(row, "rdrc_cf_arcAngle"),
+                        module_angle=get_attr_or_none(row, "rdrc_cf_moduleAngle"),
+                        rotation_angle=get_attr_or_none(row, "rdrc_cf_rotationAngle"),
+                        coordinate_transform=get_attr_or_none(row, "rdrc_cf_manipulatorCalibrations_display"),
+                        ccf_coordinate_ap=get_attr_or_none(row, "rdrc_cf_targetedCcfCoordinatesAp"),
+                        ccf_coordinate_ml=get_attr_or_none(row, "rdrc_cf_targetedCcfCoordinatesMl"),
+                        ccf_coordinate_dv=get_attr_or_none(row, "rdrc_cf_targetedCcfCoordinatesDv"),
+                        ccf_version=get_attr_or_none(row, "rdrc_cf_ccfVersion"),
+                        bregma_target_ap=get_attr_or_none(row, "rdrc_cf_targetAp"), # unit is not fixed
+                        bregma_target_ml=get_attr_or_none(row, "rdrc_cf_targetMl"), # unit is not fixed
+                        bregma_target_dv=get_attr_or_none(row, "rdrc_cf_targetDv"), # unit is not fixed
+                        surface_z=get_attr_or_none(row, "rdrc_cf_surfaceZ"),
+                        manipulator_x=get_attr_or_none(row, "rdrc_cf_manipulatorX"),
+                        manipulator_y=get_attr_or_none(row, "rdrc_cf_manipulatory"),
+                        manipulator_z=get_attr_or_none(row, "rdrc_cf_manipulatorZ"),
+                        dye=get_attr_or_none(row, "rdrc_cf_fk_dye", "displayValue"),
+                        # fiber connections? deprecated in sandbox
                     )
-                    spim_data.stitching_channels = get_attr_or_none(
-                        row, "ordr_cf_fluorescenceChannels_Stitching"
-                    )
-                    spim_data.ccf_registration_channels = get_attr_or_none(
-                        row, "ordr_cf_fluorescenceChannels_CcfRegistration"
-                    )
-                    spim_data.cell_segmentation_channels = get_attr_or_none(
-                        row, "ordr_cf_fluorescenceChannels_CellSegmentation"
-                    )
-            if subject_id is None or subject_id == spim_data.subject_id:
-                spim_data_list.append(spim_data)
-        return spim_data_list
+                    ephys_data.stream_modules.append(stream_module)
+                    
+            if subject_id is None or subject_id == ephys_data.subject_id:
+                ephys_data_list.append(ephys_data)
+        return ephys_data_list
 
     def _get_graph(
         self,
@@ -259,19 +278,19 @@ class SlimsEcephys(SlimsTableHandler):
             foreign_table_col="cntn_pk",
             graph=G,
         )
-        # should be getting instruments
-        _ = self.get_rows_from_foreign_table(
-            input_table="ExperimentRunStep",
-            input_rows=result_rows,
-            input_table_cols=[
-                "xprs_cf_fk_instrumentJson",
-            ],
-            foreign_table="ReferenceDataRecord",
-            foreign_table_col="rdrc_pk",
-            graph=G,
-        )
+        # # might not need this!
+        # _ = self.get_rows_from_foreign_table(
+        #     input_table="ExperimentRunStep",
+        #     input_rows=exp_run_step_rows,
+        #     input_table_cols=[
+        #         "xprs_cf_fk_instrumentJson",
+        #     ],
+        #     foreign_table="ReferenceDataRecord",
+        #     foreign_table_col="rdrc_pk",
+        #     graph=G,
+        # )
         # stream modules , check if we can get targeted structures from displayvalues 
-        _ = self.get_rows_from_foreign_table(
+        reference_data_rows = self.get_rows_from_foreign_table(
             input_table="Result",
             input_rows=result_rows,
             input_table_cols=[
@@ -284,7 +303,7 @@ class SlimsEcephys(SlimsTableHandler):
         )
         _ = self.get_rows_from_foreign_table(
             input_table="ReferenceDataRecord",
-            input_rows=result_rows,
+            input_rows=reference_data_rows,
             input_table_cols=[
                 "rdrc_cf_fk_rewardSpouts"
             ],
@@ -295,12 +314,12 @@ class SlimsEcephys(SlimsTableHandler):
 
         return G, root_nodes
 
-    def get_spim_data_from_slims(
+    def get_ephys_data_from_slims(
         self,
         subject_id: Optional[str] = None,
         start_date_greater_than_or_equal: Optional[datetime] = None,
         end_date_less_than_or_equal: Optional[datetime] = None,
-    ) -> List[SlimsSpimData]:
+    ) -> List[SlimsEcephysData]:
         """
         Get SPIM data from SLIMS.
 
@@ -332,8 +351,8 @@ class SlimsEcephys(SlimsTableHandler):
             end_date_less_than_or_equal=end_date_less_than_or_equal,
         )
 
-        spim_data = self._parse_graph(
+        ephys_data = self._parse_graph(
             g=G, root_nodes=root_nodes, subject_id=subject_id
         )
 
-        return spim_data
+        return ephys_data
