@@ -5394,6 +5394,7 @@ class MappedNSBList:
             NSBProcedure.SX_26_ISI_GUIDED__INJECTI,
             NSBProcedure.SX_12__STEREOTAXIC__INJEC,
             NSBProcedure.SX_21__FIBER__OPTIC__IMPL,
+            NSBProcedure.INJECTION_FIBER_OPTIC_IMP_
         }
 
     def has_cran_procedure(self) -> bool:

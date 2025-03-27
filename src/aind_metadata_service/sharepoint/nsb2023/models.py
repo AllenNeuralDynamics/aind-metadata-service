@@ -770,6 +770,7 @@ class Procedure(Enum, metaclass=EnumMeta):
     HP_ONLY = "HP Only"
     HP_TRANSCRANIAL = "HP Transcranial"
     INJECTION_FIBER_OPTIC_IMP = "Injection+Fiber Optic Implant (with Headpost)"
+    INJECTION_FIBER_OPTIC_IMP_ = "Injection + Fiber Optic Implant (with Headpost)"
     INJ_MOTOR_CTX = "INJ + Motor Ctx"
     INJ_VISUAL_CTX_2_P = "INJ + Visual Ctx 2P"
     INJ_WHC_NP_1_INJECTION_LO = "INJ + WHC NP (1 Injection Location)"
