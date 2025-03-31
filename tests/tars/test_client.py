@@ -153,29 +153,30 @@ class TestTarsClient(unittest.TestCase):
 
     def test_filter_prep_lot_response(self):
         """Tests that response data is filtered for exact matches"""
-        mock_response = MagicMock()
-        mock_response.return_value.json.return_value = {
+        response_data = {
             "data": [
-                {
-                    "lot": "VT1",
-                    "datePrepped": "2023-12-15T12:34:56Z",
-                },
-                {
-                    "lot": "VT2",
-                    "datePrepped": "2023-12-15T12:34:56Z",
-                },
-                {
-                    "lot": "VT3",
-                    "datePrepped": "2023-12-15T12:34:56Z",
-                },
+                {"lot": "VT1", "datePrepped": "2023-12-15T12:34:56Z"},
+                {"lot": "VT2", "datePrepped": "2023-12-15T12:34:56Z"},
+                {"lot": "VT3", "datePrepped": "2023-12-15T12:34:56Z"},
             ]
         }
+        mock_response1 = MagicMock()
+        mock_response1.json.return_value = response_data
         with self.assertRaises(ValueError) as context:
             self.tars_client._filter_prep_lot_response(
-                prep_lot_number="VT", response=mock_response
+                prep_lot_number="VT", response=mock_response1
             )
-
         self.assertEqual("No data found for VT", str(context.exception))
+
+        # test for a case insensitive match
+        mock_response2 = MagicMock()
+        mock_response2.json.return_value = response_data
+        data = self.tars_client._filter_prep_lot_response(
+            prep_lot_number="vT1", response=mock_response2
+        )
+        self.assertEqual(
+            data, [{"lot": "VT1", "datePrepped": "2023-12-15T12:34:56Z"}]
+        )
 
     @patch("aind_metadata_service.tars.client.requests.get")
     def test_get_molecules_response(self, mock_get):
