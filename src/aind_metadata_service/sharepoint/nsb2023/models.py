@@ -762,7 +762,6 @@ class Procedure(Enum, metaclass=EnumMeta):
     SX__OVIDUCT__INJECTION = "Sx- Oviduct Injection"
 
     # Added missing attributes
-    """Enum class for Procedure"""
     CUSTOM = "Custom"
     DHC = "DHC"
     FIBER_OPTIC_IMPLANT_WITH = "Fiber Optic Implant (with Headpost)"
@@ -770,7 +769,6 @@ class Procedure(Enum, metaclass=EnumMeta):
     HP_ONLY = "HP Only"
     HP_TRANSCRANIAL = "HP Transcranial"
     INJECTION_FIBER_OPTIC_IMP = "Injection+Fiber Optic Implant (with Headpost)"
-    INJECTION_FIBER_OPTIC_IMP_ = "Injection + Fiber Optic Implant (with Headpost)"
     INJ_MOTOR_CTX = "INJ + Motor Ctx"
     INJ_VISUAL_CTX_2_P = "INJ + Visual Ctx 2P"
     INJ_WHC_NP_1_INJECTION_LO = "INJ + WHC NP (1 Injection Location)"
@@ -782,6 +780,22 @@ class Procedure(Enum, metaclass=EnumMeta):
     VISUAL_CTX_NP = "Visual Ctx NP"
     WHC_2_P = "WHC 2P"
     WHC_NP = "WHC NP"
+
+    # Missing attributes after Sx Procedure # Removal
+    MOTOR_CTX_2_P = "Motor Ctx 2P"
+    GRID_INJ_6_OR_9_VISUAL = "Grid INJ (6 or 9) + Visual Ctx 2P"
+    INJ_MOTOR_CTX_2_P = "INJ + Motor Ctx 2P"
+    GRID_INJ_6_OR_9_MOTOR_C = "Grid INJ (6 or 9) + Motor Ctx 2P"
+    INJ_WHC_NP = "INJ + WHC NP"
+    INJ_DHC = "INJ+DHC"
+    INJECTION_FIBER_OPTIC_IMP_ = (
+        "Injection + Fiber Optic Implant (with Headpost)"
+    )
+    STEREOTAXIC_INJECTIONS_1 = "Stereotaxic injections: 1 INJ material"
+    STEREOTAXIC_INJECTIONS_2 = "Stereotaxic injections: 2+ INJ materials"
+    EMG__ARRAY = "EMG Array"
+    TESTES__INJECTION = "Testes Injection"
+    OVIDUCT__INJECTION = "Oviduct Injection"
 
 
 class Headpost(Enum, metaclass=EnumMeta):

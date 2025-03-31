@@ -5394,7 +5394,7 @@ class MappedNSBList:
             NSBProcedure.SX_26_ISI_GUIDED__INJECTI,
             NSBProcedure.SX_12__STEREOTAXIC__INJEC,
             NSBProcedure.SX_21__FIBER__OPTIC__IMPL,
-            NSBProcedure.INJECTION_FIBER_OPTIC_IMP_
+            NSBProcedure.INJECTION_FIBER_OPTIC_IMP_,
         }
 
     def has_cran_procedure(self) -> bool:
@@ -5420,6 +5420,11 @@ class MappedNSBList:
             NSBProcedure.SX_14__VISUAL__CTX_NP,
             NSBProcedure.SX_15_WHC_NP,
             NSBProcedure.SX_16_INJ_WHC_NP,
+            NSBProcedure.GRID_INJ_6_OR_9_VISUAL,
+            NSBProcedure.MOTOR_CTX_2_P,
+            NSBProcedure.INJ_MOTOR_CTX_2_P,
+            NSBProcedure.GRID_INJ_6_OR_9_MOTOR_C,
+            NSBProcedure.INJ_WHC_NP,
         }
 
     def surgery_during_info(

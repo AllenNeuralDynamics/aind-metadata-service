@@ -477,7 +477,7 @@ class SharePointClient:
                 unique.append(item)
             else:
                 logging.info("Duplicate item found and removed.")
-            
+
         return unique
 
     def _handle_response_from_sharepoint(
