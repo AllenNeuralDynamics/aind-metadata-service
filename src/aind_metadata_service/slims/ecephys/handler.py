@@ -60,7 +60,7 @@ class SlimsEcephysData(BaseModel):
     operator: Optional[str] = None
     instrument: Optional[str] = None
     session_type: Optional[str] = None
-    device_calibrations: Optional[str] = None
+    device_calibrations: Optional[int] = None
     mouse_platform_name: Optional[str] = None
     active_mouse_platform: Optional[bool] = None
     # mouse session 
@@ -70,7 +70,7 @@ class SlimsEcephysData(BaseModel):
     animal_weight_unit: Optional[str] = None
     reward_consumed: Optional[float] = None
     reward_consumed_unit: Optional[str] = None
-    stimulus_epochs: Optional[str] = None # attachment? 
+    stimulus_epochs: Optional[int] = None # attachment? 
     link_to_stimulus_epoch_code: Optional[str] = None
     # reward delivery -- check if needs to be its own model
     reward_solution: Optional[str] = None
@@ -131,7 +131,7 @@ class SlimsEcephysHandler(SlimsTableHandler):
                     ephys_data.mouse_platform_name = get_attr_or_none(row, "xprs_cf_mousePlatformName")
                     ephys_data.active_mouse_platform = get_attr_or_none(row, "xprs_cf_activeMousePlatform")
                     ephys_data.instrument = get_attr_or_none(row, "xprs_cf_fk_instrumentJson", "displayValue")
-                    # device calibrations
+                    ephys_data.device_calibrations = get_attr_or_none(row, "xprs_cf_deviceCalibrations")
                 if (
                     table_name == "Result" and get_attr_or_none(row, "test_label") == "Mouse Session"
                 ):
@@ -142,7 +142,7 @@ class SlimsEcephysHandler(SlimsTableHandler):
                     ephys_data.reward_consumed = get_attr_or_none(row, "rslt_cf_rewardConsumedvolume") # field name in sandbox
                     ephys_data.reward_consumed_unit = get_attr_or_none(row, "rslt_cf_rewardConsumedvolume", "unit") # TODO: check this, its getting g?
                     ephys_data.link_to_stimulus_epoch_code = get_attr_or_none(row, "rslt_cf_linkToStimulusEpochCode")
-                    # stimulus epochs (attachment)
+                    ephys_data.stimulus_epochs = get_attr_or_none(row, "rslt_cf_stimulusEpochs")
                 if (
                     table_name == "ReferenceDataRecord" and get_attr_or_none(row, "rdrc_fk_referenceDataType", "displayValue") == "Reward Delivery"
                 ): 
