@@ -194,9 +194,11 @@ class SlimsEcephysHandler(SlimsTableHandler):
                         dye=get_attr_or_none(row, "rdrc_cf_fk_dye", "displayValue"),
                     )
                     ephys_data.stream_modules.append(stream_module)
-                    
-            if subject_id is None or subject_id == ephys_data.subject_id and session_name is None or session_name == ephys_data.session_name:
+            
+            if (subject_id is None or subject_id == ephys_data.subject_id) and \
+            (session_name is None or session_name == ephys_data.session_name):
                 ephys_data_list.append(ephys_data)
+                        
         return ephys_data_list
 
     def _get_graph(

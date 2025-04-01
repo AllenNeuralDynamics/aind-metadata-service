@@ -232,11 +232,8 @@ class SlimsHandler:
                 start_date_greater_than_or_equal=parsed_start_date,
                 end_date_less_than_or_equal=parsed_end_date,
             )
-            integrated_slims_ephys_data = self._integrate_ecephys_attachment_responses(
-                slims_ephys_data=slims_ephys_data
-            )
             ephys_data = SlimsEcephysMapper(
-                slims_ephys_data=integrated_slims_ephys_data
+                slims_ephys_data=slims_ephys_data
             ).map_info_from_slims()
             if len(ephys_data) == 0:
                 m = ModelResponse.no_data_found_error_response()
@@ -257,25 +254,6 @@ class SlimsHandler:
             logging.exception(e)
             m = ModelResponse.internal_server_error_response()
             return m.map_to_json_response()
-        
-    def _integrate_ecephys_attachment_responses(
-            self, slims_ephys_data: list[SlimsEcephysData]
-    ):
-        """Get the attachment response for the ecephys data"""
-        for data in slims_ephys_data:
-            if getattr(data, "stimulus_epochs", None):
-                response = self.client.fetch_attachment_content(data.stimulus_epochs)
-                if response.status_code == 200 and self._is_json_file(response):
-                    data.stimulus_epochs = response.json()
-                else: 
-                    data.stimulus_epochs = None
-            if getattr(data, "device_calibrations", None):
-                response = self.client.fetch_attachment_content(data.device_calibrations)
-                if response.status_code == 200 and self._is_json_file(response):
-                    data.device_calibrations = response.json()
-                else:
-                    data.device_calibrations = None
-        return data
         
     def get_slims_histology_response(
         self,

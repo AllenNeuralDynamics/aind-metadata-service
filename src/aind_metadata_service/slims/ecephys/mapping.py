@@ -13,30 +13,30 @@ from aind_metadata_service.slims.ecephys.handler import SlimsEcephysData, SlimsR
 class StreamModule(BaseModel):
     """Stream Module"""
     
-    implant_hole: Optional[float] = None
+    implant_hole: Optional[Decimal] = None
     assembly_name: Optional[str] = None
     probe_name: Optional[str] = None
     primary_target_structure: Optional[str] = None
     secondary_target_structures: Optional[str] = None
-    arc_angle: Optional[float] = None
-    module_angle: Optional[float] = None
-    rotation_angle: Optional[float] = None
+    arc_angle: Optional[Decimal] = None
+    module_angle: Optional[Decimal] = None
+    rotation_angle: Optional[Decimal] = None
     angle_unit: Optional[str] = None
     coordinate_transform: Optional[str] = None
-    ccf_coordinate_ap: Optional[float] = None
-    ccf_coordinate_ml: Optional[float] = None
-    ccf_coordinate_dv: Optional[float] = None
+    ccf_coordinate_ap: Optional[Decimal] = None
+    ccf_coordinate_ml: Optional[Decimal] = None
+    ccf_coordinate_dv: Optional[Decimal] = None
     ccf_coordinate_unit: Optional[str] = None
     ccf_version: Optional[str] = None
-    bregma_target_ap: Optional[float] = None
-    bregma_target_ml: Optional[float] = None
-    bregma_target_dv: Optional[float] = None
+    bregma_target_ap: Optional[Decimal] = None
+    bregma_target_ml: Optional[Decimal] = None
+    bregma_target_dv: Optional[Decimal] = None
     bregma_target_unit: Optional[str] = None
-    surface_z: Optional[float] = None
+    surface_z: Optional[Decimal] = None
     surface_z_unit: Optional[str] = None
-    manipulator_x: Optional[float] = None
-    manipulator_y: Optional[float] = None
-    manipulator_z: Optional[float] = None
+    manipulator_x: Optional[Decimal] = None
+    manipulator_y: Optional[Decimal] = None
+    manipulator_z: Optional[Decimal] = None
     manipulator_unit: Optional[str] = None
     dye: Optional[str] = None
 
@@ -49,7 +49,7 @@ class StreamModule(BaseModel):
 class EcephysData(BaseModel):
     """Model for Ecephys data"""
 
-    experiment_run_created_on: Optional[int] = None
+    experiment_run_created_on: Optional[datetime] = None
     subject_id: Optional[str] = None
     operator: Optional[str] = None
     instrument: Optional[str] = None
@@ -58,10 +58,10 @@ class EcephysData(BaseModel):
     mouse_platform_name: Optional[str] = None
     active_mouse_platform: Optional[bool] = None
     session_name: Optional[str] = None
-    animal_weight_prior: Optional[float] = None
-    animal_weight_after: Optional[float] = None
+    animal_weight_prior: Optional[Decimal] = None
+    animal_weight_after: Optional[Decimal] = None
     animal_weight_unit: Optional[str] = None
-    reward_consumed: Optional[float] = None
+    reward_consumed: Optional[Decimal] = None
     reward_consumed_unit: Optional[str] = None
     # stimulus_epochs: Optional[str] = None # attachment
     link_to_stimulus_epoch_code: Optional[str] = None
