@@ -70,7 +70,6 @@ class TestSlimsSpimMapper(unittest.TestCase):
                         arc_angle=-17.0,
                         module_angle=12.0,
                         rotation_angle=0.0,
-                        angle_unit="Â°",
                         coordinate_transform=(
                             "calibration_info_np2_2024_12_23T11_36_00.xlsx"
                         ),
@@ -140,7 +139,6 @@ class TestSlimsSpimMapper(unittest.TestCase):
                         arc_angle=Decimal("-17.0"),
                         module_angle=Decimal("12.0"),
                         rotation_angle=Decimal("0.0"),
-                        angle_unit="Â°",
                         coordinate_transform=(
                             "calibration_info_np2_2024_12_23T11_36_00.xlsx"
                         ),

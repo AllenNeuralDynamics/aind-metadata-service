@@ -26,7 +26,6 @@ class SlimsStreamModule(BaseModel):
     arc_angle: Optional[float] = None
     module_angle: Optional[float] = None
     rotation_angle: Optional[float] = None
-    angle_unit: Optional[str] = None
     coordinate_transform: Optional[str] = None
     ccf_coordinate_ap: Optional[float] = None
     ccf_coordinate_ml: Optional[float] = None
@@ -252,9 +251,6 @@ class SlimsEcephysHandler(SlimsTableHandler):
                         ),
                         rotation_angle=get_attr_or_none(
                             row, "rdrc_cf_rotationAngle"
-                        ),
-                        angle_unit=get_attr_or_none(
-                            row, "rdrc_cf_arcAngle", "unit"
                         ),
                         coordinate_transform=get_attr_or_none(
                             row,

@@ -25,7 +25,6 @@ class StreamModule(BaseModel):
     arc_angle: Optional[Decimal] = None
     module_angle: Optional[Decimal] = None
     rotation_angle: Optional[Decimal] = None
-    angle_unit: Optional[str] = None
     coordinate_transform: Optional[str] = None
     ccf_coordinate_ap: Optional[Decimal] = None
     ccf_coordinate_ml: Optional[Decimal] = None
@@ -66,7 +65,6 @@ class EcephysData(BaseModel):
     operator: Optional[str] = None
     instrument: Optional[str] = None
     session_type: Optional[str] = None
-    # device_calibrations: Optional[str] = None attachment
     mouse_platform_name: Optional[str] = None
     active_mouse_platform: Optional[bool] = None
     session_name: Optional[str] = None
@@ -75,7 +73,6 @@ class EcephysData(BaseModel):
     animal_weight_unit: Optional[str] = None
     reward_consumed: Optional[Decimal] = None
     reward_consumed_unit: Optional[str] = None
-    # stimulus_epochs: Optional[str] = None # attachment
     link_to_stimulus_epoch_code: Optional[str] = None
     reward_solution: Optional[str] = None
     other_reward_solution: Optional[str] = None
