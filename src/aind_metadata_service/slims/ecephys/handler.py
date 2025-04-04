@@ -53,6 +53,7 @@ class SlimsRewardSpouts(BaseModel):
     starting_position: Optional[str] = None
     variable_position: Optional[bool] = None
 
+
 # TODO: attachments for device_calibrations, stimulus_epochs
 class SlimsEcephysData(BaseModel):
     """Expected Model that needs to be extracted from SLIMS"""
@@ -84,7 +85,7 @@ class SlimsEcephysData(BaseModel):
 
 class SlimsEcephysHandler(SlimsTableHandler):
     """Class to handle getting Ephys Session info from SLIMS."""
-    
+
     @staticmethod
     def _get_stream_module_data(row: Record) -> SlimsStreamModule:
         """Parses a stream module info from a SLIMS row."""
