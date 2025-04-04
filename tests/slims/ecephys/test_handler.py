@@ -127,8 +127,8 @@ class TestSlimsEcephysHandler(unittest.TestCase):
                 mouse_platform_name="Dynamic Foraging",
                 active_mouse_platform=True,
                 session_name="ecephys_750108_2024-12-23_14-51-45",
-                animal_weight_prior=30.0,
-                animal_weight_after=30.0,
+                animal_weight_prior=30.2,
+                animal_weight_after=30.5,
                 animal_weight_unit="g",
                 reward_consumed=1,
                 reward_consumed_unit="ml",
@@ -187,16 +187,16 @@ class TestSlimsEcephysHandler(unittest.TestCase):
         self.assertEqual(expected_ecephys_data, ecephys_data)
 
     @patch("slims.slims.Slims")
-    def test_get_spim_data_from_slims(self, mock_slims: MagicMock):
-        """Tests get_spim_data_from_slims method"""
+    def test_get_ephys_data_from_slims(self, mock_slims: MagicMock):
+        """Tests get_ephys_data_from_slims method"""
         mock_slims.fetch.side_effect = self.fetch_side_effect
         handler = SlimsEcephysHandler(client=mock_slims)
         ecephys_data = handler.get_ephys_data_from_slims(subject_id="750108")
         self.assertEqual(1, len(ecephys_data))
 
     @patch("slims.slims.Slims")
-    def test_get_spim_data_from_slims_error(self, mock_slims: MagicMock):
-        """Tests get_spim_data_from_slims method when subject_id empty"""
+    def test_get_ephys_data_from_slims_error(self, mock_slims: MagicMock):
+        """Tests get_ephys_data_from_slims method when subject_id empty"""
         mock_slims.fetch.side_effect = self.fetch_side_effect
         handler = SlimsEcephysHandler(client=mock_slims)
         with self.assertRaises(ValueError) as e:

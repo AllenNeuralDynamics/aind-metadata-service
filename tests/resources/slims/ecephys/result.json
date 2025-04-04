@@ -17,14 +17,14 @@
          },
          {
             "name": "rslt_cf_animalWeightPrior",
-            "value": 30,
+            "value": 30.2,
             "datatype": "FLOAT",
             "title": "Animal Weight Prior",
             "unit": "g"
          },
          {
             "name": "rslt_cf_animalWeightPost",
-            "value": 30,
+            "value": 30.5,
             "datatype": "FLOAT",
             "title": "Animal Weight Post",
             "unit": "g"
