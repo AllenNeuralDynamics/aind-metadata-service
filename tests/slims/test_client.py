@@ -20,6 +20,7 @@ from requests.models import Response
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.models import SpimImagingInformation
 from aind_metadata_service.slims.client import SlimsHandler, SlimsSettings
+from aind_metadata_service.slims.ecephys.handler import SlimsEcephysData
 from aind_metadata_service.slims.histology.handler import SlimsHistologyData
 from aind_metadata_service.slims.imaging.handler import SlimsSpimData
 
@@ -301,48 +302,88 @@ class TestSlimsHandler(unittest.TestCase):
             response.status_code, StatusCodes.INTERNAL_SERVER_ERROR
         )
 
-    @patch("aind_metadata_service.slims.client.SlimsSessionMapper")
-    @patch("aind_metadata_service.slims.client.fetch_ecephys_sessions")
-    def test_get_sessions_model_response_success(
-        self, mock_fetch_sessions, mock_mapper
-    ):
-        """Tests that sessions data is fetched as expected."""
-        mock_fetch_sessions.return_value = self.slims_sessions
-        mock_mapper_instance = mock_mapper.return_value
-        mock_mapper_instance.map_sessions.return_value = self.expected_sessions
-        response = self.handler.get_sessions_model_response("test_id")
-
-        self.assertEqual(response.aind_models, self.expected_sessions)
-        self.assertEqual(response.status_code, StatusCodes.DB_RESPONDED)
-
-    @patch("aind_metadata_service.slims.client.fetch_ecephys_sessions")
-    def test_get_sessions_model_response_no_data(self, mock_fetch_sessions):
-        """Tests no data found response."""
-        mock_fetch_sessions.return_value = []
-        response = self.handler.get_sessions_model_response("test_id")
-
-        self.assertEqual(response.status_code, StatusCodes.NO_DATA_FOUND)
-
-    @patch("aind_metadata_service.slims.client.fetch_ecephys_sessions")
-    def test_get_sessions_model_response_unexpected_error(
-        self, mock_fetch_sessions
-    ):
-        """Tests internal server error.""" ""
-        mock_fetch_sessions.side_effect = Exception("Unexpected error")
-
-        response = self.handler.get_sessions_model_response("test_id")
-
-        # Assert that the response is internal server error
-        self.assertEqual(
-            response.status_code, StatusCodes.INTERNAL_SERVER_ERROR
+    def test_get_slims_ecephys_response_bad_subject_id(self):
+        """Empty subject_id should return Bad Request"""
+        response = self.handler.get_slims_ecephys_response(
+            session_name=None, subject_id="", start_date=None, end_date=None
         )
+        self.assertEqual(StatusCodes.BAD_REQUEST.value, response.status_code)
 
-    def test_get_sessions_model_response_not_found(self):
-        """Test response when SlimsRecordNotFound is raised."""
-        self.mock_client.fetch_model.side_effect = SlimsRecordNotFound
+    def test_get_slims_ecephys_response_bad_start_date(self):
+        """Bad start date should return Bad Request"""
+        response = self.handler.get_slims_ecephys_response(
+            session_name=None,
+            subject_id=None,
+            start_date="2020/02/10",
+            end_date=None,
+        )
+        self.assertEqual(StatusCodes.BAD_REQUEST.value, response.status_code)
 
-        response = self.handler.get_sessions_model_response("test_id")
-        self.assertEqual(response.status_code, StatusCodes.NO_DATA_FOUND)
+    def test_get_slims_ecephys_response_bad_end_date(self):
+        """Bad end date should return Bad Request"""
+        response = self.handler.get_slims_ecephys_response(
+            subject_id=None,
+            start_date=None,
+            end_date="2020/02/10",
+            session_name=None,
+        )
+        self.assertEqual(StatusCodes.BAD_REQUEST.value, response.status_code)
+
+    @patch(
+        "aind_metadata_service.slims.ecephys.handler.SlimsEcephysHandler"
+        ".get_ephys_data_from_slims"
+    )
+    def test_get_slims_ecephys_response(self, mock_slims_get: MagicMock):
+        """Tests get_slims_ecephys_response success"""
+        mock_slims_get.return_value = [
+            SlimsEcephysData(
+                experiment_run_created_on=1739383241200,
+                specimen_id="BRN00000018",
+                subject_id="750108",
+                date_performed=1739383260000,
+            )
+        ]
+        response = self.handler.get_slims_ecephys_response(
+            subject_id="750108",
+            start_date=None,
+            end_date=None,
+            session_name=None,
+        )
+        self.assertEqual(200, response.status_code)
+
+    @patch(
+        "aind_metadata_service.slims.ecephys.handler.SlimsEcephysHandler"
+        ".get_ephys_data_from_slims"
+    )
+    def test_get_slims_ecephys_response_empty(self, mock_slims_get: MagicMock):
+        """Tests get_slims_ecephys_response when no data returned"""
+        mock_slims_get.return_value = []
+        response = self.handler.get_slims_ecephys_response(
+            subject_id="744743",
+            start_date=None,
+            end_date=None,
+            session_name=None,
+        )
+        self.assertEqual(404, response.status_code)
+
+    @patch("logging.exception")
+    @patch(
+        "aind_metadata_service.slims.ecephys.handler.SlimsEcephysHandler"
+        ".get_ephys_data_from_slims"
+    )
+    def test_get_slims_ecephys_response_error(
+        self, mock_slims_get: MagicMock, mock_log_exception: MagicMock
+    ):
+        """Tests get_slims_ecephys_response when an error happens"""
+        mock_slims_get.side_effect = Exception("An error occurred.")
+        response = self.handler.get_slims_ecephys_response(
+            subject_id="744743",
+            start_date=None,
+            end_date=None,
+            session_name=None,
+        )
+        self.assertEqual(500, response.status_code)
+        mock_log_exception.assert_called_once()
 
     def test_parse_date(self):
         """Tests _parse_date method"""

@@ -13,7 +13,7 @@
          {
             "name": "xrsc_fk_content",
             "value": 166,
-            "displayValue": "754372",
+            "displayValue": "750108",
             "datatype": "FOREIGN_KEY",
             "title": "Content"
          }

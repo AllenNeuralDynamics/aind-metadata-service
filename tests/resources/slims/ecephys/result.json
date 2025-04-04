@@ -38,7 +38,7 @@
          },
          {
             "name": "rslt_cf_linkToStimulusEpochCode",
-            "value": "git@github.com:AllenNeuralDynamics/dynamic-foraging-task.git",
+            "value": "git@github.com:SomeLink.git",
             "datatype": "STRING",
             "title": "Link to stimulus epochs code"
          },
@@ -92,6 +92,19 @@
             "value": ["Bottom camera", "Eye camera", "Side camera left"],
             "datatype": "MULTIPLE_ENUM",
             "title": "Camera names"
+         },
+         {
+            "name": "rslt_cf_fk_injectionMaterial2",
+            "value": 4512,
+            "datatype": "FOREIGN_KEY",
+            "title": "Modules used in this stream"
+         },
+         {
+            "name": "rslt_fk_experimentRunStep",
+            "value": 60030,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run step"
          }
       ]
    }

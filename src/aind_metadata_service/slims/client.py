@@ -22,12 +22,13 @@ from slims.criteria import equals
 from aind_metadata_service.client import StatusCodes
 from aind_metadata_service.response_handler import ModelResponse
 from aind_metadata_service.settings import ParameterStoreBaseSettings
+from aind_metadata_service.slims.ecephys.handler import SlimsEcephysHandler
+from aind_metadata_service.slims.ecephys.mapping import SlimsEcephysMapper
 from aind_metadata_service.slims.histology.handler import SlimsHistologyHandler
 from aind_metadata_service.slims.histology.mapping import SlimsHistologyMapper
 from aind_metadata_service.slims.imaging.handler import SlimsImagingHandler
 from aind_metadata_service.slims.imaging.mapping import SlimsSpimMapper
-from aind_metadata_service.slims.ecephys.handler import SlimsEcephysHandler, SlimsEcephysData
-from aind_metadata_service.slims.ecephys.mapping import SlimsEcephysMapper
+
 
 class SlimsSettings(ParameterStoreBaseSettings):
     """Configuration class. Mostly a wrapper around smartsheet.Smartsheet
@@ -223,9 +224,7 @@ class SlimsHandler:
         if isinstance(parsed_end_date, ModelResponse):
             return parsed_end_date.map_to_json_response()
         try:
-            slims_ecephys_handler = SlimsEcephysHandler(
-                client=self.client.db
-            )
+            slims_ecephys_handler = SlimsEcephysHandler(client=self.client.db)
             slims_ephys_data = slims_ecephys_handler.get_ephys_data_from_slims(
                 subject_id=subject_id,
                 session_name=session_name,
@@ -254,7 +253,7 @@ class SlimsHandler:
             logging.exception(e)
             m = ModelResponse.internal_server_error_response()
             return m.map_to_json_response()
-        
+
     def get_slims_histology_response(
         self,
         subject_id: Optional[str],

@@ -6,13 +6,13 @@
          {
             "name": "cntn_fk_category",
             "value": 8,
-            "displayValue": "Samples",
+            "displayValue": "Mouse",
             "datatype": "FOREIGN_KEY",
             "title": "Category"
          },
          {
             "name": "cntn_barCode",
-            "value": "BRN00000002",
+            "value": "750108",
             "datatype": "STRING",
             "title": "Barcode"
          },
@@ -25,7 +25,7 @@
          },
          {
             "name": "cntn_cf_parentBarcode",
-            "value": "754372",
+            "value": "BRN00000002",
             "datatype": "STRING",
             "title": "Parent barcode"
          },

@@ -1,7 +1,8 @@
 """Module to test custom settings"""
 
 import unittest
-from unittest.mock import patch, MagicMock, PropertyMock
+from unittest.mock import MagicMock, PropertyMock, patch
+
 from aind_metadata_service.settings import (
     AWSParamStoreSource,
     ParameterStoreBaseSettings,

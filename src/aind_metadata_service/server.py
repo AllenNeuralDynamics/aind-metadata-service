@@ -127,7 +127,7 @@ async def retrieve_slims_ecephys(
         None,
         alias="session_name",
         description="Name of the session",
-        ),
+    ),
     start_date_gte: Optional[str] = Query(
         None,
         alias="start_date_gte",

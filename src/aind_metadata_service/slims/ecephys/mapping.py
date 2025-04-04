@@ -8,11 +8,15 @@ from typing import List, Optional
 
 from pydantic import BaseModel, field_validator
 
-from aind_metadata_service.slims.ecephys.handler import SlimsEcephysData, SlimsRewardSpouts
+from aind_metadata_service.slims.ecephys.handler import (
+    SlimsEcephysData,
+    SlimsRewardSpouts,
+)
+
 
 class StreamModule(BaseModel):
     """Stream Module"""
-    
+
     implant_hole: Optional[Decimal] = None
     assembly_name: Optional[str] = None
     probe_name: Optional[str] = None
@@ -40,12 +44,20 @@ class StreamModule(BaseModel):
     manipulator_unit: Optional[str] = None
     dye: Optional[str] = None
 
-    @field_validator("ccf_coordinate_unit", "bregma_target_unit", "surface_z_unit", "manipulator_unit", mode="before")
+    @field_validator(
+        "ccf_coordinate_unit",
+        "bregma_target_unit",
+        "surface_z_unit",
+        "manipulator_unit",
+        mode="before",
+    )
     def parse_micrometer_unit(cls, v):
         """Parse HTML entity for micrometer"""
         if isinstance(v, str) and v.strip() == "&mu;m":
             return "um"
         return v
+
+
 class EcephysData(BaseModel):
     """Model for Ecephys data"""
 
@@ -72,6 +84,7 @@ class EcephysData(BaseModel):
     stream_modules: Optional[List[StreamModule]] = []
     daq_names: Optional[List[str]] = None
     camera_names: Optional[List[str]] = None
+
 
 class SlimsEcephysMapper:
     """Class to handle mapping data from slims to a standard data model"""
