@@ -62,7 +62,7 @@ class TestSlimsSpimMapper(unittest.TestCase):
                 stream_modalities=["Behavior", "Behavior Videos", "Ecephys"],
                 stream_modules=[
                     SlimsStreamModule(
-                        implant_hole=5.0,
+                        implant_hole=5,
                         assembly_name="50209",
                         probe_name="50209",
                         primary_target_structure="Retrosplenial area",
