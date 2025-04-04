@@ -59,27 +59,23 @@ class SlimsEcephysData(BaseModel):
 
     experiment_run_created_on: Optional[int] = None
     subject_id: Optional[str] = None
-    # group of sessions
     operator: Optional[str] = None
     instrument: Optional[str] = None
     session_type: Optional[str] = None
     device_calibrations: Optional[int] = None
     mouse_platform_name: Optional[str] = None
     active_mouse_platform: Optional[bool] = None
-    # mouse session
     session_name: Optional[str] = None
     animal_weight_prior: Optional[float] = None
     animal_weight_after: Optional[float] = None
     animal_weight_unit: Optional[str] = None
     reward_consumed: Optional[float] = None
     reward_consumed_unit: Optional[str] = None
-    stimulus_epochs: Optional[int] = None  # attachment?
+    stimulus_epochs: Optional[int] = None  # attachment
     link_to_stimulus_epoch_code: Optional[str] = None
-    # reward delivery -- check if needs to be its own model
     reward_solution: Optional[str] = None
     other_reward_solution: Optional[str] = None
     reward_spouts: Optional[List[SlimsRewardSpouts]] = []
-    # streams
     stream_modalities: Optional[List[str]] = None
     stream_modules: Optional[List[SlimsStreamModule]] = []
     daq_names: Optional[List[str]] = None
@@ -320,7 +316,7 @@ class SlimsEcephysHandler(SlimsTableHandler):
             ) and (
                 session_name is None or session_name == ephys_data.session_name
             ):
-                ephys_data_list.append(ephys_data)
+                ephys_data_list.append(SlimsEcephysData.model_validate(ephys_data))
 
         return ephys_data_list
 

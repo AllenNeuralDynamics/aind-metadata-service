@@ -31,7 +31,7 @@
          },
          {
             "name": "rslt_cf_rewardConsumedvolume",
-            "value": 1,
+            "value": 1.0,
             "datatype": "FLOAT",
             "title": "Reward consumed",
             "unit": "ml"
