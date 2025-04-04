@@ -146,6 +146,7 @@ class SlimsEcephysHandler(SlimsTableHandler):
                 if (
                     table_name == "ReferenceDataRecord" and get_attr_or_none(row, "rdrc_fk_referenceDataType", "displayValue") == "Reward Delivery"
                 ): 
+                    print(get_attr_or_none(row, "rdrc_cf_rewardSolution", "datatype"))
                     ephys_data.reward_solution = get_attr_or_none(row, "rdrc_cf_rewardSolution")
                     ephys_data.other_reward_solution = get_attr_or_none(row, "rdrc_cf_specifyRewardSolution") # only in prod instance
                 if (
@@ -165,6 +166,34 @@ class SlimsEcephysHandler(SlimsTableHandler):
                 if (
                     table_name == "ReferenceDataRecord" and get_attr_or_none(row, "rdrc_fk_referenceDataType", "displayValue") == "Dome Module"
                 ):
+                    print(row.json_entity)
+                    print("Implant hole", get_attr_or_none(row, "rdrc_cf_bsl", "datatype"))
+                    print("Assembly name", get_attr_or_none(row, "rdrc_cf_assemblyName", "datatype"))
+                    print("Probe name", get_attr_or_none(row, "rdrc_cf_probeName", "datatype"))
+                    print("Primary target structure", get_attr_or_none(row, "rdrc_cf_primaryTargetStructure", "datatype"))
+                    print("Secondary target structures", get_attr_or_none(row, "rdrc_cf_secondaryTargetStructures", "datatype"))
+                    print("Arc angle", get_attr_or_none(row, "rdrc_cf_arcAngle", "datatype"))
+                    print("Module angle", get_attr_or_none(row, "rdrc_cf_moduleAngle", "datatype"))
+                    print("Rotation angle", get_attr_or_none(row, "rdrc_cf_rotationAngle", "datatype"))
+                    print("Angle unit", get_attr_or_none(row, "rdrc_cf_arcAngle", "unit"))
+                    print("Coordinate transform", get_attr_or_none(row, "rdrc_cf_manipulatorCalibrations_display", "datatype"))
+                    print("CCF coordinate AP", get_attr_or_none(row, "rdrc_cf_targetedCcfCoordinatesAp", "datatype"))
+                    print("CCF coordinate ML", get_attr_or_none(row, "rdrc_cf_targetedCcfCoordinatesMl", "datatype"))
+                    print("CCF coordinate DV", get_attr_or_none(row, "rdrc_cf_targetedCcfCoordinatesDv", "datatype"))
+                    print("CCF coordinate unit", get_attr_or_none(row, "rdrc_cf_targetedCcfCoordinatesAp", "unit"))
+                    print("CCF version", get_attr_or_none(row, "rdrc_cf_ccfVersion", "datatype"))
+                    print("Bregma target AP", get_attr_or_none(row, "rdrc_cf_targetAp", "datatype"))
+                    print("Bregma target ML", get_attr_or_none(row, "rdrc_cf_targetMl", "datatype"))
+                    print("Bregma target DV", get_attr_or_none(row, "rdrc_cf_targetDv", "datatype"))
+                    print("Bregma target unit", get_attr_or_none(row, "rdrc_cf_targetAp", "unit"))
+                    print("Surface Z", get_attr_or_none(row, "rdrc_cf_surfaceZ", "datatype"))
+                    print("Surface Z unit", get_attr_or_none(row, "rdrc_cf_surfaceZ", "unit"))
+                    print("Manipulator X", get_attr_or_none(row, "rdrc_cf_manipulatorX", "datatype"))
+                    print("Manipulator Y", get_attr_or_none(row, "rdrc_cf_manipulatory", "datatype"))
+                    print("Manipulator Z", get_attr_or_none(row, "rdrc_cf_manipulatorZ", "datatype"))
+                    print("Manipulator unit", get_attr_or_none(row, "rdrc_cf_manipulatorX", "unit"))
+                    print("Dye", get_attr_or_none(row, "rdrc_cf_fk_dye", "datatype"))
+
                     stream_module = SlimsStreamModule(
                         implant_hole=get_attr_or_none(row, "rdrc_cf_bsl"),
                         assembly_name=get_attr_or_none(row, "rdrc_cf_assemblyName"),
