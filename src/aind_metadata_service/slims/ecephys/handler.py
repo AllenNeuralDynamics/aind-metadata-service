@@ -8,6 +8,7 @@ from typing import List, Optional, Tuple
 from networkx import DiGraph, descendants
 from pydantic import BaseModel
 from slims.criteria import equals
+from slims.internal import Record
 
 from aind_metadata_service.slims.table_handler import (
     SlimsTableHandler,
@@ -52,7 +53,7 @@ class SlimsRewardSpouts(BaseModel):
     starting_position: Optional[str] = None
     variable_position: Optional[bool] = None
 
-
+# TODO: attachments for device_calibrations, stimulus_epochs
 class SlimsEcephysData(BaseModel):
     """Expected Model that needs to be extracted from SLIMS"""
 
@@ -70,7 +71,7 @@ class SlimsEcephysData(BaseModel):
     animal_weight_unit: Optional[str] = None
     reward_consumed: Optional[float] = None
     reward_consumed_unit: Optional[str] = None
-    stimulus_epochs: Optional[int] = None  # attachment
+    stimulus_epochs: Optional[int] = None
     link_to_stimulus_epoch_code: Optional[str] = None
     reward_solution: Optional[str] = None
     other_reward_solution: Optional[str] = None
@@ -83,10 +84,155 @@ class SlimsEcephysData(BaseModel):
 
 class SlimsEcephysHandler(SlimsTableHandler):
     """Class to handle getting Ephys Session info from SLIMS."""
-
-    # flake8: noqa: C901
+    
     @staticmethod
+    def _get_stream_module_data(row: Record) -> SlimsStreamModule:
+        """Parses a stream module info from a SLIMS row."""
+        return SlimsStreamModule(
+            implant_hole=get_attr_or_none(row, "rdrc_cf_bsl"),
+            assembly_name=get_attr_or_none(row, "rdrc_cf_assemblyName"),
+            probe_name=get_attr_or_none(row, "rdrc_cf_probeName"),
+            primary_target_structure=get_attr_or_none(
+                row, "rdrc_cf_fk_primaryTargetedStructure", "displayValue"
+            ),
+            secondary_target_structures=get_attr_or_none(
+                row, "rdrc_cf_fk_secondaryTargetedStructures2", "displayValues"
+            ),
+            arc_angle=get_attr_or_none(row, "rdrc_cf_arcAngle"),
+            module_angle=get_attr_or_none(row, "rdrc_cf_moduleAngle"),
+            rotation_angle=get_attr_or_none(row, "rdrc_cf_rotationAngle"),
+            coordinate_transform=get_attr_or_none(
+                row, "rdrc_cf_manipulatorCalibrations", "displayValue"
+            ),
+            ccf_coordinate_ap=get_attr_or_none(
+                row, "rdrc_cf_targetedCcfCoordinatesAp"
+            ),
+            ccf_coordinate_ml=get_attr_or_none(
+                row, "rdrc_cf_targetedCcfCoordinatesMl"
+            ),
+            ccf_coordinate_dv=get_attr_or_none(
+                row, "rdrc_cf_targetedCcfCoordinatesDv"
+            ),
+            ccf_coordinate_unit=get_attr_or_none(
+                row, "rdrc_cf_targetedCcfCoordinatesAp", "unit"
+            ),
+            ccf_version=get_attr_or_none(row, "rdrc_cf_ccfVersion"),
+            bregma_target_ap=get_attr_or_none(row, "rdrc_cf_targetAp"),
+            bregma_target_ml=get_attr_or_none(row, "rdrc_cf_targetMl"),
+            bregma_target_dv=get_attr_or_none(row, "rdrc_cf_targetDv"),
+            bregma_target_unit=get_attr_or_none(
+                row, "rdrc_cf_targetAp", "unit"
+            ),
+            surface_z=get_attr_or_none(row, "rdrc_cf_surfaceZ"),
+            surface_z_unit=get_attr_or_none(row, "rdrc_cf_surfaceZ", "unit"),
+            manipulator_x=get_attr_or_none(row, "rdrc_cf_manipulatorX"),
+            manipulator_y=get_attr_or_none(row, "rdrc_cf_manipulatory"),
+            manipulator_z=get_attr_or_none(row, "rdrc_cf_manipulatorZ"),
+            manipulator_unit=get_attr_or_none(
+                row, "rdrc_cf_manipulatorX", "unit"
+            ),
+            dye=get_attr_or_none(row, "rdrc_cf_fk_dye", "displayValue"),
+        )
+
+    @staticmethod
+    def _get_reward_spouts_data(row: Record) -> SlimsRewardSpouts:
+        """Parses a reward spouts info from a SLIMS row."""
+        return SlimsRewardSpouts(
+            spout_side=get_attr_or_none(row, "rdrc_cf_spoutSide"),
+            starting_position=get_attr_or_none(
+                row, "rdrc_cf_startingPosition"
+            ),
+            variable_position=get_attr_or_none(
+                row, "rdrc_cf_variablePosition"
+            ),
+        )
+
+    def _handle_content(self, ephys_data: SlimsEcephysData, row: Record):
+        """Handles the content table."""
+        ephys_data.subject_id = get_attr_or_none(row, "cntn_barCode")
+
+    def _handle_experimentrunstep(
+        self, ephys_data: SlimsEcephysData, row: Record
+    ):
+        """Handles the experiment run step table."""
+        if get_attr_or_none(row, "xprs_name") != "Group of Sessions":
+            return
+        ephys_data.operator = get_attr_or_none(
+            row, "xprs_cf_fk_operator", "joinedDisplayValue"
+        )
+        ephys_data.session_type = get_attr_or_none(row, "xprs_cf_sessionType")
+        ephys_data.mouse_platform_name = get_attr_or_none(
+            row, "xprs_cf_mousePlatformName"
+        )
+        ephys_data.active_mouse_platform = get_attr_or_none(
+            row, "xprs_cf_activeMousePlatform"
+        )
+        ephys_data.instrument = get_attr_or_none(
+            row, "xprs_cf_fk_instrumentJson", "displayValue"
+        )
+        ephys_data.device_calibrations = get_attr_or_none(
+            row, "xprs_cf_deviceCalibrations"
+        )
+
+    def _handle_result(self, ephys_data: SlimsEcephysData, row: Record):
+        """Handles the result table."""
+        label = get_attr_or_none(row, "test_label")
+        if label == "Mouse Session":
+            ephys_data.session_name = get_attr_or_none(
+                row, "rslt_cf_sessionName"
+            )
+            ephys_data.animal_weight_prior = get_attr_or_none(
+                row, "rslt_cf_animalWeightPrior"
+            )
+            ephys_data.animal_weight_after = get_attr_or_none(
+                row, "rslt_cf_animalWeightPost"
+            )
+            ephys_data.animal_weight_unit = get_attr_or_none(
+                row, "rslt_cf_animalWeightPrior", "unit"
+            )
+            ephys_data.reward_consumed = get_attr_or_none(
+                row, "rslt_cf_rewardConsumedvolume"
+            )
+            ephys_data.reward_consumed_unit = get_attr_or_none(
+                row, "rslt_cf_rewardConsumedvolume", "unit"
+            )
+            ephys_data.link_to_stimulus_epoch_code = get_attr_or_none(
+                row, "rslt_cf_linkToStimulusEpochCode"
+            )
+            ephys_data.stimulus_epochs = get_attr_or_none(
+                row, "rslt_cf_stimulusEpochs"
+            )
+
+        elif label == "Streams":
+            ephys_data.stream_modalities = get_attr_or_none(
+                row, "rslt_cf_streamModalities"
+            )
+            ephys_data.daq_names = get_attr_or_none(row, "rslt_cf_daqNames")
+            ephys_data.camera_names = get_attr_or_none(
+                row, "rslt_cf_cameraNames2"
+            )
+
+    def _handle_referencedatarecord(
+        self, ephys_data: SlimsEcephysData, row: Record
+    ):
+        """Handles the reference data record table."""
+        ref_type = get_attr_or_none(
+            row, "rdrc_fk_referenceDataType", "displayValue"
+        )
+        if ref_type == "Reward Delivery":
+            ephys_data.reward_solution = get_attr_or_none(
+                row, "rdrc_cf_rewardSolution"
+            )
+            ephys_data.other_reward_solution = get_attr_or_none(
+                row, "rdrc_cf_specifyRewardSolution"
+            )
+        elif ref_type == "Reward Spouts":
+            ephys_data.reward_spouts.append(self._get_reward_spouts_data(row))
+        elif ref_type == "Dome Module":
+            ephys_data.stream_modules.append(self._get_stream_module_data(row))
+
     def _parse_graph(
+        self,
         g: DiGraph,
         root_nodes: List[str],
         subject_id: Optional[str],
@@ -104,215 +250,36 @@ class SlimsEcephysHandler(SlimsTableHandler):
           Labtracks ID of mouse to filter records by.
         session_name : Optional[str]
             Name of the session to filter records by.
-
         Returns
         -------
-        List[SlimsSpimData]
-
+        List[SlimsEcephysData]
         """
-
         ephys_data_list = []
+
         for node in root_nodes:
             ephys_data = SlimsEcephysData()
-            node_des = descendants(g, node)
-            exp_run_created_on = get_attr_or_none(
+            ephys_data.experiment_run_created_on = get_attr_or_none(
                 g.nodes[node]["row"], "xprn_createdOn"
             )
-            ephys_data.experiment_run_created_on = exp_run_created_on
-            for n in node_des:
-                table_name = g.nodes[n]["table_name"]
+
+            for n in descendants(g, node):
                 row = g.nodes[n]["row"]
-                if table_name == "Content":
-                    n_subject_id = get_attr_or_none(row, "cntn_barCode")
-                    ephys_data.subject_id = n_subject_id
-                if (
-                    table_name == "ExperimentRunStep"
-                    and get_attr_or_none(row, "xprs_name")
-                    == "Group of Sessions"
-                ):
-                    ephys_data.operator = get_attr_or_none(
-                        row, "xprs_cf_fk_operator", "joinedDisplayValue"
-                    )
-                    ephys_data.session_type = get_attr_or_none(
-                        row, "xprs_cf_sessionType"
-                    )
-                    ephys_data.mouse_platform_name = get_attr_or_none(
-                        row, "xprs_cf_mousePlatformName"
-                    )
-                    ephys_data.active_mouse_platform = get_attr_or_none(
-                        row, "xprs_cf_activeMousePlatform"
-                    )
-                    ephys_data.instrument = get_attr_or_none(
-                        row, "xprs_cf_fk_instrumentJson", "displayValue"
-                    )
-                    ephys_data.device_calibrations = get_attr_or_none(
-                        row, "xprs_cf_deviceCalibrations"
-                    )
-                if (
-                    table_name == "Result"
-                    and get_attr_or_none(row, "test_label") == "Mouse Session"
-                ):
-                    ephys_data.session_name = get_attr_or_none(
-                        row, "rslt_cf_sessionName"
-                    )
-                    ephys_data.animal_weight_prior = get_attr_or_none(
-                        row, "rslt_cf_animalWeightPrior"
-                    )
-                    ephys_data.animal_weight_after = get_attr_or_none(
-                        row, "rslt_cf_animalWeightPost"
-                    )
-                    ephys_data.animal_weight_unit = get_attr_or_none(
-                        row, "rslt_cf_animalWeightPrior", "unit"
-                    )
-                    ephys_data.reward_consumed = get_attr_or_none(
-                        row, "rslt_cf_rewardConsumedvolume"
-                    )  # field name in sandbox
-                    ephys_data.reward_consumed_unit = get_attr_or_none(
-                        row, "rslt_cf_rewardConsumedvolume", "unit"
-                    )  # TODO: check this, its getting g?
-                    ephys_data.link_to_stimulus_epoch_code = get_attr_or_none(
-                        row, "rslt_cf_linkToStimulusEpochCode"
-                    )
-                    ephys_data.stimulus_epochs = get_attr_or_none(
-                        row, "rslt_cf_stimulusEpochs"
-                    )
-                if (
-                    table_name == "ReferenceDataRecord"
-                    and get_attr_or_none(
-                        row, "rdrc_fk_referenceDataType", "displayValue"
-                    )
-                    == "Reward Delivery"
-                ):
-                    ephys_data.reward_solution = get_attr_or_none(
-                        row, "rdrc_cf_rewardSolution"
-                    )
-                    ephys_data.other_reward_solution = get_attr_or_none(
-                        row, "rdrc_cf_specifyRewardSolution"
-                    )  # only in prod instance
-                if (
-                    table_name == "ReferenceDataRecord"
-                    and get_attr_or_none(
-                        row, "rdrc_fk_referenceDataType", "displayValue"
-                    )
-                    == "Reward Spouts"
-                ):
-                    spout_side = get_attr_or_none(row, "rdrc_cf_spoutSide")
-                    starting_position = get_attr_or_none(
-                        row, "rdrc_cf_startingPosition"
-                    )
-                    variable_position = get_attr_or_none(
-                        row, "rdrc_cf_variablePosition"
-                    )
-                    reward_spout = SlimsRewardSpouts(
-                        spout_side=spout_side,
-                        starting_position=starting_position,
-                        variable_position=variable_position,
-                    )
-                    ephys_data.reward_spouts.append(reward_spout)
-                if (
-                    table_name == "Result"
-                    and get_attr_or_none(row, "test_label") == "Streams"
-                ):
-                    ephys_data.stream_modalities = get_attr_or_none(
-                        row, "rslt_cf_streamModalities"
-                    )
-                    ephys_data.daq_names = get_attr_or_none(
-                        row, "rslt_cf_daqNames"
-                    )
-                    ephys_data.camera_names = get_attr_or_none(
-                        row, "rslt_cf_cameraNames2"
-                    )  # sandbox, check name in prod
-                if (
-                    table_name == "ReferenceDataRecord"
-                    and get_attr_or_none(
-                        row, "rdrc_fk_referenceDataType", "displayValue"
-                    )
-                    == "Dome Module"
-                ):
-                    stream_module = SlimsStreamModule(
-                        implant_hole=get_attr_or_none(row, "rdrc_cf_bsl"),
-                        assembly_name=get_attr_or_none(
-                            row, "rdrc_cf_assemblyName"
-                        ),
-                        probe_name=get_attr_or_none(row, "rdrc_cf_probeName"),
-                        primary_target_structure=get_attr_or_none(
-                            row,
-                            "rdrc_cf_fk_primaryTargetedStructure",
-                            "displayValue",
-                        ),  # rdrc_cf_primaryTargetStructure in prod
-                        secondary_target_structures=get_attr_or_none(
-                            row,
-                            "rdrc_cf_fk_secondaryTargetedStructures2",
-                            "displayValues",
-                        ),  # rdrc_cf_secondaryTargetStructures in prod
-                        arc_angle=get_attr_or_none(row, "rdrc_cf_arcAngle"),
-                        module_angle=get_attr_or_none(
-                            row, "rdrc_cf_moduleAngle"
-                        ),
-                        rotation_angle=get_attr_or_none(
-                            row, "rdrc_cf_rotationAngle"
-                        ),
-                        coordinate_transform=get_attr_or_none(
-                            row,
-                            "rdrc_cf_manipulatorCalibrations",
-                            "displayValue",
-                        ),
-                        ccf_coordinate_ap=get_attr_or_none(
-                            row, "rdrc_cf_targetedCcfCoordinatesAp"
-                        ),
-                        ccf_coordinate_ml=get_attr_or_none(
-                            row, "rdrc_cf_targetedCcfCoordinatesMl"
-                        ),
-                        ccf_coordinate_dv=get_attr_or_none(
-                            row, "rdrc_cf_targetedCcfCoordinatesDv"
-                        ),
-                        ccf_coordinate_unit=get_attr_or_none(
-                            row, "rdrc_cf_targetedCcfCoordinatesAp", "unit"
-                        ),
-                        ccf_version=get_attr_or_none(
-                            row, "rdrc_cf_ccfVersion"
-                        ),
-                        bregma_target_ap=get_attr_or_none(
-                            row, "rdrc_cf_targetAp"
-                        ),
-                        bregma_target_ml=get_attr_or_none(
-                            row, "rdrc_cf_targetMl"
-                        ),
-                        bregma_target_dv=get_attr_or_none(
-                            row, "rdrc_cf_targetDv"
-                        ),
-                        bregma_target_unit=get_attr_or_none(
-                            row, "rdrc_cf_targetAp", "unit"
-                        ),
-                        surface_z=get_attr_or_none(
-                            row, "rdrc_cf_surfaceZ"
-                        ),  # rdrc_cf_surfaceZ in prod
-                        surface_z_unit=get_attr_or_none(
-                            row, "rdrc_cf_surfaceZ", "unit"
-                        ),
-                        manipulator_x=get_attr_or_none(
-                            row, "rdrc_cf_manipulatorX"
-                        ),
-                        manipulator_y=get_attr_or_none(
-                            row, "rdrc_cf_manipulatory"
-                        ),
-                        manipulator_z=get_attr_or_none(
-                            row, "rdrc_cf_manipulatorZ"
-                        ),
-                        manipulator_unit=get_attr_or_none(
-                            row, "rdrc_cf_manipulatorX", "unit"
-                        ),
-                        dye=get_attr_or_none(
-                            row, "rdrc_cf_fk_dye", "displayValue"
-                        ),
-                    )
-                    ephys_data.stream_modules.append(stream_module)
+                table_name = g.nodes[n]["table_name"]
+
+                table_handler = getattr(
+                    self, f"_handle_{table_name.lower()}", None
+                )
+                if table_handler:
+                    table_handler(ephys_data, row)
+
             if (
                 subject_id is None or subject_id == ephys_data.subject_id
             ) and (
                 session_name is None or session_name == ephys_data.session_name
             ):
-                ephys_data_list.append(SlimsEcephysData.model_validate(ephys_data))
+                ephys_data_list.append(
+                    SlimsEcephysData.model_validate(ephys_data)
+                )
 
         return ephys_data_list
 
