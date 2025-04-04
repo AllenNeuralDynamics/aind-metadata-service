@@ -1,0 +1,151 @@
+[
+   {
+      "pk": 60027,
+      "tableName": "ExperimentRunStep",
+      "columns": [
+         {
+            "name": "xprs_name",
+            "value": "Select content from queue",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "xprs_modifiedBy",
+            "value": "PersonM",
+            "datatype": "STRING",
+            "title": "Modified by"
+         },
+         {
+            "name": "xprs_fk_experimentRun",
+            "value": 40007,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run"
+         },
+         {
+            "name": "xprs_pk",
+            "value": 60027,
+            "datatype": "INTEGER",
+            "title": "xprs_pk"
+         }
+      ]
+   },
+   {
+      "pk": 60028,
+      "tableName": "ExperimentRunStep",
+      "columns": [
+         {
+            "name": "xprs_name",
+            "value": "Group of Sessions",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "xprs_cf_fk_operator",
+            "value": 24,
+            "joinedDisplayValue": "Person Merson",
+            "datatype": "FOREIGN_KEY",
+            "title": "Operator"
+         },
+         {
+            "name": "xprs_cf_sessionType",
+            "value": "Dynamic Foraging",
+            "datatype": "FOREIGN_KEY",
+            "title": "Session Type"
+         },
+         {
+            "name": "xprs_cf_mousePlatformName",
+            "value": "Dynamic Foraging",
+            "datatype": "FOREIGN_KEY",
+            "title": "Mouse platform name"
+         },
+         {
+            "name": "xprs_cf_activeMousePlatform",
+            "value": true,
+            "datatype": "FOREIGN_KEY",
+            "title": "Active mouse platform"
+         },
+         {
+            "name": "xprs_modifiedBy",
+            "value": "PersonM",
+            "datatype": "STRING",
+            "title": "Modified by"
+         },
+         {
+            "name": "xprs_fk_experimentRun",
+            "value": 40007,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run"
+         },
+         {
+            "name": "xprs_pk",
+            "value": 60028,
+            "datatype": "INTEGER",
+            "title": "xprs_pk"
+         }
+      ]
+   },
+   {
+      "pk": 60029,
+      "tableName": "ExperimentRunStep",
+      "columns": [
+         {
+            "name": "xprs_name",
+            "value": "Mouse Session",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "xprs_modifiedBy",
+            "value": "PersonM",
+            "datatype": "STRING",
+            "title": "Modified by"
+         },
+         {
+            "name": "xprs_fk_experimentRun",
+            "value": 40007,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run"
+         },
+         {
+            "name": "xprs_pk",
+            "value": 60029,
+            "datatype": "INTEGER",
+            "title": "xprs_pk"
+         }
+      ]
+   },
+   {
+      "pk": 60030,
+      "tableName": "ExperimentRunStep",
+      "columns": [
+         {
+            "name": "xprs_name",
+            "value": "Streams",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "xprs_modifiedBy",
+            "value": "PersonM",
+            "datatype": "STRING",
+            "title": "Modified by"
+         },
+         {
+            "name": "xprs_fk_experimentRun",
+            "value": 40007,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run"
+         },
+         {
+            "name": "xprs_pk",
+            "value": 60030,
+            "datatype": "INTEGER",
+            "title": "xprs_pk"
+         }
+      ]
+   }
+]
