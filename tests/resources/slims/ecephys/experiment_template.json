@@ -1,0 +1,20 @@
+[
+   {
+      "pk": 41,
+      "tableName": "ExperimentTemplate",
+      "columns": [
+         {
+            "name": "xptm_name",
+            "value": "In Vivo Electrophysiology Recording",
+            "datatype": "STRING",
+            "title": "Name"
+         },
+         {
+            "name": "xptm_pk",
+            "value": 41,
+            "datatype": "INTEGER",
+            "title": "xptm_pk"
+         }
+      ]
+   }
+]
