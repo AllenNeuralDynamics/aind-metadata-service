@@ -257,6 +257,32 @@ async def retrieve_slims_histology(
     return response
 
 
+@app.get("/slims/water_restriction")
+async def retrieve_slims_histology(
+    subject_id: Optional[str] = Query(None, alias="subject_id"),
+    start_date_gte: Optional[str] = Query(
+        None,
+        alias="start_date_gte",
+        description="Experiment run created on or after. (ISO format)",
+    ),
+    end_date_lte: Optional[str] = Query(
+        None,
+        alias="end_date_lte",
+        description="Experiment run created on or before. (ISO format)",
+    ),
+):
+    """
+    Retrieves Water Restriction data from SLIMS server
+    """
+    response = await run_in_threadpool(
+        slims_client.get_slims_water_restriction_response,
+        subject_id=subject_id,
+        start_date=start_date_gte,
+        end_date=end_date_lte,
+    )
+    return response
+
+
 @app.get("/subject/{subject_id}")
 async def retrieve_subject(subject_id):
     """
@@ -341,6 +367,10 @@ async def retrieve_procedures(subject_id):
         subject_id=subject_id,
         list_id=sharepoint_settings.las_2020_list_id,
     )
+    slims_wr_response = await run_in_threadpool(
+        slims_client.get_water_restriction_procedures_model_response,
+        subject_id=subject_id,
+    )
     # merge subject procedures
     merged_response = sharepoint_client.merge_responses(
         [
@@ -349,6 +379,7 @@ async def retrieve_procedures(subject_id):
             sp2023_response,
             sp2025_response,
             las2020_response,
+            slims_wr_response,
         ]
     )
     # integrate TARS response
@@ -383,12 +414,12 @@ async def retrieve_procedures(subject_id):
     integrated_response = protocols_integrator.integrate_protocols(
         response=integrated_response, protocols_mapping=protocols_mapping
     )
-    slims_response = await run_in_threadpool(
+    slims_hist_response = await run_in_threadpool(
         slims_client.get_histology_procedures_model_response,
         subject_id=subject_id,
     )
     merged_response = sharepoint_client.merge_responses(
-        [integrated_response, slims_response]
+        [integrated_response, slims_hist_response]
     )
     return merged_response.map_to_json_response()
 
