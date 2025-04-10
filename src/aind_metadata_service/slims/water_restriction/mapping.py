@@ -1,7 +1,7 @@
 """Module for mapping water restriction data from slims"""
 
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Union
 from decimal import Decimal
 from aind_data_schema.core.procedures import (
     WaterRestriction,
@@ -57,6 +57,7 @@ class SlimsWaterRestrictionMapper:
             for m in self.slims_wr_data
         ]
         water_restrictions = []
+        # TODO: check if we can assume water volume
         for data in wr_data:
             wr = WaterRestriction.model_construct(
                 start_date=data.start_date.date() if data.start_date else None,
@@ -68,17 +69,15 @@ class SlimsWaterRestrictionMapper:
                     else None
                 ),
                 baseline_weight=data.baseline_weight,
-                weight_unit=(
-                    self._parse_mass_unit(data.weight_unit)
-                    if data.weight_unit
-                    else MassUnit.G
-                ),
+                weight_unit=self._parse_mass_unit(data.weight_unit),
             )
             water_restrictions.append(wr)
         return water_restrictions
 
     @staticmethod
-    def _parse_mass_unit(value: str) -> MassUnit:
+    def _parse_mass_unit(
+        value: Optional[str],
+    ) -> Optional[Union[MassUnit, str]]:
         """Parse mass unit from string to MassUnit enum."""
         mass_unit_abbreviations = {
             "kg": MassUnit.KG,
@@ -88,10 +87,13 @@ class SlimsWaterRestrictionMapper:
             "µg": MassUnit.UG,
             "ng": MassUnit.NG,
         }
-        try:
-            return mass_unit_abbreviations[value.lower()]
-        except KeyError:
-            logging.warning(
-                f"Mass unit {value} not recognized. Defaulting to g."
-            )
+        if not value:
             return MassUnit.G
+        else:
+            try:
+                return mass_unit_abbreviations[value.lower()]
+            except KeyError:
+                logging.warning(
+                    f"Mass unit {value} not recognized. Returning it as is."
+                )
+                return value

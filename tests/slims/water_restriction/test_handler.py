@@ -3,11 +3,10 @@
 import json
 import os
 import unittest
-from decimal import Decimal
 from pathlib import Path
 from typing import Any, Dict
 from unittest.mock import MagicMock, patch
-
+from datetime import datetime
 from slims.internal import Record
 
 from aind_metadata_service.slims.water_restriction.handler import (
@@ -25,8 +24,8 @@ RESOURCES_DIR = (
 )
 
 
-class TestSlimsImagingHandler(unittest.TestCase):
-    """Tests methods in SlimsImagingHandler class"""
+class TestSlimsWaterRestrictionHandler(unittest.TestCase):
+    """Tests methods in SlimsWaterRestriction class"""
 
     @classmethod
     def setUp(cls):
@@ -57,7 +56,21 @@ class TestSlimsImagingHandler(unittest.TestCase):
         handler = SlimsWaterRestrictionHandler(client=mock_slims)
         G, root_nodes = handler._get_graph()
         expected_root_nodes = ["ContentEvent.15"]
-        expected_edges = [('ContentEvent.15', 'Content.55')]
+        expected_edges = [("ContentEvent.15", "Content.55")]
+        self.assertEqual(expected_root_nodes, root_nodes)
+        self.assertCountEqual(expected_edges, G.edges())
+
+    @patch("slims.slims.Slims")
+    def test_get_graph_date_criteria(self, mock_slims: MagicMock):
+        """Tests _get_graph method"""
+
+        mock_slims.fetch.side_effect = self.fetch_side_effect
+        handler = SlimsWaterRestrictionHandler(client=mock_slims)
+        G, root_nodes = handler._get_graph(
+            start_date_greater_than_or_equal=datetime(2024, 12, 13, 19, 43, 32)
+        )
+        expected_root_nodes = ["ContentEvent.15"]
+        expected_edges = [("ContentEvent.15", "Content.55")]
         self.assertEqual(expected_root_nodes, root_nodes)
         self.assertCountEqual(expected_edges, G.edges())
 
@@ -84,23 +97,25 @@ class TestSlimsImagingHandler(unittest.TestCase):
         ]
         self.assertEqual(expected_wr_data, wr_data)
 
-    # @patch("slims.slims.Slims")
-    # def test_get_spim_data_from_slims(self, mock_slims: MagicMock):
-    #     """Tests get_spim_data_from_slims method"""
-    #     mock_slims.fetch.side_effect = self.fetch_side_effect
-    #     handler = SlimsImagingHandler(client=mock_slims)
-    #     spim_data = handler.get_spim_data_from_slims(subject_id="744742")
-    #     self.assertEqual(1, len(spim_data))
+    @patch("slims.slims.Slims")
+    def test_get_spim_data_from_slims(self, mock_slims: MagicMock):
+        """Tests get_spim_data_from_slims method"""
+        mock_slims.fetch.side_effect = self.fetch_side_effect
+        handler = SlimsWaterRestrictionHandler(client=mock_slims)
+        wr_data = handler.get_water_restriction_data_from_slims(
+            subject_id="762287"
+        )
+        self.assertEqual(1, len(wr_data))
 
-    # @patch("slims.slims.Slims")
-    # def test_get_spim_data_from_slims_error(self, mock_slims: MagicMock):
-    #     """Tests get_spim_data_from_slims method when subject_id empty"""
-    #     mock_slims.fetch.side_effect = self.fetch_side_effect
-    #     handler = SlimsImagingHandler(client=mock_slims)
-    #     with self.assertRaises(ValueError) as e:
-    #         handler.get_spim_data_from_slims(subject_id="")
+    @patch("slims.slims.Slims")
+    def test_get_spim_data_from_slims_error(self, mock_slims: MagicMock):
+        """Tests get_spim_data_from_slims method when subject_id empty"""
+        mock_slims.fetch.side_effect = self.fetch_side_effect
+        handler = SlimsWaterRestrictionHandler(client=mock_slims)
+        with self.assertRaises(ValueError) as e:
+            handler.get_water_restriction_data_from_slims(subject_id="")
 
-    #     self.assertIn("subject_id must not be empty!", str(e.exception))
+        self.assertIn("subject_id must not be empty!", str(e.exception))
 
 
 if __name__ == "__main__":

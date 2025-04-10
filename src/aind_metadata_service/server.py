@@ -258,7 +258,7 @@ async def retrieve_slims_histology(
 
 
 @app.get("/slims/water_restriction")
-async def retrieve_slims_histology(
+async def retrieve_slims_water_restriction(
     subject_id: Optional[str] = Query(None, alias="subject_id"),
     start_date_gte: Optional[str] = Query(
         None,
