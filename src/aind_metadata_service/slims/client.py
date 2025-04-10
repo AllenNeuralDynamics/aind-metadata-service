@@ -28,6 +28,12 @@ from aind_metadata_service.slims.histology.mapping import SlimsHistologyMapper
 from aind_metadata_service.slims.imaging.handler import SlimsImagingHandler
 from aind_metadata_service.slims.imaging.mapping import SlimsSpimMapper
 from aind_metadata_service.slims.sessions.mapping import SlimsSessionMapper
+from aind_metadata_service.slims.water_restriction.handler import (
+    SlimsWaterRestrictionHandler,
+)
+from aind_metadata_service.slims.water_restriction.mapping import (
+    SlimsWaterRestrictionMapper,
+)
 
 
 class SlimsSettings(ParameterStoreBaseSettings):
@@ -61,6 +67,23 @@ class SlimsHandler:
     def _is_json_file(file: Response) -> bool:
         """Checks whether file is a json."""
         return file.headers.get("Content-Type", "") == "application/json"
+
+    @staticmethod
+    def _parse_date(
+        date_str: Optional[str],
+    ) -> Union[Optional[datetime], ModelResponse]:
+        """Parse a date_str to datetime object or return a Bad Request
+        response"""
+        if date_str is None:
+            return None
+        else:
+            try:
+                dt = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+                return dt
+            except ValueError:
+                return ModelResponse.bad_request_error_response(
+                    message=f"{date_str} is not valid ISOFormat!"
+                )
 
     def get_instrument_model_response(
         self, input_id: str, partial_match: bool = False
@@ -276,23 +299,6 @@ class SlimsHandler:
             m = ModelResponse.internal_server_error_response()
             return m.map_to_json_response()
 
-    @staticmethod
-    def _parse_date(
-        date_str: Optional[str],
-    ) -> Union[Optional[datetime], ModelResponse]:
-        """Parse a date_str to datetime object or return a Bad Request
-        response"""
-        if date_str is None:
-            return None
-        else:
-            try:
-                dt = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
-                return dt
-            except ValueError:
-                return ModelResponse.bad_request_error_response(
-                    message=f"{date_str} is not valid ISOFormat!"
-                )
-
     def get_slims_imaging_response(
         self,
         subject_id: Optional[str],
@@ -352,3 +358,105 @@ class SlimsHandler:
             logging.exception(e)
             m = ModelResponse.internal_server_error_response()
             return m.map_to_json_response()
+
+    def get_slims_water_restriction_response(
+        self,
+        subject_id: Optional[str],
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> JSONResponse:
+        """
+
+        Parameters
+        ----------
+        subject_id : str | None
+        start_date : str | None
+          Optional ISO Format datetime string
+        end_date :  str | None
+          Optional ISO Format datetime string
+        Returns
+        -------
+        JSONResponse
+
+        """
+        if subject_id is not None and subject_id == "":
+            return ModelResponse.bad_request_error_response(
+                message="subject_id cannot be an empty string!"
+            ).map_to_json_response()
+        parsed_start_date = self._parse_date(start_date)
+        if isinstance(parsed_start_date, ModelResponse):
+            return parsed_start_date.map_to_json_response()
+        parsed_end_date = self._parse_date(end_date)
+        if isinstance(parsed_end_date, ModelResponse):
+            return parsed_end_date.map_to_json_response()
+        try:
+            slims_wr_handler = SlimsWaterRestrictionHandler(
+                client=self.client.db
+            )
+            slims_wr_data = (
+                slims_wr_handler.get_water_restriction_data_from_slims(
+                    subject_id=subject_id,
+                    start_date_greater_than_or_equal=parsed_start_date,
+                    end_date_less_than_or_equal=parsed_end_date,
+                )
+            )
+            wr_data = SlimsWaterRestrictionMapper(
+                slims_wr_data=slims_wr_data
+            ).map_info_from_slims()
+            if len(wr_data) == 0:
+                m = ModelResponse.no_data_found_error_response()
+                return m.map_to_json_response()
+            response = JSONResponse(
+                status_code=StatusCodes.VALID_DATA.value,
+                content=(
+                    {
+                        "message": "Data from SLIMS",
+                        "data": [
+                            json.loads(m.model_dump_json()) for m in wr_data
+                        ],
+                    }
+                ),
+            )
+            return response
+        except Exception as e:
+            logging.exception(e)
+            m = ModelResponse.internal_server_error_response()
+            return m.map_to_json_response()
+
+    def get_water_restriction_procedures_model_response(
+        self,
+        subject_id: str,
+    ) -> ModelResponse:
+        """
+        Parameters
+        ----------
+        subject_id : str | None
+        Returns
+        -------
+        JSONResponse
+
+        """
+        try:
+            slims_wr_handler = SlimsWaterRestrictionHandler(
+                client=self.client.db
+            )
+            slims_wr_data = (
+                slims_wr_handler.get_water_restriction_data_from_slims(
+                    subject_id=subject_id,
+                )
+            )
+            if slims_wr_data:
+                mapped_wr_procedures = SlimsWaterRestrictionMapper(
+                    slims_wr_data=slims_wr_data
+                ).map_slims_info_to_water_restrictions()
+                procedures = Procedures.model_construct(subject_id=subject_id)
+                procedures.subject_procedures = mapped_wr_procedures
+                return ModelResponse(
+                    aind_models=[procedures],
+                    status_code=StatusCodes.DB_RESPONDED,
+                )
+            else:
+                return ModelResponse.no_data_found_error_response()
+        except Exception as e:
+            logging.exception(e)
+            return ModelResponse.internal_server_error_response()
