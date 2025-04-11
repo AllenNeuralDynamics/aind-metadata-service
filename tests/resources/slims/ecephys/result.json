@@ -88,13 +88,13 @@
             "title": "DAQ names"
          },
          {
-            "name": "rslt_cf_cameraNames2",
+            "name": "rslt_cf_cameraNames",
             "value": ["Bottom camera", "Eye camera", "Side camera left"],
             "datatype": "MULTIPLE_ENUM",
             "title": "Camera names"
          },
          {
-            "name": "rslt_cf_fk_injectionMaterial2",
+            "name": "rslt_cf_fk_modulesinStream",
             "value": 4512,
             "datatype": "FOREIGN_KEY",
             "title": "Modules used in this stream"

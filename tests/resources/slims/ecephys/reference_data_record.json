@@ -91,7 +91,7 @@
             "displayValue": "Dome Module"
          },
          {
-            "name": "rdrc_cf_bsl",
+            "name": "rdrc_cf_implantHole",
             "value": 5,
             "datatype": "INTEGER",
             "title": "Implant Hole"
@@ -144,28 +144,28 @@
             "unit": "°"
          },
          {
-            "name": "rdrc_cf_manipulatorCalibrations",
+            "name": "rdrc_cf_coordinateTransform",
             "value": 417,
             "datatype": "FOREIGN_KEY",
             "title": "Coordinate Transform",
             "displayValue": "calibration_info_np2_2024_12_23T11_36_00.xlsx"
          },
          {
-            "name": "rdrc_cf_targetedCcfCoordinatesAp",
+            "name": "rdrc_cf_ccfCoordinatesAp",
             "value": 0.5,
             "datatype": "QUANTITY",
             "title": "CCF Coordinates (AP)",
             "unit": "&mu;m"
          },
          {
-            "name": "rdrc_cf_targetedCcfCoordinatesDv",
+            "name": "rdrc_cf_ccfCoordinatesDv",
             "value": 0.5,
             "datatype": "QUANTITY",
             "title": "CCF Coordinates (DV)",
             "unit": "&mu;m"
          },
          {
-            "name": "rdrc_cf_targetedCcfCoordinatesMl",
+            "name": "rdrc_cf_ccfCoordinatesMl",
             "value": 0.5,
             "datatype": "QUANTITY",
             "title": "CCF Coordinates (ML)",
@@ -178,28 +178,28 @@
             "title": "CCF Version"
          },
          {
-            "name": "rdrc_cf_targetAp",
+            "name": "rdrc_cf_bregmaAP",
             "value": 0.5,
             "datatype": "QUANTITY",
             "title": "Bregma Target AP",
             "unit": "mm"
          },
          {
-            "name": "rdrc_cf_targetMl",
+            "name": "rdrc_cf_bregmaML",
             "value": 0.5,
             "datatype": "QUANTITY",
             "title": "Bregma Target ML",
             "unit": "mm"
          },
          {
-            "name": "rdrc_cf_targetDv",
+            "name": "rdrc_cf_bregmaDV",
             "value": 0.5,
             "datatype": "QUANTITY",
             "title": "]Bregma Target DV",
             "unit": "mm"
          },
          {
-            "name": "rdrc_cf_surface-Z",
+            "name": "rdrc_cf_surfaceZ",
             "value": 5508.5,
             "datatype": "QUANTITY",
             "title": "Surface Z",
