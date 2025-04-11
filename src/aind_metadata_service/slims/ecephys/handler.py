@@ -23,7 +23,7 @@ class SlimsStreamModule(BaseModel):
     assembly_name: Optional[str] = None
     probe_name: Optional[str] = None
     primary_target_structure: Optional[str] = None
-    secondary_target_structures: Optional[str] = None
+    secondary_target_structures: Optional[list] = None
     arc_angle: Optional[float] = None
     module_angle: Optional[float] = None
     rotation_angle: Optional[float] = None
@@ -90,39 +90,39 @@ class SlimsEcephysHandler(SlimsTableHandler):
     def _get_stream_module_data(row: Record) -> SlimsStreamModule:
         """Parses a stream module info from a SLIMS row."""
         return SlimsStreamModule(
-            implant_hole=get_attr_or_none(row, "rdrc_cf_bsl"),
+            implant_hole=get_attr_or_none(row, "rdrc_cf_implantHole"),
             assembly_name=get_attr_or_none(row, "rdrc_cf_assemblyName"),
             probe_name=get_attr_or_none(row, "rdrc_cf_probeName"),
             primary_target_structure=get_attr_or_none(
                 row, "rdrc_cf_fk_primaryTargetedStructure", "displayValue"
             ),
             secondary_target_structures=get_attr_or_none(
-                row, "rdrc_cf_fk_secondaryTargetedStructures2", "displayValues"
+                row, "rdrc_cf_fk_secondaryTargetedStructures", "displayValues"
             ),
             arc_angle=get_attr_or_none(row, "rdrc_cf_arcAngle"),
             module_angle=get_attr_or_none(row, "rdrc_cf_moduleAngle"),
             rotation_angle=get_attr_or_none(row, "rdrc_cf_rotationAngle"),
             coordinate_transform=get_attr_or_none(
-                row, "rdrc_cf_manipulatorCalibrations", "displayValue"
+                row, "rdrc_cf_coordinateTransform", "displayValue"
             ),
             ccf_coordinate_ap=get_attr_or_none(
-                row, "rdrc_cf_targetedCcfCoordinatesAp"
+                row, "rdrc_cf_ccfCoordinatesAp"
             ),
             ccf_coordinate_ml=get_attr_or_none(
-                row, "rdrc_cf_targetedCcfCoordinatesMl"
+                row, "rdrc_cf_ccfCoordinatesMl"
             ),
             ccf_coordinate_dv=get_attr_or_none(
-                row, "rdrc_cf_targetedCcfCoordinatesDv"
+                row, "rdrc_cf_ccfCoordinatesDv"
             ),
             ccf_coordinate_unit=get_attr_or_none(
-                row, "rdrc_cf_targetedCcfCoordinatesAp", "unit"
+                row, "rdrc_cf_ccfCoordinatesAp", "unit"
             ),
             ccf_version=get_attr_or_none(row, "rdrc_cf_ccfVersion"),
-            bregma_target_ap=get_attr_or_none(row, "rdrc_cf_targetAp"),
-            bregma_target_ml=get_attr_or_none(row, "rdrc_cf_targetMl"),
-            bregma_target_dv=get_attr_or_none(row, "rdrc_cf_targetDv"),
+            bregma_target_ap=get_attr_or_none(row, "rdrc_cf_bregmaAP"),
+            bregma_target_ml=get_attr_or_none(row, "rdrc_cf_bregmaML"),
+            bregma_target_dv=get_attr_or_none(row, "rdrc_cf_bregmaDV"),
             bregma_target_unit=get_attr_or_none(
-                row, "rdrc_cf_targetAp", "unit"
+                row, "rdrc_cf_bregmaAP", "unit"
             ),
             surface_z=get_attr_or_none(row, "rdrc_cf_surfaceZ"),
             surface_z_unit=get_attr_or_none(row, "rdrc_cf_surfaceZ", "unit"),
@@ -169,7 +169,7 @@ class SlimsEcephysHandler(SlimsTableHandler):
             row, "xprs_cf_activeMousePlatform"
         )
         ephys_data.instrument = get_attr_or_none(
-            row, "xprs_cf_fk_instrumentJson", "displayValue"
+            row, "xprs_cf_fk_instrument", "displayValue"
         )
         ephys_data.device_calibrations = get_attr_or_none(
             row, "xprs_cf_deviceCalibrations"
@@ -210,7 +210,7 @@ class SlimsEcephysHandler(SlimsTableHandler):
             )
             ephys_data.daq_names = get_attr_or_none(row, "rslt_cf_daqNames")
             ephys_data.camera_names = get_attr_or_none(
-                row, "rslt_cf_cameraNames2"
+                row, "rslt_cf_cameraNames"
             )
 
     def _handle_referencedatarecord(
@@ -371,7 +371,7 @@ class SlimsEcephysHandler(SlimsTableHandler):
             input_table="Result",
             input_rows=result_rows,
             input_table_cols=[
-                "rslt_cf_fk_injectionMaterial2",
+                "rslt_cf_fk_modulesinStream",
                 "rslt_cf_fk_rewardDelivery",
             ],
             foreign_table="ReferenceDataRecord",

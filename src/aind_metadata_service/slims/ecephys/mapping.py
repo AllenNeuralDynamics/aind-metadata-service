@@ -21,7 +21,7 @@ class StreamModule(BaseModel):
     assembly_name: Optional[str] = None
     probe_name: Optional[str] = None
     primary_target_structure: Optional[str] = None
-    secondary_target_structures: Optional[str] = None
+    secondary_target_structures: Optional[list] = None
     arc_angle: Optional[Decimal] = None
     module_angle: Optional[Decimal] = None
     rotation_angle: Optional[Decimal] = None
