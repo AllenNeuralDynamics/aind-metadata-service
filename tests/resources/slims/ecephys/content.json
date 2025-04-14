@@ -1,0 +1,40 @@
+[
+   {
+      "pk": 166,
+      "tableName": "Content",
+      "columns": [
+         {
+            "name": "cntn_fk_category",
+            "value": 8,
+            "displayValue": "Mouse",
+            "datatype": "FOREIGN_KEY",
+            "title": "Category"
+         },
+         {
+            "name": "cntn_barCode",
+            "value": "750108",
+            "datatype": "STRING",
+            "title": "Barcode"
+         },
+         {
+            "name": "cntn_fk_source",
+            "value": null,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Source"
+         },
+         {
+            "name": "cntn_cf_parentBarcode",
+            "value": "BRN00000002",
+            "datatype": "STRING",
+            "title": "Parent barcode"
+         },
+         {
+            "name": "cntn_pk",
+            "value": 166,
+            "datatype": "INTEGER",
+            "title": "cntn_pk"
+         }
+      ]
+   }
+]

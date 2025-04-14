@@ -119,13 +119,34 @@ async def retrieve_rig(rig_id, partial_match=False):
     return model_response.map_to_json_response(validate=False)
 
 
-@app.get("/ecephys_sessions_by_subject/{subject_id}")
-async def retrieve_sessions(subject_id):
+@app.get("/slims/ecephys_sessions")
+async def retrieve_slims_ecephys(
+    subject_id: Optional[str] = Query(None, alias="subject_id"),
+    session_name: Optional[str] = Query(
+        None,
+        alias="session_name",
+        description="Name of the session",
+    ),
+    start_date_gte: Optional[str] = Query(
+        None,
+        alias="start_date_gte",
+        description="Experiment run created on or after. (ISO format)",
+    ),
+    end_date_lte: Optional[str] = Query(
+        None,
+        alias="end_date_lte",
+        description="Experiment run created on or before. (ISO format)",
+    ),
+):
     """Retrieves sessions from slims"""
-    model_response = await run_in_threadpool(
-        slims_client.get_sessions_model_response, subject_id=subject_id
+    response = await run_in_threadpool(
+        slims_client.get_slims_ecephys_response,
+        subject_id=subject_id,
+        session_name=session_name,
+        start_date=start_date_gte,
+        end_date=end_date_lte,
     )
-    return model_response.map_to_json_response()
+    return response
 
 
 @app.get("/protocols/{protocol_name}")
