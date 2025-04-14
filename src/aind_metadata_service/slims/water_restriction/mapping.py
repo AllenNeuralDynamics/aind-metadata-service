@@ -69,7 +69,7 @@ class SlimsWaterRestrictionMapper:
                 ),
                 baseline_weight=data.baseline_weight,
                 weight_unit=self._parse_mass_unit(data.weight_unit),
-                minimum_water_per_day=Decimal("1.0"), # default value
+                minimum_water_per_day=Decimal("1.0"),  # default value
             )
             water_restrictions.append(wr)
         return water_restrictions
