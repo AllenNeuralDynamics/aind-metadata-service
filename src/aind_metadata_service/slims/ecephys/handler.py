@@ -89,6 +89,19 @@ class SlimsEcephysHandler(SlimsTableHandler):
     @staticmethod
     def _get_stream_module_data(row: Record) -> SlimsStreamModule:
         """Parses a stream module info from a SLIMS row."""
+        arc_angle = get_attr_or_none(row, "rdrc_cf_arcAngle")
+        module_angle = get_attr_or_none(row, "rdrc_cf_moduleAngle")
+        rotation_angle = get_attr_or_none(row, "rdrc_cf_rotationAngle")
+        ccf_coordinate_ap = get_attr_or_none(row, "rdrc_cf_ccfCoordinatesAp")
+        ccf_coordinate_ml = get_attr_or_none(row, "rdrc_cf_ccfCoordinatesMl")
+        ccf_coordinate_dv = get_attr_or_none(row, "rdrc_cf_ccfCoordinatesDv")
+        bregma_target_ap = get_attr_or_none(row, "rdrc_cf_bregmaAP")
+        bregma_target_ml = get_attr_or_none(row, "rdrc_cf_bregmaML")
+        bregma_target_dv = get_attr_or_none(row, "rdrc_cf_bregmaDV")
+        surface_z = get_attr_or_none(row, "rdrc_cf_surfaceZ")
+        manipulator_x = get_attr_or_none(row, "rdrc_cf_manipulatorX")
+        manipulator_y = get_attr_or_none(row, "rdrc_cf_manipulatory")
+        manipulator_z = get_attr_or_none(row, "rdrc_cf_manipulatorZ")
         return SlimsStreamModule(
             implant_hole=get_attr_or_none(row, "rdrc_cf_implantHole"),
             assembly_name=get_attr_or_none(row, "rdrc_cf_assemblyName"),
@@ -99,36 +112,66 @@ class SlimsEcephysHandler(SlimsTableHandler):
             secondary_target_structures=get_attr_or_none(
                 row, "rdrc_cf_fk_secondaryTargetedStructures", "displayValues"
             ),
-            arc_angle=get_attr_or_none(row, "rdrc_cf_arcAngle"),
-            module_angle=get_attr_or_none(row, "rdrc_cf_moduleAngle"),
-            rotation_angle=get_attr_or_none(row, "rdrc_cf_rotationAngle"),
+            arc_angle=(None if arc_angle is None else Decimal(str(arc_angle))),
+            module_angle=(
+                None if module_angle is None else Decimal(str(module_angle))
+            ),
+            rotation_angle=(
+                None
+                if rotation_angle is None
+                else Decimal(str(rotation_angle))
+            ),
             coordinate_transform=get_attr_or_none(
                 row, "rdrc_cf_coordinateTransform", "displayValue"
             ),
-            ccf_coordinate_ap=get_attr_or_none(
-                row, "rdrc_cf_ccfCoordinatesAp"
+            ccf_coordinate_ap=(
+                None
+                if ccf_coordinate_ap is None
+                else Decimal(str(ccf_coordinate_ap))
             ),
-            ccf_coordinate_ml=get_attr_or_none(
-                row, "rdrc_cf_ccfCoordinatesMl"
+            ccf_coordinate_ml=(
+                None
+                if ccf_coordinate_ml is None
+                else Decimal(str(ccf_coordinate_ml))
             ),
-            ccf_coordinate_dv=get_attr_or_none(
-                row, "rdrc_cf_ccfCoordinatesDv"
+            ccf_coordinate_dv=(
+                None
+                if ccf_coordinate_dv is None
+                else Decimal(str(ccf_coordinate_dv))
             ),
             ccf_coordinate_unit=get_attr_or_none(
                 row, "rdrc_cf_ccfCoordinatesAp", "unit"
             ),
             ccf_version=get_attr_or_none(row, "rdrc_cf_ccfVersion"),
-            bregma_target_ap=get_attr_or_none(row, "rdrc_cf_bregmaAP"),
-            bregma_target_ml=get_attr_or_none(row, "rdrc_cf_bregmaML"),
-            bregma_target_dv=get_attr_or_none(row, "rdrc_cf_bregmaDV"),
+            bregma_target_ap=(
+                None
+                if bregma_target_ap is None
+                else Decimal(str(bregma_target_ap))
+            ),
+            bregma_target_ml=(
+                None
+                if bregma_target_ml is None
+                else Decimal(str(bregma_target_ml))
+            ),
+            bregma_target_dv=(
+                None
+                if bregma_target_dv is None
+                else Decimal(str(bregma_target_dv))
+            ),
             bregma_target_unit=get_attr_or_none(
                 row, "rdrc_cf_bregmaAP", "unit"
             ),
-            surface_z=get_attr_or_none(row, "rdrc_cf_surfaceZ"),
+            surface_z=(None if surface_z is None else Decimal(str(surface_z))),
             surface_z_unit=get_attr_or_none(row, "rdrc_cf_surfaceZ", "unit"),
-            manipulator_x=get_attr_or_none(row, "rdrc_cf_manipulatorX"),
-            manipulator_y=get_attr_or_none(row, "rdrc_cf_manipulatory"),
-            manipulator_z=get_attr_or_none(row, "rdrc_cf_manipulatorZ"),
+            manipulator_x=(
+                None if manipulator_x is None else Decimal(str(manipulator_x))
+            ),
+            manipulator_y=(
+                None if manipulator_y is None else Decimal(str(manipulator_y))
+            ),
+            manipulator_z=(
+                None if manipulator_z is None else Decimal(str(manipulator_z))
+            ),
             manipulator_unit=get_attr_or_none(
                 row, "rdrc_cf_manipulatorX", "unit"
             ),
@@ -182,17 +225,32 @@ class SlimsEcephysHandler(SlimsTableHandler):
             ephys_data.session_name = get_attr_or_none(
                 row, "rslt_cf_sessionName"
             )
-            ephys_data.animal_weight_prior = get_attr_or_none(
+            animal_weight_prior = get_attr_or_none(
                 row, "rslt_cf_animalWeightPrior"
             )
-            ephys_data.animal_weight_after = get_attr_or_none(
+            ephys_data.animal_weight_prior = (
+                None
+                if animal_weight_prior is None
+                else Decimal(str(animal_weight_prior))
+            )
+            animal_weight_after = get_attr_or_none(
                 row, "rslt_cf_animalWeightPost"
+            )
+            ephys_data.animal_weight_after = (
+                None
+                if animal_weight_after is None
+                else Decimal(str(animal_weight_after))
             )
             ephys_data.animal_weight_unit = get_attr_or_none(
                 row, "rslt_cf_animalWeightPrior", "unit"
             )
-            ephys_data.reward_consumed = get_attr_or_none(
+            reward_consumed = get_attr_or_none(
                 row, "rslt_cf_rewardConsumedvolume"
+            )
+            ephys_data.reward_consumed = (
+                None
+                if reward_consumed is None
+                else Decimal(str(reward_consumed))
             )
             ephys_data.reward_consumed_unit = get_attr_or_none(
                 row, "rslt_cf_rewardConsumedvolume", "unit"
