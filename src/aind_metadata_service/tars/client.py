@@ -106,7 +106,11 @@ class TarsClient:
            Raw Response from ViralPrepLot endpoint
         """
         data = response.json()["data"]
-        filtered_data = [lot for lot in data if lot["lot"] == prep_lot_number]
+        filtered_data = [
+            lot
+            for lot in data
+            if lot["lot"].lower() == prep_lot_number.lower()
+        ]
         if not filtered_data:
             raise ValueError(f"No data found for {prep_lot_number}")
         return filtered_data

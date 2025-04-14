@@ -1,0 +1,72 @@
+[
+    {
+    "pk": 15,
+    "tableName": "ContentEvent",
+    "columns": [
+    {
+    "datatype": "DATE",
+    "name": "cnvn_cf_startDate",
+    "title": "Start date",
+    "value": 1734119012354,
+    "dateFormat": "MM/dd/yyyy",
+    "subType": "date",
+    "timeZone": "America/Los_Angeles"
+    },
+    {
+    "datatype": "DATE",
+    "name": "cnvn_cf_endDate",
+    "title": "End date",
+    "position": 4,
+    "value": null,
+    "dateFormat": "MM/dd/yyyy",
+    "subType": "date",
+    "timeZone": "America/Los_Angeles"
+    },
+    {
+    "datatype": "STRING",
+    "name": "cnvn_cf_assignedBy",
+    "title": "Assigned by",
+    "value": "person.name"
+    },
+    {
+    "datatype": "FLOAT",
+    "name": "cnvn_cf_targetWeightFraction",
+    "title": "Target weight fraction",
+    "value": 0.85
+    },
+    {
+    "datatype": "FOREIGN_KEY",
+    "name": "cnvn_fk_content",
+    "title": "Content",
+    "value": 55
+    },
+    {
+    "datatype": "DATE",
+    "name": "cnvn_createdOn",
+    "title": "Created on",
+    "value": 1734119014103,
+    "dateFormat": "MM/dd/yyyy HH:mm:ss",
+    "subType": "datetime",
+    "timeZone": "America/Los_Angeles"
+    },
+    {
+    "datatype": "STRING",
+    "name": "cntn_id",
+    "title": "Id",
+    "value": "762287"
+    },
+    {
+    "datatype": "INTEGER",
+    "name": "cnvn_pk",
+    "title": "cnvn_pk",
+    "value": 15
+    },
+    {
+    "datatype": "STRING",
+    "name": "cnvt_name",
+    "title": "Name",
+    "value": "Water Restriction"
+    }
+    ]
+}
+]

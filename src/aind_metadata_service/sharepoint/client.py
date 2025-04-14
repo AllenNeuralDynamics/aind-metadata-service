@@ -475,6 +475,8 @@ class SharePointClient:
             if identifier not in seen:
                 seen.add(identifier)
                 unique.append(item)
+            else:
+                logging.info("Duplicate item found and removed.")
 
         return unique
 
