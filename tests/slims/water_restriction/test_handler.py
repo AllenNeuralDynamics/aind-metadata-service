@@ -90,8 +90,8 @@ class TestSlimsWaterRestrictionHandler(unittest.TestCase):
                 start_date=1734119012354,
                 end_date=None,
                 assigned_by="person.name",
-                target_weight_fraction=Decimal(0.85),
-                baseline_weight=Decimal(28.23),
+                target_weight_fraction=Decimal("0.85"),
+                baseline_weight=Decimal("28.23"),
                 weight_unit="g",
             )
         ]

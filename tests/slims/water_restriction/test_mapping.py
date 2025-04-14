@@ -90,6 +90,7 @@ class TestSlimsWaterRestrictionMapper(unittest.TestCase):
                 weight_unit=MassUnit.G,
                 start_date=date(2024, 12, 13),
                 end_date=None,
+                minimum_water_per_day=1.0,
             )
         ]
         self.assertEqual(expected_output, output)

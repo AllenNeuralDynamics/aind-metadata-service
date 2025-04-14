@@ -60,8 +60,13 @@ class SlimsWaterRestrictionHandler(SlimsTableHandler):
             wr_data.start_date = get_attr_or_none(row, "cnvn_cf_startDate")
             wr_data.end_date = get_attr_or_none(row, "cnvn_cf_endDate")
             wr_data.assigned_by = get_attr_or_none(row, "cnvn_cf_assignedBy")
-            wr_data.target_weight_fraction = get_attr_or_none(
+            target_weight_fraction = get_attr_or_none(
                 row, "cnvn_cf_targetWeightFraction"
+            )
+            wr_data.target_weight_fraction = (
+                None
+                if target_weight_fraction is None
+                else Decimal(str(target_weight_fraction))
             )
             node_des = descendants(g, node)
             for n in node_des:
@@ -69,8 +74,13 @@ class SlimsWaterRestrictionHandler(SlimsTableHandler):
                 row = g.nodes[n]["row"]
                 if table_name == "Content":
                     wr_data.subject_id = get_attr_or_none(row, "cntn_barCode")
-                    wr_data.baseline_weight = get_attr_or_none(
+                    baseline_weight = get_attr_or_none(
                         row, "cntn_cf_baselineWeight"
+                    )
+                    wr_data.baseline_weight = (
+                        None
+                        if baseline_weight is None
+                        else Decimal(str(baseline_weight))
                     )
                     wr_data.weight_unit = get_attr_or_none(
                         row, "cntn_cf_baselineWeight", "unit"
@@ -158,7 +168,7 @@ class SlimsWaterRestrictionHandler(SlimsTableHandler):
           Filter content events that were created on or before this datetime.
         Returns
         -------
-        List[SlimsSpSlimsWaterRestrictionDataimData]
+        List[SlimsSlimsWaterRestrictionDataimData]
 
         Raises
         ------

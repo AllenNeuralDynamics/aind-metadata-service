@@ -57,7 +57,6 @@ class SlimsWaterRestrictionMapper:
             for m in self.slims_wr_data
         ]
         water_restrictions = []
-        # TODO: check if we can assume water volume
         for data in wr_data:
             wr = WaterRestriction.model_construct(
                 start_date=data.start_date.date() if data.start_date else None,
@@ -70,6 +69,7 @@ class SlimsWaterRestrictionMapper:
                 ),
                 baseline_weight=data.baseline_weight,
                 weight_unit=self._parse_mass_unit(data.weight_unit),
+                minimum_water_per_day=Decimal("1.0"), # default value
             )
             water_restrictions.append(wr)
         return water_restrictions
