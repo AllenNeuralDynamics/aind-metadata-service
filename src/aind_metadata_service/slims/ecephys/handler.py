@@ -4,7 +4,7 @@ Module to handle fetching ephys data from slims and parsing it to a model
 
 from datetime import datetime
 from typing import List, Optional, Tuple
-
+from decimal import Decimal
 from networkx import DiGraph, descendants
 from pydantic import BaseModel
 from slims.criteria import equals
@@ -24,24 +24,24 @@ class SlimsStreamModule(BaseModel):
     probe_name: Optional[str] = None
     primary_target_structure: Optional[str] = None
     secondary_target_structures: Optional[list] = None
-    arc_angle: Optional[float] = None
-    module_angle: Optional[float] = None
-    rotation_angle: Optional[float] = None
+    arc_angle: Optional[Decimal] = None
+    module_angle: Optional[Decimal] = None
+    rotation_angle: Optional[Decimal] = None
     coordinate_transform: Optional[str] = None
-    ccf_coordinate_ap: Optional[float] = None
-    ccf_coordinate_ml: Optional[float] = None
-    ccf_coordinate_dv: Optional[float] = None
+    ccf_coordinate_ap: Optional[Decimal] = None
+    ccf_coordinate_ml: Optional[Decimal] = None
+    ccf_coordinate_dv: Optional[Decimal] = None
     ccf_coordinate_unit: Optional[str] = None
     ccf_version: Optional[str] = None
-    bregma_target_ap: Optional[float] = None
-    bregma_target_ml: Optional[float] = None
-    bregma_target_dv: Optional[float] = None
+    bregma_target_ap: Optional[Decimal] = None
+    bregma_target_ml: Optional[Decimal] = None
+    bregma_target_dv: Optional[Decimal] = None
     bregma_target_unit: Optional[str] = None
-    surface_z: Optional[float] = None
+    surface_z: Optional[Decimal] = None
     surface_z_unit: Optional[str] = None
-    manipulator_x: Optional[float] = None
-    manipulator_y: Optional[float] = None
-    manipulator_z: Optional[float] = None
+    manipulator_x: Optional[Decimal] = None
+    manipulator_y: Optional[Decimal] = None
+    manipulator_z: Optional[Decimal] = None
     manipulator_unit: Optional[str] = None
     dye: Optional[str] = None
 
@@ -67,10 +67,10 @@ class SlimsEcephysData(BaseModel):
     mouse_platform_name: Optional[str] = None
     active_mouse_platform: Optional[bool] = None
     session_name: Optional[str] = None
-    animal_weight_prior: Optional[float] = None
-    animal_weight_after: Optional[float] = None
+    animal_weight_prior: Optional[Decimal] = None
+    animal_weight_after: Optional[Decimal] = None
     animal_weight_unit: Optional[str] = None
-    reward_consumed: Optional[float] = None
+    reward_consumed: Optional[Decimal] = None
     reward_consumed_unit: Optional[str] = None
     stimulus_epochs: Optional[int] = None
     link_to_stimulus_epoch_code: Optional[str] = None
