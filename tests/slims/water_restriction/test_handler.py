@@ -8,7 +8,7 @@ from typing import Any, Dict
 from unittest.mock import MagicMock, patch
 from datetime import datetime
 from slims.internal import Record
-
+from decimal import Decimal
 from aind_metadata_service.slims.water_restriction.handler import (
     SlimsWaterRestrictionHandler,
     SlimsWaterRestrictionData,
@@ -90,8 +90,8 @@ class TestSlimsWaterRestrictionHandler(unittest.TestCase):
                 start_date=1734119012354,
                 end_date=None,
                 assigned_by="person.name",
-                target_weight_fraction=0.85,
-                baseline_weight=28.23,
+                target_weight_fraction=Decimal(0.85),
+                baseline_weight=Decimal(28.23),
                 weight_unit="g",
             )
         ]

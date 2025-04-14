@@ -5,7 +5,7 @@ and parsing it to a model.
 
 from datetime import datetime
 from typing import List, Optional, Tuple
-
+from decimal import Decimal
 from networkx import DiGraph, descendants
 from pydantic import BaseModel
 from slims.criteria import equals, conjunction
@@ -24,8 +24,8 @@ class SlimsWaterRestrictionData(BaseModel):
     start_date: Optional[int] = None
     end_date: Optional[int] = None
     assigned_by: Optional[str] = None
-    target_weight_fraction: Optional[float] = None
-    baseline_weight: Optional[float] = None
+    target_weight_fraction: Optional[Decimal] = None
+    baseline_weight: Optional[Decimal] = None
     weight_unit: Optional[str] = None
 
 
