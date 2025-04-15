@@ -3,8 +3,9 @@ Module to handle fetching ephys data from slims and parsing it to a model
 """
 
 from datetime import datetime
-from typing import List, Optional, Tuple
 from decimal import Decimal
+from typing import List, Optional, Tuple
+
 from networkx import DiGraph, descendants
 from pydantic import BaseModel
 from slims.criteria import equals

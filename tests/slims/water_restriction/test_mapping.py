@@ -2,10 +2,13 @@
 
 import os
 import unittest
-from unittest.mock import patch
-from datetime import datetime, timezone, date
+from datetime import date, datetime, timezone
 from decimal import Decimal
 from pathlib import Path
+from unittest.mock import patch
+
+from aind_data_schema.core.procedures import WaterRestriction
+from aind_data_schema_models.units import MassUnit, UnitlessUnit, VolumeUnit
 
 from aind_metadata_service.slims.water_restriction.handler import (
     SlimsWaterRestrictionData,
@@ -14,8 +17,6 @@ from aind_metadata_service.slims.water_restriction.mapping import (
     SlimsWaterRestrictionMapper,
     WaterRestrictionData,
 )
-from aind_data_schema.core.procedures import WaterRestriction
-from aind_data_schema_models.units import MassUnit, VolumeUnit, UnitlessUnit
 
 RESOURCES_DIR = (
     Path(os.path.dirname(os.path.realpath(__file__)))

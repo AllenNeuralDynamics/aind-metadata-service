@@ -364,10 +364,10 @@ async def retrieve_procedures(subject_id):
     Retrieves procedure info from SharePoint and Labtracks servers
     """
     sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
-    lb_client = LabTracksClient.from_settings(labtracks_settings)
-    lb_response = await run_in_threadpool(
-        lb_client.get_procedures_info, subject_id=subject_id
-    )
+    # lb_client = LabTracksClient.from_settings(labtracks_settings)
+    # lb_response = await run_in_threadpool(
+    #     lb_client.get_procedures_info, subject_id=subject_id
+    # )
     sp2019_response = await run_in_threadpool(
         sharepoint_client.get_procedure_info,
         subject_id=subject_id,
@@ -392,15 +392,24 @@ async def retrieve_procedures(subject_id):
         slims_client.get_water_restriction_procedures_model_response,
         subject_id=subject_id,
     )
+    smartsheet_perfusions_response = await run_in_threadpool(
+        perfusions_smart_sheet_client.get_sheet
+    )
+    mapper = PerfusionsMapper(
+        smart_sheet_response=smartsheet_perfusions_response,
+        input_id=subject_id,
+    )
+    smartsheet_model_response = mapper.get_procedures_model_response()
     # merge subject procedures
     merged_response = sharepoint_client.merge_responses(
         [
-            lb_response,
+            # lb_response,
             sp2019_response,
             sp2023_response,
             sp2025_response,
             las2020_response,
             slims_wr_response,
+            smartsheet_model_response,
         ]
     )
     # integrate TARS response
@@ -416,7 +425,7 @@ async def retrieve_procedures(subject_id):
         response=merged_response, tars_mapping=tars_mapping
     )
     # integrate protocols from smartsheet
-    smart_sheet_response = await run_in_threadpool(
+    smartsheet_protocols_response = await run_in_threadpool(
         protocols_smart_sheet_client.get_sheet
     )
     protocols_integrator = ProtocolsIntegrator()
@@ -426,7 +435,8 @@ async def retrieve_procedures(subject_id):
     protocols_mapping = {}
     for protocol_name in protocols_list:
         mapper = ProtocolsMapper(
-            smart_sheet_response=smart_sheet_response, input_id=protocol_name
+            smart_sheet_response=smartsheet_protocols_response,
+            input_id=protocol_name,
         )
         model_response = mapper.get_model_response()
         protocols_mapping[protocol_name] = (

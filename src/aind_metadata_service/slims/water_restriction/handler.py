@@ -4,11 +4,12 @@ and parsing it to a model.
 """
 
 from datetime import datetime
-from typing import List, Optional, Tuple
 from decimal import Decimal
+from typing import List, Optional, Tuple
+
 from networkx import DiGraph, descendants
 from pydantic import BaseModel
-from slims.criteria import equals, conjunction
+from slims.criteria import conjunction, equals
 
 from aind_metadata_service.slims.table_handler import (
     SlimsTableHandler,
