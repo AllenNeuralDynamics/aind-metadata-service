@@ -6,7 +6,7 @@ import re
 from datetime import date
 from typing import List, Optional
 
-from aind_data_schema.core.procedures import Perfusion, Surgery
+from aind_data_schema.core.procedures import Perfusion, Procedures, Surgery
 from pydantic import ValidationError
 
 from aind_metadata_service.client import StatusCodes
@@ -179,6 +179,32 @@ class PerfusionsMapper(SmartSheetMapper):
                 aind_models=perfusion_list,
                 status_code=StatusCodes.DB_RESPONDED,
             )
+        except Exception as e:
+            logging.error(repr(e))
+            return ModelResponse.internal_server_error_response()
+
+    def get_procedures_model_response(self) -> ModelResponse:
+        """
+        Return a ModelResponse.
+
+        Returns
+        -------
+        ModelResponse
+            Wraps perfusions response in Procedures model.
+        """
+        try:
+            perfusion_list = self._get_perfusion_list(subject_id=self.input_id)
+            if perfusion_list:
+                procedures = Procedures.model_construct(
+                    subject_id=self.input_id
+                )
+                procedures.subject_procedures = perfusion_list
+                return ModelResponse(
+                    aind_models=[procedures],
+                    status_code=StatusCodes.DB_RESPONDED,
+                )
+            else:
+                return ModelResponse.no_data_found_error_response()
         except Exception as e:
             logging.error(repr(e))
             return ModelResponse.internal_server_error_response()

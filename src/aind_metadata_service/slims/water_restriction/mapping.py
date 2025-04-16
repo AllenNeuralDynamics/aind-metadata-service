@@ -1,17 +1,17 @@
 """Module for mapping water restriction data from slims"""
 
+import logging
 from datetime import datetime
-from typing import List, Optional, Union
 from decimal import Decimal
-from aind_data_schema.core.procedures import (
-    WaterRestriction,
-)
+from typing import List, Optional, Union
+
+from aind_data_schema.core.procedures import WaterRestriction
 from aind_data_schema_models.units import MassUnit
 from pydantic import BaseModel
+
 from aind_metadata_service.slims.water_restriction.handler import (
     SlimsWaterRestrictionData,
 )
-import logging
 
 
 class WaterRestrictionData(BaseModel):

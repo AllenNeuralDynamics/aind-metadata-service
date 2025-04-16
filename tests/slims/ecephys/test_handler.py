@@ -3,10 +3,11 @@
 import json
 import os
 import unittest
+from decimal import Decimal
 from pathlib import Path
 from typing import Any, Dict
 from unittest.mock import MagicMock, patch
-from decimal import Decimal
+
 from slims.internal import Record
 
 from aind_metadata_service.slims.ecephys.handler import (

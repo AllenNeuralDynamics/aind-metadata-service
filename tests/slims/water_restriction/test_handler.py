@@ -3,15 +3,17 @@
 import json
 import os
 import unittest
+from datetime import datetime
+from decimal import Decimal
 from pathlib import Path
 from typing import Any, Dict
 from unittest.mock import MagicMock, patch
-from datetime import datetime
+
 from slims.internal import Record
-from decimal import Decimal
+
 from aind_metadata_service.slims.water_restriction.handler import (
-    SlimsWaterRestrictionHandler,
     SlimsWaterRestrictionData,
+    SlimsWaterRestrictionHandler,
 )
 
 RESOURCES_DIR = (
