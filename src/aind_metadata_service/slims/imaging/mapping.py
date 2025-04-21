@@ -2,8 +2,6 @@
 Module to handle mapping data from SLIMS
 """
 
-import logging
-import xml.etree.ElementTree as ET
 from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
@@ -11,6 +9,7 @@ from typing import List, Optional
 from pydantic import BaseModel, field_validator
 
 from aind_metadata_service.slims.imaging.handler import SlimsSpimData
+from aind_metadata_service.slims.table_handler import parse_html
 
 
 class SpimData(BaseModel):
@@ -31,20 +30,15 @@ class SpimData(BaseModel):
     z_direction: Optional[str] = None
     y_direction: Optional[str] = None
     x_direction: Optional[str] = None
+    imaging_channels: Optional[List[str]] = []
+    stitching_channels: Optional[str] = None
+    ccf_registration_channels: Optional[str] = None
+    cell_segmentation_channels: Optional[List[str]] = []
 
     @field_validator("protocol_id")
-    def parse_html(cls, v: Optional[str]) -> Optional[str]:
+    def parse_protocol_id(cls, v: Optional[str]) -> Optional[str]:
         """Parse link from html tag"""
-        if v is None:
-            return None
-        try:
-            root = ET.fromstring(v)
-            return root.get("href")
-        except ET.ParseError:
-            return v
-        except Exception as e:
-            logging.warning(f"An exception occurred parsing link {v}: {e}")
-            return None
+        return parse_html(v)
 
 
 class SlimsSpimMapper:

@@ -1,22 +1,28 @@
 """Module to instantiate a client to connect to TARS and retrieve data."""
 
 import logging
+import os
 from typing import List, Optional
 
 import requests
 from azure.identity import ClientSecretCredential
 from pydantic import Field, SecretStr
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import SettingsConfigDict
 
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
+from aind_metadata_service.settings import ParameterStoreBaseSettings
 from aind_metadata_service.tars.mapping import TarsResponseHandler
 
 
-class AzureSettings(BaseSettings):
+class AzureSettings(ParameterStoreBaseSettings):
     """Configuration class. Mostly a wrapper around AzureAuth
     class constructor arguments."""
 
-    model_config = SettingsConfigDict(env_prefix="TARS_")
+    model_config = SettingsConfigDict(
+        env_prefix="TARS_",
+        extra="ignore",
+        aws_param_store_name=os.getenv("AWS_PARAM_STORE_NAME"),
+    )
 
     tenant_id: str = Field(
         ..., description="The ID of the AllenInstituteB2C Azure tenant."
@@ -100,7 +106,11 @@ class TarsClient:
            Raw Response from ViralPrepLot endpoint
         """
         data = response.json()["data"]
-        filtered_data = [lot for lot in data if lot["lot"] == prep_lot_number]
+        filtered_data = [
+            lot
+            for lot in data
+            if lot["lot"].lower() == prep_lot_number.lower()
+        ]
         if not filtered_data:
             raise ValueError(f"No data found for {prep_lot_number}")
         return filtered_data

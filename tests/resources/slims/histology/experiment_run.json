@@ -1,0 +1,33 @@
+[
+   {
+      "pk": 40007,
+      "tableName": "ExperimentRun",
+      "columns": [
+         {
+            "name": "xprn_fk_experimentTemplate",
+            "value": 47,
+            "displayValue": "SmartSPIM Refractive Index Matching (v. 2)",
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol"
+         },
+         {
+            "name": "xprn_createdOn",
+            "value": 1738175075574,
+            "datatype": "DATE",
+            "title": "Created on"
+         },
+         {
+            "name": "xprn_pk",
+            "value": 40007,
+            "datatype": "INTEGER",
+            "title": "xprn_pk"
+         },
+         {
+            "name": "xptm_name",
+            "value": "SmartSPIM Refractive Index Matching",
+            "datatype": "STRING",
+            "title": "Name"
+         }
+      ]
+   }
+]

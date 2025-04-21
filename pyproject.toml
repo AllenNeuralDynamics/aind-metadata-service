@@ -46,7 +46,8 @@ server = [
     'python-dateutil',
     'aind-slims-api==0.1.21',
     'azure-identity==1.15.0',
-    'networkx'
+    'networkx',
+    'boto3',
 ]
 
 client = [

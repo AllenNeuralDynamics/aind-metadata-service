@@ -6,6 +6,7 @@ from datetime import date
 from unittest.mock import MagicMock, Mock, patch
 
 from aind_data_schema.core.procedures import TarsVirusIdentifiers
+from aind_data_schema_models.pid_names import BaseName, PIDName
 
 from aind_metadata_service.models import ViralMaterialInformation
 from aind_metadata_service.response_handler import ModelResponse, StatusCodes
@@ -72,11 +73,17 @@ class TestTarsClient(unittest.TestCase):
             prep_type="Crude",
             prep_protocol="SOP#VC002",
         )
+        addgene_id = PIDName(
+            name="rAAV-MGT_789",
+            registry=BaseName(name="Addgene_54321"),
+            registry_identifier="54321",
+        )
         viral_material = ViralMaterialInformation(
             material_type="Virus",
             name="rAAV-MGT_789",
             tars_identifiers=tars_virus_identifiers,
             stock_titer=413000000000,
+            addgene_id=addgene_id,
         )
 
         mock_credential.return_value.get_token.return_value = (
@@ -146,29 +153,30 @@ class TestTarsClient(unittest.TestCase):
 
     def test_filter_prep_lot_response(self):
         """Tests that response data is filtered for exact matches"""
-        mock_response = MagicMock()
-        mock_response.return_value.json.return_value = {
+        response_data = {
             "data": [
-                {
-                    "lot": "VT1",
-                    "datePrepped": "2023-12-15T12:34:56Z",
-                },
-                {
-                    "lot": "VT2",
-                    "datePrepped": "2023-12-15T12:34:56Z",
-                },
-                {
-                    "lot": "VT3",
-                    "datePrepped": "2023-12-15T12:34:56Z",
-                },
+                {"lot": "VT1", "datePrepped": "2023-12-15T12:34:56Z"},
+                {"lot": "VT2", "datePrepped": "2023-12-15T12:34:56Z"},
+                {"lot": "VT3", "datePrepped": "2023-12-15T12:34:56Z"},
             ]
         }
+        mock_response1 = MagicMock()
+        mock_response1.json.return_value = response_data
         with self.assertRaises(ValueError) as context:
             self.tars_client._filter_prep_lot_response(
-                prep_lot_number="VT", response=mock_response
+                prep_lot_number="VT", response=mock_response1
             )
-
         self.assertEqual("No data found for VT", str(context.exception))
+
+        # test for a case insensitive match
+        mock_response2 = MagicMock()
+        mock_response2.json.return_value = response_data
+        data = self.tars_client._filter_prep_lot_response(
+            prep_lot_number="vT1", response=mock_response2
+        )
+        self.assertEqual(
+            data, [{"lot": "VT1", "datePrepped": "2023-12-15T12:34:56Z"}]
+        )
 
     @patch("aind_metadata_service.tars.client.requests.get")
     def test_get_molecules_response(self, mock_get):
@@ -287,6 +295,8 @@ class TestTarsClient(unittest.TestCase):
                                 },
                             ],
                             "fullName": "rAAV-MGT_789",
+                            "addgeneId": "54321",
+                            "rrId": "Addgene_54321",
                         }
                     ],
                 }

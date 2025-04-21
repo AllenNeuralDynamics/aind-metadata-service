@@ -1,0 +1,104 @@
+[
+    {
+        "procedure_type": "Delipidation",
+        "procedure_name": "iDISCO: Dichloromethane Whole Mouse Brain Delipidation",
+        "specimen_id": "744742",
+        "start_date": "2025-02-04",
+        "end_date": "2025-02-05",
+        "experimenter_full_name": "PersonM",
+        "protocol_id": "https://www.protocols.io/edit/refractive-index-matching-ethyl-cinnamate-cukpwuvn",
+        "reagents": [
+            {
+                "name": "34860-1L-R",
+                "source": null,
+                "rrid": null,
+                "lot_number": "SHBR4455",
+                "expiration_date": null
+            },
+            {
+                "name": "270997-1L",
+                "source": null,
+                "rrid": null,
+                "lot_number": "SHBQ9167",
+                "expiration_date": null
+            },
+            {
+                "name": "34860-1L-R",
+                "source": null,
+                "rrid": null,
+                "lot_number": "SHBR4455",
+                "expiration_date": null
+            }
+        ],
+        "hcr_series": null,
+        "antibodies": null,
+        "sectioning": null,
+        "notes": null
+    },
+    {
+        "procedure_type": "Immunolabeling",
+        "procedure_name": "SmartSPIM Labeling",
+        "specimen_id": "744742",
+        "start_date": "2025-02-04",
+        "end_date": "2025-02-05",
+        "experimenter_full_name": "PersonM",
+        "protocol_id": null,
+        "reagents": [],
+        "hcr_series": null,
+        "antibodies": {
+            "rrid": null,
+            "expiration_date": null,
+            "immunolabel_class": "Primary",
+            "fluorophore": null,
+            "mass": 10.2,
+            "mass_unit": "microgram",
+            "notes": null
+        },
+        "sectioning": null,
+        "notes": null
+    },
+    {
+        "procedure_type": "Immunolabeling",
+        "procedure_name": "SmartSPIM Labeling",
+        "specimen_id": "744742",
+        "start_date": "2025-02-04",
+        "end_date": "2025-02-05",
+        "experimenter_full_name": "PersonM",
+        "protocol_id": null,
+        "reagents": [],
+        "hcr_series": null,
+        "antibodies": {
+            "rrid": null,
+            "expiration_date": null,
+            "immunolabel_class": "Secondary",
+            "fluorophore": null,
+            "mass": null,
+            "mass_unit": "microgram",
+            "notes": null
+        },
+        "sectioning": null,
+        "notes": null
+    },
+    {
+        "procedure_type": "Refractive index matching",
+        "procedure_name": "SmartSPIM Refractive Index Matching",
+        "specimen_id": "744742",
+        "start_date": "2025-02-05",
+        "end_date": "2025-02-07",
+        "experimenter_full_name": "PersonM",
+        "protocol_id": null,
+        "reagents": [
+            {
+                "name": "112372-100G",
+                "source": null,
+                "rrid": null,
+                "lot_number": "stbk5149",
+                "expiration_date": null
+            }
+        ],
+        "hcr_series": null,
+        "antibodies": null,
+        "sectioning": null,
+        "notes": null
+    }
+]

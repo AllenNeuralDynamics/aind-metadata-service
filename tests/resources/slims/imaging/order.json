@@ -1,0 +1,64 @@
+[
+    {
+        "pk": 21,
+        "tableName": "Order",
+        "columns": [
+            {
+            "datatype": "FOREIGN_KEY",
+            "name": "ordr_fk_orderType",
+            "title": "Order type",
+            "position": 1,
+            "value": 2,
+            "hidden": false,
+            "editable": false,
+            "foreignTable": "OrderType",
+            "displayValue": "SmartSPIM Histology and Imaging",
+            "displayField": "rdtp_name",
+            "foreignDisplayColumn": "rdtp_name"
+            },
+            {
+            "datatype": "MULTIPLE_ENUM",
+            "name": "ordr_cf_fluorescenceChannels_Imaging",
+            "title": "Fluorescence channels - imaging",
+            "position": 12,
+            "value": [
+            "Laser = 488; Emission Filter = 525/45",
+            "Laser = 561; Emission Filter = 593/40",
+            "Laser = 639; Emission Filter = 667/30"
+            ],
+            "hidden": false,
+            "editable": true,
+            "joinedValue": "Laser = 488; Emission Filter = 525/45, Laser = 561; Emission Filter = 593/40, Laser = 639; Emission Filter = 667/30"
+            },
+            {
+            "datatype": "ENUM",
+            "name": "ordr_cf_fluorescenceChannels_Stitching",
+            "title": "Fluorescence channels - stitching",
+            "position": 13,
+            "value": "Laser = 639, Emission Filter = 667/30",
+            "hidden": false,
+            "editable": true,
+            "displayValue": "Laser = 639, Emission Filter = 667/30"
+            },
+            {
+            "datatype": "ENUM",
+            "name": "ordr_cf_fluorescenceChannels_CcfRegistration",
+            "title": "Fluorescence channels - CCF registration",
+            "position": 14,
+            "value": "Laser = 639, Emission Filter = 667/30",
+            "hidden": false,
+            "editable": true,
+            "displayValue": "Laser = 639, Emission Filter = 667/30"
+            },
+            {
+            "datatype": "NA",
+            "name": "ordr_cf_fluorescenceChannels_CellSegmentation",
+            "title": "Fluorescence channels - cell segmentation",
+            "position": 15,
+            "value": null,
+            "hidden": false,
+            "editable": true
+            }
+        ]
+    }
+]
