@@ -115,12 +115,16 @@ http://localhost:5000
 ```bash
 MSYS_NO_PATHCONV=1 docker run -v {aws_config_file_path} -e AWS_PROFILE={profile} -e AWS_PARAM_STORE_NAME={param name} -e AWS_DEFAULT_REGION={region} -p 58350:58350 -p 5000:5000 aind-metadata-service-local:latest
 ```
+
+3. If your aws configurations are not setup, you can request credentials. 
+
 #### 3. Using Environment File
 You can also run the container with credentials defined in a `.env` file. Check the `.env.template` for required variables.
 
 ```bash
 docker run -it -p 58350:58350 -p 5000:5000 --env-file=.env aind-metadata-service-local
 ```
+
 ## Contributing
 ### Linters and testing
 
