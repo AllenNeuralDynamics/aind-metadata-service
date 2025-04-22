@@ -1,0 +1,111 @@
+[
+   {
+      "pk": 1581,
+      "tableName": "Result",
+      "columns": [
+         {
+            "name": "test_label",
+            "value": "Mouse Session",
+            "datatype": "STRING",
+            "title": "Test"
+         },
+         {
+            "name": "rslt_cf_sessionName",
+            "value": "ecephys_750108_2024-12-23_14-51-45",
+            "datatype": "STRING",
+            "title": "Session Name"
+         },
+         {
+            "name": "rslt_cf_animalWeightPrior",
+            "value": 30.2,
+            "datatype": "FLOAT",
+            "title": "Animal Weight Prior",
+            "unit": "g"
+         },
+         {
+            "name": "rslt_cf_animalWeightPost",
+            "value": 30.5,
+            "datatype": "FLOAT",
+            "title": "Animal Weight Post",
+            "unit": "g"
+         },
+         {
+            "name": "rslt_cf_rewardConsumedvolume",
+            "value": 1.0,
+            "datatype": "FLOAT",
+            "title": "Reward consumed",
+            "unit": "ml"
+         },
+         {
+            "name": "rslt_cf_linkToStimulusEpochCode",
+            "value": "git@github.com:SomeLink.git",
+            "datatype": "STRING",
+            "title": "Link to stimulus epochs code"
+         },
+         {
+            "name": "rslt_cf_stimulusEpochs",
+            "value": 410,
+            "datatype": "FOREIGN_KEY",
+            "title": "Stimulus epochs",
+            "displayValue": "750108_2024-12-23_14-51-52.json"
+         },
+         {
+            "name": "rslt_fk_experimentRunStep",
+            "value": 60029,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run step"
+         },
+         {
+            "name": "rslt_cf_fk_rewardDelivery",
+            "value": 3466,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run step"
+         }
+      ]
+   },
+   {
+      "pk": 1611,
+      "tableName": "Result",
+      "columns": [
+         {
+            "name": "test_label",
+            "value": "Streams",
+            "datatype": "STRING",
+            "title": "Test"
+         },
+         {
+            "name": "rslt_cf_streamModalities",
+            "value": ["Behavior", "Behavior Videos", "Ecephys"],
+            "datatype": "MULTIPLE_ENUM",
+            "title": "Stream Modalities"
+         },
+         {
+            "name": "rslt_cf_daqNames",
+            "value": ["Basestation Slot 3"],
+            "datatype": "MULTIPLE_ENUM",
+            "title": "DAQ names"
+         },
+         {
+            "name": "rslt_cf_cameraNames",
+            "value": ["Bottom camera", "Eye camera", "Side camera left"],
+            "datatype": "MULTIPLE_ENUM",
+            "title": "Camera names"
+         },
+         {
+            "name": "rslt_cf_fk_modulesinStream",
+            "value": 4512,
+            "datatype": "FOREIGN_KEY",
+            "title": "Modules used in this stream"
+         },
+         {
+            "name": "rslt_fk_experimentRunStep",
+            "value": 60030,
+            "displayValue": null,
+            "datatype": "FOREIGN_KEY",
+            "title": "Protocol run step"
+         }
+      ]
+   }
+]

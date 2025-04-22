@@ -119,13 +119,34 @@ async def retrieve_rig(rig_id, partial_match=False):
     return model_response.map_to_json_response(validate=False)
 
 
-@app.get("/ecephys_sessions_by_subject/{subject_id}")
-async def retrieve_sessions(subject_id):
+@app.get("/slims/ecephys_sessions")
+async def retrieve_slims_ecephys(
+    subject_id: Optional[str] = Query(None, alias="subject_id"),
+    session_name: Optional[str] = Query(
+        None,
+        alias="session_name",
+        description="Name of the session",
+    ),
+    start_date_gte: Optional[str] = Query(
+        None,
+        alias="start_date_gte",
+        description="Experiment run created on or after. (ISO format)",
+    ),
+    end_date_lte: Optional[str] = Query(
+        None,
+        alias="end_date_lte",
+        description="Experiment run created on or before. (ISO format)",
+    ),
+):
     """Retrieves sessions from slims"""
-    model_response = await run_in_threadpool(
-        slims_client.get_sessions_model_response, subject_id=subject_id
+    response = await run_in_threadpool(
+        slims_client.get_slims_ecephys_response,
+        subject_id=subject_id,
+        session_name=session_name,
+        start_date=start_date_gte,
+        end_date=end_date_lte,
     )
-    return model_response.map_to_json_response()
+    return response
 
 
 @app.get("/protocols/{protocol_name}")
@@ -257,6 +278,32 @@ async def retrieve_slims_histology(
     return response
 
 
+@app.get("/slims/water_restriction")
+async def retrieve_slims_water_restriction(
+    subject_id: Optional[str] = Query(None, alias="subject_id"),
+    start_date_gte: Optional[str] = Query(
+        None,
+        alias="start_date_gte",
+        description="Experiment run created on or after. (ISO format)",
+    ),
+    end_date_lte: Optional[str] = Query(
+        None,
+        alias="end_date_lte",
+        description="Experiment run created on or before. (ISO format)",
+    ),
+):
+    """
+    Retrieves Water Restriction data from SLIMS server
+    """
+    response = await run_in_threadpool(
+        slims_client.get_slims_water_restriction_response,
+        subject_id=subject_id,
+        start_date=start_date_gte,
+        end_date=end_date_lte,
+    )
+    return response
+
+
 @app.get("/subject/{subject_id}")
 async def retrieve_subject(subject_id):
     """
@@ -341,6 +388,18 @@ async def retrieve_procedures(subject_id):
         subject_id=subject_id,
         list_id=sharepoint_settings.las_2020_list_id,
     )
+    slims_wr_response = await run_in_threadpool(
+        slims_client.get_water_restriction_procedures_model_response,
+        subject_id=subject_id,
+    )
+    smartsheet_perfusions_response = await run_in_threadpool(
+        perfusions_smart_sheet_client.get_sheet
+    )
+    mapper = PerfusionsMapper(
+        smart_sheet_response=smartsheet_perfusions_response,
+        input_id=subject_id,
+    )
+    smartsheet_model_response = mapper.get_procedures_model_response()
     # merge subject procedures
     merged_response = sharepoint_client.merge_responses(
         [
@@ -349,6 +408,8 @@ async def retrieve_procedures(subject_id):
             sp2023_response,
             sp2025_response,
             las2020_response,
+            slims_wr_response,
+            smartsheet_model_response,
         ]
     )
     # integrate TARS response
@@ -364,7 +425,7 @@ async def retrieve_procedures(subject_id):
         response=merged_response, tars_mapping=tars_mapping
     )
     # integrate protocols from smartsheet
-    smart_sheet_response = await run_in_threadpool(
+    smartsheet_protocols_response = await run_in_threadpool(
         protocols_smart_sheet_client.get_sheet
     )
     protocols_integrator = ProtocolsIntegrator()
@@ -374,7 +435,8 @@ async def retrieve_procedures(subject_id):
     protocols_mapping = {}
     for protocol_name in protocols_list:
         mapper = ProtocolsMapper(
-            smart_sheet_response=smart_sheet_response, input_id=protocol_name
+            smart_sheet_response=smartsheet_protocols_response,
+            input_id=protocol_name,
         )
         model_response = mapper.get_model_response()
         protocols_mapping[protocol_name] = (
@@ -383,12 +445,12 @@ async def retrieve_procedures(subject_id):
     integrated_response = protocols_integrator.integrate_protocols(
         response=integrated_response, protocols_mapping=protocols_mapping
     )
-    slims_response = await run_in_threadpool(
+    slims_hist_response = await run_in_threadpool(
         slims_client.get_histology_procedures_model_response,
         subject_id=subject_id,
     )
     merged_response = sharepoint_client.merge_responses(
-        [integrated_response, slims_response]
+        [integrated_response, slims_hist_response]
     )
     return merged_response.map_to_json_response()
 
