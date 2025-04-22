@@ -34,6 +34,7 @@ dev = [
     'interrogate',
     'isort',
     'Sphinx',
+    'pre-commit',
 ]
 
 server = [
