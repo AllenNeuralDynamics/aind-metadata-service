@@ -3,57 +3,39 @@
 [![License](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE)
 ![Code Style](https://img.shields.io/badge/code%20style-black-black)
 
-REST service to retrieve metadata from databases.
+REST service to retrieve metadata from various AIND databases hosted at http://aind-metadata-service/ . 
+Spins up query-able endpoints for each database to fetch metadata. 
 
-## Installation
+## User Installation & Usage
+These instructions are for users at the Allen Institute using the [existing deployment](http://aind-metadata-service/). 
 
-### Server Installation
+### Using the HTTP API 
+To programatically interact with the HTTP API, you can use the `requests` library. For example, to fetch procedures for a particular subject_id: 
 
-Can be pip installed using `pip install "aind-metadata-service[server]"`.
+```python
+import requests
 
-Installing `pyodbc`.
-- You may need to install `unixodbc-dev`. You can follow this [https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver16](link) for instructions depending on your os.
+subject_id = "000000"
+url = f"http://aind-metadata-service/procedures/{subject_id}"
+response = requests.get(url)
+response.raise_for_status()
+rj = response.json()
 
-- You may need to run `docker system prune` before building the docker image if you're getting errors running apt-get:
+data = rj.get("data")
+message = rj.get("message")
 ```
-#10 23.69 Err:1 http://deb.debian.org/debian bullseye/main amd64 libodbc1 amd64 2.3.6-0.1+b1
-#10 23.69   Could not connect to debian.map.fastlydns.net:80 (146.75.42.132). - connect (111: Connection refused) Unable to connect to deb.debian.org:http:
+This can be done with any of the HTTP endpoints. More info about available endpoints and acceptable queries can be found [here](http:/aind-metadata-service/docs)
 
-```
 
-## Running Locally with Docker
+### Using the Metadata Service API Client
 
-### Build the container
-```bash
-docker build . -t aind-metadata-service-local:latest
-```
-
-#### Option 1: Using AWS Credentials from Local Machine
-If your AWS credentials are already configured on your machine (`~/.aws/credentials` on Linux/macOS or `%USERPROFILE%\.aws\credentials` on Windows), you can mount your credentials directly into the container:
-1. Run the container with AWS credentials mounted:
-```bash
-docker run -v ~/.aws:/root/.aws -e AWS_PROFILE={profile} -e AWS_PARAM_STORE_NAME={param name} -p 58350:58350 -p 5000:5000 aind-metadata-service-local:latest
-```
-This allows the container to use your locally configured AWS credentials without needing to pass them explicitly.
-
-This will start the service on port `5000`. You can access it at:
-```
-http://localhost:5000
-```
-
-### Client Installation
-
-Installing the client allows you to interact with the metadata service programmatically.
-
-The client can be installed with pip:
+The client provides a simple interface to the API. It can be installed with pip:
 
 ```bash
 pip install "aind-metadata-service[client]"
 ```
 
-#### Using the client
-
-The client provides a simple interface to the API:
+Once installed, you can use the provided `AindMetadataServiceClient` to fetch metadata.
 
 ```python
 from aind_metadata_service.client import AindMetadataServiceClient
@@ -88,16 +70,62 @@ imaging_data = client.get_smartspim_imaging(
 histology_data = client.get_histology(subject_id="775745").json()
 ```
 
-### For Development
+## Deployment 
+Install the server to host your own metadata-service, whether locally for development or in a production environment. 
+### Server Installation
+The server can be pip installed using `pip install "aind-metadata-service[server]"`.
 
-In the root directory, run
+Installing `pyodbc`.
+- You may need to install `unixodbc-dev`. You can follow this [https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver16](link) for instructions depending on your os.
+
+- You may need to run `docker system prune` before building the docker image if you're getting errors running apt-get:
 ```
-pip install -e ".[dev]"
+#10 23.69 Err:1 http://deb.debian.org/debian bullseye/main amd64 libodbc1 amd64 2.3.6-0.1+b1
+#10 23.69   Could not connect to debian.map.fastlydns.net:80 (146.75.42.132). - connect (111: Connection refused) Unable to connect to deb.debian.org:http:
+
+```
+
+## Development
+
+Development dependencies can be pip installed using `pip install "aind-metadata-service[dev]"`.
+Once the development environment is setup, use docker to run locally. 
+
+
+### Running Locally with Docker
+
+#### 1. Build the container
+```bash
+docker build . -t aind-metadata-service-local:latest
+```
+
+#### 2. Using AWS Credentials from Local Machine
+If your AWS credentials are already configured on your machine (`~/.aws/credentials` on Linux/macOS or `%USERPROFILE%\.aws\credentials` on Windows), you can mount your credentials directly into the container:
+1. Run the container with AWS credentials mounted:
+```bash
+docker run -v ~/.aws:/root/.aws -e AWS_PROFILE={profile} -e AWS_PARAM_STORE_NAME={param name} -p 58350:58350 -p 5000:5000 aind-metadata-service-local:latest
+```
+This allows the container to use your locally configured AWS credentials without needing to pass them explicitly.
+
+This will start the service on port `5000`. You can access it at:
+```
+http://localhost:5000
+```
+
+2. If you run into errors reading from your aws configurations, explicitly set the region and aws config file path:
+```bash
+MSYS_NO_PATHCONV=1 docker run -v {aws_config_file_path} -e AWS_PROFILE={profile} -e AWS_PARAM_STORE_NAME={param name} -e AWS_DEFAULT_REGION={region} -p 58350:58350 -p 5000:5000 aind-metadata-service-local:latest
+```
+
+3. If your aws configurations are not setup, you can request credentials. 
+
+#### 3. Using Environment File
+You can also run the container with credentials defined in a `.env` file. Check the `.env.template` for required variables.
+
+```bash
+docker run -it -p 58350:58350 -p 5000:5000 --env-file=.env aind-metadata-service-local
 ```
 
 ## Contributing
-
-
 ### Linters and testing
 
 There are several libraries used to run linters, check documentation, and run tests.
@@ -158,7 +186,7 @@ sphinx-build -b html doc_template/source/ doc_template/build/html
 ```
 More info on sphinx installation can be found here: https://www.sphinx-doc.org/en/master/usage/installation.html
 
-### Responses
+### API Response Codes
 There are 6 possible status code responses for aind-metadata-service:
 - **200**: successfully retrieved valid data without any problems. 
 - **406**: successfully retrieved some data, but failed to validate against pydantic models.

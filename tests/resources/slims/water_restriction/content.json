@@ -1,0 +1,33 @@
+[
+   {
+      "pk": 55,
+      "tableName": "Content",
+      "columns": [
+         {
+            "name": "cntn_barCode",
+            "value": "762287",
+            "datatype": "STRING",
+            "title": "Barcode"
+         },
+         {
+            "name": "cntn_pk",
+            "value": 55,
+            "datatype": "INTEGER",
+            "title": "cntn_pk"
+         },
+         {
+            "name": "cntn_id",
+            "value": "762287",
+            "datatype": "STRING",
+            "title": "Id"
+         },
+         {
+            "datatype": "QUANTITY",
+            "name": "cntn_cf_baselineWeight",
+            "title": "Baseline weight",
+            "value": 28.23,
+            "unit": "g"
+            }
+      ]
+   }
+]

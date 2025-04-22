@@ -1,0 +1,238 @@
+[
+   {
+      "pk": 3466,
+      "tableName": "ReferenceDataRecord",
+      "columns": [
+         {
+            "name": "rdrc_pk",
+            "value": 3466,
+            "datatype": "INTEGER",
+            "title": "rdrc_pk"
+         },
+         {
+            "name": "rdrc_fk_referenceDataType",
+            "value": 43,
+            "datatype": "INTEGER",
+            "title": "rdrc_fk_referenceDataType",
+            "displayValue": "Reward Delivery"
+         },
+         {
+            "name": "rdrc_cf_rewardSolution",
+            "value": "Water",
+            "datatype": "ENUM",
+            "title": "Reward Solution"
+         },
+         {
+            "name": "rdrc_cf_specifyRewardSolution",
+            "value": null,
+            "datatype": "STRING",
+            "title": "Specify Reward Solution"
+         },
+         {
+            "name": "rdrc_cf_fk_rewardSpouts",
+            "value": 3467,
+            "datatype": "INTEGER",
+            "title": "Reward Spouts"
+         }
+      ]
+   },
+   {
+      "pk": 3467,
+      "tableName": "ReferenceDataRecord",
+      "columns": [
+         {
+            "name": "rdrc_pk",
+            "value": 3467,
+            "datatype": "INTEGER",
+            "title": "rdrc_pk"
+         },
+         {
+            "name": "rdrc_fk_referenceDataType",
+            "value": 44,
+            "datatype": "INTEGER",
+            "title": "rdrc_fk_referenceDataType",
+            "displayValue": "Reward Spouts"
+         },
+         {
+            "name": "rdrc_cf_spoutSide",
+            "value": "Water",
+            "datatype": "ENUM",
+            "title": "Reward Solution"
+         },
+         {
+            "name": "rdrc_cf_startingPosition",
+            "value": null,
+            "datatype": "STRING",
+            "title": "Specify Reward Solution"
+         },
+         {
+            "name": "rdrc_cf_variablePosition",
+            "value": null,
+            "datatype": "STRING",
+            "title": "Specify Reward Solution"
+         }
+      ]
+   },
+   {
+      "pk": 4512,
+      "tableName": "ReferenceDataRecord",
+      "columns": [
+         {
+            "name": "rdrc_pk",
+            "value": 4512,
+            "datatype": "INTEGER",
+            "title": "rdrc_pk"
+         },
+         {
+            "name": "rdrc_fk_referenceDataType",
+            "value": 25,
+            "datatype": "INTEGER",
+            "title": "rdrc_fk_referenceDataType",
+            "displayValue": "Dome Module"
+         },
+         {
+            "name": "rdrc_cf_implantHole",
+            "value": 5,
+            "datatype": "INTEGER",
+            "title": "Implant Hole"
+         },
+         {
+            "name": "rdrc_cf_assemblyName",
+            "value": "50209",
+            "datatype": "STRING",
+            "title": "Assembly Name"
+         },
+         {
+            "name": "rdrc_cf_probeName",
+            "value": "50209",
+            "datatype": "STRING",
+            "title": "Ephys Probe Name"
+         },
+         {
+            "name": "rdrc_cf_fk_primaryTargetedStructure",
+            "value": 2204,
+            "datatype": "FOREIGN_KEY",
+            "title": "Primary Targeted Structure",
+            "displayValue": "Retrosplenial area"
+         },
+         {
+            "name": "rdrc_cf_fk_secondaryTargetedStructures2",
+            "value": [],
+            "datatype": "MULTIPLE_FOREIGN_KEY",
+            "title": "Secondary Targeted Structures",
+            "displayValues": null
+         },
+         {
+            "name": "rdrc_cf_arcAngle",
+            "value": -17,
+            "datatype": "QUANTITY",
+            "title": "Arc Angle",
+            "unit": "°"
+         },
+         {
+            "name": "rdrc_cf_moduleAngle",
+            "value": 12,
+            "datatype": "QUANTITY",
+            "title": "Module Angle",
+            "unit": "°"
+         },
+         {
+            "name": "rdrc_cf_rotationAngle",
+            "value": 0,
+            "datatype": "QUANTITY",
+            "title": "Rotation Angle",
+            "unit": "°"
+         },
+         {
+            "name": "rdrc_cf_coordinateTransform",
+            "value": 417,
+            "datatype": "FOREIGN_KEY",
+            "title": "Coordinate Transform",
+            "displayValue": "calibration_info_np2_2024_12_23T11_36_00.xlsx"
+         },
+         {
+            "name": "rdrc_cf_ccfCoordinatesAp",
+            "value": 0.5,
+            "datatype": "QUANTITY",
+            "title": "CCF Coordinates (AP)",
+            "unit": "&mu;m"
+         },
+         {
+            "name": "rdrc_cf_ccfCoordinatesDv",
+            "value": 0.5,
+            "datatype": "QUANTITY",
+            "title": "CCF Coordinates (DV)",
+            "unit": "&mu;m"
+         },
+         {
+            "name": "rdrc_cf_ccfCoordinatesMl",
+            "value": 0.5,
+            "datatype": "QUANTITY",
+            "title": "CCF Coordinates (ML)",
+            "unit": "&mu;m"
+         },
+         {
+            "name": "rdrc_cf_ccfVersion",
+            "value": null,
+            "datatype": "STRING",
+            "title": "CCF Version"
+         },
+         {
+            "name": "rdrc_cf_bregmaAP",
+            "value": 0.5,
+            "datatype": "QUANTITY",
+            "title": "Bregma Target AP",
+            "unit": "mm"
+         },
+         {
+            "name": "rdrc_cf_bregmaML",
+            "value": 0.5,
+            "datatype": "QUANTITY",
+            "title": "Bregma Target ML",
+            "unit": "mm"
+         },
+         {
+            "name": "rdrc_cf_bregmaDV",
+            "value": 0.5,
+            "datatype": "QUANTITY",
+            "title": "]Bregma Target DV",
+            "unit": "mm"
+         },
+         {
+            "name": "rdrc_cf_surfaceZ",
+            "value": 5508.5,
+            "datatype": "QUANTITY",
+            "title": "Surface Z",
+            "unit": "&mu;m"
+         },
+         {
+            "name": "rdrc_cf_manipulatorX",
+            "value": 7610,
+            "datatype": "QUANTITY",
+            "title": "Manipulator X",
+            "unit": "&mu;m"
+         },
+         {
+            "name": "rdrc_cf_manipulatory",
+            "value": 9063,
+            "datatype": "QUANTITY",
+            "title": "Manipulator Y",
+            "unit": "&mu;m"
+         },
+         {
+            "name": "rdrc_cf_manipulatorZ",
+            "value": 6703,
+            "datatype": "QUANTITY",
+            "title": "Manipulator Z",
+            "unit": "&mu;m"
+         },
+         {
+            "name": "rdrc_cf_fk_dye",
+            "value": 12,
+            "datatype": "FOREIGN_KEY",
+            "title": "Dye",
+            "displayValue": "DiI"
+         }
+      ]
+   }
+]

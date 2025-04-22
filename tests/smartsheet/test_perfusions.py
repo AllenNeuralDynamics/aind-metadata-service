@@ -9,7 +9,7 @@ from decimal import Decimal
 from pathlib import Path
 from unittest.mock import MagicMock, call, patch
 
-from aind_data_schema.core.procedures import Perfusion, Surgery
+from aind_data_schema.core.procedures import Perfusion, Procedures, Surgery
 from aind_data_schema_models.units import MassUnit
 
 from aind_metadata_service.client import StatusCodes
@@ -247,6 +247,65 @@ class TestSmartsheetPerfusionsClient(unittest.TestCase):
         model_response = mapper.get_model_response()
         self.assertEqual([], model_response.aind_models)
         self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
+
+    @patch("smartsheet.sheets.Sheets.get_sheet")
+    def test_get_procedures_model_response(self, mock_get_sheet: MagicMock):
+        """Tests get_procedures_model_response method"""
+        mock_get_sheet.return_value.to_json.return_value = self.example_sheet
+        settings = PerfusionsSmartsheetSettings(
+            api_token="abc-123", id=7478444220698500
+        )
+        client = SmartSheetClient(smartsheet_settings=settings)
+        smart_sheet_response = client.get_sheet()
+        mapper = PerfusionsMapper(
+            smart_sheet_response=smart_sheet_response, input_id="689418"
+        )
+        model_response = mapper.get_procedures_model_response()
+        expected_models = [
+            Procedures.model_construct(
+                subject_id="689418", subject_procedures=self.expected_model
+            )
+        ]
+        self.assertEqual(expected_models, model_response.aind_models)
+        self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
+
+    @patch("smartsheet.sheets.Sheets.get_sheet")
+    def test_get_procedures_no_data_response(self, mock_get_sheet: MagicMock):
+        """Tests get_procedures_model_response method"""
+        mock_get_sheet.return_value.to_json.return_value = self.example_sheet
+        settings = PerfusionsSmartsheetSettings(
+            api_token="abc-123", id=7478444220698500
+        )
+        client = SmartSheetClient(smartsheet_settings=settings)
+        smart_sheet_response = client.get_sheet()
+        mapper = PerfusionsMapper(
+            smart_sheet_response=smart_sheet_response, input_id="000000"
+        )
+        model_response = mapper.get_procedures_model_response()
+        self.assertEqual(StatusCodes.NO_DATA_FOUND, model_response.status_code)
+        self.assertEqual([], model_response.aind_models)
+
+    @patch("smartsheet.sheets.Sheets.get_sheet")
+    def test_get_procedures_error_response(self, mock_get_sheet: MagicMock):
+        """Tests get_procedures_model_response method"""
+        mock_get_sheet.return_value.to_json.return_value = self.example_sheet
+        settings = PerfusionsSmartsheetSettings(
+            api_token="abc-123", id=7478444220698500
+        )
+        client = SmartSheetClient(smartsheet_settings=settings)
+        smart_sheet_response = client.get_sheet()
+        mapper = PerfusionsMapper(
+            smart_sheet_response=smart_sheet_response, input_id="000000"
+        )
+        with patch(
+            "aind_metadata_service.smartsheet.perfusions.mapping."
+            "PerfusionsMapper._get_perfusion_list"
+        ) as mock_get_perfusion_list:
+            mock_get_perfusion_list.side_effect = Exception("Some error.")
+            model_response = mapper.get_procedures_model_response()
+        self.assertEqual(
+            StatusCodes.INTERNAL_SERVER_ERROR, model_response.status_code
+        )
 
 
 if __name__ == "__main__":
