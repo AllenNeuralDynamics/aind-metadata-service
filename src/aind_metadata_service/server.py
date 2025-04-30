@@ -303,6 +303,16 @@ async def retrieve_slims_water_restriction(
     )
     return response
 
+@app.get("/slims/viral_materials")
+async def retrieve_slims_viral_materials():
+    """
+    Retrieves Viral Material data from SLIMS server
+    """
+    response = await run_in_threadpool(
+        slims_client.get_slims_viral_material_response,
+    )
+    return response
+
 
 @app.get("/subject/{subject_id}")
 async def retrieve_subject(subject_id):

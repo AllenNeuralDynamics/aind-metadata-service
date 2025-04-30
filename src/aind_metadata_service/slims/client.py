@@ -34,7 +34,12 @@ from aind_metadata_service.slims.water_restriction.handler import (
 from aind_metadata_service.slims.water_restriction.mapping import (
     SlimsWaterRestrictionMapper,
 )
-
+from aind_metadata_service.slims.viral_materials.handler import (
+    SlimsViralMaterialHandler,
+)
+from aind_metadata_service.slims.viral_materials.mapping import (
+    SlimsViralMaterialMapper,
+)
 
 class SlimsSettings(ParameterStoreBaseSettings):
     """Configuration class. Mostly a wrapper around smartsheet.Smartsheet
@@ -500,3 +505,33 @@ class SlimsHandler:
         except Exception as e:
             logging.exception(e)
             return ModelResponse.internal_server_error_response()
+
+    def get_slims_viral_material_response(self):
+        """"""
+        try:
+            slims_vm_handler = SlimsViralMaterialHandler(
+                client=self.client.db
+            )
+            slims_vm_data = slims_vm_handler.get_viral_material_info_from_slims()
+            vm_data = SlimsViralMaterialMapper(
+                slims_vm_data=slims_vm_data
+            ).map_info_from_slims()
+            if len(vm_data) == 0:
+                m = ModelResponse.no_data_found_error_response()
+                return m.map_to_json_response()
+            response = JSONResponse(
+                status_code=StatusCodes.VALID_DATA.value,
+                content=(
+                    {
+                        "message": "Data from SLIMS",
+                        "data": [
+                            json.loads(m.model_dump_json()) for m in vm_data
+                        ],
+                    }
+                ),
+            )
+            return response
+        except Exception as e:
+            logging.exception(e)
+            m = ModelResponse.internal_server_error_response()
+            return m.map_to_json_response()
