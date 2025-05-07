@@ -41,6 +41,7 @@ from aind_metadata_service.slims.viral_materials.mapping import (
     SlimsViralMaterialMapper,
 )
 
+
 class SlimsSettings(ParameterStoreBaseSettings):
     """Configuration class. Mostly a wrapper around smartsheet.Smartsheet
     class constructor arguments."""
@@ -509,10 +510,10 @@ class SlimsHandler:
     def get_slims_viral_material_response(self):
         """"""
         try:
-            slims_vm_handler = SlimsViralMaterialHandler(
-                client=self.client.db
+            slims_vm_handler = SlimsViralMaterialHandler(client=self.client.db)
+            slims_vm_data = (
+                slims_vm_handler.get_viral_material_info_from_slims()
             )
-            slims_vm_data = slims_vm_handler.get_viral_material_info_from_slims()
             vm_data = SlimsViralMaterialMapper(
                 slims_vm_data=slims_vm_data
             ).map_info_from_slims()

@@ -303,6 +303,7 @@ async def retrieve_slims_water_restriction(
     )
     return response
 
+
 @app.get("/slims/viral_materials")
 async def retrieve_slims_viral_materials():
     """
