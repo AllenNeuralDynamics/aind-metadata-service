@@ -187,6 +187,48 @@ class TestSlimsImagingHandler(unittest.TestCase):
         self.assertEqual(expected_spim_data, spim_data)
 
     @patch("slims.slims.Slims")
+    def test_parse_graph_specimen_id(self, mock_slims: MagicMock):
+        """Tests _parse_graph method filters specimen_id."""
+        mock_slims.fetch.side_effect = self.fetch_side_effect
+        handler = SlimsImagingHandler(client=mock_slims)
+        g, root_nodes = handler._get_graph()
+        spim_data = handler._parse_graph(
+            g=g, root_nodes=root_nodes, subject_id="740610"
+        )
+        expected_spim_data = [
+            SlimsSpimData(
+                experiment_run_created_on=1739301437964,
+                specimen_id="740610",
+                subject_id="BRN00000017",
+                protocol_name="Imaging cleared mouse brains on SmartSPIM",
+                protocol_id=(
+                    "<a href="
+                    '"https://dx.doi.org/10.17504/protocols.io.3byl4jo1rlo5/'
+                    'v1" '
+                    'target="_blank" '
+                    'rel="nofollow noopener noreferrer">'
+                    "Imaging cleared mouse brains on SmartSPIM"
+                    "</a>"
+                ),
+                date_performed=1739301420000,
+                chamber_immersion_medium="Ethyl Cinnamate",
+                sample_immersion_medium="Ethyl Cinnamate",
+                chamber_refractive_index=Decimal("1.557"),
+                sample_refractive_index=Decimal("1.557"),
+                instrument_id="440_SmartSPIM1_20240327",
+                experimenter_name="Person R",
+                z_direction="Superior to Inferior",
+                y_direction="Anterior to Posterior",
+                x_direction="Left to Right",
+                imaging_channels=None,
+                stitching_channels=None,
+                ccf_registration_channels=None,
+                cell_segmentation_channels=None,
+            )
+        ]
+        self.assertEqual(expected_spim_data, spim_data)
+
+    @patch("slims.slims.Slims")
     def test_get_spim_data_from_slims(self, mock_slims: MagicMock):
         """Tests get_spim_data_from_slims method"""
         mock_slims.fetch.side_effect = self.fetch_side_effect
