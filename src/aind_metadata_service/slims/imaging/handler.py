@@ -163,7 +163,11 @@ class SlimsImagingHandler(SlimsTableHandler):
                     spim_data.cell_segmentation_channels = get_attr_or_none(
                         row, "ordr_cf_fluorescenceChannels_CellSegmentation"
                     )
-            if subject_id is None or subject_id == spim_data.subject_id:
+            if (
+                subject_id is None
+                or subject_id == spim_data.subject_id
+                or subject_id == spim_data.specimen_id
+            ):
                 spim_data_list.append(spim_data)
         return spim_data_list
 
