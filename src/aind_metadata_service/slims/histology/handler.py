@@ -153,7 +153,7 @@ class SlimsHistologyHandler(SlimsTableHandler):
         specimen_id = None
         subject_id = None
         for record in records:
-            n_subject_id = get_attr_or_none(record, "cntn_cf_parentBarcode")
+            n_subject_id = get_attr_or_none(record, "cntn_id")
             if n_subject_id is not None:
                 subject_id = n_subject_id
             n_specimen_id = get_attr_or_none(record, "cntn_barCode")

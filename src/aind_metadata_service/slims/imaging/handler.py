@@ -76,9 +76,7 @@ class SlimsImagingHandler(SlimsTableHandler):
                 table_name = g.nodes[n]["table_name"]
                 row = g.nodes[n]["row"]
                 if table_name == "Content":
-                    n_subject_id = get_attr_or_none(
-                        row, "cntn_cf_parentBarcode"
-                    )
+                    n_subject_id = get_attr_or_none(row, "cntn_id")
                     n_specimen_id = get_attr_or_none(row, "cntn_barCode")
                     spim_data.subject_id = n_subject_id
                     spim_data.specimen_id = n_specimen_id
@@ -163,11 +161,7 @@ class SlimsImagingHandler(SlimsTableHandler):
                     spim_data.cell_segmentation_channels = get_attr_or_none(
                         row, "ordr_cf_fluorescenceChannels_CellSegmentation"
                     )
-            if (
-                subject_id is None
-                or subject_id == spim_data.subject_id
-                or subject_id == spim_data.specimen_id
-            ):
+            if subject_id is None or subject_id == spim_data.subject_id:
                 spim_data_list.append(spim_data)
         return spim_data_list
 
