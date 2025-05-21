@@ -40,6 +40,7 @@ class ViralInjectionData(BaseModel):
     requested_for_date: Optional[datetime] = None
     planned_injection_date: Optional[datetime] = None
     planned_injection_time: Optional[datetime] = None
+    order_created_on: Optional[datetime] = None
 
     viral_materials: Optional[List[SlimsViralMaterialData]] = []
 

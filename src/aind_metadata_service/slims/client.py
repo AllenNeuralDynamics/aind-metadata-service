@@ -507,12 +507,43 @@ class SlimsHandler:
             logging.exception(e)
             return ModelResponse.internal_server_error_response()
 
-    def get_slims_viral_material_response(self):
-        """"""
+    def get_slims_viral_material_response(
+            self,
+            subject_id: str,
+            start_date: Optional[str],
+            end_date: Optional[str],
+        ) -> JSONResponse:
+        """
+
+        Parameters
+        ----------
+        subject_id : str | None
+        start_date : str | None
+          Optional ISO Format datetime string
+        end_date :  str | None
+          Optional ISO Format datetime string
+        Returns
+        -------
+        JSONResponse
+        """
+        if subject_id is not None and subject_id == "":
+            return ModelResponse.bad_request_error_response(
+                message="subject_id cannot be an empty string!"
+            ).map_to_json_response()
+        parsed_start_date = self._parse_date(start_date)
+        if isinstance(parsed_start_date, ModelResponse):
+            return parsed_start_date.map_to_json_response()
+        parsed_end_date = self._parse_date(end_date)
+        if isinstance(parsed_end_date, ModelResponse):
+            return parsed_end_date.map_to_json_response()
         try:
             slims_vm_handler = SlimsViralMaterialHandler(client=self.client.db)
             slims_vm_data = (
-                slims_vm_handler.get_viral_material_info_from_slims()
+                slims_vm_handler.get_viral_material_info_from_slims(
+                    subject_id=subject_id,
+                    start_date_greater_than_or_equal=parsed_start_date,
+                    end_date_less_than_or_equal=parsed_end_date,
+                )
             )
             vm_data = SlimsViralMaterialMapper(
                 slims_vm_data=slims_vm_data

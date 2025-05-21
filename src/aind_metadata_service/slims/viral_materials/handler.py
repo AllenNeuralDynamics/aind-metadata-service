@@ -21,8 +21,8 @@ class SlimsViralMaterialData(BaseModel):
 
     content_category: Optional[str] = "Viral Materials"
     content_type: Optional[str] = None
-    content_created_on: Optional[datetime] = None
-    content_modified_on: Optional[datetime] = None
+    content_created_on: Optional[int] = None
+    content_modified_on: Optional[int] = None
     viral_solution_type: Optional[str] = None
     virus_name: Optional[str] = None
     lot_number: Optional[str] = None
@@ -37,8 +37,8 @@ class SlimsViralMaterialData(BaseModel):
     titer_unit: Optional[str] = "GC/ml"
     volume: Optional[Decimal] = None
     volume_unit: Optional[str] = None
-    date_made: Optional[datetime] = None
-    intake_date: Optional[datetime] = None
+    date_made: Optional[int] = None
+    intake_date: Optional[int] = None
     storage_temperature: Optional[str] = None
     special_storage_guidelines: Optional[List[str]] = []
     special_handling_guidelines: Optional[List[str]] = []
@@ -52,15 +52,15 @@ class SlimsViralInjectionData(BaseModel):
     
     content_category: Optional[str] = "Viral Materials"
     content_type: Optional[str] = "Viral Injection"
-    content_created_on: Optional[datetime] = None
-    content_modified_on: Optional[datetime] = None
+    content_created_on: Optional[int] = None
+    content_modified_on: Optional[int] = None
     name: Optional[str] = None
     viral_injection_buffer: Optional[str] = None
     volume: Optional[Decimal] = None
     volume_unit: Optional[str] = None
     labeling_protein: Optional[str] = None
-    date_made: Optional[datetime] = None
-    intake_date: Optional[datetime] = None
+    date_made: Optional[int] = None
+    intake_date: Optional[int] = None
     storage_temperature: Optional[str] = None
     special_storage_guidelines: Optional[List[str]] = []
     special_handling_guidelines: Optional[List[str]] = []
@@ -69,9 +69,10 @@ class SlimsViralInjectionData(BaseModel):
 
     # From ORDER table
     assigned_mice: Optional[List[str]] = []
-    requested_for_date: Optional[datetime] = None
-    planned_injection_date: Optional[datetime] = None
-    planned_injection_time: Optional[datetime] = None
+    requested_for_date: Optional[int] = None
+    planned_injection_date: Optional[int] = None
+    planned_injection_time: Optional[int] = None
+    order_created_on: Optional[int] = None
 
     viral_materials: Optional[List[SlimsViralMaterialData]] = []
 
@@ -81,7 +82,7 @@ class SlimsViralMaterialHandler(SlimsTableHandler):
 
     @staticmethod
     def _parse_graph(
-        g: DiGraph, root_nodes: List[str]) -> List[SlimsViralMaterialData]:
+        g: DiGraph, root_nodes: List[str], subject_id: Optional[str]) -> List[SlimsViralMaterialData]:
         """
         Parses the graph object into a list of pydantic models.
         Parameters
@@ -97,37 +98,42 @@ class SlimsViralMaterialHandler(SlimsTableHandler):
 
         """
         vi_data_list = []
+        print("HANDLER: Parsing graph")
         for node in root_nodes:
             vi_data = SlimsViralInjectionData()
-            row = g.nodes[node]["row"]
+            # node_des = descendants(g, node)
+            root_row = g.nodes[node]["row"]
+            vi_data.content_created_on = get_attr_or_none(
+                root_row, "cntn_createdOn"
+            )
+            vi_data.content_category = get_attr_or_none(root_row, "cntn_fk_category", "displayValue")
+            vi_data.content_type = get_attr_or_none(root_row, "cntn_fk_contentType", "displayValue")
+            vi_data.content_created_on = get_attr_or_none(root_row, "cntn_createdOn")
+            # vi_data.content_modified_on = get_attr_or_none(root_row, "cntn_modifiedOn")
+            vi_data.viral_injection_buffer = get_attr_or_none(root_row, "cntn_cf_fk_viralInjectionBuffer", "displayValue")
+            vi_data.volume = get_attr_or_none(root_row, "cntn_cf_volumeRequired")
+            vi_data.volume_unit = get_attr_or_none(root_row, "cntn_cf_volumeRequired", "unit")
+            vi_data.labeling_protein = get_attr_or_none(root_row, "cntn_cf_fk_viralInjectionFluorescentLabelingP", "displayValue") # Reference Data Record 
+            vi_data.name = get_attr_or_none(root_row, "cntn_id") # null? 
+            vi_data.date_made = get_attr_or_none(root_row, "cntn_cf_dateMade")
+            vi_data.intake_date = get_attr_or_none(root_row, "cntn_cf_intakeDate_NA")
+            vi_data.storage_temperature = get_attr_or_none(root_row, "cntn_cf_fk_storageTemp_dynChoice", "displayValue")
+            vi_data.special_storage_guidelines = get_attr_or_none(root_row, "cntn_cf_fk_specialStorageGuidelines", "displayValues")
+            vi_data.special_handling_guidelines = get_attr_or_none(root_row, "cntn_cf_fk_specialHandlingGuidelines", "displayValues")
             node_des = descendants(g, node)
             for n in node_des:
                 table_name = g.nodes[n]["table_name"]
                 row = g.nodes[n]["row"]
                 if table_name == "Order":
                     vi_data.assigned_mice = get_attr_or_none(row, "ordr_cf_fk_assignedMice", "displayValues")
-                    vi_data.requested_for_date = get_attr_or_none(row, "ordr_requestedForDate")
+                    vi_data.requested_for_date = get_attr_or_none(row, "ordr_cf_requestedForDate")
                     vi_data.planned_injection_date = get_attr_or_none(row, "ordr_plannedOnDate")
                     vi_data.planned_injection_time = get_attr_or_none(row, "ordr_plannedOnTime")
-                if table_name == "Content" and get_attr_or_none(row, "cntn_fk_contentType", "displayValue") == "Viral injection":
-                    vi_data.content_category = get_attr_or_none(row, "cntn_fk_category", "displayValue")
-                    vi_data.content_type = get_attr_or_none(row, "cntn_fk_type")
-                    vi_data.content_created_on = get_attr_or_none(row, "cntn_createdOn")
-                    vi_data.content_modified_on = get_attr_or_none(row, "cntn_modifiedOn")
-                    vi_data.viral_injection_buffer = get_attr_or_none(row, "cntn_cf_fk_viralInjectionBuffer", "displayValue")
-                    vi_data.volume = get_attr_or_none(row, "cntn_cf_volumeRequired")
-                    vi_data.volume_unit = get_attr_or_none(row, "cntn_cf_volumeRequired", "unit")
-                    vi_data.labeling_protein = get_attr_or_none(row, "cntn_cf_fk_viralInjectionFluorescentLabelingP", "displayValue") # Reference Data Record 
-                    vi_data.name = get_attr_or_none(row, "cntn_id")
-                    vi_data.date_made = get_attr_or_none(row, "cntn_cf_dateMade")
-                    vi_data.intake_date = get_attr_or_none(row, "cntn_cf_intakeDate_NA")
-                    vi_data.storage_temperature = get_attr_or_none(row, "cntn_cf_fk_storageTemp_dynChoice", "displayValue")
-                    vi_data.special_storage_guidelines = get_attr_or_none(row, "cntn_cf_fk_specialStorageGuidelines", "displayValues")
-                    vi_data.special_handling_guidelines = get_attr_or_none(row, "cntn_cf_fk_specialHandlingGuidelines", "displayValues")
-                if table_name == "Content" and get_attr_or_none(row, "cntn_fk_contentType", "displayValue") == "Viral Materials":
+                    vi_data.order_created_on = get_attr_or_none(row, "ordr_createdOn")
+                if table_name == "Content" and get_attr_or_none(row, "cntn_fk_contentType", "displayValue") == "Viral solution":
                     vm_data = SlimsViralMaterialData()
                     vm_data.content_category = get_attr_or_none(row, "cntn_fk_category", "displayValue")
-                    vm_data.content_type = get_attr_or_none(row, "cntn_fk_type")
+                    vm_data.content_type = get_attr_or_none(row, "cntn_fk_contentType", "displayValue")
                     vm_data.content_created_on = get_attr_or_none(row, "cntn_createdOn")
                     vm_data.content_modified_on = get_attr_or_none(row, "cntn_modifiedOn")
                     vm_data.viral_solution_type = get_attr_or_none(row, "cntn_cf_fk_viralSolutionType", "displayValue")
@@ -154,7 +160,8 @@ class SlimsViralMaterialHandler(SlimsTableHandler):
                     vm_data.derivation_count = get_attr_or_none(row, "cntn_cf_derivationCount")
                     vm_data.ingredient_count = get_attr_or_none(row, "cntn_cf_ingredientCount")
                     vi_data.viral_materials.append(vm_data)
-            vi_data_list.append(vi_data)
+            if subject_id is None or subject_id in vi_data.assigned_mice:
+                vi_data_list.append(vi_data)
         return vi_data_list
 
     def _get_graph(
@@ -189,7 +196,6 @@ class SlimsViralMaterialHandler(SlimsTableHandler):
             input_table_cols=["cntp_pk"],
             foreign_table="Content",
             foreign_table_col="cntn_fk_contentType",
-            graph=G,
             extra_criteria=date_criteria,
         )
         G = DiGraph()
@@ -203,6 +209,7 @@ class SlimsViralMaterialHandler(SlimsTableHandler):
             )
             root_nodes.append(f"{row.table_name()}.{row.pk()}")
 
+        # content relation links viral injection to viral materials
         content_relation_rows = self.get_rows_from_foreign_table(
             input_table="Content",
             input_rows=viral_injection_content_rows,
@@ -211,15 +218,17 @@ class SlimsViralMaterialHandler(SlimsTableHandler):
             foreign_table_col="corl_fk_to",
             graph=G,
         )
-        viral_material_content_rows = self.get_rows_from_foreign_table(
+        # viral materials 
+        _ = self.get_rows_from_foreign_table(
             input_table="ContentRelation",
-            input_rows=viral_injection_content_rows,
+            input_rows=content_relation_rows,
             input_table_cols=["corl_fk_from"],
             foreign_table="Content",
             foreign_table_col="cntn_pk",
             graph=G,
         )
-        order_rows = self.get_rows_from_foreign_table(
+        # order rows 
+        _ = self.get_rows_from_foreign_table(
             input_table="Content",
             input_rows=viral_injection_content_rows,
             input_table_cols=["cntn_pk"],
@@ -260,5 +269,5 @@ class SlimsViralMaterialHandler(SlimsTableHandler):
             start_date_greater_than_or_equal=start_date_greater_than_or_equal,
             end_date_less_than_or_equal=end_date_less_than_or_equal,
         )
-        vm_data = self._parse_graph(g=G, root_nodes=root_nodes)
+        vm_data = self._parse_graph(g=G, root_nodes=root_nodes, subject_id=subject_id)
         return vm_data
