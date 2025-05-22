@@ -1,23 +1,52 @@
 """Module for mapping viral material data from slims"""
 
-import logging
 from datetime import datetime
 from decimal import Decimal
-from typing import List, Optional, Union
+from typing import List, Optional
 
-from aind_data_schema.core.procedures import ViralMaterial
-from aind_data_schema_models.units import MassUnit
 from pydantic import BaseModel
 
-from aind_metadata_service.slims.viral_materials.handler import (
+from aind_metadata_service.slims.viral_injection.handler import (
     SlimsViralMaterialData,
-    SlimsViralInjectionData
+    SlimsViralInjectionData,
 )
 
 
+class ViralMaterialData(BaseModel):
+    """Model for viral material data."""
+
+    content_category: Optional[str] = "Viral Materials"
+    content_type: Optional[str] = None
+    content_created_on: Optional[datetime] = None
+    content_modified_on: Optional[datetime] = None
+    viral_solution_type: Optional[str] = None
+    virus_name: Optional[str] = None
+    lot_number: Optional[str] = None
+    lab_team: Optional[str] = None
+    virus_type: Optional[str] = None
+    virus_serotype: Optional[str] = None
+    virus_plasmid_number: Optional[str] = None
+    name: Optional[str] = None
+    dose: Optional[Decimal] = None
+    dose_unit: Optional[str] = None
+    titer: Optional[Decimal] = None
+    titer_unit: Optional[str] = "GC/ml"
+    volume: Optional[Decimal] = None
+    volume_unit: Optional[str] = None
+    date_made: Optional[datetime] = None
+    intake_date: Optional[datetime] = None
+    storage_temperature: Optional[str] = None
+    special_storage_guidelines: Optional[List[str]] = []
+    special_handling_guidelines: Optional[List[str]] = []
+    parent_barcode: Optional[str] = None
+    parent_name: Optional[str] = None
+    derivation_count: Optional[int] = 0
+    ingredient_count: Optional[int] = 0
+
+
 class ViralInjectionData(BaseModel):
-    """"Model for viral injection data."""
-    
+    """ "Model for viral injection data."""
+
     content_category: Optional[str] = "Viral Materials"
     content_type: Optional[str] = "Viral Injection"
     content_created_on: Optional[datetime] = None
@@ -45,9 +74,8 @@ class ViralInjectionData(BaseModel):
     viral_materials: Optional[List[SlimsViralMaterialData]] = []
 
 
-
-class SlimsViralMaterialMapper:
-    """Mapper class for Slims histology procedures"""
+class SlimsViralInjectionlMapper:
+    """Mapper class for Slims viral injections and materials"""
 
     def __init__(self, slims_vm_data: List[SlimsViralInjectionData]):
         """Class constructor"""

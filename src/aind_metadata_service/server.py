@@ -304,8 +304,8 @@ async def retrieve_slims_water_restriction(
     return response
 
 
-@app.get("/slims/viral_materials")
-async def retrieve_slims_viral_materials(
+@app.get("/slims/viral_injections")
+async def retrieve_slims_injections(
     subject_id: Optional[str] = Query(None, alias="subject_id"),
     start_date_gte: Optional[str] = Query(
         None,
@@ -322,7 +322,7 @@ async def retrieve_slims_viral_materials(
     Retrieves Viral Material data from SLIMS server
     """
     response = await run_in_threadpool(
-        slims_client.get_slims_viral_material_response,
+        slims_client.get_slims_viral_injection_response,
         subject_id=subject_id,
         start_date=start_date_gte,
         end_date=end_date_lte,

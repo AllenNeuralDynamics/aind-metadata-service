@@ -34,11 +34,11 @@ from aind_metadata_service.slims.water_restriction.handler import (
 from aind_metadata_service.slims.water_restriction.mapping import (
     SlimsWaterRestrictionMapper,
 )
-from aind_metadata_service.slims.viral_materials.handler import (
-    SlimsViralMaterialHandler,
+from aind_metadata_service.slims.viral_injection.handler import (
+    SlimsViralInjectionHandler,
 )
-from aind_metadata_service.slims.viral_materials.mapping import (
-    SlimsViralMaterialMapper,
+from aind_metadata_service.slims.viral_injection.mapping import (
+    SlimsViralInjectionlMapper,
 )
 
 
@@ -507,12 +507,12 @@ class SlimsHandler:
             logging.exception(e)
             return ModelResponse.internal_server_error_response()
 
-    def get_slims_viral_material_response(
-            self,
-            subject_id: str,
-            start_date: Optional[str],
-            end_date: Optional[str],
-        ) -> JSONResponse:
+    def get_slims_viral_injection_response(
+        self,
+        subject_id: str,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> JSONResponse:
         """
 
         Parameters
@@ -537,7 +537,9 @@ class SlimsHandler:
         if isinstance(parsed_end_date, ModelResponse):
             return parsed_end_date.map_to_json_response()
         try:
-            slims_vm_handler = SlimsViralMaterialHandler(client=self.client.db)
+            slims_vm_handler = SlimsViralInjectionHandler(
+                client=self.client.db
+            )
             slims_vm_data = (
                 slims_vm_handler.get_viral_material_info_from_slims(
                     subject_id=subject_id,
@@ -545,7 +547,7 @@ class SlimsHandler:
                     end_date_less_than_or_equal=parsed_end_date,
                 )
             )
-            vm_data = SlimsViralMaterialMapper(
+            vm_data = SlimsViralInjectionlMapper(
                 slims_vm_data=slims_vm_data
             ).map_info_from_slims()
             if len(vm_data) == 0:
