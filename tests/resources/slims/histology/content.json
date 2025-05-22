@@ -25,6 +25,12 @@
          },
          {
             "name": "cntn_cf_parentBarcode",
+            "value": "754372_parent",
+            "datatype": "STRING",
+            "title": "Parent barcode"
+         },
+         {
+            "name": "cntn_id",
             "value": "754372",
             "datatype": "STRING",
             "title": "Parent barcode"
