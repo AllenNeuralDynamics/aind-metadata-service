@@ -30,7 +30,7 @@
                 "name": "corl_fk_to",
                 "title": "To",
                 "position": 2,
-                "value": 944,
+                "value": 994,
                 "hidden": true,
                 "editable": true,
                 "foreignTable": "Content",
@@ -52,133 +52,7 @@
                 "name": "corl_fk_from",
                 "title": "From",
                 "position": 4,
-                "value": 940,
-                "hidden": true,
-                "editable": true,
-                "foreignTable": "Content",
-                "displayValue": null,
-                "displayField": "cntn_id",
-                "foreignDisplayColumn": "cntn_id"
-            }
-        ]
-    },
-    {
-        "pk": 203,
-        "tableName": "ContentRelation",
-        "columns": [
-            {
-                "datatype": "STRING",
-                "name": "corl_name",
-                "title": "Name",
-                "position": 0,
-                "value": "mix",
-                "hidden": false,
-                "editable": true
-            },
-            {
-                "datatype": "FOREIGN_KEY",
-                "name": "corl_fk_relationType",
-                "title": "Relation type",
-                "position": 1,
-                "value": 1,
-                "hidden": true,
-                "editable": true,
-                "foreignTable": "ContentRelationType",
-                "displayValue": null,
-                "displayField": "cort_name",
-                "foreignDisplayColumn": "cort_name"
-            },
-            {
-                "datatype": "FOREIGN_KEY",
-                "name": "corl_fk_to",
-                "title": "To",
-                "position": 2,
-                "value": 944,
-                "hidden": true,
-                "editable": true,
-                "foreignTable": "Content",
-                "displayValue": null,
-                "displayField": "cntn_id",
-                "foreignDisplayColumn": "cntn_id"
-            },
-            {
-                "datatype": "INTEGER",
-                "name": "corl_pk",
-                "title": "corl_pk",
-                "position": 3,
-                "value": 203,
-                "hidden": true,
-                "editable": true
-            },
-            {
-                "datatype": "FOREIGN_KEY",
-                "name": "corl_fk_from",
-                "title": "From",
-                "position": 4,
-                "value": 941,
-                "hidden": true,
-                "editable": true,
-                "foreignTable": "Content",
-                "displayValue": null,
-                "displayField": "cntn_id",
-                "foreignDisplayColumn": "cntn_id"
-            }
-        ]
-    },
-    {
-        "pk": 204,
-        "tableName": "ContentRelation",
-        "columns": [
-            {
-                "datatype": "STRING",
-                "name": "corl_name",
-                "title": "Name",
-                "position": 0,
-                "value": "mix",
-                "hidden": false,
-                "editable": true
-            },
-            {
-                "datatype": "FOREIGN_KEY",
-                "name": "corl_fk_relationType",
-                "title": "Relation type",
-                "position": 1,
-                "value": 1,
-                "hidden": true,
-                "editable": true,
-                "foreignTable": "ContentRelationType",
-                "displayValue": null,
-                "displayField": "cort_name",
-                "foreignDisplayColumn": "cort_name"
-            },
-            {
-                "datatype": "FOREIGN_KEY",
-                "name": "corl_fk_to",
-                "title": "To",
-                "position": 2,
-                "value": 944,
-                "hidden": true,
-                "editable": true,
-                "foreignTable": "Content",
-                "displayValue": null,
-                "displayField": "cntn_id",
-                "foreignDisplayColumn": "cntn_id"
-            },
-            {
-                "datatype": "INTEGER",
-                "name": "corl_pk",
-                "title": "corl_pk",
-                "position": 3,
-                "value": 204,
-                "hidden": true,
-                "editable": true
-            },
-            {
-                "datatype": "FOREIGN_KEY",
-                "name": "corl_fk_from",
-                "title": "From",
-                "position": 4,
-                "value": 942,
+                "value": 992,
                 "hidden": true,
                 "editable": true,
                 "foreignTable": "Content",

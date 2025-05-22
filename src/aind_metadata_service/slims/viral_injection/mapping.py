@@ -4,10 +4,9 @@ from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 from aind_metadata_service.slims.viral_injection.handler import (
-    SlimsViralMaterialData,
     SlimsViralInjectionData,
 )
 
@@ -15,7 +14,7 @@ from aind_metadata_service.slims.viral_injection.handler import (
 class ViralMaterialData(BaseModel):
     """Model for viral material data."""
 
-    content_category: Optional[str] = "Viral Materials"
+    content_category: Optional[str] = None
     content_type: Optional[str] = None
     content_created_on: Optional[datetime] = None
     content_modified_on: Optional[datetime] = None
@@ -38,17 +37,24 @@ class ViralMaterialData(BaseModel):
     storage_temperature: Optional[str] = None
     special_storage_guidelines: Optional[List[str]] = []
     special_handling_guidelines: Optional[List[str]] = []
-    parent_barcode: Optional[str] = None
     parent_name: Optional[str] = None
-    derivation_count: Optional[int] = 0
-    ingredient_count: Optional[int] = 0
+    derivation_count: Optional[int] = None
+    ingredient_count: Optional[int] = None
+    mix_count: Optional[int] = None
+
+    @field_validator("volume_unit", mode="before")
+    def parse_microliter_unit(cls, v):
+        """Parse HTML entity for micrometer"""
+        if isinstance(v, str) and v.strip() == "&mu;l":
+            return "ul"
+        return v
 
 
 class ViralInjectionData(BaseModel):
     """ "Model for viral injection data."""
 
-    content_category: Optional[str] = "Viral Materials"
-    content_type: Optional[str] = "Viral Injection"
+    content_category: Optional[str] = None
+    content_type: Optional[str] = None
     content_created_on: Optional[datetime] = None
     content_modified_on: Optional[datetime] = None
     name: Optional[str] = None
@@ -61,20 +67,26 @@ class ViralInjectionData(BaseModel):
     storage_temperature: Optional[str] = None
     special_storage_guidelines: Optional[List[str]] = []
     special_handling_guidelines: Optional[List[str]] = []
-    derivation_count: Optional[int] = 0
-    ingredient_count: Optional[int] = 0
-
-    # From ORDER table
+    derivation_count: Optional[int] = None
+    ingredient_count: Optional[int] = None
+    mix_count: Optional[int] = None
     assigned_mice: Optional[List[str]] = []
     requested_for_date: Optional[datetime] = None
     planned_injection_date: Optional[datetime] = None
     planned_injection_time: Optional[datetime] = None
     order_created_on: Optional[datetime] = None
 
-    viral_materials: Optional[List[SlimsViralMaterialData]] = []
+    viral_materials: Optional[List[ViralMaterialData]] = []
+
+    @field_validator("volume_unit", mode="before")
+    def parse_microliter_unit(cls, v):
+        """Parse HTML entity for micrometer"""
+        if isinstance(v, str) and v.strip() == "&mu;l":
+            return "ul"
+        return v
 
 
-class SlimsViralInjectionlMapper:
+class SlimsViralInjectionMapper:
     """Mapper class for Slims viral injections and materials"""
 
     def __init__(self, slims_vm_data: List[SlimsViralInjectionData]):

@@ -43,10 +43,10 @@ class SlimsViralMaterialData(BaseModel):
     storage_temperature: Optional[str] = None
     special_storage_guidelines: Optional[List[str]] = []
     special_handling_guidelines: Optional[List[str]] = []
-    parent_barcode: Optional[str] = None
     parent_name: Optional[str] = None
-    derivation_count: Optional[int] = 0
-    ingredient_count: Optional[int] = 0
+    mix_count: Optional[int] = None
+    derivation_count: Optional[int] = None
+    ingredient_count: Optional[int] = None
 
 
 class SlimsViralInjectionData(BaseModel):
@@ -66,8 +66,9 @@ class SlimsViralInjectionData(BaseModel):
     storage_temperature: Optional[str] = None
     special_storage_guidelines: Optional[List[str]] = []
     special_handling_guidelines: Optional[List[str]] = []
-    derivation_count: Optional[int] = 0
-    ingredient_count: Optional[int] = 0
+    mix_count: Optional[int] = None
+    derivation_count: Optional[int] = None
+    ingredient_count: Optional[int] = None
 
     # From ORDER table
     assigned_mice: Optional[List[str]] = []
@@ -101,10 +102,9 @@ class SlimsViralInjectionHandler(SlimsTableHandler):
 
         """
         vi_data_list = []
-        print("HANDLER: Parsing graph")
         for node in root_nodes:
             vi_data = SlimsViralInjectionData()
-            # node_des = descendants(g, node)
+            node_des = descendants(g, node)
             root_row = g.nodes[node]["row"]
             vi_data.content_created_on = get_attr_or_none(
                 root_row, "cntn_createdOn"
@@ -124,9 +124,8 @@ class SlimsViralInjectionHandler(SlimsTableHandler):
             vi_data.viral_injection_buffer = get_attr_or_none(
                 root_row, "cntn_cf_fk_viralInjectionBuffer", "displayValue"
             )
-            vi_data.volume = get_attr_or_none(
-                root_row, "cntn_cf_volumeRequired"
-            )
+            volume = get_attr_or_none(root_row, "cntn_cf_volumeRequired")
+            vi_data.volume = None if volume is None else Decimal(str(volume))
             vi_data.volume_unit = get_attr_or_none(
                 root_row, "cntn_cf_volumeRequired", "unit"
             )
@@ -153,7 +152,6 @@ class SlimsViralInjectionHandler(SlimsTableHandler):
                 "cntn_cf_fk_specialHandlingGuidelines",
                 "displayValues",
             )
-            node_des = descendants(g, node)
             for n in node_des:
                 table_name = g.nodes[n]["table_name"]
                 row = g.nodes[n]["row"]
@@ -173,6 +171,13 @@ class SlimsViralInjectionHandler(SlimsTableHandler):
                     vi_data.order_created_on = get_attr_or_none(
                         row, "ordr_createdOn"
                     )
+                    vi_data.derivation_count = get_attr_or_none(
+                        row, "derivedCount"
+                    )
+                    vi_data.ingredient_count = get_attr_or_none(
+                        row, "ingredientCount"
+                    )
+                    vi_data.mix_count = get_attr_or_none(row, "mixCount")
                 if (
                     table_name == "Content"
                     and get_attr_or_none(
@@ -215,16 +220,21 @@ class SlimsViralInjectionHandler(SlimsTableHandler):
                         row, "cntn_cf_virusPlasmidNumber"
                     )
                     vm_data.name = get_attr_or_none(row, "cntn_id")
-                    vm_data.dose = get_attr_or_none(row, "cntn_cf_dose")
+                    dose = get_attr_or_none(row, "cntn_cf_dose")
+                    vm_data.dose = None if dose is None else Decimal(str(dose))
                     vm_data.dose_unit = get_attr_or_none(
                         row, "cntn_cf_doseUnit", "unit"
                     )
-                    vm_data.titer = get_attr_or_none(row, "cntn_cf_titer")
+                    titer = get_attr_or_none(row, "cntn_cf_titer")
+                    vm_data.titer = (
+                        None if titer is None else Decimal(str(titer))
+                    )
                     vm_data.titer_unit = get_attr_or_none(
                         row, "cntn_cf_titer", "unit"
                     )
-                    vm_data.volume = get_attr_or_none(
-                        row, "cntn_cf_volumeRequired"
+                    volume = get_attr_or_none(row, "cntn_cf_volumeRequired")
+                    vm_data.volume = (
+                        None if volume is None else Decimal(str(volume))
                     )
                     vm_data.volume_unit = get_attr_or_none(
                         row, "cntn_cf_volumeRequired", "unit"
@@ -248,18 +258,13 @@ class SlimsViralInjectionHandler(SlimsTableHandler):
                         "cntn_cf_fk_specialHandlingGuidelines",
                         "displayValues",
                     )
-                    vm_data.parent_barcode = get_attr_or_none(
-                        row, "cntn_cf_parentBarcode"
-                    )
-                    vm_data.parent_name = get_attr_or_none(
-                        row, "cntn_cf_parentName"
-                    )
                     vm_data.derivation_count = get_attr_or_none(
-                        row, "cntn_cf_derivationCount"
+                        row, "derivedCount"
                     )
                     vm_data.ingredient_count = get_attr_or_none(
-                        row, "cntn_cf_ingredientCount"
+                        row, "ingredientCount"
                     )
+                    vm_data.mix_count = get_attr_or_none(row, "mixCount")
                     vi_data.viral_materials.append(vm_data)
             if subject_id is None or subject_id in vi_data.assigned_mice:
                 vi_data_list.append(vi_data)
@@ -310,7 +315,7 @@ class SlimsViralInjectionHandler(SlimsTableHandler):
             )
             root_nodes.append(f"{row.table_name()}.{row.pk()}")
 
-        # content relation links viral injection to viral materials
+        # content relation: viral injection -> viral materials
         content_relation_rows = self.get_rows_from_foreign_table(
             input_table="Content",
             input_rows=viral_injection_content_rows,
@@ -319,7 +324,6 @@ class SlimsViralInjectionHandler(SlimsTableHandler):
             foreign_table_col="corl_fk_to",
             graph=G,
         )
-        # viral materials
         _ = self.get_rows_from_foreign_table(
             input_table="ContentRelation",
             input_rows=content_relation_rows,
@@ -328,7 +332,6 @@ class SlimsViralInjectionHandler(SlimsTableHandler):
             foreign_table_col="cntn_pk",
             graph=G,
         )
-        # order rows
         _ = self.get_rows_from_foreign_table(
             input_table="Content",
             input_rows=viral_injection_content_rows,

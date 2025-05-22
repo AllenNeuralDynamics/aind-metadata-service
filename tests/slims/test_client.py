@@ -4,6 +4,7 @@ import json
 import os
 import unittest
 from datetime import datetime
+from decimal import Decimal
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -23,6 +24,10 @@ from aind_metadata_service.slims.client import SlimsHandler, SlimsSettings
 from aind_metadata_service.slims.ecephys.handler import SlimsEcephysData
 from aind_metadata_service.slims.histology.handler import SlimsHistologyData
 from aind_metadata_service.slims.imaging.handler import SlimsSpimData
+from aind_metadata_service.slims.viral_injection.handler import (
+    SlimsViralInjectionData,
+    SlimsViralMaterialData,
+)
 from aind_metadata_service.slims.water_restriction.handler import (
     SlimsWaterRestrictionData,
 )
@@ -751,6 +756,137 @@ class TestSlimsHandler(unittest.TestCase):
         self.assertEqual(
             StatusCodes.INTERNAL_SERVER_ERROR, response.status_code
         )
+        mock_log_exception.assert_called_once()
+
+    def test_get_slims_viral_injection_response_bad_subject_id(self):
+        """Empty subject_id should return Bad Request"""
+        response = self.handler.get_slims_viral_injection_response(
+            subject_id="", start_date=None, end_date=None
+        )
+        self.assertEqual(StatusCodes.BAD_REQUEST.value, response.status_code)
+
+    def test_get_slims_viral_injection_response_bad_start_date(self):
+        """Bad start date should return Bad Request"""
+        response = self.handler.get_slims_viral_injection_response(
+            subject_id=None, start_date="2020/02/10", end_date=None
+        )
+        self.assertEqual(StatusCodes.BAD_REQUEST.value, response.status_code)
+
+    def test_get_slims_viral_injection_response_bad_end_date(self):
+        """Bad end date should return Bad Request"""
+        response = self.handler.get_slims_viral_injection_response(
+            subject_id=None,
+            start_date=None,
+            end_date="2020/02/10",
+        )
+        self.assertEqual(StatusCodes.BAD_REQUEST.value, response.status_code)
+
+    @patch(
+        "aind_metadata_service.slims.viral_injection.handler"
+        ".SlimsViralInjectionHandler.get_viral_injection_info_from_slims"
+    )
+    def test_get_slims_viral_injection_response(
+        self, mock_slims_get: MagicMock
+    ):
+        """Tests get_slims_viral_injection success"""
+        mock_slims_get.return_value = [
+            SlimsViralInjectionData(
+                content_category="Viral Materials",
+                content_type="Viral injection",
+                content_created_on=None,
+                content_modified_on=None,
+                name="INJ00000002",
+                viral_injection_buffer="AAV Buffer",
+                volume=Decimal(str(98.56)),
+                volume_unit="&mu;l",
+                labeling_protein="tdTomato",
+                date_made=1746014400000,
+                intake_date=None,
+                storage_temperature="4 C",
+                special_storage_guidelines=["Light sensitive storage"],
+                special_handling_guidelines=["BSL - 1"],
+                mix_count=None,
+                derivation_count=None,
+                ingredient_count=None,
+                assigned_mice=["614178"],
+                requested_for_date=None,
+                planned_injection_date=1746705600000,
+                planned_injection_time=None,
+                order_created_on=1746717795853,
+                viral_materials=[
+                    SlimsViralMaterialData(
+                        content_category="Viral Materials",
+                        content_type="Viral solution",
+                        content_created_on=1746049926016,
+                        content_modified_on=None,
+                        viral_solution_type="Injection Dilution",
+                        virus_name="7x-TRE-tDTomato",
+                        lot_number="VT5355g",
+                        lab_team="Molecular Anatomy",
+                        virus_type="AAV",
+                        virus_serotype="PhP.eB",
+                        virus_plasmid_number="AiP300001",
+                        name="VRS00000029",
+                        dose=Decimal(str(180000000000)),
+                        dose_unit=None,
+                        titer=Decimal(str(24200000000000)),
+                        titer_unit="GC/ml",
+                        volume=Decimal(str(8.55)),
+                        volume_unit="&mu;l",
+                        date_made=1746049926079,
+                        intake_date=None,
+                        storage_temperature="-80 C",
+                        special_storage_guidelines=[
+                            "Avoid freeze - thaw cycles"
+                        ],
+                        special_handling_guidelines=["BSL - 1"],
+                        parent_name=None,
+                        mix_count=1,
+                        derivation_count=0,
+                        ingredient_count=0,
+                    )
+                ],
+            )
+        ]
+        response = self.handler.get_slims_viral_injection_response(
+            subject_id="614178",
+            start_date=None,
+            end_date=None,
+        )
+        self.assertEqual(200, response.status_code)
+
+    @patch(
+        "aind_metadata_service.slims.viral_injection.handler"
+        ".SlimsViralInjectionHandler.get_viral_injection_info_from_slims"
+    )
+    def test_get_slims_viral_injection_response_empty(
+        self, mock_slims_get: MagicMock
+    ):
+        """Tests get_slims_viral_injection_response when no data returned"""
+        mock_slims_get.return_value = []
+        response = self.handler.get_slims_viral_injection_response(
+            subject_id="614178",
+            start_date=None,
+            end_date=None,
+        )
+        self.assertEqual(404, response.status_code)
+
+    @patch("logging.exception")
+    @patch(
+        "aind_metadata_service.slims.viral_injection.handler"
+        ".SlimsViralInjectionHandler.get_viral_injection_info_from_slims"
+    )
+    def test_get_slims_viral_injection_response_error(
+        self, mock_slims_get: MagicMock, mock_log_exception: MagicMock
+    ):
+        """Tests get_slims_viral_injection_response when an error happens"""
+        mock_slims_get.side_effect = Exception("An error occurred.")
+        response = self.handler.get_slims_viral_injection_response(
+            subject_id="614178",
+            start_date=None,
+            end_date=None,
+        )
+        self.assertEqual(500, response.status_code)
         mock_log_exception.assert_called_once()
 
 

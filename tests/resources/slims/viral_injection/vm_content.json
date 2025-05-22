@@ -1,0 +1,371 @@
+[
+    {
+        "pk": 992,
+        "tableName": "Content",
+        "columns": [
+            {
+                "datatype": "FOREIGN_KEY",
+                "name": "cntn_fk_category",
+                "title": "Category",
+                "value": 61,
+                "foreignTable": "ContentType",
+                "displayValue": "Viral Materials",
+                "displayField": "category_name",
+                "foreignDisplayColumn": "cntp_name"
+            },
+            {
+                "datatype": "FOREIGN_KEY",
+                "name": "cntn_fk_contentType",
+                "title": "Type",
+                "value": 62,
+                "foreignTable": "ContentType",
+                "displayValue": "Viral solution",
+                "displayField": "cntp_name",
+                "foreignDisplayColumn": "cntp_name"
+            },
+            {
+                "datatype": "FOREIGN_KEY",
+                "name": "cntn_cf_fk_viralSolutionType",
+                "title": "Viral solution type",
+                "value": 2774,
+                "foreignTable": "ReferenceDataRecord",
+                "displayValue": "Injection Dilution",
+                "displayField": "cntn_cf_fk_viralSolutionType_display",
+                "foreignDisplayColumn": "rdrc_name"
+            },
+            {
+                "datatype": "STRING",
+                "name": "cntn_barCode",
+                "title": "Barcode",
+                "value": "VRS00000029"
+            },
+            {
+                "datatype": "STRING",
+                "name": "cntn_cf_virusName",
+                "title": "Virus name",
+                "value": "7x-TRE-tDTomato"
+            },
+            {
+                "datatype": "STRING",
+                "name": "cntn_cf_lotNumber",
+                "title": "Lot number",
+                "value": "VT5355g"
+            },
+            {
+                "datatype": "FOREIGN_KEY",
+                "name": "cntn_cf_fk_labTeam",
+                "title": "Lab team",
+                "value": 1667,
+                "foreignTable": "ReferenceDataRecord",
+                "displayValue": "Molecular Anatomy",
+                "displayField": "cntn_cf_fk_labTeam_display",
+                "foreignDisplayColumn": "rdrc_name"
+            },
+            {
+                "datatype": "FOREIGN_KEY",
+                "name": "cntn_cf_fk_virusType",
+                "title": "Virus type",
+                "value": 2758,
+                "foreignTable": "ReferenceDataRecord",
+                "displayValue": "AAV",
+                "displayField": "cntn_cf_fk_virusType_display",
+                "foreignDisplayColumn": "rdrc_name"
+            },
+            {
+                "datatype": "FOREIGN_KEY",
+                "name": "cntn_cf_fk_virusSerotype",
+                "title": "Virus serotype",
+                "value": 2940,
+                "foreignTable": "ReferenceDataRecord",
+                "displayValue": "PhP.eB",
+                "displayField": "cntn_cf_fk_virusSerotype_display",
+                "foreignDisplayColumn": "rdrc_name"
+            },
+            {
+                "datatype": "STRING",
+                "name": "cntn_cf_virusPlasmidNumber",
+                "title": "Virus plasmid number",
+                "value": "AiP300001"
+            },
+            {
+                "datatype": "STRING",
+                "name": "cntn_id",
+                "title": "Name",
+                "value": "VRS00000029"
+            },
+            {
+                "datatype": "QUANTITY",
+                "name": "cntn_cf_dose",
+                "title": "Dose",
+                "value": 180000000000,
+                "unit": "GC"
+            },
+            {
+                "datatype": "QUANTITY",
+                "name": "cntn_cf_titer",
+                "title": "Titer",
+                "value": 24200000000000,
+                "unit": "GC/ml"
+            },
+            {
+                "datatype": "QUANTITY",
+                "name": "cntn_cf_volumeRequired",
+                "title": "Volume",
+                "value": 8.55,
+                "unit": "&mu;l"
+            },
+            {
+                "datatype": "DATE",
+                "name": "cntn_cf_dateMade",
+                "title": "Date made",
+                "value": 1746049926079,
+                "dateFormat": "MM/dd/yyyy",
+                "subType": "date",
+                "timeZone": "America/Los_Angeles"
+            },
+            {
+                "datatype": "FLOAT",
+                "name": "cntn_dilutionFactor",
+                "title": "Dilution Factor",
+                "value": null
+            },
+            {
+                "datatype": "NA",
+                "name": "cntn_cf_intakeDate_NA",
+                "title": "Intake date",
+                "value": null
+            },
+            {
+                "datatype": "FOREIGN_KEY",
+                "name": "cntn_cf_fk_storageTemp_dynChoice",
+                "title": "Storage temperature",
+                "value": 1655,
+                "foreignTable": "ReferenceDataRecord",
+                "displayValue": "-80 C",
+                "displayField": "cntn_cf_fk_storageTemp_dynChoice_display",
+                "foreignDisplayColumn": "rdrc_name"
+            },
+            {
+                "datatype": "MULTIPLE_FOREIGN_KEY",
+                "name": "cntn_cf_fk_specialStorageGuidelines",
+                "title": "Special storage guidelines",
+                "value": [
+                    2604
+                ],
+                "foreignTable": "ReferenceDataRecord",
+                "displayValues": [
+                    "Avoid freeze - thaw cycles"
+                ],
+                "foreignDisplayColumn": "rdrc_name",
+                "joinedDisplayValue": "Avoid freeze - thaw cycles"
+            },
+            {
+                "datatype": "MULTIPLE_FOREIGN_KEY",
+                "name": "cntn_cf_fk_specialHandlingGuidelines",
+                "title": "Special handling guidelines",
+                "value": [
+                    2594
+                ],
+                "foreignTable": "ReferenceDataRecord",
+                "displayValues": [
+                    "BSL - 1"
+                ],
+                "foreignDisplayColumn": "rdrc_name",
+                "joinedDisplayValue": "BSL - 1"
+            },
+            {
+                "datatype": "STRING",
+                "name": "cntn_cf_parentName",
+                "title": "Parent name",
+                "value": "VRS00000026"
+            },
+            {
+                "datatype": "INTEGER",
+                "name": "derivedCount",
+                "title": "Derivation count",
+                "value": 0
+            },
+            {
+                "datatype": "INTEGER",
+                "name": "ingredientCount",
+                "title": "Ingredient count",
+                "value": 0
+            },
+            {
+                "datatype": "INTEGER",
+                "name": "mixCount",
+                "title": "Mix count",
+                "value": 1
+            },
+            {
+                "datatype": "DATE",
+                "name": "cntn_createdOn",
+                "title": "Created on",
+                "value": 1746049926016,
+                "dateFormat": "MM/dd/yyyy HH:mm:ss",
+                "subType": "datetime",
+                "timeZone": "America/Los_Angeles"
+            },
+            {
+                "datatype": "INTEGER",
+                "name": "cntn_pk",
+                "title": "cntn_pk",
+                "value": 992
+            }
+        ]
+    },
+    {
+        "pk": 994,
+        "tableName": "Content",
+        "columns": [
+            {
+                "datatype": "FOREIGN_KEY",
+                "name": "cntn_fk_category",
+                "title": "Category",
+                "value": 61,
+                "foreignTable": "ContentType",
+                "displayValue": "Viral Materials",
+                "displayField": "category_name",
+                "foreignDisplayColumn": "cntp_name"
+            },
+            {
+                "datatype": "FOREIGN_KEY",
+                "name": "cntn_fk_contentType",
+                "title": "Type",
+                "value": 63,
+                "foreignTable": "ContentType",
+                "displayValue": "Viral injection",
+                "displayField": "cntp_name",
+                "foreignDisplayColumn": "cntp_name"
+            },
+            {
+                "datatype": "STRING",
+                "name": "cntn_barCode",
+                "title": "Barcode",
+                "value": "INJ00000002"
+            },
+            {
+                "datatype": "STRING",
+                "name": "cntn_id",
+                "title": "Name",
+                "value": "INJ00000002"
+            },
+            {
+                "datatype": "FOREIGN_KEY",
+                "name": "cntn_cf_fk_viralInjectionBuffer",
+                "title": "Viral injection buffer",
+                "value": 2770,
+                "foreignTable": "ReferenceDataRecord",
+                "displayValue": "AAV Buffer",
+                "displayField": "cntn_cf_fk_viralInjectionBuffer_display",
+                "foreignDisplayColumn": "rdrc_name"
+            },
+            {
+                "datatype": "QUANTITY",
+                "name": "cntn_cf_volumeRequired",
+                "title": "Volume",
+                "value": 98.56,
+                "unit": "&mu;l"
+            },
+            {
+                "datatype": "FOREIGN_KEY",
+                "name": "cntn_cf_fk_viralInjectionFluorescentLabelingP",
+                "title": "Viral injection fluorescent labeling protein",
+                "value": 2570,
+                "foreignTable": "ReferenceDataRecord",
+                "displayValue": "tdTomato",
+                "displayField": "cntn_cf_fk_viralInjectionFluorescentLabelingP_display",
+                "foreignDisplayColumn": "rdrc_name"
+            },
+            {
+                "datatype": "DATE",
+                "name": "cntn_cf_dateMade",
+                "title": "Date made",
+                "value": 1746014400000,
+                "dateFormat": "MM/dd/yyyy",
+                "subType": "date",
+                "timeZone": "America/Los_Angeles"
+            },
+            {
+                "datatype": "FLOAT",
+                "name": "cntn_dilutionFactor",
+                "title": "Dilution Factor",
+                "value": null
+            },
+            {
+                "datatype": "NA",
+                "name": "cntn_cf_intakeDate_NA",
+                "title": "Intake date",
+                "value": null
+            },
+            {
+                "datatype": "FOREIGN_KEY",
+                "name": "cntn_cf_fk_storageTemp_dynChoice",
+                "title": "Storage temperature",
+                "value": 1653,
+                "foreignTable": "ReferenceDataRecord",
+                "displayValue": "4 C",
+                "displayField": "cntn_cf_fk_storageTemp_dynChoice_display",
+                "foreignDisplayColumn": "rdrc_name"
+            },
+            {
+                "datatype": "MULTIPLE_FOREIGN_KEY",
+                "name": "cntn_cf_fk_specialStorageGuidelines",
+                "title": "Special storage guidelines",
+                "value": [
+                    2605
+                ],
+                "foreignTable": "ReferenceDataRecord",
+                "displayValues": [
+                    "Light sensitive storage"
+                ],
+                "foreignDisplayColumn": "rdrc_name",
+                "joinedDisplayValue": "Light sensitive storage"
+            },
+            {
+                "datatype": "MULTIPLE_FOREIGN_KEY",
+                "name": "cntn_cf_fk_specialHandlingGuidelines",
+                "title": "Special handling guidelines",
+                "value": [
+                    2594
+                ],
+                "foreignTable": "ReferenceDataRecord",
+                "displayValues": [
+                    "BSL - 1"
+                ],
+                "foreignDisplayColumn": "rdrc_name",
+                "joinedDisplayValue": "BSL - 1"
+            },
+            {
+                "datatype": "INTEGER",
+                "name": "derivedCount",
+                "title": "Derivation count",
+                "value": 0
+            },
+            {
+                "datatype": "INTEGER",
+                "name": "ingredientCount",
+                "title": "Ingredient count",
+                "value": 3
+            },
+            {
+                "datatype": "INTEGER",
+                "name": "mixCount",
+                "title": "Mix count",
+                "value": 0
+            },
+            {
+                "datatype": "INTEGER",
+                "name": "cntn_pk",
+                "title": "cntn_pk",
+                "value": 994
+            },
+            {
+                "datatype": "STRING",
+                "name": "cntp_name",
+                "title": "Name",
+                "value": "Viral injection"
+            }
+        ]
+    }
+]

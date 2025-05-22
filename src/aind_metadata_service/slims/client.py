@@ -28,17 +28,17 @@ from aind_metadata_service.slims.histology.handler import SlimsHistologyHandler
 from aind_metadata_service.slims.histology.mapping import SlimsHistologyMapper
 from aind_metadata_service.slims.imaging.handler import SlimsImagingHandler
 from aind_metadata_service.slims.imaging.mapping import SlimsSpimMapper
+from aind_metadata_service.slims.viral_injection.handler import (
+    SlimsViralInjectionHandler,
+)
+from aind_metadata_service.slims.viral_injection.mapping import (
+    SlimsViralInjectionMapper,
+)
 from aind_metadata_service.slims.water_restriction.handler import (
     SlimsWaterRestrictionHandler,
 )
 from aind_metadata_service.slims.water_restriction.mapping import (
     SlimsWaterRestrictionMapper,
-)
-from aind_metadata_service.slims.viral_injection.handler import (
-    SlimsViralInjectionHandler,
-)
-from aind_metadata_service.slims.viral_injection.mapping import (
-    SlimsViralInjectionlMapper,
 )
 
 
@@ -541,13 +541,13 @@ class SlimsHandler:
                 client=self.client.db
             )
             slims_vm_data = (
-                slims_vm_handler.get_viral_material_info_from_slims(
+                slims_vm_handler.get_viral_injection_info_from_slims(
                     subject_id=subject_id,
                     start_date_greater_than_or_equal=parsed_start_date,
                     end_date_less_than_or_equal=parsed_end_date,
                 )
             )
-            vm_data = SlimsViralInjectionlMapper(
+            vm_data = SlimsViralInjectionMapper(
                 slims_vm_data=slims_vm_data
             ).map_info_from_slims()
             if len(vm_data) == 0:
