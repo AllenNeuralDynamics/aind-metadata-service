@@ -1,5 +1,5 @@
 """
-Module to handle fetching viral material data from slims
+Module to handle fetching viral injection data from slims
 and parsing it to a model.
 """
 
@@ -81,7 +81,7 @@ class SlimsViralInjectionData(BaseModel):
 
 
 class SlimsViralInjectionHandler(SlimsTableHandler):
-    """Class to handle getting Viral Material info from SLIMS."""
+    """Class to handle getting Viral Injection info from SLIMS."""
 
     @staticmethod
     def _parse_graph(
@@ -133,8 +133,8 @@ class SlimsViralInjectionHandler(SlimsTableHandler):
                 root_row,
                 "cntn_cf_fk_viralInjectionFluorescentLabelingP",
                 "displayValue",
-            )  # Reference Data Record
-            vi_data.name = get_attr_or_none(root_row, "cntn_id")  # null?
+            )
+            vi_data.name = get_attr_or_none(root_row, "cntn_id")
             vi_data.date_made = get_attr_or_none(root_row, "cntn_cf_dateMade")
             vi_data.intake_date = get_attr_or_none(
                 root_row, "cntn_cf_intakeDate_NA"
@@ -276,7 +276,7 @@ class SlimsViralInjectionHandler(SlimsTableHandler):
         end_date_less_than_or_equal: Optional[datetime] = None,
     ) -> Tuple[DiGraph, List[str]]:
         """
-        Generate a Graph of the records from SLIMS for viral material
+        Generate a Graph of the records from SLIMS for viral injection
         contents.
         Parameters
         ----------
@@ -348,9 +348,9 @@ class SlimsViralInjectionHandler(SlimsTableHandler):
         subject_id: Optional[str] = None,
         start_date_greater_than_or_equal: Optional[datetime] = None,
         end_date_less_than_or_equal: Optional[datetime] = None,
-    ) -> List[SlimsViralMaterialData]:
+    ) -> List[SlimsViralInjectionData]:
         """
-        Get Viral Material data from SLIMS.
+        Get Viral injection data from SLIMS.
 
         Parameters
         ----------
@@ -358,7 +358,7 @@ class SlimsViralInjectionHandler(SlimsTableHandler):
           The lot number of the prep to get data for.
         Returns
         -------
-        List[SlimsViralMaterialData]
+        List[SlimsViralInjectionData]
 
         Raises
         ------

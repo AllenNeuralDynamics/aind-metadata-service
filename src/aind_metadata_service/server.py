@@ -319,7 +319,7 @@ async def retrieve_slims_injections(
     ),
 ):
     """
-    Retrieves Viral Material data from SLIMS server
+    Retrieves Viral Injection data from SLIMS server
     """
     response = await run_in_threadpool(
         slims_client.get_slims_viral_injection_response,

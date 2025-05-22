@@ -1,4 +1,4 @@
-"""Module for mapping viral material data from slims"""
+"""Module for mapping viral injection data from slims"""
 
 from datetime import datetime
 from decimal import Decimal
