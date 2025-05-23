@@ -1,0 +1,20 @@
+[
+    {
+        "pk": 63,
+        "tableName": "ContentType",
+        "columns": [
+            {
+                "datatype": "STRING",
+                "name": "cntp_name",
+                "title": "Name",
+                "value": "Viral Injection"
+            },
+            {
+                "datatype": "INTEGER",
+                "name": "cntp_pk",
+                "title": "cntp_pk",
+                "value": 63
+            }
+        ]
+    }
+]
