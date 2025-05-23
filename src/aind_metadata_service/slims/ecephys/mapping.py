@@ -2,6 +2,7 @@
 Module to handle mapping data from SLIMS
 """
 
+import html
 from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
@@ -52,8 +53,8 @@ class StreamModule(BaseModel):
     )
     def parse_micrometer_unit(cls, v):
         """Parse HTML entity for micrometer"""
-        if isinstance(v, str) and v.strip() == "&mu;m":
-            return "um"
+        if isinstance(v, str):
+            v = html.unescape(v)
         return v
 
 

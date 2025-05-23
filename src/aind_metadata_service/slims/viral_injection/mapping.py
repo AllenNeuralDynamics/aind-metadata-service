@@ -1,5 +1,6 @@
 """Module for mapping viral injection data from slims"""
 
+import html
 from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
@@ -45,8 +46,8 @@ class ViralMaterialData(BaseModel):
     @field_validator("volume_unit", mode="before")
     def parse_microliter_unit(cls, v):
         """Parse HTML entity for micrometer"""
-        if isinstance(v, str) and v.strip() == "&mu;l":
-            return "ul"
+        if isinstance(v, str):
+            v = html.unescape(v)
         return v
 
 
@@ -81,8 +82,8 @@ class ViralInjectionData(BaseModel):
     @field_validator("volume_unit", mode="before")
     def parse_microliter_unit(cls, v):
         """Parse HTML entity for micrometer"""
-        if isinstance(v, str) and v.strip() == "&mu;l":
-            return "ul"
+        if isinstance(v, str):
+            v = html.unescape(v)
         return v
 
 

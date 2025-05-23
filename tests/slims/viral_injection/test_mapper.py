@@ -101,7 +101,7 @@ class TestSlimsViralInjectionMapper(unittest.TestCase):
                 name="INJ00000002",
                 viral_injection_buffer="AAV Buffer",
                 volume=Decimal("98.56"),
-                volume_unit="ul",
+                volume_unit="μl",
                 labeling_protein="tdTomato",
                 date_made=datetime(2025, 4, 30, 12, 0, tzinfo=timezone.utc),
                 intake_date=None,
@@ -141,7 +141,7 @@ class TestSlimsViralInjectionMapper(unittest.TestCase):
                         titer=Decimal("24200000000000"),
                         titer_unit="GC/ml",
                         volume=Decimal("8.55"),
-                        volume_unit="ul",
+                        volume_unit="μl",
                         date_made=datetime(
                             2025, 4, 30, 21, 52, 6, 79000, tzinfo=timezone.utc
                         ),
