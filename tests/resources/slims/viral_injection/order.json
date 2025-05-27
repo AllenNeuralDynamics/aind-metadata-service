@@ -1,0 +1,148 @@
+[
+    {
+        "pk": 124,
+        "tableName": "Order",
+        "columns": [
+            {
+                "datatype": "STRING",
+                "name": "ordr_barCode",
+                "title": "Barcode",
+                "position": 0,
+                "value": "00000128",
+                "hidden": false,
+                "editable": true
+            },
+            {
+                "datatype": "FOREIGN_KEY",
+                "name": "ordr_fk_orderType",
+                "title": "Order type",
+                "position": 1,
+                "value": 3,
+                "hidden": false,
+                "editable": false,
+                "foreignTable": "OrderType",
+                "displayValue": "Retro Orbital Viral Injection",
+                "displayField": "rdtp_name",
+                "foreignDisplayColumn": "rdtp_name"
+            },
+            {
+                "datatype": "MULTIPLE_FOREIGN_KEY",
+                "name": "ordr_cf_fk_assignedMice",
+                "title": "Assigned Mice",
+                "position": 5,
+                "value": [
+                    23
+                ],
+                "hidden": false,
+                "editable": true,
+                "foreignTable": "Content",
+                "displayValues": [
+                    "614178"
+                ],
+                "foreignDisplayColumn": "cntn_id",
+                "joinedDisplayValue": "614178"
+            },
+            {
+                "datatype": "FOREIGN_KEY",
+                "name": "ordr_cf_fk_viralInjection",
+                "title": "viral injection",
+                "position": 6,
+                "value": 994,
+                "hidden": false,
+                "editable": true,
+                "foreignTable": "Content",
+                "displayValue": "INJ00000002",
+                "displayField": "ordr_cf_fk_viralInjection_display",
+                "foreignDisplayColumn": "cntn_id"
+            },
+            {
+                "datatype": "DATE",
+                "name": "ordr_cf_requestedForDate",
+                "title": "Requested For Date",
+                "position": 7,
+                "value": null,
+                "hidden": false,
+                "editable": true,
+                "dateFormat": "MM/dd/yyyy",
+                "subType": "date",
+                "timeZone": "America/Los_Angeles"
+            },
+            {
+                "datatype": "DATE",
+                "name": "ordr_plannedOnDate",
+                "title": "Planned on date",
+                "position": 8,
+                "value": 1746705600000,
+                "hidden": false,
+                "editable": true,
+                "dateFormat": "MM/dd/yyyy",
+                "subType": "date",
+                "timeZone": "America/Los_Angeles"
+            },
+            {
+                "datatype": "DATE",
+                "name": "ordr_plannedOnTime",
+                "title": "Planned on time",
+                "position": 9,
+                "value": null,
+                "hidden": false,
+                "editable": true,
+                "dateFormat": "HH:mm:ss",
+                "subType": "time",
+                "timeZone": "UTC"
+            },
+            {
+                "datatype": "FOREIGN_KEY",
+                "name": "ordr_fk_status",
+                "title": "Status",
+                "position": 10,
+                "value": 1,
+                "hidden": false,
+                "editable": true,
+                "foreignTable": "Status",
+                "displayValue": "Pending",
+                "displayField": "stts_name",
+                "foreignDisplayColumn": "stts_name"
+            },
+            {
+                "datatype": "INTEGER",
+                "name": "linkedContentCount",
+                "title": "# content",
+                "position": 16,
+                "value": 2,
+                "hidden": false,
+                "editable": true
+            },
+            {
+                "datatype": "STRING",
+                "name": "ordr_createdBy",
+                "title": "Created by",
+                "position": 17,
+                "value": "SomeName",
+                "hidden": false,
+                "editable": true
+            },
+            {
+                "datatype": "DATE",
+                "name": "ordr_createdOn",
+                "title": "Created on",
+                "position": 18,
+                "value": 1746717795853,
+                "hidden": false,
+                "editable": true,
+                "dateFormat": "MM/dd/yyyy HH:mm:ss",
+                "subType": "datetime",
+                "timeZone": "America/Los_Angeles"
+            },
+            {
+                "datatype": "INTEGER",
+                "name": "ordr_pk",
+                "title": "ordr_pk",
+                "position": 24,
+                "value": 124,
+                "hidden": true,
+                "editable": true
+            }
+        ]
+    }
+]

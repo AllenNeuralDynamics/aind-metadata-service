@@ -145,7 +145,7 @@ class TestSlimsSpimMapper(unittest.TestCase):
                         ccf_coordinate_ap=Decimal("0.5"),
                         ccf_coordinate_ml=Decimal("0.5"),
                         ccf_coordinate_dv=Decimal("0.5"),
-                        ccf_coordinate_unit="um",
+                        ccf_coordinate_unit="μm",
                         ccf_version=None,
                         bregma_target_ap=Decimal("0.5"),
                         bregma_target_ml=Decimal("0.5"),
@@ -156,7 +156,7 @@ class TestSlimsSpimMapper(unittest.TestCase):
                         manipulator_x=Decimal("7610.0"),
                         manipulator_y=Decimal("9063.0"),
                         manipulator_z=Decimal("6703.0"),
-                        manipulator_unit="um",
+                        manipulator_unit="μm",
                         dye="DiI",
                     )
                 ],

@@ -5,13 +5,13 @@
       "columns": [
          {
             "name": "cntn_barCode",
-            "value": "BRN00000016",
+            "value": "740610",
             "datatype": "STRING",
             "title": "Barcode"
          },
          {
             "name": "cntn_cf_parentBarcode",
-            "value": "740610",
+            "value": "BRN00000017",
             "datatype": "STRING",
             "title": "Parent Barcode"
          },
@@ -35,6 +35,12 @@
          },
          {
             "name": "cntn_cf_parentBarcode",
+            "value": "744742_parent",
+            "datatype": "STRING",
+            "title": "Parent Barcode"
+         },
+         {
+            "name": "cntn_id",
             "value": "744742",
             "datatype": "STRING",
             "title": "Parent Barcode"

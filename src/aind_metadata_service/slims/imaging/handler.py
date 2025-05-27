@@ -76,9 +76,7 @@ class SlimsImagingHandler(SlimsTableHandler):
                 table_name = g.nodes[n]["table_name"]
                 row = g.nodes[n]["row"]
                 if table_name == "Content":
-                    n_subject_id = get_attr_or_none(
-                        row, "cntn_cf_parentBarcode"
-                    )
+                    n_subject_id = get_attr_or_none(row, "cntn_id")
                     n_specimen_id = get_attr_or_none(row, "cntn_barCode")
                     spim_data.subject_id = n_subject_id
                     spim_data.specimen_id = n_specimen_id
