@@ -199,6 +199,11 @@ class IacucProtocol(Enum, metaclass=EnumMeta):
     N_2113 = "2113"
     N_2115 = "2115"
     N_2010 = "2010"
+    N_2119 = "2119"
+    N_2204 = "2204"
+    N_2207 = "2207"
+    N_2308 = "2308"
+    N_2417 = "2427"
 
 
 class Protocol(Enum, metaclass=EnumMeta):
@@ -4685,9 +4690,23 @@ class NSBList(BaseModel, extra="allow"):
     author: Optional[str] = Field(
         default=None, alias="Author", title="Created By"
     )
-    # author id an editor id were removed. backwards compatibility
+    # author, author id an editor id were removed. backwards compatibility
     author_id: Optional[int] = Field(default=None, alias="AuthorId")
+    author_lookup_id: Optional[int] = Field(
+        default=None, alias="AuthorLookupId", title="Author Lookup Id"
+    )
     editor_id: Optional[int] = Field(default=None, alias="EditorId")
+    editor_lookup_id: Optional[int] = Field(
+        default=None, alias="EditorLookupId", title="Editor Lookup Id"
+    )
+    initial_surgeon_lookup_id: Optional[int] = Field(
+        default=None, alias="Test1LookupId", title="Test1 Lookup Id"
+    )
+    followup_surgeon_lookup_id: Optional[int] = Field(
+        default=None,
+        alias="TEST_x0020_1st_x0020_Round_x0020LookupId",
+        title="Test 1st Round Lookup Id",
+    )
     behavior: Annotated[Behavior, WrapValidator(optional_enum)] = Field(
         default=None, alias="Behavior", title="Behavior"
     )
