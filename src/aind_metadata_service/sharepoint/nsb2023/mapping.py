@@ -5414,7 +5414,6 @@ class MappedNSBList:
             NSBProcedure.SX_12__STEREOTAXIC__INJEC,
             NSBProcedure.SX_21__FIBER__OPTIC__IMPL,
             NSBProcedure.INJECTION_FIBER_OPTIC_IMP_,
-            NSBProcedure.DHC,
         }
 
     def has_cran_procedure(self) -> bool:
@@ -6096,6 +6095,7 @@ class MappedNSBList:
             headframe_procedure = Headframe.model_construct(
                 headframe_type=headpost_info.headframe_type,
                 headframe_part_number=headpost_info.headframe_part_number,
+                headframe_material=headpost_info.headframe_material,
                 well_type=headpost_info.well_type,
                 well_part_number=headpost_info.well_part_number,
             )

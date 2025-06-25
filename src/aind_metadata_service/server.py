@@ -390,10 +390,10 @@ async def retrieve_procedures(subject_id):
     Retrieves procedure info from SharePoint and Labtracks servers
     """
     sharepoint_client = SharePointClient.from_settings(sharepoint_settings)
-    # lb_client = LabTracksClient.from_settings(labtracks_settings)
-    # lb_response = await run_in_threadpool(
-    #     lb_client.get_procedures_info, subject_id=subject_id
-    # )
+    lb_client = LabTracksClient.from_settings(labtracks_settings)
+    lb_response = await run_in_threadpool(
+        lb_client.get_procedures_info, subject_id=subject_id
+    )
     sp2019_response = await run_in_threadpool(
         sharepoint_client.get_procedure_info,
         subject_id=subject_id,
@@ -429,7 +429,7 @@ async def retrieve_procedures(subject_id):
     # merge subject procedures
     merged_response = sharepoint_client.merge_responses(
         [
-            # lb_response,
+            lb_response,
             sp2019_response,
             sp2023_response,
             sp2025_response,
