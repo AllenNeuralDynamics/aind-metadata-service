@@ -76,7 +76,7 @@ class TestNSB2023Parsers(TestCase):
             raw_data = list_item[0]
             expected_mapped_data = list_item[1]
             raw_file_name = list_item[2]
-            logging.debug(f"Processing file: {raw_file_name}")
+            print(f"Processing file: {raw_file_name}")
             nsb_model = NSBList.model_validate(raw_data)
             mapper = MappedNSBList(nsb=nsb_model)
             mapped_procedure = mapper.get_procedure()
@@ -146,7 +146,7 @@ class TestNSB2023Parsers(TestCase):
             attr = getattr(cls, k)
             if isinstance(attr, property):
                 props.append(getattr(mapped_model, k))
-        self.assertEqual(313, len(props))
+        self.assertEqual(314, len(props))
 
     def test_parse_basic_float_str(self):
         """Tests parsing of basic float strings"""
@@ -197,6 +197,16 @@ class TestNSB2023Parsers(TestCase):
             well_part_number="0160-200-20",
         )
         self.assertEqual(exp_hp_info, hp_info)
+
+        hp_info = HeadPostInfo.from_hp_and_hp_type(
+            hp=HeadPost.DHC, hp_type=HeadPostType.DHC_WELL
+        )
+        exp_hp_info = HeadPostInfo(
+            headframe_type=HeadPost.DHC.value,
+            headframe_part_number="0160-100-57",
+            well_type=HeadPostType.DHC_WELL.value,
+            well_part_number="0160-075-01",
+        )
 
     def test_injection_edge_case(self):
         """Tests the case where there is an INJ procedure, but the inj types

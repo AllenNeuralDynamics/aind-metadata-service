@@ -16,6 +16,7 @@ from aind_data_schema.core.procedures import (
     CraniotomyType,
     FiberImplant,
     Headframe,
+    HeadframeMaterial,
     IontophoresisInjection,
     NanojectInjection,
     NonViralMaterial,
@@ -30,7 +31,10 @@ from aind_data_schema_models.organizations import Organization
 from pydantic import BaseModel
 
 from aind_metadata_service.models import IntendedMeasurementInformation
-from aind_metadata_service.sharepoint.nsb2023.models import NSBList
+from aind_metadata_service.sharepoint.nsb2023.models import (
+    IacucProtocol,
+    NSBList,
+)
 from aind_metadata_service.sharepoint.nsb2023.models import (
     Procedure as NSBProcedure,
 )
@@ -176,6 +180,7 @@ class HeadPostInfo:
 
     headframe_type: Optional[str] = None
     headframe_part_number: Optional[str] = None
+    headframe_material: Optional[HeadframeMaterial] = None
     well_type: Optional[str] = None
     well_part_number: Optional[str] = None
 
@@ -186,8 +191,10 @@ class HeadPostInfo:
     ):
         """Construct HeadPostInfo2023 from headpost and headpost_type"""
         # TODO: map part numbers for new headframe and well types
+        # TODO: map headframe material
         headframe_type = None if hp is None else hp.value
         well_type = None if hp_type is None else hp_type.value
+        headframe_material = None
         if hp == HeadPost.VISUAL_CTX:
             headframe_part_number = "0160-100-10"
         elif hp == HeadPost.WHC_NP:
@@ -198,6 +205,9 @@ class HeadPostInfo:
             headframe_part_number = "0160-100-46"
         elif hp == HeadPost.MOTOR_CTX:
             headframe_part_number = "0160-100-51"
+        elif hp == HeadPost.DHC:
+            headframe_part_number = "0160-100-57"
+            headframe_material = HeadframeMaterial.TITANIUM
         else:
             headframe_part_number = None
         if hp_type == HeadPostType.CAM:
@@ -210,6 +220,8 @@ class HeadPostInfo:
             well_part_number = "0160-055-08"
         elif hp_type == HeadPostType.WHC_2P:
             well_part_number = "0160-200-62"
+        elif hp_type == HeadPostType.DHC_WELL:
+            well_part_number = "0160-075-01"
         else:
             well_part_number = None
         return cls(
@@ -217,6 +229,7 @@ class HeadPostInfo:
             headframe_part_number=headframe_part_number,
             well_type=well_type,
             well_part_number=well_part_number,
+            headframe_material=headframe_material,
         )
 
 
@@ -3958,6 +3971,7 @@ class MappedNSBList:
                 self._nsb.craniotomy_type.N_5MM: CraniotomyType.FIVE_MM,
                 self._nsb.craniotomy_type.WHC_2_P: CraniotomyType.WHC,
                 self._nsb.craniotomy_type.WHC_NP: CraniotomyType.WHC,
+                self._nsb.craniotomy_type.DHC: CraniotomyType.DHC,
             }.get(self._nsb.craniotomy_type, None)
         )
 
@@ -4138,7 +4152,6 @@ class MappedNSBList:
     @property
     def aind_headpost(self) -> Optional[HeadPost]:
         """Maps headpost to aind model."""
-        # TODO: update mapping for DHC
         return (
             None
             if self._nsb.headpost is None
@@ -5190,40 +5203,40 @@ class MappedNSBList:
         )
 
     @property
-    def aind_protocol(self) -> Optional[Any]:
-        """Maps protocol to aind model."""
+    def aind_protocol(self) -> Optional[str]:
+        """Maps protocol to aind iacuc protocol."""
         return (
             None
             if self._nsb.protocol is None
             else {
                 self._nsb.protocol.SELECT: None,
-                self._nsb.protocol.N_2119__TRAINING_AND_QUAL: None,
-                self._nsb.protocol.N_2201__INTERROGATING_PRO: None,
-                self._nsb.protocol.N_2202__TESTING_AA_VS_IN: None,
-                self._nsb.protocol.N_2204__PRIMARY_NEURON_AN: None,
-                self._nsb.protocol.N_2205__OPTIMIZATION_AND: None,
-                self._nsb.protocol.N_2207__IN__VITRO__BRAIN: None,
-                self._nsb.protocol.N_2212__INVESTIGATING__BR: None,
-                self._nsb.protocol.N_2301__TESTING_OF_ENHANC: None,
-                self._nsb.protocol.N_2304__NEUROSURGERY__BEH: None,
-                self._nsb.protocol.N_2305__IN__VIVO__BRAIN: None,
-                self._nsb.protocol.N_2306__PATCH_SEQ_CHARACT: None,
-                self._nsb.protocol.N_2307__DISSECTING_THE_NE: None,
-                self._nsb.protocol.N_2308__INDUCTION_OF__IMM: None,
-                self._nsb.protocol.N_2401__THE_USE_OF_MICE_F: None,
-                self._nsb.protocol.N_2402__BRAIN__OBSERVATOR: None,
-                self._nsb.protocol.N_2403__ELECTROPHYSIOLOGY: None,
-                self._nsb.protocol.N_2405__ANALYSIS_OF__INTE: None,
-                self._nsb.protocol.N_2406__CHARACTERIZATION: None,
-                self._nsb.protocol.N_2410__VALIDATION_OF_BRA: None,
-                self._nsb.protocol.N_2412__CIRCUIT_TRACING_A: None,
-                self._nsb.protocol.N_2413__NEUROPHYSIOLOGY_O: None,
-                self._nsb.protocol.N_2414__ELECTROPHYSIOLOGI: None,
-                self._nsb.protocol.N_2415__OPTOPHYSIOLOGICAL: None,
-                self._nsb.protocol.N_2416__ANATOMICAL_ANALYS: None,
-                self._nsb.protocol.N_2417__CHARACTERIZATION: None,
-                self._nsb.protocol.N_2418__IN__VITRO__SINGLE: None,
-                self._nsb.protocol.N_2427__OPEN_SCOPE__MINDS: None,
+                self._nsb.protocol.N_2119__TRAINING_AND_QUAL: IacucProtocol.N_2119.value,
+                self._nsb.protocol.N_2201__INTERROGATING_PRO: IacucProtocol.N_2201.value,
+                self._nsb.protocol.N_2202__TESTING_AA_VS_IN: IacucProtocol.N_2202.value,
+                self._nsb.protocol.N_2204__PRIMARY_NEURON_AN: IacucProtocol.N_2204.value,
+                self._nsb.protocol.N_2205__OPTIMIZATION_AND: IacucProtocol.N_2205.value,
+                self._nsb.protocol.N_2207__IN__VITRO__BRAIN: IacucProtocol.N_2207.value,
+                self._nsb.protocol.N_2212__INVESTIGATING__BR: IacucProtocol.N_2212.value,
+                self._nsb.protocol.N_2301__TESTING_OF_ENHANC: IacucProtocol.N_2301.value,
+                self._nsb.protocol.N_2304__NEUROSURGERY__BEH: IacucProtocol.N_2304.value,
+                self._nsb.protocol.N_2305__IN__VIVO__BRAIN: IacucProtocol.N_2305.value,
+                self._nsb.protocol.N_2306__PATCH_SEQ_CHARACT: IacucProtocol.N_2306.value,
+                self._nsb.protocol.N_2307__DISSECTING_THE_NE: IacucProtocol.N_2307.value,
+                self._nsb.protocol.N_2308__INDUCTION_OF__IMM: IacucProtocol.N_2308.value,
+                self._nsb.protocol.N_2401__THE_USE_OF_MICE_F: IacucProtocol.N_2401.value,
+                self._nsb.protocol.N_2402__BRAIN__OBSERVATOR: IacucProtocol.N_2402.value,
+                self._nsb.protocol.N_2403__ELECTROPHYSIOLOGY: IacucProtocol.N_2403.value,
+                self._nsb.protocol.N_2405__ANALYSIS_OF__INTE: IacucProtocol.N_2405.value,
+                self._nsb.protocol.N_2406__CHARACTERIZATION: IacucProtocol.N_2406.value,
+                self._nsb.protocol.N_2410__VALIDATION_OF_BRA: IacucProtocol.N_2410.value,
+                self._nsb.protocol.N_2412__CIRCUIT_TRACING_A: IacucProtocol.N_2412.value,
+                self._nsb.protocol.N_2413__NEUROPHYSIOLOGY_O: IacucProtocol.N_2413.value,
+                self._nsb.protocol.N_2414__ELECTROPHYSIOLOGI: IacucProtocol.N_2414.value,
+                self._nsb.protocol.N_2415__OPTOPHYSIOLOGICAL: IacucProtocol.N_2415.value,
+                self._nsb.protocol.N_2416__ANATOMICAL_ANALYS: IacucProtocol.N_2416.value,
+                self._nsb.protocol.N_2417__CHARACTERIZATION: IacucProtocol.N_2417.value,
+                self._nsb.protocol.N_2418__IN__VITRO__SINGLE: IacucProtocol.N_2418.value,
+                self._nsb.protocol.N_2427__OPEN_SCOPE__MINDS: IacucProtocol.N_2427.value,
             }.get(self._nsb.protocol, None)
         )
 
@@ -5292,9 +5305,19 @@ class MappedNSBList:
         return self._nsb.test1
 
     @property
+    def aind_initial_surgeon_lookup_id(self) -> Optional[int]:
+        """Maps test1_lookup_id to aind model."""
+        return self._nsb.initial_surgeon_lookup_id
+
+    @property
     def aind_test_1st_round_x0020(self) -> Optional[str]:
         """Maps test_1st_round_x0020 to aind model."""
         return self._nsb.test_1st_round_x0020
+
+    @property
+    def aind_followup_surgeon_lookup_id(self) -> Optional[int]:
+        """Maps followup_surgeon_lookup_id to aind model."""
+        return self._nsb.followup_surgeon_lookup_id
 
     @property
     def aind_thermistor(self) -> Optional[Any]:
@@ -5368,16 +5391,12 @@ class MappedNSBList:
         )
 
     # Additional Properties
-    @property
-    def aind_experimenter_full_name(self) -> str:
-        """Map author id to experimenter name"""
-        return (
-            "NSB"
-            if self.aind_author_id is None
-            else f"NSB-{self.aind_author_id}"
-        )
+    @staticmethod
+    def aind_experimenter_full_name(surgeon_id: Optional[str]) -> str:
+        """Map surgeon to experimenter name"""
+        return "NSB" if surgeon_id is None else f"NSB-{surgeon_id}"
 
-    # TODO: support new Procedures (DHC, EMG Array, Grid Injections, Testes, Oviduct)
+    # TODO: support new Procedures (EMG Array, Grid Injections, Testes, Oviduct)
     def has_hp_procedure(self) -> bool:
         """Is there a headpost procedure?"""
         return self.aind_procedure in {
@@ -5395,6 +5414,7 @@ class MappedNSBList:
             NSBProcedure.SX_12__STEREOTAXIC__INJEC,
             NSBProcedure.SX_21__FIBER__OPTIC__IMPL,
             NSBProcedure.INJECTION_FIBER_OPTIC_IMP_,
+            NSBProcedure.DHC,
         }
 
     def has_cran_procedure(self) -> bool:
@@ -5425,6 +5445,7 @@ class MappedNSBList:
             NSBProcedure.INJ_MOTOR_CTX_2_P,
             NSBProcedure.GRID_INJ_6_OR_9_MOTOR_C,
             NSBProcedure.INJ_WHC_NP,
+            NSBProcedure.DHC,
         }
 
     def surgery_during_info(
@@ -5970,13 +5991,23 @@ class MappedNSBList:
         initial_start_date = self.aind_date_of_surgery
         initial_animal_weight_prior = self.aind_weight_before_surger
         initial_animal_weight_post = self.aind_weight_after_surgery
+        initial_surgeon = self.aind_experimenter_full_name(
+            surgeon_id=self.aind_initial_surgeon_lookup_id
+        )
 
         followup_start_date = self.aind_date1st_injection
         followup_animal_weight_prior = self.aind_first_injection_weight_be
         followup_animal_weight_post = self.aind_first_injection_weight_af
+        followup_surgeon = self.aind_experimenter_full_name(
+            surgeon_id=self.aind_followup_surgeon_lookup_id
+        )
 
-        experimenter_full_name = self.aind_experimenter_full_name
-        iacuc_protocol = self.aind_iacuc_protocol
+        # Iacuc protocol & protocol field merged
+        iacuc_protocol = (
+            self.aind_iacuc_protocol
+            if self.aind_iacuc_protocol
+            else self.aind_protocol
+        )
 
         # The if statements below will override these Nones with something proper hopefully
         initial_anaesthesia = None
@@ -6000,6 +6031,7 @@ class MappedNSBList:
             headframe_procedure = Headframe.model_construct(
                 headframe_type=headpost_info.headframe_type,
                 headframe_part_number=headpost_info.headframe_part_number,
+                headframe_material=headpost_info.headframe_material,
                 well_type=headpost_info.well_type,
                 well_part_number=headpost_info.well_part_number,
             )
@@ -6237,7 +6269,7 @@ class MappedNSBList:
             self.assign_fiber_probe_names(initial_procedures)
             initial_surgery = Surgery.model_construct(
                 start_date=initial_start_date,
-                experimenter_full_name=experimenter_full_name,
+                experimenter_full_name=initial_surgeon,
                 iacuc_protocol=iacuc_protocol,
                 animal_weight_prior=initial_animal_weight_prior,
                 animal_weight_post=initial_animal_weight_post,
@@ -6251,7 +6283,7 @@ class MappedNSBList:
             self.assign_fiber_probe_names(followup_procedures)
             followup_surgery = Surgery.model_construct(
                 start_date=followup_start_date,
-                experimenter_full_name=experimenter_full_name,
+                experimenter_full_name=followup_surgeon,
                 iacuc_protocol=iacuc_protocol,
                 animal_weight_prior=followup_animal_weight_prior,
                 animal_weight_post=followup_animal_weight_post,
@@ -6267,7 +6299,7 @@ class MappedNSBList:
             self.assign_fiber_probe_names(other_procedures)
             other_surgery = Surgery.model_construct(
                 start_date=None,
-                experimenter_full_name=experimenter_full_name,
+                experimenter_full_name="NSB",
                 iacuc_protocol=iacuc_protocol,
                 animal_weight_prior=None,
                 animal_weight_post=None,
