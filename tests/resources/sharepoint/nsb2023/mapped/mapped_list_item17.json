@@ -1,7 +1,7 @@
 [
   {
     "start_date": "2022-01-03",
-    "experimenter_full_name": "NSB-187",
+    "experimenter_full_name": "NSB-2846",
     "iacuc_protocol": "2103",
     "animal_weight_prior": "25.2",
     "animal_weight_post": "28.2",
@@ -94,7 +94,7 @@
   },
   {
     "start_date": null,
-    "experimenter_full_name": "NSB-187",
+    "experimenter_full_name": "NSB",
     "iacuc_protocol": "2103",
     "animal_weight_prior": null,
     "animal_weight_post": null,
@@ -179,7 +179,7 @@
   },
   {
     "start_date": null,
-    "experimenter_full_name": "NSB-187",
+    "experimenter_full_name": "NSB",
     "iacuc_protocol": "2103",
     "animal_weight_prior": null,
     "animal_weight_post": null,
