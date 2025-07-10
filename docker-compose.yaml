@@ -1,13 +1,12 @@
 services:
-  fastapi:
-    build: .
+  aind-metadata-service-local:
+    build: ./aind-metadata-service-server
     ports:
-      - "5000:5000"
-      - "58350:58350"
+      - "5000:80"
+    expose:
+      - "5000"
     depends_on:
-      - redis
-    env_file: "env/webapp.env"
-  redis:
-    image: "redis:latest"
-    ports:
-      - "6379:6379"
+      - labtracks
+  labtracks:
+    image: "ghcr.io/allenneuraldynamics/aind-labtracks-service-server:0.2.3"
+    env_file: "env/labtracks.env"
