@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     labtracks_host: HttpUrl = Field(
         ..., description="Host address for labtracks endpoint"
     )
+    smartsheet_host: HttpUrl = Field(
+        ..., description="Host address for smartsheet endpoint"
+    )
 
 
 def get_settings():

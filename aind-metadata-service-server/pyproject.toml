@@ -92,5 +92,6 @@ fail-under = 100
 asyncio_mode="auto"
 asyncio_default_fixture_loop_scope="function"
 env = [
-    "AIND_METADATA_SERVICE_LABTRACKS_HOST=http://example.com/labtracks"
+    "AIND_METADATA_SERVICE_LABTRACKS_HOST=http://example.com/labtracks",
+    AIND_METADATA_SERVICE_LABTRACKS_HOST="http://example.com/smartsheet"
 ]
