@@ -1,19 +1,8 @@
 """Module to handle responses"""
 
 import json
-import logging
 from typing import Generic, List, Optional, TypeVar, Union
 
-from aind_data_schema.core.instrument import Instrument
-from aind_data_schema.core.procedures import (
-    NonViralMaterial,
-    Perfusion,
-    Procedures,
-    Surgery,
-    ViralMaterial,
-)
-from aind_data_schema.core.rig import Rig
-from aind_data_schema.core.session import Session
 from aind_data_schema.core.subject import Subject
 from aind_data_schema_models.pid_names import PIDName
 from fastapi import Response
@@ -166,7 +155,6 @@ class ModelResponse(Generic[T]):
                 validation_errors = []
                 for model in self.aind_models:
                     error = self._validate_model(model)
-                    logging.error(error)
                     if error:
                         validation_errors.append(error)
 

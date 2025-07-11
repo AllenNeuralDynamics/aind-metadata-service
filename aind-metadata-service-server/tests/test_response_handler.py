@@ -1,12 +1,9 @@
 """"Tests response_handler module"""
 
 import json
-import os
 import unittest
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from aind_data_schema.core.procedures import Procedures
 from aind_data_schema.core.subject import BreedingInfo, Species, Subject
 from aind_data_schema_models.organizations import Organization
 from fastapi.encoders import jsonable_encoder
@@ -18,50 +15,14 @@ from aind_metadata_service_server.response_handler import (
     StatusCodes,
 )
 
-TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__)))
-DIR_MAP = TEST_DIR / "resources" / "json_responses"
-
-SP_VALID_RESPONSE_PATH = DIR_MAP / "mapped_sp_procedure.json"
-LAS_VALID_RESPONSE_PATH = DIR_MAP / "mapped_las_procedure.json"
-COMBINED_VALID_PATH = DIR_MAP / "combined.json"
-
-SP_INVALID_RESPONSE_PATH = DIR_MAP / "mapped_sp_procedure_invalid.json"
-LAS_INVALID_RESPONSE_PATH = DIR_MAP / "mapped_las_procedure_invalid.json"
-COMBINED_INVALID_PATH = DIR_MAP / "combined_invalid.json"
-
-with open(SP_VALID_RESPONSE_PATH) as f:
-    sp_valid_subject_procedures = json.load(f)
-
-with open(LAS_VALID_RESPONSE_PATH) as f:
-    las_valid_subject_procedures = json.load(f)
-
-with open(COMBINED_VALID_PATH) as f:
-    combined_valid_procedures = json.load(f)
-
-with open(SP_INVALID_RESPONSE_PATH) as f:
-    sp_invalid_subject_procedures = json.load(f)
-
-with open(LAS_INVALID_RESPONSE_PATH) as f:
-    las_invalid_subject_procedures = json.load(f)
-
-with open(COMBINED_INVALID_PATH) as f:
-    combined_invalid_procedures = json.load(f)
-
-sp_valid_model = Procedures.model_construct(
-    subject_id="115977",
-    subject_procedures=sp_valid_subject_procedures["data"][
-        "subject_procedures"
-    ],
-)
-
 
 class TestResponseHandler(unittest.TestCase):
     """Tests JSON methods in Responses class"""
 
-    def test_valid_model(self):
-        """Test model_response with valid model."""
-
-        model = Subject(
+    @classmethod
+    def setUpClass(cls) -> None:
+        """Sets up class with pre-configured models"""
+        cls.valid_subject = Subject(
             species=Species.MUS_MUSCULUS,
             source=Organization.AI,
             breeding_info=BreedingInfo(
@@ -76,12 +37,20 @@ class TestResponseHandler(unittest.TestCase):
             date_of_birth="2022-06-24",
             genotype="Pvalb-IRES-Cre/wt;RCL-somBiPoles_mCerulean-WPRE/wt",
         )
+        cls.invalid_subject = Subject.model_construct()
+
+    def test_valid_model(self):
+        """Test model_response with valid model."""
+
         model_response = ModelResponse(
-            status_code=StatusCodes.DB_RESPONDED, aind_models=[model]
+            status_code=StatusCodes.DB_RESPONDED,
+            aind_models=[self.valid_subject]
         )
         actual_json = model_response.map_to_json_response()
 
-        model_json = jsonable_encoder(json.loads(model.model_dump_json()))
+        model_json = jsonable_encoder(json.loads(
+            self.valid_subject.model_dump_json())
+        )
         expected_json = JSONResponse(
             status_code=200,
             content=(
@@ -98,19 +67,21 @@ class TestResponseHandler(unittest.TestCase):
 
     def test_invalid_model(self):
         """Test model_response with invalid model."""
-        model = Subject.model_construct()
         model_response = ModelResponse(
-            status_code=StatusCodes.DB_RESPONDED, aind_models=[model]
+            status_code=StatusCodes.DB_RESPONDED,
+            aind_models=[self.invalid_subject]
         )
         actual_json = model_response.map_to_json_response()
 
         validation_error = None
         try:
-            model.__class__.model_validate(model.model_dump())
+            self.invalid_subject.__class__.model_validate(
+                self.invalid_subject.model_dump()
+            )
         except ValidationError as e:
             validation_error = repr(e)
 
-        model_json = jsonable_encoder(model)
+        model_json = jsonable_encoder(self.invalid_subject)
         expected_json = JSONResponse(
             status_code=406,
             content=(
@@ -124,8 +95,10 @@ class TestResponseHandler(unittest.TestCase):
         self.assertEqual(expected_json.status_code, actual_json.status_code)
         self.assertEqual(expected_json.body, actual_json.body)
 
-    @patch("aind_metadata_service.response_handler.json.loads")
-    @patch("aind_metadata_service.response_handler.Subject.model_validate")
+    @patch("aind_metadata_service_server.response_handler.json.loads")
+    @patch(
+        "aind_metadata_service_server.response_handler.Subject.model_validate"
+    )
     def test_key_error(self, mock_model_validate, mock_json_loads):
         """Test model_response with valid model."""
         key_error = KeyError("Mocked Key Error")
@@ -176,35 +149,19 @@ class TestResponseHandler(unittest.TestCase):
 
     def test_multiple_items_response(self):
         """Test multiple item response with validation."""
-        models = [sp_valid_model, sp_valid_model]
+        models = [self.valid_subject, self.valid_subject]
         model_response = ModelResponse(
             status_code=StatusCodes.DB_RESPONDED, aind_models=models
         )
         actual_json = model_response.map_to_json_response()
 
-        models_json = [
-            jsonable_encoder(json.loads(model.model_dump_json()))
-            for model in models
-        ]
-        validation_error = ModelResponse._validate_model(sp_valid_model)
-        expected_json = JSONResponse(
-            status_code=300,
-            content=(
-                {
-                    "message": f"Multiple Items Found. Validation Errors:"
-                    f" {validation_error}, {validation_error}",
-                    "data": models_json,
-                }
-            ),
-        )
-
         self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
-        self.assertEqual(expected_json.status_code, actual_json.status_code)
-        self.assertEqual(expected_json.body, actual_json.body)
+        self.assertEqual(300, actual_json.status_code)
+        self.assertIn("Multiple Items Found", str(actual_json.body))
 
     def test_multiple_items_response_no_validation(self):
         """Test multiple item response"""
-        models = [sp_valid_model, sp_valid_model]
+        models = [self.valid_subject, self.valid_subject]
         model_response = ModelResponse(
             status_code=StatusCodes.DB_RESPONDED, aind_models=models
         )

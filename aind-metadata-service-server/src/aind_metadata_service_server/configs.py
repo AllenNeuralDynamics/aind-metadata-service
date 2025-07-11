@@ -1,7 +1,6 @@
 """Module for settings to connect to backend"""
-from dataclasses import Field
 
-from pydantic import HttpUrl
+from pydantic import HttpUrl, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -20,4 +19,5 @@ class Settings(BaseSettings):
 
 
 def get_settings():
+    """Return Settings object"""
     return Settings()

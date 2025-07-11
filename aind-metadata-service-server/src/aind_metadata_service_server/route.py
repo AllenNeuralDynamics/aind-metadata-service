@@ -1,13 +1,12 @@
 """Module to handle endpoint responses"""
 
-from typing import List
-
 import aind_labtracks_service_async_client
-from aind_data_schema.core.subject import Subject
 from fastapi import APIRouter, Path, status
 
 from aind_metadata_service_server.mappers.subject import SubjectMapper
 from aind_metadata_service_server.models import HealthCheck
+from aind_metadata_service_server.response_handler import ModelResponse, \
+    StatusCodes
 
 router = APIRouter()
 
@@ -31,8 +30,7 @@ def get_health() -> HealthCheck:
 
 
 @router.get(
-    "/subject/{subject_id}",
-    response_model=List[Subject],
+    "/subject/{subject_id}"
 )
 async def get_subject(subject_id: str = Path(..., examples=["632269"])):
     """
@@ -53,4 +51,9 @@ async def get_subject(subject_id: str = Path(..., examples=["632269"])):
         SubjectMapper(labtracks_subject=s).map_to_aind_subject()
         for s in api_response
     ]
-    return subjects
+    response_handler = ModelResponse(
+        aind_models=subjects,
+        status_code=StatusCodes.DB_RESPONDED
+    )
+    response = response_handler.map_to_json_response()
+    return response
