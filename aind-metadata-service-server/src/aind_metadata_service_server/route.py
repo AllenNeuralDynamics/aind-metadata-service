@@ -32,7 +32,18 @@ def get_health() -> HealthCheck:
 
 
 @router.get("/subject/{subject_id}")
-async def get_subject(subject_id: str = Path(..., examples=["632269"])):
+async def get_subject(
+    subject_id: str = Path(
+        ...,
+        openapi_examples={
+            "default": {
+                "summary": "A sample subject ID",
+                "description": "Example subject ID for LabTracks",
+                "value": "632269",
+            }
+        },
+    )
+):
     """
     ## Subject
     Return Subject metadata.

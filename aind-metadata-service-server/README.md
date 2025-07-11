@@ -7,7 +7,7 @@
 ![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen?logo=codecov)
 ![Python](https://img.shields.io/badge/python->=3.10-blue?logo=python)
 
-REST service to retrieve data from an backends.
+REST service to retrieve data from backends.
 
 ## Local Development
 

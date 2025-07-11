@@ -15,7 +15,7 @@ log_level = os.getenv("LOG_LEVEL", "INFO")
 logging.basicConfig(level=log_level)
 
 description = """
-## aind-service-template
+## aind-metadata-service
 
 Service to pull data from example backend.
 
