@@ -5,8 +5,10 @@ from fastapi import APIRouter, Path, status
 
 from aind_metadata_service_server.mappers.subject import SubjectMapper
 from aind_metadata_service_server.models import HealthCheck
-from aind_metadata_service_server.response_handler import ModelResponse, \
-    StatusCodes
+from aind_metadata_service_server.response_handler import (
+    ModelResponse,
+    StatusCodes,
+)
 
 router = APIRouter()
 
@@ -29,9 +31,7 @@ def get_health() -> HealthCheck:
     return HealthCheck()
 
 
-@router.get(
-    "/subject/{subject_id}"
-)
+@router.get("/subject/{subject_id}")
 async def get_subject(subject_id: str = Path(..., examples=["632269"])):
     """
     ## Subject
@@ -52,8 +52,7 @@ async def get_subject(subject_id: str = Path(..., examples=["632269"])):
         for s in api_response
     ]
     response_handler = ModelResponse(
-        aind_models=subjects,
-        status_code=StatusCodes.DB_RESPONDED
+        aind_models=subjects, status_code=StatusCodes.DB_RESPONDED
     )
     response = response_handler.map_to_json_response()
     return response

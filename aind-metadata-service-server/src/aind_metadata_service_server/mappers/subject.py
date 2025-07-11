@@ -1,3 +1,5 @@
+"""Maps information to aind-data-schema Subject model."""
+
 from decimal import Decimal
 from typing import Optional
 
@@ -17,8 +19,15 @@ from pydantic import ValidationError
 
 
 class SubjectMapper:
+    """Class to handle mapping of data."""
 
     def __init__(self, labtracks_subject: LabTracksSubject):
+        """
+        Class constructor.
+        Parameters
+        ----------
+        labtracks_subject :  LabTracksSubject
+        """
         self.labtracks_subject = labtracks_subject
 
     @staticmethod
@@ -121,6 +130,12 @@ class SubjectMapper:
             return None
 
     def _map_breeding_info(self) -> Optional[BreedingInfo]:
+        """
+        Map to BreedingInfo
+        Returns
+        -------
+        Optional[BreedingInfo]
+        """
         labtracks_subject = self.labtracks_subject
         breeding_group = labtracks_subject.group_name
         paternal_id = labtracks_subject.paternal_id
@@ -164,6 +179,15 @@ class SubjectMapper:
             return None
 
     def map_to_aind_subject(self) -> Subject:
+        """
+        Map information to aind-data-schema Subject. Will attempt to return
+        a valid model. If there are any validation errors, then an invalid
+        model will be returned.
+        Returns
+        -------
+        Subject
+
+        """
         # LabTracksSubject
         labtracks_subject = self.labtracks_subject
         subject_id = labtracks_subject.id

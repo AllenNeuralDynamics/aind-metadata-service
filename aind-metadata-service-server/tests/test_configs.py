@@ -4,7 +4,7 @@ import os
 import unittest
 from unittest.mock import patch
 
-from aind_metadata_service_server.configs import Settings
+from aind_metadata_service_server.configs import Settings, get_settings
 
 
 class TestSettings(unittest.TestCase):
@@ -14,14 +14,14 @@ class TestSettings(unittest.TestCase):
         os.environ,
         {
             "AIND_METADATA_SERVICE_LABTRACKS_HOST": (
-                    "http://example.com/labtracks"
+                "http://example.com/labtracks"
             )
         },
-        clear=True
+        clear=True,
     )
     def test_get_settings(self):
         """Tests settings can be set via env vars"""
-        settings = Settings()
+        settings = get_settings()
         expected_settings = Settings(
             labtracks_host="http://example.com/labtracks"
         )

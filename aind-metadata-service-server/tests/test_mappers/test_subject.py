@@ -169,6 +169,22 @@ class TestSubjectMapper(unittest.TestCase):
         )
         self.assertEqual(expected_subject, aind_subject)
 
+    def test_map_to_aind_invalid_subject(self):
+        """Tests _map_to_aind_subject method when there is incomplete info."""
+        subject = LabtrackSubject(
+            id="123",
+        )
+        mapper = SubjectMapper(subject)
+        aind_subject = mapper.map_to_aind_subject()
+        expected_subject = Subject.model_construct(
+            subject_id="123",
+            source=Organization.OTHER,
+            species=None,
+            sex=None,
+            date_of_birth=None,
+        )
+        self.assertEqual(expected_subject, aind_subject)
+
 
 if __name__ == "__main__":
     unittest.main()

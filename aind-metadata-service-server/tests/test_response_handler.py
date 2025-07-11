@@ -1,4 +1,4 @@
-""""Tests response_handler module"""
+""" "Tests response_handler module"""
 
 import json
 import unittest
@@ -44,12 +44,12 @@ class TestResponseHandler(unittest.TestCase):
 
         model_response = ModelResponse(
             status_code=StatusCodes.DB_RESPONDED,
-            aind_models=[self.valid_subject]
+            aind_models=[self.valid_subject],
         )
         actual_json = model_response.map_to_json_response()
 
-        model_json = jsonable_encoder(json.loads(
-            self.valid_subject.model_dump_json())
+        model_json = jsonable_encoder(
+            json.loads(self.valid_subject.model_dump_json())
         )
         expected_json = JSONResponse(
             status_code=200,
@@ -69,7 +69,7 @@ class TestResponseHandler(unittest.TestCase):
         """Test model_response with invalid model."""
         model_response = ModelResponse(
             status_code=StatusCodes.DB_RESPONDED,
-            aind_models=[self.invalid_subject]
+            aind_models=[self.invalid_subject],
         )
         actual_json = model_response.map_to_json_response()
 
@@ -159,6 +159,19 @@ class TestResponseHandler(unittest.TestCase):
         self.assertEqual(300, actual_json.status_code)
         self.assertIn("Multiple Items Found", str(actual_json.body))
 
+    def test_multiple_items_response_invalid_record(self):
+        """Test multiple item response with valid and invalid record."""
+        models = [self.valid_subject, self.invalid_subject]
+        model_response = ModelResponse(
+            status_code=StatusCodes.DB_RESPONDED, aind_models=models
+        )
+        actual_json = model_response.map_to_json_response()
+
+        self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
+        self.assertEqual(300, actual_json.status_code)
+        self.assertIn("Multiple Items Found", str(actual_json.body))
+        self.assertIn("Validation Errors:", str(actual_json.body))
+
     def test_multiple_items_response_no_validation(self):
         """Test multiple item response"""
         models = [self.valid_subject, self.valid_subject]
@@ -186,25 +199,31 @@ class TestResponseHandler(unittest.TestCase):
         self.assertEqual(expected_json.status_code, actual_json.status_code)
         self.assertEqual(expected_json.body, actual_json.body)
 
-    def test_nodata_error(self):
+    def test_multi_status_response(self):
+        """Test multi status response."""
+        models = [self.valid_subject]
+        model_response = ModelResponse(
+            status_code=StatusCodes.MULTI_STATUS, aind_models=models
+        )
+        actual_json = model_response.map_to_json_response()
+
+        self.assertEqual(StatusCodes.MULTI_STATUS, model_response.status_code)
+        self.assertEqual(207, actual_json.status_code)
+        self.assertIn(
+            "There was an error retrieving records", str(actual_json.body)
+        )
+
+    def test_no_data_error(self):
         """Test no data error response"""
         model_response = ModelResponse(
             status_code=StatusCodes.DB_RESPONDED, aind_models=[]
         )
         actual_json = model_response.map_to_json_response()
-
-        expected_json = JSONResponse(
-            status_code=404,
-            content=(
-                {
-                    "message": "No Data Found.",
-                    "data": None,
-                }
-            ),
+        expected_json = (
+            ModelResponse.no_data_found_error_response().map_to_json_response()
         )
-        self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
-        self.assertEqual(expected_json.status_code, actual_json.status_code)
         self.assertEqual(expected_json.body, actual_json.body)
+        self.assertEqual(StatusCodes.DB_RESPONDED, model_response.status_code)
 
     def test_connection_error(self):
         """Test connection error response"""
