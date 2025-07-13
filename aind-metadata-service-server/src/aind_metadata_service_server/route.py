@@ -1,8 +1,10 @@
 """Module to handle endpoint responses"""
 
 import aind_labtracks_service_async_client
-from fastapi import APIRouter, Path, status
+import aind_mgi_service_async_client
+from fastapi import APIRouter, Depends, Path, status
 
+from aind_metadata_service_server.configs import Settings, get_settings
 from aind_metadata_service_server.mappers.subject import SubjectMapper
 from aind_metadata_service_server.models import HealthCheck
 from aind_metadata_service_server.response_handler import (
@@ -42,26 +44,47 @@ async def get_subject(
                 "value": "632269",
             }
         },
-    )
+    ),
+    settings: Settings = Depends(get_settings),
 ):
     """
     ## Subject
     Return Subject metadata.
     """
-    configuration = aind_labtracks_service_async_client.Configuration(
+    labtracks_config = aind_labtracks_service_async_client.Configuration(
         host="http://labtracks"
     )
     async with aind_labtracks_service_async_client.ApiClient(
-        configuration
+        labtracks_config
     ) as api_client:
         api_instance = aind_labtracks_service_async_client.DefaultApi(
             api_client
         )
-        api_response = await api_instance.get_subject(subject_id)
-    subjects = [
-        SubjectMapper(labtracks_subject=s).map_to_aind_subject()
-        for s in api_response
+        labtracks_response = await api_instance.get_subject(subject_id)
+
+    mappers = [
+        SubjectMapper(labtracks_subject=labtracks_subject)
+        for labtracks_subject in labtracks_response
     ]
+
+    mgi_config = aind_mgi_service_async_client.Configuration(
+        host="http://mgi"
+    )
+    async with aind_mgi_service_async_client.ApiClient(
+        mgi_config
+    ) as api_client:
+        api_instance = aind_mgi_service_async_client.DefaultApi(api_client)
+        for mapper in mappers:
+            mgi_info = []
+            allele_names = mapper.get_allele_names_from_genotype()
+            for allele_name in allele_names:
+                api_response = await api_instance.get_allele_info(
+                    allele_name=allele_name
+                )
+                mgi_info.extend(api_response)
+            mapper.mgi_info = mgi_info
+
+    subjects = [mapper.map_to_aind_subject() for mapper in mappers]
     response_handler = ModelResponse(
         aind_models=subjects, status_code=StatusCodes.DB_RESPONDED
     )

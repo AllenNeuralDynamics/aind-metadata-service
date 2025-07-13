@@ -41,8 +41,9 @@ class TestRoute:
                         "Pvalb-IRES-Cre/wt;RCL-somBiPoles_mCerulean-WPRE/wt"
                     ),
                     phenotype=(
-                        "P19: TSTW. Small body, large head, slightly dehydrated. "
-                        "3.78g. P22: 5.59g. P26: 8.18g. Normal body proportions. "
+                        "P19: TSTW. Small body, large head, slightly "
+                        "dehydrated. 3.78g. P22: 5.59g. P26: 8.18g. "
+                        "Normal body proportions. "
                     ),
                 ),
                 sex="F",
