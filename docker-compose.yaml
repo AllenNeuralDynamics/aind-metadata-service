@@ -7,6 +7,10 @@ services:
       - "5000"
     depends_on:
       - labtracks
+      - mgi
+    env_file: "env/webapp.env"
   labtracks:
     image: "ghcr.io/allenneuraldynamics/aind-labtracks-service-server:0.2.3"
     env_file: "env/labtracks.env"
+  mgi:
+    image: "ghcr.io/allenneuraldynamics/aind-mgi-service-server:0.1.2"
