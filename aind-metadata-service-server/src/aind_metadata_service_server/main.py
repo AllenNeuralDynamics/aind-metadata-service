@@ -10,6 +10,7 @@ from fastapi.routing import APIRoute
 from aind_metadata_service_server import __version__ as service_version
 from aind_metadata_service_server.routes.healthcheck import router as hc_route
 from aind_metadata_service_server.routes.subject import router as su_route
+from aind_metadata_service_server.routes.perfusions import router as pe_route
 
 # The log level can be set by adding an environment variable before launch.
 log_level = os.getenv("LOG_LEVEL", "INFO")
@@ -39,6 +40,7 @@ app.add_middleware(
 )
 app.include_router(hc_route)
 app.include_router(su_route)
+app.include_router(pe_route)
 
 # Clean up the methods names that is generated in the client code
 for route in app.routes:
