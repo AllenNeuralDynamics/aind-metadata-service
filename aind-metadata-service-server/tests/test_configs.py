@@ -15,7 +15,8 @@ class TestSettings(unittest.TestCase):
         {
             "AIND_METADATA_SERVICE_LABTRACKS_HOST": (
                 "http://example.com/labtracks"
-            )
+            ),
+            "AIND_METADATA_SERVICE_MGI_HOST": ("http://example.com/mgi"),
         },
         clear=True,
     )
@@ -23,7 +24,8 @@ class TestSettings(unittest.TestCase):
         """Tests settings can be set via env vars"""
         settings = get_settings()
         expected_settings = Settings(
-            labtracks_host="http://example.com/labtracks"
+            labtracks_host="http://example.com/labtracks",
+            mgi_host="http://example.com/mgi",
         )
         self.assertEqual(expected_settings, settings)
 

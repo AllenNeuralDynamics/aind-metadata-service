@@ -17,7 +17,8 @@ readme = "README.md"
 dynamic = ["version"]
 
 dependencies = [
-    'aind-labtracks-service-async-client',
+    'aind-labtracks-service-async-client>=0.2.4',
+    'aind-mgi-service-async-client>=0.1.2',
     'aind-data-schema==1.4.0',
     'aind-data-schema-models==0.7.5',
     'pydantic>=2.0',
@@ -38,6 +39,7 @@ dev = [
     'pytest-env',
     'pytest-mock',
     'pytest_asyncio',
+    'pytest-httpx'
 ]
 
 [tool.setuptools.packages.find]
@@ -92,5 +94,6 @@ fail-under = 100
 asyncio_mode="auto"
 asyncio_default_fixture_loop_scope="function"
 env = [
-    "AIND_METADATA_SERVICE_LABTRACKS_HOST=http://example.com/labtracks"
+    "AIND_METADATA_SERVICE_LABTRACKS_HOST=http://example.com/labtracks",
+    "AIND_METADATA_SERVICE_MGI_HOST=http://example.com/mgi"
 ]

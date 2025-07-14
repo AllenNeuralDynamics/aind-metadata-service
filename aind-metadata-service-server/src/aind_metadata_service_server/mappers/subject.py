@@ -1,7 +1,8 @@
 """Maps information to aind-data-schema Subject model."""
 
+import re
 from decimal import Decimal
-from typing import Optional
+from typing import List, Optional
 
 from aind_data_schema.core.subject import (
     BackgroundStrain,
@@ -11,17 +12,24 @@ from aind_data_schema.core.subject import (
     Subject,
 )
 from aind_data_schema_models.organizations import Organization
+from aind_data_schema_models.pid_names import PIDName
+from aind_data_schema_models.registries import Registry
 from aind_data_schema_models.species import Species
 from aind_labtracks_service_async_client.models.subject import (
     Subject as LabTracksSubject,
 )
+from aind_mgi_service_async_client.models import MgiSummaryRow
 from pydantic import ValidationError
 
 
 class SubjectMapper:
     """Class to handle mapping of data."""
 
-    def __init__(self, labtracks_subject: LabTracksSubject):
+    def __init__(
+        self,
+        labtracks_subject: LabTracksSubject,
+        mgi_info: List[MgiSummaryRow] = (),
+    ):
         """
         Class constructor.
         Parameters
@@ -29,6 +37,45 @@ class SubjectMapper:
         labtracks_subject :  LabTracksSubject
         """
         self.labtracks_subject = labtracks_subject
+        self.mgi_info = list(mgi_info)
+
+    @staticmethod
+    def _map_allele_info_to_pid_name(
+        mgi_summary_row: MgiSummaryRow,
+    ) -> Optional[PIDName]:
+        """
+        Map MgiSummaryRow to a PIDName
+        Parameters
+        ----------
+        mgi_summary_row : MgiSummaryRow
+
+        Returns
+        -------
+        Optional[PIDName]
+
+        """
+
+        detail_uri_pattern = re.compile(r"/allele/MGI:(\d+)")
+        if mgi_summary_row.detail_uri is not None and re.match(
+            detail_uri_pattern, mgi_summary_row.detail_uri
+        ):
+            registry_identifier = re.match(
+                detail_uri_pattern, mgi_summary_row.detail_uri
+            ).group(1)
+        else:
+            registry_identifier = None
+        if (
+            mgi_summary_row.stars == "****"
+            and mgi_summary_row.best_match_type == "Synonym"
+        ):
+            return PIDName(
+                name=mgi_summary_row.symbol,
+                abbreviation=None,
+                registry=Registry.MGI,
+                registry_identifier=registry_identifier,
+            )
+        else:
+            return None
 
     @staticmethod
     def _map_sex(sex: Optional[str]) -> Optional[Sex]:
@@ -178,6 +225,31 @@ class SubjectMapper:
         else:
             return None
 
+    def _map_genotype(self) -> Optional[str]:
+        """Maps LabtracksSubject class values to a genotype."""
+        if self.labtracks_subject.class_values:
+            genotype = self.labtracks_subject.class_values.full_genotype
+        else:
+            genotype = None
+        return genotype
+
+    def get_allele_names_from_genotype(self) -> List[str]:
+        """
+        Maps a genotype to list of allele names
+
+        Returns
+        -------
+        List[str]
+
+        """
+        genotype = self._map_genotype()
+        if genotype is None:
+            filtered_alleles = []
+        else:
+            alleles = re.split("[; /]", genotype)
+            filtered_alleles = [a for a in alleles if a not in ["", "wt"]]
+        return filtered_alleles
+
     def map_to_aind_subject(self) -> Subject:
         """
         Map information to aind-data-schema Subject. Will attempt to return
@@ -202,15 +274,18 @@ class SubjectMapper:
             room_id=labtracks_subject.room_id,
             cage_id=labtracks_subject.cage_id,
         )
-        if labtracks_subject.class_values:
-            genotype = labtracks_subject.class_values.full_genotype
-        else:
-            genotype = None
+        genotype = self._map_genotype()
         breeding_info = self._map_breeding_info()
         if breeding_info:
             source = Organization.AI
         else:
             source = Organization.OTHER
+        alleles = [
+            self._map_allele_info_to_pid_name(mgi_summary_row=row)
+            for row in self.mgi_info
+            if self._map_allele_info_to_pid_name(mgi_summary_row=row)
+            is not None
+        ]
         try:
             return Subject(
                 subject_id=subject_id,
@@ -222,6 +297,7 @@ class SubjectMapper:
                 background_strain=bg_strain,
                 breeding_info=breeding_info,
                 source=source,
+                alleles=alleles,
             )
         except ValidationError:
             return Subject.model_construct(
@@ -234,4 +310,5 @@ class SubjectMapper:
                 background_strain=bg_strain,
                 breeding_info=breeding_info,
                 source=source,
+                alleles=alleles,
             )

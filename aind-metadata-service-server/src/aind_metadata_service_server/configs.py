@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     labtracks_host: HttpUrl = Field(
         ..., description="Host address for labtracks endpoint"
     )
+    mgi_host: HttpUrl = Field(..., description="Host address for mgi endpoint")
 
 
 def get_settings():

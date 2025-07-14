@@ -1,4 +1,4 @@
-"""Test routes"""
+"""Test subject routes"""
 
 from datetime import datetime
 from unittest.mock import MagicMock, patch
@@ -12,24 +12,18 @@ from fastapi.testclient import TestClient
 
 
 class TestRoute:
-    """Test healthcheck responses."""
+    """Test responses."""
 
-    def test_get_health(self, client: TestClient):
-        """Tests a good response"""
-        response = client.get("/healthcheck")
-        assert 200 == response.status_code
-        assert "OK" == response.json()["status"]
-
-    @patch("aind_labtracks_service_async_client.ApiClient")
+    @patch("aind_mgi_service_async_client.DefaultApi.get_allele_info")
     @patch("aind_labtracks_service_async_client.DefaultApi.get_subject")
     def test_get_subject(
         self,
-        mock_get_subject: MagicMock,
-        mock_labtrack_client: MagicMock,
+        mock_lb_api_get: MagicMock,
+        mock_mg_api_get: MagicMock,
         client: TestClient,
     ):
         """Tests a good response"""
-        mock_get_subject.return_value = [
+        mock_lb_api_get.return_value = [
             LabtrackSubject(
                 id="632269",
                 class_values=MouseCustomClass(
@@ -41,8 +35,9 @@ class TestRoute:
                         "Pvalb-IRES-Cre/wt;RCL-somBiPoles_mCerulean-WPRE/wt"
                     ),
                     phenotype=(
-                        "P19: TSTW. Small body, large head, slightly dehydrated. "
-                        "3.78g. P22: 5.59g. P26: 8.18g. Normal body proportions. "
+                        "P19: TSTW. Small body, large head, slightly "
+                        "dehydrated. 3.78g. P22: 5.59g. P26: 8.18g. "
+                        "Normal body proportions. "
                     ),
                 ),
                 sex="F",
@@ -72,9 +67,11 @@ class TestRoute:
                 group_description="BALB/c",
             )
         ]
+        mock_mg_api_get.return_value = []
         response = client.get("/subject/632269")
-        mock_labtrack_client.assert_called_once()
         assert 200 == response.status_code
+        assert 1 == len(mock_lb_api_get.mock_calls)
+        assert 2 == len(mock_mg_api_get.mock_calls)
 
 
 if __name__ == "__main__":
