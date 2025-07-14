@@ -28,7 +28,7 @@ class SubjectMapper:
     def __init__(
         self,
         labtracks_subject: LabTracksSubject,
-        mgi_info: List[MgiSummaryRow] = [],
+        mgi_info: List[MgiSummaryRow] = (),
     ):
         """
         Class constructor.
@@ -37,24 +37,7 @@ class SubjectMapper:
         labtracks_subject :  LabTracksSubject
         """
         self.labtracks_subject = labtracks_subject
-        self.mgi_info = mgi_info
-
-    def get_allele_names_from_genotype(self) -> List[str]:
-        """
-        Maps a genotype to list of allele names
-
-        Returns
-        -------
-        List[str]
-
-        """
-        genotype = self._map_to_genotype()
-        if genotype is None:
-            filtered_alleles = []
-        else:
-            alleles = re.split("[; /]", genotype)
-            filtered_alleles = [a for a in alleles if a not in ["", "wt"]]
-        return filtered_alleles
+        self.mgi_info = list(mgi_info)
 
     @staticmethod
     def _map_allele_info_to_pid_name(
@@ -73,9 +56,11 @@ class SubjectMapper:
         """
 
         detail_uri_pattern = re.compile(r"/allele/MGI:(\d+)")
-        if re.match(detail_uri_pattern, mgi_summary_row.detailUri):
+        if mgi_summary_row.detail_uri is not None and re.match(
+            detail_uri_pattern, mgi_summary_row.detail_uri
+        ):
             registry_identifier = re.match(
-                detail_uri_pattern, mgi_summary_row.detailUri
+                detail_uri_pattern, mgi_summary_row.detail_uri
             ).group(1)
         else:
             registry_identifier = None
@@ -240,12 +225,30 @@ class SubjectMapper:
         else:
             return None
 
-    def _map_to_genotype(self) -> Optional[str]:
+    def _map_genotype(self) -> Optional[str]:
+        """Maps LabtracksSubject class values to a genotype."""
         if self.labtracks_subject.class_values:
             genotype = self.labtracks_subject.class_values.full_genotype
         else:
             genotype = None
         return genotype
+
+    def get_allele_names_from_genotype(self) -> List[str]:
+        """
+        Maps a genotype to list of allele names
+
+        Returns
+        -------
+        List[str]
+
+        """
+        genotype = self._map_genotype()
+        if genotype is None:
+            filtered_alleles = []
+        else:
+            alleles = re.split("[; /]", genotype)
+            filtered_alleles = [a for a in alleles if a not in ["", "wt"]]
+        return filtered_alleles
 
     def map_to_aind_subject(self) -> Subject:
         """
@@ -271,7 +274,7 @@ class SubjectMapper:
             room_id=labtracks_subject.room_id,
             cage_id=labtracks_subject.cage_id,
         )
-        genotype = self._map_to_genotype()
+        genotype = self._map_genotype()
         breeding_info = self._map_breeding_info()
         if breeding_info:
             source = Organization.AI
