@@ -1,12 +1,10 @@
-name: Run tests for server code
+name: Run checks in main and release
 
 on:
   pull_request:
     branches:
-      - release-v1.0.0
-      - dev
-    paths:
-      - aind-metadata-service-server/**
+      - '*release*'
+      - main
 
 jobs:
   tests:
@@ -30,3 +28,18 @@ jobs:
       run: flake8 . && interrogate --verbose .
     - name: Run tests and coverage
       run: coverage run -m pytest && coverage report
+  verify_version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check version incremented
+        run: |
+          init_file="./aind-metadata-service-server/src/aind_metadata_service_server/__init__.py"
+          pkg_version=$(grep -Po '[0-9]+\.[0-9]+\.[0-9]+' "$init_file")
+          latest_tag=$(git ls-remote --tags --refs --sort="v:refname" | tail -n1 | sed 's/.*\///')
+          echo "Checking pkg_version v$pkg_version and latest_tag $latest_tag"
+          if [ "$latest_tag" == "v$pkg_version" ]
+          then
+            exit 1
+          fi
+          echo "Versions are different"
