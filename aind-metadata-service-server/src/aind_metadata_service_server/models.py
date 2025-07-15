@@ -1,7 +1,7 @@
 """Models and schema definitions for backend data structures"""
 
 from typing import Literal
-
+from enum import Enum
 from pydantic import BaseModel
 
 from aind_metadata_service_server import __version__

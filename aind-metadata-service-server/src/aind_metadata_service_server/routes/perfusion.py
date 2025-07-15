@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Depends, Path
 
-from aind_metadata_service_server.mappers.subject import SubjectMapper
+from aind_metadata_service_server.mappers.perfusion import PerfusionMapper
 from aind_metadata_service_server.response_handler import (
     ModelResponse,
     StatusCodes,
@@ -35,9 +35,13 @@ async def get_perfusions(
     perfusions_response = await smartsheet_api_instance.get_perfusions(
         subject_id, _request_timeout=10
     )
-    return perfusions_response
-    # response_handler = ModelResponse(
-    #     aind_models=subjects, status_code=StatusCodes.DB_RESPONDED
-    # )
-    # response = response_handler.map_to_json_response()
-    # return response
+    mappers = [
+        PerfusionMapper(smartsheet_perfusion=smartsheet_perfusion)
+        for smartsheet_perfusion in perfusions_response
+    ]
+    perfusions = [mapper.map_to_aind_surgery() for mapper in mappers]
+    response_handler = ModelResponse(
+        aind_models=perfusions, status_code=StatusCodes.DB_RESPONDED
+    )
+    response = response_handler.map_to_json_response()
+    return response
