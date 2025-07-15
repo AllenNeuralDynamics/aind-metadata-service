@@ -9,6 +9,7 @@ from pydantic import ValidationError
 from aind_smartsheet_service_async_client.models import FundingModel
 from aind_metadata_service_server.models import FundingInformation
 
+
 class FundingMapper:
     """Primary class to handle mapping FundingModel to FundingInformation models"""
 
@@ -50,7 +51,8 @@ class FundingMapper:
             return input_name
 
     def _map_funding_to_funding_information(
-        self, smartsheet_funding: FundingModel,
+        self,
+        smartsheet_funding: FundingModel,
     ) -> Optional[FundingInformation]:
         """
         Map a FundingModel to an optional FundingInformation model.
@@ -88,7 +90,9 @@ class FundingMapper:
                 investigators=investigators,
             )
         except ValidationError as e:
-            logging.warning(f"Validation error creating FundingInformation model: {e}")
+            logging.warning(
+                f"Validation error creating FundingInformation model: {e}"
+            )
             return FundingInformation.model_construct(
                 funder=funder,
                 grant_number=grant_number,

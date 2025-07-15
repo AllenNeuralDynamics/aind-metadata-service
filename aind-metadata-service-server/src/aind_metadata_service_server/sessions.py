@@ -19,6 +19,7 @@ smartsheet_config = aind_smartsheet_service_async_client.Configuration(
     host=settings.smartsheet_host.unicode_string().strip("/")
 )
 
+
 async def get_labtracks_api_instance() -> (
     AsyncGenerator[aind_labtracks_service_async_client.DefaultApi, None]
 ):
@@ -45,6 +46,7 @@ async def get_mgi_api_instance() -> (
     ) as api_client:
         api_instance = aind_mgi_service_async_client.DefaultApi(api_client)
         yield api_instance
+
 
 async def get_smartsheet_api_instance() -> (
     AsyncGenerator[aind_smartsheet_service_async_client.DefaultApi, None]

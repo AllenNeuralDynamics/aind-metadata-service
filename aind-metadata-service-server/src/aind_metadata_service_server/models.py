@@ -5,17 +5,20 @@ from pydantic import BaseModel, Field, field_validator
 from aind_metadata_service_server import __version__
 from aind_data_schema.core.data_description import Funding
 
+
 class HealthCheck(BaseModel):
     """Response model to validate and return when performing a health check."""
 
     status: Literal["OK"] = "OK"
     service_version: str = __version__
 
+
 class FundingInformation(Funding):
     """Funding information that will be returned to the user that requests
     information from the Funding SmartSheet"""
 
     investigators: Optional[str] = Field(default=None)
+
 
 class ProtocolInformation(BaseModel):
     """Protocol information that will be returned to the user that requests

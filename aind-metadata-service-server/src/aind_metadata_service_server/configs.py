@@ -20,6 +20,7 @@ class Settings(BaseSettings):
         ..., description="Host address for smartsheet endpoint"
     )
 
+
 def get_settings():
     """Return Settings object"""
     return Settings()

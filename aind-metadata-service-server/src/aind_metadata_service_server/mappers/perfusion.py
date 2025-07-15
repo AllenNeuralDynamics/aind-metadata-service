@@ -4,11 +4,9 @@ aind-data-schema Surgery model."""
 import logging
 import re
 from typing import Optional
-
+from decimal import Decimal
 from aind_data_schema.core.procedures import Perfusion, Surgery
 from pydantic import ValidationError
-
-from aind_metadata_service_server.response_handler import ModelResponse
 from aind_smartsheet_service_async_client.models import PerfusionsModel
 
 
@@ -34,7 +32,7 @@ class PerfusionMapper:
         Parses the iacuc protocol number from a string. For example,
         '2109 - Analysis of brain - wide neural circuits in the mouse' is
         mapped to '2109'
-        
+
         Parameters
         ----------
         iacuc_protocol_id : Optional[str]
@@ -65,12 +63,17 @@ class PerfusionMapper:
         protocol_id = self.ID_10_17504
         start_date = smartsheet_perfusion.var_date
         experimenter_full_name = smartsheet_perfusion.experimenter
-        iacuc_protocol = self._map_iacuc_protocol(smartsheet_perfusion.iacuc_protocol)
-        animal_weight_prior = smartsheet_perfusion.animal_weight_prior__g
+        iacuc_protocol = self._map_iacuc_protocol(
+            smartsheet_perfusion.iacuc_protocol
+        )
+        animal_weight_prior = (
+            None if smartsheet_perfusion.animal_weight_prior__g is None
+            else Decimal(smartsheet_perfusion.animal_weight_prior__g)
+        )
         output_specimen_ids = (
             set()
             if smartsheet_perfusion.output_specimen_id_s is None
-            else {str(float(smartsheet_perfusion.output_specimen_id_s))}
+            else {str(int(float(smartsheet_perfusion.output_specimen_id_s)))}
         )
         notes = smartsheet_perfusion.notes
 

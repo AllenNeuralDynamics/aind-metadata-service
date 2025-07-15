@@ -6,10 +6,9 @@ from aind_metadata_service_server.response_handler import (
     ModelResponse,
     StatusCodes,
 )
-from aind_metadata_service_server.sessions import (
-    get_smartsheet_api_instance
-)
+from aind_metadata_service_server.sessions import get_smartsheet_api_instance
 from aind_metadata_service_server.mappers.funding import FundingMapper
+
 router = APIRouter()
 
 
@@ -51,6 +50,7 @@ async def get_funding(
     )
     response = response_handler.map_to_json_response()
     return response
+
 
 @router.get("/project_names")
 async def get_project_names(

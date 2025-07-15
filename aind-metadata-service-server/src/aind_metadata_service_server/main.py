@@ -13,7 +13,6 @@ from aind_metadata_service_server.routes.subject import router as su_route
 from aind_metadata_service_server.routes.perfusion import router as pe_route
 from aind_metadata_service_server.routes.funding import (
     router as fu_route,
-
 )
 from aind_metadata_service_server.routes.protocol import router as pr_route
 

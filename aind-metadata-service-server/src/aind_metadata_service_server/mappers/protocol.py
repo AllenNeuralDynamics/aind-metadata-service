@@ -63,7 +63,9 @@ class ProtocolMapper:
                 protocol_collection=protocol_collection,
             )
         except ValidationError as e:
-            logging.warning(f"Validation error creating ProtocolInformation model: {e}")
+            logging.warning(
+                f"Validation error creating ProtocolInformation model: {e}"
+            )
             return ProtocolInformation.model_construct(
                 procedure_name=procedure_name,
                 protocol_type=protocol_type,
@@ -72,5 +74,3 @@ class ProtocolMapper:
                 version=version,
                 protocol_collection=protocol_collection,
             )
-
-

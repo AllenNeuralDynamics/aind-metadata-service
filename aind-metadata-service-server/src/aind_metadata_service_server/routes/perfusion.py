@@ -7,9 +7,7 @@ from aind_metadata_service_server.response_handler import (
     ModelResponse,
     StatusCodes,
 )
-from aind_metadata_service_server.sessions import (
-    get_smartsheet_api_instance
-)
+from aind_metadata_service_server.sessions import get_smartsheet_api_instance
 
 router = APIRouter()
 
@@ -18,7 +16,7 @@ router = APIRouter()
 async def get_perfusions(
     subject_id: str = Path(
         ...,
-         openapi_examples={
+        openapi_examples={
             "default": {
                 "summary": "A sample subject id",
                 "description": "Example subject id",
