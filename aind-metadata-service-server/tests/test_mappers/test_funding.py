@@ -70,7 +70,7 @@ class TestFundingMapper(unittest.TestCase):
     def test_mapping_success(self):
         """Tests successful mapping of funding data"""
         discovery_funding_rows = self.funding_sheet[3:5]
-        mapper = FundingMapper(funding_data=discovery_funding_rows)
+        mapper = FundingMapper(smartsheet_funding=discovery_funding_rows)
         funding_information = mapper.get_funding_list()
         expected_funding = [
             FundingInformation(
@@ -94,7 +94,7 @@ class TestFundingMapper(unittest.TestCase):
 
     def test_mapping_empty_list(self):
         """Tests mapping with empty funding data list"""
-        mapper = FundingMapper(funding_data=[])
+        mapper = FundingMapper(smartsheet_funding=[])
         funding_information = mapper.get_funding_list()
 
         self.assertEqual([], funding_information)
@@ -102,7 +102,7 @@ class TestFundingMapper(unittest.TestCase):
     def test_mapping_empty_funding_model(self):
         """Tests mapping when funding model has all None fields"""
         empty_funding_row = [self.funding_sheet[0]]
-        mapper = FundingMapper(funding_data=empty_funding_row)
+        mapper = FundingMapper(smartsheet_funding=empty_funding_row)
         funding_information = mapper.get_funding_list()
         self.assertEqual([], funding_information)
 
@@ -118,8 +118,8 @@ class TestFundingMapper(unittest.TestCase):
             investigators=None,
         )
 
-        funding_data = [funding_model_invalid]
-        mapper = FundingMapper(funding_data=funding_data)
+        smartsheet_funding = [funding_model_invalid]
+        mapper = FundingMapper(smartsheet_funding=smartsheet_funding)
         funding_information = mapper.get_funding_list()
 
         expected_model = FundingInformation.model_construct(
@@ -135,7 +135,7 @@ class TestFundingMapper(unittest.TestCase):
 
     def test_get_project_names_success(self):
         """Tests successful retrieval of project names"""
-        funding_data = [
+        smartsheet_funding = [
             self.funding_sheet[3],
             self.funding_sheet[1],
             FundingModel(
@@ -150,7 +150,7 @@ class TestFundingMapper(unittest.TestCase):
             ),
         ]
 
-        mapper = FundingMapper(funding_data=funding_data)
+        mapper = FundingMapper(smartsheet_funding=smartsheet_funding)
         project_names = mapper.get_project_names()
 
         expected_names = [
@@ -166,19 +166,19 @@ class TestFundingMapper(unittest.TestCase):
 
     def test_get_project_names_empty(self):
         """Tests project names with empty data"""
-        mapper = FundingMapper(funding_data=[])
+        mapper = FundingMapper(smartsheet_funding=[])
         project_names = mapper.get_project_names()
 
         self.assertEqual([], project_names)
 
     def test_get_project_names_with_none_values(self):
         """Tests project names when some projects have None values"""
-        funding_data = [
+        smartsheet_funding = [
             self.funding_sheet[1],
             self.funding_sheet[0],
         ]
 
-        mapper = FundingMapper(funding_data=funding_data)
+        mapper = FundingMapper(smartsheet_funding=smartsheet_funding)
         project_names = mapper.get_project_names()
 
         expected_names = ["Ephys Platform"]
