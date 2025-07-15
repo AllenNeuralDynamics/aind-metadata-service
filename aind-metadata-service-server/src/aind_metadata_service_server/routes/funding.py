@@ -20,7 +20,9 @@ async def get_funding(
             "default": {
                 "summary": "A sample project name",
                 "description": "Example project name for smartsheet",
-                "value": "Discovery-Neuromodulator circuit dynamics during foraging",
+                "value": (
+                    "Discovery-Neuromodulator circuit dynamics during foraging"
+                ),
             }
         },
     ),
@@ -43,7 +45,7 @@ async def get_funding(
     funding_response = await smartsheet_api_instance.get_funding(
         project_name=project_name, subproject=subproject, _request_timeout=10
     )
-    mapper = FundingMapper(funding_data=funding_response)
+    mapper = FundingMapper(smartsheet_funding=funding_response)
     funding_information = mapper.get_funding_list()
     response_handler = ModelResponse(
         aind_models=funding_information, status_code=StatusCodes.DB_RESPONDED
@@ -62,6 +64,6 @@ async def get_project_names(
     funding_response = await smartsheet_api_instance.get_funding(
         _request_timeout=10
     )
-    mapper = FundingMapper(funding_data=funding_response)
+    mapper = FundingMapper(smartsheet_funding=funding_response)
     response = mapper.get_project_names()
     return response

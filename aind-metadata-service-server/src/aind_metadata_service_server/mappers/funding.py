@@ -11,18 +11,16 @@ from aind_metadata_service_server.models import FundingInformation
 
 
 class FundingMapper:
-    """Primary class to handle mapping FundingModel to FundingInformation models"""
+    """Class to handle mapping of funding data"""
 
-    def __init__(self, funding_data: List[FundingModel]):
+    def __init__(self, smartsheet_funding: List[FundingModel]):
         """
-        Initialize mapper with list of FundingModel instances
-
-        Parameters
-        ----------
-        funding_data : List[FundingModel]
-            List of funding models from the service
+        Class constructor
+         Parameters
+         ----------
+         smartsheet_funding : List[FundingModel]
         """
-        self.funding_data = funding_data
+        self.smartsheet_funding = smartsheet_funding
 
     @staticmethod
     def _parse_institution(
@@ -38,8 +36,7 @@ class FundingMapper:
         Returns
         -------
         Optional[Union[Organization, str]]
-          Either an Organization parsed from the name. If the Organization can't
-          be generated from the name, then it returns the input name.
+          Either an Organization parsed from the name or input.
         """
         if input_name is None:
             return None
@@ -116,7 +113,7 @@ class FundingMapper:
         """
         funding_list: List[FundingInformation] = []
 
-        for smartsheet_funding in self.funding_data:
+        for smartsheet_funding in self.smartsheet_funding:
             funding_info = self._map_funding_to_funding_information(
                 smartsheet_funding=smartsheet_funding,
             )
@@ -136,7 +133,7 @@ class FundingMapper:
         """
         project_names = set()
 
-        for smartsheet_funding in self.funding_data:
+        for smartsheet_funding in self.smartsheet_funding:
             project_name = smartsheet_funding.project_name
             subproject_name = smartsheet_funding.subproject
 

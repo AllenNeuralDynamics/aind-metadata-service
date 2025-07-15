@@ -11,7 +11,7 @@ from aind_smartsheet_service_async_client.models import PerfusionsModel
 
 
 class PerfusionMapper:
-    """Primary class to handle mapping PerfusionsModel to Surgery with Perfusion procedures"""
+    """Class to handle mapping perfusion data"""
 
     IACUC_COL_PATTERN = re.compile(r"(\d+).*")
     ID_10_17504 = "dx.doi.org/10.17504/protocols.io.bg5vjy66"
@@ -67,7 +67,8 @@ class PerfusionMapper:
             smartsheet_perfusion.iacuc_protocol
         )
         animal_weight_prior = (
-            None if smartsheet_perfusion.animal_weight_prior__g is None
+            None
+            if smartsheet_perfusion.animal_weight_prior__g is None
             else Decimal(smartsheet_perfusion.animal_weight_prior__g)
         )
         output_specimen_ids = (

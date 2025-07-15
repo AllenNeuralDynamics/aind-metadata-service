@@ -49,7 +49,7 @@ class TestPerfusionMapper(unittest.TestCase):
                 output_specimen_id_s="689418.0",
                 postfix_solution="1xPBS",
                 notes="Good",
-            )
+            ),
         ]
 
         cls.expected_surgery_model = Surgery.model_construct(

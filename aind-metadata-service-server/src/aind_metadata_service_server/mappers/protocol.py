@@ -11,7 +11,7 @@ from aind_metadata_service_server.models import ProtocolInformation
 
 
 class ProtocolMapper:
-    """Primary class to handle mapping ProtocolsModel to ProtocolInformation models"""
+    """Class to handle mapping protocol information"""
 
     def __init__(self, smartsheet_protocol: ProtocolsModel):
         """

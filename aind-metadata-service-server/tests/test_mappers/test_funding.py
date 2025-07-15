@@ -76,15 +76,18 @@ class TestFundingMapper(unittest.TestCase):
             FundingInformation(
                 funder=Organization.AI,
                 grant_number=None,
-                fundee='Person Four, Person Five, Person Six, Person Seven, Person Eight',
-                investigators=None
+                fundee=(
+                    "Person Four, Person Five, Person Six,"
+                    " Person Seven, Person Eight"
+                ),
+                investigators=None,
             ),
             FundingInformation(
                 funder=Organization.NINDS,
-                grant_number='1RF1NS131984',
-                fundee='Person Five, Person Six, Person Eight',
-                investigators='Person Six, Person Eight'
-            )
+                grant_number="1RF1NS131984",
+                fundee="Person Five, Person Six, Person Eight",
+                investigators="Person Six, Person Eight",
+            ),
         ]
         self.assertEqual(len(funding_information), 2)
         self.assertEqual(funding_information, expected_funding)
@@ -109,7 +112,7 @@ class TestFundingMapper(unittest.TestCase):
         funding_model_invalid = FundingModel(
             project_name="Ephys Platform",
             subproject=None,
-            funding_institution="Some Institute", 
+            funding_institution="Some Institute",
             grant_number=None,
             fundees="Person One, Person Two, Person Three",
             investigators=None,
@@ -136,7 +139,9 @@ class TestFundingMapper(unittest.TestCase):
             self.funding_sheet[3],
             self.funding_sheet[1],
             FundingModel(
-                project_name="Discovery-Neuromodulator circuit dynamics during foraging",
+                project_name=(
+                    "Discovery-Neuromodulator circuit dynamics during foraging"
+                ),
                 subproject="Subproject 1 Electrophysiological Recordings",
                 funding_institution="Allen Institute",
                 grant_number=None,
@@ -149,8 +154,11 @@ class TestFundingMapper(unittest.TestCase):
         project_names = mapper.get_project_names()
 
         expected_names = [
-            "Discovery-Neuromodulator circuit dynamics during foraging - Subproject 1 Electrophysiological Recordings",
-            "Discovery-Neuromodulator circuit dynamics during foraging - Subproject 1 Electrophysiological Recordings from NM Neurons During Behavior",
+            "Discovery-Neuromodulator circuit dynamics during foraging - "
+            "Subproject 1 Electrophysiological Recordings",
+            "Discovery-Neuromodulator circuit dynamics during foraging - "
+            "Subproject 1 Electrophysiological Recordings from NM Neurons "
+            "During Behavior",
             "Ephys Platform",
         ]
 
@@ -167,7 +175,7 @@ class TestFundingMapper(unittest.TestCase):
         """Tests project names when some projects have None values"""
         funding_data = [
             self.funding_sheet[1],
-            self.funding_sheet[0], 
+            self.funding_sheet[0],
         ]
 
         mapper = FundingMapper(funding_data=funding_data)
