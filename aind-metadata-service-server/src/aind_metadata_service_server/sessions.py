@@ -66,6 +66,7 @@ async def get_smartsheet_api_instance() -> (
         )
         yield api_instance
 
+
 async def get_slims_api_instance() -> (
     AsyncGenerator[aind_slims_service_async_client.DefaultApi, None]
 ):
