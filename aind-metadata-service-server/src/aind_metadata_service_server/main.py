@@ -2,6 +2,7 @@
 
 import logging
 import os
+import warnings
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,12 +10,20 @@ from fastapi.routing import APIRoute
 
 from aind_metadata_service_server import __version__ as service_version
 from aind_metadata_service_server.routes.healthcheck import router as hc_route
+from aind_metadata_service_server.routes.rig_and_instrument import (
+    router as ri_route,
+)
+from aind_metadata_service_server.routes.slims import router as sl_route
 from aind_metadata_service_server.routes.subject import router as su_route
 from aind_metadata_service_server.routes.perfusion import router as pe_route
 from aind_metadata_service_server.routes.funding import (
     router as fu_route,
 )
 from aind_metadata_service_server.routes.protocol import router as pr_route
+
+warnings.filterwarnings(
+    "ignore", category=UserWarning, message=r".*Pydantic serializer warnings.*"
+)
 
 # The log level can be set by adding an environment variable before launch.
 log_level = os.getenv("LOG_LEVEL", "INFO")
@@ -47,6 +56,8 @@ app.include_router(su_route)
 app.include_router(pe_route)
 app.include_router(fu_route)
 app.include_router(pr_route)
+app.include_router(sl_route)
+app.include_router(ri_route)
 
 # Clean up the methods names that is generated in the client code
 for route in app.routes:

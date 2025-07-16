@@ -20,6 +20,7 @@ class TestSettings(unittest.TestCase):
             "AIND_METADATA_SERVICE_SMARTSHEET_HOST": (
                 "http://example.com/smartsheet"
             ),
+            "AIND_METADATA_SERVICE_SLIMS_HOST": "http://example.com/slims",
         },
         clear=True,
     )
@@ -30,6 +31,7 @@ class TestSettings(unittest.TestCase):
             labtracks_host="http://example.com/labtracks",
             mgi_host="http://example.com/mgi",
             smartsheet_host="http://example.com/smartsheet",
+            slims_host="http://example.com/slims",
         )
         self.assertEqual(expected_settings, settings)
 
