@@ -4,6 +4,8 @@ import json
 from enum import Enum
 from typing import Generic, List, Optional, TypeVar, Union
 
+from aind_data_schema.core.instrument import Instrument
+from aind_data_schema.core.rig import Rig
 from aind_data_schema.core.subject import Subject
 from aind_data_schema_models.pid_names import PIDName
 from fastapi import Response
@@ -11,7 +13,15 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
-T = TypeVar("T", Subject, PIDName)
+import warnings
+
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    message=r".*PydanticSerialization.*"
+)
+
+T = TypeVar("T", Subject, PIDName, Rig, Instrument)
 
 
 class StatusCodes(Enum):
