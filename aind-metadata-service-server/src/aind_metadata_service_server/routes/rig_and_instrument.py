@@ -19,6 +19,13 @@ router = APIRouter()
 async def get_rig(
     rig_id: str = Path(
         ...,
+        openapi_examples={
+            "default": {
+                "summary": "A sample rig ID",
+                "description": "Example rig ID for SLIMS",
+                "value": "323_EPHYS1_20250205",
+            }
+        },
     ),
     partial_match: bool = Query(False, alias="partial_match"),
     slims_api_instance: DefaultApi = Depends(get_slims_api_instance),
@@ -44,6 +51,13 @@ async def get_rig(
 async def get_instrument(
     instrument_id: str = Path(
         ...,
+        openapi_examples={
+            "default": {
+                "summary": "A sample instrument ID",
+                "description": "Example instrument ID for SLIMS",
+                "value": "440_SmartSPIM1_20240327",
+            }
+        },
     ),
     partial_match: bool = Query(False, alias="partial_match"),
     slims_api_instance: DefaultApi = Depends(get_slims_api_instance),
