@@ -3,7 +3,7 @@
 from enum import Enum
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query, Path
+from fastapi import APIRouter, Depends, Path, Query
 from starlette.responses import JSONResponse
 
 from aind_metadata_service_server.response_handler import (
@@ -65,12 +65,12 @@ async def get_slims_workflow(
         openapi_examples={
             "none_example": {
                 "summary": "No session name (default)",
-                "value": None
+                "value": None,
             },
             "ecephys_session_example": {
                 "summary": "Ecephys example session name",
                 "value": "ecephys_750108_2024-12-23_14-51-45",
-            }
+            },
         },
     ),
     start_date_gte: Optional[str] = Query(
@@ -97,7 +97,7 @@ async def get_slims_workflow(
             "ecephys_session_example": {
                 "summary": "Ecephys example start date",
                 "value": "2025-04-10",
-            }
+            },
         },
     ),
     end_date_lte: Optional[str] = Query(
@@ -124,7 +124,7 @@ async def get_slims_workflow(
             "ecephys_session_example": {
                 "summary": "Ecephys example end date",
                 "value": "2025-04-11",
-            }
+            },
         },
     ),
     slims_api_instance=Depends(get_slims_api_instance),

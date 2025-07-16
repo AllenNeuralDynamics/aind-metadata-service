@@ -1,7 +1,7 @@
 """Test subject routes"""
 
 from datetime import datetime
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from aind_labtracks_service_async_client import MouseCustomClass
@@ -18,8 +18,8 @@ class TestRoute:
     @patch("aind_labtracks_service_async_client.DefaultApi.get_subject")
     def test_get_subject(
         self,
-        mock_lb_api_get: MagicMock,
-        mock_mg_api_get: MagicMock,
+        mock_lb_api_get: AsyncMock,
+        mock_mg_api_get: AsyncMock,
         client: TestClient,
     ):
         """Tests a good response"""

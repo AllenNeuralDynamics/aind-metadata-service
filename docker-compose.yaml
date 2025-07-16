@@ -9,6 +9,7 @@ services:
       - labtracks
       - mgi
       - slims
+      - smartsheet
     env_file: "env/webapp.env"
   labtracks:
     image: "ghcr.io/allenneuraldynamics/aind-labtracks-service-server:0.2.4"

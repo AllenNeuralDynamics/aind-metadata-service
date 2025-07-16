@@ -3,11 +3,12 @@ aind-data-schema Surgery model."""
 
 import logging
 import re
-from typing import Optional
 from decimal import Decimal
+from typing import Optional
+
 from aind_data_schema.core.procedures import Perfusion, Surgery
-from pydantic import ValidationError
 from aind_smartsheet_service_async_client.models import PerfusionsModel
+from pydantic import ValidationError
 
 
 class PerfusionMapper:
@@ -39,7 +40,7 @@ class PerfusionMapper:
 
         Returns
         -------
-        Optional[str]
+        str | None
         """
         if iacuc_protocol_id is None:
             return None
@@ -55,7 +56,7 @@ class PerfusionMapper:
         model will be returned.
         Returns
         -------
-        Subject
+        Surgery
         """
         smartsheet_perfusion = self.smartsheet_perfusion
         animal_weight_post = None
@@ -94,8 +95,11 @@ class PerfusionMapper:
                     )
                 ],
             )
-        except ValidationError as e:
-            logging.warning(f"Validation error creating Surgery model: {e}")
+        except ValidationError:
+            logging.warning(
+                f"Validation error creating Surgery model for "
+                f"{self.smartsheet_perfusion.subject_id}"
+            )
             return Surgery.model_construct(
                 start_date=start_date,
                 experimenter_full_name=experimenter_full_name,

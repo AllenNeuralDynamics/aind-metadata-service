@@ -40,7 +40,11 @@ async def get_protocols(
         ProtocolMapper(smartsheet_protocol=smartsheet_protocol)
         for smartsheet_protocol in protocols_response
     ]
-    protocols = [mapper.map_to_protocol_information() for mapper in mappers]
+    protocols = [
+        mapper.map_to_protocol_information()
+        for mapper in mappers
+        if mapper.map_to_protocol_information() is not None
+    ]
     response_handler = ModelResponse(
         aind_models=protocols, status_code=StatusCodes.DB_RESPONDED
     )

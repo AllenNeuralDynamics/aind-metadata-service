@@ -4,8 +4,8 @@ import unittest
 
 from aind_smartsheet_service_async_client.models import ProtocolsModel
 
-from aind_metadata_service_server.models import ProtocolInformation
 from aind_metadata_service_server.mappers.protocol import ProtocolMapper
+from aind_metadata_service_server.models import ProtocolInformation
 
 
 class TestProtocolMapper(unittest.TestCase):

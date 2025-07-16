@@ -5,8 +5,9 @@ import logging
 from typing import List, Optional, Union
 
 from aind_data_schema_models.organizations import Organization
-from pydantic import ValidationError
 from aind_smartsheet_service_async_client.models import FundingModel
+from pydantic import ValidationError
+
 from aind_metadata_service_server.models import FundingInformation
 
 
@@ -25,7 +26,7 @@ class FundingMapper:
     @staticmethod
     def _parse_institution(
         input_name: Optional[str],
-    ) -> Optional[Union[Organization, str]]:
+    ) -> Union[Organization, str, None]:
         """
         Generate Institution from string
         Parameters
@@ -35,7 +36,7 @@ class FundingMapper:
 
         Returns
         -------
-        Optional[Union[Organization, str]]
+        Union[Organization, str, None]
           Either an Organization parsed from the name or input.
         """
         if input_name is None:
@@ -61,9 +62,9 @@ class FundingMapper:
 
         Returns
         -------
-        Optional[FundingInformation]
-            None if no relevant funding information is found,
-            otherwise a FundingInformation model with parsed data.
+        FundingInformation | None
+            If no relevant funding information is found, then None.
+            Otherwise, a FundingInformation model with parsed data.
         """
         grant_number = smartsheet_funding.grant_number
         institution_value = smartsheet_funding.funding_institution
@@ -86,9 +87,10 @@ class FundingMapper:
                 fundee=fundees,
                 investigators=investigators,
             )
-        except ValidationError as e:
+        except ValidationError:
             logging.warning(
-                f"Validation error creating FundingInformation model: {e}"
+                f"Validation error creating FundingInformation model for "
+                f"{smartsheet_funding.project_name}"
             )
             return FundingInformation.model_construct(
                 funder=funder,
@@ -100,11 +102,6 @@ class FundingMapper:
     def get_funding_list(self) -> List[FundingInformation]:
         """
         Return a list of FundingInformation models for a given project name.
-
-        Parameters
-        ----------
-        project_name : str
-            The project name that the user inputs.
 
         Returns
         -------

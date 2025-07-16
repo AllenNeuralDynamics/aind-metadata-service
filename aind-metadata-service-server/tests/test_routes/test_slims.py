@@ -1,6 +1,6 @@
 """Test slims routes"""
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from aind_slims_service_async_client import models
@@ -13,7 +13,7 @@ class TestRoute:
     @patch("aind_slims_service_async_client.DefaultApi.get_ecephys_sessions")
     def test_get_ecephys_workflow(
         self,
-        mock_slims_api_get: MagicMock,
+        mock_slims_api_get: AsyncMock,
         client: TestClient,
     ):
         """Tests a good response"""
@@ -33,7 +33,7 @@ class TestRoute:
     @patch("aind_slims_service_async_client.DefaultApi.get_smartspim_imaging")
     def test_get_imaging_workflow(
         self,
-        mock_slims_api_get: MagicMock,
+        mock_slims_api_get: AsyncMock,
         client: TestClient,
     ):
         """Tests a good response"""
@@ -53,7 +53,7 @@ class TestRoute:
     @patch("aind_slims_service_async_client.DefaultApi.get_viral_injections")
     def test_get_viral_injections_workflow(
         self,
-        mock_slims_api_get: MagicMock,
+        mock_slims_api_get: AsyncMock,
         client: TestClient,
     ):
         """Tests a good response"""
@@ -76,7 +76,7 @@ class TestRoute:
     )
     def test_get_water_restriction_workflow(
         self,
-        mock_slims_api_get: MagicMock,
+        mock_slims_api_get: AsyncMock,
         client: TestClient,
     ):
         """Tests a good response"""
@@ -97,7 +97,7 @@ class TestRoute:
     @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
     def test_get_histology_workflow(
         self,
-        mock_slims_api_get: MagicMock,
+        mock_slims_api_get: AsyncMock,
         client: TestClient,
     ):
         """Tests a good response"""
@@ -116,7 +116,7 @@ class TestRoute:
     @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
     def test_get_no_data(
         self,
-        mock_slims_api_get: MagicMock,
+        mock_slims_api_get: AsyncMock,
         client: TestClient,
     ):
         """Tests a Not Found Response"""

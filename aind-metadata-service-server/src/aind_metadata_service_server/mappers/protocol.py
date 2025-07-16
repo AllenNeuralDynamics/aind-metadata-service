@@ -4,9 +4,9 @@ Protocols model."""
 import logging
 from typing import Optional
 
+from aind_smartsheet_service_async_client.models import ProtocolsModel
 from pydantic import ValidationError
 
-from aind_smartsheet_service_async_client.models import ProtocolsModel
 from aind_metadata_service_server.models import ProtocolInformation
 
 
@@ -32,7 +32,7 @@ class ProtocolMapper:
 
         Returns
         -------
-        Optional[ProtocolInformation]
+        ProtocolInformation | None
             ProtocolInformation model or None if all fields are empty
         """
         smartsheet_protocol = self.smartsheet_protocol
@@ -62,9 +62,10 @@ class ProtocolMapper:
                 version=version,
                 protocol_collection=protocol_collection,
             )
-        except ValidationError as e:
+        except ValidationError:
             logging.warning(
-                f"Validation error creating ProtocolInformation model: {e}"
+                f"Validation error creating ProtocolInformation model for "
+                f"{self.smartsheet_protocol.protocol_name}"
             )
             return ProtocolInformation.model_construct(
                 procedure_name=procedure_name,
