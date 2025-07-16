@@ -16,7 +16,8 @@ class TestSettings(unittest.TestCase):
             "AIND_METADATA_SERVICE_LABTRACKS_HOST": (
                 "http://example.com/labtracks"
             ),
-            "AIND_METADATA_SERVICE_MGI_HOST": ("http://example.com/mgi"),
+            "AIND_METADATA_SERVICE_MGI_HOST": "http://example.com/mgi",
+            "AIND_METADATA_SERVICE_SLIMS_HOST": "http://example.com/slims",
         },
         clear=True,
     )
@@ -26,6 +27,7 @@ class TestSettings(unittest.TestCase):
         expected_settings = Settings(
             labtracks_host="http://example.com/labtracks",
             mgi_host="http://example.com/mgi",
+            slims_host="http://example.com/slims",
         )
         self.assertEqual(expected_settings, settings)
 
