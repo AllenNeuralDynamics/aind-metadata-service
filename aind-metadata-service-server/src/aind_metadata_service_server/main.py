@@ -12,6 +12,7 @@ from aind_metadata_service_server import __version__ as service_version
 from aind_metadata_service_server.routes import (
     funding,
     healthcheck,
+    mgi_allele,
     perfusion,
     protocol,
     rig_and_instrument,
@@ -56,6 +57,7 @@ app.include_router(protocol.router)
 app.include_router(funding.router)
 app.include_router(slims.router)
 app.include_router(rig_and_instrument.router)
+app.include_router(mgi_allele.router)
 
 # Clean up the methods names that is generated in the client code
 for route in app.routes:
