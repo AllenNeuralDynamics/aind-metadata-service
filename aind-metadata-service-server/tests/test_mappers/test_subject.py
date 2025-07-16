@@ -26,32 +26,6 @@ from aind_metadata_service_server.mappers.subject import SubjectMapper
 class TestSubjectMapper(unittest.TestCase):
     """Test methods in SubjectMapper class"""
 
-    def test_map_allele_info_to_pid_name(self):
-        """Tests _map_allele_info_to_pid_name method"""
-        allele_info = MgiSummaryRow(
-            detail_uri="/allele/MGI:3590684",
-            feature_type="Targeted allele",
-            strand="-",
-            chromosome="15",
-            stars="****",
-            best_match_text="Parvalbumin-IRES-Cre",
-            best_match_type="Synonym",
-            name="parvalbumin; targeted mutation 1, Silvia Arber",
-            location="78075314-78090600",
-            symbol="Pvalb<tm1(cre)Arbr>",
-        )
-        pid_name = SubjectMapper._map_allele_info_to_pid_name(allele_info)
-        expected_pid_name = PIDName(
-            name="Pvalb<tm1(cre)Arbr>",
-            abbreviation=None,
-            registry=Registry.MGI,
-            registry_identifier="3590684",
-        )
-        self.assertEqual(expected_pid_name, pid_name)
-        self.assertIsNone(
-            SubjectMapper._map_allele_info_to_pid_name(MgiSummaryRow())
-        )
-
     def test_map_genotype_method(self):
         """Tests _map_genotype method"""
         subject = LabtrackSubject(
@@ -258,6 +232,34 @@ class TestSubjectMapper(unittest.TestCase):
             date_of_birth=None,
         )
         self.assertEqual(expected_subject, aind_subject)
+
+    def test_mgi_mapper_integration(self):
+        """Tests that mgi allele mapping is integrated as expected."""
+        allele_info = MgiSummaryRow(
+            detail_uri="/allele/MGI:3590684",
+            feature_type="Targeted allele",
+            strand="-",
+            chromosome="15",
+            stars="****",
+            best_match_text="Parvalbumin-IRES-Cre",
+            best_match_type="Synonym",
+            name="parvalbumin; targeted mutation 1, Silvia Arber",
+            location="78075314-78090600",
+            symbol="Pvalb<tm1(cre)Arbr>",
+        )
+        expected_pid_name = PIDName(
+            name="Pvalb<tm1(cre)Arbr>",
+            abbreviation=None,
+            registry=Registry.MGI,
+            registry_identifier="3590684",
+        )
+        subject = LabtrackSubject(id="123")
+        mapper = SubjectMapper(
+            labtracks_subject=subject, mgi_info=[allele_info]
+        )
+        aind_subject = mapper.map_to_aind_subject()
+        self.assertEqual(1, len(aind_subject.alleles))
+        self.assertEqual(expected_pid_name, aind_subject.alleles[0])
 
 
 if __name__ == "__main__":

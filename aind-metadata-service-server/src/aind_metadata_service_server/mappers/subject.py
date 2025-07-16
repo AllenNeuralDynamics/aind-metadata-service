@@ -12,14 +12,14 @@ from aind_data_schema.core.subject import (
     Subject,
 )
 from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.pid_names import PIDName
-from aind_data_schema_models.registries import Registry
 from aind_data_schema_models.species import Species
 from aind_labtracks_service_async_client.models.subject import (
     Subject as LabTracksSubject,
 )
 from aind_mgi_service_async_client.models import MgiSummaryRow
 from pydantic import ValidationError
+
+from aind_metadata_service_server.mappers.mgi_allele import MgiMapper
 
 
 class SubjectMapper:
@@ -38,44 +38,6 @@ class SubjectMapper:
         """
         self.labtracks_subject = labtracks_subject
         self.mgi_info = list(mgi_info)
-
-    @staticmethod
-    def _map_allele_info_to_pid_name(
-        mgi_summary_row: MgiSummaryRow,
-    ) -> Optional[PIDName]:
-        """
-        Map MgiSummaryRow to a PIDName
-        Parameters
-        ----------
-        mgi_summary_row : MgiSummaryRow
-
-        Returns
-        -------
-        Optional[PIDName]
-
-        """
-
-        detail_uri_pattern = re.compile(r"/allele/MGI:(\d+)")
-        if mgi_summary_row.detail_uri is not None and re.match(
-            detail_uri_pattern, mgi_summary_row.detail_uri
-        ):
-            registry_identifier = re.match(
-                detail_uri_pattern, mgi_summary_row.detail_uri
-            ).group(1)
-        else:
-            registry_identifier = None
-        if (
-            mgi_summary_row.stars == "****"
-            and mgi_summary_row.best_match_type == "Synonym"
-        ):
-            return PIDName(
-                name=mgi_summary_row.symbol,
-                abbreviation=None,
-                registry=Registry.MGI,
-                registry_identifier=registry_identifier,
-            )
-        else:
-            return None
 
     @staticmethod
     def _map_sex(sex: Optional[str]) -> Optional[Sex]:
@@ -260,7 +222,6 @@ class SubjectMapper:
         Subject
 
         """
-        # LabTracksSubject
         labtracks_subject = self.labtracks_subject
         subject_id = labtracks_subject.id
         sex = self._map_sex(labtracks_subject.sex)
@@ -280,12 +241,12 @@ class SubjectMapper:
             source = Organization.AI
         else:
             source = Organization.OTHER
-        alleles = [
-            self._map_allele_info_to_pid_name(mgi_summary_row=row)
-            for row in self.mgi_info
-            if self._map_allele_info_to_pid_name(mgi_summary_row=row)
-            is not None
-        ]
+        alleles = []
+        for mgi_summary_row in self.mgi_info:
+            mgi_mapper = MgiMapper(mgi_summary_row=mgi_summary_row)
+            pid_name = mgi_mapper.map_to_aind_pid_name()
+            if pid_name is not None:
+                alleles.append(pid_name)
         try:
             return Subject(
                 subject_id=subject_id,
