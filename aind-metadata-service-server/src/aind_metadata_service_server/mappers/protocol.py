@@ -62,10 +62,9 @@ class ProtocolMapper:
                 version=version,
                 protocol_collection=protocol_collection,
             )
-        except ValidationError:
+        except ValidationError as e:
             logging.warning(
-                f"Validation error creating ProtocolInformation model for "
-                f"{self.smartsheet_protocol.protocol_name}"
+                f"Validation error creating ProtocolInformation model: {e}"
             )
             return ProtocolInformation.model_construct(
                 procedure_name=procedure_name,

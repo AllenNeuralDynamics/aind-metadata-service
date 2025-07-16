@@ -95,11 +95,8 @@ class PerfusionMapper:
                     )
                 ],
             )
-        except ValidationError:
-            logging.warning(
-                f"Validation error creating Surgery model for "
-                f"{self.smartsheet_perfusion.subject_id}"
-            )
+        except ValidationError as e:
+            logging.warning(f"Validation error creating Surgery model: {e}")
             return Surgery.model_construct(
                 start_date=start_date,
                 experimenter_full_name=experimenter_full_name,

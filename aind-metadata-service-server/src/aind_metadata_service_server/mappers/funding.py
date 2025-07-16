@@ -87,10 +87,9 @@ class FundingMapper:
                 fundee=fundees,
                 investigators=investigators,
             )
-        except ValidationError:
+        except ValidationError as e:
             logging.warning(
-                f"Validation error creating FundingInformation model for "
-                f"{smartsheet_funding.project_name}"
+                f"Validation error creating FundingInformation model: {e}"
             )
             return FundingInformation.model_construct(
                 funder=funder,
