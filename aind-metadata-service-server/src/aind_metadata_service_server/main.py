@@ -2,6 +2,7 @@
 
 import logging
 import os
+import warnings
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,13 +16,8 @@ from aind_metadata_service_server.routes.rig_and_instrument import (
 from aind_metadata_service_server.routes.slims import router as sl_route
 from aind_metadata_service_server.routes.subject import router as su_route
 
-import warnings
-
-
 warnings.filterwarnings(
-    "ignore",
-    category=UserWarning,
-    message=r".*Pydantic serializer warnings.*"
+    "ignore", category=UserWarning, message=r".*Pydantic serializer warnings.*"
 )
 
 # The log level can be set by adding an environment variable before launch.
