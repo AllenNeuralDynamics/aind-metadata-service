@@ -1,6 +1,6 @@
 """Test funding routes"""
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from aind_smartsheet_service_async_client.models import FundingModel
@@ -13,7 +13,7 @@ class TestRoute:
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_funding")
     def test_get_funding(
         self,
-        mock_get_funding: MagicMock,
+        mock_get_funding: AsyncMock,
         client: TestClient,
     ):
         """Tests successful funding retrieval"""
@@ -141,9 +141,6 @@ class TestRoute:
         ]
         response = client.get("/project_names")
 
-        assert 200 == response.status_code
-        assert 1 == len(mock_get_funding.mock_calls)
-
         project_names = response.json()
         expected_names = [
             "Discovery-Neuromodulator circuit dynamics during foraging - "
@@ -155,10 +152,9 @@ class TestRoute:
             "MSMA Platform",
         ]
 
-        assert isinstance(project_names, list)
-        assert 4 == len(project_names)
-        for name in expected_names:
-            assert name in project_names
+        assert 200 == response.status_code
+        assert 1 == len(mock_get_funding.mock_calls)
+        assert sorted(expected_names) == sorted(project_names)
 
 
 if __name__ == "__main__":

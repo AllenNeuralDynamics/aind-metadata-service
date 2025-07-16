@@ -1,9 +1,11 @@
 """Models and schema definitions for backend data structures"""
 
 from typing import Literal, Optional
-from pydantic import BaseModel, Field, field_validator
-from aind_metadata_service_server import __version__
+
 from aind_data_schema.core.data_description import Funding
+from pydantic import BaseModel, Field, field_validator
+
+from aind_metadata_service_server import __version__
 
 
 class HealthCheck(BaseModel):
