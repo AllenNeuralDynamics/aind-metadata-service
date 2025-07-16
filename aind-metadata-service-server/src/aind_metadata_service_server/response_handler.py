@@ -1,7 +1,6 @@
 """Module to handle responses"""
 
 import json
-import warnings
 from enum import Enum
 from typing import Generic, List, Optional, TypeVar, Union
 
@@ -13,10 +12,6 @@ from fastapi import Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
-
-warnings.filterwarnings(
-    "ignore", category=UserWarning, message=r".*PydanticSerialization.*"
-)
 
 T = TypeVar("T", Subject, PIDName, Rig, Instrument)
 
