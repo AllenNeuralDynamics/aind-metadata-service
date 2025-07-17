@@ -10,15 +10,15 @@ from fastapi.routing import APIRoute
 
 from aind_metadata_service_server import __version__ as service_version
 from aind_metadata_service_server.routes.healthcheck import router as hc_route
-from aind_metadata_service_server.routes.rig_and_instrument import (
-    router as ri_route,
-)
-from aind_metadata_service_server.routes.mgi_allele import router as mg_route
-from aind_metadata_service_server.routes.slims import router as sl_route
-from aind_metadata_service_server.routes.subject import router as su_route
 from aind_metadata_service_server.routes.injection_materials import (
     router as in_route,
 )
+from aind_metadata_service_server.routes.mgi_allele import router as mg_route
+from aind_metadata_service_server.routes.rig_and_instrument import (
+    router as ri_route,
+)
+from aind_metadata_service_server.routes.slims import router as sl_route
+from aind_metadata_service_server.routes.subject import router as su_route
 
 warnings.filterwarnings(
     "ignore", category=UserWarning, message=r".*Pydantic serializer warnings.*"

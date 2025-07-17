@@ -13,7 +13,9 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
-T = TypeVar("T", Subject, PIDName, Rig, Instrument)
+from aind_metadata_service_server.models import ViralMaterialInformation
+
+T = TypeVar("T", Subject, PIDName, Rig, Instrument, ViralMaterialInformation)
 
 
 class StatusCodes(Enum):

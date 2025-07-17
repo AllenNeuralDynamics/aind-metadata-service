@@ -23,6 +23,7 @@ tars_config = aind_tars_service_async_client.Configuration(
     host=settings.tars_host.unicode_string().strip("/")
 )
 
+
 async def get_labtracks_api_instance() -> (
     AsyncGenerator[aind_labtracks_service_async_client.DefaultApi, None]
 ):
@@ -63,6 +64,7 @@ async def get_slims_api_instance() -> (
         api_instance = aind_slims_service_async_client.DefaultApi(api_client)
         yield api_instance
 
+
 async def get_tars_api_instance() -> (
     AsyncGenerator[aind_tars_service_async_client.DefaultApi, None]
 ):
@@ -72,7 +74,5 @@ async def get_tars_api_instance() -> (
     async with aind_tars_service_async_client.ApiClient(
         tars_config
     ) as api_client:
-        api_instance = aind_tars_service_async_client.DefaultApi(
-            api_client
-        )
+        api_instance = aind_tars_service_async_client.DefaultApi(api_client)
         yield api_instance

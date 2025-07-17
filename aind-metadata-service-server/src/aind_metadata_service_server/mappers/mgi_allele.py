@@ -31,7 +31,7 @@ class MgiMapper:
 
         Returns
         -------
-        Optional[PIDName]
+        PIDName | None
             None if no valid PIDName can be created,
             otherwise a PIDName model with parsed data.
         """
