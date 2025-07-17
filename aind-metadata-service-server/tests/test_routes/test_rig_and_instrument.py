@@ -2,7 +2,7 @@
 
 from datetime import date
 from decimal import Decimal
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from aind_data_schema.components.devices import ImagingInstrumentType, Tube
@@ -19,7 +19,7 @@ class TestRoute:
     @patch("aind_slims_service_async_client.DefaultApi.get_aind_instrument")
     def test_get_rig(
         self,
-        mock_slims_api_get: MagicMock,
+        mock_slims_api_get: AsyncMock,
         client: TestClient,
     ):
         """Tests a good response"""
@@ -46,7 +46,7 @@ class TestRoute:
     @patch("aind_slims_service_async_client.DefaultApi.get_aind_instrument")
     def test_get_instrument(
         self,
-        mock_slims_api_get: MagicMock,
+        mock_slims_api_get: AsyncMock,
         client: TestClient,
     ):
         """Tests a good response"""

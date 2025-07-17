@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     slims_host: HttpUrl = Field(
         ..., description="Host address for slims endpoint"
     )
+    smartsheet_host: HttpUrl = Field(
+        ..., description="Host address for smartsheet endpoint"
+    )
 
 
 def get_settings():

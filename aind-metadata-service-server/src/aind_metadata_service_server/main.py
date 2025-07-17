@@ -9,13 +9,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRoute
 
 from aind_metadata_service_server import __version__ as service_version
-from aind_metadata_service_server.routes.healthcheck import router as hc_route
-from aind_metadata_service_server.routes.rig_and_instrument import (
-    router as ri_route,
+from aind_metadata_service_server.routes import (
+    funding,
+    healthcheck,
+    mgi_allele,
+    perfusion,
+    protocol,
+    rig_and_instrument,
+    slims,
+    subject,
 )
-from aind_metadata_service_server.routes.mgi_allele import router as mg_route
-from aind_metadata_service_server.routes.slims import router as sl_route
-from aind_metadata_service_server.routes.subject import router as su_route
 
 warnings.filterwarnings(
     "ignore", category=UserWarning, message=r".*Pydantic serializer warnings.*"
@@ -47,11 +50,14 @@ app.add_middleware(
     allow_methods=["GET"],
     allow_headers=["*"],
 )
-app.include_router(hc_route)
-app.include_router(su_route)
-app.include_router(sl_route)
-app.include_router(ri_route)
-app.include_router(mg_route)
+app.include_router(healthcheck.router)
+app.include_router(subject.router)
+app.include_router(perfusion.router)
+app.include_router(protocol.router)
+app.include_router(funding.router)
+app.include_router(slims.router)
+app.include_router(rig_and_instrument.router)
+app.include_router(mgi_allele.router)
 
 # Clean up the methods names that is generated in the client code
 for route in app.routes:
