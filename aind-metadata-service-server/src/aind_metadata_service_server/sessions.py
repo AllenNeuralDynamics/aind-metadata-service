@@ -5,7 +5,7 @@ from typing import AsyncGenerator
 import aind_labtracks_service_async_client
 import aind_mgi_service_async_client
 import aind_slims_service_async_client
-
+import aind_sharepoint_service_async_client
 from aind_metadata_service_server.configs import get_settings
 
 settings = get_settings()
@@ -17,6 +17,9 @@ mgi_config = aind_mgi_service_async_client.Configuration(
 )
 slims_config = aind_slims_service_async_client.Configuration(
     host=settings.slims_host.unicode_string().strip("/")
+)
+sharepoint_config = aind_sharepoint_service_async_client.Configuration(
+    host=settings.sharepoint_host.unicode_string().strip("/")
 )
 
 
@@ -58,4 +61,16 @@ async def get_slims_api_instance() -> (
         slims_config
     ) as api_client:
         api_instance = aind_slims_service_async_client.DefaultApi(api_client)
+        yield api_instance
+
+async def get_sharepoint_api_instance() -> (
+    AsyncGenerator[aind_sharepoint_service_async_client.DefaultApi, None]
+):
+    """
+    Yield an aind_sharepoint_service_async_client.DefaultApi object for SharePoint.
+    """
+    async with aind_sharepoint_service_async_client.ApiClient(
+        sharepoint_config
+    ) as api_client:
+        api_instance = aind_sharepoint_service_async_client.DefaultApi(api_client)
         yield api_instance

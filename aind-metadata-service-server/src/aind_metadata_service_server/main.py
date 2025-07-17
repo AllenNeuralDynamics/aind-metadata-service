@@ -16,6 +16,9 @@ from aind_metadata_service_server.routes.rig_and_instrument import (
 from aind_metadata_service_server.routes.mgi_allele import router as mg_route
 from aind_metadata_service_server.routes.slims import router as sl_route
 from aind_metadata_service_server.routes.subject import router as su_route
+from aind_metadata_service_server.routes.procedures import (
+    router as pr_route,
+)
 
 warnings.filterwarnings(
     "ignore", category=UserWarning, message=r".*Pydantic serializer warnings.*"
@@ -52,6 +55,7 @@ app.include_router(su_route)
 app.include_router(sl_route)
 app.include_router(ri_route)
 app.include_router(mg_route)
+app.include_router(pr_route)
 
 # Clean up the methods names that is generated in the client code
 for route in app.routes:
