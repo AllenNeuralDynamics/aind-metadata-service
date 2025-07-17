@@ -5,6 +5,7 @@ from typing import AsyncGenerator
 import aind_labtracks_service_async_client
 import aind_mgi_service_async_client
 import aind_slims_service_async_client
+import aind_tars_service_async_client
 
 from aind_metadata_service_server.configs import get_settings
 
@@ -18,7 +19,9 @@ mgi_config = aind_mgi_service_async_client.Configuration(
 slims_config = aind_slims_service_async_client.Configuration(
     host=settings.slims_host.unicode_string().strip("/")
 )
-
+tars_config = aind_tars_service_async_client.Configuration(
+    host=settings.tars_host.unicode_string().strip("/")
+)
 
 async def get_labtracks_api_instance() -> (
     AsyncGenerator[aind_labtracks_service_async_client.DefaultApi, None]
@@ -58,4 +61,18 @@ async def get_slims_api_instance() -> (
         slims_config
     ) as api_client:
         api_instance = aind_slims_service_async_client.DefaultApi(api_client)
+        yield api_instance
+
+async def get_tars_api_instance() -> (
+    AsyncGenerator[aind_tars_service_async_client.DefaultApi, None]
+):
+    """
+    Yield an aind_tars_service_async_client.DefaultApi object.
+    """
+    async with aind_tars_service_async_client.ApiClient(
+        tars_config
+    ) as api_client:
+        api_instance = aind_tars_service_async_client.DefaultApi(
+            api_client
+        )
         yield api_instance
