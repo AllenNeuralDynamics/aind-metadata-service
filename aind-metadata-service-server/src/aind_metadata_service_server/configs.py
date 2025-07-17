@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     tars_host: HttpUrl = Field(
         ..., description="Host address for tars endpoint"
     )
+    smartsheet_host: HttpUrl = Field(
+        ..., description="Host address for smartsheet endpoint"
+    )
 
 
 def get_settings():
