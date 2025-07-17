@@ -17,8 +17,10 @@ services:
   mgi:
     image: "ghcr.io/allenneuraldynamics/aind-mgi-service-server:0.1.2"
   smartsheet:
-    image: "ghcr.io/allenneuraldynamics/aind-smartsheet-service-server:0.1.3"
+    image: "ghcr.io/allenneuraldynamics/aind-smartsheet-service-server:0.2.1"
     env_file: "env/smartsheet.env"
   slims:
     image: "ghcr.io/allenneuraldynamics/aind-slims-service-server:0.2.4"
     env_file: "env/slims.env"
+  redis:
+    image: "redis:latest"

@@ -20,7 +20,7 @@ dependencies = [
     'aind-labtracks-service-async-client>=0.2.4',
     'aind-mgi-service-async-client>=0.1.2',
     'aind-slims-service-async-client>=0.2.4',
-    'aind-smartsheet-service-async-client>=0.1.5',
+    'aind-smartsheet-service-async-client>=0.2.1',
     'aind-data-schema==1.4.0',
     'aind-data-schema-models==0.7.5',
     'pydantic>=2.0',
