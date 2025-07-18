@@ -1,20 +1,19 @@
 """Module to map data in TARS to aind_data_schema InjectionMaterial"""
 
-import logging
-import re
 from dataclasses import dataclass
-from datetime import date, datetime
 from enum import Enum
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from aind_data_schema.core.procedures import (
-    Injection,
     TarsVirusIdentifiers,
-    ViralMaterial,
     VirusPrepType,
 )
 from aind_data_schema_models.pid_names import BaseName, PIDName
-from aind_tars_service_async_client.models import PrepLotData, VirusData, Alias
+from aind_tars_service_async_client import Titers
+from aind_tars_service_async_client.models import (
+    PrepLotData,
+    VirusData,
+)
 from pydantic import ValidationError
 
 from aind_metadata_service_server.models import ViralMaterialInformation
@@ -57,10 +56,10 @@ class PrepProtocols(str, Enum):
 class TarsVirusInformation:
     """Dataclass to store virus information"""
 
-    name: Optional[str]
-    plasmid_alias: Optional[str]
-    addgene_id: Optional[str]
-    rrid: Optional[str]
+    name: Optional[str] = None
+    plasmid_alias: Optional[str] = None
+    addgene_id: Optional[str] = None
+    rrid: Optional[str] = None
 
 
 class TarsMapper:
@@ -99,31 +98,32 @@ class TarsMapper:
 
     @staticmethod
     def _map_to_prep_type(
-        viral_prep_type: ViralPrepTypes,
+        viral_prep_type_name: Optional[str],
     ) -> Optional[VirusPrepType]:
         """
         Maps tars viral prep type to VirusPrepType
 
         Parameters
         ----------
-        viral_prep_type : ViralPrepTypes
-            The viral prep type from TARS
+        viral_prep_type_name : str | None
+            The viral prep type name from TARS
 
         Returns
         -------
         VirusPrepType | None
         """
-        match viral_prep_type:
+        match viral_prep_type_name:
             case (
                 ViralPrepTypes.CRUDE_SOP
                 | ViralPrepTypes.CRUDE_HGT
                 | ViralPrepTypes.CRUDE_HGT1
                 | ViralPrepTypes.RABIES_SOP
                 | ViralPrepTypes.CRUDE_PHP_SOP
-                | ViralPrepTypes.CRUDE_MGT1 | ViralPrepTypes.CRUDE_MGT2
+                | ViralPrepTypes.CRUDE_MGT1
+                | ViralPrepTypes.CRUDE_MGT2
             ):
                 prep_type = VirusPrepType.CRUDE
-            case (ViralPrepTypes.PURIFIED_SOP | ViralPrepTypes.PURIFIED_MGT1):
+            case ViralPrepTypes.PURIFIED_SOP | ViralPrepTypes.PURIFIED_MGT1:
                 prep_type = VirusPrepType.PURIFIED
             case _:
                 prep_type = None
@@ -131,24 +131,22 @@ class TarsMapper:
 
     @staticmethod
     def _map_to_protocol(
-        viral_prep_type: ViralPrepTypes,
+        viral_prep_type_name: Optional[str],
     ) -> Optional[PrepProtocols]:
         """
-        Maps tars viral_prep_type to  protocol string.
+        Maps tars viral_prep_type to protocol string.
 
         Parameters
         ----------
-        viral_prep_type : ViralPrepTypes
+        viral_prep_type_name : str | None
             The viral prep type from TARS
 
         Returns
         -------
         PrepProtocols | None
         """
-        match viral_prep_type:
-            case (
-                ViralPrepTypes.CRUDE_MGT1 | ViralPrepTypes.PURIFIED_MGT1
-            ):
+        match viral_prep_type_name:
+            case ViralPrepTypes.CRUDE_MGT1 | ViralPrepTypes.PURIFIED_MGT1:
                 prep_protocol = PrepProtocols.MGT1
             case ViralPrepTypes.CRUDE_MGT2:
                 prep_protocol = PrepProtocols.MGT2
@@ -169,13 +167,13 @@ class TarsMapper:
         return prep_protocol
 
     @staticmethod
-    def _map_plasmid_name(aliases: List[Alias]) -> Optional[str]:
+    def _map_plasmid_name(aliases: List[Dict[str, Any]]) -> Optional[str]:
         """
         Maps plasmid name from aliases.
 
         Parameters
         ----------
-        aliases : List
+        aliases : List[Dict[str, Any]]
             List of alias objects
 
         Returns
@@ -184,12 +182,12 @@ class TarsMapper:
             Preferred plasmid name or None
         """
         for alias in aliases:
-            if alias.is_preferred:
-                return alias.name
+            if alias.get("isPreferred"):
+                return alias.get("name")
         return None
 
     @staticmethod
-    def _map_stock_titer(titers: Optional[List]) -> Optional[int]:
+    def _map_stock_titer(titers: Optional[List[Titers]]) -> Optional[int]:
         """
         Maps titer from viral prep lot.
 
@@ -203,38 +201,8 @@ class TarsMapper:
         int | None
             Stock titer value or None
         """
-        if titers and len(titers) > 0:
-            first_titer = titers[0]
-            if first_titer.result
-            if (
-                hasattr(first_titer, "result")
-                and first_titer.result is not None
-            ):
-                return int(first_titer.result)
-        return None
-
-    def _get_virus_tars_id_from_prep_lot(self) -> Optional[str]:
-        """
-        Extracts virus TARS ID from prep lot data.
-
-        Returns
-        -------
-        Optional[str]
-            Virus TARS ID or None
-        """
-        if (
-            self.prep_lot_data.viral_prep
-            and self.prep_lot_data.viral_prep.virus
-            and self.prep_lot_data.viral_prep.virus.aliases
-        ):
-            return next(
-                (
-                    alias.name
-                    for alias in self.prep_lot_data.viral_prep.virus.aliases
-                    if alias.is_preferred
-                ),
-                None,
-            )
+        if titers and len(titers) > 0 and titers[0].result is not None:
+            return titers[0].result
         return None
 
     def _map_virus_information(self) -> TarsVirusInformation:
@@ -246,35 +214,29 @@ class TarsMapper:
         TarsVirusInformation
             Mapped virus information
         """
+        if len(self.virus_data) == 0:
+            return TarsVirusInformation()
+
+        first_virus = self.virus_data[0]
         names = []
         plasmid_aliases = []
         addgene_ids = []
         rrids = []
-
-        # Use the rr_id from the virus data if available
-        if self.virus_data.rr_id:
-            rrids.append(str(self.virus_data.rr_id))
-
-        # Process molecules if they exist
-        if self.virus_data.molecules:
-            for molecule in self.virus_data.molecules:
-                # Extract full name
-                if hasattr(molecule, "full_name") and molecule.full_name:
-                    names.append(molecule.full_name)
-
-                # Extract plasmid name from aliases
-                if hasattr(molecule, "aliases") and molecule.aliases:
-                    plasmid_name = self._map_plasmid_name(molecule.aliases)
-                    if plasmid_name:
-                        plasmid_aliases.append(plasmid_name)
-
-                # Extract addgene ID
-                if hasattr(molecule, "addgene_id") and molecule.addgene_id:
-                    addgene_ids.append(str(molecule.addgene_id))
-
-                # Extract rr_id from molecule
-                if hasattr(molecule, "rr_id") and molecule.rr_id:
-                    rrids.append(str(molecule.rr_id))
+        if first_virus.rr_id is not None:
+            rrids.append(first_virus.rr_id)
+        virus_molecules: List[Dict[str, Any]] = (
+            [] if first_virus.molecules is None else first_virus.molecules
+        )
+        for molecule in virus_molecules:
+            if molecule.get("fullName") is not None:
+                names.append(molecule["fullName"])
+            plasmid_name = self._map_plasmid_name(molecule.get("aliases", []))
+            if plasmid_name:
+                plasmid_aliases.append(plasmid_name)
+            if molecule.get("addgeneId"):
+                addgene_ids.append(molecule["addgeneId"])
+            if molecule.get("rrId"):
+                rrids.append(molecule.get("rrId"))
 
         name = "; ".join(names) if names else None
         plasmid_alias = "; ".join(plasmid_aliases) if plasmid_aliases else None
@@ -288,26 +250,9 @@ class TarsMapper:
             rrid=rrid,
         )
 
-    def _get_prep_type_name(self) -> str:
-        """
-        Gets the prep type name from the prep lot data.
-
-        Returns
-        -------
-        str
-            Prep type name or empty string
-        """
-        if (
-            self.prep_lot_data.viral_prep
-            and hasattr(self.prep_lot_data.viral_prep, "viral_prep_type")
-            and self.prep_lot_data.viral_prep.viral_prep_type
-            and hasattr(self.prep_lot_data.viral_prep.viral_prep_type, "name")
-        ):
-            return self.prep_lot_data.viral_prep.viral_prep_type.name
-        return ""
-
+    @staticmethod
     def _create_addgene_pid_name(
-        self, virus_info: TarsVirusInformation
+        virus_info: TarsVirusInformation,
     ) -> Optional[PIDName]:
         """
         Creates PIDName for Addgene information.
@@ -322,16 +267,19 @@ class TarsMapper:
         PIDName | None
             PIDName object or None
         """
-        if not virus_info.addgene_id:
+        if virus_info.name is None:
             return None
-
-        return PIDName(
-            name=virus_info.name,
-            registry=(
-                BaseName(name=virus_info.rrid) if virus_info.rrid else None
-            ),
-            registry_identifier=virus_info.addgene_id,
-        )
+        else:
+            registry = (
+                None
+                if virus_info.rrid is None
+                else BaseName(name=virus_info.rrid)
+            )
+            return PIDName(
+                name=virus_info.name,
+                registry=registry,
+                registry_identifier=virus_info.addgene_id,
+            )
 
     def map_to_viral_material_information(self) -> ViralMaterialInformation:
         """
@@ -350,41 +298,42 @@ class TarsMapper:
             if self.prep_lot_data.date_prepped is None
             else self.prep_lot_data.date_prepped.date()
         )
-        prep_type_name = self._get_prep_type_name()
-        prep_type, prep_protocol = self._map_prep_type_and_protocol(
-            prep_type_name
+        viral_prep_type_name = (
+            None
+            if self.prep_lot_data.viral_prep is None
+            or self.prep_lot_data.viral_prep.viral_prep_type is None
+            else self.prep_lot_data.viral_prep.viral_prep_type.name
         )
+        prep_type = self._map_to_prep_type(
+            viral_prep_type_name=viral_prep_type_name
+        )
+        prep_protocol = self._map_to_protocol(
+            viral_prep_type_name=viral_prep_type_name
+        )
+
         virus_info = self._map_virus_information()
-        addgene_id = self._create_addgene_pid_name(virus_info)
+        addgene_id_pidname = self._create_addgene_pid_name(virus_info)
         stock_titer = self._map_stock_titer(self.prep_lot_data.titers)
+        tars_virus_identifiers = TarsVirusIdentifiers(
+            prep_lot_number=prep_lot_number,  # Only required field
+            virus_tars_id=self.virus_id,
+            plasmid_tars_alias=virus_info.plasmid_alias,
+            prep_date=prep_date,
+            prep_type=prep_type,
+            prep_protocol=prep_protocol,
+        )
 
         try:
-            tars_virus_identifiers = TarsVirusIdentifiers(
-                virus_tars_id=self.virus_id,
-                plasmid_tars_alias=virus_info.plasmid_alias,
-                prep_lot_number=prep_lot_number,
-                prep_date=prep_date,
-                prep_type=prep_type,
-                prep_protocol=prep_protocol,
-            )
             return ViralMaterialInformation(
                 name=virus_info.name,
                 tars_identifiers=tars_virus_identifiers,
                 stock_titer=stock_titer,
-                addgene_id=addgene_id,
+                addgene_id=addgene_id_pidname,
             )
         except ValidationError:
-            tars_virus_identifiers = TarsVirusIdentifiers.model_construct(
-                virus_tars_id=self.virus_id,
-                plasmid_tars_alias=virus_info.plasmid_alias,
-                prep_lot_number=prep_lot_number,
-                prep_date=prep_date,
-                prep_type=prep_type,
-                prep_protocol=prep_protocol,
-            )
             return ViralMaterialInformation.model_construct(
                 name=virus_info.name,
                 tars_identifiers=tars_virus_identifiers,
                 stock_titer=stock_titer,
-                addgene_id=addgene_id,
+                addgene_id=addgene_id_pidname,
             )

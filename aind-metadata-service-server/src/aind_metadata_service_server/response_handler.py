@@ -14,12 +14,10 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
-from aind_metadata_service_server.models import ViralMaterialInformation
-
-
 from aind_metadata_service_server.models import (
     FundingInformation,
     ProtocolInformation,
+    ViralMaterialInformation,
 )
 
 T = TypeVar(
@@ -29,7 +27,8 @@ T = TypeVar(
     Rig,
     Instrument,
     FundingInformation,
-    ProtocolInformation, ViralMaterialInformation,
+    ProtocolInformation,
+    ViralMaterialInformation,
     Surgery,
 )
 

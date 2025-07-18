@@ -15,7 +15,7 @@ from aind_metadata_service_server.sessions import get_tars_api_instance
 router = APIRouter()
 
 
-@router.get("/tars_injection_material/{prep_lot_number}")
+@router.get("/tars_injection_materials/{prep_lot_number}")
 async def get_injection_materials(
     prep_lot_number: str = Path(
         ...,

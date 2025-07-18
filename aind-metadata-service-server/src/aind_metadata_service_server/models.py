@@ -2,8 +2,8 @@
 
 from typing import Literal, Optional
 
-from aind_data_schema.core.procedures import ViralMaterial
 from aind_data_schema.core.data_description import Funding
+from aind_data_schema.core.procedures import ViralMaterial
 from pydantic import BaseModel, Field, field_validator
 
 from aind_metadata_service_server import __version__
