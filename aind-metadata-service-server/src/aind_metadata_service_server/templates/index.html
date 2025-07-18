@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <meta charset="UTF-8">
+  <title>{{ service_name }}</title>
+  <style>
+    body {
+      font-family: arial, sans-serif;
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 120px;
+        background-color: #E8EAF6;
+        padding-left: 40px;
+        overflow: hidden;
+        border-radius: 6px;
+        h1 { color: #3F51B5; }
+      }
+      .main {
+        margin-top: 120px;
+        padding: 20px;
+        div, input, button, label { border-radius: 6px; }
+      }
+    }
+    input {
+      padding: 8px 20px;
+      border: 1px solid #5065df;
+      background-color: #E8EAF6;
+      &:focus {
+        outline: none;
+        border-width: 2px;
+      }
+    }
+    button {
+      margin: 20px 0px;
+      border: none;
+      padding: 8px 20px;
+      cursor: pointer;
+      &.primary {
+        font-size: medium;
+        color: #ffffff;
+        background-color: #5065df;
+        &:hover { background-color: #3f51b5; }
+      }
+      &.secondary {
+        background-color: #c0c7f7;
+        &:hover { background-color: #aab1dc; }
+      }
+    }
+    #user-message {
+      &.pending { color: darkorange; }
+      &.success { color: green; }
+      &.error { color: red; }
+      &.partialError { color: black; }
+    }
+    .path, pre {
+      font-family: monospace;
+      border: 1px solid #dddddd;
+      background-color: #f5f5f5;
+      font-size: small;
+      border-radius: 6px;
+    }
+    pre {
+      padding: 10px;
+      max-width: 80vw;
+      max-height: 50vh;
+      min-width: 300px;
+      overflow: auto;
+    }
+    .path {
+      margin-left: 10px;
+      padding: 5px;
+    }
+    .container {
+      margin: 10px 0px;
+      padding: 15px;
+      border: 1px dashed #dddddd;
+      width: fit-content;
+      .heading {
+        font-size: x-large;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <h1>{{ service_name }}</h1>
+    <span>
+      {{ service_description }}
+      {% if service_version %} Version {{ service_version }}{% endif %}
+    </span>
+  </div>
+  <div class="main">
+    {% for e in endpoints if e.endpoint and e.parameter %}
+      <div class="container">
+        <div class="heading">{{ e.endpoint|title }}
+        </div>
+        <p>{{ e.description }}</p>
+        <label for="param-id-{{ e.endpoint }}">{{ e.parameter_label or e.parameter }}:</label>
+        <input type="text" id="param-id-{{ e.endpoint }}" size="6" placeholder="{{ e.parameter }}" onkeydown="searchWithEnter('{{ e.endpoint }}')" />
+      <button id="search" type="button" class="primary" onclick="queryEndpoint('{{ e.endpoint }}')">Search</button>
+    </div>
+    {% endfor %}
+    <div>
+      <div id="user-message"></div>
+      <div id="response" class="container" hidden>
+        <div class="heading">Response</div>
+        <div>Data:<pre id="response-data"></pre></div>
+        <div>Message:<pre id="response-message"></pre></div>
+        <div id="response-raw-div" hidden>Raw Response:<pre id="response-raw"></pre></div>
+        <button id="toggle-raw" type="button" class="secondary" onclick="toggleViewRawResponse()">View raw response</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    searchWithEnter = function (endpoint) {
+      if(event.key === 'Enter') {
+        queryEndpoint(endpoint);
+      }
+    };
+    displayPendingUI = function () {
+      $("#user-message").removeClass("success error partialError").addClass("pending");
+      $("#user-message").html("Searching.... Please do not refresh or re-submit.");
+      for (let id of ["message", "data", "raw"]) {
+        $(`#response-${id}`).html("");
+      }
+      $("#response").hide();
+    };
+    displayResponseUI = function (isError, response, statusCode, statusText) {
+      const responseText = {
+        "user-message"    : `Search returned ${statusText} (Status ${statusCode}).`,
+        "response-message": response?.message,
+        "response-data"   : JSON.stringify(response?.data, null, 2),
+        "response-raw"    : JSON.stringify(response, null, 2)
+      }
+      if (statusCode === 406 || statusCode === 300){
+        $("#user-message").removeClass("pending error success").addClass("partialError")
+      } else{
+        $("#user-message").removeClass("pending").addClass(isError ? "error" : "success");
+      }
+      Object.keys(responseText).forEach((id) => {
+        $(`#${id}`).html(responseText[id]);
+      });
+      $("#response").show();
+    };
+    toggleViewRawResponse = function () {
+      $("#response-raw-div").toggle();
+      const viewOrHide = $("#response-raw-div").is(":visible") ? "Hide" : "View";
+      $("#toggle-raw").text(`${viewOrHide} raw response`);
+    };
+    queryEndpoint = function (endpoint) {
+        let parameter = $(`#param-id-${endpoint}`).val();
+        $.ajax({
+        url: `/${endpoint}/${parameter}`,
+        type: "GET",
+        beforeSend: function () {
+          displayPendingUI();
+        },
+        success: function (data, status, xhr) {
+          displayResponseUI(false, data, xhr.status, xhr.statusText);
+        },
+        error: function (data) {
+          displayResponseUI(
+            true,
+            data.responseJSON ?? data.responseText ?? data,
+            data.status,
+            data.statusText
+          );
+        }
+      });
+    };
+  </script>
+</body>
+
+</html>
