@@ -9,15 +9,23 @@ services:
       - labtracks
       - mgi
       - slims
+      - smartsheet
+      - tars
+      - redis
     env_file: "env/webapp.env"
   labtracks:
     image: "ghcr.io/allenneuraldynamics/aind-labtracks-service-server:0.2.4"
     env_file: "env/labtracks.env"
   mgi:
     image: "ghcr.io/allenneuraldynamics/aind-mgi-service-server:0.1.2"
+  smartsheet:
+    image: "ghcr.io/allenneuraldynamics/aind-smartsheet-service-server:0.2.1"
+    env_file: "env/smartsheet.env"
   slims:
     image: "ghcr.io/allenneuraldynamics/aind-slims-service-server:0.2.4"
     env_file: "env/slims.env"
   tars:
-    image: "ghcr.io/allenneuraldynamics/aind-tars-service-server:0.0.4"
+    image: "ghcr.io/allenneuraldynamics/aind-tars-service-server:0.0.5"
     env_file: "env/tars.env"
+  redis:
+    image: "redis:latest"

@@ -45,7 +45,7 @@ class SubjectMapper:
         Maps the LabTracks Sex enum to the aind_data_schema.subject.Sex
         Parameters
         ----------
-        sex : Optional[str]
+        sex : str | None
           LabTracks sex name
 
         Returns
@@ -72,11 +72,11 @@ class SubjectMapper:
         aind_data_schema.subject.BackgroundStrain
         Parameters
         ----------
-        bg_strain : Optional[str]
+        bg_strain : str | None
 
         Returns
         -------
-        Optional[BackgroundStrain]
+        BackgroundStrain | None
         """
 
         match bg_strain:
@@ -98,6 +98,7 @@ class SubjectMapper:
 
         Returns
         -------
+        Species | None
           An aind_data_schema.subject.Species or None if no mapping exists.
 
         """
@@ -116,12 +117,12 @@ class SubjectMapper:
         to the aind_data_schema.subject.Housing
         Parameters
         ----------
-        room_id : Optional[str]
-        cage_id: Optional[str]
+        room_id : str | None
+        cage_id: str | None
 
         Returns
         -------
-        Optional[Housing]
+        Housing | None
         """
         room_id = (
             None
@@ -143,7 +144,7 @@ class SubjectMapper:
         Map to BreedingInfo
         Returns
         -------
-        Optional[BreedingInfo]
+        BreedingInfo | None
         """
         labtracks_subject = self.labtracks_subject
         breeding_group = labtracks_subject.group_name

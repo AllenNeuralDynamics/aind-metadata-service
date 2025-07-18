@@ -3,7 +3,7 @@
 from enum import Enum
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query, Path
+from fastapi import APIRouter, Depends, Path, Query
 from starlette.responses import JSONResponse
 
 from aind_metadata_service_server.response_handler import (
