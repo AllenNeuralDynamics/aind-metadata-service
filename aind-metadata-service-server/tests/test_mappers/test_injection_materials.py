@@ -129,7 +129,7 @@ class TestTarsMapping(unittest.TestCase):
         """Tests _map_virus_information with first_rrid edge case"""
         mapper = TarsMapper(
             prep_lot_data=self.mapper.prep_lot_data,
-            virus_data=[VirusData(rr_id="abc")]
+            virus_data=[VirusData(rr_id="abc")],
         )
         self.assertEqual(
             TarsVirusInformation(rrid="abc"), mapper._map_virus_information()
