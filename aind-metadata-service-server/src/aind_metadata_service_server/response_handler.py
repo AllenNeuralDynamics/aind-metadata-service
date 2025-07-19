@@ -17,6 +17,7 @@ from pydantic import ValidationError
 from aind_metadata_service_server.models import (
     FundingInformation,
     ProtocolInformation,
+    ViralMaterialInformation,
 )
 
 T = TypeVar(
@@ -27,6 +28,7 @@ T = TypeVar(
     Instrument,
     FundingInformation,
     ProtocolInformation,
+    ViralMaterialInformation,
     Surgery,
 )
 

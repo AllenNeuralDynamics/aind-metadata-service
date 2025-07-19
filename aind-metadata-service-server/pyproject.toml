@@ -20,6 +20,7 @@ dependencies = [
     'aind-labtracks-service-async-client>=0.2.4',
     'aind-mgi-service-async-client>=0.1.2',
     'aind-slims-service-async-client>=0.2.4',
+    'aind-tars-service-async-client>=0.0.5',
     'aind-smartsheet-service-async-client>=0.2.1',
     'aind-data-schema==1.4.0',
     'aind-data-schema-models==0.7.5',
@@ -99,5 +100,6 @@ env = [
     "AIND_METADATA_SERVICE_LABTRACKS_HOST=http://example.com/labtracks",
     "AIND_METADATA_SERVICE_MGI_HOST=http://example.com/mgi",
     "AIND_METADATA_SERVICE_SLIMS_HOST=http://example.com/slims",
-    "AIND_METADATA_SERVICE_SMARTSHEET_HOST=http://example.com/smartsheet"
+    "AIND_METADATA_SERVICE_SMARTSHEET_HOST=http://example.com/smartsheet",
+    "AIND_METADATA_SERVICE_TARS_HOST=http://example.com/tars",
 ]

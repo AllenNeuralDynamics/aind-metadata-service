@@ -16,11 +16,12 @@ class TestSettings(unittest.TestCase):
             "AIND_METADATA_SERVICE_LABTRACKS_HOST": (
                 "http://example.com/labtracks"
             ),
-            "AIND_METADATA_SERVICE_MGI_HOST": ("http://example.com/mgi"),
+            "AIND_METADATA_SERVICE_MGI_HOST": "http://example.com/mgi",
             "AIND_METADATA_SERVICE_SMARTSHEET_HOST": (
                 "http://example.com/smartsheet"
             ),
             "AIND_METADATA_SERVICE_SLIMS_HOST": "http://example.com/slims",
+            "AIND_METADATA_SERVICE_TARS_HOST": "http://example.com/tars",
         },
         clear=True,
     )
@@ -32,6 +33,7 @@ class TestSettings(unittest.TestCase):
             mgi_host="http://example.com/mgi",
             smartsheet_host="http://example.com/smartsheet",
             slims_host="http://example.com/slims",
+            tars_host="http://example.com/tars",
         )
         self.assertEqual(expected_settings, settings)
 
