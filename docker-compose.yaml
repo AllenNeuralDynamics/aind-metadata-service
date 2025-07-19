@@ -11,6 +11,7 @@ services:
       - slims
       - smartsheet
       - tars
+      - session_json
       - redis
     env_file: "env/webapp.env"
   labtracks:
@@ -27,5 +28,7 @@ services:
   tars:
     image: "ghcr.io/allenneuraldynamics/aind-tars-service-server:0.0.5"
     env_file: "env/tars.env"
+  session_json:
+    image: "ghcr.io/allenneuraldynamics/aind-session-json-service-server:0.1.3"
   redis:
     image: "redis:latest"

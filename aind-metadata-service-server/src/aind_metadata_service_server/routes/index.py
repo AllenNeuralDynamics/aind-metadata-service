@@ -22,9 +22,9 @@ async def index(request: Request):
     """
     return templates.TemplateResponse(
         name="index.html",
+        request=request,
         context=(
             {
-                "request": request,
                 "service_name": "AIND Metadata Service",
                 "service_description": (
                     "REST service to retrieve metadata from AIND databases."
