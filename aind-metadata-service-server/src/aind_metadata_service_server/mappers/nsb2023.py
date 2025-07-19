@@ -21,27 +21,20 @@ from aind_data_schema.core.procedures import (
     NanojectInjection,
     NonViralMaterial,
     OphysProbe,
-    Procedures,
     Side,
     Surgery,
     ViralMaterial,
 )
 from aind_data_schema.core.subject import Sex
 from aind_data_schema_models.organizations import Organization
-from pydantic import BaseModel
 
-from aind_metadata_service.models import IntendedMeasurementInformation
-from aind_metadata_service.sharepoint.nsb2023.models import (
-    IacucProtocol,
-    NSBList,
+from aind_metadata_service_server.models import IntendedMeasurementInformation
+from aind_sharepoint_service_async_client.models import (
+    NSB2023List,
+    NSB2023IacucProtocol as IacucProtocol,
+    NSB2023Procedure,
+    NSB2023ProcedureCategory,
 )
-from aind_metadata_service.sharepoint.nsb2023.models import (
-    Procedure as NSBProcedure,
-)
-from aind_metadata_service.sharepoint.nsb2023.models import (
-    ProcedureCategory as NSBProcedureCategory,
-)
-from aind_metadata_service.sharepoint.nsb2023.models import WindowPlacment
 
 
 class BurrHoleProcedure(Enum):
@@ -266,7 +259,7 @@ class MappedNSBList:
     CONCENTRATION_REGEX = re.compile(r"^\d+(\.\d+)?\s*mg[/]m[lL]$")
     LENGTH_MM_REGEX = re.compile(r"^([1-9]\.\d) mm$")
 
-    def __init__(self, nsb: NSBList):
+    def __init__(self, nsb: NSB2023List):
         """Class constructor"""
         self._nsb = nsb
 
@@ -361,34 +354,34 @@ class MappedNSBList:
     @property
     def aind_age_at_injection(self) -> Optional[Decimal]:
         """Maps age_at_injection to aind model."""
-        return self._parse_basic_decimal_str(self._nsb.age_at_injection)
+        return self._parse_basic_decimal_str(self._nsb.age_x0020_at_x0020_injection)
 
     @property
     def aind_aind_project_name(self) -> Optional[Any]:
         """Maps aind_project_name to aind model."""
         return (
             None
-            if self._nsb.aind_project_name is None
+            if self._nsb.aind_x0020_project_x0020_name is None
             else {
-                self._nsb.aind_project_name.BRAIN__WIDE__CIRCUIT__DYN: None,
-                self._nsb.aind_project_name.CELL__TYPE__LOOKUP__TABLE: None,
-                self._nsb.aind_project_name.COGNITIVE_FLEXIBILITY_IN: None,
-                self._nsb.aind_project_name.CREDIT_ASSIGNMENT_DURING: None,
-                self._nsb.aind_project_name.DYNAMIC__ROUTING: None,
-                self._nsb.aind_project_name.FORCE__FORGING: None,
-                self._nsb.aind_project_name.GENETIC__PERTURBATION__PR: None,
-                self._nsb.aind_project_name.INDICATOR__TESTING: None,
-                self._nsb.aind_project_name.INFORMATION_SEEKING_IN_PA: None,
-                self._nsb.aind_project_name.MEDULLA: None,
-                self._nsb.aind_project_name.MULTIPLEXED_NM: None,
-                self._nsb.aind_project_name.NEUROMODULATOR_CIRCUIT_DY: None,
-                self._nsb.aind_project_name.OPEN_SCOPE: None,
-                self._nsb.aind_project_name.OPHYS_M_FISH__CELL_TYPES: None,
-                self._nsb.aind_project_name.PLACE: None,
-                self._nsb.aind_project_name.SINGLE__NEURON__COMPUTATI: None,
-                self._nsb.aind_project_name.THALAMUS: None,
-                self._nsb.aind_project_name.THALAMUS_AIND__SCIENTIFIC: None,
-            }.get(self._nsb.aind_project_name, None)
+                self._nsb.aind_x0020_project_x0020_name.BRAIN__WIDE__CIRCUIT__DYN: None,
+                self._nsb.aind_x0020_project_x0020_name.CELL__TYPE__LOOKUP__TABLE: None,
+                self._nsb.aind_x0020_project_x0020_name.COGNITIVE_FLEXIBILITY_IN: None,
+                self._nsb.aind_x0020_project_x0020_name.CREDIT_ASSIGNMENT_DURING: None,
+                self._nsb.aind_x0020_project_x0020_name.DYNAMIC__ROUTING: None,
+                self._nsb.aind_x0020_project_x0020_name.FORCE__FORGING: None,
+                self._nsb.aind_x0020_project_x0020_name.GENETIC__PERTURBATION__PR: None,
+                self._nsb.aind_x0020_project_x0020_name.INDICATOR__TESTING: None,
+                self._nsb.aind_x0020_project_x0020_name.INFORMATION_SEEKING_IN_PA: None,
+                self._nsb.aind_x0020_project_x0020_name.MEDULLA: None,
+                self._nsb.aind_x0020_project_x0020_name.MULTIPLEXED_NM: None,
+                self._nsb.aind_x0020_project_x0020_name.NEUROMODULATOR_CIRCUIT_DY: None,
+                self._nsb.aind_x0020_project_x0020_name.OPEN_SCOPE: None,
+                self._nsb.aind_x0020_project_x0020_name.OPHYS_M_FISH__CELL_TYPES: None,
+                self._nsb.aind_x0020_project_x0020_name.PLACE: None,
+                self._nsb.aind_x0020_project_x0020_name.SINGLE__NEURON__COMPUTATI: None,
+                self._nsb.aind_x0020_project_x0020_name.THALAMUS: None,
+                self._nsb.aind_x0020_project_x0020_name.THALAMUS_AIND__SCIENTIFIC: None,
+            }.get(self._nsb.aind_x0020_project_x0020_name, None)
         )
 
     @property
@@ -438,31 +431,31 @@ class MappedNSBList:
         """Maps behavior_autotrain_c to aind model."""
         return (
             None
-            if self._nsb.behavior_autotrain_c is None
+            if self._nsb.behavior_x0020_autotrain_x0020_c is None
             else {
-                self._nsb.behavior_autotrain_c.COUPLED__BAITING: None,
-                self._nsb.behavior_autotrain_c.UNCOUPLED__BAITING: None,
-                self._nsb.behavior_autotrain_c.UNCOUPLED__WITHOUT__BAITI: None,
-                self._nsb.behavior_autotrain_c.N_A: None,
-            }.get(self._nsb.behavior_autotrain_c, None)
+                self._nsb.behavior_x0020_autotrain_x0020_c.COUPLED__BAITING: None,
+                self._nsb.behavior_x0020_autotrain_x0020_c.UNCOUPLED__BAITING: None,
+                self._nsb.behavior_x0020_autotrain_x0020_c.UNCOUPLED__WITHOUT__BAITI: None,
+                self._nsb.behavior_x0020_autotrain_x0020_c.N_A: None,
+            }.get(self._nsb.behavior_x0020_autotrain_x0020_c, None)
         )
 
     @property
     def aind_behavior_complete(self) -> Optional[str]:
         """Maps behavior_complete to aind model."""
-        return self._nsb.behavior_complete
+        return self._nsb.behavior_x0020_complete
 
     @property
     def aind_behavior_curriculum(self) -> Optional[Any]:
         """Maps behavior_curriculum to aind model."""
         return (
             None
-            if self._nsb.behavior_curriculum is None
+            if self._nsb.behavior_x0020_curriculum_x0020_ is None
             else {
-                self._nsb.behavior_curriculum.N_2_3: None,
-                self._nsb.behavior_curriculum.N_2_3_1RWD_DELAY159: None,
-                self._nsb.behavior_curriculum.N_A: None,
-            }.get(self._nsb.behavior_curriculum, None)
+                self._nsb.behavior_x0020_curriculum_x0020_.N_2_3: None,
+                self._nsb.behavior_x0020_curriculum_x0020_.N_2_3_1RWD_DELAY159: None,
+                self._nsb.behavior_x0020_curriculum_x0020_.N_A: None,
+            }.get(self._nsb.behavior_x0020_curriculum_x0020_, None)
         )
 
     @property
@@ -470,14 +463,14 @@ class MappedNSBList:
         """Maps behavior_destination to aind model."""
         return (
             None
-            if self._nsb.behavior_destination is None
+            if self._nsb.behavior_x0020_destination is None
             else {
-                self._nsb.behavior_destination.EPHYS: None,
-                self._nsb.behavior_destination.OPHYS: None,
-                self._nsb.behavior_destination.HSFP: None,
-                self._nsb.behavior_destination.PERFUSION: None,
-                self._nsb.behavior_destination.N_A: None,
-            }.get(self._nsb.behavior_destination, None)
+                self._nsb.behavior_x0020_destination.EPHYS: None,
+                self._nsb.behavior_x0020_destination.OPHYS: None,
+                self._nsb.behavior_x0020_destination.HSFP: None,
+                self._nsb.behavior_x0020_destination.PERFUSION: None,
+                self._nsb.behavior_x0020_destination.N_A: None,
+            }.get(self._nsb.behavior_x0020_destination, None)
         )
 
     @property
@@ -485,11 +478,11 @@ class MappedNSBList:
         """Maps behavior_fiber_photo to aind model."""
         return (
             None
-            if self._nsb.behavior_fiber_photo is None
+            if self._nsb.behavior_x0020_fiber_x0020_photo is None
             else {
-                self._nsb.behavior_fiber_photo.YES: None,
-                self._nsb.behavior_fiber_photo.NO: None,
-            }.get(self._nsb.behavior_fiber_photo, None)
+                self._nsb.behavior_x0020_fiber_x0020_photo.YES: None,
+                self._nsb.behavior_x0020_fiber_x0020_photo.NO: None,
+            }.get(self._nsb.behavior_x0020_fiber_x0020_photo, None)
         )
 
     @property
@@ -497,12 +490,12 @@ class MappedNSBList:
         """Maps behavior_fip_mode to aind model."""
         return (
             None
-            if self._nsb.behavior_fip_mode is None
+            if self._nsb.behavior_x0020_fip_x0020_mode is None
             else {
-                self._nsb.behavior_fip_mode.N_A: None,
-                self._nsb.behavior_fip_mode.NORMAL: None,
-                self._nsb.behavior_fip_mode.AXON: None,
-            }.get(self._nsb.behavior_fip_mode, None)
+                self._nsb.behavior_x0020_fip_x0020_mode.N_A: None,
+                self._nsb.behavior_x0020_fip_x0020_mode.NORMAL: None,
+                self._nsb.behavior_x0020_fip_x0020_mode.AXON: None,
+            }.get(self._nsb.behavior_x0020_fip_x0020_mode, None)
         )
 
     @property
@@ -510,19 +503,19 @@ class MappedNSBList:
         """Maps behavior_first_fip_x to aind model."""
         return (
             None
-            if self._nsb.behavior_first_fip_x is None
+            if self._nsb.behavior_x0020_first_x0020_fip_x is None
             else {
-                self._nsb.behavior_first_fip_x.N_1_1: None,
-                self._nsb.behavior_first_fip_x.N_1_2: None,
-                self._nsb.behavior_first_fip_x.N_2: None,
-                self._nsb.behavior_first_fip_x.N_3: None,
-                self._nsb.behavior_first_fip_x.N_4: None,
-                self._nsb.behavior_first_fip_x.N_5: None,
-                self._nsb.behavior_first_fip_x.N_6: None,
-                self._nsb.behavior_first_fip_x.FINAL: None,
-                self._nsb.behavior_first_fip_x.GRADUATED: None,
-                self._nsb.behavior_first_fip_x.N_A: None,
-            }.get(self._nsb.behavior_first_fip_x, None)
+                self._nsb.behavior_x0020_first_x0020_fip_x.N_1_1: None,
+                self._nsb.behavior_x0020_first_x0020_fip_x.N_1_2: None,
+                self._nsb.behavior_x0020_first_x0020_fip_x.N_2: None,
+                self._nsb.behavior_x0020_first_x0020_fip_x.N_3: None,
+                self._nsb.behavior_x0020_first_x0020_fip_x.N_4: None,
+                self._nsb.behavior_x0020_first_x0020_fip_x.N_5: None,
+                self._nsb.behavior_x0020_first_x0020_fip_x.N_6: None,
+                self._nsb.behavior_x0020_first_x0020_fip_x.FINAL: None,
+                self._nsb.behavior_x0020_first_x0020_fip_x.GRADUATED: None,
+                self._nsb.behavior_x0020_first_x0020_fip_x.N_A: None,
+            }.get(self._nsb.behavior_x0020_first_x0020_fip_x, None)
         )
 
     @property
@@ -530,19 +523,19 @@ class MappedNSBList:
         """Maps behavior_first_video to aind model."""
         return (
             None
-            if self._nsb.behavior_first_video is None
+            if self._nsb.behavior_x0020_first_x0020_video is None
             else {
-                self._nsb.behavior_first_video.N_1_1: None,
-                self._nsb.behavior_first_video.N_1_2: None,
-                self._nsb.behavior_first_video.N_2: None,
-                self._nsb.behavior_first_video.N_3: None,
-                self._nsb.behavior_first_video.N_4: None,
-                self._nsb.behavior_first_video.N_5: None,
-                self._nsb.behavior_first_video.N_6: None,
-                self._nsb.behavior_first_video.FINAL: None,
-                self._nsb.behavior_first_video.GRADUATED: None,
-                self._nsb.behavior_first_video.N_A: None,
-            }.get(self._nsb.behavior_first_video, None)
+                self._nsb.behavior_x0020_first_x0020_video.N_1_1: None,
+                self._nsb.behavior_x0020_first_x0020_video.N_1_2: None,
+                self._nsb.behavior_x0020_first_x0020_video.N_2: None,
+                self._nsb.behavior_x0020_first_x0020_video.N_3: None,
+                self._nsb.behavior_x0020_first_x0020_video.N_4: None,
+                self._nsb.behavior_x0020_first_x0020_video.N_5: None,
+                self._nsb.behavior_x0020_first_x0020_video.N_6: None,
+                self._nsb.behavior_x0020_first_x0020_video.FINAL: None,
+                self._nsb.behavior_x0020_first_x0020_video.GRADUATED: None,
+                self._nsb.behavior_x0020_first_x0020_video.N_A: None,
+            }.get(self._nsb.behavior_x0020_first_x0020_video, None)
         )
 
     @property
@@ -550,12 +543,12 @@ class MappedNSBList:
         """Maps behavior_platform to aind model."""
         return (
             None
-            if self._nsb.behavior_platform is None
+            if self._nsb.behavior_x0020_platform is None
             else {
-                self._nsb.behavior_platform.MINDSCOPE: None,
-                self._nsb.behavior_platform.FORAGING: None,
-                self._nsb.behavior_platform.VR: None,
-            }.get(self._nsb.behavior_platform, None)
+                self._nsb.behavior_x0020_platform.MINDSCOPE: None,
+                self._nsb.behavior_x0020_platform.FORAGING: None,
+                self._nsb.behavior_x0020_platform.VR: None,
+            }.get(self._nsb.behavior_x0020_platform, None)
         )
 
     @property
@@ -563,21 +556,21 @@ class MappedNSBList:
         """Maps behavior_type to aind model."""
         return (
             None
-            if self._nsb.behavior_type is None
+            if self._nsb.behavior_x0020_type is None
             else {
-                self._nsb.behavior_type.SELECT: None,
-                self._nsb.behavior_type.FORAGING: None,
-                self._nsb.behavior_type.FORAGING_FP: None,
-                self._nsb.behavior_type.WR__HAB: None,
-                self._nsb.behavior_type.HAB__ONLY: None,
-                self._nsb.behavior_type.AIBS_CHARACTERIZATION_ROT: None,
-                self._nsb.behavior_type.AIND_FORAGING_TASK_WITH_O: None,
-                self._nsb.behavior_type.AIND_MOTOR_OBSERVATORY_WH: None,
-                self._nsb.behavior_type.CHANGE_DETECTION_TASK: None,
-                self._nsb.behavior_type.DR_AUDITORY_VISUAL_TASK: None,
-                self._nsb.behavior_type.HABITUATION_ONLY: None,
-                self._nsb.behavior_type.HABITUATION_PASSIVE_TRAIN: None,
-            }.get(self._nsb.behavior_type, None)
+                self._nsb.behavior_x0020_type.SELECT: None,
+                self._nsb.behavior_x0020_type.FORAGING: None,
+                self._nsb.behavior_x0020_type.FORAGING_FP: None,
+                self._nsb.behavior_x0020_type.WR__HAB: None,
+                self._nsb.behavior_x0020_type.HAB__ONLY: None,
+                self._nsb.behavior_x0020_type.AIBS_CHARACTERIZATION_ROT: None,
+                self._nsb.behavior_x0020_type.AIND_FORAGING_TASK_WITH_O: None,
+                self._nsb.behavior_x0020_type.AIND_MOTOR_OBSERVATORY_WH: None,
+                self._nsb.behavior_x0020_type.CHANGE_DETECTION_TASK: None,
+                self._nsb.behavior_x0020_type.DR_AUDITORY_VISUAL_TASK: None,
+                self._nsb.behavior_x0020_type.HABITUATION_ONLY: None,
+                self._nsb.behavior_x0020_type.HABITUATION_PASSIVE_TRAIN: None,
+            }.get(self._nsb.behavior_x0020_type, None)
         )
 
     @property
@@ -585,11 +578,11 @@ class MappedNSBList:
         """Maps black_cement to aind model."""
         return (
             None
-            if self._nsb.black_cement is None
+            if self._nsb.black_x0020_cement is None
             else {
-                self._nsb.black_cement.YES: None,
-                self._nsb.black_cement.NO: None,
-            }.get(self._nsb.black_cement, None)
+                self._nsb.black_x0020_cement.YES: None,
+                self._nsb.black_x0020_cement.NO: None,
+            }.get(self._nsb.black_x0020_cement, None)
         )
 
     @property
@@ -602,28 +595,28 @@ class MappedNSBList:
         """Maps burr1_injection_devi to aind model."""
         return (
             None
-            if self._nsb.burr1_injection_devi is None
+            if self._nsb.burr1_x0020_injection_x0020_devi is None
             else {
-                self._nsb.burr1_injection_devi.SELECT: None,
-                self._nsb.burr1_injection_devi.NANO_1: None,
-                self._nsb.burr1_injection_devi.IONTO_1: None,
-                self._nsb.burr1_injection_devi.NANO_2: None,
-                self._nsb.burr1_injection_devi.IONTO_2: None,
-                self._nsb.burr1_injection_devi.NANO_3: None,
-                self._nsb.burr1_injection_devi.IONTO_3: None,
-                self._nsb.burr1_injection_devi.NANO_4: None,
-                self._nsb.burr1_injection_devi.IONTO_4: None,
-                self._nsb.burr1_injection_devi.NANO_5: None,
-                self._nsb.burr1_injection_devi.IONTO_5: None,
-                self._nsb.burr1_injection_devi.NANO_6: None,
-                self._nsb.burr1_injection_devi.IONTO_6: None,
-                self._nsb.burr1_injection_devi.NANO_7: None,
-                self._nsb.burr1_injection_devi.IONTO_7: None,
-                self._nsb.burr1_injection_devi.NANO_8: None,
-                self._nsb.burr1_injection_devi.IONTO_8: None,
-                self._nsb.burr1_injection_devi.NANO_9: None,
-                self._nsb.burr1_injection_devi.IONTO_9: None,
-            }.get(self._nsb.burr1_injection_devi, None)
+                self._nsb.burr1_x0020_injection_x0020_devi.SELECT: None,
+                self._nsb.burr1_x0020_injection_x0020_devi.NANO_1: None,
+                self._nsb.burr1_x0020_injection_x0020_devi.IONTO_1: None,
+                self._nsb.burr1_x0020_injection_x0020_devi.NANO_2: None,
+                self._nsb.burr1_x0020_injection_x0020_devi.IONTO_2: None,
+                self._nsb.burr1_x0020_injection_x0020_devi.NANO_3: None,
+                self._nsb.burr1_x0020_injection_x0020_devi.IONTO_3: None,
+                self._nsb.burr1_x0020_injection_x0020_devi.NANO_4: None,
+                self._nsb.burr1_x0020_injection_x0020_devi.IONTO_4: None,
+                self._nsb.burr1_x0020_injection_x0020_devi.NANO_5: None,
+                self._nsb.burr1_x0020_injection_x0020_devi.IONTO_5: None,
+                self._nsb.burr1_x0020_injection_x0020_devi.NANO_6: None,
+                self._nsb.burr1_x0020_injection_x0020_devi.IONTO_6: None,
+                self._nsb.burr1_x0020_injection_x0020_devi.NANO_7: None,
+                self._nsb.burr1_x0020_injection_x0020_devi.IONTO_7: None,
+                self._nsb.burr1_x0020_injection_x0020_devi.NANO_8: None,
+                self._nsb.burr1_x0020_injection_x0020_devi.IONTO_8: None,
+                self._nsb.burr1_x0020_injection_x0020_devi.NANO_9: None,
+                self._nsb.burr1_x0020_injection_x0020_devi.IONTO_9: None,
+            }.get(self._nsb.burr1_x0020_injection_x0020_devi, None)
         )
 
     @property
@@ -631,11 +624,11 @@ class MappedNSBList:
         """Maps burr1_perform_during to aind model"""
         return (
             None
-            if self._nsb.burr1_perform_during is None
+            if self._nsb.burr1_x0020_perform_x0020_during is None
             else {
-                self._nsb.burr1_perform_during.INITIAL_SURGERY: During.INITIAL,
-                self._nsb.burr1_perform_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
-            }.get(self._nsb.burr1_perform_during, None)
+                self._nsb.burr1_x0020_perform_x0020_during.INITIAL_SURGERY: During.INITIAL,
+                self._nsb.burr1_x0020_perform_x0020_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
+            }.get(self._nsb.burr1_x0020_perform_x0020_during, None)
         )
 
     @property
@@ -643,22 +636,22 @@ class MappedNSBList:
         """Maps burr1_virus_biosafte to aind model."""
         return (
             None
-            if self._nsb.burr1_virus_biosafte is None
+            if self._nsb.burr1_x0020_virus_x0020_biosafte is None
             else {
-                self._nsb.burr1_virus_biosafte.SELECT: None,
-                self._nsb.burr1_virus_biosafte.BSL_1_AAV: None,
-                self._nsb.burr1_virus_biosafte.BSL_1_AAV_BEADS: None,
-                self._nsb.burr1_virus_biosafte.BSL_1_BEADS: None,
-                self._nsb.burr1_virus_biosafte.BSL_1_OTHER_WRITE_IN_COMM: None,
-                self._nsb.burr1_virus_biosafte.BSL_2__RABIES: None,
-                self._nsb.burr1_virus_biosafte.BSL_2_CAV: None,
-                self._nsb.burr1_virus_biosafte.BSL_2_6_OHDA: None,
-                self._nsb.burr1_virus_biosafte.BSL_2__SINDBIS: None,
-                self._nsb.burr1_virus_biosafte.BSL_2_HSV_1: None,
-                self._nsb.burr1_virus_biosafte.BSL_2_LENTI: None,
-                self._nsb.burr1_virus_biosafte.BSL_2_CHOLERA_TOXIN_B: None,
-                self._nsb.burr1_virus_biosafte.BSL_2__OTHER__WRITE_IN_CO: None,
-            }.get(self._nsb.burr1_virus_biosafte, None)
+                self._nsb.burr1_x0020_virus_x0020_biosafte.SELECT: None,
+                self._nsb.burr1_x0020_virus_x0020_biosafte.BSL_1_AAV: None,
+                self._nsb.burr1_x0020_virus_x0020_biosafte.BSL_1_AAV_BEADS: None,
+                self._nsb.burr1_x0020_virus_x0020_biosafte.BSL_1_BEADS: None,
+                self._nsb.burr1_x0020_virus_x0020_biosafte.BSL_1_OTHER_WRITE_IN_COMM: None,
+                self._nsb.burr1_x0020_virus_x0020_biosafte.BSL_2__RABIES: None,
+                self._nsb.burr1_x0020_virus_x0020_biosafte.BSL_2_CAV: None,
+                self._nsb.burr1_x0020_virus_x0020_biosafte.BSL_2_6_OHDA: None,
+                self._nsb.burr1_x0020_virus_x0020_biosafte.BSL_2__SINDBIS: None,
+                self._nsb.burr1_x0020_virus_x0020_biosafte.BSL_2_HSV_1: None,
+                self._nsb.burr1_x0020_virus_x0020_biosafte.BSL_2_LENTI: None,
+                self._nsb.burr1_x0020_virus_x0020_biosafte.BSL_2_CHOLERA_TOXIN_B: None,
+                self._nsb.burr1_x0020_virus_x0020_biosafte.BSL_2__OTHER__WRITE_IN_CO: None,
+            }.get(self._nsb.burr1_x0020_virus_x0020_biosafte, None)
         )
 
     @property
@@ -666,28 +659,28 @@ class MappedNSBList:
         """Maps burr2_injection_devi to aind model."""
         return (
             None
-            if self._nsb.burr2_injection_devi is None
+            if self._nsb.burr2_x0020_injection_x0020_devi is None
             else {
-                self._nsb.burr2_injection_devi.SELECT: None,
-                self._nsb.burr2_injection_devi.NANO_1: None,
-                self._nsb.burr2_injection_devi.IONTO_1: None,
-                self._nsb.burr2_injection_devi.NANO_2: None,
-                self._nsb.burr2_injection_devi.IONTO_2: None,
-                self._nsb.burr2_injection_devi.NANO_3: None,
-                self._nsb.burr2_injection_devi.IONTO_3: None,
-                self._nsb.burr2_injection_devi.NANO_4: None,
-                self._nsb.burr2_injection_devi.IONTO_4: None,
-                self._nsb.burr2_injection_devi.NANO_5: None,
-                self._nsb.burr2_injection_devi.IONTO_5: None,
-                self._nsb.burr2_injection_devi.NANO_6: None,
-                self._nsb.burr2_injection_devi.IONTO_6: None,
-                self._nsb.burr2_injection_devi.NANO_7: None,
-                self._nsb.burr2_injection_devi.IONTO_7: None,
-                self._nsb.burr2_injection_devi.NANO_8: None,
-                self._nsb.burr2_injection_devi.IONTO_8: None,
-                self._nsb.burr2_injection_devi.NANO_9: None,
-                self._nsb.burr2_injection_devi.IONTO_9: None,
-            }.get(self._nsb.burr2_injection_devi, None)
+                self._nsb.burr2_x0020_injection_x0020_devi.SELECT: None,
+                self._nsb.burr2_x0020_injection_x0020_devi.NANO_1: None,
+                self._nsb.burr2_x0020_injection_x0020_devi.IONTO_1: None,
+                self._nsb.burr2_x0020_injection_x0020_devi.NANO_2: None,
+                self._nsb.burr2_x0020_injection_x0020_devi.IONTO_2: None,
+                self._nsb.burr2_x0020_injection_x0020_devi.NANO_3: None,
+                self._nsb.burr2_x0020_injection_x0020_devi.IONTO_3: None,
+                self._nsb.burr2_x0020_injection_x0020_devi.NANO_4: None,
+                self._nsb.burr2_x0020_injection_x0020_devi.IONTO_4: None,
+                self._nsb.burr2_x0020_injection_x0020_devi.NANO_5: None,
+                self._nsb.burr2_x0020_injection_x0020_devi.IONTO_5: None,
+                self._nsb.burr2_x0020_injection_x0020_devi.NANO_6: None,
+                self._nsb.burr2_x0020_injection_x0020_devi.IONTO_6: None,
+                self._nsb.burr2_x0020_injection_x0020_devi.NANO_7: None,
+                self._nsb.burr2_x0020_injection_x0020_devi.IONTO_7: None,
+                self._nsb.burr2_x0020_injection_x0020_devi.NANO_8: None,
+                self._nsb.burr2_x0020_injection_x0020_devi.IONTO_8: None,
+                self._nsb.burr2_x0020_injection_x0020_devi.NANO_9: None,
+                self._nsb.burr2_x0020_injection_x0020_devi.IONTO_9: None,
+            }.get(self._nsb.burr2_x0020_injection_x0020_devi, None)
         )
 
     @property
@@ -695,11 +688,11 @@ class MappedNSBList:
         """Maps burr2_perform_during to aind model"""
         return (
             None
-            if self._nsb.burr2_perform_during is None
+            if self._nsb.burr2_x0020_perform_x0020_during is None
             else {
-                self._nsb.burr2_perform_during.INITIAL_SURGERY: During.INITIAL,
-                self._nsb.burr2_perform_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
-            }.get(self._nsb.burr2_perform_during, None)
+                self._nsb.burr2_x0020_perform_x0020_during.INITIAL_SURGERY: During.INITIAL,
+                self._nsb.burr2_x0020_perform_x0020_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
+            }.get(self._nsb.burr2_x0020_perform_x0020_during, None)
         )
 
     @property
@@ -707,10 +700,10 @@ class MappedNSBList:
         """Maps burr2_status to aind model."""
         return (
             None
-            if self._nsb.burr2_status is None
+            if self._nsb.burr2_x0020_status is None
             else {
-                self._nsb.burr2_status.COMPLETE: None,
-            }.get(self._nsb.burr2_status, None)
+                self._nsb.burr2_x0020_status.COMPLETE: None,
+            }.get(self._nsb.burr2_x0020_status, None)
         )
 
     @property
@@ -718,78 +711,78 @@ class MappedNSBList:
         """Maps burr2_virus_biosafte to aind model."""
         return (
             None
-            if self._nsb.burr2_virus_biosafte is None
+            if self._nsb.burr2_x0020_virus_x0020_biosafte is None
             else {
-                self._nsb.burr2_virus_biosafte.SELECT: None,
-                self._nsb.burr2_virus_biosafte.BSL_1_AAV: None,
-                self._nsb.burr2_virus_biosafte.BSL_1__BEADS: None,
-                self._nsb.burr2_virus_biosafte.BSL_1_AAV__BEADS: None,
-                self._nsb.burr2_virus_biosafte.BSL_1__OTHER__WRITE_IN_CO: None,
-                self._nsb.burr2_virus_biosafte.BSL_2__RABIES: None,
-                self._nsb.burr2_virus_biosafte.BSL_2_CAV: None,
-                self._nsb.burr2_virus_biosafte.BSL_2_6_OHDA: None,
-                self._nsb.burr2_virus_biosafte.BSL_2__SINDBIS: None,
-                self._nsb.burr2_virus_biosafte.BSL_2_HSV_1: None,
-                self._nsb.burr2_virus_biosafte.BSL_2__LENTI: None,
-                self._nsb.burr2_virus_biosafte.BSL_2__CHOLERA__TOXIN_B: None,
-                self._nsb.burr2_virus_biosafte.BSL_2__OTHER__WRITE_IN_CO: None,
-            }.get(self._nsb.burr2_virus_biosafte, None)
+                self._nsb.burr2_x0020_virus_x0020_biosafte.SELECT: None,
+                self._nsb.burr2_x0020_virus_x0020_biosafte.BSL_1_AAV: None,
+                self._nsb.burr2_x0020_virus_x0020_biosafte.BSL_1__BEADS: None,
+                self._nsb.burr2_x0020_virus_x0020_biosafte.BSL_1_AAV__BEADS: None,
+                self._nsb.burr2_x0020_virus_x0020_biosafte.BSL_1__OTHER__WRITE_IN_CO: None,
+                self._nsb.burr2_x0020_virus_x0020_biosafte.BSL_2__RABIES: None,
+                self._nsb.burr2_x0020_virus_x0020_biosafte.BSL_2_CAV: None,
+                self._nsb.burr2_x0020_virus_x0020_biosafte.BSL_2_6_OHDA: None,
+                self._nsb.burr2_x0020_virus_x0020_biosafte.BSL_2__SINDBIS: None,
+                self._nsb.burr2_x0020_virus_x0020_biosafte.BSL_2_HSV_1: None,
+                self._nsb.burr2_x0020_virus_x0020_biosafte.BSL_2__LENTI: None,
+                self._nsb.burr2_x0020_virus_x0020_biosafte.BSL_2__CHOLERA__TOXIN_B: None,
+                self._nsb.burr2_x0020_virus_x0020_biosafte.BSL_2__OTHER__WRITE_IN_CO: None,
+            }.get(self._nsb.burr2_x0020_virus_x0020_biosafte, None)
         )
 
     @property
     def aind_burr3_a_p(self) -> Optional[Decimal]:
         """Maps burr3_a_p to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr3_a_p)
+        return self._map_float_to_decimal(self._nsb.burr3_x0020_a_x002f_p)
 
     @property
     def aind_burr3_d_v(self) -> Optional[Decimal]:
         """Maps burr3_d_v to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr3_d_v)
+        return self._map_float_to_decimal(self._nsb.burr3_x0020_d_x002f_v)
 
     @property
     def aind_burr3_injection_devi(self) -> Optional[Any]:
         """Maps burr3_injection_devi to aind model."""
         return (
             None
-            if self._nsb.burr3_injection_devi is None
+            if self._nsb.burr3_x0020_injection_x0020_devi is None
             else {
-                self._nsb.burr3_injection_devi.SELECT: None,
-                self._nsb.burr3_injection_devi.NANO_1: None,
-                self._nsb.burr3_injection_devi.IONTO_1: None,
-                self._nsb.burr3_injection_devi.NANO_2: None,
-                self._nsb.burr3_injection_devi.IONTO_2: None,
-                self._nsb.burr3_injection_devi.NANO_3: None,
-                self._nsb.burr3_injection_devi.IONTO_3: None,
-                self._nsb.burr3_injection_devi.NANO_4: None,
-                self._nsb.burr3_injection_devi.IONTO_4: None,
-                self._nsb.burr3_injection_devi.NANO_5: None,
-                self._nsb.burr3_injection_devi.IONTO_5: None,
-                self._nsb.burr3_injection_devi.NANO_6: None,
-                self._nsb.burr3_injection_devi.IONTO_6: None,
-                self._nsb.burr3_injection_devi.NANO_7: None,
-                self._nsb.burr3_injection_devi.IONTO_7: None,
-                self._nsb.burr3_injection_devi.NANO_8: None,
-                self._nsb.burr3_injection_devi.IONTO_8: None,
-                self._nsb.burr3_injection_devi.NANO_9: None,
-                self._nsb.burr3_injection_devi.IONTO_9: None,
-            }.get(self._nsb.burr3_injection_devi, None)
+                self._nsb.burr3_x0020_injection_x0020_devi.SELECT: None,
+                self._nsb.burr3_x0020_injection_x0020_devi.NANO_1: None,
+                self._nsb.burr3_x0020_injection_x0020_devi.IONTO_1: None,
+                self._nsb.burr3_x0020_injection_x0020_devi.NANO_2: None,
+                self._nsb.burr3_x0020_injection_x0020_devi.IONTO_2: None,
+                self._nsb.burr3_x0020_injection_x0020_devi.NANO_3: None,
+                self._nsb.burr3_x0020_injection_x0020_devi.IONTO_3: None,
+                self._nsb.burr3_x0020_injection_x0020_devi.NANO_4: None,
+                self._nsb.burr3_x0020_injection_x0020_devi.IONTO_4: None,
+                self._nsb.burr3_x0020_injection_x0020_devi.NANO_5: None,
+                self._nsb.burr3_x0020_injection_x0020_devi.IONTO_5: None,
+                self._nsb.burr3_x0020_injection_x0020_devi.NANO_6: None,
+                self._nsb.burr3_x0020_injection_x0020_devi.IONTO_6: None,
+                self._nsb.burr3_x0020_injection_x0020_devi.NANO_7: None,
+                self._nsb.burr3_x0020_injection_x0020_devi.IONTO_7: None,
+                self._nsb.burr3_x0020_injection_x0020_devi.NANO_8: None,
+                self._nsb.burr3_x0020_injection_x0020_devi.IONTO_8: None,
+                self._nsb.burr3_x0020_injection_x0020_devi.NANO_9: None,
+                self._nsb.burr3_x0020_injection_x0020_devi.IONTO_9: None,
+            }.get(self._nsb.burr3_x0020_injection_x0020_devi, None)
         )
 
     @property
     def aind_burr3_m_l(self) -> Optional[Decimal]:
         """Maps burr3_m_l to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr3_m_l)
+        return self._map_float_to_decimal(self._nsb.burr3_x0020_m_x002f_l)
 
     @property
     def aind_burr3_perform_during(self) -> Optional[During]:
         """Maps burr3_perform_during to aind model"""
         return (
             None
-            if self._nsb.burr3_perform_during is None
+            if self._nsb.burr3_x0020_perform_x0020_during is None
             else {
-                self._nsb.burr3_perform_during.INITIAL_SURGERY: During.INITIAL,
-                self._nsb.burr3_perform_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
-            }.get(self._nsb.burr3_perform_during, None)
+                self._nsb.burr3_x0020_perform_x0020_during.INITIAL_SURGERY: During.INITIAL,
+                self._nsb.burr3_x0020_perform_x0020_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
+            }.get(self._nsb.burr3_x0020_perform_x0020_during, None)
         )
 
     @property
@@ -797,10 +790,10 @@ class MappedNSBList:
         """Maps burr3_status to aind model."""
         return (
             None
-            if self._nsb.burr3_status is None
+            if self._nsb.burr3_x0020_status is None
             else {
-                self._nsb.burr3_status.COMPLETE: None,
-            }.get(self._nsb.burr3_status, None)
+                self._nsb.burr3_x0020_status.COMPLETE: None,
+            }.get(self._nsb.burr3_x0020_status, None)
         )
 
     @property
@@ -808,78 +801,78 @@ class MappedNSBList:
         """Maps burr3_virus_biosafet to aind model."""
         return (
             None
-            if self._nsb.burr3_virus_biosafet is None
+            if self._nsb.burr3_x0020_virus_x0020_biosafet is None
             else {
-                self._nsb.burr3_virus_biosafet.SELECT: None,
-                self._nsb.burr3_virus_biosafet.BSL_1_AAV: None,
-                self._nsb.burr3_virus_biosafet.BSL_1__BEADS: None,
-                self._nsb.burr3_virus_biosafet.BSL_1_AAV__BEADS: None,
-                self._nsb.burr3_virus_biosafet.BSL_1__OTHER__WRITE_IN_CO: None,
-                self._nsb.burr3_virus_biosafet.BSL_2__RABIES: None,
-                self._nsb.burr3_virus_biosafet.BSL_2_CAV: None,
-                self._nsb.burr3_virus_biosafet.BSL_2_6_OHDA: None,
-                self._nsb.burr3_virus_biosafet.BSL_2__SINDBIS: None,
-                self._nsb.burr3_virus_biosafet.BSL_2_HSV_1: None,
-                self._nsb.burr3_virus_biosafet.BSL_2__LENTI: None,
-                self._nsb.burr3_virus_biosafet.BSL_2__CHOLERA__TOXIN_B: None,
-                self._nsb.burr3_virus_biosafet.BSL_2__OTHER__WRITE_IN_CO: None,
-            }.get(self._nsb.burr3_virus_biosafet, None)
+                self._nsb.burr3_x0020_virus_x0020_biosafet.SELECT: None,
+                self._nsb.burr3_x0020_virus_x0020_biosafet.BSL_1_AAV: None,
+                self._nsb.burr3_x0020_virus_x0020_biosafet.BSL_1__BEADS: None,
+                self._nsb.burr3_x0020_virus_x0020_biosafet.BSL_1_AAV__BEADS: None,
+                self._nsb.burr3_x0020_virus_x0020_biosafet.BSL_1__OTHER__WRITE_IN_CO: None,
+                self._nsb.burr3_x0020_virus_x0020_biosafet.BSL_2__RABIES: None,
+                self._nsb.burr3_x0020_virus_x0020_biosafet.BSL_2_CAV: None,
+                self._nsb.burr3_x0020_virus_x0020_biosafet.BSL_2_6_OHDA: None,
+                self._nsb.burr3_x0020_virus_x0020_biosafet.BSL_2__SINDBIS: None,
+                self._nsb.burr3_x0020_virus_x0020_biosafet.BSL_2_HSV_1: None,
+                self._nsb.burr3_x0020_virus_x0020_biosafet.BSL_2__LENTI: None,
+                self._nsb.burr3_x0020_virus_x0020_biosafet.BSL_2__CHOLERA__TOXIN_B: None,
+                self._nsb.burr3_x0020_virus_x0020_biosafet.BSL_2__OTHER__WRITE_IN_CO: None,
+            }.get(self._nsb.burr3_x0020_virus_x0020_biosafet, None)
         )
 
     @property
     def aind_burr4_a_p(self) -> Optional[Decimal]:
         """Maps burr4_a_p to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr4_a_p)
+        return self._map_float_to_decimal(self._nsb.burr4_x0020_a_x002f_p)
 
     @property
     def aind_burr4_d_v(self) -> Optional[Decimal]:
         """Maps burr4_d_v to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr4_d_v)
+        return self._map_float_to_decimal(self._nsb.burr4_x0020_d_x002f_v)
 
     @property
     def aind_burr4_injection_devi(self) -> Optional[Any]:
         """Maps burr4_injection_devi to aind model."""
         return (
             None
-            if self._nsb.burr4_injection_devi is None
+            if self._nsb.burr4_x0020_injection_x0020_devi is None
             else {
-                self._nsb.burr4_injection_devi.SELECT: None,
-                self._nsb.burr4_injection_devi.NANO_1: None,
-                self._nsb.burr4_injection_devi.IONTO_1: None,
-                self._nsb.burr4_injection_devi.NANO_2: None,
-                self._nsb.burr4_injection_devi.IONTO_2: None,
-                self._nsb.burr4_injection_devi.NANO_3: None,
-                self._nsb.burr4_injection_devi.IONTO_3: None,
-                self._nsb.burr4_injection_devi.NANO_4: None,
-                self._nsb.burr4_injection_devi.IONTO_4: None,
-                self._nsb.burr4_injection_devi.NANO_5: None,
-                self._nsb.burr4_injection_devi.IONTO_5: None,
-                self._nsb.burr4_injection_devi.NANO_6: None,
-                self._nsb.burr4_injection_devi.IONTO_6: None,
-                self._nsb.burr4_injection_devi.NANO_7: None,
-                self._nsb.burr4_injection_devi.IONTO_7: None,
-                self._nsb.burr4_injection_devi.NANO_8: None,
-                self._nsb.burr4_injection_devi.IONTO_8: None,
-                self._nsb.burr4_injection_devi.NANO_9: None,
-                self._nsb.burr4_injection_devi.IONTO_9: None,
-            }.get(self._nsb.burr4_injection_devi, None)
+                self._nsb.burr4_x0020_injection_x0020_devi.SELECT: None,
+                self._nsb.burr4_x0020_injection_x0020_devi.NANO_1: None,
+                self._nsb.burr4_x0020_injection_x0020_devi.IONTO_1: None,
+                self._nsb.burr4_x0020_injection_x0020_devi.NANO_2: None,
+                self._nsb.burr4_x0020_injection_x0020_devi.IONTO_2: None,
+                self._nsb.burr4_x0020_injection_x0020_devi.NANO_3: None,
+                self._nsb.burr4_x0020_injection_x0020_devi.IONTO_3: None,
+                self._nsb.burr4_x0020_injection_x0020_devi.NANO_4: None,
+                self._nsb.burr4_x0020_injection_x0020_devi.IONTO_4: None,
+                self._nsb.burr4_x0020_injection_x0020_devi.NANO_5: None,
+                self._nsb.burr4_x0020_injection_x0020_devi.IONTO_5: None,
+                self._nsb.burr4_x0020_injection_x0020_devi.NANO_6: None,
+                self._nsb.burr4_x0020_injection_x0020_devi.IONTO_6: None,
+                self._nsb.burr4_x0020_injection_x0020_devi.NANO_7: None,
+                self._nsb.burr4_x0020_injection_x0020_devi.IONTO_7: None,
+                self._nsb.burr4_x0020_injection_x0020_devi.NANO_8: None,
+                self._nsb.burr4_x0020_injection_x0020_devi.IONTO_8: None,
+                self._nsb.burr4_x0020_injection_x0020_devi.NANO_9: None,
+                self._nsb.burr4_x0020_injection_x0020_devi.IONTO_9: None,
+            }.get(self._nsb.burr4_x0020_injection_x0020_devi, None)
         )
 
     @property
     def aind_burr4_m_l(self) -> Optional[Decimal]:
         """Maps burr4_m_l to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr4_m_l)
+        return self._map_float_to_decimal(self._nsb.burr4_x0020_m_x002f_l)
 
     @property
     def aind_burr4_perform_during(self) -> Optional[During]:
         """Maps burr4_perform_during to aind model"""
         return (
             None
-            if self._nsb.burr4_perform_during is None
+            if self._nsb.burr4_x0020_perform_x0020_during is None
             else {
-                self._nsb.burr4_perform_during.INITIAL_SURGERY: During.INITIAL,
-                self._nsb.burr4_perform_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
-            }.get(self._nsb.burr4_perform_during, None)
+                self._nsb.burr4_x0020_perform_x0020_during.INITIAL_SURGERY: During.INITIAL,
+                self._nsb.burr4_x0020_perform_x0020_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
+            }.get(self._nsb.burr4_x0020_perform_x0020_during, None)
         )
 
     @property
@@ -887,10 +880,10 @@ class MappedNSBList:
         """Maps burr4_status to aind model."""
         return (
             None
-            if self._nsb.burr4_status is None
+            if self._nsb.burr4_x0020_status is None
             else {
-                self._nsb.burr4_status.COMPLETE: None,
-            }.get(self._nsb.burr4_status, None)
+                self._nsb.burr4_x0020_status.COMPLETE: None,
+            }.get(self._nsb.burr4_x0020_status, None)
         )
 
     @property
@@ -898,22 +891,22 @@ class MappedNSBList:
         """Maps burr4_virus_biosafte to aind model."""
         return (
             None
-            if self._nsb.burr4_virus_biosafte is None
+            if self._nsb.burr4_x0020_virus_x0020_biosafte is None
             else {
-                self._nsb.burr4_virus_biosafte.SELECT: None,
-                self._nsb.burr4_virus_biosafte.BSL_1_AAV: None,
-                self._nsb.burr4_virus_biosafte.BSL_1__BEADS: None,
-                self._nsb.burr4_virus_biosafte.BSL_1_AAV__BEADS: None,
-                self._nsb.burr4_virus_biosafte.BSL_1__OTHER__WRITE_IN_CO: None,
-                self._nsb.burr4_virus_biosafte.BSL_2__RABIES: None,
-                self._nsb.burr4_virus_biosafte.BSL_2_CAV: None,
-                self._nsb.burr4_virus_biosafte.BSL_2_6_OHDA: None,
-                self._nsb.burr4_virus_biosafte.BSL_2__SINDBIS: None,
-                self._nsb.burr4_virus_biosafte.BSL_2_HSV_1: None,
-                self._nsb.burr4_virus_biosafte.BSL_2__LENTI: None,
-                self._nsb.burr4_virus_biosafte.BSL_2__CHOLERA__TOXIN_B: None,
-                self._nsb.burr4_virus_biosafte.BSL_2__OTHER__WRITE_IN_CO: None,
-            }.get(self._nsb.burr4_virus_biosafte, None)
+                self._nsb.burr4_x0020_virus_x0020_biosafte.SELECT: None,
+                self._nsb.burr4_x0020_virus_x0020_biosafte.BSL_1_AAV: None,
+                self._nsb.burr4_x0020_virus_x0020_biosafte.BSL_1__BEADS: None,
+                self._nsb.burr4_x0020_virus_x0020_biosafte.BSL_1_AAV__BEADS: None,
+                self._nsb.burr4_x0020_virus_x0020_biosafte.BSL_1__OTHER__WRITE_IN_CO: None,
+                self._nsb.burr4_x0020_virus_x0020_biosafte.BSL_2__RABIES: None,
+                self._nsb.burr4_x0020_virus_x0020_biosafte.BSL_2_CAV: None,
+                self._nsb.burr4_x0020_virus_x0020_biosafte.BSL_2_6_OHDA: None,
+                self._nsb.burr4_x0020_virus_x0020_biosafte.BSL_2__SINDBIS: None,
+                self._nsb.burr4_x0020_virus_x0020_biosafte.BSL_2_HSV_1: None,
+                self._nsb.burr4_x0020_virus_x0020_biosafte.BSL_2__LENTI: None,
+                self._nsb.burr4_x0020_virus_x0020_biosafte.BSL_2__CHOLERA__TOXIN_B: None,
+                self._nsb.burr4_x0020_virus_x0020_biosafte.BSL_2__OTHER__WRITE_IN_CO: None,
+            }.get(self._nsb.burr4_x0020_virus_x0020_biosafte, None)
         )
 
     @property
@@ -921,28 +914,28 @@ class MappedNSBList:
         """Maps burr5_injection_devi to aind model."""
         return (
             None
-            if self._nsb.burr5_injection_devi is None
+            if self._nsb.burr5_x0020_injection_x0020_devi is None
             else {
-                self._nsb.burr5_injection_devi.SELECT: None,
-                self._nsb.burr5_injection_devi.NANO_1: None,
-                self._nsb.burr5_injection_devi.IONTO_1: None,
-                self._nsb.burr5_injection_devi.NANO_2: None,
-                self._nsb.burr5_injection_devi.IONTO_2: None,
-                self._nsb.burr5_injection_devi.NANO_3: None,
-                self._nsb.burr5_injection_devi.IONTO_3: None,
-                self._nsb.burr5_injection_devi.NANO_4: None,
-                self._nsb.burr5_injection_devi.IONTO_4: None,
-                self._nsb.burr5_injection_devi.NANO_5: None,
-                self._nsb.burr5_injection_devi.IONTO_5: None,
-                self._nsb.burr5_injection_devi.NANO_6: None,
-                self._nsb.burr5_injection_devi.IONTO_6: None,
-                self._nsb.burr5_injection_devi.NANO_7: None,
-                self._nsb.burr5_injection_devi.IONTO_7: None,
-                self._nsb.burr5_injection_devi.NANO_8: None,
-                self._nsb.burr5_injection_devi.IONTO_8: None,
-                self._nsb.burr5_injection_devi.NANO_9: None,
-                self._nsb.burr5_injection_devi.IONTO_9: None,
-            }.get(self._nsb.burr5_injection_devi, None)
+                self._nsb.burr5_x0020_injection_x0020_devi.SELECT: None,
+                self._nsb.burr5_x0020_injection_x0020_devi.NANO_1: None,
+                self._nsb.burr5_x0020_injection_x0020_devi.IONTO_1: None,
+                self._nsb.burr5_x0020_injection_x0020_devi.NANO_2: None,
+                self._nsb.burr5_x0020_injection_x0020_devi.IONTO_2: None,
+                self._nsb.burr5_x0020_injection_x0020_devi.NANO_3: None,
+                self._nsb.burr5_x0020_injection_x0020_devi.IONTO_3: None,
+                self._nsb.burr5_x0020_injection_x0020_devi.NANO_4: None,
+                self._nsb.burr5_x0020_injection_x0020_devi.IONTO_4: None,
+                self._nsb.burr5_x0020_injection_x0020_devi.NANO_5: None,
+                self._nsb.burr5_x0020_injection_x0020_devi.IONTO_5: None,
+                self._nsb.burr5_x0020_injection_x0020_devi.NANO_6: None,
+                self._nsb.burr5_x0020_injection_x0020_devi.IONTO_6: None,
+                self._nsb.burr5_x0020_injection_x0020_devi.NANO_7: None,
+                self._nsb.burr5_x0020_injection_x0020_devi.IONTO_7: None,
+                self._nsb.burr5_x0020_injection_x0020_devi.NANO_8: None,
+                self._nsb.burr5_x0020_injection_x0020_devi.IONTO_8: None,
+                self._nsb.burr5_x0020_injection_x0020_devi.NANO_9: None,
+                self._nsb.burr5_x0020_injection_x0020_devi.IONTO_9: None,
+            }.get(self._nsb.burr5_x0020_injection_x0020_devi, None)
         )
 
     @property
@@ -950,11 +943,11 @@ class MappedNSBList:
         """Maps burr5_perform_during to aind model"""
         return (
             None
-            if self._nsb.burr5_status is None
+            if self._nsb.burr5_x0020_perform_x0020_during is None
             else {
-                self._nsb.burr5_perform_during.INITIAL_SURGERY: During.INITIAL,
-                self._nsb.burr5_perform_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
-            }.get(self._nsb.burr5_perform_during, None)
+                self._nsb.burr5_x0020_perform_x0020_during.INITIAL_SURGERY: During.INITIAL,
+                self._nsb.burr5_x0020_perform_x0020_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
+            }.get(self._nsb.burr5_x0020_perform_x0020_during, None)
         )
 
     @property
@@ -962,10 +955,10 @@ class MappedNSBList:
         """Maps burr5_status to aind model."""
         return (
             None
-            if self._nsb.burr5_status is None
+            if self._nsb.burr5_x0020_status is None
             else {
-                self._nsb.burr5_status.COMPLETE: None,
-            }.get(self._nsb.burr5_status, None)
+                self._nsb.burr5_x0020_status.COMPLETE: None,
+            }.get(self._nsb.burr5_x0020_status, None)
         )
 
     @property
@@ -973,22 +966,22 @@ class MappedNSBList:
         """Maps burr5_virus_biosafte to aind model."""
         return (
             None
-            if self._nsb.burr5_virus_biosafte is None
+            if self._nsb.burr5_x0020_virus_x0020_biosafte is None
             else {
-                self._nsb.burr5_virus_biosafte.SELECT: None,
-                self._nsb.burr5_virus_biosafte.BSL_1_AAV: None,
-                self._nsb.burr5_virus_biosafte.BSL_1__BEADS: None,
-                self._nsb.burr5_virus_biosafte.BSL_1_AAV__BEADS: None,
-                self._nsb.burr5_virus_biosafte.BSL_1__OTHER__WRITE_IN_CO: None,
-                self._nsb.burr5_virus_biosafte.BSL_2__RABIES: None,
-                self._nsb.burr5_virus_biosafte.BSL_2_CAV: None,
-                self._nsb.burr5_virus_biosafte.BSL_2_6_OHDA: None,
-                self._nsb.burr5_virus_biosafte.BSL_2__SINDBIS: None,
-                self._nsb.burr5_virus_biosafte.BSL_2_HSV_1: None,
-                self._nsb.burr5_virus_biosafte.BSL_2__LENTI: None,
-                self._nsb.burr5_virus_biosafte.BSL_2__CHOLERA__TOXIN_B: None,
-                self._nsb.burr5_virus_biosafte.BSL_2__OTHER__WRITE_IN_CO: None,
-            }.get(self._nsb.burr5_virus_biosafte, None)
+                self._nsb.burr5_x0020_virus_x0020_biosafte.SELECT: None,
+                self._nsb.burr5_x0020_virus_x0020_biosafte.BSL_1_AAV: None,
+                self._nsb.burr5_x0020_virus_x0020_biosafte.BSL_1__BEADS: None,
+                self._nsb.burr5_x0020_virus_x0020_biosafte.BSL_1_AAV__BEADS: None,
+                self._nsb.burr5_x0020_virus_x0020_biosafte.BSL_1__OTHER__WRITE_IN_CO: None,
+                self._nsb.burr5_x0020_virus_x0020_biosafte.BSL_2__RABIES: None,
+                self._nsb.burr5_x0020_virus_x0020_biosafte.BSL_2_CAV: None,
+                self._nsb.burr5_x0020_virus_x0020_biosafte.BSL_2_6_OHDA: None,
+                self._nsb.burr5_x0020_virus_x0020_biosafte.BSL_2__SINDBIS: None,
+                self._nsb.burr5_x0020_virus_x0020_biosafte.BSL_2_HSV_1: None,
+                self._nsb.burr5_x0020_virus_x0020_biosafte.BSL_2__LENTI: None,
+                self._nsb.burr5_x0020_virus_x0020_biosafte.BSL_2__CHOLERA__TOXIN_B: None,
+                self._nsb.burr5_x0020_virus_x0020_biosafte.BSL_2__OTHER__WRITE_IN_CO: None,
+            }.get(self._nsb.burr5_x0020_virus_x0020_biosafte, None)
         )
 
     @property
@@ -996,28 +989,28 @@ class MappedNSBList:
         """Maps burr6_injection_devi to aind model."""
         return (
             None
-            if self._nsb.burr6_injection_devi is None
+            if self._nsb.burr6_x0020_injection_x0020_devi is None
             else {
-                self._nsb.burr6_injection_devi.SELECT: None,
-                self._nsb.burr6_injection_devi.NANO_1: None,
-                self._nsb.burr6_injection_devi.IONTO_1: None,
-                self._nsb.burr6_injection_devi.NANO_2: None,
-                self._nsb.burr6_injection_devi.IONTO_2: None,
-                self._nsb.burr6_injection_devi.NANO_3: None,
-                self._nsb.burr6_injection_devi.IONTO_3: None,
-                self._nsb.burr6_injection_devi.NANO_4: None,
-                self._nsb.burr6_injection_devi.IONTO_4: None,
-                self._nsb.burr6_injection_devi.NANO_5: None,
-                self._nsb.burr6_injection_devi.IONTO_5: None,
-                self._nsb.burr6_injection_devi.NANO_6: None,
-                self._nsb.burr6_injection_devi.IONTO_6: None,
-                self._nsb.burr6_injection_devi.NANO_7: None,
-                self._nsb.burr6_injection_devi.IONTO_7: None,
-                self._nsb.burr6_injection_devi.NANO_8: None,
-                self._nsb.burr6_injection_devi.IONTO_8: None,
-                self._nsb.burr6_injection_devi.NANO_9: None,
-                self._nsb.burr6_injection_devi.IONTO_9: None,
-            }.get(self._nsb.burr6_injection_devi, None)
+                self._nsb.burr6_x0020_injection_x0020_devi.SELECT: None,
+                self._nsb.burr6_x0020_injection_x0020_devi.NANO_1: None,
+                self._nsb.burr6_x0020_injection_x0020_devi.IONTO_1: None,
+                self._nsb.burr6_x0020_injection_x0020_devi.NANO_2: None,
+                self._nsb.burr6_x0020_injection_x0020_devi.IONTO_2: None,
+                self._nsb.burr6_x0020_injection_x0020_devi.NANO_3: None,
+                self._nsb.burr6_x0020_injection_x0020_devi.IONTO_3: None,
+                self._nsb.burr6_x0020_injection_x0020_devi.NANO_4: None,
+                self._nsb.burr6_x0020_injection_x0020_devi.IONTO_4: None,
+                self._nsb.burr6_x0020_injection_x0020_devi.NANO_5: None,
+                self._nsb.burr6_x0020_injection_x0020_devi.IONTO_5: None,
+                self._nsb.burr6_x0020_injection_x0020_devi.NANO_6: None,
+                self._nsb.burr6_x0020_injection_x0020_devi.IONTO_6: None,
+                self._nsb.burr6_x0020_injection_x0020_devi.NANO_7: None,
+                self._nsb.burr6_x0020_injection_x0020_devi.IONTO_7: None,
+                self._nsb.burr6_x0020_injection_x0020_devi.NANO_8: None,
+                self._nsb.burr6_x0020_injection_x0020_devi.IONTO_8: None,
+                self._nsb.burr6_x0020_injection_x0020_devi.NANO_9: None,
+                self._nsb.burr6_x0020_injection_x0020_devi.IONTO_9: None,
+            }.get(self._nsb.burr6_x0020_injection_x0020_devi, None)
         )
 
     @property
@@ -1025,11 +1018,11 @@ class MappedNSBList:
         """Maps burr6_perform_during to aind model"""
         return (
             None
-            if self._nsb.burr6_perform_during is None
+            if self._nsb.burr6_x0020_perform_x0020_during is None
             else {
-                self._nsb.burr6_perform_during.INITIAL_SURGERY: During.INITIAL,
-                self._nsb.burr6_perform_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
-            }.get(self._nsb.burr6_perform_during, None)
+                self._nsb.burr6_x0020_perform_x0020_during.INITIAL_SURGERY: During.INITIAL,
+                self._nsb.burr6_x0020_perform_x0020_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
+            }.get(self._nsb.burr6_x0020_perform_x0020_during, None)
         )
 
     @property
@@ -1037,10 +1030,10 @@ class MappedNSBList:
         """Maps burr6_status to aind model."""
         return (
             None
-            if self._nsb.burr6_status is None
+            if self._nsb.burr6_x0020_status is None
             else {
-                self._nsb.burr6_status.COMPLETE: None,
-            }.get(self._nsb.burr6_status, None)
+                self._nsb.burr6_x0020_status.COMPLETE: None,
+            }.get(self._nsb.burr6_x0020_status, None)
         )
 
     @property
@@ -1048,410 +1041,411 @@ class MappedNSBList:
         """Maps burr6_virus_biosafte to aind model."""
         return (
             None
-            if self._nsb.burr6_virus_biosafte is None
+            if self._nsb.burr6_x0020_virus_x0020_biosafte is None
             else {
-                self._nsb.burr6_virus_biosafte.SELECT: None,
-                self._nsb.burr6_virus_biosafte.BSL_1_AAV: None,
-                self._nsb.burr6_virus_biosafte.BSL_1__BEADS: None,
-                self._nsb.burr6_virus_biosafte.BSL_1_AAV__BEADS: None,
-                self._nsb.burr6_virus_biosafte.BSL_1__OTHER__WRITE_IN_CO: None,
-                self._nsb.burr6_virus_biosafte.BSL_2__RABIES: None,
-                self._nsb.burr6_virus_biosafte.BSL_2_CAV: None,
-                self._nsb.burr6_virus_biosafte.BSL_2_6_OHDA: None,
-                self._nsb.burr6_virus_biosafte.BSL_2__SINDBIS: None,
-                self._nsb.burr6_virus_biosafte.BSL_2_HSV_1: None,
-                self._nsb.burr6_virus_biosafte.BSL_2__LENTI: None,
-                self._nsb.burr6_virus_biosafte.BSL_2__CHOLERA__TOXIN_B: None,
-                self._nsb.burr6_virus_biosafte.BSL_2__OTHER__WRITE_IN_CO: None,
-            }.get(self._nsb.burr6_virus_biosafte, None)
+                self._nsb.burr6_x0020_virus_x0020_biosafte.SELECT: None,
+                self._nsb.burr6_x0020_virus_x0020_biosafte.BSL_1_AAV: None,
+                self._nsb.burr6_x0020_virus_x0020_biosafte.BSL_1__BEADS: None,
+                self._nsb.burr6_x0020_virus_x0020_biosafte.BSL_1_AAV__BEADS: None,
+                self._nsb.burr6_x0020_virus_x0020_biosafte.BSL_1__OTHER__WRITE_IN_CO: None,
+                self._nsb.burr6_x0020_virus_x0020_biosafte.BSL_2__RABIES: None,
+                self._nsb.burr6_x0020_virus_x0020_biosafte.BSL_2_CAV: None,
+                self._nsb.burr6_x0020_virus_x0020_biosafte.BSL_2_6_OHDA: None,
+                self._nsb.burr6_x0020_virus_x0020_biosafte.BSL_2__SINDBIS: None,
+                self._nsb.burr6_x0020_virus_x0020_biosafte.BSL_2_HSV_1: None,
+                self._nsb.burr6_x0020_virus_x0020_biosafte.BSL_2__LENTI: None,
+                self._nsb.burr6_x0020_virus_x0020_biosafte.BSL_2__CHOLERA__TOXIN_B: None,
+                self._nsb.burr6_x0020_virus_x0020_biosafte.BSL_2__OTHER__WRITE_IN_CO: None,
+            }.get(self._nsb.burr6_x0020_virus_x0020_biosafte, None)
         )
 
     @property
     def aind_burr_1_d_v_x00(self) -> Optional[Decimal]:
         """Maps burr_1_d_v_x00 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_1_d_v_x00)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_1_x0020_d_x002f_v_x00)
 
     @property
     def aind_burr_1_dv_2(self) -> Optional[Decimal]:
         """Maps burr_1_dv_2 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_1_dv_2)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_1_x0020_dv_x0020_2)
 
     @property
     def aind_burr_1_fiber_t(self) -> Optional[FiberType]:
         """Maps burr_1_fiber_t to aind model"""
         return (
             None
-            if self._nsb.burr_1_fiber_t is None
+            if self._nsb.burr_x0020_1_x0020_fiber_x0020_t is None
             else {
-                self._nsb.burr_1_fiber_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
-                self._nsb.burr_1_fiber_t.CUSTOM: FiberType.CUSTOM,
-            }.get(self._nsb.burr_1_fiber_t, None)
+                self._nsb.burr_x0020_1_x0020_fiber_x0020_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
+                self._nsb.burr_x0020_1_x0020_fiber_x0020_t.CUSTOM: FiberType.CUSTOM,
+            }.get(self._nsb.burr_x0020_1_x0020_fiber_x0020_t, None)
         )
 
     @property
     def aind_burr_1_grid_sp(self) -> Optional[str]:
         """Maps burr_1_grid_sp to aind model."""
-        return self._nsb.burr_1_grid_sp
+        return self._nsb.burr_x0020_1_x0020_grid_x0020_sp
 
     @property
     def aind_burr_1_injectable_x0(self) -> Optional[str]:
         """Maps burr_1_injectable_x0 to aind model."""
         # TODO: figure out how to parse injectable materials
         # first 4 are injectable material, other 4 are titer
-        return self._nsb.burr_1_injectable_x0
+        return self._nsb.burr_x0020_1_x0020_injectable_x0
 
     @property
     def aind_burr_1_injectable_x00(self) -> Optional[str]:
         """Maps burr_1_injectable_x00 to aind model."""
-        return self._nsb.burr_1_injectable_x00
+        return self._nsb.burr_x0020_1_x0020_injectable_x00
 
     @property
     def aind_burr_1_injectable_x01(self) -> Optional[str]:
         """Maps burr_1_injectable_x01 to aind model."""
-        return self._nsb.burr_1_injectable_x01
+        return self._nsb.burr_x0020_1_x0020_injectable_x01
 
     @property
     def aind_burr_1_injectable_x02(self) -> Optional[str]:
         """Maps burr_1_injectable_x02 to aind model."""
-        return self._nsb.burr_1_injectable_x02
+        return self._nsb.burr_x0020_1_x0020_injectable_x02
 
     @property
     def aind_burr_1_injectable_x03(self) -> Optional[str]:
         """Maps burr_1_injectable_x03 to aind model."""
-        return self._nsb.burr_1_injectable_x03
+        return self._nsb.burr_x0020_1_x0020_injectable_x03
 
     @property
     def aind_burr_1_injectable_x04(self) -> Optional[str]:
         """Maps burr_1_injectable_x04 to aind model."""
-        return self._nsb.burr_1_injectable_x04
+        return self._nsb.burr_x0020_1_x0020_injectable_x04
 
     @property
     def aind_burr_1_injectable_x05(self) -> Optional[str]:
         """Maps burr_1_injectable_x05 to aind model."""
-        return self._nsb.burr_1_injectable_x05
+        return self._nsb.burr_x0020_1_x0020_injectable_x05
 
     @property
     def aind_burr_1_injectable_x06(self) -> Optional[str]:
         """Maps burr_1_injectable_x06 to aind model."""
-        return self._nsb.burr_1_injectable_x06
+        return self._nsb.burr_x0020_1_x0020_injectable_x06
 
     @property
     def aind_burr_1_intended(self) -> Optional[Any]:
         """Maps burr_1_intended to aind model."""
+        burr_1_intended = self._nsb.burr_x0020_1_x0020_intended_x002
         return (
             None
-            if self._nsb.burr_1_intended is None
+            if burr_1_intended is None
             else {
-                self._nsb.burr_1_intended.FRP__FRONTAL_POLE_CEREBRA: None,
-                self._nsb.burr_1_intended.M_OP__PRIMARY_MOTOR_AREA: None,
-                self._nsb.burr_1_intended.M_OS__SECONDARY_MOTOR_ARE: None,
-                self._nsb.burr_1_intended.S_SP_N__PRIMARY_SOMATOSEN: None,
-                self._nsb.burr_1_intended.S_SP_BFD__PRIMARY_SOMATOS: None,
-                self._nsb.burr_1_intended.S_SP_LL__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_1_intended.S_SP_M__PRIMARY_SOMATOSEN: None,
-                self._nsb.burr_1_intended.S_SP_UL__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_1_intended.S_SP_TR__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_1_intended.S_SP_UN__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_1_intended.S_SS__SUPPLEMENTAL_SOMATO: None,
-                self._nsb.burr_1_intended.GU__GUSTATORY_AREAS: None,
-                self._nsb.burr_1_intended.VISC__VISCERAL_AREA: None,
-                self._nsb.burr_1_intended.AU_DD__DORSAL_AUDITORY_AR: None,
-                self._nsb.burr_1_intended.AU_DP__PRIMARY_AUDITORY_A: None,
-                self._nsb.burr_1_intended.AU_DPO__POSTERIOR_AUDITOR: None,
-                self._nsb.burr_1_intended.AU_DV__VENTRAL_AUDITORY_A: None,
-                self._nsb.burr_1_intended.VI_SAL__ANTEROLATERAL_VIS: None,
-                self._nsb.burr_1_intended.VI_SAM__ANTEROMEDIAL_VISU: None,
-                self._nsb.burr_1_intended.VI_SL__LATERAL_VISUAL_ARE: None,
-                self._nsb.burr_1_intended.VI_SP__PRIMARY_VISUAL_ARE: None,
-                self._nsb.burr_1_intended.VI_SPL__POSTEROLATERAL_VI: None,
-                self._nsb.burr_1_intended.VI_SPM_POSTEROMEDIAL_VISU: None,
-                self._nsb.burr_1_intended.VI_SLI__LATEROINTERMEDIAT: None,
-                self._nsb.burr_1_intended.VI_SPOR__POSTRHINAL_AREA: None,
-                self._nsb.burr_1_intended.AC_AD__ANTERIOR_CINGULATE: None,
-                self._nsb.burr_1_intended.AC_AV__ANTERIOR_CINGULATE: None,
-                self._nsb.burr_1_intended.PL__PRELIMBIC_AREA: None,
-                self._nsb.burr_1_intended.ILA__INFRALIMBIC_AREA: None,
-                self._nsb.burr_1_intended.OR_BL__ORBITAL_AREA_LATER: None,
-                self._nsb.burr_1_intended.OR_BM__ORBITAL_AREA_MEDIA: None,
-                self._nsb.burr_1_intended.OR_BV__ORBITAL_AREA_VENTR: None,
-                self._nsb.burr_1_intended.OR_BVL__ORBITAL_AREA_VENT: None,
-                self._nsb.burr_1_intended.A_ID__AGRANULAR_INSULAR_A: None,
-                self._nsb.burr_1_intended.A_IP__AGRANULAR_INSULAR_A: None,
-                self._nsb.burr_1_intended.A_IV__AGRANULAR_INSULAR_A: None,
-                self._nsb.burr_1_intended.RS_PAGL__RETROSPLENIAL_AR: None,
-                self._nsb.burr_1_intended.RS_PD__RETROSPLENIAL_AREA: None,
-                self._nsb.burr_1_intended.RS_PV__RETROSPLENIAL_AREA: None,
-                self._nsb.burr_1_intended.VI_SA__ANTERIOR_AREA: None,
-                self._nsb.burr_1_intended.VI_SRL__ROSTROLATERAL_VIS: None,
-                self._nsb.burr_1_intended.T_EA__TEMPORAL_ASSOCIATIO: None,
-                self._nsb.burr_1_intended.PERI__PERIRHINAL_AREA: None,
-                self._nsb.burr_1_intended.ECT__ECTORHINAL_AREA: None,
-                self._nsb.burr_1_intended.MOB__MAIN_OLFACTORY_BULB: None,
-                self._nsb.burr_1_intended.AOB__ACCESSORY_OLFACTORY: None,
-                self._nsb.burr_1_intended.AON__ANTERIOR_OLFACTORY_N: None,
-                self._nsb.burr_1_intended.T_TD__TAENIA_TECTA_DORSAL: None,
-                self._nsb.burr_1_intended.T_TV__TAENIA_TECTA_VENTRA: None,
-                self._nsb.burr_1_intended.DP__DORSAL_PEDUNCULAR_ARE: None,
-                self._nsb.burr_1_intended.PIR__PIRIFORM_AREA: None,
-                self._nsb.burr_1_intended.NLOT__NUCLEUS_OF_THE_LATE: None,
-                self._nsb.burr_1_intended.CO_AA__CORTICAL_AMYGDALAR: None,
-                self._nsb.burr_1_intended.CO_AP__CORTICAL_AMYGDALAR: None,
-                self._nsb.burr_1_intended.PAA__PIRIFORM_AMYGDALAR_A: None,
-                self._nsb.burr_1_intended.TR__POSTPIRIFORM_TRANSITI: None,
-                self._nsb.burr_1_intended.CA1__FIELD_CA1: None,
-                self._nsb.burr_1_intended.CA2__FIELD_CA2: None,
-                self._nsb.burr_1_intended.CA3__FIELD_CA3: None,
-                self._nsb.burr_1_intended.DG__DENTATE_GYRUS: None,
-                self._nsb.burr_1_intended.FC__FASCIOLA_CINEREA: None,
-                self._nsb.burr_1_intended.IG__INDUSEUM_GRISEUM: None,
-                self._nsb.burr_1_intended.EN_TL__ENTORHINAL_AREA_LA: None,
-                self._nsb.burr_1_intended.EN_TM__ENTORHINAL_AREA_ME: None,
-                self._nsb.burr_1_intended.PAR__PARASUBICULUM: None,
-                self._nsb.burr_1_intended.POST__POSTSUBICULUM: None,
-                self._nsb.burr_1_intended.PRE__PRESUBICULUM: None,
-                self._nsb.burr_1_intended.SUB__SUBICULUM: None,
-                self._nsb.burr_1_intended.PRO_S__PROSUBICULUM: None,
-                self._nsb.burr_1_intended.HATA__HIPPOCAMPO_AMYGDALA: None,
-                self._nsb.burr_1_intended.A_PR__AREA_PROSTRIATA: None,
-                self._nsb.burr_1_intended.CLA__CLAUSTRUM: None,
-                self._nsb.burr_1_intended.E_PD__ENDOPIRIFORM_NUCLEU: None,
-                self._nsb.burr_1_intended.E_PV__ENDOPIRIFORM_NUCLEU: None,
-                self._nsb.burr_1_intended.LA__LATERAL_AMYGDALAR_NUC: None,
-                self._nsb.burr_1_intended.BLA__BASOLATERAL_AMYGDALA: None,
-                self._nsb.burr_1_intended.BMA__BASOMEDIAL_AMYGDALAR: None,
-                self._nsb.burr_1_intended.PA__POSTERIOR_AMYGDALAR_N: None,
-                self._nsb.burr_1_intended.CP__CAUDOPUTAMEN: None,
-                self._nsb.burr_1_intended.ACB__NUCLEUS_ACCUMBENS: None,
-                self._nsb.burr_1_intended.FS__FUNDUS_OF_STRIATUM: None,
-                self._nsb.burr_1_intended.OT__OLFACTORY_TUBERCLE: None,
-                self._nsb.burr_1_intended.L_SC__LATERAL_SEPTAL_NUCL: None,
-                self._nsb.burr_1_intended.L_SR__LATERAL_SEPTAL_NUCL: None,
-                self._nsb.burr_1_intended.L_SV__LATERAL_SEPTAL_NUCL: None,
-                self._nsb.burr_1_intended.SF__SEPTOFIMBRIAL_NUCLEUS: None,
-                self._nsb.burr_1_intended.SH__SEPTOHIPPOCAMPAL_NUCL: None,
-                self._nsb.burr_1_intended.AAA__ANTERIOR_AMYGDALAR_A: None,
-                self._nsb.burr_1_intended.BA__BED_NUCLEUS_OF_THE_AC: None,
-                self._nsb.burr_1_intended.CEA__CENTRAL_AMYGDALAR_NU: None,
-                self._nsb.burr_1_intended.IA__INTERCALATED_AMYGDALA: None,
-                self._nsb.burr_1_intended.MEA__MEDIAL_AMYGDALAR_NUC: None,
-                self._nsb.burr_1_intended.G_PE__GLOBUS_PALLIDUS_EXT: None,
-                self._nsb.burr_1_intended.G_PI__GLOBUS_PALLIDUS_INT: None,
-                self._nsb.burr_1_intended.SI__SUBSTANTIA_INNOMINATA: None,
-                self._nsb.burr_1_intended.MA__MAGNOCELLULAR_NUCLEUS: None,
-                self._nsb.burr_1_intended.MS__MEDIAL_SEPTAL_NUCLEUS: None,
-                self._nsb.burr_1_intended.NDB__DIAGONAL_BAND_NUCLEU: None,
-                self._nsb.burr_1_intended.TRS__TRIANGULAR_NUCLEUS_O: None,
-                self._nsb.burr_1_intended.BST__BED_NUCLEI_OF_THE_ST: None,
-                self._nsb.burr_1_intended.VAL__VENTRAL_ANTERIOR_LAT: None,
-                self._nsb.burr_1_intended.VM__VENTRAL_MEDIAL_NUCLEU: None,
-                self._nsb.burr_1_intended.VPL__VENTRAL_POSTEROLATER: None,
-                self._nsb.burr_1_intended.VP_LPC__VENTRAL_POSTEROLA: None,
-                self._nsb.burr_1_intended.VPM__VENTRAL_POSTEROMEDIA: None,
-                self._nsb.burr_1_intended.VP_MPC__VENTRAL_POSTEROME: None,
-                self._nsb.burr_1_intended.PO_T__POSTERIOR_TRIANGULA: None,
-                self._nsb.burr_1_intended.SPF__SUBPARAFASCICULAR_NU: None,
-                self._nsb.burr_1_intended.SPA__SUBPARAFASCICULAR_AR: None,
-                self._nsb.burr_1_intended.PP__PERIPEDUNCULAR_NUCLEU: None,
-                self._nsb.burr_1_intended.MG__MEDIAL_GENICULATE_COM: None,
-                self._nsb.burr_1_intended.L_GD__DORSAL_PART_OF_THE: None,
-                self._nsb.burr_1_intended.LP__LATERAL_POSTERIOR_NUC: None,
-                self._nsb.burr_1_intended.PO__POSTERIOR_COMPLEX_OF: None,
-                self._nsb.burr_1_intended.POL__POSTERIOR_LIMITING_N: None,
-                self._nsb.burr_1_intended.SGN__SUPRAGENICULATE_NUCL: None,
-                self._nsb.burr_1_intended.ETH__ETHMOID_NUCLEUS_OF_T: None,
-                self._nsb.burr_1_intended.AV__ANTEROVENTRAL_NUCLEUS: None,
-                self._nsb.burr_1_intended.AM__ANTEROMEDIAL_NUCLEUS: None,
-                self._nsb.burr_1_intended.AD__ANTERODORSAL_NUCLEUS: None,
-                self._nsb.burr_1_intended.IAM__INTERANTEROMEDIAL_NU: None,
-                self._nsb.burr_1_intended.IAD__INTERANTERODORSAL_NU: None,
-                self._nsb.burr_1_intended.LD__LATERAL_DORSAL_NUCLEU: None,
-                self._nsb.burr_1_intended.IMD__INTERMEDIODORSAL_NUC: None,
-                self._nsb.burr_1_intended.MD__MEDIODORSAL_NUCLEUS_O: None,
-                self._nsb.burr_1_intended.SMT__SUBMEDIAL_NUCLEUS_OF: None,
-                self._nsb.burr_1_intended.PR__PERIREUNENSIS_NUCLEUS: None,
-                self._nsb.burr_1_intended.PVT__PARAVENTRICULAR_NUCL: None,
-                self._nsb.burr_1_intended.PT__PARATAENIAL_NUCLEUS: None,
-                self._nsb.burr_1_intended.RE__NUCLEUS_OF_REUNIENS: None,
-                self._nsb.burr_1_intended.XI__XIPHOID_THALAMIC_NUCL: None,
-                self._nsb.burr_1_intended.RH__RHOMBOID_NUCLEUS: None,
-                self._nsb.burr_1_intended.CM__CENTRAL_MEDIAL_NUCLEU: None,
-                self._nsb.burr_1_intended.PCN__PARACENTRAL_NUCLEUS: None,
-                self._nsb.burr_1_intended.CL__CENTRAL_LATERAL_NUCLE: None,
-                self._nsb.burr_1_intended.PF__PARAFASCICULAR_NUCLEU: None,
-                self._nsb.burr_1_intended.PIL__POSTERIOR_INTRALAMIN: None,
-                self._nsb.burr_1_intended.RT__RETICULAR_NUCLEUS_OF: None,
-                self._nsb.burr_1_intended.IGL__INTERGENICULATE_LEAF: None,
-                self._nsb.burr_1_intended.INT_G__INTERMEDIATE_GENIC: None,
-                self._nsb.burr_1_intended.L_GV__VENTRAL_PART_OF_THE: None,
-                self._nsb.burr_1_intended.SUB_G__SUBGENICULATE_NUCL: None,
-                self._nsb.burr_1_intended.MH__MEDIAL_HABENULA: None,
-                self._nsb.burr_1_intended.LH__LATERAL_HABENULA: None,
-                self._nsb.burr_1_intended.SO__SUPRAOPTIC_NUCLEUS: None,
-                self._nsb.burr_1_intended.PVH__PARAVENTRICULAR_HYPO: None,
-                self._nsb.burr_1_intended.P_VA__PERIVENTRICULAR_HYP: None,
-                self._nsb.burr_1_intended.P_VI__PERIVENTRICULAR_HYP: None,
-                self._nsb.burr_1_intended.ARH__ARCUATE_HYPOTHALAMIC: None,
-                self._nsb.burr_1_intended.ADP__ANTERODORSAL_PREOPTI: None,
-                self._nsb.burr_1_intended.AVP__ANTEROVENTRAL_PREOPT: None,
-                self._nsb.burr_1_intended.AVPV__ANTEROVENTRAL_PERIV: None,
-                self._nsb.burr_1_intended.DMH__DORSOMEDIAL_NUCLEUS: None,
-                self._nsb.burr_1_intended.MEPO__MEDIAN_PREOPTIC_NUC: None,
-                self._nsb.burr_1_intended.MPO__MEDIAL_PREOPTIC_AREA: None,
-                self._nsb.burr_1_intended.PS__PARASTRIAL_NUCLEUS: None,
-                self._nsb.burr_1_intended.P_VP__PERIVENTRICULAR_HYP: None,
-                self._nsb.burr_1_intended.P_VPO__PERIVENTRICULAR_HY: None,
-                self._nsb.burr_1_intended.SBPV__SUBPARAVENTRICULAR: None,
-                self._nsb.burr_1_intended.SCH__SUPRACHIASMATIC_NUCL: None,
-                self._nsb.burr_1_intended.SFO__SUBFORNICAL_ORGAN: None,
-                self._nsb.burr_1_intended.VMPO__VENTROMEDIAL_PREOPT: None,
-                self._nsb.burr_1_intended.VLPO__VENTROLATERAL_PREOP: None,
-                self._nsb.burr_1_intended.AHN__ANTERIOR_HYPOTHALAMI: None,
-                self._nsb.burr_1_intended.LM__LATERAL_MAMMILLARY_NU: None,
-                self._nsb.burr_1_intended.MM__MEDIAL_MAMMILLARY_NUC: None,
-                self._nsb.burr_1_intended.SUM__SUPRAMAMMILLARY_NUCL: None,
-                self._nsb.burr_1_intended.TM__TUBEROMAMMILLARY_NUCL: None,
-                self._nsb.burr_1_intended.MPN__MEDIAL_PREOPTIC_NUCL: None,
-                self._nsb.burr_1_intended.P_MD__DORSAL_PREMAMMILLAR: None,
-                self._nsb.burr_1_intended.P_MV__VENTRAL_PREMAMMILLA: None,
-                self._nsb.burr_1_intended.PV_HD__PARAVENTRICULAR_HY: None,
-                self._nsb.burr_1_intended.VMH__VENTROMEDIAL_HYPOTHA: None,
-                self._nsb.burr_1_intended.PH__POSTERIOR_HYPOTHALAMI: None,
-                self._nsb.burr_1_intended.LHA__LATERAL_HYPOTHALAMIC: None,
-                self._nsb.burr_1_intended.LPO__LATERAL_PREOPTIC_ARE: None,
-                self._nsb.burr_1_intended.PSTN__PARASUBTHALAMIC_NUC: None,
-                self._nsb.burr_1_intended.PE_F__PERIFORNICAL_NUCLEU: None,
-                self._nsb.burr_1_intended.RCH__RETROCHIASMATIC_AREA: None,
-                self._nsb.burr_1_intended.STN__SUBTHALAMIC_NUCLEUS: None,
-                self._nsb.burr_1_intended.TU__TUBERAL_NUCLEUS: None,
-                self._nsb.burr_1_intended.ZI__ZONA_INCERTA: None,
-                self._nsb.burr_1_intended.S_CS__SUPERIOR_COLLICULUS: None,
-                self._nsb.burr_1_intended.IC__INFERIOR_COLLICULUS: None,
-                self._nsb.burr_1_intended.NB__NUCLEUS_OF_THE_BRACHI: None,
-                self._nsb.burr_1_intended.SAG__NUCLEUS_SAGULUM: None,
-                self._nsb.burr_1_intended.PBG__PARABIGEMINAL_NUCLEU: None,
-                self._nsb.burr_1_intended.S_NR__SUBSTANTIA_NIGRA_RE: None,
-                self._nsb.burr_1_intended.VTA__VENTRAL_TEGMENTAL_AR: None,
-                self._nsb.burr_1_intended.PN__PARANIGRAL_NUCLEUS: None,
-                self._nsb.burr_1_intended.RR__MIDBRAIN_RETICULAR_NU: None,
-                self._nsb.burr_1_intended.MRN__MIDBRAIN_RETICULAR_N: None,
-                self._nsb.burr_1_intended.S_CM__SUPERIOR_COLLICULUS: None,
-                self._nsb.burr_1_intended.PAG__PERIAQUEDUCTAL_GRAY: None,
-                self._nsb.burr_1_intended.APN__ANTERIOR_PRETECTAL_N: None,
-                self._nsb.burr_1_intended.MPT__MEDIAL_PRETECTAL_ARE: None,
-                self._nsb.burr_1_intended.NOT__NUCLEUS_OF_THE_OPTIC: None,
-                self._nsb.burr_1_intended.NPC__NUCLEUS_OF_THE_POSTE: None,
-                self._nsb.burr_1_intended.OP__OLIVARY_PRETECTAL_NUC: None,
-                self._nsb.burr_1_intended.PPT__POSTERIOR_PRETECTAL: None,
-                self._nsb.burr_1_intended.RPF__RETROPARAFASCICULAR: None,
-                self._nsb.burr_1_intended.CUN__CUNEIFORM_NUCLEUS: None,
-                self._nsb.burr_1_intended.RN__RED_NUCLEUS: None,
-                self._nsb.burr_1_intended.III__OCULOMOTOR_NUCLEUS: None,
-                self._nsb.burr_1_intended.MA3__MEDIAL_ACCESORY_OCUL: None,
-                self._nsb.burr_1_intended.EW__EDINGER__WESTPHAL_NUC: None,
-                self._nsb.burr_1_intended.IV__TROCHLEAR_NUCLEUS: None,
-                self._nsb.burr_1_intended.PA4__PARATROCHLEAR_NUCLEU: None,
-                self._nsb.burr_1_intended.VTN__VENTRAL_TEGMENTAL_NU: None,
-                self._nsb.burr_1_intended.AT__ANTERIOR_TEGMENTAL_NU: None,
-                self._nsb.burr_1_intended.LT__LATERAL_TERMINAL_NUCL: None,
-                self._nsb.burr_1_intended.DT__DORSAL_TERMINAL_NUCLE: None,
-                self._nsb.burr_1_intended.MT__MEDIAL_TERMINAL_NUCLE: None,
-                self._nsb.burr_1_intended.S_NC__SUBSTANTIA_NIGRA_CO: None,
-                self._nsb.burr_1_intended.PPN__PEDUNCULOPONTINE_NUC: None,
-                self._nsb.burr_1_intended.IF__INTERFASCICULAR_NUCLE: None,
-                self._nsb.burr_1_intended.IPN__INTERPEDUNCULAR_NUCL: None,
-                self._nsb.burr_1_intended.RL__ROSTRAL_LINEAR_NUCLEU: None,
-                self._nsb.burr_1_intended.CLI__CENTRAL_LINEAR_NUCLE: None,
-                self._nsb.burr_1_intended.DR__DORSAL_NUCLEUS_RAPHE: None,
-                self._nsb.burr_1_intended.NLL__NUCLEUS_OF_THE_LATER: None,
-                self._nsb.burr_1_intended.PSV__PRINCIPAL_SENSORY_NU: None,
-                self._nsb.burr_1_intended.PB__PARABRACHIAL_NUCLEUS: None,
-                self._nsb.burr_1_intended.SOC__SUPERIOR_OLIVARY_COM: None,
-                self._nsb.burr_1_intended.B__BARRINGTON_S_NUCLEUS: None,
-                self._nsb.burr_1_intended.DTN__DORSAL_TEGMENTAL_NUC: None,
-                self._nsb.burr_1_intended.PD_TG__POSTERODORSAL_TEGM: None,
-                self._nsb.burr_1_intended.PCG__PONTINE_CENTRAL_GRAY: None,
-                self._nsb.burr_1_intended.PG__PONTINE_GRAY: None,
-                self._nsb.burr_1_intended.PR_NC__PONTINE_RETICULAR: None,
-                self._nsb.burr_1_intended.SG__SUPRAGENUAL_NUCLEUS: None,
-                self._nsb.burr_1_intended.SUT__SUPRATRIGEMINAL_NUCL: None,
-                self._nsb.burr_1_intended.TRN__TEGMENTAL_RETICULAR: None,
-                self._nsb.burr_1_intended.V__MOTOR_NUCLEUS_OF_TRIGE: None,
-                self._nsb.burr_1_intended.P5__PERITRIGEMINAL_ZONE: None,
-                self._nsb.burr_1_intended.ACS5__ACCESSORY_TRIGEMINA: None,
-                self._nsb.burr_1_intended.PC5__PARVICELLULAR_MOTOR: None,
-                self._nsb.burr_1_intended.I5__INTERTRIGEMINAL_NUCLE: None,
-                self._nsb.burr_1_intended.CS__SUPERIOR_CENTRAL_NUCL: None,
-                self._nsb.burr_1_intended.LC__LOCUS_CERULEUS: None,
-                self._nsb.burr_1_intended.LDT__LATERODORSAL_TEGMENT: None,
-                self._nsb.burr_1_intended.NI__NUCLEUS_INCERTUS: None,
-                self._nsb.burr_1_intended.PR_NR__PONTINE_RETICULAR: None,
-                self._nsb.burr_1_intended.RPO__NUCLEUS_RAPHE_PONTIS: None,
-                self._nsb.burr_1_intended.SLC__SUBCERULEUS_NUCLEUS: None,
-                self._nsb.burr_1_intended.SLD__SUBLATERODORSAL_NUCL: None,
-                self._nsb.burr_1_intended.MY__MEDULLA: None,
-                self._nsb.burr_1_intended.AP__AREA_POSTREMA: None,
-                self._nsb.burr_1_intended.DCO__DORSAL_COCHLEAR_NUCL: None,
-                self._nsb.burr_1_intended.VCO__VENTRAL_COCHLEAR_NUC: None,
-                self._nsb.burr_1_intended.CU__CUNEATE_NUCLEUS: None,
-                self._nsb.burr_1_intended.GR__GRACILE_NUCLEUS: None,
-                self._nsb.burr_1_intended.ECU__EXTERNAL_CUNEATE_NUC: None,
-                self._nsb.burr_1_intended.NTB__NUCLEUS_OF_THE_TRAPE: None,
-                self._nsb.burr_1_intended.NTS__NUCLEUS_OF_THE_SOLIT: None,
-                self._nsb.burr_1_intended.SPVC__SPINAL_NUCLEUS_OF_T: None,
-                self._nsb.burr_1_intended.SPVI__SPINAL_NUCLEUS_OF_T: None,
-                self._nsb.burr_1_intended.SPVO__SPINAL_NUCLEUS_OF_T: None,
-                self._nsb.burr_1_intended.PA5__PARATRIGEMINAL_NUCLE: None,
-                self._nsb.burr_1_intended.VI__ABDUCENS_NUCLEUS: None,
-                self._nsb.burr_1_intended.VII__FACIAL_MOTOR_NUCLEUS: None,
-                self._nsb.burr_1_intended.AMB__NUCLEUS_AMBIGUUS: None,
-                self._nsb.burr_1_intended.DMX__DORSAL_MOTOR_NUCLEUS: None,
-                self._nsb.burr_1_intended.GRN__GIGANTOCELLULAR_RETI: None,
-                self._nsb.burr_1_intended.ICB__INFRACEREBELLAR_NUCL: None,
-                self._nsb.burr_1_intended.IO__INFERIOR_OLIVARY_COMP: None,
-                self._nsb.burr_1_intended.IRN__INTERMEDIATE_RETICUL: None,
-                self._nsb.burr_1_intended.ISN__INFERIOR_SALIVATORY: None,
-                self._nsb.burr_1_intended.LIN__LINEAR_NUCLEUS_OF_TH: None,
-                self._nsb.burr_1_intended.LRN__LATERAL_RETICULAR_NU: None,
-                self._nsb.burr_1_intended.MARN__MAGNOCELLULAR_RETIC: None,
-                self._nsb.burr_1_intended.MDRN__MEDULLARY_RETICULAR: None,
-                self._nsb.burr_1_intended.PARN__PARVICELLULAR_RETIC: None,
-                self._nsb.burr_1_intended.PAS__PARASOLITARY_NUCLEUS: None,
-                self._nsb.burr_1_intended.PGRN__PARAGIGANTOCELLULAR: None,
-                self._nsb.burr_1_intended.NR__NUCLEUS_OF__ROLLER: None,
-                self._nsb.burr_1_intended.PRP__NUCLEUS_PREPOSITUS: None,
-                self._nsb.burr_1_intended.PMR__PARAMEDIAN_RETICULAR: None,
-                self._nsb.burr_1_intended.PPY__PARAPYRAMIDAL_NUCLEU: None,
-                self._nsb.burr_1_intended.LAV__LATERAL_VESTIBULAR_N: None,
-                self._nsb.burr_1_intended.MV__MEDIAL_VESTIBULAR_NUC: None,
-                self._nsb.burr_1_intended.SPIV__SPINAL_VESTIBULAR_N: None,
-                self._nsb.burr_1_intended.SUV__SUPERIOR_VESTIBULAR: None,
-                self._nsb.burr_1_intended.X__NUCLEUS_X: None,
-                self._nsb.burr_1_intended.XII__HYPOGLOSSAL_NUCLEUS: None,
-                self._nsb.burr_1_intended.Y__NUCLEUS_Y: None,
-                self._nsb.burr_1_intended.RM__NUCLEUS_RAPHE_MAGNUS: None,
-                self._nsb.burr_1_intended.RPA__NUCLEUS_RAPHE_PALLID: None,
-                self._nsb.burr_1_intended.RO__NUCLEUS_RAPHE_OBSCURU: None,
-                self._nsb.burr_1_intended.LING__LINGULA_I: None,
-                self._nsb.burr_1_intended.CENT2__LOBULE_II: None,
-                self._nsb.burr_1_intended.CENT3__LOBULE_III: None,
-                self._nsb.burr_1_intended.CUL4_5__LOBULES_IV_V: None,
-                self._nsb.burr_1_intended.DEC__DECLIVE_VI: None,
-                self._nsb.burr_1_intended.FOTU__FOLIUM_TUBER_VERMIS: None,
-                self._nsb.burr_1_intended.PYR__PYRAMUS_VIII: None,
-                self._nsb.burr_1_intended.UVU__UVULA_IX: None,
-                self._nsb.burr_1_intended.NOD__NODULUS_X: None,
-                self._nsb.burr_1_intended.SIM__SIMPLE_LOBULE: None,
-                self._nsb.burr_1_intended.A_NCR1__CRUS_1: None,
-                self._nsb.burr_1_intended.A_NCR2__CRUS_2: None,
-                self._nsb.burr_1_intended.PRM__PARAMEDIAN_LOBULE: None,
-                self._nsb.burr_1_intended.COPY__COPULA_PYRAMIDIS: None,
-                self._nsb.burr_1_intended.PFL__PARAFLOCCULUS: None,
-                self._nsb.burr_1_intended.FL__FLOCCULUS: None,
-                self._nsb.burr_1_intended.FN__FASTIGIAL_NUCLEUS: None,
-                self._nsb.burr_1_intended.IP__INTERPOSED_NUCLEUS: None,
-                self._nsb.burr_1_intended.DN__DENTATE_NUCLEUS: None,
-                self._nsb.burr_1_intended.VE_CB__VESTIBULOCEREBELLA: None,
-            }.get(self._nsb.burr_1_intended, None)
+                burr_1_intended.FRP__FRONTAL_POLE_CEREBRA: None,
+                burr_1_intended.M_OP__PRIMARY_MOTOR_AREA: None,
+                burr_1_intended.M_OS__SECONDARY_MOTOR_ARE: None,
+                burr_1_intended.S_SP_N__PRIMARY_SOMATOSEN: None,
+                burr_1_intended.S_SP_BFD__PRIMARY_SOMATOS: None,
+                burr_1_intended.S_SP_LL__PRIMARY_SOMATOSE: None,
+                burr_1_intended.S_SP_M__PRIMARY_SOMATOSEN: None,
+                burr_1_intended.S_SP_UL__PRIMARY_SOMATOSE: None,
+                burr_1_intended.S_SP_TR__PRIMARY_SOMATOSE: None,
+                burr_1_intended.S_SP_UN__PRIMARY_SOMATOSE: None,
+                burr_1_intended.S_SS__SUPPLEMENTAL_SOMATO: None,
+                burr_1_intended.GU__GUSTATORY_AREAS: None,
+                burr_1_intended.VISC__VISCERAL_AREA: None,
+                burr_1_intended.AU_DD__DORSAL_AUDITORY_AR: None,
+                burr_1_intended.AU_DP__PRIMARY_AUDITORY_A: None,
+                burr_1_intended.AU_DPO__POSTERIOR_AUDITOR: None,
+                burr_1_intended.AU_DV__VENTRAL_AUDITORY_A: None,
+                burr_1_intended.VI_SAL__ANTEROLATERAL_VIS: None,
+                burr_1_intended.VI_SAM__ANTEROMEDIAL_VISU: None,
+                burr_1_intended.VI_SL__LATERAL_VISUAL_ARE: None,
+                burr_1_intended.VI_SP__PRIMARY_VISUAL_ARE: None,
+                burr_1_intended.VI_SPL__POSTEROLATERAL_VI: None,
+                burr_1_intended.VI_SPM_POSTEROMEDIAL_VISU: None,
+                burr_1_intended.VI_SLI__LATEROINTERMEDIAT: None,
+                burr_1_intended.VI_SPOR__POSTRHINAL_AREA: None,
+                burr_1_intended.AC_AD__ANTERIOR_CINGULATE: None,
+                burr_1_intended.AC_AV__ANTERIOR_CINGULATE: None,
+                burr_1_intended.PL__PRELIMBIC_AREA: None,
+                burr_1_intended.ILA__INFRALIMBIC_AREA: None,
+                burr_1_intended.OR_BL__ORBITAL_AREA_LATER: None,
+                burr_1_intended.OR_BM__ORBITAL_AREA_MEDIA: None,
+                burr_1_intended.OR_BV__ORBITAL_AREA_VENTR: None,
+                burr_1_intended.OR_BVL__ORBITAL_AREA_VENT: None,
+                burr_1_intended.A_ID__AGRANULAR_INSULAR_A: None,
+                burr_1_intended.A_IP__AGRANULAR_INSULAR_A: None,
+                burr_1_intended.A_IV__AGRANULAR_INSULAR_A: None,
+                burr_1_intended.RS_PAGL__RETROSPLENIAL_AR: None,
+                burr_1_intended.RS_PD__RETROSPLENIAL_AREA: None,
+                burr_1_intended.RS_PV__RETROSPLENIAL_AREA: None,
+                burr_1_intended.VI_SA__ANTERIOR_AREA: None,
+                burr_1_intended.VI_SRL__ROSTROLATERAL_VIS: None,
+                burr_1_intended.T_EA__TEMPORAL_ASSOCIATIO: None,
+                burr_1_intended.PERI__PERIRHINAL_AREA: None,
+                burr_1_intended.ECT__ECTORHINAL_AREA: None,
+                burr_1_intended.MOB__MAIN_OLFACTORY_BULB: None,
+                burr_1_intended.AOB__ACCESSORY_OLFACTORY: None,
+                burr_1_intended.AON__ANTERIOR_OLFACTORY_N: None,
+                burr_1_intended.T_TD__TAENIA_TECTA_DORSAL: None,
+                burr_1_intended.T_TV__TAENIA_TECTA_VENTRA: None,
+                burr_1_intended.DP__DORSAL_PEDUNCULAR_ARE: None,
+                burr_1_intended.PIR__PIRIFORM_AREA: None,
+                burr_1_intended.NLOT__NUCLEUS_OF_THE_LATE: None,
+                burr_1_intended.CO_AA__CORTICAL_AMYGDALAR: None,
+                burr_1_intended.CO_AP__CORTICAL_AMYGDALAR: None,
+                burr_1_intended.PAA__PIRIFORM_AMYGDALAR_A: None,
+                burr_1_intended.TR__POSTPIRIFORM_TRANSITI: None,
+                burr_1_intended.CA1__FIELD_CA1: None,
+                burr_1_intended.CA2__FIELD_CA2: None,
+                burr_1_intended.CA3__FIELD_CA3: None,
+                burr_1_intended.DG__DENTATE_GYRUS: None,
+                burr_1_intended.FC__FASCIOLA_CINEREA: None,
+                burr_1_intended.IG__INDUSEUM_GRISEUM: None,
+                burr_1_intended.EN_TL__ENTORHINAL_AREA_LA: None,
+                burr_1_intended.EN_TM__ENTORHINAL_AREA_ME: None,
+                burr_1_intended.PAR__PARASUBICULUM: None,
+                burr_1_intended.POST__POSTSUBICULUM: None,
+                burr_1_intended.PRE__PRESUBICULUM: None,
+                burr_1_intended.SUB__SUBICULUM: None,
+                burr_1_intended.PRO_S__PROSUBICULUM: None,
+                burr_1_intended.HATA__HIPPOCAMPO_AMYGDALA: None,
+                burr_1_intended.A_PR__AREA_PROSTRIATA: None,
+                burr_1_intended.CLA__CLAUSTRUM: None,
+                burr_1_intended.E_PD__ENDOPIRIFORM_NUCLEU: None,
+                burr_1_intended.E_PV__ENDOPIRIFORM_NUCLEU: None,
+                burr_1_intended.LA__LATERAL_AMYGDALAR_NUC: None,
+                burr_1_intended.BLA__BASOLATERAL_AMYGDALA: None,
+                burr_1_intended.BMA__BASOMEDIAL_AMYGDALAR: None,
+                burr_1_intended.PA__POSTERIOR_AMYGDALAR_N: None,
+                burr_1_intended.CP__CAUDOPUTAMEN: None,
+                burr_1_intended.ACB__NUCLEUS_ACCUMBENS: None,
+                burr_1_intended.FS__FUNDUS_OF_STRIATUM: None,
+                burr_1_intended.OT__OLFACTORY_TUBERCLE: None,
+                burr_1_intended.L_SC__LATERAL_SEPTAL_NUCL: None,
+                burr_1_intended.L_SR__LATERAL_SEPTAL_NUCL: None,
+                burr_1_intended.L_SV__LATERAL_SEPTAL_NUCL: None,
+                burr_1_intended.SF__SEPTOFIMBRIAL_NUCLEUS: None,
+                burr_1_intended.SH__SEPTOHIPPOCAMPAL_NUCL: None,
+                burr_1_intended.AAA__ANTERIOR_AMYGDALAR_A: None,
+                burr_1_intended.BA__BED_NUCLEUS_OF_THE_AC: None,
+                burr_1_intended.CEA__CENTRAL_AMYGDALAR_N: None,
+                burr_1_intended.IA__INTERCALATED_AMYGDALA: None,
+                burr_1_intended.MEA__MEDIAL_AMYGDALAR_NUC: None,
+                burr_1_intended.G_PE__GLOBUS_PALLIDUS_EXT: None,
+                burr_1_intended.G_PI__GLOBUS_PALLIDUS_INT: None,
+                burr_1_intended.SI__SUBSTANTIA_INNOMINATA: None,
+                burr_1_intended.MA__MAGNOCELLULAR_NUCLEUS: None,
+                burr_1_intended.MS__MEDIAL_SEPTAL_NUCLEUS: None,
+                burr_1_intended.NDB__DIAGONAL_BAND_NUCLEU: None,
+                burr_1_intended.TRS__TRIANGULAR_NUCLEUS_O: None,
+                burr_1_intended.BST__BED_NUCLEI_OF_THE_ST: None,
+                burr_1_intended.VAL__VENTRAL_ANTERIOR_LAT: None,
+                burr_1_intended.VM__VENTRAL_MEDIAL_NUCLEU: None,
+                burr_1_intended.VPL__VENTRAL_POSTEROLATER: None,
+                burr_1_intended.VP_LPC__VENTRAL_POSTEROLA: None,
+                burr_1_intended.VPM__VENTRAL_POSTEROMEDIA: None,
+                burr_1_intended.VP_MPC__VENTRAL_POSTEROME: None,
+                burr_1_intended.PO_T__POSTERIOR_TRIANGULA: None,
+                burr_1_intended.SPF__SUBPARAFASCICULAR_NU: None,
+                burr_1_intended.SPA__SUBPARAFASCICULAR_AR: None,
+                burr_1_intended.PP__PERIPEDUNCULAR_NUCLEU: None,
+                burr_1_intended.MG__MEDIAL_GENICULATE_COM: None,
+                burr_1_intended.L_GD__DORSAL_PART_OF_THE: None,
+                burr_1_intended.LP__LATERAL_POSTERIOR_NUC: None,
+                burr_1_intended.PO__POSTERIOR_COMPLEX_OF: None,
+                burr_1_intended.POL__POSTERIOR_LIMITING_N: None,
+                burr_1_intended.SGN__SUPRAGENICULATE_NUCL: None,
+                burr_1_intended.ETH__ETHMOID_NUCLEUS_OF_T: None,
+                burr_1_intended.AV__ANTEROVENTRAL_NUCLEUS: None,
+                burr_1_intended.AM__ANTEROMEDIAL_NUCLEUS: None,
+                burr_1_intended.AD__ANTERODORSAL_NUCLEUS: None,
+                burr_1_intended.IAM__INTERANTEROMEDIAL_NU: None,
+                burr_1_intended.IAD__INTERANTERODORSAL_NU: None,
+                burr_1_intended.LD__LATERAL_DORSAL_NUCLEU: None,
+                burr_1_intended.IMD__INTERMEDIODORSAL_NUC: None,
+                burr_1_intended.MD__MEDIODORSAL_NUCLEUS_O: None,
+                burr_1_intended.SMT__SUBMEDIAL_NUCLEUS_OF: None,
+                burr_1_intended.PR__PERIREUNENSIS_NUCLEUS: None,
+                burr_1_intended.PVT__PARAVENTRICULAR_NUCL: None,
+                burr_1_intended.PT__PARATAENIAL_NUCLEUS: None,
+                burr_1_intended.RE__NUCLEUS_OF_REUNIENS: None,
+                burr_1_intended.XI__XIPHOID_THALAMIC_NUCL: None,
+                burr_1_intended.RH__RHOMBOID_NUCLEUS: None,
+                burr_1_intended.CM__CENTRAL_MEDIAL_NUCLEU: None,
+                burr_1_intended.PCN__PARACENTRAL_NUCLEUS: None,
+                burr_1_intended.CL__CENTRAL_LATERAL_NUCLE: None,
+                burr_1_intended.PF__PARAFASCICULAR_NUCLEU: None,
+                burr_1_intended.PIL__POSTERIOR_INTRALAMIN: None,
+                burr_1_intended.RT__RETICULAR_NUCLEUS_OF: None,
+                burr_1_intended.IGL__INTERGENICULATE_LEAF: None,
+                burr_1_intended.INT_G__INTERMEDIATE_GENIC: None,
+                burr_1_intended.L_GV__VENTRAL_PART_OF_THE: None,
+                burr_1_intended.SUB_G__SUBGENICULATE_NUCL: None,
+                burr_1_intended.MH__MEDIAL_HABENULA: None,
+                burr_1_intended.LH__LATERAL_HABENULA: None,
+                burr_1_intended.SO__SUPRAOPTIC_NUCLEUS: None,
+                burr_1_intended.PVH__PARAVENTRICULAR_HYPO: None,
+                burr_1_intended.P_VA__PERIVENTRICULAR_HYP: None,
+                burr_1_intended.P_VI__PERIVENTRICULAR_HYP: None,
+                burr_1_intended.ARH__ARCUATE_HYPOTHALAMIC: None,
+                burr_1_intended.ADP__ANTERODORSAL_PREOPTI: None,
+                burr_1_intended.AVP__ANTEROVENTRAL_PREOPT: None,
+                burr_1_intended.AVPV__ANTEROVENTRAL_PERIV: None,
+                burr_1_intended.DMH__DORSOMEDIAL_NUCLEUS: None,
+                burr_1_intended.MEPO__MEDIAN_PREOPTIC_NUC: None,
+                burr_1_intended.MPO__MEDIAL_PREOPTIC_AREA: None,
+                burr_1_intended.PS__PARASTRIAL_NUCLEUS: None,
+                burr_1_intended.P_VP__PERIVENTRICULAR_HYP: None,
+                burr_1_intended.P_VPO__PERIVENTRICULAR_HY: None,
+                burr_1_intended.SBPV__SUBPARAVENTRICULAR: None,
+                burr_1_intended.SCH__SUPRACHIASMATIC_NUCL: None,
+                burr_1_intended.SFO__SUBFORNICAL_ORGAN: None,
+                burr_1_intended.VMPO__VENTROMEDIAL_PREOPT: None,
+                burr_1_intended.VLPO__VENTROLATERAL_PREOP: None,
+                burr_1_intended.AHN__ANTERIOR_HYPOTHALAMI: None,
+                burr_1_intended.LM__LATERAL_MAMMILLARY_NU: None,
+                burr_1_intended.MM__MEDIAL_MAMMILLARY_NUC: None,
+                burr_1_intended.SUM__SUPRAMAMMILLARY_NUCL: None,
+                burr_1_intended.TM__TUBEROMAMMILLARY_NUCL: None,
+                burr_1_intended.MPN__MEDIAL_PREOPTIC_NUCL: None,
+                burr_1_intended.P_MD__DORSAL_PREMAMMILLAR: None,
+                burr_1_intended.P_MV__VENTRAL_PREMAMMILLA: None,
+                burr_1_intended.PV_HD__PARAVENTRICULAR_HY: None,
+                burr_1_intended.VMH__VENTROMEDIAL_HYPOTHA: None,
+                burr_1_intended.PH__POSTERIOR_HYPOTHALAMI: None,
+                burr_1_intended.LHA__LATERAL_HYPOTHALAMIC: None,
+                burr_1_intended.LPO__LATERAL_PREOPTIC_ARE: None,
+                burr_1_intended.PSTN__PARASUBTHALAMIC_NUC: None,
+                burr_1_intended.PE_F__PERIFORNICAL_NUCLEU: None,
+                burr_1_intended.RCH__RETROCHIASMATIC_AREA: None,
+                burr_1_intended.STN__SUBTHALAMIC_NUCLEUS: None,
+                burr_1_intended.TU__TUBERAL_NUCLEUS: None,
+                burr_1_intended.ZI__ZONA_INCERTA: None,
+                burr_1_intended.S_CS__SUPERIOR_COLLICULUS: None,
+                burr_1_intended.IC__INFERIOR_COLLICULUS: None,
+                burr_1_intended.NB__NUCLEUS_OF_THE_BRACHI: None,
+                burr_1_intended.SAG__NUCLEUS_SAGULUM: None,
+                burr_1_intended.PBG__PARABIGEMINAL_NUCLEU: None,
+                burr_1_intended.S_NR__SUBSTANTIA_NIGRA_RE: None,
+                burr_1_intended.VTA__VENTRAL_TEGMENTAL_AR: None,
+                burr_1_intended.PN__PARANIGRAL_NUCLEUS: None,
+                burr_1_intended.RR__MIDBRAIN_RETICULAR_NU: None,
+                burr_1_intended.MRN__MIDBRAIN_RETICULAR_N: None,
+                burr_1_intended.S_CM__SUPERIOR_COLLICULUS: None,
+                burr_1_intended.PAG__PERIAQUEDUCTAL_GRAY: None,
+                burr_1_intended.APN__ANTERIOR_PRETECTAL_N: None,
+                burr_1_intended.MPT__MEDIAL_PRETECTAL_ARE: None,
+                burr_1_intended.NOT__NUCLEUS_OF_THE_OPTIC: None,
+                burr_1_intended.NPC__NUCLEUS_OF_THE_POSTE: None,
+                burr_1_intended.OP__OLIVARY_PRETECTAL_NUC: None,
+                burr_1_intended.PPT__POSTERIOR_PRETECTAL: None,
+                burr_1_intended.RPF__RETROPARAFASCICULAR: None,
+                burr_1_intended.CUN__CUNEIFORM_NUCLEUS: None,
+                burr_1_intended.RN__RED_NUCLEUS: None,
+                burr_1_intended.III__OCULOMOTOR_NUCLEUS: None,
+                burr_1_intended.MA3__MEDIAL_ACCESORY_OCUL: None,
+                burr_1_intended.EW__EDINGER__WESTPHAL_NUC: None,
+                burr_1_intended.IV__TROCHLEAR_NUCLEUS: None,
+                burr_1_intended.PA4__PARATROCHLEAR_NUCLEU: None,
+                burr_1_intended.VTN__VENTRAL_TEGMENTAL_NU: None,
+                burr_1_intended.AT__ANTERIOR_TEGMENTAL_NU: None,
+                burr_1_intended.LT__LATERAL_TERMINAL_NUCL: None,
+                burr_1_intended.DT__DORSAL_TERMINAL_NUCLE: None,
+                burr_1_intended.MT__MEDIAL_TERMINAL_NUCLE: None,
+                burr_1_intended.S_NC__SUBSTANTIA_NIGRA_CO: None,
+                burr_1_intended.PPN__PEDUNCULOPONTINE_NUC: None,
+                burr_1_intended.IF__INTERFASCICULAR_NUCLE: None,
+                burr_1_intended.IPN__INTERPEDUNCULAR_NUCL: None,
+                burr_1_intended.RL__ROSTRAL_LINEAR_NUCLEU: None,
+                burr_1_intended.CLI__CENTRAL_LINEAR_NUCLE: None,
+                burr_1_intended.DR__DORSAL_NUCLEUS_RAPHE: None,
+                burr_1_intended.NLL__NUCLEUS_OF_THE_LATER: None,
+                burr_1_intended.PSV__PRINCIPAL_SENSORY_NU: None,
+                burr_1_intended.PB__PARABRACHIAL_NUCLEUS: None,
+                burr_1_intended.SOC__SUPERIOR_OLIVARY_COM: None,
+                burr_1_intended.B__BARRINGTON_S_NUCLEUS: None,
+                burr_1_intended.DTN__DORSAL_TEGMENTAL_NUC: None,
+                burr_1_intended.PD_TG__POSTERODORSAL_TEGM: None,
+                burr_1_intended.PCG__PONTINE_CENTRAL_GRAY: None,
+                burr_1_intended.PG__PONTINE_GRAY: None,
+                burr_1_intended.PR_NC__PONTINE_RETICULAR: None,
+                burr_1_intended.SG__SUPRAGENUAL_NUCLEUS: None,
+                burr_1_intended.SUT__SUPRATRIGEMINAL_NUCL: None,
+                burr_1_intended.TRN__TEGMENTAL_RETICULAR: None,
+                burr_1_intended.V__MOTOR_NUCLEUS_OF_TRIGE: None,
+                burr_1_intended.P5__PERITRIGEMINAL_ZONE: None,
+                burr_1_intended.ACS5__ACCESSORY_TRIGEMINA: None,
+                burr_1_intended.PC5__PARVICELLULAR_MOTOR: None,
+                burr_1_intended.I5__INTERTRIGEMINAL_NUCLE: None,
+                burr_1_intended.CS__SUPERIOR_CENTRAL_NUCL: None,
+                burr_1_intended.LC__LOCUS_CERULEUS: None,
+                burr_1_intended.LDT__LATERODORSAL_TEGMENT: None,
+                burr_1_intended.NI__NUCLEUS_INCERTUS: None,
+                burr_1_intended.PR_NR__PONTINE_RETICULAR: None,
+                burr_1_intended.RPO__NUCLEUS_RAPHE_PONTIS: None,
+                burr_1_intended.SLC__SUBCERULEUS_NUCLEUS: None,
+                burr_1_intended.SLD__SUBLATERODORSAL_NUCL: None,
+                burr_1_intended.MY__MEDULLA: None,
+                burr_1_intended.AP__AREA_POSTREMA: None,
+                burr_1_intended.DCO__DORSAL_COCHLEAR_NUCL: None,
+                burr_1_intended.VCO__VENTRAL_COCHLEAR_NUC: None,
+                burr_1_intended.CU__CUNEATE_NUCLEUS: None,
+                burr_1_intended.GR__GRACILE_NUCLEUS: None,
+                burr_1_intended.ECU__EXTERNAL_CUNEATE_NUC: None,
+                burr_1_intended.NTB__NUCLEUS_OF_THE_TRAPE: None,
+                burr_1_intended.NTS__NUCLEUS_OF_THE_SOLIT: None,
+                burr_1_intended.SPVC__SPINAL_NUCLEUS_OF_T: None,
+                burr_1_intended.SPVI__SPINAL_NUCLEUS_OF_T: None,
+                burr_1_intended.SPVO__SPINAL_NUCLEUS_OF_T: None,
+                burr_1_intended.PA5__PARATRIGEMINAL_NUCLE: None,
+                burr_1_intended.VI__ABDUCENS_NUCLEUS: None,
+                burr_1_intended.VII__FACIAL_MOTOR_NUCLEUS: None,
+                burr_1_intended.AMB__NUCLEUS_AMBIGUUS: None,
+                burr_1_intended.DMX__DORSAL_MOTOR_NUCLEUS: None,
+                burr_1_intended.GRN__GIGANTOCELLULAR_RETI: None,
+                burr_1_intended.ICB__INFRACEREBELLAR_NUCL: None,
+                burr_1_intended.IO__INFERIOR_OLIVARY_COMP: None,
+                burr_1_intended.IRN__INTERMEDIATE_RETICUL: None,
+                burr_1_intended.ISN__INFERIOR_SALIVATORY: None,
+                burr_1_intended.LIN__LINEAR_NUCLEUS_OF_TH: None,
+                burr_1_intended.LRN__LATERAL_RETICULAR_NU: None,
+                burr_1_intended.MARN__MAGNOCELLULAR_RETIC: None,
+                burr_1_intended.MDRN__MEDULLARY_RETICULAR: None,
+                burr_1_intended.PARN__PARVICELLULAR_RETIC: None,
+                burr_1_intended.PAS__PARASOLITARY_NUCLEUS: None,
+                burr_1_intended.PGRN__PARAGIGANTOCELLULAR: None,
+                burr_1_intended.NR__NUCLEUS_OF__ROLLER: None,
+                burr_1_intended.PRP__NUCLEUS_PREPOSITUS: None,
+                burr_1_intended.PMR__PARAMEDIAN_RETICULAR: None,
+                burr_1_intended.PPY__PARAPYRAMIDAL_NUCLEU: None,
+                burr_1_intended.LAV__LATERAL_VESTIBULAR_N: None,
+                burr_1_intended.MV__MEDIAL_VESTIBULAR_NUC: None,
+                burr_1_intended.SPIV__SPINAL_VESTIBULAR_N: None,
+                burr_1_intended.SUV__SUPERIOR_VESTIBULAR: None,
+                burr_1_intended.X__NUCLEUS_X: None,
+                burr_1_intended.XII__HYPOGLOSSAL_NUCLEUS: None,
+                burr_1_intended.Y__NUCLEUS_Y: None,
+                burr_1_intended.RM__NUCLEUS_RAPHE_MAGNUS: None,
+                burr_1_intended.RPA__NUCLEUS_RAPHE_PALLID: None,
+                burr_1_intended.RO__NUCLEUS_RAPHE_OBSCURU: None,
+                burr_1_intended.LING__LINGULA_I: None,
+                burr_1_intended.CENT2__LOBULE_II: None,
+                burr_1_intended.CENT3__LOBULE_III: None,
+                burr_1_intended.CUL4_5__LOBULES_IV_V: None,
+                burr_1_intended.DEC__DECLIVE_VI: None,
+                burr_1_intended.FOTU__FOLIUM_TUBER_VERMIS: None,
+                burr_1_intended.PYR__PYRAMUS_VIII: None,
+                burr_1_intended.UVU__UVULA_IX: None,
+                burr_1_intended.NOD__NODULUS_X: None,
+                burr_1_intended.SIM__SIMPLE_LOBULE: None,
+                burr_1_intended.A_NCR1__CRUS_1: None,
+                burr_1_intended.A_NCR2__CRUS_2: None,
+                burr_1_intended.PRM__PARAMEDIAN_LOBULE: None,
+                burr_1_intended.COPY__COPULA_PYRAMIDIS: None,
+                burr_1_intended.PFL__PARAFLOCCULUS: None,
+                burr_1_intended.FL__FLOCCULUS: None,
+                burr_1_intended.FN__FASTIGIAL_NUCLEUS: None,
+                burr_1_intended.IP__INTERPOSED_NUCLEUS: None,
+                burr_1_intended.DN__DENTATE_NUCLEUS: None,
+                burr_1_intended.VE_CB__VESTIBULOCEREBELLA: None,
+            }.get(burr_1_intended, None)
         )
 
     @property
@@ -1500,405 +1494,405 @@ class MappedNSBList:
         """Maps burr_1_spinal to aind model."""
         return (
             None
-            if self._nsb.burr_1_spinal is None
+            if self._nsb.burr_x0020_1_x0020_spinal_x0020_ is None
             else {
-                self._nsb.burr_1_spinal.SELECT: None,
-                self._nsb.burr_1_spinal.BETWEEN_C1_C2: None,
-                self._nsb.burr_1_spinal.BETWEEN_C2_C3: None,
-                self._nsb.burr_1_spinal.BETWEEN_C3_C4: None,
-                self._nsb.burr_1_spinal.BETWEEN_C4_C5: None,
-                self._nsb.burr_1_spinal.BETWEEN_C6_C7: None,
-                self._nsb.burr_1_spinal.BETWEEN_C7_C8: None,
-                self._nsb.burr_1_spinal.BETWEEN_C8_T1: None,
-                self._nsb.burr_1_spinal.BETWEEN_T1_T2: None,
-            }.get(self._nsb.burr_1_spinal, None)
+                self._nsb.burr_x0020_1_x0020_spinal_x0020_.SELECT: None,
+                self._nsb.burr_x0020_1_x0020_spinal_x0020_.BETWEEN_C1_C2: None,
+                self._nsb.burr_x0020_1_x0020_spinal_x0020_.BETWEEN_C2_C3: None,
+                self._nsb.burr_x0020_1_x0020_spinal_x0020_.BETWEEN_C3_C4: None,
+                self._nsb.burr_x0020_1_x0020_spinal_x0020_.BETWEEN_C4_C5: None,
+                self._nsb.burr_x0020_1_x0020_spinal_x0020_.BETWEEN_C6_C7: None,
+                self._nsb.burr_x0020_1_x0020_spinal_x0020_.BETWEEN_C7_C8: None,
+                self._nsb.burr_x0020_1_x0020_spinal_x0020_.BETWEEN_C8_T1: None,
+                self._nsb.burr_x0020_1_x0020_spinal_x0020_.BETWEEN_T1_T2: None,
+            }.get(self._nsb.burr_x0020_1_x0020_spinal_x0020_, None)
         )
 
     @property
     def aind_burr_2_d_v_x00(self) -> Optional[Decimal]:
         """Maps burr_2_d_v_x00 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_2_d_v_x00)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_2_x0020_d_x002f_v_x00)
 
     @property
     def aind_burr_2_d_v_x000(self) -> Optional[Decimal]:
         """Maps burr_2_d_v_x000 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_2_d_v_x000)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_2_x0020_d_x002f_v_x000)
 
     @property
     def aind_burr_2_fiber_t(self) -> Optional[FiberType]:
         """Maps burr_2_fiber_t to aind model"""
         return (
             None
-            if self._nsb.burr_2_fiber_t is None
+            if self._nsb.burr_x0020_2_x0020_fiber_x0020_t is None
             else {
-                self._nsb.burr_2_fiber_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
-                self._nsb.burr_2_fiber_t.CUSTOM: FiberType.CUSTOM,
-            }.get(self._nsb.burr_2_fiber_t, None)
+                self._nsb.burr_x0020_2_x0020_fiber_x0020_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
+                self._nsb.burr_x0020_2_x0020_fiber_x0020_t.CUSTOM: FiberType.CUSTOM,
+            }.get(self._nsb.burr_x0020_2_x0020_fiber_x0020_t, None)
         )
 
     @property
     def aind_burr_2_injectable_x0(self) -> Optional[str]:
         """Maps burr_2_injectable_x0 to aind model."""
-        return self._nsb.burr_2_injectable_x0
+        return self._nsb.burr_x0020_2_x0020_injectable_x0
 
     @property
     def aind_burr_2_injectable_x00(self) -> Optional[str]:
         """Maps burr_2_injectable_x00 to aind model."""
-        return self._nsb.burr_2_injectable_x00
+        return self._nsb.burr_x0020_2_x0020_injectable_x00
 
     @property
     def aind_burr_2_injectable_x01(self) -> Optional[str]:
         """Maps burr_2_injectable_x01 to aind model."""
-        return self._nsb.burr_2_injectable_x01
+        return self._nsb.burr_x0020_2_x0020_injectable_x01
 
     @property
     def aind_burr_2_injectable_x02(self) -> Optional[str]:
         """Maps burr_2_injectable_x02 to aind model."""
-        return self._nsb.burr_2_injectable_x02
+        return self._nsb.burr_x0020_2_x0020_injectable_x02
 
     @property
     def aind_burr_2_injectable_x03(self) -> Optional[str]:
         """Maps burr_2_injectable_x03 to aind model."""
-        return self._nsb.burr_2_injectable_x03
+        return self._nsb.burr_x0020_2_x0020_injectable_x03
 
     @property
     def aind_burr_2_injectable_x04(self) -> Optional[str]:
         """Maps burr_2_injectable_x04 to aind model."""
-        return self._nsb.burr_2_injectable_x04
+        return self._nsb.burr_x0020_2_x0020_injectable_x04
 
     @property
     def aind_burr_2_injectable_x05(self) -> Optional[str]:
         """Maps burr_2_injectable_x05 to aind model."""
-        return self._nsb.burr_2_injectable_x05
+        return self._nsb.burr_x0020_2_x0020_injectable_x05
 
     @property
     def aind_burr_2_injectable_x06(self) -> Optional[str]:
         """Maps burr_2_injectable_x06 to aind model."""
-        return self._nsb.burr_2_injectable_x06
+        return self._nsb.burr_x0020_2_x0020_injectable_x06
 
     @property
     def aind_burr_2_intended(self) -> Optional[Any]:
         """Maps burr_2_intended to aind model."""
         return (
             None
-            if self._nsb.burr_2_intended is None
+            if self._nsb.burr_x0020_2_x0020_intended_x002 is None
             else {
-                self._nsb.burr_2_intended.FRP__FRONTAL_POLE_CEREBRA: None,
-                self._nsb.burr_2_intended.M_OP__PRIMARY_MOTOR_AREA: None,
-                self._nsb.burr_2_intended.M_OS__SECONDARY_MOTOR_ARE: None,
-                self._nsb.burr_2_intended.S_SP_N__PRIMARY_SOMATOSEN: None,
-                self._nsb.burr_2_intended.S_SP_BFD__PRIMARY_SOMATOS: None,
-                self._nsb.burr_2_intended.S_SP_LL__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_2_intended.S_SP_M__PRIMARY_SOMATOSEN: None,
-                self._nsb.burr_2_intended.S_SP_UL__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_2_intended.S_SP_TR__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_2_intended.S_SP_UN__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_2_intended.S_SS__SUPPLEMENTAL_SOMATO: None,
-                self._nsb.burr_2_intended.GU__GUSTATORY_AREAS: None,
-                self._nsb.burr_2_intended.VISC__VISCERAL_AREA: None,
-                self._nsb.burr_2_intended.AU_DD__DORSAL_AUDITORY_AR: None,
-                self._nsb.burr_2_intended.AU_DP__PRIMARY_AUDITORY_A: None,
-                self._nsb.burr_2_intended.AU_DPO__POSTERIOR_AUDITOR: None,
-                self._nsb.burr_2_intended.AU_DV__VENTRAL_AUDITORY_A: None,
-                self._nsb.burr_2_intended.VI_SAL__ANTEROLATERAL_VIS: None,
-                self._nsb.burr_2_intended.VI_SAM__ANTEROMEDIAL_VISU: None,
-                self._nsb.burr_2_intended.VI_SL__LATERAL_VISUAL_ARE: None,
-                self._nsb.burr_2_intended.VI_SP__PRIMARY_VISUAL_ARE: None,
-                self._nsb.burr_2_intended.VI_SPL__POSTEROLATERAL_VI: None,
-                self._nsb.burr_2_intended.VI_SPM_POSTEROMEDIAL_VISU: None,
-                self._nsb.burr_2_intended.VI_SLI__LATEROINTERMEDIAT: None,
-                self._nsb.burr_2_intended.VI_SPOR__POSTRHINAL_AREA: None,
-                self._nsb.burr_2_intended.AC_AD__ANTERIOR_CINGULATE: None,
-                self._nsb.burr_2_intended.AC_AV__ANTERIOR_CINGULATE: None,
-                self._nsb.burr_2_intended.PL__PRELIMBIC_AREA: None,
-                self._nsb.burr_2_intended.ILA__INFRALIMBIC_AREA: None,
-                self._nsb.burr_2_intended.OR_BL__ORBITAL_AREA_LATER: None,
-                self._nsb.burr_2_intended.OR_BM__ORBITAL_AREA_MEDIA: None,
-                self._nsb.burr_2_intended.OR_BV__ORBITAL_AREA_VENTR: None,
-                self._nsb.burr_2_intended.OR_BVL__ORBITAL_AREA_VENT: None,
-                self._nsb.burr_2_intended.A_ID__AGRANULAR_INSULAR_A: None,
-                self._nsb.burr_2_intended.A_IP__AGRANULAR_INSULAR_A: None,
-                self._nsb.burr_2_intended.A_IV__AGRANULAR_INSULAR_A: None,
-                self._nsb.burr_2_intended.RS_PAGL__RETROSPLENIAL_AR: None,
-                self._nsb.burr_2_intended.RS_PD__RETROSPLENIAL_AREA: None,
-                self._nsb.burr_2_intended.RS_PV__RETROSPLENIAL_AREA: None,
-                self._nsb.burr_2_intended.VI_SA__ANTERIOR_AREA: None,
-                self._nsb.burr_2_intended.VI_SRL__ROSTROLATERAL_VIS: None,
-                self._nsb.burr_2_intended.T_EA__TEMPORAL_ASSOCIATIO: None,
-                self._nsb.burr_2_intended.PERI__PERIRHINAL_AREA: None,
-                self._nsb.burr_2_intended.ECT__ECTORHINAL_AREA: None,
-                self._nsb.burr_2_intended.MOB__MAIN_OLFACTORY_BULB: None,
-                self._nsb.burr_2_intended.AOB__ACCESSORY_OLFACTORY: None,
-                self._nsb.burr_2_intended.AON__ANTERIOR_OLFACTORY_N: None,
-                self._nsb.burr_2_intended.T_TD__TAENIA_TECTA_DORSAL: None,
-                self._nsb.burr_2_intended.T_TV__TAENIA_TECTA_VENTRA: None,
-                self._nsb.burr_2_intended.DP__DORSAL_PEDUNCULAR_ARE: None,
-                self._nsb.burr_2_intended.PIR__PIRIFORM_AREA: None,
-                self._nsb.burr_2_intended.NLOT__NUCLEUS_OF_THE_LATE: None,
-                self._nsb.burr_2_intended.CO_AA__CORTICAL_AMYGDALAR: None,
-                self._nsb.burr_2_intended.CO_AP__CORTICAL_AMYGDALAR: None,
-                self._nsb.burr_2_intended.PAA__PIRIFORM_AMYGDALAR_A: None,
-                self._nsb.burr_2_intended.TR__POSTPIRIFORM_TRANSITI: None,
-                self._nsb.burr_2_intended.CA1__FIELD_CA1: None,
-                self._nsb.burr_2_intended.CA2__FIELD_CA2: None,
-                self._nsb.burr_2_intended.CA3__FIELD_CA3: None,
-                self._nsb.burr_2_intended.DG__DENTATE_GYRUS: None,
-                self._nsb.burr_2_intended.FC__FASCIOLA_CINEREA: None,
-                self._nsb.burr_2_intended.IG__INDUSEUM_GRISEUM: None,
-                self._nsb.burr_2_intended.EN_TL__ENTORHINAL_AREA_LA: None,
-                self._nsb.burr_2_intended.EN_TM__ENTORHINAL_AREA_ME: None,
-                self._nsb.burr_2_intended.PAR__PARASUBICULUM: None,
-                self._nsb.burr_2_intended.POST__POSTSUBICULUM: None,
-                self._nsb.burr_2_intended.PRE__PRESUBICULUM: None,
-                self._nsb.burr_2_intended.SUB__SUBICULUM: None,
-                self._nsb.burr_2_intended.PRO_S__PROSUBICULUM: None,
-                self._nsb.burr_2_intended.HATA__HIPPOCAMPO_AMYGDALA: None,
-                self._nsb.burr_2_intended.A_PR__AREA_PROSTRIATA: None,
-                self._nsb.burr_2_intended.CLA__CLAUSTRUM: None,
-                self._nsb.burr_2_intended.E_PD__ENDOPIRIFORM_NUCLEU: None,
-                self._nsb.burr_2_intended.E_PV__ENDOPIRIFORM_NUCLEU: None,
-                self._nsb.burr_2_intended.LA__LATERAL_AMYGDALAR_NUC: None,
-                self._nsb.burr_2_intended.BLA__BASOLATERAL_AMYGDALA: None,
-                self._nsb.burr_2_intended.BMA__BASOMEDIAL_AMYGDALAR: None,
-                self._nsb.burr_2_intended.PA__POSTERIOR_AMYGDALAR_N: None,
-                self._nsb.burr_2_intended.CP__CAUDOPUTAMEN: None,
-                self._nsb.burr_2_intended.ACB__NUCLEUS_ACCUMBENS: None,
-                self._nsb.burr_2_intended.FS__FUNDUS_OF_STRIATUM: None,
-                self._nsb.burr_2_intended.OT__OLFACTORY_TUBERCLE: None,
-                self._nsb.burr_2_intended.L_SC__LATERAL_SEPTAL_NUCL: None,
-                self._nsb.burr_2_intended.L_SR__LATERAL_SEPTAL_NUCL: None,
-                self._nsb.burr_2_intended.L_SV__LATERAL_SEPTAL_NUCL: None,
-                self._nsb.burr_2_intended.SF__SEPTOFIMBRIAL_NUCLEUS: None,
-                self._nsb.burr_2_intended.SH__SEPTOHIPPOCAMPAL_NUCL: None,
-                self._nsb.burr_2_intended.AAA__ANTERIOR_AMYGDALAR_A: None,
-                self._nsb.burr_2_intended.BA__BED_NUCLEUS_OF_THE_AC: None,
-                self._nsb.burr_2_intended.CEA__CENTRAL_AMYGDALAR_NU: None,
-                self._nsb.burr_2_intended.IA__INTERCALATED_AMYGDALA: None,
-                self._nsb.burr_2_intended.MEA__MEDIAL_AMYGDALAR_NUC: None,
-                self._nsb.burr_2_intended.G_PE__GLOBUS_PALLIDUS_EXT: None,
-                self._nsb.burr_2_intended.G_PI__GLOBUS_PALLIDUS_INT: None,
-                self._nsb.burr_2_intended.SI__SUBSTANTIA_INNOMINATA: None,
-                self._nsb.burr_2_intended.MA__MAGNOCELLULAR_NUCLEUS: None,
-                self._nsb.burr_2_intended.MS__MEDIAL_SEPTAL_NUCLEUS: None,
-                self._nsb.burr_2_intended.NDB__DIAGONAL_BAND_NUCLEU: None,
-                self._nsb.burr_2_intended.TRS__TRIANGULAR_NUCLEUS_O: None,
-                self._nsb.burr_2_intended.BST__BED_NUCLEI_OF_THE_ST: None,
-                self._nsb.burr_2_intended.VAL__VENTRAL_ANTERIOR_LAT: None,
-                self._nsb.burr_2_intended.VM__VENTRAL_MEDIAL_NUCLEU: None,
-                self._nsb.burr_2_intended.VPL__VENTRAL_POSTEROLATER: None,
-                self._nsb.burr_2_intended.VP_LPC__VENTRAL_POSTEROLA: None,
-                self._nsb.burr_2_intended.VPM__VENTRAL_POSTEROMEDIA: None,
-                self._nsb.burr_2_intended.VP_MPC__VENTRAL_POSTEROME: None,
-                self._nsb.burr_2_intended.PO_T__POSTERIOR_TRIANGULA: None,
-                self._nsb.burr_2_intended.SPF__SUBPARAFASCICULAR_NU: None,
-                self._nsb.burr_2_intended.SPA__SUBPARAFASCICULAR_AR: None,
-                self._nsb.burr_2_intended.PP__PERIPEDUNCULAR_NUCLEU: None,
-                self._nsb.burr_2_intended.MG__MEDIAL_GENICULATE_COM: None,
-                self._nsb.burr_2_intended.L_GD__DORSAL_PART_OF_THE: None,
-                self._nsb.burr_2_intended.LP__LATERAL_POSTERIOR_NUC: None,
-                self._nsb.burr_2_intended.PO__POSTERIOR_COMPLEX_OF: None,
-                self._nsb.burr_2_intended.POL__POSTERIOR_LIMITING_N: None,
-                self._nsb.burr_2_intended.SGN__SUPRAGENICULATE_NUCL: None,
-                self._nsb.burr_2_intended.ETH__ETHMOID_NUCLEUS_OF_T: None,
-                self._nsb.burr_2_intended.AV__ANTEROVENTRAL_NUCLEUS: None,
-                self._nsb.burr_2_intended.AM__ANTEROMEDIAL_NUCLEUS: None,
-                self._nsb.burr_2_intended.AD__ANTERODORSAL_NUCLEUS: None,
-                self._nsb.burr_2_intended.IAM__INTERANTEROMEDIAL_NU: None,
-                self._nsb.burr_2_intended.IAD__INTERANTERODORSAL_NU: None,
-                self._nsb.burr_2_intended.LD__LATERAL_DORSAL_NUCLEU: None,
-                self._nsb.burr_2_intended.IMD__INTERMEDIODORSAL_NUC: None,
-                self._nsb.burr_2_intended.MD__MEDIODORSAL_NUCLEUS_O: None,
-                self._nsb.burr_2_intended.SMT__SUBMEDIAL_NUCLEUS_OF: None,
-                self._nsb.burr_2_intended.PR__PERIREUNENSIS_NUCLEUS: None,
-                self._nsb.burr_2_intended.PVT__PARAVENTRICULAR_NUCL: None,
-                self._nsb.burr_2_intended.PT__PARATAENIAL_NUCLEUS: None,
-                self._nsb.burr_2_intended.RE__NUCLEUS_OF_REUNIENS: None,
-                self._nsb.burr_2_intended.XI__XIPHOID_THALAMIC_NUCL: None,
-                self._nsb.burr_2_intended.RH__RHOMBOID_NUCLEUS: None,
-                self._nsb.burr_2_intended.CM__CENTRAL_MEDIAL_NUCLEU: None,
-                self._nsb.burr_2_intended.PCN__PARACENTRAL_NUCLEUS: None,
-                self._nsb.burr_2_intended.CL__CENTRAL_LATERAL_NUCLE: None,
-                self._nsb.burr_2_intended.PF__PARAFASCICULAR_NUCLEU: None,
-                self._nsb.burr_2_intended.PIL__POSTERIOR_INTRALAMIN: None,
-                self._nsb.burr_2_intended.RT__RETICULAR_NUCLEUS_OF: None,
-                self._nsb.burr_2_intended.IGL__INTERGENICULATE_LEAF: None,
-                self._nsb.burr_2_intended.INT_G__INTERMEDIATE_GENIC: None,
-                self._nsb.burr_2_intended.L_GV__VENTRAL_PART_OF_THE: None,
-                self._nsb.burr_2_intended.SUB_G__SUBGENICULATE_NUCL: None,
-                self._nsb.burr_2_intended.MH__MEDIAL_HABENULA: None,
-                self._nsb.burr_2_intended.LH__LATERAL_HABENULA: None,
-                self._nsb.burr_2_intended.SO__SUPRAOPTIC_NUCLEUS: None,
-                self._nsb.burr_2_intended.PVH__PARAVENTRICULAR_HYPO: None,
-                self._nsb.burr_2_intended.P_VA__PERIVENTRICULAR_HYP: None,
-                self._nsb.burr_2_intended.P_VI__PERIVENTRICULAR_HYP: None,
-                self._nsb.burr_2_intended.ARH__ARCUATE_HYPOTHALAMIC: None,
-                self._nsb.burr_2_intended.ADP__ANTERODORSAL_PREOPTI: None,
-                self._nsb.burr_2_intended.AVP__ANTEROVENTRAL_PREOPT: None,
-                self._nsb.burr_2_intended.AVPV__ANTEROVENTRAL_PERIV: None,
-                self._nsb.burr_2_intended.DMH__DORSOMEDIAL_NUCLEUS: None,
-                self._nsb.burr_2_intended.MEPO__MEDIAN_PREOPTIC_NUC: None,
-                self._nsb.burr_2_intended.MPO__MEDIAL_PREOPTIC_AREA: None,
-                self._nsb.burr_2_intended.PS__PARASTRIAL_NUCLEUS: None,
-                self._nsb.burr_2_intended.P_VP__PERIVENTRICULAR_HYP: None,
-                self._nsb.burr_2_intended.P_VPO__PERIVENTRICULAR_HY: None,
-                self._nsb.burr_2_intended.SBPV__SUBPARAVENTRICULAR: None,
-                self._nsb.burr_2_intended.SCH__SUPRACHIASMATIC_NUCL: None,
-                self._nsb.burr_2_intended.SFO__SUBFORNICAL_ORGAN: None,
-                self._nsb.burr_2_intended.VMPO__VENTROMEDIAL_PREOPT: None,
-                self._nsb.burr_2_intended.VLPO__VENTROLATERAL_PREOP: None,
-                self._nsb.burr_2_intended.AHN__ANTERIOR_HYPOTHALAMI: None,
-                self._nsb.burr_2_intended.LM__LATERAL_MAMMILLARY_NU: None,
-                self._nsb.burr_2_intended.MM__MEDIAL_MAMMILLARY_NUC: None,
-                self._nsb.burr_2_intended.SUM__SUPRAMAMMILLARY_NUCL: None,
-                self._nsb.burr_2_intended.TM__TUBEROMAMMILLARY_NUCL: None,
-                self._nsb.burr_2_intended.MPN__MEDIAL_PREOPTIC_NUCL: None,
-                self._nsb.burr_2_intended.P_MD__DORSAL_PREMAMMILLAR: None,
-                self._nsb.burr_2_intended.P_MV__VENTRAL_PREMAMMILLA: None,
-                self._nsb.burr_2_intended.PV_HD__PARAVENTRICULAR_HY: None,
-                self._nsb.burr_2_intended.VMH__VENTROMEDIAL_HYPOTHA: None,
-                self._nsb.burr_2_intended.PH__POSTERIOR_HYPOTHALAMI: None,
-                self._nsb.burr_2_intended.LHA__LATERAL_HYPOTHALAMIC: None,
-                self._nsb.burr_2_intended.LPO__LATERAL_PREOPTIC_ARE: None,
-                self._nsb.burr_2_intended.PSTN__PARASUBTHALAMIC_NUC: None,
-                self._nsb.burr_2_intended.PE_F__PERIFORNICAL_NUCLEU: None,
-                self._nsb.burr_2_intended.RCH__RETROCHIASMATIC_AREA: None,
-                self._nsb.burr_2_intended.STN__SUBTHALAMIC_NUCLEUS: None,
-                self._nsb.burr_2_intended.TU__TUBERAL_NUCLEUS: None,
-                self._nsb.burr_2_intended.ZI__ZONA_INCERTA: None,
-                self._nsb.burr_2_intended.S_CS__SUPERIOR_COLLICULUS: None,
-                self._nsb.burr_2_intended.IC__INFERIOR_COLLICULUS: None,
-                self._nsb.burr_2_intended.NB__NUCLEUS_OF_THE_BRACHI: None,
-                self._nsb.burr_2_intended.SAG__NUCLEUS_SAGULUM: None,
-                self._nsb.burr_2_intended.PBG__PARABIGEMINAL_NUCLEU: None,
-                self._nsb.burr_2_intended.S_NR__SUBSTANTIA_NIGRA_RE: None,
-                self._nsb.burr_2_intended.VTA__VENTRAL_TEGMENTAL_AR: None,
-                self._nsb.burr_2_intended.PN__PARANIGRAL_NUCLEUS: None,
-                self._nsb.burr_2_intended.RR__MIDBRAIN_RETICULAR_NU: None,
-                self._nsb.burr_2_intended.MRN__MIDBRAIN_RETICULAR_N: None,
-                self._nsb.burr_2_intended.S_CM__SUPERIOR_COLLICULUS: None,
-                self._nsb.burr_2_intended.PAG__PERIAQUEDUCTAL_GRAY: None,
-                self._nsb.burr_2_intended.APN__ANTERIOR_PRETECTAL_N: None,
-                self._nsb.burr_2_intended.MPT__MEDIAL_PRETECTAL_ARE: None,
-                self._nsb.burr_2_intended.NOT__NUCLEUS_OF_THE_OPTIC: None,
-                self._nsb.burr_2_intended.NPC__NUCLEUS_OF_THE_POSTE: None,
-                self._nsb.burr_2_intended.OP__OLIVARY_PRETECTAL_NUC: None,
-                self._nsb.burr_2_intended.PPT__POSTERIOR_PRETECTAL: None,
-                self._nsb.burr_2_intended.RPF__RETROPARAFASCICULAR: None,
-                self._nsb.burr_2_intended.CUN__CUNEIFORM_NUCLEUS: None,
-                self._nsb.burr_2_intended.RN__RED_NUCLEUS: None,
-                self._nsb.burr_2_intended.III__OCULOMOTOR_NUCLEUS: None,
-                self._nsb.burr_2_intended.MA3__MEDIAL_ACCESORY_OCUL: None,
-                self._nsb.burr_2_intended.EW__EDINGER__WESTPHAL_NUC: None,
-                self._nsb.burr_2_intended.IV__TROCHLEAR_NUCLEUS: None,
-                self._nsb.burr_2_intended.PA4__PARATROCHLEAR_NUCLEU: None,
-                self._nsb.burr_2_intended.VTN__VENTRAL_TEGMENTAL_NU: None,
-                self._nsb.burr_2_intended.AT__ANTERIOR_TEGMENTAL_NU: None,
-                self._nsb.burr_2_intended.LT__LATERAL_TERMINAL_NUCL: None,
-                self._nsb.burr_2_intended.DT__DORSAL_TERMINAL_NUCLE: None,
-                self._nsb.burr_2_intended.MT__MEDIAL_TERMINAL_NUCLE: None,
-                self._nsb.burr_2_intended.S_NC__SUBSTANTIA_NIGRA_CO: None,
-                self._nsb.burr_2_intended.PPN__PEDUNCULOPONTINE_NUC: None,
-                self._nsb.burr_2_intended.IF__INTERFASCICULAR_NUCLE: None,
-                self._nsb.burr_2_intended.IPN__INTERPEDUNCULAR_NUCL: None,
-                self._nsb.burr_2_intended.RL__ROSTRAL_LINEAR_NUCLEU: None,
-                self._nsb.burr_2_intended.CLI__CENTRAL_LINEAR_NUCLE: None,
-                self._nsb.burr_2_intended.DR__DORSAL_NUCLEUS_RAPHE: None,
-                self._nsb.burr_2_intended.NLL__NUCLEUS_OF_THE_LATER: None,
-                self._nsb.burr_2_intended.PSV__PRINCIPAL_SENSORY_NU: None,
-                self._nsb.burr_2_intended.PB__PARABRACHIAL_NUCLEUS: None,
-                self._nsb.burr_2_intended.SOC__SUPERIOR_OLIVARY_COM: None,
-                self._nsb.burr_2_intended.B__BARRINGTON_S_NUCLEUS: None,
-                self._nsb.burr_2_intended.DTN__DORSAL_TEGMENTAL_NUC: None,
-                self._nsb.burr_2_intended.PD_TG__POSTERODORSAL_TEGM: None,
-                self._nsb.burr_2_intended.PCG__PONTINE_CENTRAL_GRAY: None,
-                self._nsb.burr_2_intended.PG__PONTINE_GRAY: None,
-                self._nsb.burr_2_intended.PR_NC__PONTINE_RETICULAR: None,
-                self._nsb.burr_2_intended.SG__SUPRAGENUAL_NUCLEUS: None,
-                self._nsb.burr_2_intended.SUT__SUPRATRIGEMINAL_NUCL: None,
-                self._nsb.burr_2_intended.TRN__TEGMENTAL_RETICULAR: None,
-                self._nsb.burr_2_intended.V__MOTOR_NUCLEUS_OF_TRIGE: None,
-                self._nsb.burr_2_intended.P5__PERITRIGEMINAL_ZONE: None,
-                self._nsb.burr_2_intended.ACS5__ACCESSORY_TRIGEMINA: None,
-                self._nsb.burr_2_intended.PC5__PARVICELLULAR_MOTOR: None,
-                self._nsb.burr_2_intended.I5__INTERTRIGEMINAL_NUCLE: None,
-                self._nsb.burr_2_intended.CS__SUPERIOR_CENTRAL_NUCL: None,
-                self._nsb.burr_2_intended.LC__LOCUS_CERULEUS: None,
-                self._nsb.burr_2_intended.LDT__LATERODORSAL_TEGMENT: None,
-                self._nsb.burr_2_intended.NI__NUCLEUS_INCERTUS: None,
-                self._nsb.burr_2_intended.PR_NR__PONTINE_RETICULAR: None,
-                self._nsb.burr_2_intended.RPO__NUCLEUS_RAPHE_PONTIS: None,
-                self._nsb.burr_2_intended.SLC__SUBCERULEUS_NUCLEUS: None,
-                self._nsb.burr_2_intended.SLD__SUBLATERODORSAL_NUCL: None,
-                self._nsb.burr_2_intended.MY__MEDULLA: None,
-                self._nsb.burr_2_intended.AP__AREA_POSTREMA: None,
-                self._nsb.burr_2_intended.DCO__DORSAL_COCHLEAR_NUCL: None,
-                self._nsb.burr_2_intended.VCO__VENTRAL_COCHLEAR_NUC: None,
-                self._nsb.burr_2_intended.CU__CUNEATE_NUCLEUS: None,
-                self._nsb.burr_2_intended.GR__GRACILE_NUCLEUS: None,
-                self._nsb.burr_2_intended.ECU__EXTERNAL_CUNEATE_NUC: None,
-                self._nsb.burr_2_intended.NTB__NUCLEUS_OF_THE_TRAPE: None,
-                self._nsb.burr_2_intended.NTS__NUCLEUS_OF_THE_SOLIT: None,
-                self._nsb.burr_2_intended.SPVC__SPINAL_NUCLEUS_OF_T: None,
-                self._nsb.burr_2_intended.SPVI__SPINAL_NUCLEUS_OF_T: None,
-                self._nsb.burr_2_intended.SPVO__SPINAL_NUCLEUS_OF_T: None,
-                self._nsb.burr_2_intended.PA5__PARATRIGEMINAL_NUCLE: None,
-                self._nsb.burr_2_intended.VI__ABDUCENS_NUCLEUS: None,
-                self._nsb.burr_2_intended.VII__FACIAL_MOTOR_NUCLEUS: None,
-                self._nsb.burr_2_intended.AMB__NUCLEUS_AMBIGUUS: None,
-                self._nsb.burr_2_intended.DMX__DORSAL_MOTOR_NUCLEUS: None,
-                self._nsb.burr_2_intended.GRN__GIGANTOCELLULAR_RETI: None,
-                self._nsb.burr_2_intended.ICB__INFRACEREBELLAR_NUCL: None,
-                self._nsb.burr_2_intended.IO__INFERIOR_OLIVARY_COMP: None,
-                self._nsb.burr_2_intended.IRN__INTERMEDIATE_RETICUL: None,
-                self._nsb.burr_2_intended.ISN__INFERIOR_SALIVATORY: None,
-                self._nsb.burr_2_intended.LIN__LINEAR_NUCLEUS_OF_TH: None,
-                self._nsb.burr_2_intended.LRN__LATERAL_RETICULAR_NU: None,
-                self._nsb.burr_2_intended.MARN__MAGNOCELLULAR_RETIC: None,
-                self._nsb.burr_2_intended.MDRN__MEDULLARY_RETICULAR: None,
-                self._nsb.burr_2_intended.PARN__PARVICELLULAR_RETIC: None,
-                self._nsb.burr_2_intended.PAS__PARASOLITARY_NUCLEUS: None,
-                self._nsb.burr_2_intended.PGRN__PARAGIGANTOCELLULAR: None,
-                self._nsb.burr_2_intended.NR__NUCLEUS_OF__ROLLER: None,
-                self._nsb.burr_2_intended.PRP__NUCLEUS_PREPOSITUS: None,
-                self._nsb.burr_2_intended.PMR__PARAMEDIAN_RETICULAR: None,
-                self._nsb.burr_2_intended.PPY__PARAPYRAMIDAL_NUCLEU: None,
-                self._nsb.burr_2_intended.LAV__LATERAL_VESTIBULAR_N: None,
-                self._nsb.burr_2_intended.MV__MEDIAL_VESTIBULAR_NUC: None,
-                self._nsb.burr_2_intended.SPIV__SPINAL_VESTIBULAR_N: None,
-                self._nsb.burr_2_intended.SUV__SUPERIOR_VESTIBULAR: None,
-                self._nsb.burr_2_intended.X__NUCLEUS_X: None,
-                self._nsb.burr_2_intended.XII__HYPOGLOSSAL_NUCLEUS: None,
-                self._nsb.burr_2_intended.Y__NUCLEUS_Y: None,
-                self._nsb.burr_2_intended.RM__NUCLEUS_RAPHE_MAGNUS: None,
-                self._nsb.burr_2_intended.RPA__NUCLEUS_RAPHE_PALLID: None,
-                self._nsb.burr_2_intended.RO__NUCLEUS_RAPHE_OBSCURU: None,
-                self._nsb.burr_2_intended.LING__LINGULA_I: None,
-                self._nsb.burr_2_intended.CENT2__LOBULE_II: None,
-                self._nsb.burr_2_intended.CENT3__LOBULE_III: None,
-                self._nsb.burr_2_intended.CUL4_5__LOBULES_IV_V: None,
-                self._nsb.burr_2_intended.DEC__DECLIVE_VI: None,
-                self._nsb.burr_2_intended.FOTU__FOLIUM_TUBER_VERMIS: None,
-                self._nsb.burr_2_intended.PYR__PYRAMUS_VIII: None,
-                self._nsb.burr_2_intended.UVU__UVULA_IX: None,
-                self._nsb.burr_2_intended.NOD__NODULUS_X: None,
-                self._nsb.burr_2_intended.SIM__SIMPLE_LOBULE: None,
-                self._nsb.burr_2_intended.A_NCR1__CRUS_1: None,
-                self._nsb.burr_2_intended.A_NCR2__CRUS_2: None,
-                self._nsb.burr_2_intended.PRM__PARAMEDIAN_LOBULE: None,
-                self._nsb.burr_2_intended.COPY__COPULA_PYRAMIDIS: None,
-                self._nsb.burr_2_intended.PFL__PARAFLOCCULUS: None,
-                self._nsb.burr_2_intended.FL__FLOCCULUS: None,
-                self._nsb.burr_2_intended.FN__FASTIGIAL_NUCLEUS: None,
-                self._nsb.burr_2_intended.IP__INTERPOSED_NUCLEUS: None,
-                self._nsb.burr_2_intended.DN__DENTATE_NUCLEUS: None,
-                self._nsb.burr_2_intended.VE_CB__VESTIBULOCEREBELLA: None,
-            }.get(self._nsb.burr_2_intended, None)
+                self._nsb.burr_x0020_2_x0020_intended_x002.FRP__FRONTAL_POLE_CEREBRA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.M_OP__PRIMARY_MOTOR_AREA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.M_OS__SECONDARY_MOTOR_ARE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.S_SP_N__PRIMARY_SOMATOSEN: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.S_SP_BFD__PRIMARY_SOMATOS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.S_SP_LL__PRIMARY_SOMATOSE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.S_SP_M__PRIMARY_SOMATOSEN: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.S_SP_UL__PRIMARY_SOMATOSE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.S_SP_TR__PRIMARY_SOMATOSE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.S_SP_UN__PRIMARY_SOMATOSE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.S_SS__SUPPLEMENTAL_SOMATO: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.GU__GUSTATORY_AREAS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VISC__VISCERAL_AREA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.AU_DD__DORSAL_AUDITORY_AR: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.AU_DP__PRIMARY_AUDITORY_A: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.AU_DPO__POSTERIOR_AUDITOR: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.AU_DV__VENTRAL_AUDITORY_A: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VI_SAL__ANTEROLATERAL_VIS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VI_SAM__ANTEROMEDIAL_VISU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VI_SL__LATERAL_VISUAL_ARE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VI_SP__PRIMARY_VISUAL_ARE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VI_SPL__POSTEROLATERAL_VI: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VI_SPM_POSTEROMEDIAL_VISU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VI_SLI__LATEROINTERMEDIAT: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VI_SPOR__POSTRHINAL_AREA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.AC_AD__ANTERIOR_CINGULATE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.AC_AV__ANTERIOR_CINGULATE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PL__PRELIMBIC_AREA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.ILA__INFRALIMBIC_AREA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.OR_BL__ORBITAL_AREA_LATER: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.OR_BM__ORBITAL_AREA_MEDIA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.OR_BV__ORBITAL_AREA_VENTR: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.OR_BVL__ORBITAL_AREA_VENT: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.A_ID__AGRANULAR_INSULAR_A: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.A_IP__AGRANULAR_INSULAR_A: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.A_IV__AGRANULAR_INSULAR_A: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.RS_PAGL__RETROSPLENIAL_AR: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.RS_PD__RETROSPLENIAL_AREA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.RS_PV__RETROSPLENIAL_AREA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VI_SA__ANTERIOR_AREA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VI_SRL__ROSTROLATERAL_VIS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.T_EA__TEMPORAL_ASSOCIATIO: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PERI__PERIRHINAL_AREA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.ECT__ECTORHINAL_AREA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.MOB__MAIN_OLFACTORY_BULB: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.AOB__ACCESSORY_OLFACTORY: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.AON__ANTERIOR_OLFACTORY_N: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.T_TD__TAENIA_TECTA_DORSAL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.T_TV__TAENIA_TECTA_VENTRA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.DP__DORSAL_PEDUNCULAR_ARE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PIR__PIRIFORM_AREA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.NLOT__NUCLEUS_OF_THE_LATE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.CO_AA__CORTICAL_AMYGDALAR: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.CO_AP__CORTICAL_AMYGDALAR: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PAA__PIRIFORM_AMYGDALAR_A: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.TR__POSTPIRIFORM_TRANSITI: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.CA1__FIELD_CA1: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.CA2__FIELD_CA2: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.CA3__FIELD_CA3: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.DG__DENTATE_GYRUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.FC__FASCIOLA_CINEREA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.IG__INDUSEUM_GRISEUM: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.EN_TL__ENTORHINAL_AREA_LA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.EN_TM__ENTORHINAL_AREA_ME: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PAR__PARASUBICULUM: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.POST__POSTSUBICULUM: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PRE__PRESUBICULUM: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SUB__SUBICULUM: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PRO_S__PROSUBICULUM: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.HATA__HIPPOCAMPO_AMYGDALA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.A_PR__AREA_PROSTRIATA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.CLA__CLAUSTRUM: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.E_PD__ENDOPIRIFORM_NUCLEU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.E_PV__ENDOPIRIFORM_NUCLEU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.LA__LATERAL_AMYGDALAR_NUC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.BLA__BASOLATERAL_AMYGDALA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.BMA__BASOMEDIAL_AMYGDALAR: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PA__POSTERIOR_AMYGDALAR_N: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.CP__CAUDOPUTAMEN: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.ACB__NUCLEUS_ACCUMBENS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.FS__FUNDUS_OF_STRIATUM: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.OT__OLFACTORY_TUBERCLE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.L_SC__LATERAL_SEPTAL_NUCL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.L_SR__LATERAL_SEPTAL_NUCL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.L_SV__LATERAL_SEPTAL_NUCL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SF__SEPTOFIMBRIAL_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SH__SEPTOHIPPOCAMPAL_NUCL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.AAA__ANTERIOR_AMYGDALAR_A: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.BA__BED_NUCLEUS_OF_THE_AC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.CEA__CENTRAL_AMYGDALAR_NU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.IA__INTERCALATED_AMYGDALA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.MEA__MEDIAL_AMYGDALAR_NUC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.G_PE__GLOBUS_PALLIDUS_EXT: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.G_PI__GLOBUS_PALLIDUS_INT: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SI__SUBSTANTIA_INNOMINATA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.MA__MAGNOCELLULAR_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.MS__MEDIAL_SEPTAL_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.NDB__DIAGONAL_BAND_NUCLEU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.TRS__TRIANGULAR_NUCLEUS_O: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.BST__BED_NUCLEI_OF_THE_ST: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VAL__VENTRAL_ANTERIOR_LAT: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VM__VENTRAL_MEDIAL_NUCLEU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VPL__VENTRAL_POSTEROLATER: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VP_LPC__VENTRAL_POSTEROLA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VPM__VENTRAL_POSTEROMEDIA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VP_MPC__VENTRAL_POSTEROME: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PO_T__POSTERIOR_TRIANGULA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SPF__SUBPARAFASCICULAR_NU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SPA__SUBPARAFASCICULAR_AR: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PP__PERIPEDUNCULAR_NUCLEU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.MG__MEDIAL_GENICULATE_COM: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.L_GD__DORSAL_PART_OF_THE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.LP__LATERAL_POSTERIOR_NUC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PO__POSTERIOR_COMPLEX_OF: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.POL__POSTERIOR_LIMITING_N: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SGN__SUPRAGENICULATE_NUCL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.ETH__ETHMOID_NUCLEUS_OF_T: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.AV__ANTEROVENTRAL_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.AM__ANTEROMEDIAL_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.AD__ANTERODORSAL_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.IAM__INTERANTEROMEDIAL_NU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.IAD__INTERANTERODORSAL_NU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.LD__LATERAL_DORSAL_NUCLEU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.IMD__INTERMEDIODORSAL_NUC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.MD__MEDIODORSAL_NUCLEUS_O: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SMT__SUBMEDIAL_NUCLEUS_OF: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PR__PERIREUNENSIS_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PVT__PARAVENTRICULAR_NUCL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PT__PARATAENIAL_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.RE__NUCLEUS_OF_REUNIENS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.XI__XIPHOID_THALAMIC_NUCL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.RH__RHOMBOID_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.CM__CENTRAL_MEDIAL_NUCLEU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PCN__PARACENTRAL_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.CL__CENTRAL_LATERAL_NUCLE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PF__PARAFASCICULAR_NUCLEU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PIL__POSTERIOR_INTRALAMIN: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.RT__RETICULAR_NUCLEUS_OF: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.IGL__INTERGENICULATE_LEAF: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.INT_G__INTERMEDIATE_GENIC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.L_GV__VENTRAL_PART_OF_THE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SUB_G__SUBGENICULATE_NUCL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.MH__MEDIAL_HABENULA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.LH__LATERAL_HABENULA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SO__SUPRAOPTIC_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PVH__PARAVENTRICULAR_HYPO: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.P_VA__PERIVENTRICULAR_HYP: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.P_VI__PERIVENTRICULAR_HYP: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.ARH__ARCUATE_HYPOTHALAMIC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.ADP__ANTERODORSAL_PREOPTI: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.AVP__ANTEROVENTRAL_PREOPT: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.AVPV__ANTEROVENTRAL_PERIV: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.DMH__DORSOMEDIAL_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.MEPO__MEDIAN_PREOPTIC_NUC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.MPO__MEDIAL_PREOPTIC_AREA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PS__PARASTRIAL_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.P_VP__PERIVENTRICULAR_HYP: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.P_VPO__PERIVENTRICULAR_HY: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SBPV__SUBPARAVENTRICULAR: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SCH__SUPRACHIASMATIC_NUCL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SFO__SUBFORNICAL_ORGAN: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VMPO__VENTROMEDIAL_PREOPT: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VLPO__VENTROLATERAL_PREOP: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.AHN__ANTERIOR_HYPOTHALAMI: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.LM__LATERAL_MAMMILLARY_NU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.MM__MEDIAL_MAMMILLARY_NUC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SUM__SUPRAMAMMILLARY_NUCL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.TM__TUBEROMAMMILLARY_NUCL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.MPN__MEDIAL_PREOPTIC_NUCL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.P_MD__DORSAL_PREMAMMILLAR: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.P_MV__VENTRAL_PREMAMMILLA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PV_HD__PARAVENTRICULAR_HY: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VMH__VENTROMEDIAL_HYPOTHA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PH__POSTERIOR_HYPOTHALAMI: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.LHA__LATERAL_HYPOTHALAMIC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.LPO__LATERAL_PREOPTIC_ARE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PSTN__PARASUBTHALAMIC_NUC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PE_F__PERIFORNICAL_NUCLEU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.RCH__RETROCHIASMATIC_AREA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.STN__SUBTHALAMIC_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.TU__TUBERAL_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.ZI__ZONA_INCERTA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.S_CS__SUPERIOR_COLLICULUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.IC__INFERIOR_COLLICULUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.NB__NUCLEUS_OF_THE_BRACHI: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SAG__NUCLEUS_SAGULUM: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PBG__PARABIGEMINAL_NUCLEU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.S_NR__SUBSTANTIA_NIGRA_RE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VTA__VENTRAL_TEGMENTAL_AR: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PN__PARANIGRAL_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.RR__MIDBRAIN_RETICULAR_NU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.MRN__MIDBRAIN_RETICULAR_N: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.S_CM__SUPERIOR_COLLICULUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PAG__PERIAQUEDUCTAL_GRAY: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.APN__ANTERIOR_PRETECTAL_N: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.MPT__MEDIAL_PRETECTAL_ARE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.NOT__NUCLEUS_OF_THE_OPTIC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.NPC__NUCLEUS_OF_THE_POSTE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.OP__OLIVARY_PRETECTAL_NUC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PPT__POSTERIOR_PRETECTAL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.RPF__RETROPARAFASCICULAR: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.CUN__CUNEIFORM_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.RN__RED_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.III__OCULOMOTOR_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.MA3__MEDIAL_ACCESORY_OCUL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.EW__EDINGER__WESTPHAL_NUC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.IV__TROCHLEAR_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PA4__PARATROCHLEAR_NUCLEU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VTN__VENTRAL_TEGMENTAL_NU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.AT__ANTERIOR_TEGMENTAL_NU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.LT__LATERAL_TERMINAL_NUCL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.DT__DORSAL_TERMINAL_NUCLE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.MT__MEDIAL_TERMINAL_NUCLE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.S_NC__SUBSTANTIA_NIGRA_CO: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PPN__PEDUNCULOPONTINE_NUC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.IF__INTERFASCICULAR_NUCLE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.IPN__INTERPEDUNCULAR_NUCL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.RL__ROSTRAL_LINEAR_NUCLEU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.CLI__CENTRAL_LINEAR_NUCLE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.DR__DORSAL_NUCLEUS_RAPHE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.NLL__NUCLEUS_OF_THE_LATER: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PSV__PRINCIPAL_SENSORY_NU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PB__PARABRACHIAL_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SOC__SUPERIOR_OLIVARY_COM: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.B__BARRINGTON_S_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.DTN__DORSAL_TEGMENTAL_NUC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PD_TG__POSTERODORSAL_TEGM: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PCG__PONTINE_CENTRAL_GRAY: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PG__PONTINE_GRAY: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PR_NC__PONTINE_RETICULAR: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SG__SUPRAGENUAL_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SUT__SUPRATRIGEMINAL_NUCL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.TRN__TEGMENTAL_RETICULAR: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.V__MOTOR_NUCLEUS_OF_TRIGE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.P5__PERITRIGEMINAL_ZONE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.ACS5__ACCESSORY_TRIGEMINA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PC5__PARVICELLULAR_MOTOR: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.I5__INTERTRIGEMINAL_NUCLE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.CS__SUPERIOR_CENTRAL_NUCL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.LC__LOCUS_CERULEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.LDT__LATERODORSAL_TEGMENT: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.NI__NUCLEUS_INCERTUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PR_NR__PONTINE_RETICULAR: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.RPO__NUCLEUS_RAPHE_PONTIS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SLC__SUBCERULEUS_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SLD__SUBLATERODORSAL_NUCL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.MY__MEDULLA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.AP__AREA_POSTREMA: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.DCO__DORSAL_COCHLEAR_NUCL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VCO__VENTRAL_COCHLEAR_NUC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.CU__CUNEATE_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.GR__GRACILE_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.ECU__EXTERNAL_CUNEATE_NUC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.NTB__NUCLEUS_OF_THE_TRAPE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.NTS__NUCLEUS_OF_THE_SOLIT: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SPVC__SPINAL_NUCLEUS_OF_T: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SPVI__SPINAL_NUCLEUS_OF_T: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SPVO__SPINAL_NUCLEUS_OF_T: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PA5__PARATRIGEMINAL_NUCLE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VI__ABDUCENS_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VII__FACIAL_MOTOR_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.AMB__NUCLEUS_AMBIGUUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.DMX__DORSAL_MOTOR_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.GRN__GIGANTOCELLULAR_RETI: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.ICB__INFRACEREBELLAR_NUCL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.IO__INFERIOR_OLIVARY_COMP: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.IRN__INTERMEDIATE_RETICUL: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.ISN__INFERIOR_SALIVATORY: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.LIN__LINEAR_NUCLEUS_OF_TH: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.LRN__LATERAL_RETICULAR_NU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.MARN__MAGNOCELLULAR_RETIC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.MDRN__MEDULLARY_RETICULAR: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PARN__PARVICELLULAR_RETIC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PAS__PARASOLITARY_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PGRN__PARAGIGANTOCELLULAR: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.NR__NUCLEUS_OF__ROLLER: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PRP__NUCLEUS_PREPOSITUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PMR__PARAMEDIAN_RETICULAR: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PPY__PARAPYRAMIDAL_NUCLEU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.LAV__LATERAL_VESTIBULAR_N: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.MV__MEDIAL_VESTIBULAR_NUC: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SPIV__SPINAL_VESTIBULAR_N: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SUV__SUPERIOR_VESTIBULAR: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.X__NUCLEUS_X: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.XII__HYPOGLOSSAL_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.Y__NUCLEUS_Y: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.RM__NUCLEUS_RAPHE_MAGNUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.RPA__NUCLEUS_RAPHE_PALLID: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.RO__NUCLEUS_RAPHE_OBSCURU: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.LING__LINGULA_I: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.CENT2__LOBULE_II: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.CENT3__LOBULE_III: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.CUL4_5__LOBULES_IV_V: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.DEC__DECLIVE_VI: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.FOTU__FOLIUM_TUBER_VERMIS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PYR__PYRAMUS_VIII: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.UVU__UVULA_IX: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.NOD__NODULUS_X: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.SIM__SIMPLE_LOBULE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.A_NCR1__CRUS_1: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.A_NCR2__CRUS_2: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PRM__PARAMEDIAN_LOBULE: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.COPY__COPULA_PYRAMIDIS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.PFL__PARAFLOCCULUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.FL__FLOCCULUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.FN__FASTIGIAL_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.IP__INTERPOSED_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.DN__DENTATE_NUCLEUS: None,
+                self._nsb.burr_x0020_2_x0020_intended_x002.VE_CB__VESTIBULOCEREBELLA: None,
+            }.get(self._nsb.burr_x0020_2_x0020_intended_x002, None)
         )
 
     @property
     def aind_burr_2_intended_x0020(self) -> Optional[str]:
         """Maps burr_2_intended_x0020 to aind model."""
-        intended = getattr(self._nsb, "burr_2_intended_x0020", None)
+        intended = getattr(self._nsb, "burr_x0020_2_x0020_intended_x0020", None)
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -1908,7 +1902,7 @@ class MappedNSBList:
     @property
     def aind_burr_2_intended_x0021(self) -> Optional[str]:
         """Maps burr_2_intended_x0021 to aind model."""
-        intended = getattr(self._nsb, "burr_2_intended_x0021", None)
+        intended = getattr(self._nsb, "burr_x0020_2_x0020_intended_x0021", None)
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -1918,7 +1912,7 @@ class MappedNSBList:
     @property
     def aind_burr_2_intended_x0022(self) -> Optional[str]:
         """Maps burr_2_intended_x0022 to aind model."""
-        intended = getattr(self._nsb, "burr_2_intended_x0022", None)
+        intended = getattr(self._nsb, "burr_x0020_2_x0020_intended_x0022", None)
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -1928,7 +1922,7 @@ class MappedNSBList:
     @property
     def aind_burr_2_intended_x0023(self) -> Optional[str]:
         """Maps burr_2_intended_x0023 to aind model."""
-        intended = getattr(self._nsb, "burr_2_intended_x0023", None)
+        intended = getattr(self._nsb, "burr_x0020_2_x0020_intended_x0023", None)
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -1940,45 +1934,45 @@ class MappedNSBList:
         """Maps burr_2_spinal to aind model."""
         return (
             None
-            if self._nsb.burr_2_spinal is None
+            if self._nsb.burr_x0020_2_x0020_spinal_x0020_ is None
             else {
-                self._nsb.burr_2_spinal.SELECT: None,
-                self._nsb.burr_2_spinal.BETWEEN_C1_C2: None,
-                self._nsb.burr_2_spinal.BETWEEN_C2_C3: None,
-                self._nsb.burr_2_spinal.BETWEEN_C3_C4: None,
-                self._nsb.burr_2_spinal.BETWEEN_C4_C5: None,
-                self._nsb.burr_2_spinal.BETWEEN_C6_C7: None,
-                self._nsb.burr_2_spinal.BETWEEN_C7_C8: None,
-                self._nsb.burr_2_spinal.BETWEEN_C8_T1: None,
-                self._nsb.burr_2_spinal.BETWEEN_T1_T2: None,
-            }.get(self._nsb.burr_2_spinal, None)
+                self._nsb.burr_x0020_2_x0020_spinal_x0020_.SELECT: None,
+                self._nsb.burr_x0020_2_x0020_spinal_x0020_.BETWEEN_C1_C2: None,
+                self._nsb.burr_x0020_2_x0020_spinal_x0020_.BETWEEN_C2_C3: None,
+                self._nsb.burr_x0020_2_x0020_spinal_x0020_.BETWEEN_C3_C4: None,
+                self._nsb.burr_x0020_2_x0020_spinal_x0020_.BETWEEN_C4_C5: None,
+                self._nsb.burr_x0020_2_x0020_spinal_x0020_.BETWEEN_C6_C7: None,
+                self._nsb.burr_x0020_2_x0020_spinal_x0020_.BETWEEN_C7_C8: None,
+                self._nsb.burr_x0020_2_x0020_spinal_x0020_.BETWEEN_C8_T1: None,
+                self._nsb.burr_x0020_2_x0020_spinal_x0020_.BETWEEN_T1_T2: None,
+            }.get(self._nsb.burr_x0020_2_x0020_spinal_x0020_, None)
         )
-
+    
     @property
     def aind_burr_3_angle(self) -> Optional[Decimal]:
         """Maps burr_3_angle to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_3_angle)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_3_x0020_angle)
 
     @property
     def aind_burr_3_d_v_x00(self) -> Optional[Decimal]:
         """Maps burr_3_d_v_x00 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_3_d_v_x00)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_3_x0020_d_x002f_v_x00)
 
     @property
     def aind_burr_3_d_v_x000(self) -> Optional[Decimal]:
         """Maps burr_3_d_v_x000 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_3_d_v_x000)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_3_x0020_d_x002f_v_x000)
 
     @property
     def aind_burr_3_fiber_t(self) -> Optional[FiberType]:
         """Maps burr_3_fiber_t to aind model"""
         return (
             None
-            if self._nsb.burr_3_fiber_t is None
+            if self._nsb.burr_x0020_3_x0020_fiber_x0020_t is None
             else {
-                self._nsb.burr_3_fiber_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
-                self._nsb.burr_3_fiber_t.CUSTOM: FiberType.CUSTOM,
-            }.get(self._nsb.burr_3_fiber_t, None)
+                self._nsb.burr_x0020_3_x0020_fiber_x0020_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
+                self._nsb.burr_x0020_3_x0020_fiber_x0020_t.CUSTOM: FiberType.CUSTOM,
+            }.get(self._nsb.burr_x0020_3_x0020_fiber_x0020_t, None)
         )
 
     @property
@@ -1986,371 +1980,372 @@ class MappedNSBList:
         """Maps burr_3_hemisphere to aind model"""
         return (
             None
-            if self._nsb.burr_3_hemisphere is None
+            if self._nsb.burr_x0020_3_x0020_hemisphere is None
             else {
-                self._nsb.burr_3_hemisphere.SELECT: None,
-                self._nsb.burr_3_hemisphere.LEFT: Side.LEFT,
-                self._nsb.burr_3_hemisphere.RIGHT: Side.RIGHT,
-            }.get(self._nsb.burr_3_hemisphere, None)
+                self._nsb.burr_x0020_3_x0020_hemisphere.SELECT: None,
+                self._nsb.burr_x0020_3_x0020_hemisphere.LEFT: Side.LEFT,
+                self._nsb.burr_x0020_3_x0020_hemisphere.RIGHT: Side.RIGHT,
+            }.get(self._nsb.burr_x0020_3_x0020_hemisphere, None)
         )
 
     @property
     def aind_burr_3_injectable_x0(self) -> Optional[str]:
         """Maps burr_3_injectable_x0 to aind model."""
-        return self._nsb.burr_3_injectable_x0
+        return self._nsb.burr_x0020_3_x0020_injectable_x0
 
     @property
     def aind_burr_3_injectable_x00(self) -> Optional[str]:
         """Maps burr_3_injectable_x00 to aind model."""
-        return self._nsb.burr_3_injectable_x00
+        return self._nsb.burr_x0020_3_x0020_injectable_x00
 
     @property
     def aind_burr_3_injectable_x01(self) -> Optional[str]:
         """Maps burr_3_injectable_x01 to aind model."""
-        return self._nsb.burr_3_injectable_x01
+        return self._nsb.burr_x0020_3_x0020_injectable_x01
 
     @property
     def aind_burr_3_injectable_x02(self) -> Optional[str]:
         """Maps burr_3_injectable_x02 to aind model."""
-        return self._nsb.burr_3_injectable_x02
+        return self._nsb.burr_x0020_3_x0020_injectable_x02
 
     @property
     def aind_burr_3_injectable_x03(self) -> Optional[str]:
         """Maps burr_3_injectable_x03 to aind model."""
-        return self._nsb.burr_3_injectable_x03
+        return self._nsb.burr_x0020_3_x0020_injectable_x03
 
     @property
     def aind_burr_3_injectable_x04(self) -> Optional[str]:
         """Maps burr_3_injectable_x04 to aind model."""
-        return self._nsb.burr_3_injectable_x04
+        return self._nsb.burr_x0020_3_x0020_injectable_x04
 
     @property
     def aind_burr_3_injectable_x05(self) -> Optional[str]:
         """Maps burr_3_injectable_x05 to aind model."""
-        return self._nsb.burr_3_injectable_x05
+        return self._nsb.burr_x0020_3_x0020_injectable_x05
 
     @property
     def aind_burr_3_injectable_x06(self) -> Optional[str]:
         """Maps burr_3_injectable_x06 to aind model."""
-        return self._nsb.burr_3_injectable_x06
+        return self._nsb.burr_x0020_3_x0020_injectable_x06
 
     @property
     def aind_burr_3_intended(self) -> Optional[Any]:
         """Maps burr_3_intended to aind model."""
+        burr_3_intended = self._nsb.burr_x0020_3_x0020_intended_x002
         return (
             None
-            if self._nsb.burr_3_intended is None
+            if burr_3_intended is None
             else {
-                self._nsb.burr_3_intended.FRP__FRONTAL_POLE_CEREBRA: None,
-                self._nsb.burr_3_intended.M_OP__PRIMARY_MOTOR_AREA: None,
-                self._nsb.burr_3_intended.M_OS__SECONDARY_MOTOR_ARE: None,
-                self._nsb.burr_3_intended.S_SP_N__PRIMARY_SOMATOSEN: None,
-                self._nsb.burr_3_intended.S_SP_BFD__PRIMARY_SOMATOS: None,
-                self._nsb.burr_3_intended.S_SP_LL__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_3_intended.S_SP_M__PRIMARY_SOMATOSEN: None,
-                self._nsb.burr_3_intended.S_SP_UL__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_3_intended.S_SP_TR__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_3_intended.S_SP_UN__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_3_intended.S_SS__SUPPLEMENTAL_SOMATO: None,
-                self._nsb.burr_3_intended.GU__GUSTATORY_AREAS: None,
-                self._nsb.burr_3_intended.VISC__VISCERAL_AREA: None,
-                self._nsb.burr_3_intended.AU_DD__DORSAL_AUDITORY_AR: None,
-                self._nsb.burr_3_intended.AU_DP__PRIMARY_AUDITORY_A: None,
-                self._nsb.burr_3_intended.AU_DPO__POSTERIOR_AUDITOR: None,
-                self._nsb.burr_3_intended.AU_DV__VENTRAL_AUDITORY_A: None,
-                self._nsb.burr_3_intended.VI_SAL__ANTEROLATERAL_VIS: None,
-                self._nsb.burr_3_intended.VI_SAM__ANTEROMEDIAL_VISU: None,
-                self._nsb.burr_3_intended.VI_SL__LATERAL_VISUAL_ARE: None,
-                self._nsb.burr_3_intended.VI_SP__PRIMARY_VISUAL_ARE: None,
-                self._nsb.burr_3_intended.VI_SPL__POSTEROLATERAL_VI: None,
-                self._nsb.burr_3_intended.VI_SPM_POSTEROMEDIAL_VISU: None,
-                self._nsb.burr_3_intended.VI_SLI__LATEROINTERMEDIAT: None,
-                self._nsb.burr_3_intended.VI_SPOR__POSTRHINAL_AREA: None,
-                self._nsb.burr_3_intended.AC_AD__ANTERIOR_CINGULATE: None,
-                self._nsb.burr_3_intended.AC_AV__ANTERIOR_CINGULATE: None,
-                self._nsb.burr_3_intended.PL__PRELIMBIC_AREA: None,
-                self._nsb.burr_3_intended.ILA__INFRALIMBIC_AREA: None,
-                self._nsb.burr_3_intended.OR_BL__ORBITAL_AREA_LATER: None,
-                self._nsb.burr_3_intended.OR_BM__ORBITAL_AREA_MEDIA: None,
-                self._nsb.burr_3_intended.OR_BV__ORBITAL_AREA_VENTR: None,
-                self._nsb.burr_3_intended.OR_BVL__ORBITAL_AREA_VENT: None,
-                self._nsb.burr_3_intended.A_ID__AGRANULAR_INSULAR_A: None,
-                self._nsb.burr_3_intended.A_IP__AGRANULAR_INSULAR_A: None,
-                self._nsb.burr_3_intended.A_IV__AGRANULAR_INSULAR_A: None,
-                self._nsb.burr_3_intended.RS_PAGL__RETROSPLENIAL_AR: None,
-                self._nsb.burr_3_intended.RS_PD__RETROSPLENIAL_AREA: None,
-                self._nsb.burr_3_intended.RS_PV__RETROSPLENIAL_AREA: None,
-                self._nsb.burr_3_intended.VI_SA__ANTERIOR_AREA: None,
-                self._nsb.burr_3_intended.VI_SRL__ROSTROLATERAL_VIS: None,
-                self._nsb.burr_3_intended.T_EA__TEMPORAL_ASSOCIATIO: None,
-                self._nsb.burr_3_intended.PERI__PERIRHINAL_AREA: None,
-                self._nsb.burr_3_intended.ECT__ECTORHINAL_AREA: None,
-                self._nsb.burr_3_intended.MOB__MAIN_OLFACTORY_BULB: None,
-                self._nsb.burr_3_intended.AOB__ACCESSORY_OLFACTORY: None,
-                self._nsb.burr_3_intended.AON__ANTERIOR_OLFACTORY_N: None,
-                self._nsb.burr_3_intended.T_TD__TAENIA_TECTA_DORSAL: None,
-                self._nsb.burr_3_intended.T_TV__TAENIA_TECTA_VENTRA: None,
-                self._nsb.burr_3_intended.DP__DORSAL_PEDUNCULAR_ARE: None,
-                self._nsb.burr_3_intended.PIR__PIRIFORM_AREA: None,
-                self._nsb.burr_3_intended.NLOT__NUCLEUS_OF_THE_LATE: None,
-                self._nsb.burr_3_intended.CO_AA__CORTICAL_AMYGDALAR: None,
-                self._nsb.burr_3_intended.CO_AP__CORTICAL_AMYGDALAR: None,
-                self._nsb.burr_3_intended.PAA__PIRIFORM_AMYGDALAR_A: None,
-                self._nsb.burr_3_intended.TR__POSTPIRIFORM_TRANSITI: None,
-                self._nsb.burr_3_intended.CA1__FIELD_CA1: None,
-                self._nsb.burr_3_intended.CA2__FIELD_CA2: None,
-                self._nsb.burr_3_intended.CA3__FIELD_CA3: None,
-                self._nsb.burr_3_intended.DG__DENTATE_GYRUS: None,
-                self._nsb.burr_3_intended.FC__FASCIOLA_CINEREA: None,
-                self._nsb.burr_3_intended.IG__INDUSEUM_GRISEUM: None,
-                self._nsb.burr_3_intended.EN_TL__ENTORHINAL_AREA_LA: None,
-                self._nsb.burr_3_intended.EN_TM__ENTORHINAL_AREA_ME: None,
-                self._nsb.burr_3_intended.PAR__PARASUBICULUM: None,
-                self._nsb.burr_3_intended.POST__POSTSUBICULUM: None,
-                self._nsb.burr_3_intended.PRE__PRESUBICULUM: None,
-                self._nsb.burr_3_intended.SUB__SUBICULUM: None,
-                self._nsb.burr_3_intended.PRO_S__PROSUBICULUM: None,
-                self._nsb.burr_3_intended.HATA__HIPPOCAMPO_AMYGDALA: None,
-                self._nsb.burr_3_intended.A_PR__AREA_PROSTRIATA: None,
-                self._nsb.burr_3_intended.CLA__CLAUSTRUM: None,
-                self._nsb.burr_3_intended.E_PD__ENDOPIRIFORM_NUCLEU: None,
-                self._nsb.burr_3_intended.E_PV__ENDOPIRIFORM_NUCLEU: None,
-                self._nsb.burr_3_intended.LA__LATERAL_AMYGDALAR_NUC: None,
-                self._nsb.burr_3_intended.BLA__BASOLATERAL_AMYGDALA: None,
-                self._nsb.burr_3_intended.BMA__BASOMEDIAL_AMYGDALAR: None,
-                self._nsb.burr_3_intended.PA__POSTERIOR_AMYGDALAR_N: None,
-                self._nsb.burr_3_intended.CP__CAUDOPUTAMEN: None,
-                self._nsb.burr_3_intended.ACB__NUCLEUS_ACCUMBENS: None,
-                self._nsb.burr_3_intended.FS__FUNDUS_OF_STRIATUM: None,
-                self._nsb.burr_3_intended.OT__OLFACTORY_TUBERCLE: None,
-                self._nsb.burr_3_intended.L_SC__LATERAL_SEPTAL_NUCL: None,
-                self._nsb.burr_3_intended.L_SR__LATERAL_SEPTAL_NUCL: None,
-                self._nsb.burr_3_intended.L_SV__LATERAL_SEPTAL_NUCL: None,
-                self._nsb.burr_3_intended.SF__SEPTOFIMBRIAL_NUCLEUS: None,
-                self._nsb.burr_3_intended.SH__SEPTOHIPPOCAMPAL_NUCL: None,
-                self._nsb.burr_3_intended.AAA__ANTERIOR_AMYGDALAR_A: None,
-                self._nsb.burr_3_intended.BA__BED_NUCLEUS_OF_THE_AC: None,
-                self._nsb.burr_3_intended.CEA__CENTRAL_AMYGDALAR_NU: None,
-                self._nsb.burr_3_intended.IA__INTERCALATED_AMYGDALA: None,
-                self._nsb.burr_3_intended.MEA__MEDIAL_AMYGDALAR_NUC: None,
-                self._nsb.burr_3_intended.G_PE__GLOBUS_PALLIDUS_EXT: None,
-                self._nsb.burr_3_intended.G_PI__GLOBUS_PALLIDUS_INT: None,
-                self._nsb.burr_3_intended.SI__SUBSTANTIA_INNOMINATA: None,
-                self._nsb.burr_3_intended.MA__MAGNOCELLULAR_NUCLEUS: None,
-                self._nsb.burr_3_intended.MS__MEDIAL_SEPTAL_NUCLEUS: None,
-                self._nsb.burr_3_intended.NDB__DIAGONAL_BAND_NUCLEU: None,
-                self._nsb.burr_3_intended.TRS__TRIANGULAR_NUCLEUS_O: None,
-                self._nsb.burr_3_intended.BST__BED_NUCLEI_OF_THE_ST: None,
-                self._nsb.burr_3_intended.VAL__VENTRAL_ANTERIOR_LAT: None,
-                self._nsb.burr_3_intended.VM__VENTRAL_MEDIAL_NUCLEU: None,
-                self._nsb.burr_3_intended.VPL__VENTRAL_POSTEROLATER: None,
-                self._nsb.burr_3_intended.VP_LPC__VENTRAL_POSTEROLA: None,
-                self._nsb.burr_3_intended.VPM__VENTRAL_POSTEROMEDIA: None,
-                self._nsb.burr_3_intended.VP_MPC__VENTRAL_POSTEROME: None,
-                self._nsb.burr_3_intended.PO_T__POSTERIOR_TRIANGULA: None,
-                self._nsb.burr_3_intended.SPF__SUBPARAFASCICULAR_NU: None,
-                self._nsb.burr_3_intended.SPA__SUBPARAFASCICULAR_AR: None,
-                self._nsb.burr_3_intended.PP__PERIPEDUNCULAR_NUCLEU: None,
-                self._nsb.burr_3_intended.MG__MEDIAL_GENICULATE_COM: None,
-                self._nsb.burr_3_intended.L_GD__DORSAL_PART_OF_THE: None,
-                self._nsb.burr_3_intended.LP__LATERAL_POSTERIOR_NUC: None,
-                self._nsb.burr_3_intended.PO__POSTERIOR_COMPLEX_OF: None,
-                self._nsb.burr_3_intended.POL__POSTERIOR_LIMITING_N: None,
-                self._nsb.burr_3_intended.SGN__SUPRAGENICULATE_NUCL: None,
-                self._nsb.burr_3_intended.ETH__ETHMOID_NUCLEUS_OF_T: None,
-                self._nsb.burr_3_intended.AV__ANTEROVENTRAL_NUCLEUS: None,
-                self._nsb.burr_3_intended.AM__ANTEROMEDIAL_NUCLEUS: None,
-                self._nsb.burr_3_intended.AD__ANTERODORSAL_NUCLEUS: None,
-                self._nsb.burr_3_intended.IAM__INTERANTEROMEDIAL_NU: None,
-                self._nsb.burr_3_intended.IAD__INTERANTERODORSAL_NU: None,
-                self._nsb.burr_3_intended.LD__LATERAL_DORSAL_NUCLEU: None,
-                self._nsb.burr_3_intended.IMD__INTERMEDIODORSAL_NUC: None,
-                self._nsb.burr_3_intended.MD__MEDIODORSAL_NUCLEUS_O: None,
-                self._nsb.burr_3_intended.SMT__SUBMEDIAL_NUCLEUS_OF: None,
-                self._nsb.burr_3_intended.PR__PERIREUNENSIS_NUCLEUS: None,
-                self._nsb.burr_3_intended.PVT__PARAVENTRICULAR_NUCL: None,
-                self._nsb.burr_3_intended.PT__PARATAENIAL_NUCLEUS: None,
-                self._nsb.burr_3_intended.RE__NUCLEUS_OF_REUNIENS: None,
-                self._nsb.burr_3_intended.XI__XIPHOID_THALAMIC_NUCL: None,
-                self._nsb.burr_3_intended.RH__RHOMBOID_NUCLEUS: None,
-                self._nsb.burr_3_intended.CM__CENTRAL_MEDIAL_NUCLEU: None,
-                self._nsb.burr_3_intended.PCN__PARACENTRAL_NUCLEUS: None,
-                self._nsb.burr_3_intended.CL__CENTRAL_LATERAL_NUCLE: None,
-                self._nsb.burr_3_intended.PF__PARAFASCICULAR_NUCLEU: None,
-                self._nsb.burr_3_intended.PIL__POSTERIOR_INTRALAMIN: None,
-                self._nsb.burr_3_intended.RT__RETICULAR_NUCLEUS_OF: None,
-                self._nsb.burr_3_intended.IGL__INTERGENICULATE_LEAF: None,
-                self._nsb.burr_3_intended.INT_G__INTERMEDIATE_GENIC: None,
-                self._nsb.burr_3_intended.L_GV__VENTRAL_PART_OF_THE: None,
-                self._nsb.burr_3_intended.SUB_G__SUBGENICULATE_NUCL: None,
-                self._nsb.burr_3_intended.MH__MEDIAL_HABENULA: None,
-                self._nsb.burr_3_intended.LH__LATERAL_HABENULA: None,
-                self._nsb.burr_3_intended.SO__SUPRAOPTIC_NUCLEUS: None,
-                self._nsb.burr_3_intended.PVH__PARAVENTRICULAR_HYPO: None,
-                self._nsb.burr_3_intended.P_VA__PERIVENTRICULAR_HYP: None,
-                self._nsb.burr_3_intended.P_VI__PERIVENTRICULAR_HYP: None,
-                self._nsb.burr_3_intended.ARH__ARCUATE_HYPOTHALAMIC: None,
-                self._nsb.burr_3_intended.ADP__ANTERODORSAL_PREOPTI: None,
-                self._nsb.burr_3_intended.AVP__ANTEROVENTRAL_PREOPT: None,
-                self._nsb.burr_3_intended.AVPV__ANTEROVENTRAL_PERIV: None,
-                self._nsb.burr_3_intended.DMH__DORSOMEDIAL_NUCLEUS: None,
-                self._nsb.burr_3_intended.MEPO__MEDIAN_PREOPTIC_NUC: None,
-                self._nsb.burr_3_intended.MPO__MEDIAL_PREOPTIC_AREA: None,
-                self._nsb.burr_3_intended.PS__PARASTRIAL_NUCLEUS: None,
-                self._nsb.burr_3_intended.P_VP__PERIVENTRICULAR_HYP: None,
-                self._nsb.burr_3_intended.P_VPO__PERIVENTRICULAR_HY: None,
-                self._nsb.burr_3_intended.SBPV__SUBPARAVENTRICULAR: None,
-                self._nsb.burr_3_intended.SCH__SUPRACHIASMATIC_NUCL: None,
-                self._nsb.burr_3_intended.SFO__SUBFORNICAL_ORGAN: None,
-                self._nsb.burr_3_intended.VMPO__VENTROMEDIAL_PREOPT: None,
-                self._nsb.burr_3_intended.VLPO__VENTROLATERAL_PREOP: None,
-                self._nsb.burr_3_intended.AHN__ANTERIOR_HYPOTHALAMI: None,
-                self._nsb.burr_3_intended.LM__LATERAL_MAMMILLARY_NU: None,
-                self._nsb.burr_3_intended.MM__MEDIAL_MAMMILLARY_NUC: None,
-                self._nsb.burr_3_intended.SUM__SUPRAMAMMILLARY_NUCL: None,
-                self._nsb.burr_3_intended.TM__TUBEROMAMMILLARY_NUCL: None,
-                self._nsb.burr_3_intended.MPN__MEDIAL_PREOPTIC_NUCL: None,
-                self._nsb.burr_3_intended.P_MD__DORSAL_PREMAMMILLAR: None,
-                self._nsb.burr_3_intended.P_MV__VENTRAL_PREMAMMILLA: None,
-                self._nsb.burr_3_intended.PV_HD__PARAVENTRICULAR_HY: None,
-                self._nsb.burr_3_intended.VMH__VENTROMEDIAL_HYPOTHA: None,
-                self._nsb.burr_3_intended.PH__POSTERIOR_HYPOTHALAMI: None,
-                self._nsb.burr_3_intended.LHA__LATERAL_HYPOTHALAMIC: None,
-                self._nsb.burr_3_intended.LPO__LATERAL_PREOPTIC_ARE: None,
-                self._nsb.burr_3_intended.PSTN__PARASUBTHALAMIC_NUC: None,
-                self._nsb.burr_3_intended.PE_F__PERIFORNICAL_NUCLEU: None,
-                self._nsb.burr_3_intended.RCH__RETROCHIASMATIC_AREA: None,
-                self._nsb.burr_3_intended.STN__SUBTHALAMIC_NUCLEUS: None,
-                self._nsb.burr_3_intended.TU__TUBERAL_NUCLEUS: None,
-                self._nsb.burr_3_intended.ZI__ZONA_INCERTA: None,
-                self._nsb.burr_3_intended.S_CS__SUPERIOR_COLLICULUS: None,
-                self._nsb.burr_3_intended.IC__INFERIOR_COLLICULUS: None,
-                self._nsb.burr_3_intended.NB__NUCLEUS_OF_THE_BRACHI: None,
-                self._nsb.burr_3_intended.SAG__NUCLEUS_SAGULUM: None,
-                self._nsb.burr_3_intended.PBG__PARABIGEMINAL_NUCLEU: None,
-                self._nsb.burr_3_intended.S_NR__SUBSTANTIA_NIGRA_RE: None,
-                self._nsb.burr_3_intended.VTA__VENTRAL_TEGMENTAL_AR: None,
-                self._nsb.burr_3_intended.PN__PARANIGRAL_NUCLEUS: None,
-                self._nsb.burr_3_intended.RR__MIDBRAIN_RETICULAR_NU: None,
-                self._nsb.burr_3_intended.MRN__MIDBRAIN_RETICULAR_N: None,
-                self._nsb.burr_3_intended.S_CM__SUPERIOR_COLLICULUS: None,
-                self._nsb.burr_3_intended.PAG__PERIAQUEDUCTAL_GRAY: None,
-                self._nsb.burr_3_intended.APN__ANTERIOR_PRETECTAL_N: None,
-                self._nsb.burr_3_intended.MPT__MEDIAL_PRETECTAL_ARE: None,
-                self._nsb.burr_3_intended.NOT__NUCLEUS_OF_THE_OPTIC: None,
-                self._nsb.burr_3_intended.NPC__NUCLEUS_OF_THE_POSTE: None,
-                self._nsb.burr_3_intended.OP__OLIVARY_PRETECTAL_NUC: None,
-                self._nsb.burr_3_intended.PPT__POSTERIOR_PRETECTAL: None,
-                self._nsb.burr_3_intended.RPF__RETROPARAFASCICULAR: None,
-                self._nsb.burr_3_intended.CUN__CUNEIFORM_NUCLEUS: None,
-                self._nsb.burr_3_intended.RN__RED_NUCLEUS: None,
-                self._nsb.burr_3_intended.III__OCULOMOTOR_NUCLEUS: None,
-                self._nsb.burr_3_intended.MA3__MEDIAL_ACCESORY_OCUL: None,
-                self._nsb.burr_3_intended.EW__EDINGER__WESTPHAL_NUC: None,
-                self._nsb.burr_3_intended.IV__TROCHLEAR_NUCLEUS: None,
-                self._nsb.burr_3_intended.PA4__PARATROCHLEAR_NUCLEU: None,
-                self._nsb.burr_3_intended.VTN__VENTRAL_TEGMENTAL_NU: None,
-                self._nsb.burr_3_intended.AT__ANTERIOR_TEGMENTAL_NU: None,
-                self._nsb.burr_3_intended.LT__LATERAL_TERMINAL_NUCL: None,
-                self._nsb.burr_3_intended.DT__DORSAL_TERMINAL_NUCLE: None,
-                self._nsb.burr_3_intended.MT__MEDIAL_TERMINAL_NUCLE: None,
-                self._nsb.burr_3_intended.S_NC__SUBSTANTIA_NIGRA_CO: None,
-                self._nsb.burr_3_intended.PPN__PEDUNCULOPONTINE_NUC: None,
-                self._nsb.burr_3_intended.IF__INTERFASCICULAR_NUCLE: None,
-                self._nsb.burr_3_intended.IPN__INTERPEDUNCULAR_NUCL: None,
-                self._nsb.burr_3_intended.RL__ROSTRAL_LINEAR_NUCLEU: None,
-                self._nsb.burr_3_intended.CLI__CENTRAL_LINEAR_NUCLE: None,
-                self._nsb.burr_3_intended.DR__DORSAL_NUCLEUS_RAPHE: None,
-                self._nsb.burr_3_intended.NLL__NUCLEUS_OF_THE_LATER: None,
-                self._nsb.burr_3_intended.PSV__PRINCIPAL_SENSORY_NU: None,
-                self._nsb.burr_3_intended.PB__PARABRACHIAL_NUCLEUS: None,
-                self._nsb.burr_3_intended.SOC__SUPERIOR_OLIVARY_COM: None,
-                self._nsb.burr_3_intended.B__BARRINGTON_S_NUCLEUS: None,
-                self._nsb.burr_3_intended.DTN__DORSAL_TEGMENTAL_NUC: None,
-                self._nsb.burr_3_intended.PD_TG__POSTERODORSAL_TEGM: None,
-                self._nsb.burr_3_intended.PCG__PONTINE_CENTRAL_GRAY: None,
-                self._nsb.burr_3_intended.PG__PONTINE_GRAY: None,
-                self._nsb.burr_3_intended.PR_NC__PONTINE_RETICULAR: None,
-                self._nsb.burr_3_intended.SG__SUPRAGENUAL_NUCLEUS: None,
-                self._nsb.burr_3_intended.SUT__SUPRATRIGEMINAL_NUCL: None,
-                self._nsb.burr_3_intended.TRN__TEGMENTAL_RETICULAR: None,
-                self._nsb.burr_3_intended.V__MOTOR_NUCLEUS_OF_TRIGE: None,
-                self._nsb.burr_3_intended.P5__PERITRIGEMINAL_ZONE: None,
-                self._nsb.burr_3_intended.ACS5__ACCESSORY_TRIGEMINA: None,
-                self._nsb.burr_3_intended.PC5__PARVICELLULAR_MOTOR: None,
-                self._nsb.burr_3_intended.I5__INTERTRIGEMINAL_NUCLE: None,
-                self._nsb.burr_3_intended.CS__SUPERIOR_CENTRAL_NUCL: None,
-                self._nsb.burr_3_intended.LC__LOCUS_CERULEUS: None,
-                self._nsb.burr_3_intended.LDT__LATERODORSAL_TEGMENT: None,
-                self._nsb.burr_3_intended.NI__NUCLEUS_INCERTUS: None,
-                self._nsb.burr_3_intended.PR_NR__PONTINE_RETICULAR: None,
-                self._nsb.burr_3_intended.RPO__NUCLEUS_RAPHE_PONTIS: None,
-                self._nsb.burr_3_intended.SLC__SUBCERULEUS_NUCLEUS: None,
-                self._nsb.burr_3_intended.SLD__SUBLATERODORSAL_NUCL: None,
-                self._nsb.burr_3_intended.MY__MEDULLA: None,
-                self._nsb.burr_3_intended.AP__AREA_POSTREMA: None,
-                self._nsb.burr_3_intended.DCO__DORSAL_COCHLEAR_NUCL: None,
-                self._nsb.burr_3_intended.VCO__VENTRAL_COCHLEAR_NUC: None,
-                self._nsb.burr_3_intended.CU__CUNEATE_NUCLEUS: None,
-                self._nsb.burr_3_intended.GR__GRACILE_NUCLEUS: None,
-                self._nsb.burr_3_intended.ECU__EXTERNAL_CUNEATE_NUC: None,
-                self._nsb.burr_3_intended.NTB__NUCLEUS_OF_THE_TRAPE: None,
-                self._nsb.burr_3_intended.NTS__NUCLEUS_OF_THE_SOLIT: None,
-                self._nsb.burr_3_intended.SPVC__SPINAL_NUCLEUS_OF_T: None,
-                self._nsb.burr_3_intended.SPVI__SPINAL_NUCLEUS_OF_T: None,
-                self._nsb.burr_3_intended.SPVO__SPINAL_NUCLEUS_OF_T: None,
-                self._nsb.burr_3_intended.PA5__PARATRIGEMINAL_NUCLE: None,
-                self._nsb.burr_3_intended.VI__ABDUCENS_NUCLEUS: None,
-                self._nsb.burr_3_intended.VII__FACIAL_MOTOR_NUCLEUS: None,
-                self._nsb.burr_3_intended.AMB__NUCLEUS_AMBIGUUS: None,
-                self._nsb.burr_3_intended.DMX__DORSAL_MOTOR_NUCLEUS: None,
-                self._nsb.burr_3_intended.GRN__GIGANTOCELLULAR_RETI: None,
-                self._nsb.burr_3_intended.ICB__INFRACEREBELLAR_NUCL: None,
-                self._nsb.burr_3_intended.IO__INFERIOR_OLIVARY_COMP: None,
-                self._nsb.burr_3_intended.IRN__INTERMEDIATE_RETICUL: None,
-                self._nsb.burr_3_intended.ISN__INFERIOR_SALIVATORY: None,
-                self._nsb.burr_3_intended.LIN__LINEAR_NUCLEUS_OF_TH: None,
-                self._nsb.burr_3_intended.LRN__LATERAL_RETICULAR_NU: None,
-                self._nsb.burr_3_intended.MARN__MAGNOCELLULAR_RETIC: None,
-                self._nsb.burr_3_intended.MDRN__MEDULLARY_RETICULAR: None,
-                self._nsb.burr_3_intended.PARN__PARVICELLULAR_RETIC: None,
-                self._nsb.burr_3_intended.PAS__PARASOLITARY_NUCLEUS: None,
-                self._nsb.burr_3_intended.PGRN__PARAGIGANTOCELLULAR: None,
-                self._nsb.burr_3_intended.NR__NUCLEUS_OF__ROLLER: None,
-                self._nsb.burr_3_intended.PRP__NUCLEUS_PREPOSITUS: None,
-                self._nsb.burr_3_intended.PMR__PARAMEDIAN_RETICULAR: None,
-                self._nsb.burr_3_intended.PPY__PARAPYRAMIDAL_NUCLEU: None,
-                self._nsb.burr_3_intended.LAV__LATERAL_VESTIBULAR_N: None,
-                self._nsb.burr_3_intended.MV__MEDIAL_VESTIBULAR_NUC: None,
-                self._nsb.burr_3_intended.SPIV__SPINAL_VESTIBULAR_N: None,
-                self._nsb.burr_3_intended.SUV__SUPERIOR_VESTIBULAR: None,
-                self._nsb.burr_3_intended.X__NUCLEUS_X: None,
-                self._nsb.burr_3_intended.XII__HYPOGLOSSAL_NUCLEUS: None,
-                self._nsb.burr_3_intended.Y__NUCLEUS_Y: None,
-                self._nsb.burr_3_intended.RM__NUCLEUS_RAPHE_MAGNUS: None,
-                self._nsb.burr_3_intended.RPA__NUCLEUS_RAPHE_PALLID: None,
-                self._nsb.burr_3_intended.RO__NUCLEUS_RAPHE_OBSCURU: None,
-                self._nsb.burr_3_intended.LING__LINGULA_I: None,
-                self._nsb.burr_3_intended.CENT2__LOBULE_II: None,
-                self._nsb.burr_3_intended.CENT3__LOBULE_III: None,
-                self._nsb.burr_3_intended.CUL4_5__LOBULES_IV_V: None,
-                self._nsb.burr_3_intended.DEC__DECLIVE_VI: None,
-                self._nsb.burr_3_intended.FOTU__FOLIUM_TUBER_VERMIS: None,
-                self._nsb.burr_3_intended.PYR__PYRAMUS_VIII: None,
-                self._nsb.burr_3_intended.UVU__UVULA_IX: None,
-                self._nsb.burr_3_intended.NOD__NODULUS_X: None,
-                self._nsb.burr_3_intended.SIM__SIMPLE_LOBULE: None,
-                self._nsb.burr_3_intended.A_NCR1__CRUS_1: None,
-                self._nsb.burr_3_intended.A_NCR2__CRUS_2: None,
-                self._nsb.burr_3_intended.PRM__PARAMEDIAN_LOBULE: None,
-                self._nsb.burr_3_intended.COPY__COPULA_PYRAMIDIS: None,
-                self._nsb.burr_3_intended.PFL__PARAFLOCCULUS: None,
-                self._nsb.burr_3_intended.FL__FLOCCULUS: None,
-                self._nsb.burr_3_intended.FN__FASTIGIAL_NUCLEUS: None,
-                self._nsb.burr_3_intended.IP__INTERPOSED_NUCLEUS: None,
-                self._nsb.burr_3_intended.DN__DENTATE_NUCLEUS: None,
-                self._nsb.burr_3_intended.VE_CB__VESTIBULOCEREBELLA: None,
-            }.get(self._nsb.burr_3_intended, None)
+                burr_3_intended.FRP__FRONTAL_POLE_CEREBRA: None,
+                burr_3_intended.M_OP__PRIMARY_MOTOR_AREA: None,
+                burr_3_intended.M_OS__SECONDARY_MOTOR_ARE: None,
+                burr_3_intended.S_SP_N__PRIMARY_SOMATOSEN: None,
+                burr_3_intended.S_SP_BFD__PRIMARY_SOMATOS: None,
+                burr_3_intended.S_SP_LL__PRIMARY_SOMATOSE: None,
+                burr_3_intended.S_SP_M__PRIMARY_SOMATOSEN: None,
+                burr_3_intended.S_SP_UL__PRIMARY_SOMATOSE: None,
+                burr_3_intended.S_SP_TR__PRIMARY_SOMATOSE: None,
+                burr_3_intended.S_SP_UN__PRIMARY_SOMATOSE: None,
+                burr_3_intended.S_SS__SUPPLEMENTAL_SOMATO: None,
+                burr_3_intended.GU__GUSTATORY_AREAS: None,
+                burr_3_intended.VISC__VISCERAL_AREA: None,
+                burr_3_intended.AU_DD__DORSAL_AUDITORY_AR: None,
+                burr_3_intended.AU_DP__PRIMARY_AUDITORY_A: None,
+                burr_3_intended.AU_DPO__POSTERIOR_AUDITOR: None,
+                burr_3_intended.AU_DV__VENTRAL_AUDITORY_A: None,
+                burr_3_intended.VI_SAL__ANTEROLATERAL_VIS: None,
+                burr_3_intended.VI_SAM__ANTEROMEDIAL_VISU: None,
+                burr_3_intended.VI_SL__LATERAL_VISUAL_ARE: None,
+                burr_3_intended.VI_SP__PRIMARY_VISUAL_ARE: None,
+                burr_3_intended.VI_SPL__POSTEROLATERAL_VI: None,
+                burr_3_intended.VI_SPM_POSTEROMEDIAL_VISU: None,
+                burr_3_intended.VI_SLI__LATEROINTERMEDIAT: None,
+                burr_3_intended.VI_SPOR__POSTRHINAL_AREA: None,
+                burr_3_intended.AC_AD__ANTERIOR_CINGULATE: None,
+                burr_3_intended.AC_AV__ANTERIOR_CINGULATE: None,
+                burr_3_intended.PL__PRELIMBIC_AREA: None,
+                burr_3_intended.ILA__INFRALIMBIC_AREA: None,
+                burr_3_intended.OR_BL__ORBITAL_AREA_LATER: None,
+                burr_3_intended.OR_BM__ORBITAL_AREA_MEDIA: None,
+                burr_3_intended.OR_BV__ORBITAL_AREA_VENTR: None,
+                burr_3_intended.OR_BVL__ORBITAL_AREA_VENT: None,
+                burr_3_intended.A_ID__AGRANULAR_INSULAR_A: None,
+                burr_3_intended.A_IP__AGRANULAR_INSULAR_A: None,
+                burr_3_intended.A_IV__AGRANULAR_INSULAR_A: None,
+                burr_3_intended.RS_PAGL__RETROSPLENIAL_AR: None,
+                burr_3_intended.RS_PD__RETROSPLENIAL_AREA: None,
+                burr_3_intended.RS_PV__RETROSPLENIAL_AREA: None,
+                burr_3_intended.VI_SA__ANTERIOR_AREA: None,
+                burr_3_intended.VI_SRL__ROSTROLATERAL_VIS: None,
+                burr_3_intended.T_EA__TEMPORAL_ASSOCIATIO: None,
+                burr_3_intended.PERI__PERIRHINAL_AREA: None,
+                burr_3_intended.ECT__ECTORHINAL_AREA: None,
+                burr_3_intended.MOB__MAIN_OLFACTORY_BULB: None,
+                burr_3_intended.AOB__ACCESSORY_OLFACTORY: None,
+                burr_3_intended.AON__ANTERIOR_OLFACTORY_N: None,
+                burr_3_intended.T_TD__TAENIA_TECTA_DORSAL: None,
+                burr_3_intended.T_TV__TAENIA_TECTA_VENTRA: None,
+                burr_3_intended.DP__DORSAL_PEDUNCULAR_ARE: None,
+                burr_3_intended.PIR__PIRIFORM_AREA: None,
+                burr_3_intended.NLOT__NUCLEUS_OF_THE_LATE: None,
+                burr_3_intended.CO_AA__CORTICAL_AMYGDALAR: None,
+                burr_3_intended.CO_AP__CORTICAL_AMYGDALAR: None,
+                burr_3_intended.PAA__PIRIFORM_AMYGDALAR_A: None,
+                burr_3_intended.TR__POSTPIRIFORM_TRANSITI: None,
+                burr_3_intended.CA1__FIELD_CA1: None,
+                burr_3_intended.CA2__FIELD_CA2: None,
+                burr_3_intended.CA3__FIELD_CA3: None,
+                burr_3_intended.DG__DENTATE_GYRUS: None,
+                burr_3_intended.FC__FASCIOLA_CINEREA: None,
+                burr_3_intended.IG__INDUSEUM_GRISEUM: None,
+                burr_3_intended.EN_TL__ENTORHINAL_AREA_LA: None,
+                burr_3_intended.EN_TM__ENTORHINAL_AREA_ME: None,
+                burr_3_intended.PAR__PARASUBICULUM: None,
+                burr_3_intended.POST__POSTSUBICULUM: None,
+                burr_3_intended.PRE__PRESUBICULUM: None,
+                burr_3_intended.SUB__SUBICULUM: None,
+                burr_3_intended.PRO_S__PROSUBICULUM: None,
+                burr_3_intended.HATA__HIPPOCAMPO_AMYGDALA: None,
+                burr_3_intended.A_PR__AREA_PROSTRIATA: None,
+                burr_3_intended.CLA__CLAUSTRUM: None,
+                burr_3_intended.E_PD__ENDOPIRIFORM_NUCLEU: None,
+                burr_3_intended.E_PV__ENDOPIRIFORM_NUCLEU: None,
+                burr_3_intended.LA__LATERAL_AMYGDALAR_NUC: None,
+                burr_3_intended.BLA__BASOLATERAL_AMYGDALA: None,
+                burr_3_intended.BMA__BASOMEDIAL_AMYGDALAR: None,
+                burr_3_intended.PA__POSTERIOR_AMYGDALAR_N: None,
+                burr_3_intended.CP__CAUDOPUTAMEN: None,
+                burr_3_intended.ACB__NUCLEUS_ACCUMBENS: None,
+                burr_3_intended.FS__FUNDUS_OF_STRIATUM: None,
+                burr_3_intended.OT__OLFACTORY_TUBERCLE: None,
+                burr_3_intended.L_SC__LATERAL_SEPTAL_NUCL: None,
+                burr_3_intended.L_SR__LATERAL_SEPTAL_NUCL: None,
+                burr_3_intended.L_SV__LATERAL_SEPTAL_NUCL: None,
+                burr_3_intended.SF__SEPTOFIMBRIAL_NUCLEUS: None,
+                burr_3_intended.SH__SEPTOHIPPOCAMPAL_NUCL: None,
+                burr_3_intended.AAA__ANTERIOR_AMYGDALAR_A: None,
+                burr_3_intended.BA__BED_NUCLEUS_OF_THE_AC: None,
+                burr_3_intended.CEA__CENTRAL_AMYGDALAR_NU: None,
+                burr_3_intended.IA__INTERCALATED_AMYGDALA: None,
+                burr_3_intended.MEA__MEDIAL_AMYGDALAR_NUC: None,
+                burr_3_intended.G_PE__GLOBUS_PALLIDUS_EXT: None,
+                burr_3_intended.G_PI__GLOBUS_PALLIDUS_INT: None,
+                burr_3_intended.SI__SUBSTANTIA_INNOMINATA: None,
+                burr_3_intended.MA__MAGNOCELLULAR_NUCLEUS: None,
+                burr_3_intended.MS__MEDIAL_SEPTAL_NUCLEUS: None,
+                burr_3_intended.NDB__DIAGONAL_BAND_NUCLEU: None,
+                burr_3_intended.TRS__TRIANGULAR_NUCLEUS_O: None,
+                burr_3_intended.BST__BED_NUCLEI_OF_THE_ST: None,
+                burr_3_intended.VAL__VENTRAL_ANTERIOR_LAT: None,
+                burr_3_intended.VM__VENTRAL_MEDIAL_NUCLEU: None,
+                burr_3_intended.VPL__VENTRAL_POSTEROLATER: None,
+                burr_3_intended.VP_LPC__VENTRAL_POSTEROLA: None,
+                burr_3_intended.VPM__VENTRAL_POSTEROMEDIA: None,
+                burr_3_intended.VP_MPC__VENTRAL_POSTEROME: None,
+                burr_3_intended.PO_T__POSTERIOR_TRIANGULA: None,
+                burr_3_intended.SPF__SUBPARAFASCICULAR_NU: None,
+                burr_3_intended.SPA__SUBPARAFASCICULAR_AR: None,
+                burr_3_intended.PP__PERIPEDUNCULAR_NUCLEU: None,
+                burr_3_intended.MG__MEDIAL_GENICULATE_COM: None,
+                burr_3_intended.L_GD__DORSAL_PART_OF_THE: None,
+                burr_3_intended.LP__LATERAL_POSTERIOR_NUC: None,
+                burr_3_intended.PO__POSTERIOR_COMPLEX_OF: None,
+                burr_3_intended.POL__POSTERIOR_LIMITING_N: None,
+                burr_3_intended.SGN__SUPRAGENICULATE_NUCL: None,
+                burr_3_intended.ETH__ETHMOID_NUCLEUS_OF_T: None,
+                burr_3_intended.AV__ANTEROVENTRAL_NUCLEUS: None,
+                burr_3_intended.AM__ANTEROMEDIAL_NUCLEUS: None,
+                burr_3_intended.AD__ANTERODORSAL_NUCLEUS: None,
+                burr_3_intended.IAM__INTERANTEROMEDIAL_NU: None,
+                burr_3_intended.IAD__INTERANTERODORSAL_NU: None,
+                burr_3_intended.LD__LATERAL_DORSAL_NUCLEU: None,
+                burr_3_intended.IMD__INTERMEDIODORSAL_NUC: None,
+                burr_3_intended.MD__MEDIODORSAL_NUCLEUS_O: None,
+                burr_3_intended.SMT__SUBMEDIAL_NUCLEUS_OF: None,
+                burr_3_intended.PR__PERIREUNENSIS_NUCLEUS: None,
+                burr_3_intended.PVT__PARAVENTRICULAR_NUCL: None,
+                burr_3_intended.PT__PARATAENIAL_NUCLEUS: None,
+                burr_3_intended.RE__NUCLEUS_OF_REUNIENS: None,
+                burr_3_intended.XI__XIPHOID_THALAMIC_NUCL: None,
+                burr_3_intended.RH__RHOMBOID_NUCLEUS: None,
+                burr_3_intended.CM__CENTRAL_MEDIAL_NUCLEU: None,
+                burr_3_intended.PCN__PARACENTRAL_NUCLEUS: None,
+                burr_3_intended.CL__CENTRAL_LATERAL_NUCLE: None,
+                burr_3_intended.PF__PARAFASCICULAR_NUCLEU: None,
+                burr_3_intended.PIL__POSTERIOR_INTRALAMIN: None,
+                burr_3_intended.RT__RETICULAR_NUCLEUS_OF: None,
+                burr_3_intended.IGL__INTERGENICULATE_LEAF: None,
+                burr_3_intended.INT_G__INTERMEDIATE_GENIC: None,
+                burr_3_intended.L_GV__VENTRAL_PART_OF_THE: None,
+                burr_3_intended.SUB_G__SUBGENICULATE_NUCL: None,
+                burr_3_intended.MH__MEDIAL_HABENULA: None,
+                burr_3_intended.LH__LATERAL_HABENULA: None,
+                burr_3_intended.SO__SUPRAOPTIC_NUCLEUS: None,
+                burr_3_intended.PVH__PARAVENTRICULAR_HYPO: None,
+                burr_3_intended.P_VA__PERIVENTRICULAR_HYP: None,
+                burr_3_intended.P_VI__PERIVENTRICULAR_HYP: None,
+                burr_3_intended.ARH__ARCUATE_HYPOTHALAMIC: None,
+                burr_3_intended.ADP__ANTERODORSAL_PREOPTI: None,
+                burr_3_intended.AVP__ANTEROVENTRAL_PREOPT: None,
+                burr_3_intended.AVPV__ANTEROVENTRAL_PERIV: None,
+                burr_3_intended.DMH__DORSOMEDIAL_NUCLEUS: None,
+                burr_3_intended.MEPO__MEDIAN_PREOPTIC_NUC: None,
+                burr_3_intended.MPO__MEDIAL_PREOPTIC_AREA: None,
+                burr_3_intended.PS__PARASTRIAL_NUCLEUS: None,
+                burr_3_intended.P_VP__PERIVENTRICULAR_HYP: None,
+                burr_3_intended.P_VPO__PERIVENTRICULAR_HY: None,
+                burr_3_intended.SBPV__SUBPARAVENTRICULAR: None,
+                burr_3_intended.SCH__SUPRACHIASMATIC_NUCL: None,
+                burr_3_intended.SFO__SUBFORNICAL_ORGAN: None,
+                burr_3_intended.VMPO__VENTROMEDIAL_PREOPT: None,
+                burr_3_intended.VLPO__VENTROLATERAL_PREOP: None,
+                burr_3_intended.AHN__ANTERIOR_HYPOTHALAMI: None,
+                burr_3_intended.LM__LATERAL_MAMMILLARY_NU: None,
+                burr_3_intended.MM__MEDIAL_MAMMILLARY_NUC: None,
+                burr_3_intended.SUM__SUPRAMAMMILLARY_NUCL: None,
+                burr_3_intended.TM__TUBEROMAMMILLARY_NUCL: None,
+                burr_3_intended.MPN__MEDIAL_PREOPTIC_NUCL: None,
+                burr_3_intended.P_MD__DORSAL_PREMAMMILLAR: None,
+                burr_3_intended.P_MV__VENTRAL_PREMAMMILLA: None,
+                burr_3_intended.PV_HD__PARAVENTRICULAR_HY: None,
+                burr_3_intended.VMH__VENTROMEDIAL_HYPOTHA: None,
+                burr_3_intended.PH__POSTERIOR_HYPOTHALAMI: None,
+                burr_3_intended.LHA__LATERAL_HYPOTHALAMIC: None,
+                burr_3_intended.LPO__LATERAL_PREOPTIC_ARE: None,
+                burr_3_intended.PSTN__PARASUBTHALAMIC_NUC: None,
+                burr_3_intended.PE_F__PERIFORNICAL_NUCLEU: None,
+                burr_3_intended.RCH__RETROCHIASMATIC_AREA: None,
+                burr_3_intended.STN__SUBTHALAMIC_NUCLEUS: None,
+                burr_3_intended.TU__TUBERAL_NUCLEUS: None,
+                burr_3_intended.ZI__ZONA_INCERTA: None,
+                burr_3_intended.S_CS__SUPERIOR_COLLICULUS: None,
+                burr_3_intended.IC__INFERIOR_COLLICULUS: None,
+                burr_3_intended.NB__NUCLEUS_OF_THE_BRACHI: None,
+                burr_3_intended.SAG__NUCLEUS_SAGULUM: None,
+                burr_3_intended.PBG__PARABIGEMINAL_NUCLEU: None,
+                burr_3_intended.S_NR__SUBSTANTIA_NIGRA_RE: None,
+                burr_3_intended.VTA__VENTRAL_TEGMENTAL_AR: None,
+                burr_3_intended.PN__PARANIGRAL_NUCLEUS: None,
+                burr_3_intended.RR__MIDBRAIN_RETICULAR_NU: None,
+                burr_3_intended.MRN__MIDBRAIN_RETICULAR_N: None,
+                burr_3_intended.S_CM__SUPERIOR_COLLICULUS: None,
+                burr_3_intended.PAG__PERIAQUEDUCTAL_GRAY: None,
+                burr_3_intended.APN__ANTERIOR_PRETECTAL_N: None,
+                burr_3_intended.MPT__MEDIAL_PRETECTAL_ARE: None,
+                burr_3_intended.NOT__NUCLEUS_OF_THE_OPTIC: None,
+                burr_3_intended.NPC__NUCLEUS_OF_THE_POSTE: None,
+                burr_3_intended.OP__OLIVARY_PRETECTAL_NUC: None,
+                burr_3_intended.PPT__POSTERIOR_PRETECTAL: None,
+                burr_3_intended.RPF__RETROPARAFASCICULAR: None,
+                burr_3_intended.CUN__CUNEIFORM_NUCLEUS: None,
+                burr_3_intended.RN__RED_NUCLEUS: None,
+                burr_3_intended.III__OCULOMOTOR_NUCLEUS: None,
+                burr_3_intended.MA3__MEDIAL_ACCESORY_OCUL: None,
+                burr_3_intended.EW__EDINGER__WESTPHAL_NUC: None,
+                burr_3_intended.IV__TROCHLEAR_NUCLEUS: None,
+                burr_3_intended.PA4__PARATROCHLEAR_NUCLEU: None,
+                burr_3_intended.VTN__VENTRAL_TEGMENTAL_NU: None,
+                burr_3_intended.AT__ANTERIOR_TEGMENTAL_NU: None,
+                burr_3_intended.LT__LATERAL_TERMINAL_NUCL: None,
+                burr_3_intended.DT__DORSAL_TERMINAL_NUCLE: None,
+                burr_3_intended.MT__MEDIAL_TERMINAL_NUCLE: None,
+                burr_3_intended.S_NC__SUBSTANTIA_NIGRA_CO: None,
+                burr_3_intended.PPN__PEDUNCULOPONTINE_NUC: None,
+                burr_3_intended.IF__INTERFASCICULAR_NUCLE: None,
+                burr_3_intended.IPN__INTERPEDUNCULAR_NUCL: None,
+                burr_3_intended.RL__ROSTRAL_LINEAR_NUCLEU: None,
+                burr_3_intended.CLI__CENTRAL_LINEAR_NUCLE: None,
+                burr_3_intended.DR__DORSAL_NUCLEUS_RAPHE: None,
+                burr_3_intended.NLL__NUCLEUS_OF_THE_LATER: None,
+                burr_3_intended.PSV__PRINCIPAL_SENSORY_NU: None,
+                burr_3_intended.PB__PARABRACHIAL_NUCLEUS: None,
+                burr_3_intended.SOC__SUPERIOR_OLIVARY_COM: None,
+                burr_3_intended.B__BARRINGTON_S_NUCLEUS: None,
+                burr_3_intended.DTN__DORSAL_TEGMENTAL_NUC: None,
+                burr_3_intended.PD_TG__POSTERODORSAL_TEGM: None,
+                burr_3_intended.PCG__PONTINE_CENTRAL_GRAY: None,
+                burr_3_intended.PG__PONTINE_GRAY: None,
+                burr_3_intended.PR_NC__PONTINE_RETICULAR: None,
+                burr_3_intended.SG__SUPRAGENUAL_NUCLEUS: None,
+                burr_3_intended.SUT__SUPRATRIGEMINAL_NUCL: None,
+                burr_3_intended.TRN__TEGMENTAL_RETICULAR: None,
+                burr_3_intended.V__MOTOR_NUCLEUS_OF_TRIGE: None,
+                burr_3_intended.P5__PERITRIGEMINAL_ZONE: None,
+                burr_3_intended.ACS5__ACCESSORY_TRIGEMINA: None,
+                burr_3_intended.PC5__PARVICELLULAR_MOTOR: None,
+                burr_3_intended.I5__INTERTRIGEMINAL_NUCLE: None,
+                burr_3_intended.CS__SUPERIOR_CENTRAL_NUCL: None,
+                burr_3_intended.LC__LOCUS_CERULEUS: None,
+                burr_3_intended.LDT__LATERODORSAL_TEGMENT: None,
+                burr_3_intended.NI__NUCLEUS_INCERTUS: None,
+                burr_3_intended.PR_NR__PONTINE_RETICULAR: None,
+                burr_3_intended.RPO__NUCLEUS_RAPHE_PONTIS: None,
+                burr_3_intended.SLC__SUBCERULEUS_NUCLEUS: None,
+                burr_3_intended.SLD__SUBLATERODORSAL_NUCL: None,
+                burr_3_intended.MY__MEDULLA: None,
+                burr_3_intended.AP__AREA_POSTREMA: None,
+                burr_3_intended.DCO__DORSAL_COCHLEAR_NUCL: None,
+                burr_3_intended.VCO__VENTRAL_COCHLEAR_NUC: None,
+                burr_3_intended.CU__CUNEATE_NUCLEUS: None,
+                burr_3_intended.GR__GRACILE_NUCLEUS: None,
+                burr_3_intended.ECU__EXTERNAL_CUNEATE_NUC: None,
+                burr_3_intended.NTB__NUCLEUS_OF_THE_TRAPE: None,
+                burr_3_intended.NTS__NUCLEUS_OF_THE_SOLIT: None,
+                burr_3_intended.SPVC__SPINAL_NUCLEUS_OF_T: None,
+                burr_3_intended.SPVI__SPINAL_NUCLEUS_OF_T: None,
+                burr_3_intended.SPVO__SPINAL_NUCLEUS_OF_T: None,
+                burr_3_intended.PA5__PARATRIGEMINAL_NUCLE: None,
+                burr_3_intended.VI__ABDUCENS_NUCLEUS: None,
+                burr_3_intended.VII__FACIAL_MOTOR_NUCLEUS: None,
+                burr_3_intended.AMB__NUCLEUS_AMBIGUUS: None,
+                burr_3_intended.DMX__DORSAL_MOTOR_NUCLEUS: None,
+                burr_3_intended.GRN__GIGANTOCELLULAR_RETI: None,
+                burr_3_intended.ICB__INFRACEREBELLAR_NUCL: None,
+                burr_3_intended.IO__INFERIOR_OLIVARY_COMP: None,
+                burr_3_intended.IRN__INTERMEDIATE_RETICUL: None,
+                burr_3_intended.ISN__INFERIOR_SALIVATORY: None,
+                burr_3_intended.LIN__LINEAR_NUCLEUS_OF_TH: None,
+                burr_3_intended.LRN__LATERAL_RETICULAR_NU: None,
+                burr_3_intended.MARN__MAGNOCELLULAR_RETIC: None,
+                burr_3_intended.MDRN__MEDULLARY_RETICULAR: None,
+                burr_3_intended.PARN__PARVICELLULAR_RETIC: None,
+                burr_3_intended.PAS__PARASOLITARY_NUCLEUS: None,
+                burr_3_intended.PGRN__PARAGIGANTOCELLULAR: None,
+                burr_3_intended.NR__NUCLEUS_OF__ROLLER: None,
+                burr_3_intended.PRP__NUCLEUS_PREPOSITUS: None,
+                burr_3_intended.PMR__PARAMEDIAN_RETICULAR: None,
+                burr_3_intended.PPY__PARAPYRAMIDAL_NUCLEU: None,
+                burr_3_intended.LAV__LATERAL_VESTIBULAR_N: None,
+                burr_3_intended.MV__MEDIAL_VESTIBULAR_NUC: None,
+                burr_3_intended.SPIV__SPINAL_VESTIBULAR_N: None,
+                burr_3_intended.SUV__SUPERIOR_VESTIBULAR: None,
+                burr_3_intended.X__NUCLEUS_X: None,
+                burr_3_intended.XII__HYPOGLOSSAL_NUCLEUS: None,
+                burr_3_intended.Y__NUCLEUS_Y: None,
+                burr_3_intended.RM__NUCLEUS_RAPHE_MAGNUS: None,
+                burr_3_intended.RPA__NUCLEUS_RAPHE_PALLID: None,
+                burr_3_intended.RO__NUCLEUS_RAPHE_OBSCURU: None,
+                burr_3_intended.LING__LINGULA_I: None,
+                burr_3_intended.CENT2__LOBULE_II: None,
+                burr_3_intended.CENT3__LOBULE_III: None,
+                burr_3_intended.CUL4_5__LOBULES_IV_V: None,
+                burr_3_intended.DEC__DECLIVE_VI: None,
+                burr_3_intended.FOTU__FOLIUM_TUBER_VERMIS: None,
+                burr_3_intended.PYR__PYRAMUS_VIII: None,
+                burr_3_intended.UVU__UVULA_IX: None,
+                burr_3_intended.NOD__NODULUS_X: None,
+                burr_3_intended.SIM__SIMPLE_LOBULE: None,
+                burr_3_intended.A_NCR1__CRUS_1: None,
+                burr_3_intended.A_NCR2__CRUS_2: None,
+                burr_3_intended.PRM__PARAMEDIAN_LOBULE: None,
+                burr_3_intended.COPY__COPULA_PYRAMIDIS: None,
+                burr_3_intended.PFL__PARAFLOCCULUS: None,
+                burr_3_intended.FL__FLOCCULUS: None,
+                burr_3_intended.FN__FASTIGIAL_NUCLEUS: None,
+                burr_3_intended.IP__INTERPOSED_NUCLEUS: None,
+                burr_3_intended.DN__DENTATE_NUCLEUS: None,
+                burr_3_intended.VE_CB__VESTIBULOCEREBELLA: None,
+            }.get(burr_3_intended, None)
         )
 
     @property
@@ -2396,28 +2391,28 @@ class MappedNSBList:
     @property
     def aind_burr_4_angle(self) -> Optional[Decimal]:
         """Maps burr_4_angle to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_4_angle)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_4_x0020_angle)
 
     @property
     def aind_burr_4_d_v_x00(self) -> Optional[Decimal]:
         """Maps burr_4_d_v_x00 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_4_d_v_x00)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_4_x0020_d_x002f_v_x00)
 
     @property
     def aind_burr_4_d_v_x000(self) -> Optional[Decimal]:
         """Maps burr_4_d_v_x000 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_4_d_v_x000)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_4_x0020_d_x002f_v_x000)
 
     @property
     def aind_burr_4_fiber_t(self) -> Optional[FiberType]:
         """Maps burr_4_fiber_t to aind model"""
         return (
             None
-            if self._nsb.burr_4_fiber_t is None
+            if self._nsb.burr_x0020_4_x0020_fiber_x0020_t is None
             else {
-                self._nsb.burr_4_fiber_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
-                self._nsb.burr_4_fiber_t.CUSTOM: FiberType.CUSTOM,
-            }.get(self._nsb.burr_4_fiber_t, None)
+                self._nsb.burr_x0020_4_x0020_fiber_x0020_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
+                self._nsb.burr_x0020_4_x0020_fiber_x0020_t.CUSTOM: FiberType.CUSTOM,
+            }.get(self._nsb.burr_x0020_4_x0020_fiber_x0020_t, None)
         )
 
     @property
@@ -2425,371 +2420,372 @@ class MappedNSBList:
         """Maps burr_4_hemisphere to aind model"""
         return (
             None
-            if self._nsb.burr_4_hemisphere is None
+            if self._nsb.burr_x0020_4_x0020_hemisphere is None
             else {
-                self._nsb.burr_4_hemisphere.SELECT: None,
-                self._nsb.burr_4_hemisphere.LEFT: Side.LEFT,
-                self._nsb.burr_4_hemisphere.RIGHT: Side.RIGHT,
-            }.get(self._nsb.burr_4_hemisphere, None)
+                self._nsb.burr_x0020_4_x0020_hemisphere.SELECT: None,
+                self._nsb.burr_x0020_4_x0020_hemisphere.LEFT: Side.LEFT,
+                self._nsb.burr_x0020_4_x0020_hemisphere.RIGHT: Side.RIGHT,
+            }.get(self._nsb.burr_x0020_4_x0020_hemisphere, None)
         )
 
     @property
     def aind_burr_4_injectable_x0(self) -> Optional[str]:
         """Maps burr_4_injectable_x0 to aind model."""
-        return self._nsb.burr_4_injectable_x0
+        return self._nsb.burr_x0020_4_x0020_injectable_x0
 
     @property
     def aind_burr_4_injectable_x00(self) -> Optional[str]:
         """Maps burr_4_injectable_x00 to aind model."""
-        return self._nsb.burr_4_injectable_x00
+        return self._nsb.burr_x0020_4_x0020_injectable_x00
 
     @property
     def aind_burr_4_injectable_x01(self) -> Optional[str]:
         """Maps burr_4_injectable_x01 to aind model."""
-        return self._nsb.burr_4_injectable_x01
+        return self._nsb.burr_x0020_4_x0020_injectable_x01
 
     @property
     def aind_burr_4_injectable_x02(self) -> Optional[str]:
         """Maps burr_4_injectable_x02 to aind model."""
-        return self._nsb.burr_4_injectable_x02
+        return self._nsb.burr_x0020_4_x0020_injectable_x02
 
     @property
     def aind_burr_4_injectable_x03(self) -> Optional[str]:
         """Maps burr_4_injectable_x03 to aind model."""
-        return self._nsb.burr_4_injectable_x03
+        return self._nsb.burr_x0020_4_x0020_injectable_x03
 
     @property
     def aind_burr_4_injectable_x04(self) -> Optional[str]:
         """Maps burr_4_injectable_x04 to aind model."""
-        return self._nsb.burr_4_injectable_x04
+        return self._nsb.burr_x0020_4_x0020_injectable_x04
 
     @property
     def aind_burr_4_injectable_x05(self) -> Optional[str]:
         """Maps burr_4_injectable_x05 to aind model."""
-        return self._nsb.burr_4_injectable_x05
+        return self._nsb.burr_x0020_4_x0020_injectable_x05
 
     @property
     def aind_burr_4_injectable_x06(self) -> Optional[str]:
         """Maps burr_4_injectable_x06 to aind model."""
-        return self._nsb.burr_4_injectable_x06
+        return self._nsb.burr_x0020_4_x0020_injectable_x06
 
     @property
     def aind_burr_4_intended(self) -> Optional[Any]:
         """Maps burr_4_intended to aind model."""
+        burr_4_intended = self._nsb.burr_x0020_4_x0020_intended_x002
         return (
             None
-            if self._nsb.burr_4_intended is None
+            if burr_4_intended is None
             else {
-                self._nsb.burr_4_intended.FRP__FRONTAL_POLE_CEREBRA: None,
-                self._nsb.burr_4_intended.M_OP__PRIMARY_MOTOR_AREA: None,
-                self._nsb.burr_4_intended.M_OS__SECONDARY_MOTOR_ARE: None,
-                self._nsb.burr_4_intended.S_SP_N__PRIMARY_SOMATOSEN: None,
-                self._nsb.burr_4_intended.S_SP_BFD__PRIMARY_SOMATOS: None,
-                self._nsb.burr_4_intended.S_SP_LL__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_4_intended.S_SP_M__PRIMARY_SOMATOSEN: None,
-                self._nsb.burr_4_intended.S_SP_UL__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_4_intended.S_SP_TR__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_4_intended.S_SP_UN__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_4_intended.S_SS__SUPPLEMENTAL_SOMATO: None,
-                self._nsb.burr_4_intended.GU__GUSTATORY_AREAS: None,
-                self._nsb.burr_4_intended.VISC__VISCERAL_AREA: None,
-                self._nsb.burr_4_intended.AU_DD__DORSAL_AUDITORY_AR: None,
-                self._nsb.burr_4_intended.AU_DP__PRIMARY_AUDITORY_A: None,
-                self._nsb.burr_4_intended.AU_DPO__POSTERIOR_AUDITOR: None,
-                self._nsb.burr_4_intended.AU_DV__VENTRAL_AUDITORY_A: None,
-                self._nsb.burr_4_intended.VI_SAL__ANTEROLATERAL_VIS: None,
-                self._nsb.burr_4_intended.VI_SAM__ANTEROMEDIAL_VISU: None,
-                self._nsb.burr_4_intended.VI_SL__LATERAL_VISUAL_ARE: None,
-                self._nsb.burr_4_intended.VI_SP__PRIMARY_VISUAL_ARE: None,
-                self._nsb.burr_4_intended.VI_SPL__POSTEROLATERAL_VI: None,
-                self._nsb.burr_4_intended.VI_SPM_POSTEROMEDIAL_VISU: None,
-                self._nsb.burr_4_intended.VI_SLI__LATEROINTERMEDIAT: None,
-                self._nsb.burr_4_intended.VI_SPOR__POSTRHINAL_AREA: None,
-                self._nsb.burr_4_intended.AC_AD__ANTERIOR_CINGULATE: None,
-                self._nsb.burr_4_intended.AC_AV__ANTERIOR_CINGULATE: None,
-                self._nsb.burr_4_intended.PL__PRELIMBIC_AREA: None,
-                self._nsb.burr_4_intended.ILA__INFRALIMBIC_AREA: None,
-                self._nsb.burr_4_intended.OR_BL__ORBITAL_AREA_LATER: None,
-                self._nsb.burr_4_intended.OR_BM__ORBITAL_AREA_MEDIA: None,
-                self._nsb.burr_4_intended.OR_BV__ORBITAL_AREA_VENTR: None,
-                self._nsb.burr_4_intended.OR_BVL__ORBITAL_AREA_VENT: None,
-                self._nsb.burr_4_intended.A_ID__AGRANULAR_INSULAR_A: None,
-                self._nsb.burr_4_intended.A_IP__AGRANULAR_INSULAR_A: None,
-                self._nsb.burr_4_intended.A_IV__AGRANULAR_INSULAR_A: None,
-                self._nsb.burr_4_intended.RS_PAGL__RETROSPLENIAL_AR: None,
-                self._nsb.burr_4_intended.RS_PD__RETROSPLENIAL_AREA: None,
-                self._nsb.burr_4_intended.RS_PV__RETROSPLENIAL_AREA: None,
-                self._nsb.burr_4_intended.VI_SA__ANTERIOR_AREA: None,
-                self._nsb.burr_4_intended.VI_SRL__ROSTROLATERAL_VIS: None,
-                self._nsb.burr_4_intended.T_EA__TEMPORAL_ASSOCIATIO: None,
-                self._nsb.burr_4_intended.PERI__PERIRHINAL_AREA: None,
-                self._nsb.burr_4_intended.ECT__ECTORHINAL_AREA: None,
-                self._nsb.burr_4_intended.MOB__MAIN_OLFACTORY_BULB: None,
-                self._nsb.burr_4_intended.AOB__ACCESSORY_OLFACTORY: None,
-                self._nsb.burr_4_intended.AON__ANTERIOR_OLFACTORY_N: None,
-                self._nsb.burr_4_intended.T_TD__TAENIA_TECTA_DORSAL: None,
-                self._nsb.burr_4_intended.T_TV__TAENIA_TECTA_VENTRA: None,
-                self._nsb.burr_4_intended.DP__DORSAL_PEDUNCULAR_ARE: None,
-                self._nsb.burr_4_intended.PIR__PIRIFORM_AREA: None,
-                self._nsb.burr_4_intended.NLOT__NUCLEUS_OF_THE_LATE: None,
-                self._nsb.burr_4_intended.CO_AA__CORTICAL_AMYGDALAR: None,
-                self._nsb.burr_4_intended.CO_AP__CORTICAL_AMYGDALAR: None,
-                self._nsb.burr_4_intended.PAA__PIRIFORM_AMYGDALAR_A: None,
-                self._nsb.burr_4_intended.TR__POSTPIRIFORM_TRANSITI: None,
-                self._nsb.burr_4_intended.CA1__FIELD_CA1: None,
-                self._nsb.burr_4_intended.CA2__FIELD_CA2: None,
-                self._nsb.burr_4_intended.CA3__FIELD_CA3: None,
-                self._nsb.burr_4_intended.DG__DENTATE_GYRUS: None,
-                self._nsb.burr_4_intended.FC__FASCIOLA_CINEREA: None,
-                self._nsb.burr_4_intended.IG__INDUSEUM_GRISEUM: None,
-                self._nsb.burr_4_intended.EN_TL__ENTORHINAL_AREA_LA: None,
-                self._nsb.burr_4_intended.EN_TM__ENTORHINAL_AREA_ME: None,
-                self._nsb.burr_4_intended.PAR__PARASUBICULUM: None,
-                self._nsb.burr_4_intended.POST__POSTSUBICULUM: None,
-                self._nsb.burr_4_intended.PRE__PRESUBICULUM: None,
-                self._nsb.burr_4_intended.SUB__SUBICULUM: None,
-                self._nsb.burr_4_intended.PRO_S__PROSUBICULUM: None,
-                self._nsb.burr_4_intended.HATA__HIPPOCAMPO_AMYGDALA: None,
-                self._nsb.burr_4_intended.A_PR__AREA_PROSTRIATA: None,
-                self._nsb.burr_4_intended.CLA__CLAUSTRUM: None,
-                self._nsb.burr_4_intended.E_PD__ENDOPIRIFORM_NUCLEU: None,
-                self._nsb.burr_4_intended.E_PV__ENDOPIRIFORM_NUCLEU: None,
-                self._nsb.burr_4_intended.LA__LATERAL_AMYGDALAR_NUC: None,
-                self._nsb.burr_4_intended.BLA__BASOLATERAL_AMYGDALA: None,
-                self._nsb.burr_4_intended.BMA__BASOMEDIAL_AMYGDALAR: None,
-                self._nsb.burr_4_intended.PA__POSTERIOR_AMYGDALAR_N: None,
-                self._nsb.burr_4_intended.CP__CAUDOPUTAMEN: None,
-                self._nsb.burr_4_intended.ACB__NUCLEUS_ACCUMBENS: None,
-                self._nsb.burr_4_intended.FS__FUNDUS_OF_STRIATUM: None,
-                self._nsb.burr_4_intended.OT__OLFACTORY_TUBERCLE: None,
-                self._nsb.burr_4_intended.L_SC__LATERAL_SEPTAL_NUCL: None,
-                self._nsb.burr_4_intended.L_SR__LATERAL_SEPTAL_NUCL: None,
-                self._nsb.burr_4_intended.L_SV__LATERAL_SEPTAL_NUCL: None,
-                self._nsb.burr_4_intended.SF__SEPTOFIMBRIAL_NUCLEUS: None,
-                self._nsb.burr_4_intended.SH__SEPTOHIPPOCAMPAL_NUCL: None,
-                self._nsb.burr_4_intended.AAA__ANTERIOR_AMYGDALAR_A: None,
-                self._nsb.burr_4_intended.BA__BED_NUCLEUS_OF_THE_AC: None,
-                self._nsb.burr_4_intended.CEA__CENTRAL_AMYGDALAR_NU: None,
-                self._nsb.burr_4_intended.IA__INTERCALATED_AMYGDALA: None,
-                self._nsb.burr_4_intended.MEA__MEDIAL_AMYGDALAR_NUC: None,
-                self._nsb.burr_4_intended.G_PE__GLOBUS_PALLIDUS_EXT: None,
-                self._nsb.burr_4_intended.G_PI__GLOBUS_PALLIDUS_INT: None,
-                self._nsb.burr_4_intended.SI__SUBSTANTIA_INNOMINATA: None,
-                self._nsb.burr_4_intended.MA__MAGNOCELLULAR_NUCLEUS: None,
-                self._nsb.burr_4_intended.MS__MEDIAL_SEPTAL_NUCLEUS: None,
-                self._nsb.burr_4_intended.NDB__DIAGONAL_BAND_NUCLEU: None,
-                self._nsb.burr_4_intended.TRS__TRIANGULAR_NUCLEUS_O: None,
-                self._nsb.burr_4_intended.BST__BED_NUCLEI_OF_THE_ST: None,
-                self._nsb.burr_4_intended.VAL__VENTRAL_ANTERIOR_LAT: None,
-                self._nsb.burr_4_intended.VM__VENTRAL_MEDIAL_NUCLEU: None,
-                self._nsb.burr_4_intended.VPL__VENTRAL_POSTEROLATER: None,
-                self._nsb.burr_4_intended.VP_LPC__VENTRAL_POSTEROLA: None,
-                self._nsb.burr_4_intended.VPM__VENTRAL_POSTEROMEDIA: None,
-                self._nsb.burr_4_intended.VP_MPC__VENTRAL_POSTEROME: None,
-                self._nsb.burr_4_intended.PO_T__POSTERIOR_TRIANGULA: None,
-                self._nsb.burr_4_intended.SPF__SUBPARAFASCICULAR_NU: None,
-                self._nsb.burr_4_intended.SPA__SUBPARAFASCICULAR_AR: None,
-                self._nsb.burr_4_intended.PP__PERIPEDUNCULAR_NUCLEU: None,
-                self._nsb.burr_4_intended.MG__MEDIAL_GENICULATE_COM: None,
-                self._nsb.burr_4_intended.L_GD__DORSAL_PART_OF_THE: None,
-                self._nsb.burr_4_intended.LP__LATERAL_POSTERIOR_NUC: None,
-                self._nsb.burr_4_intended.PO__POSTERIOR_COMPLEX_OF: None,
-                self._nsb.burr_4_intended.POL__POSTERIOR_LIMITING_N: None,
-                self._nsb.burr_4_intended.SGN__SUPRAGENICULATE_NUCL: None,
-                self._nsb.burr_4_intended.ETH__ETHMOID_NUCLEUS_OF_T: None,
-                self._nsb.burr_4_intended.AV__ANTEROVENTRAL_NUCLEUS: None,
-                self._nsb.burr_4_intended.AM__ANTEROMEDIAL_NUCLEUS: None,
-                self._nsb.burr_4_intended.AD__ANTERODORSAL_NUCLEUS: None,
-                self._nsb.burr_4_intended.IAM__INTERANTEROMEDIAL_NU: None,
-                self._nsb.burr_4_intended.IAD__INTERANTERODORSAL_NU: None,
-                self._nsb.burr_4_intended.LD__LATERAL_DORSAL_NUCLEU: None,
-                self._nsb.burr_4_intended.IMD__INTERMEDIODORSAL_NUC: None,
-                self._nsb.burr_4_intended.MD__MEDIODORSAL_NUCLEUS_O: None,
-                self._nsb.burr_4_intended.SMT__SUBMEDIAL_NUCLEUS_OF: None,
-                self._nsb.burr_4_intended.PR__PERIREUNENSIS_NUCLEUS: None,
-                self._nsb.burr_4_intended.PVT__PARAVENTRICULAR_NUCL: None,
-                self._nsb.burr_4_intended.PT__PARATAENIAL_NUCLEUS: None,
-                self._nsb.burr_4_intended.RE__NUCLEUS_OF_REUNIENS: None,
-                self._nsb.burr_4_intended.XI__XIPHOID_THALAMIC_NUCL: None,
-                self._nsb.burr_4_intended.RH__RHOMBOID_NUCLEUS: None,
-                self._nsb.burr_4_intended.CM__CENTRAL_MEDIAL_NUCLEU: None,
-                self._nsb.burr_4_intended.PCN__PARACENTRAL_NUCLEUS: None,
-                self._nsb.burr_4_intended.CL__CENTRAL_LATERAL_NUCLE: None,
-                self._nsb.burr_4_intended.PF__PARAFASCICULAR_NUCLEU: None,
-                self._nsb.burr_4_intended.PIL__POSTERIOR_INTRALAMIN: None,
-                self._nsb.burr_4_intended.RT__RETICULAR_NUCLEUS_OF: None,
-                self._nsb.burr_4_intended.IGL__INTERGENICULATE_LEAF: None,
-                self._nsb.burr_4_intended.INT_G__INTERMEDIATE_GENIC: None,
-                self._nsb.burr_4_intended.L_GV__VENTRAL_PART_OF_THE: None,
-                self._nsb.burr_4_intended.SUB_G__SUBGENICULATE_NUCL: None,
-                self._nsb.burr_4_intended.MH__MEDIAL_HABENULA: None,
-                self._nsb.burr_4_intended.LH__LATERAL_HABENULA: None,
-                self._nsb.burr_4_intended.SO__SUPRAOPTIC_NUCLEUS: None,
-                self._nsb.burr_4_intended.PVH__PARAVENTRICULAR_HYPO: None,
-                self._nsb.burr_4_intended.P_VA__PERIVENTRICULAR_HYP: None,
-                self._nsb.burr_4_intended.P_VI__PERIVENTRICULAR_HYP: None,
-                self._nsb.burr_4_intended.ARH__ARCUATE_HYPOTHALAMIC: None,
-                self._nsb.burr_4_intended.ADP__ANTERODORSAL_PREOPTI: None,
-                self._nsb.burr_4_intended.AVP__ANTEROVENTRAL_PREOPT: None,
-                self._nsb.burr_4_intended.AVPV__ANTEROVENTRAL_PERIV: None,
-                self._nsb.burr_4_intended.DMH__DORSOMEDIAL_NUCLEUS: None,
-                self._nsb.burr_4_intended.MEPO__MEDIAN_PREOPTIC_NUC: None,
-                self._nsb.burr_4_intended.MPO__MEDIAL_PREOPTIC_AREA: None,
-                self._nsb.burr_4_intended.PS__PARASTRIAL_NUCLEUS: None,
-                self._nsb.burr_4_intended.P_VP__PERIVENTRICULAR_HYP: None,
-                self._nsb.burr_4_intended.P_VPO__PERIVENTRICULAR_HY: None,
-                self._nsb.burr_4_intended.SBPV__SUBPARAVENTRICULAR: None,
-                self._nsb.burr_4_intended.SCH__SUPRACHIASMATIC_NUCL: None,
-                self._nsb.burr_4_intended.SFO__SUBFORNICAL_ORGAN: None,
-                self._nsb.burr_4_intended.VMPO__VENTROMEDIAL_PREOPT: None,
-                self._nsb.burr_4_intended.VLPO__VENTROLATERAL_PREOP: None,
-                self._nsb.burr_4_intended.AHN__ANTERIOR_HYPOTHALAMI: None,
-                self._nsb.burr_4_intended.LM__LATERAL_MAMMILLARY_NU: None,
-                self._nsb.burr_4_intended.MM__MEDIAL_MAMMILLARY_NUC: None,
-                self._nsb.burr_4_intended.SUM__SUPRAMAMMILLARY_NUCL: None,
-                self._nsb.burr_4_intended.TM__TUBEROMAMMILLARY_NUCL: None,
-                self._nsb.burr_4_intended.MPN__MEDIAL_PREOPTIC_NUCL: None,
-                self._nsb.burr_4_intended.P_MD__DORSAL_PREMAMMILLAR: None,
-                self._nsb.burr_4_intended.P_MV__VENTRAL_PREMAMMILLA: None,
-                self._nsb.burr_4_intended.PV_HD__PARAVENTRICULAR_HY: None,
-                self._nsb.burr_4_intended.VMH__VENTROMEDIAL_HYPOTHA: None,
-                self._nsb.burr_4_intended.PH__POSTERIOR_HYPOTHALAMI: None,
-                self._nsb.burr_4_intended.LHA__LATERAL_HYPOTHALAMIC: None,
-                self._nsb.burr_4_intended.LPO__LATERAL_PREOPTIC_ARE: None,
-                self._nsb.burr_4_intended.PSTN__PARASUBTHALAMIC_NUC: None,
-                self._nsb.burr_4_intended.PE_F__PERIFORNICAL_NUCLEU: None,
-                self._nsb.burr_4_intended.RCH__RETROCHIASMATIC_AREA: None,
-                self._nsb.burr_4_intended.STN__SUBTHALAMIC_NUCLEUS: None,
-                self._nsb.burr_4_intended.TU__TUBERAL_NUCLEUS: None,
-                self._nsb.burr_4_intended.ZI__ZONA_INCERTA: None,
-                self._nsb.burr_4_intended.S_CS__SUPERIOR_COLLICULUS: None,
-                self._nsb.burr_4_intended.IC__INFERIOR_COLLICULUS: None,
-                self._nsb.burr_4_intended.NB__NUCLEUS_OF_THE_BRACHI: None,
-                self._nsb.burr_4_intended.SAG__NUCLEUS_SAGULUM: None,
-                self._nsb.burr_4_intended.PBG__PARABIGEMINAL_NUCLEU: None,
-                self._nsb.burr_4_intended.S_NR__SUBSTANTIA_NIGRA_RE: None,
-                self._nsb.burr_4_intended.VTA__VENTRAL_TEGMENTAL_AR: None,
-                self._nsb.burr_4_intended.PN__PARANIGRAL_NUCLEUS: None,
-                self._nsb.burr_4_intended.RR__MIDBRAIN_RETICULAR_NU: None,
-                self._nsb.burr_4_intended.MRN__MIDBRAIN_RETICULAR_N: None,
-                self._nsb.burr_4_intended.S_CM__SUPERIOR_COLLICULUS: None,
-                self._nsb.burr_4_intended.PAG__PERIAQUEDUCTAL_GRAY: None,
-                self._nsb.burr_4_intended.APN__ANTERIOR_PRETECTAL_N: None,
-                self._nsb.burr_4_intended.MPT__MEDIAL_PRETECTAL_ARE: None,
-                self._nsb.burr_4_intended.NOT__NUCLEUS_OF_THE_OPTIC: None,
-                self._nsb.burr_4_intended.NPC__NUCLEUS_OF_THE_POSTE: None,
-                self._nsb.burr_4_intended.OP__OLIVARY_PRETECTAL_NUC: None,
-                self._nsb.burr_4_intended.PPT__POSTERIOR_PRETECTAL: None,
-                self._nsb.burr_4_intended.RPF__RETROPARAFASCICULAR: None,
-                self._nsb.burr_4_intended.CUN__CUNEIFORM_NUCLEUS: None,
-                self._nsb.burr_4_intended.RN__RED_NUCLEUS: None,
-                self._nsb.burr_4_intended.III__OCULOMOTOR_NUCLEUS: None,
-                self._nsb.burr_4_intended.MA3__MEDIAL_ACCESORY_OCUL: None,
-                self._nsb.burr_4_intended.EW__EDINGER__WESTPHAL_NUC: None,
-                self._nsb.burr_4_intended.IV__TROCHLEAR_NUCLEUS: None,
-                self._nsb.burr_4_intended.PA4__PARATROCHLEAR_NUCLEU: None,
-                self._nsb.burr_4_intended.VTN__VENTRAL_TEGMENTAL_NU: None,
-                self._nsb.burr_4_intended.AT__ANTERIOR_TEGMENTAL_NU: None,
-                self._nsb.burr_4_intended.LT__LATERAL_TERMINAL_NUCL: None,
-                self._nsb.burr_4_intended.DT__DORSAL_TERMINAL_NUCLE: None,
-                self._nsb.burr_4_intended.MT__MEDIAL_TERMINAL_NUCLE: None,
-                self._nsb.burr_4_intended.S_NC__SUBSTANTIA_NIGRA_CO: None,
-                self._nsb.burr_4_intended.PPN__PEDUNCULOPONTINE_NUC: None,
-                self._nsb.burr_4_intended.IF__INTERFASCICULAR_NUCLE: None,
-                self._nsb.burr_4_intended.IPN__INTERPEDUNCULAR_NUCL: None,
-                self._nsb.burr_4_intended.RL__ROSTRAL_LINEAR_NUCLEU: None,
-                self._nsb.burr_4_intended.CLI__CENTRAL_LINEAR_NUCLE: None,
-                self._nsb.burr_4_intended.DR__DORSAL_NUCLEUS_RAPHE: None,
-                self._nsb.burr_4_intended.NLL__NUCLEUS_OF_THE_LATER: None,
-                self._nsb.burr_4_intended.PSV__PRINCIPAL_SENSORY_NU: None,
-                self._nsb.burr_4_intended.PB__PARABRACHIAL_NUCLEUS: None,
-                self._nsb.burr_4_intended.SOC__SUPERIOR_OLIVARY_COM: None,
-                self._nsb.burr_4_intended.B__BARRINGTON_S_NUCLEUS: None,
-                self._nsb.burr_4_intended.DTN__DORSAL_TEGMENTAL_NUC: None,
-                self._nsb.burr_4_intended.PD_TG__POSTERODORSAL_TEGM: None,
-                self._nsb.burr_4_intended.PCG__PONTINE_CENTRAL_GRAY: None,
-                self._nsb.burr_4_intended.PG__PONTINE_GRAY: None,
-                self._nsb.burr_4_intended.PR_NC__PONTINE_RETICULAR: None,
-                self._nsb.burr_4_intended.SG__SUPRAGENUAL_NUCLEUS: None,
-                self._nsb.burr_4_intended.SUT__SUPRATRIGEMINAL_NUCL: None,
-                self._nsb.burr_4_intended.TRN__TEGMENTAL_RETICULAR: None,
-                self._nsb.burr_4_intended.V__MOTOR_NUCLEUS_OF_TRIGE: None,
-                self._nsb.burr_4_intended.P5__PERITRIGEMINAL_ZONE: None,
-                self._nsb.burr_4_intended.ACS5__ACCESSORY_TRIGEMINA: None,
-                self._nsb.burr_4_intended.PC5__PARVICELLULAR_MOTOR: None,
-                self._nsb.burr_4_intended.I5__INTERTRIGEMINAL_NUCLE: None,
-                self._nsb.burr_4_intended.CS__SUPERIOR_CENTRAL_NUCL: None,
-                self._nsb.burr_4_intended.LC__LOCUS_CERULEUS: None,
-                self._nsb.burr_4_intended.LDT__LATERODORSAL_TEGMENT: None,
-                self._nsb.burr_4_intended.NI__NUCLEUS_INCERTUS: None,
-                self._nsb.burr_4_intended.PR_NR__PONTINE_RETICULAR: None,
-                self._nsb.burr_4_intended.RPO__NUCLEUS_RAPHE_PONTIS: None,
-                self._nsb.burr_4_intended.SLC__SUBCERULEUS_NUCLEUS: None,
-                self._nsb.burr_4_intended.SLD__SUBLATERODORSAL_NUCL: None,
-                self._nsb.burr_4_intended.MY__MEDULLA: None,
-                self._nsb.burr_4_intended.AP__AREA_POSTREMA: None,
-                self._nsb.burr_4_intended.DCO__DORSAL_COCHLEAR_NUCL: None,
-                self._nsb.burr_4_intended.VCO__VENTRAL_COCHLEAR_NUC: None,
-                self._nsb.burr_4_intended.CU__CUNEATE_NUCLEUS: None,
-                self._nsb.burr_4_intended.GR__GRACILE_NUCLEUS: None,
-                self._nsb.burr_4_intended.ECU__EXTERNAL_CUNEATE_NUC: None,
-                self._nsb.burr_4_intended.NTB__NUCLEUS_OF_THE_TRAPE: None,
-                self._nsb.burr_4_intended.NTS__NUCLEUS_OF_THE_SOLIT: None,
-                self._nsb.burr_4_intended.SPVC__SPINAL_NUCLEUS_OF_T: None,
-                self._nsb.burr_4_intended.SPVI__SPINAL_NUCLEUS_OF_T: None,
-                self._nsb.burr_4_intended.SPVO__SPINAL_NUCLEUS_OF_T: None,
-                self._nsb.burr_4_intended.PA5__PARATRIGEMINAL_NUCLE: None,
-                self._nsb.burr_4_intended.VI__ABDUCENS_NUCLEUS: None,
-                self._nsb.burr_4_intended.VII__FACIAL_MOTOR_NUCLEUS: None,
-                self._nsb.burr_4_intended.AMB__NUCLEUS_AMBIGUUS: None,
-                self._nsb.burr_4_intended.DMX__DORSAL_MOTOR_NUCLEUS: None,
-                self._nsb.burr_4_intended.GRN__GIGANTOCELLULAR_RETI: None,
-                self._nsb.burr_4_intended.ICB__INFRACEREBELLAR_NUCL: None,
-                self._nsb.burr_4_intended.IO__INFERIOR_OLIVARY_COMP: None,
-                self._nsb.burr_4_intended.IRN__INTERMEDIATE_RETICUL: None,
-                self._nsb.burr_4_intended.ISN__INFERIOR_SALIVATORY: None,
-                self._nsb.burr_4_intended.LIN__LINEAR_NUCLEUS_OF_TH: None,
-                self._nsb.burr_4_intended.LRN__LATERAL_RETICULAR_NU: None,
-                self._nsb.burr_4_intended.MARN__MAGNOCELLULAR_RETIC: None,
-                self._nsb.burr_4_intended.MDRN__MEDULLARY_RETICULAR: None,
-                self._nsb.burr_4_intended.PARN__PARVICELLULAR_RETIC: None,
-                self._nsb.burr_4_intended.PAS__PARASOLITARY_NUCLEUS: None,
-                self._nsb.burr_4_intended.PGRN__PARAGIGANTOCELLULAR: None,
-                self._nsb.burr_4_intended.NR__NUCLEUS_OF__ROLLER: None,
-                self._nsb.burr_4_intended.PRP__NUCLEUS_PREPOSITUS: None,
-                self._nsb.burr_4_intended.PMR__PARAMEDIAN_RETICULAR: None,
-                self._nsb.burr_4_intended.PPY__PARAPYRAMIDAL_NUCLEU: None,
-                self._nsb.burr_4_intended.LAV__LATERAL_VESTIBULAR_N: None,
-                self._nsb.burr_4_intended.MV__MEDIAL_VESTIBULAR_NUC: None,
-                self._nsb.burr_4_intended.SPIV__SPINAL_VESTIBULAR_N: None,
-                self._nsb.burr_4_intended.SUV__SUPERIOR_VESTIBULAR: None,
-                self._nsb.burr_4_intended.X__NUCLEUS_X: None,
-                self._nsb.burr_4_intended.XII__HYPOGLOSSAL_NUCLEUS: None,
-                self._nsb.burr_4_intended.Y__NUCLEUS_Y: None,
-                self._nsb.burr_4_intended.RM__NUCLEUS_RAPHE_MAGNUS: None,
-                self._nsb.burr_4_intended.RPA__NUCLEUS_RAPHE_PALLID: None,
-                self._nsb.burr_4_intended.RO__NUCLEUS_RAPHE_OBSCURU: None,
-                self._nsb.burr_4_intended.LING__LINGULA_I: None,
-                self._nsb.burr_4_intended.CENT2__LOBULE_II: None,
-                self._nsb.burr_4_intended.CENT3__LOBULE_III: None,
-                self._nsb.burr_4_intended.CUL4_5__LOBULES_IV_V: None,
-                self._nsb.burr_4_intended.DEC__DECLIVE_VI: None,
-                self._nsb.burr_4_intended.FOTU__FOLIUM_TUBER_VERMIS: None,
-                self._nsb.burr_4_intended.PYR__PYRAMUS_VIII: None,
-                self._nsb.burr_4_intended.UVU__UVULA_IX: None,
-                self._nsb.burr_4_intended.NOD__NODULUS_X: None,
-                self._nsb.burr_4_intended.SIM__SIMPLE_LOBULE: None,
-                self._nsb.burr_4_intended.A_NCR1__CRUS_1: None,
-                self._nsb.burr_4_intended.A_NCR2__CRUS_2: None,
-                self._nsb.burr_4_intended.PRM__PARAMEDIAN_LOBULE: None,
-                self._nsb.burr_4_intended.COPY__COPULA_PYRAMIDIS: None,
-                self._nsb.burr_4_intended.PFL__PARAFLOCCULUS: None,
-                self._nsb.burr_4_intended.FL__FLOCCULUS: None,
-                self._nsb.burr_4_intended.FN__FASTIGIAL_NUCLEUS: None,
-                self._nsb.burr_4_intended.IP__INTERPOSED_NUCLEUS: None,
-                self._nsb.burr_4_intended.DN__DENTATE_NUCLEUS: None,
-                self._nsb.burr_4_intended.VE_CB__VESTIBULOCEREBELLA: None,
-            }.get(self._nsb.burr_4_intended, None)
+                burr_4_intended.FRP__FRONTAL_POLE_CEREBRA: None,
+                burr_4_intended.M_OP__PRIMARY_MOTOR_AREA: None,
+                burr_4_intended.M_OS__SECONDARY_MOTOR_ARE: None,
+                burr_4_intended.S_SP_N__PRIMARY_SOMATOSEN: None,
+                burr_4_intended.S_SP_BFD__PRIMARY_SOMATOS: None,
+                burr_4_intended.S_SP_LL__PRIMARY_SOMATOSE: None,
+                burr_4_intended.S_SP_M__PRIMARY_SOMATOSEN: None,
+                burr_4_intended.S_SP_UL__PRIMARY_SOMATOSE: None,
+                burr_4_intended.S_SP_TR__PRIMARY_SOMATOSE: None,
+                burr_4_intended.S_SP_UN__PRIMARY_SOMATOSE: None,
+                burr_4_intended.S_SS__SUPPLEMENTAL_SOMATO: None,
+                burr_4_intended.GU__GUSTATORY_AREAS: None,
+                burr_4_intended.VISC__VISCERAL_AREA: None,
+                burr_4_intended.AU_DD__DORSAL_AUDITORY_AR: None,
+                burr_4_intended.AU_DP__PRIMARY_AUDITORY_A: None,
+                burr_4_intended.AU_DPO__POSTERIOR_AUDITOR: None,
+                burr_4_intended.AU_DV__VENTRAL_AUDITORY_A: None,
+                burr_4_intended.VI_SAL__ANTEROLATERAL_VIS: None,
+                burr_4_intended.VI_SAM__ANTEROMEDIAL_VISU: None,
+                burr_4_intended.VI_SL__LATERAL_VISUAL_ARE: None,
+                burr_4_intended.VI_SP__PRIMARY_VISUAL_ARE: None,
+                burr_4_intended.VI_SPL__POSTEROLATERAL_VI: None,
+                burr_4_intended.VI_SPM_POSTEROMEDIAL_VISU: None,
+                burr_4_intended.VI_SLI__LATEROINTERMEDIAT: None,
+                burr_4_intended.VI_SPOR__POSTRHINAL_AREA: None,
+                burr_4_intended.AC_AD__ANTERIOR_CINGULATE: None,
+                burr_4_intended.AC_AV__ANTERIOR_CINGULATE: None,
+                burr_4_intended.PL__PRELIMBIC_AREA: None,
+                burr_4_intended.ILA__INFRALIMBIC_AREA: None,
+                burr_4_intended.OR_BL__ORBITAL_AREA_LATER: None,
+                burr_4_intended.OR_BM__ORBITAL_AREA_MEDIA: None,
+                burr_4_intended.OR_BV__ORBITAL_AREA_VENTR: None,
+                burr_4_intended.OR_BVL__ORBITAL_AREA_VENT: None,
+                burr_4_intended.A_ID__AGRANULAR_INSULAR_A: None,
+                burr_4_intended.A_IP__AGRANULAR_INSULAR_A: None,
+                burr_4_intended.A_IV__AGRANULAR_INSULAR_A: None,
+                burr_4_intended.RS_PAGL__RETROSPLENIAL_AR: None,
+                burr_4_intended.RS_PD__RETROSPLENIAL_AREA: None,
+                burr_4_intended.RS_PV__RETROSPLENIAL_AREA: None,
+                burr_4_intended.VI_SA__ANTERIOR_AREA: None,
+                burr_4_intended.VI_SRL__ROSTROLATERAL_VIS: None,
+                burr_4_intended.T_EA__TEMPORAL_ASSOCIATIO: None,
+                burr_4_intended.PERI__PERIRHINAL_AREA: None,
+                burr_4_intended.ECT__ECTORHINAL_AREA: None,
+                burr_4_intended.MOB__MAIN_OLFACTORY_BULB: None,
+                burr_4_intended.AOB__ACCESSORY_OLFACTORY: None,
+                burr_4_intended.AON__ANTERIOR_OLFACTORY_N: None,
+                burr_4_intended.T_TD__TAENIA_TECTA_DORSAL: None,
+                burr_4_intended.T_TV__TAENIA_TECTA_VENTRA: None,
+                burr_4_intended.DP__DORSAL_PEDUNCULAR_ARE: None,
+                burr_4_intended.PIR__PIRIFORM_AREA: None,
+                burr_4_intended.NLOT__NUCLEUS_OF_THE_LATE: None,
+                burr_4_intended.CO_AA__CORTICAL_AMYGDALAR: None,
+                burr_4_intended.CO_AP__CORTICAL_AMYGDALAR: None,
+                burr_4_intended.PAA__PIRIFORM_AMYGDALAR_A: None,
+                burr_4_intended.TR__POSTPIRIFORM_TRANSITI: None,
+                burr_4_intended.CA1__FIELD_CA1: None,
+                burr_4_intended.CA2__FIELD_CA2: None,
+                burr_4_intended.CA3__FIELD_CA3: None,
+                burr_4_intended.DG__DENTATE_GYRUS: None,
+                burr_4_intended.FC__FASCIOLA_CINEREA: None,
+                burr_4_intended.IG__INDUSEUM_GRISEUM: None,
+                burr_4_intended.EN_TL__ENTORHINAL_AREA_LA: None,
+                burr_4_intended.EN_TM__ENTORHINAL_AREA_ME: None,
+                burr_4_intended.PAR__PARASUBICULUM: None,
+                burr_4_intended.POST__POSTSUBICULUM: None,
+                burr_4_intended.PRE__PRESUBICULUM: None,
+                burr_4_intended.SUB__SUBICULUM: None,
+                burr_4_intended.PRO_S__PROSUBICULUM: None,
+                burr_4_intended.HATA__HIPPOCAMPO_AMYGDALA: None,
+                burr_4_intended.A_PR__AREA_PROSTRIATA: None,
+                burr_4_intended.CLA__CLAUSTRUM: None,
+                burr_4_intended.E_PD__ENDOPIRIFORM_NUCLEU: None,
+                burr_4_intended.E_PV__ENDOPIRIFORM_NUCLEU: None,
+                burr_4_intended.LA__LATERAL_AMYGDALAR_NUC: None,
+                burr_4_intended.BLA__BASOLATERAL_AMYGDALA: None,
+                burr_4_intended.BMA__BASOMEDIAL_AMYGDALAR: None,
+                burr_4_intended.PA__POSTERIOR_AMYGDALAR_N: None,
+                burr_4_intended.CP__CAUDOPUTAMEN: None,
+                burr_4_intended.ACB__NUCLEUS_ACCUMBENS: None,
+                burr_4_intended.FS__FUNDUS_OF_STRIATUM: None,
+                burr_4_intended.OT__OLFACTORY_TUBERCLE: None,
+                burr_4_intended.L_SC__LATERAL_SEPTAL_NUCL: None,
+                burr_4_intended.L_SR__LATERAL_SEPTAL_NUCL: None,
+                burr_4_intended.L_SV__LATERAL_SEPTAL_NUCL: None,
+                burr_4_intended.SF__SEPTOFIMBRIAL_NUCLEUS: None,
+                burr_4_intended.SH__SEPTOHIPPOCAMPAL_NUCL: None,
+                burr_4_intended.AAA__ANTERIOR_AMYGDALAR_A: None,
+                burr_4_intended.BA__BED_NUCLEUS_OF_THE_AC: None,
+                burr_4_intended.CEA__CENTRAL_AMYGDALAR_NU: None,
+                burr_4_intended.IA__INTERCALATED_AMYGDALA: None,
+                burr_4_intended.MEA__MEDIAL_AMYGDALAR_NUC: None,
+                burr_4_intended.G_PE__GLOBUS_PALLIDUS_EXT: None,
+                burr_4_intended.G_PI__GLOBUS_PALLIDUS_INT: None,
+                burr_4_intended.SI__SUBSTANTIA_INNOMINATA: None,
+                burr_4_intended.MA__MAGNOCELLULAR_NUCLEUS: None,
+                burr_4_intended.MS__MEDIAL_SEPTAL_NUCLEUS: None,
+                burr_4_intended.NDB__DIAGONAL_BAND_NUCLEU: None,
+                burr_4_intended.TRS__TRIANGULAR_NUCLEUS_O: None,
+                burr_4_intended.BST__BED_NUCLEI_OF_THE_ST: None,
+                burr_4_intended.VAL__VENTRAL_ANTERIOR_LAT: None,
+                burr_4_intended.VM__VENTRAL_MEDIAL_NUCLEU: None,
+                burr_4_intended.VPL__VENTRAL_POSTEROLATER: None,
+                burr_4_intended.VP_LPC__VENTRAL_POSTEROLA: None,
+                burr_4_intended.VPM__VENTRAL_POSTEROMEDIA: None,
+                burr_4_intended.VP_MPC__VENTRAL_POSTEROME: None,
+                burr_4_intended.PO_T__POSTERIOR_TRIANGULA: None,
+                burr_4_intended.SPF__SUBPARAFASCICULAR_NU: None,
+                burr_4_intended.SPA__SUBPARAFASCICULAR_AR: None,
+                burr_4_intended.PP__PERIPEDUNCULAR_NUCLEU: None,
+                burr_4_intended.MG__MEDIAL_GENICULATE_COM: None,
+                burr_4_intended.L_GD__DORSAL_PART_OF_THE: None,
+                burr_4_intended.LP__LATERAL_POSTERIOR_NUC: None,
+                burr_4_intended.PO__POSTERIOR_COMPLEX_OF: None,
+                burr_4_intended.POL__POSTERIOR_LIMITING_N: None,
+                burr_4_intended.SGN__SUPRAGENICULATE_NUCL: None,
+                burr_4_intended.ETH__ETHMOID_NUCLEUS_OF_T: None,
+                burr_4_intended.AV__ANTEROVENTRAL_NUCLEUS: None,
+                burr_4_intended.AM__ANTEROMEDIAL_NUCLEUS: None,
+                burr_4_intended.AD__ANTERODORSAL_NUCLEUS: None,
+                burr_4_intended.IAM__INTERANTEROMEDIAL_NU: None,
+                burr_4_intended.IAD__INTERANTERODORSAL_NU: None,
+                burr_4_intended.LD__LATERAL_DORSAL_NUCLEU: None,
+                burr_4_intended.IMD__INTERMEDIODORSAL_NUC: None,
+                burr_4_intended.MD__MEDIODORSAL_NUCLEUS_O: None,
+                burr_4_intended.SMT__SUBMEDIAL_NUCLEUS_OF: None,
+                burr_4_intended.PR__PERIREUNENSIS_NUCLEUS: None,
+                burr_4_intended.PVT__PARAVENTRICULAR_NUCL: None,
+                burr_4_intended.PT__PARATAENIAL_NUCLEUS: None,
+                burr_4_intended.RE__NUCLEUS_OF_REUNIENS: None,
+                burr_4_intended.XI__XIPHOID_THALAMIC_NUCL: None,
+                burr_4_intended.RH__RHOMBOID_NUCLEUS: None,
+                burr_4_intended.CM__CENTRAL_MEDIAL_NUCLEU: None,
+                burr_4_intended.PCN__PARACENTRAL_NUCLEUS: None,
+                burr_4_intended.CL__CENTRAL_LATERAL_NUCLE: None,
+                burr_4_intended.PF__PARAFASCICULAR_NUCLEU: None,
+                burr_4_intended.PIL__POSTERIOR_INTRALAMIN: None,
+                burr_4_intended.RT__RETICULAR_NUCLEUS_OF: None,
+                burr_4_intended.IGL__INTERGENICULATE_LEAF: None,
+                burr_4_intended.INT_G__INTERMEDIATE_GENIC: None,
+                burr_4_intended.L_GV__VENTRAL_PART_OF_THE: None,
+                burr_4_intended.SUB_G__SUBGENICULATE_NUCL: None,
+                burr_4_intended.MH__MEDIAL_HABENULA: None,
+                burr_4_intended.LH__LATERAL_HABENULA: None,
+                burr_4_intended.SO__SUPRAOPTIC_NUCLEUS: None,
+                burr_4_intended.PVH__PARAVENTRICULAR_HYPO: None,
+                burr_4_intended.P_VA__PERIVENTRICULAR_HYP: None,
+                burr_4_intended.P_VI__PERIVENTRICULAR_HYP: None,
+                burr_4_intended.ARH__ARCUATE_HYPOTHALAMIC: None,
+                burr_4_intended.ADP__ANTERODORSAL_PREOPTI: None,
+                burr_4_intended.AVP__ANTEROVENTRAL_PREOPT: None,
+                burr_4_intended.AVPV__ANTEROVENTRAL_PERIV: None,
+                burr_4_intended.DMH__DORSOMEDIAL_NUCLEUS: None,
+                burr_4_intended.MEPO__MEDIAN_PREOPTIC_NUC: None,
+                burr_4_intended.MPO__MEDIAL_PREOPTIC_AREA: None,
+                burr_4_intended.PS__PARASTRIAL_NUCLEUS: None,
+                burr_4_intended.P_VP__PERIVENTRICULAR_HYP: None,
+                burr_4_intended.P_VPO__PERIVENTRICULAR_HY: None,
+                burr_4_intended.SBPV__SUBPARAVENTRICULAR: None,
+                burr_4_intended.SCH__SUPRACHIASMATIC_NUCL: None,
+                burr_4_intended.SFO__SUBFORNICAL_ORGAN: None,
+                burr_4_intended.VMPO__VENTROMEDIAL_PREOPT: None,
+                burr_4_intended.VLPO__VENTROLATERAL_PREOP: None,
+                burr_4_intended.AHN__ANTERIOR_HYPOTHALAMI: None,
+                burr_4_intended.LM__LATERAL_MAMMILLARY_NU: None,
+                burr_4_intended.MM__MEDIAL_MAMMILLARY_NUC: None,
+                burr_4_intended.SUM__SUPRAMAMMILLARY_NUCL: None,
+                burr_4_intended.TM__TUBEROMAMMILLARY_NUCL: None,
+                burr_4_intended.MPN__MEDIAL_PREOPTIC_NUCL: None,
+                burr_4_intended.P_MD__DORSAL_PREMAMMILLAR: None,
+                burr_4_intended.P_MV__VENTRAL_PREMAMMILLA: None,
+                burr_4_intended.PV_HD__PARAVENTRICULAR_HY: None,
+                burr_4_intended.VMH__VENTROMEDIAL_HYPOTHA: None,
+                burr_4_intended.PH__POSTERIOR_HYPOTHALAMI: None,
+                burr_4_intended.LHA__LATERAL_HYPOTHALAMIC: None,
+                burr_4_intended.LPO__LATERAL_PREOPTIC_ARE: None,
+                burr_4_intended.PSTN__PARASUBTHALAMIC_NUC: None,
+                burr_4_intended.PE_F__PERIFORNICAL_NUCLEU: None,
+                burr_4_intended.RCH__RETROCHIASMATIC_AREA: None,
+                burr_4_intended.STN__SUBTHALAMIC_NUCLEUS: None,
+                burr_4_intended.TU__TUBERAL_NUCLEUS: None,
+                burr_4_intended.ZI__ZONA_INCERTA: None,
+                burr_4_intended.S_CS__SUPERIOR_COLLICULUS: None,
+                burr_4_intended.IC__INFERIOR_COLLICULUS: None,
+                burr_4_intended.NB__NUCLEUS_OF_THE_BRACHI: None,
+                burr_4_intended.SAG__NUCLEUS_SAGULUM: None,
+                burr_4_intended.PBG__PARABIGEMINAL_NUCLEU: None,
+                burr_4_intended.S_NR__SUBSTANTIA_NIGRA_RE: None,
+                burr_4_intended.VTA__VENTRAL_TEGMENTAL_AR: None,
+                burr_4_intended.PN__PARANIGRAL_NUCLEUS: None,
+                burr_4_intended.RR__MIDBRAIN_RETICULAR_NU: None,
+                burr_4_intended.MRN__MIDBRAIN_RETICULAR_N: None,
+                burr_4_intended.S_CM__SUPERIOR_COLLICULUS: None,
+                burr_4_intended.PAG__PERIAQUEDUCTAL_GRAY: None,
+                burr_4_intended.APN__ANTERIOR_PRETECTAL_N: None,
+                burr_4_intended.MPT__MEDIAL_PRETECTAL_ARE: None,
+                burr_4_intended.NOT__NUCLEUS_OF_THE_OPTIC: None,
+                burr_4_intended.NPC__NUCLEUS_OF_THE_POSTE: None,
+                burr_4_intended.OP__OLIVARY_PRETECTAL_NUC: None,
+                burr_4_intended.PPT__POSTERIOR_PRETECTAL: None,
+                burr_4_intended.RPF__RETROPARAFASCICULAR: None,
+                burr_4_intended.CUN__CUNEIFORM_NUCLEUS: None,
+                burr_4_intended.RN__RED_NUCLEUS: None,
+                burr_4_intended.III__OCULOMOTOR_NUCLEUS: None,
+                burr_4_intended.MA3__MEDIAL_ACCESORY_OCUL: None,
+                burr_4_intended.EW__EDINGER__WESTPHAL_NUC: None,
+                burr_4_intended.IV__TROCHLEAR_NUCLEUS: None,
+                burr_4_intended.PA4__PARATROCHLEAR_NUCLEU: None,
+                burr_4_intended.VTN__VENTRAL_TEGMENTAL_NU: None,
+                burr_4_intended.AT__ANTERIOR_TEGMENTAL_NU: None,
+                burr_4_intended.LT__LATERAL_TERMINAL_NUCL: None,
+                burr_4_intended.DT__DORSAL_TERMINAL_NUCLE: None,
+                burr_4_intended.MT__MEDIAL_TERMINAL_NUCLE: None,
+                burr_4_intended.S_NC__SUBSTANTIA_NIGRA_CO: None,
+                burr_4_intended.PPN__PEDUNCULOPONTINE_NUC: None,
+                burr_4_intended.IF__INTERFASCICULAR_NUCLE: None,
+                burr_4_intended.IPN__INTERPEDUNCULAR_NUCL: None,
+                burr_4_intended.RL__ROSTRAL_LINEAR_NUCLEU: None,
+                burr_4_intended.CLI__CENTRAL_LINEAR_NUCLE: None,
+                burr_4_intended.DR__DORSAL_NUCLEUS_RAPHE: None,
+                burr_4_intended.NLL__NUCLEUS_OF_THE_LATER: None,
+                burr_4_intended.PSV__PRINCIPAL_SENSORY_NU: None,
+                burr_4_intended.PB__PARABRACHIAL_NUCLEUS: None,
+                burr_4_intended.SOC__SUPERIOR_OLIVARY_COM: None,
+                burr_4_intended.B__BARRINGTON_S_NUCLEUS: None,
+                burr_4_intended.DTN__DORSAL_TEGMENTAL_NUC: None,
+                burr_4_intended.PD_TG__POSTERODORSAL_TEGM: None,
+                burr_4_intended.PCG__PONTINE_CENTRAL_GRAY: None,
+                burr_4_intended.PG__PONTINE_GRAY: None,
+                burr_4_intended.PR_NC__PONTINE_RETICULAR: None,
+                burr_4_intended.SG__SUPRAGENUAL_NUCLEUS: None,
+                burr_4_intended.SUT__SUPRATRIGEMINAL_NUCL: None,
+                burr_4_intended.TRN__TEGMENTAL_RETICULAR: None,
+                burr_4_intended.V__MOTOR_NUCLEUS_OF_TRIGE: None,
+                burr_4_intended.P5__PERITRIGEMINAL_ZONE: None,
+                burr_4_intended.ACS5__ACCESSORY_TRIGEMINA: None,
+                burr_4_intended.PC5__PARVICELLULAR_MOTOR: None,
+                burr_4_intended.I5__INTERTRIGEMINAL_NUCLE: None,
+                burr_4_intended.CS__SUPERIOR_CENTRAL_NUCL: None,
+                burr_4_intended.LC__LOCUS_CERULEUS: None,
+                burr_4_intended.LDT__LATERODORSAL_TEGMENT: None,
+                burr_4_intended.NI__NUCLEUS_INCERTUS: None,
+                burr_4_intended.PR_NR__PONTINE_RETICULAR: None,
+                burr_4_intended.RPO__NUCLEUS_RAPHE_PONTIS: None,
+                burr_4_intended.SLC__SUBCERULEUS_NUCLEUS: None,
+                burr_4_intended.SLD__SUBLATERODORSAL_NUCL: None,
+                burr_4_intended.MY__MEDULLA: None,
+                burr_4_intended.AP__AREA_POSTREMA: None,
+                burr_4_intended.DCO__DORSAL_COCHLEAR_NUCL: None,
+                burr_4_intended.VCO__VENTRAL_COCHLEAR_NUC: None,
+                burr_4_intended.CU__CUNEATE_NUCLEUS: None,
+                burr_4_intended.GR__GRACILE_NUCLEUS: None,
+                burr_4_intended.ECU__EXTERNAL_CUNEATE_NUC: None,
+                burr_4_intended.NTB__NUCLEUS_OF_THE_TRAPE: None,
+                burr_4_intended.NTS__NUCLEUS_OF_THE_SOLIT: None,
+                burr_4_intended.SPVC__SPINAL_NUCLEUS_OF_T: None,
+                burr_4_intended.SPVI__SPINAL_NUCLEUS_OF_T: None,
+                burr_4_intended.SPVO__SPINAL_NUCLEUS_OF_T: None,
+                burr_4_intended.PA5__PARATRIGEMINAL_NUCLE: None,
+                burr_4_intended.VI__ABDUCENS_NUCLEUS: None,
+                burr_4_intended.VII__FACIAL_MOTOR_NUCLEUS: None,
+                burr_4_intended.AMB__NUCLEUS_AMBIGUUS: None,
+                burr_4_intended.DMX__DORSAL_MOTOR_NUCLEUS: None,
+                burr_4_intended.GRN__GIGANTOCELLULAR_RETI: None,
+                burr_4_intended.ICB__INFRACEREBELLAR_NUCL: None,
+                burr_4_intended.IO__INFERIOR_OLIVARY_COMP: None,
+                burr_4_intended.IRN__INTERMEDIATE_RETICUL: None,
+                burr_4_intended.ISN__INFERIOR_SALIVATORY: None,
+                burr_4_intended.LIN__LINEAR_NUCLEUS_OF_TH: None,
+                burr_4_intended.LRN__LATERAL_RETICULAR_NU: None,
+                burr_4_intended.MARN__MAGNOCELLULAR_RETIC: None,
+                burr_4_intended.MDRN__MEDULLARY_RETICULAR: None,
+                burr_4_intended.PARN__PARVICELLULAR_RETIC: None,
+                burr_4_intended.PAS__PARASOLITARY_NUCLEUS: None,
+                burr_4_intended.PGRN__PARAGIGANTOCELLULAR: None,
+                burr_4_intended.NR__NUCLEUS_OF__ROLLER: None,
+                burr_4_intended.PRP__NUCLEUS_PREPOSITUS: None,
+                burr_4_intended.PMR__PARAMEDIAN_RETICULAR: None,
+                burr_4_intended.PPY__PARAPYRAMIDAL_NUCLEU: None,
+                burr_4_intended.LAV__LATERAL_VESTIBULAR_N: None,
+                burr_4_intended.MV__MEDIAL_VESTIBULAR_NUC: None,
+                burr_4_intended.SPIV__SPINAL_VESTIBULAR_N: None,
+                burr_4_intended.SUV__SUPERIOR_VESTIBULAR: None,
+                burr_4_intended.X__NUCLEUS_X: None,
+                burr_4_intended.XII__HYPOGLOSSAL_NUCLEUS: None,
+                burr_4_intended.Y__NUCLEUS_Y: None,
+                burr_4_intended.RM__NUCLEUS_RAPHE_MAGNUS: None,
+                burr_4_intended.RPA__NUCLEUS_RAPHE_PALLID: None,
+                burr_4_intended.RO__NUCLEUS_RAPHE_OBSCURU: None,
+                burr_4_intended.LING__LINGULA_I: None,
+                burr_4_intended.CENT2__LOBULE_II: None,
+                burr_4_intended.CENT3__LOBULE_III: None,
+                burr_4_intended.CUL4_5__LOBULES_IV_V: None,
+                burr_4_intended.DEC__DECLIVE_VI: None,
+                burr_4_intended.FOTU__FOLIUM_TUBER_VERMIS: None,
+                burr_4_intended.PYR__PYRAMUS_VIII: None,
+                burr_4_intended.UVU__UVULA_IX: None,
+                burr_4_intended.NOD__NODULUS_X: None,
+                burr_4_intended.SIM__SIMPLE_LOBULE: None,
+                burr_4_intended.A_NCR1__CRUS_1: None,
+                burr_4_intended.A_NCR2__CRUS_2: None,
+                burr_4_intended.PRM__PARAMEDIAN_LOBULE: None,
+                burr_4_intended.COPY__COPULA_PYRAMIDIS: None,
+                burr_4_intended.PFL__PARAFLOCCULUS: None,
+                burr_4_intended.FL__FLOCCULUS: None,
+                burr_4_intended.FN__FASTIGIAL_NUCLEUS: None,
+                burr_4_intended.IP__INTERPOSED_NUCLEUS: None,
+                burr_4_intended.DN__DENTATE_NUCLEUS: None,
+                burr_4_intended.VE_CB__VESTIBULOCEREBELLA: None,
+            }.get(burr_4_intended, None)
         )
 
     @property
@@ -2835,38 +2831,38 @@ class MappedNSBList:
     @property
     def aind_burr_5_a_p(self) -> Optional[Decimal]:
         """Maps burr_5_a_p to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_5_a_p)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_5_x0020_a_x002f_p)
 
     @property
     def aind_burr_5_angle(self) -> Optional[Decimal]:
         """Maps burr_5_angle to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_5_angle)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_5_x0020_angle)
 
     @property
     def aind_burr_5_d_v_x00(self) -> Optional[Decimal]:
         """Maps burr_5_d_v_x00 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_5_d_v_x00)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_5_x0020_d_x002f_v_x00)
 
     @property
     def aind_burr_5_d_v_x000(self) -> Optional[Decimal]:
         """Maps burr_5_d_v_x000 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_5_d_v_x000)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_5_x0020_d_x002f_v_x000)
 
     @property
     def aind_burr_5_d_v_x001(self) -> Optional[Decimal]:
         """Maps burr_5_d_v_x001 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_5_d_v_x001)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_5_x0020_d_x002f_v_x001)
 
     @property
     def aind_burr_5_fiber_t(self) -> Optional[Any]:
         """Maps burr_5_fiber_t to aind model"""
         return (
             None
-            if self._nsb.burr_5_fiber_t is None
+            if self._nsb.burr_x0020_5_x0020_fiber_x0020_t is None
             else {
-                self._nsb.burr_5_fiber_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
-                self._nsb.burr_5_fiber_t.CUSTOM: FiberType.CUSTOM,
-            }.get(self._nsb.burr_5_fiber_t, None)
+                self._nsb.burr_x0020_5_x0020_fiber_x0020_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
+                self._nsb.burr_x0020_5_x0020_fiber_x0020_t.CUSTOM: FiberType.CUSTOM,
+            }.get(self._nsb.burr_x0020_5_x0020_fiber_x0020_t, None)
         )
 
     @property
@@ -2874,371 +2870,372 @@ class MappedNSBList:
         """Maps burr_5_hemisphere to aind model"""
         return (
             None
-            if self._nsb.burr_5_hemisphere is None
+            if self._nsb.burr_x0020_5_x0020_hemisphere is None
             else {
-                self._nsb.burr_5_hemisphere.SELECT: None,
-                self._nsb.burr_5_hemisphere.LEFT: Side.LEFT,
-                self._nsb.burr_5_hemisphere.RIGHT: Side.RIGHT,
-            }.get(self._nsb.burr_5_hemisphere, None)
+                self._nsb.burr_x0020_5_x0020_hemisphere.SELECT: None,
+                self._nsb.burr_x0020_5_x0020_hemisphere.LEFT: Side.LEFT,
+                self._nsb.burr_x0020_5_x0020_hemisphere.RIGHT: Side.RIGHT,
+            }.get(self._nsb.burr_x0020_5_x0020_hemisphere, None)
         )
 
     @property
     def aind_burr_5_injectable_x0(self) -> Optional[str]:
         """Maps burr_5_injectable_x0 to aind model."""
-        return self._nsb.burr_5_injectable_x0
+        return self._nsb.burr_x0020_5_x0020_injectable_x0
 
     @property
     def aind_burr_5_injectable_x00(self) -> Optional[str]:
         """Maps burr_5_injectable_x00 to aind model."""
-        return self._nsb.burr_5_injectable_x00
+        return self._nsb.burr_x0020_5_x0020_injectable_x00
 
     @property
     def aind_burr_5_injectable_x01(self) -> Optional[str]:
         """Maps burr_5_injectable_x01 to aind model."""
-        return self._nsb.burr_5_injectable_x01
+        return self._nsb.burr_x0020_5_x0020_injectable_x01
 
     @property
     def aind_burr_5_injectable_x02(self) -> Optional[str]:
         """Maps burr_5_injectable_x02 to aind model."""
-        return self._nsb.burr_5_injectable_x02
+        return self._nsb.burr_x0020_5_x0020_injectable_x02
 
     @property
     def aind_burr_5_injectable_x03(self) -> Optional[str]:
         """Maps burr_5_injectable_x03 to aind model."""
-        return self._nsb.burr_5_injectable_x03
+        return self._nsb.burr_x0020_5_x0020_injectable_x03
 
     @property
     def aind_burr_5_injectable_x04(self) -> Optional[str]:
         """Maps burr_5_injectable_x04 to aind model."""
-        return self._nsb.burr_5_injectable_x04
+        return self._nsb.burr_x0020_5_x0020_injectable_x04
 
     @property
     def aind_burr_5_injectable_x05(self) -> Optional[str]:
         """Maps burr_5_injectable_x05 to aind model."""
-        return self._nsb.burr_5_injectable_x05
+        return self._nsb.burr_x0020_5_x0020_injectable_x05
 
     @property
     def aind_burr_5_injectable_x06(self) -> Optional[str]:
         """Maps burr_5_injectable_x06 to aind model."""
-        return self._nsb.burr_5_injectable_x06
+        return self._nsb.burr_x0020_5_x0020_injectable_x06
 
     @property
     def aind_burr_5_intended(self) -> Optional[Any]:
         """Maps burr_5_intended to aind model."""
+        burr_5_intended = self._nsb.burr_x0020_5_x0020_intended_x002
         return (
             None
-            if self._nsb.burr_5_intended is None
+            if burr_5_intended is None
             else {
-                self._nsb.burr_5_intended.FRP__FRONTAL_POLE_CEREBRA: None,
-                self._nsb.burr_5_intended.M_OP__PRIMARY_MOTOR_AREA: None,
-                self._nsb.burr_5_intended.M_OS__SECONDARY_MOTOR_ARE: None,
-                self._nsb.burr_5_intended.S_SP_N__PRIMARY_SOMATOSEN: None,
-                self._nsb.burr_5_intended.S_SP_BFD__PRIMARY_SOMATOS: None,
-                self._nsb.burr_5_intended.S_SP_LL__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_5_intended.S_SP_M__PRIMARY_SOMATOSEN: None,
-                self._nsb.burr_5_intended.S_SP_UL__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_5_intended.S_SP_TR__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_5_intended.S_SP_UN__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_5_intended.S_SS__SUPPLEMENTAL_SOMATO: None,
-                self._nsb.burr_5_intended.GU__GUSTATORY_AREAS: None,
-                self._nsb.burr_5_intended.VISC__VISCERAL_AREA: None,
-                self._nsb.burr_5_intended.AU_DD__DORSAL_AUDITORY_AR: None,
-                self._nsb.burr_5_intended.AU_DP__PRIMARY_AUDITORY_A: None,
-                self._nsb.burr_5_intended.AU_DPO__POSTERIOR_AUDITOR: None,
-                self._nsb.burr_5_intended.AU_DV__VENTRAL_AUDITORY_A: None,
-                self._nsb.burr_5_intended.VI_SAL__ANTEROLATERAL_VIS: None,
-                self._nsb.burr_5_intended.VI_SAM__ANTEROMEDIAL_VISU: None,
-                self._nsb.burr_5_intended.VI_SL__LATERAL_VISUAL_ARE: None,
-                self._nsb.burr_5_intended.VI_SP__PRIMARY_VISUAL_ARE: None,
-                self._nsb.burr_5_intended.VI_SPL__POSTEROLATERAL_VI: None,
-                self._nsb.burr_5_intended.VI_SPM_POSTEROMEDIAL_VISU: None,
-                self._nsb.burr_5_intended.VI_SLI__LATEROINTERMEDIAT: None,
-                self._nsb.burr_5_intended.VI_SPOR__POSTRHINAL_AREA: None,
-                self._nsb.burr_5_intended.AC_AD__ANTERIOR_CINGULATE: None,
-                self._nsb.burr_5_intended.AC_AV__ANTERIOR_CINGULATE: None,
-                self._nsb.burr_5_intended.PL__PRELIMBIC_AREA: None,
-                self._nsb.burr_5_intended.ILA__INFRALIMBIC_AREA: None,
-                self._nsb.burr_5_intended.OR_BL__ORBITAL_AREA_LATER: None,
-                self._nsb.burr_5_intended.OR_BM__ORBITAL_AREA_MEDIA: None,
-                self._nsb.burr_5_intended.OR_BV__ORBITAL_AREA_VENTR: None,
-                self._nsb.burr_5_intended.OR_BVL__ORBITAL_AREA_VENT: None,
-                self._nsb.burr_5_intended.A_ID__AGRANULAR_INSULAR_A: None,
-                self._nsb.burr_5_intended.A_IP__AGRANULAR_INSULAR_A: None,
-                self._nsb.burr_5_intended.A_IV__AGRANULAR_INSULAR_A: None,
-                self._nsb.burr_5_intended.RS_PAGL__RETROSPLENIAL_AR: None,
-                self._nsb.burr_5_intended.RS_PD__RETROSPLENIAL_AREA: None,
-                self._nsb.burr_5_intended.RS_PV__RETROSPLENIAL_AREA: None,
-                self._nsb.burr_5_intended.VI_SA__ANTERIOR_AREA: None,
-                self._nsb.burr_5_intended.VI_SRL__ROSTROLATERAL_VIS: None,
-                self._nsb.burr_5_intended.T_EA__TEMPORAL_ASSOCIATIO: None,
-                self._nsb.burr_5_intended.PERI__PERIRHINAL_AREA: None,
-                self._nsb.burr_5_intended.ECT__ECTORHINAL_AREA: None,
-                self._nsb.burr_5_intended.MOB__MAIN_OLFACTORY_BULB: None,
-                self._nsb.burr_5_intended.AOB__ACCESSORY_OLFACTORY: None,
-                self._nsb.burr_5_intended.AON__ANTERIOR_OLFACTORY_N: None,
-                self._nsb.burr_5_intended.T_TD__TAENIA_TECTA_DORSAL: None,
-                self._nsb.burr_5_intended.T_TV__TAENIA_TECTA_VENTRA: None,
-                self._nsb.burr_5_intended.DP__DORSAL_PEDUNCULAR_ARE: None,
-                self._nsb.burr_5_intended.PIR__PIRIFORM_AREA: None,
-                self._nsb.burr_5_intended.NLOT__NUCLEUS_OF_THE_LATE: None,
-                self._nsb.burr_5_intended.CO_AA__CORTICAL_AMYGDALAR: None,
-                self._nsb.burr_5_intended.CO_AP__CORTICAL_AMYGDALAR: None,
-                self._nsb.burr_5_intended.PAA__PIRIFORM_AMYGDALAR_A: None,
-                self._nsb.burr_5_intended.TR__POSTPIRIFORM_TRANSITI: None,
-                self._nsb.burr_5_intended.CA1__FIELD_CA1: None,
-                self._nsb.burr_5_intended.CA2__FIELD_CA2: None,
-                self._nsb.burr_5_intended.CA3__FIELD_CA3: None,
-                self._nsb.burr_5_intended.DG__DENTATE_GYRUS: None,
-                self._nsb.burr_5_intended.FC__FASCIOLA_CINEREA: None,
-                self._nsb.burr_5_intended.IG__INDUSEUM_GRISEUM: None,
-                self._nsb.burr_5_intended.EN_TL__ENTORHINAL_AREA_LA: None,
-                self._nsb.burr_5_intended.EN_TM__ENTORHINAL_AREA_ME: None,
-                self._nsb.burr_5_intended.PAR__PARASUBICULUM: None,
-                self._nsb.burr_5_intended.POST__POSTSUBICULUM: None,
-                self._nsb.burr_5_intended.PRE__PRESUBICULUM: None,
-                self._nsb.burr_5_intended.SUB__SUBICULUM: None,
-                self._nsb.burr_5_intended.PRO_S__PROSUBICULUM: None,
-                self._nsb.burr_5_intended.HATA__HIPPOCAMPO_AMYGDALA: None,
-                self._nsb.burr_5_intended.A_PR__AREA_PROSTRIATA: None,
-                self._nsb.burr_5_intended.CLA__CLAUSTRUM: None,
-                self._nsb.burr_5_intended.E_PD__ENDOPIRIFORM_NUCLEU: None,
-                self._nsb.burr_5_intended.E_PV__ENDOPIRIFORM_NUCLEU: None,
-                self._nsb.burr_5_intended.LA__LATERAL_AMYGDALAR_NUC: None,
-                self._nsb.burr_5_intended.BLA__BASOLATERAL_AMYGDALA: None,
-                self._nsb.burr_5_intended.BMA__BASOMEDIAL_AMYGDALAR: None,
-                self._nsb.burr_5_intended.PA__POSTERIOR_AMYGDALAR_N: None,
-                self._nsb.burr_5_intended.CP__CAUDOPUTAMEN: None,
-                self._nsb.burr_5_intended.ACB__NUCLEUS_ACCUMBENS: None,
-                self._nsb.burr_5_intended.FS__FUNDUS_OF_STRIATUM: None,
-                self._nsb.burr_5_intended.OT__OLFACTORY_TUBERCLE: None,
-                self._nsb.burr_5_intended.L_SC__LATERAL_SEPTAL_NUCL: None,
-                self._nsb.burr_5_intended.L_SR__LATERAL_SEPTAL_NUCL: None,
-                self._nsb.burr_5_intended.L_SV__LATERAL_SEPTAL_NUCL: None,
-                self._nsb.burr_5_intended.SF__SEPTOFIMBRIAL_NUCLEUS: None,
-                self._nsb.burr_5_intended.SH__SEPTOHIPPOCAMPAL_NUCL: None,
-                self._nsb.burr_5_intended.AAA__ANTERIOR_AMYGDALAR_A: None,
-                self._nsb.burr_5_intended.BA__BED_NUCLEUS_OF_THE_AC: None,
-                self._nsb.burr_5_intended.CEA__CENTRAL_AMYGDALAR_NU: None,
-                self._nsb.burr_5_intended.IA__INTERCALATED_AMYGDALA: None,
-                self._nsb.burr_5_intended.MEA__MEDIAL_AMYGDALAR_NUC: None,
-                self._nsb.burr_5_intended.G_PE__GLOBUS_PALLIDUS_EXT: None,
-                self._nsb.burr_5_intended.G_PI__GLOBUS_PALLIDUS_INT: None,
-                self._nsb.burr_5_intended.SI__SUBSTANTIA_INNOMINATA: None,
-                self._nsb.burr_5_intended.MA__MAGNOCELLULAR_NUCLEUS: None,
-                self._nsb.burr_5_intended.MS__MEDIAL_SEPTAL_NUCLEUS: None,
-                self._nsb.burr_5_intended.NDB__DIAGONAL_BAND_NUCLEU: None,
-                self._nsb.burr_5_intended.TRS__TRIANGULAR_NUCLEUS_O: None,
-                self._nsb.burr_5_intended.BST__BED_NUCLEI_OF_THE_ST: None,
-                self._nsb.burr_5_intended.VAL__VENTRAL_ANTERIOR_LAT: None,
-                self._nsb.burr_5_intended.VM__VENTRAL_MEDIAL_NUCLEU: None,
-                self._nsb.burr_5_intended.VPL__VENTRAL_POSTEROLATER: None,
-                self._nsb.burr_5_intended.VP_LPC__VENTRAL_POSTEROLA: None,
-                self._nsb.burr_5_intended.VPM__VENTRAL_POSTEROMEDIA: None,
-                self._nsb.burr_5_intended.VP_MPC__VENTRAL_POSTEROME: None,
-                self._nsb.burr_5_intended.PO_T__POSTERIOR_TRIANGULA: None,
-                self._nsb.burr_5_intended.SPF__SUBPARAFASCICULAR_NU: None,
-                self._nsb.burr_5_intended.SPA__SUBPARAFASCICULAR_AR: None,
-                self._nsb.burr_5_intended.PP__PERIPEDUNCULAR_NUCLEU: None,
-                self._nsb.burr_5_intended.MG__MEDIAL_GENICULATE_COM: None,
-                self._nsb.burr_5_intended.L_GD__DORSAL_PART_OF_THE: None,
-                self._nsb.burr_5_intended.LP__LATERAL_POSTERIOR_NUC: None,
-                self._nsb.burr_5_intended.PO__POSTERIOR_COMPLEX_OF: None,
-                self._nsb.burr_5_intended.POL__POSTERIOR_LIMITING_N: None,
-                self._nsb.burr_5_intended.SGN__SUPRAGENICULATE_NUCL: None,
-                self._nsb.burr_5_intended.ETH__ETHMOID_NUCLEUS_OF_T: None,
-                self._nsb.burr_5_intended.AV__ANTEROVENTRAL_NUCLEUS: None,
-                self._nsb.burr_5_intended.AM__ANTEROMEDIAL_NUCLEUS: None,
-                self._nsb.burr_5_intended.AD__ANTERODORSAL_NUCLEUS: None,
-                self._nsb.burr_5_intended.IAM__INTERANTEROMEDIAL_NU: None,
-                self._nsb.burr_5_intended.IAD__INTERANTERODORSAL_NU: None,
-                self._nsb.burr_5_intended.LD__LATERAL_DORSAL_NUCLEU: None,
-                self._nsb.burr_5_intended.IMD__INTERMEDIODORSAL_NUC: None,
-                self._nsb.burr_5_intended.MD__MEDIODORSAL_NUCLEUS_O: None,
-                self._nsb.burr_5_intended.SMT__SUBMEDIAL_NUCLEUS_OF: None,
-                self._nsb.burr_5_intended.PR__PERIREUNENSIS_NUCLEUS: None,
-                self._nsb.burr_5_intended.PVT__PARAVENTRICULAR_NUCL: None,
-                self._nsb.burr_5_intended.PT__PARATAENIAL_NUCLEUS: None,
-                self._nsb.burr_5_intended.RE__NUCLEUS_OF_REUNIENS: None,
-                self._nsb.burr_5_intended.XI__XIPHOID_THALAMIC_NUCL: None,
-                self._nsb.burr_5_intended.RH__RHOMBOID_NUCLEUS: None,
-                self._nsb.burr_5_intended.CM__CENTRAL_MEDIAL_NUCLEU: None,
-                self._nsb.burr_5_intended.PCN__PARACENTRAL_NUCLEUS: None,
-                self._nsb.burr_5_intended.CL__CENTRAL_LATERAL_NUCLE: None,
-                self._nsb.burr_5_intended.PF__PARAFASCICULAR_NUCLEU: None,
-                self._nsb.burr_5_intended.PIL__POSTERIOR_INTRALAMIN: None,
-                self._nsb.burr_5_intended.RT__RETICULAR_NUCLEUS_OF: None,
-                self._nsb.burr_5_intended.IGL__INTERGENICULATE_LEAF: None,
-                self._nsb.burr_5_intended.INT_G__INTERMEDIATE_GENIC: None,
-                self._nsb.burr_5_intended.L_GV__VENTRAL_PART_OF_THE: None,
-                self._nsb.burr_5_intended.SUB_G__SUBGENICULATE_NUCL: None,
-                self._nsb.burr_5_intended.MH__MEDIAL_HABENULA: None,
-                self._nsb.burr_5_intended.LH__LATERAL_HABENULA: None,
-                self._nsb.burr_5_intended.SO__SUPRAOPTIC_NUCLEUS: None,
-                self._nsb.burr_5_intended.PVH__PARAVENTRICULAR_HYPO: None,
-                self._nsb.burr_5_intended.P_VA__PERIVENTRICULAR_HYP: None,
-                self._nsb.burr_5_intended.P_VI__PERIVENTRICULAR_HYP: None,
-                self._nsb.burr_5_intended.ARH__ARCUATE_HYPOTHALAMIC: None,
-                self._nsb.burr_5_intended.ADP__ANTERODORSAL_PREOPTI: None,
-                self._nsb.burr_5_intended.AVP__ANTEROVENTRAL_PREOPT: None,
-                self._nsb.burr_5_intended.AVPV__ANTEROVENTRAL_PERIV: None,
-                self._nsb.burr_5_intended.DMH__DORSOMEDIAL_NUCLEUS: None,
-                self._nsb.burr_5_intended.MEPO__MEDIAN_PREOPTIC_NUC: None,
-                self._nsb.burr_5_intended.MPO__MEDIAL_PREOPTIC_AREA: None,
-                self._nsb.burr_5_intended.PS__PARASTRIAL_NUCLEUS: None,
-                self._nsb.burr_5_intended.P_VP__PERIVENTRICULAR_HYP: None,
-                self._nsb.burr_5_intended.P_VPO__PERIVENTRICULAR_HY: None,
-                self._nsb.burr_5_intended.SBPV__SUBPARAVENTRICULAR: None,
-                self._nsb.burr_5_intended.SCH__SUPRACHIASMATIC_NUCL: None,
-                self._nsb.burr_5_intended.SFO__SUBFORNICAL_ORGAN: None,
-                self._nsb.burr_5_intended.VMPO__VENTROMEDIAL_PREOPT: None,
-                self._nsb.burr_5_intended.VLPO__VENTROLATERAL_PREOP: None,
-                self._nsb.burr_5_intended.AHN__ANTERIOR_HYPOTHALAMI: None,
-                self._nsb.burr_5_intended.LM__LATERAL_MAMMILLARY_NU: None,
-                self._nsb.burr_5_intended.MM__MEDIAL_MAMMILLARY_NUC: None,
-                self._nsb.burr_5_intended.SUM__SUPRAMAMMILLARY_NUCL: None,
-                self._nsb.burr_5_intended.TM__TUBEROMAMMILLARY_NUCL: None,
-                self._nsb.burr_5_intended.MPN__MEDIAL_PREOPTIC_NUCL: None,
-                self._nsb.burr_5_intended.P_MD__DORSAL_PREMAMMILLAR: None,
-                self._nsb.burr_5_intended.P_MV__VENTRAL_PREMAMMILLA: None,
-                self._nsb.burr_5_intended.PV_HD__PARAVENTRICULAR_HY: None,
-                self._nsb.burr_5_intended.VMH__VENTROMEDIAL_HYPOTHA: None,
-                self._nsb.burr_5_intended.PH__POSTERIOR_HYPOTHALAMI: None,
-                self._nsb.burr_5_intended.LHA__LATERAL_HYPOTHALAMIC: None,
-                self._nsb.burr_5_intended.LPO__LATERAL_PREOPTIC_ARE: None,
-                self._nsb.burr_5_intended.PSTN__PARASUBTHALAMIC_NUC: None,
-                self._nsb.burr_5_intended.PE_F__PERIFORNICAL_NUCLEU: None,
-                self._nsb.burr_5_intended.RCH__RETROCHIASMATIC_AREA: None,
-                self._nsb.burr_5_intended.STN__SUBTHALAMIC_NUCLEUS: None,
-                self._nsb.burr_5_intended.TU__TUBERAL_NUCLEUS: None,
-                self._nsb.burr_5_intended.ZI__ZONA_INCERTA: None,
-                self._nsb.burr_5_intended.S_CS__SUPERIOR_COLLICULUS: None,
-                self._nsb.burr_5_intended.IC__INFERIOR_COLLICULUS: None,
-                self._nsb.burr_5_intended.NB__NUCLEUS_OF_THE_BRACHI: None,
-                self._nsb.burr_5_intended.SAG__NUCLEUS_SAGULUM: None,
-                self._nsb.burr_5_intended.PBG__PARABIGEMINAL_NUCLEU: None,
-                self._nsb.burr_5_intended.S_NR__SUBSTANTIA_NIGRA_RE: None,
-                self._nsb.burr_5_intended.VTA__VENTRAL_TEGMENTAL_AR: None,
-                self._nsb.burr_5_intended.PN__PARANIGRAL_NUCLEUS: None,
-                self._nsb.burr_5_intended.RR__MIDBRAIN_RETICULAR_NU: None,
-                self._nsb.burr_5_intended.MRN__MIDBRAIN_RETICULAR_N: None,
-                self._nsb.burr_5_intended.S_CM__SUPERIOR_COLLICULUS: None,
-                self._nsb.burr_5_intended.PAG__PERIAQUEDUCTAL_GRAY: None,
-                self._nsb.burr_5_intended.APN__ANTERIOR_PRETECTAL_N: None,
-                self._nsb.burr_5_intended.MPT__MEDIAL_PRETECTAL_ARE: None,
-                self._nsb.burr_5_intended.NOT__NUCLEUS_OF_THE_OPTIC: None,
-                self._nsb.burr_5_intended.NPC__NUCLEUS_OF_THE_POSTE: None,
-                self._nsb.burr_5_intended.OP__OLIVARY_PRETECTAL_NUC: None,
-                self._nsb.burr_5_intended.PPT__POSTERIOR_PRETECTAL: None,
-                self._nsb.burr_5_intended.RPF__RETROPARAFASCICULAR: None,
-                self._nsb.burr_5_intended.CUN__CUNEIFORM_NUCLEUS: None,
-                self._nsb.burr_5_intended.RN__RED_NUCLEUS: None,
-                self._nsb.burr_5_intended.III__OCULOMOTOR_NUCLEUS: None,
-                self._nsb.burr_5_intended.MA3__MEDIAL_ACCESORY_OCUL: None,
-                self._nsb.burr_5_intended.EW__EDINGER__WESTPHAL_NUC: None,
-                self._nsb.burr_5_intended.IV__TROCHLEAR_NUCLEUS: None,
-                self._nsb.burr_5_intended.PA4__PARATROCHLEAR_NUCLEU: None,
-                self._nsb.burr_5_intended.VTN__VENTRAL_TEGMENTAL_NU: None,
-                self._nsb.burr_5_intended.AT__ANTERIOR_TEGMENTAL_NU: None,
-                self._nsb.burr_5_intended.LT__LATERAL_TERMINAL_NUCL: None,
-                self._nsb.burr_5_intended.DT__DORSAL_TERMINAL_NUCLE: None,
-                self._nsb.burr_5_intended.MT__MEDIAL_TERMINAL_NUCLE: None,
-                self._nsb.burr_5_intended.S_NC__SUBSTANTIA_NIGRA_CO: None,
-                self._nsb.burr_5_intended.PPN__PEDUNCULOPONTINE_NUC: None,
-                self._nsb.burr_5_intended.IF__INTERFASCICULAR_NUCLE: None,
-                self._nsb.burr_5_intended.IPN__INTERPEDUNCULAR_NUCL: None,
-                self._nsb.burr_5_intended.RL__ROSTRAL_LINEAR_NUCLEU: None,
-                self._nsb.burr_5_intended.CLI__CENTRAL_LINEAR_NUCLE: None,
-                self._nsb.burr_5_intended.DR__DORSAL_NUCLEUS_RAPHE: None,
-                self._nsb.burr_5_intended.NLL__NUCLEUS_OF_THE_LATER: None,
-                self._nsb.burr_5_intended.PSV__PRINCIPAL_SENSORY_NU: None,
-                self._nsb.burr_5_intended.PB__PARABRACHIAL_NUCLEUS: None,
-                self._nsb.burr_5_intended.SOC__SUPERIOR_OLIVARY_COM: None,
-                self._nsb.burr_5_intended.B__BARRINGTON_S_NUCLEUS: None,
-                self._nsb.burr_5_intended.DTN__DORSAL_TEGMENTAL_NUC: None,
-                self._nsb.burr_5_intended.PD_TG__POSTERODORSAL_TEGM: None,
-                self._nsb.burr_5_intended.PCG__PONTINE_CENTRAL_GRAY: None,
-                self._nsb.burr_5_intended.PG__PONTINE_GRAY: None,
-                self._nsb.burr_5_intended.PR_NC__PONTINE_RETICULAR: None,
-                self._nsb.burr_5_intended.SG__SUPRAGENUAL_NUCLEUS: None,
-                self._nsb.burr_5_intended.SUT__SUPRATRIGEMINAL_NUCL: None,
-                self._nsb.burr_5_intended.TRN__TEGMENTAL_RETICULAR: None,
-                self._nsb.burr_5_intended.V__MOTOR_NUCLEUS_OF_TRIGE: None,
-                self._nsb.burr_5_intended.P5__PERITRIGEMINAL_ZONE: None,
-                self._nsb.burr_5_intended.ACS5__ACCESSORY_TRIGEMINA: None,
-                self._nsb.burr_5_intended.PC5__PARVICELLULAR_MOTOR: None,
-                self._nsb.burr_5_intended.I5__INTERTRIGEMINAL_NUCLE: None,
-                self._nsb.burr_5_intended.CS__SUPERIOR_CENTRAL_NUCL: None,
-                self._nsb.burr_5_intended.LC__LOCUS_CERULEUS: None,
-                self._nsb.burr_5_intended.LDT__LATERODORSAL_TEGMENT: None,
-                self._nsb.burr_5_intended.NI__NUCLEUS_INCERTUS: None,
-                self._nsb.burr_5_intended.PR_NR__PONTINE_RETICULAR: None,
-                self._nsb.burr_5_intended.RPO__NUCLEUS_RAPHE_PONTIS: None,
-                self._nsb.burr_5_intended.SLC__SUBCERULEUS_NUCLEUS: None,
-                self._nsb.burr_5_intended.SLD__SUBLATERODORSAL_NUCL: None,
-                self._nsb.burr_5_intended.MY__MEDULLA: None,
-                self._nsb.burr_5_intended.AP__AREA_POSTREMA: None,
-                self._nsb.burr_5_intended.DCO__DORSAL_COCHLEAR_NUCL: None,
-                self._nsb.burr_5_intended.VCO__VENTRAL_COCHLEAR_NUC: None,
-                self._nsb.burr_5_intended.CU__CUNEATE_NUCLEUS: None,
-                self._nsb.burr_5_intended.GR__GRACILE_NUCLEUS: None,
-                self._nsb.burr_5_intended.ECU__EXTERNAL_CUNEATE_NUC: None,
-                self._nsb.burr_5_intended.NTB__NUCLEUS_OF_THE_TRAPE: None,
-                self._nsb.burr_5_intended.NTS__NUCLEUS_OF_THE_SOLIT: None,
-                self._nsb.burr_5_intended.SPVC__SPINAL_NUCLEUS_OF_T: None,
-                self._nsb.burr_5_intended.SPVI__SPINAL_NUCLEUS_OF_T: None,
-                self._nsb.burr_5_intended.SPVO__SPINAL_NUCLEUS_OF_T: None,
-                self._nsb.burr_5_intended.PA5__PARATRIGEMINAL_NUCLE: None,
-                self._nsb.burr_5_intended.VI__ABDUCENS_NUCLEUS: None,
-                self._nsb.burr_5_intended.VII__FACIAL_MOTOR_NUCLEUS: None,
-                self._nsb.burr_5_intended.AMB__NUCLEUS_AMBIGUUS: None,
-                self._nsb.burr_5_intended.DMX__DORSAL_MOTOR_NUCLEUS: None,
-                self._nsb.burr_5_intended.GRN__GIGANTOCELLULAR_RETI: None,
-                self._nsb.burr_5_intended.ICB__INFRACEREBELLAR_NUCL: None,
-                self._nsb.burr_5_intended.IO__INFERIOR_OLIVARY_COMP: None,
-                self._nsb.burr_5_intended.IRN__INTERMEDIATE_RETICUL: None,
-                self._nsb.burr_5_intended.ISN__INFERIOR_SALIVATORY: None,
-                self._nsb.burr_5_intended.LIN__LINEAR_NUCLEUS_OF_TH: None,
-                self._nsb.burr_5_intended.LRN__LATERAL_RETICULAR_NU: None,
-                self._nsb.burr_5_intended.MARN__MAGNOCELLULAR_RETIC: None,
-                self._nsb.burr_5_intended.MDRN__MEDULLARY_RETICULAR: None,
-                self._nsb.burr_5_intended.PARN__PARVICELLULAR_RETIC: None,
-                self._nsb.burr_5_intended.PAS__PARASOLITARY_NUCLEUS: None,
-                self._nsb.burr_5_intended.PGRN__PARAGIGANTOCELLULAR: None,
-                self._nsb.burr_5_intended.NR__NUCLEUS_OF__ROLLER: None,
-                self._nsb.burr_5_intended.PRP__NUCLEUS_PREPOSITUS: None,
-                self._nsb.burr_5_intended.PMR__PARAMEDIAN_RETICULAR: None,
-                self._nsb.burr_5_intended.PPY__PARAPYRAMIDAL_NUCLEU: None,
-                self._nsb.burr_5_intended.LAV__LATERAL_VESTIBULAR_N: None,
-                self._nsb.burr_5_intended.MV__MEDIAL_VESTIBULAR_NUC: None,
-                self._nsb.burr_5_intended.SPIV__SPINAL_VESTIBULAR_N: None,
-                self._nsb.burr_5_intended.SUV__SUPERIOR_VESTIBULAR: None,
-                self._nsb.burr_5_intended.X__NUCLEUS_X: None,
-                self._nsb.burr_5_intended.XII__HYPOGLOSSAL_NUCLEUS: None,
-                self._nsb.burr_5_intended.Y__NUCLEUS_Y: None,
-                self._nsb.burr_5_intended.RM__NUCLEUS_RAPHE_MAGNUS: None,
-                self._nsb.burr_5_intended.RPA__NUCLEUS_RAPHE_PALLID: None,
-                self._nsb.burr_5_intended.RO__NUCLEUS_RAPHE_OBSCURU: None,
-                self._nsb.burr_5_intended.LING__LINGULA_I: None,
-                self._nsb.burr_5_intended.CENT2__LOBULE_II: None,
-                self._nsb.burr_5_intended.CENT3__LOBULE_III: None,
-                self._nsb.burr_5_intended.CUL4_5__LOBULES_IV_V: None,
-                self._nsb.burr_5_intended.DEC__DECLIVE_VI: None,
-                self._nsb.burr_5_intended.FOTU__FOLIUM_TUBER_VERMIS: None,
-                self._nsb.burr_5_intended.PYR__PYRAMUS_VIII: None,
-                self._nsb.burr_5_intended.UVU__UVULA_IX: None,
-                self._nsb.burr_5_intended.NOD__NODULUS_X: None,
-                self._nsb.burr_5_intended.SIM__SIMPLE_LOBULE: None,
-                self._nsb.burr_5_intended.A_NCR1__CRUS_1: None,
-                self._nsb.burr_5_intended.A_NCR2__CRUS_2: None,
-                self._nsb.burr_5_intended.PRM__PARAMEDIAN_LOBULE: None,
-                self._nsb.burr_5_intended.COPY__COPULA_PYRAMIDIS: None,
-                self._nsb.burr_5_intended.PFL__PARAFLOCCULUS: None,
-                self._nsb.burr_5_intended.FL__FLOCCULUS: None,
-                self._nsb.burr_5_intended.FN__FASTIGIAL_NUCLEUS: None,
-                self._nsb.burr_5_intended.IP__INTERPOSED_NUCLEUS: None,
-                self._nsb.burr_5_intended.DN__DENTATE_NUCLEUS: None,
-                self._nsb.burr_5_intended.VE_CB__VESTIBULOCEREBELLA: None,
-            }.get(self._nsb.burr_5_intended, None)
+                burr_5_intended.FRP__FRONTAL_POLE_CEREBRA: None,
+                burr_5_intended.M_OP__PRIMARY_MOTOR_AREA: None,
+                burr_5_intended.M_OS__SECONDARY_MOTOR_ARE: None,
+                burr_5_intended.S_SP_N__PRIMARY_SOMATOSEN: None,
+                burr_5_intended.S_SP_BFD__PRIMARY_SOMATOS: None,
+                burr_5_intended.S_SP_LL__PRIMARY_SOMATOSE: None,
+                burr_5_intended.S_SP_M__PRIMARY_SOMATOSEN: None,
+                burr_5_intended.S_SP_UL__PRIMARY_SOMATOSE: None,
+                burr_5_intended.S_SP_TR__PRIMARY_SOMATOSE: None,
+                burr_5_intended.S_SP_UN__PRIMARY_SOMATOSE: None,
+                burr_5_intended.S_SS__SUPPLEMENTAL_SOMATO: None,
+                burr_5_intended.GU__GUSTATORY_AREAS: None,
+                burr_5_intended.VISC__VISCERAL_AREA: None,
+                burr_5_intended.AU_DD__DORSAL_AUDITORY_AR: None,
+                burr_5_intended.AU_DP__PRIMARY_AUDITORY_A: None,
+                burr_5_intended.AU_DPO__POSTERIOR_AUDITOR: None,
+                burr_5_intended.AU_DV__VENTRAL_AUDITORY_A: None,
+                burr_5_intended.VI_SAL__ANTEROLATERAL_VIS: None,
+                burr_5_intended.VI_SAM__ANTEROMEDIAL_VISU: None,
+                burr_5_intended.VI_SL__LATERAL_VISUAL_ARE: None,
+                burr_5_intended.VI_SP__PRIMARY_VISUAL_ARE: None,
+                burr_5_intended.VI_SPL__POSTEROLATERAL_VI: None,
+                burr_5_intended.VI_SPM_POSTEROMEDIAL_VISU: None,
+                burr_5_intended.VI_SLI__LATEROINTERMEDIAT: None,
+                burr_5_intended.VI_SPOR__POSTRHINAL_AREA: None,
+                burr_5_intended.AC_AD__ANTERIOR_CINGULATE: None,
+                burr_5_intended.AC_AV__ANTERIOR_CINGULATE: None,
+                burr_5_intended.PL__PRELIMBIC_AREA: None,
+                burr_5_intended.ILA__INFRALIMBIC_AREA: None,
+                burr_5_intended.OR_BL__ORBITAL_AREA_LATER: None,
+                burr_5_intended.OR_BM__ORBITAL_AREA_MEDIA: None,
+                burr_5_intended.OR_BV__ORBITAL_AREA_VENTR: None,
+                burr_5_intended.OR_BVL__ORBITAL_AREA_VENT: None,
+                burr_5_intended.A_ID__AGRANULAR_INSULAR_A: None,
+                burr_5_intended.A_IP__AGRANULAR_INSULAR_A: None,
+                burr_5_intended.A_IV__AGRANULAR_INSULAR_A: None,
+                burr_5_intended.RS_PAGL__RETROSPLENIAL_AR: None,
+                burr_5_intended.RS_PD__RETROSPLENIAL_AREA: None,
+                burr_5_intended.RS_PV__RETROSPLENIAL_AREA: None,
+                burr_5_intended.VI_SA__ANTERIOR_AREA: None,
+                burr_5_intended.VI_SRL__ROSTROLATERAL_VIS: None,
+                burr_5_intended.T_EA__TEMPORAL_ASSOCIATIO: None,
+                burr_5_intended.PERI__PERIRHINAL_AREA: None,
+                burr_5_intended.ECT__ECTORHINAL_AREA: None,
+                burr_5_intended.MOB__MAIN_OLFACTORY_BULB: None,
+                burr_5_intended.AOB__ACCESSORY_OLFACTORY: None,
+                burr_5_intended.AON__ANTERIOR_OLFACTORY_N: None,
+                burr_5_intended.T_TD__TAENIA_TECTA_DORSAL: None,
+                burr_5_intended.T_TV__TAENIA_TECTA_VENTRA: None,
+                burr_5_intended.DP__DORSAL_PEDUNCULAR_ARE: None,
+                burr_5_intended.PIR__PIRIFORM_AREA: None,
+                burr_5_intended.NLOT__NUCLEUS_OF_THE_LATE: None,
+                burr_5_intended.CO_AA__CORTICAL_AMYGDALAR: None,
+                burr_5_intended.CO_AP__CORTICAL_AMYGDALAR: None,
+                burr_5_intended.PAA__PIRIFORM_AMYGDALAR_A: None,
+                burr_5_intended.TR__POSTPIRIFORM_TRANSITI: None,
+                burr_5_intended.CA1__FIELD_CA1: None,
+                burr_5_intended.CA2__FIELD_CA2: None,
+                burr_5_intended.CA3__FIELD_CA3: None,
+                burr_5_intended.DG__DENTATE_GYRUS: None,
+                burr_5_intended.FC__FASCIOLA_CINEREA: None,
+                burr_5_intended.IG__INDUSEUM_GRISEUM: None,
+                burr_5_intended.EN_TL__ENTORHINAL_AREA_LA: None,
+                burr_5_intended.EN_TM__ENTORHINAL_AREA_ME: None,
+                burr_5_intended.PAR__PARASUBICULUM: None,
+                burr_5_intended.POST__POSTSUBICULUM: None,
+                burr_5_intended.PRE__PRESUBICULUM: None,
+                burr_5_intended.SUB__SUBICULUM: None,
+                burr_5_intended.PRO_S__PROSUBICULUM: None,
+                burr_5_intended.HATA__HIPPOCAMPO_AMYGDALA: None,
+                burr_5_intended.A_PR__AREA_PROSTRIATA: None,
+                burr_5_intended.CLA__CLAUSTRUM: None,
+                burr_5_intended.E_PD__ENDOPIRIFORM_NUCLEU: None,
+                burr_5_intended.E_PV__ENDOPIRIFORM_NUCLEU: None,
+                burr_5_intended.LA__LATERAL_AMYGDALAR_NUC: None,
+                burr_5_intended.BLA__BASOLATERAL_AMYGDALA: None,
+                burr_5_intended.BMA__BASOMEDIAL_AMYGDALAR: None,
+                burr_5_intended.PA__POSTERIOR_AMYGDALAR_N: None,
+                burr_5_intended.CP__CAUDOPUTAMEN: None,
+                burr_5_intended.ACB__NUCLEUS_ACCUMBENS: None,
+                burr_5_intended.FS__FUNDUS_OF_STRIATUM: None,
+                burr_5_intended.OT__OLFACTORY_TUBERCLE: None,
+                burr_5_intended.L_SC__LATERAL_SEPTAL_NUCL: None,
+                burr_5_intended.L_SR__LATERAL_SEPTAL_NUCL: None,
+                burr_5_intended.L_SV__LATERAL_SEPTAL_NUCL: None,
+                burr_5_intended.SF__SEPTOFIMBRIAL_NUCLEUS: None,
+                burr_5_intended.SH__SEPTOHIPPOCAMPAL_NUCL: None,
+                burr_5_intended.AAA__ANTERIOR_AMYGDALAR_A: None,
+                burr_5_intended.BA__BED_NUCLEUS_OF_THE_AC: None,
+                burr_5_intended.CEA__CENTRAL_AMYGDALAR_NU: None,
+                burr_5_intended.IA__INTERCALATED_AMYGDALA: None,
+                burr_5_intended.MEA__MEDIAL_AMYGDALAR_NUC: None,
+                burr_5_intended.G_PE__GLOBUS_PALLIDUS_EXT: None,
+                burr_5_intended.G_PI__GLOBUS_PALLIDUS_INT: None,
+                burr_5_intended.SI__SUBSTANTIA_INNOMINATA: None,
+                burr_5_intended.MA__MAGNOCELLULAR_NUCLEUS: None,
+                burr_5_intended.MS__MEDIAL_SEPTAL_NUCLEUS: None,
+                burr_5_intended.NDB__DIAGONAL_BAND_NUCLEU: None,
+                burr_5_intended.TRS__TRIANGULAR_NUCLEUS_O: None,
+                burr_5_intended.BST__BED_NUCLEI_OF_THE_ST: None,
+                burr_5_intended.VAL__VENTRAL_ANTERIOR_LAT: None,
+                burr_5_intended.VM__VENTRAL_MEDIAL_NUCLEU: None,
+                burr_5_intended.VPL__VENTRAL_POSTEROLATER: None,
+                burr_5_intended.VP_LPC__VENTRAL_POSTEROLA: None,
+                burr_5_intended.VPM__VENTRAL_POSTEROMEDIA: None,
+                burr_5_intended.VP_MPC__VENTRAL_POSTEROME: None,
+                burr_5_intended.PO_T__POSTERIOR_TRIANGULA: None,
+                burr_5_intended.SPF__SUBPARAFASCICULAR_NU: None,
+                burr_5_intended.SPA__SUBPARAFASCICULAR_AR: None,
+                burr_5_intended.PP__PERIPEDUNCULAR_NUCLEU: None,
+                burr_5_intended.MG__MEDIAL_GENICULATE_COM: None,
+                burr_5_intended.L_GD__DORSAL_PART_OF_THE: None,
+                burr_5_intended.LP__LATERAL_POSTERIOR_NUC: None,
+                burr_5_intended.PO__POSTERIOR_COMPLEX_OF: None,
+                burr_5_intended.POL__POSTERIOR_LIMITING_N: None,
+                burr_5_intended.SGN__SUPRAGENICULATE_NUCL: None,
+                burr_5_intended.ETH__ETHMOID_NUCLEUS_OF_T: None,
+                burr_5_intended.AV__ANTEROVENTRAL_NUCLEUS: None,
+                burr_5_intended.AM__ANTEROMEDIAL_NUCLEUS: None,
+                burr_5_intended.AD__ANTERODORSAL_NUCLEUS: None,
+                burr_5_intended.IAM__INTERANTEROMEDIAL_NU: None,
+                burr_5_intended.IAD__INTERANTERODORSAL_NU: None,
+                burr_5_intended.LD__LATERAL_DORSAL_NUCLEU: None,
+                burr_5_intended.IMD__INTERMEDIODORSAL_NUC: None,
+                burr_5_intended.MD__MEDIODORSAL_NUCLEUS_O: None,
+                burr_5_intended.SMT__SUBMEDIAL_NUCLEUS_OF: None,
+                burr_5_intended.PR__PERIREUNENSIS_NUCLEUS: None,
+                burr_5_intended.PVT__PARAVENTRICULAR_NUCL: None,
+                burr_5_intended.PT__PARATAENIAL_NUCLEUS: None,
+                burr_5_intended.RE__NUCLEUS_OF_REUNIENS: None,
+                burr_5_intended.XI__XIPHOID_THALAMIC_NUCL: None,
+                burr_5_intended.RH__RHOMBOID_NUCLEUS: None,
+                burr_5_intended.CM__CENTRAL_MEDIAL_NUCLEU: None,
+                burr_5_intended.PCN__PARACENTRAL_NUCLEUS: None,
+                burr_5_intended.CL__CENTRAL_LATERAL_NUCLE: None,
+                burr_5_intended.PF__PARAFASCICULAR_NUCLEU: None,
+                burr_5_intended.PIL__POSTERIOR_INTRALAMIN: None,
+                burr_5_intended.RT__RETICULAR_NUCLEUS_OF: None,
+                burr_5_intended.IGL__INTERGENICULATE_LEAF: None,
+                burr_5_intended.INT_G__INTERMEDIATE_GENIC: None,
+                burr_5_intended.L_GV__VENTRAL_PART_OF_THE: None,
+                burr_5_intended.SUB_G__SUBGENICULATE_NUCL: None,
+                burr_5_intended.MH__MEDIAL_HABENULA: None,
+                burr_5_intended.LH__LATERAL_HABENULA: None,
+                burr_5_intended.SO__SUPRAOPTIC_NUCLEUS: None,
+                burr_5_intended.PVH__PARAVENTRICULAR_HYPO: None,
+                burr_5_intended.P_VA__PERIVENTRICULAR_HYP: None,
+                burr_5_intended.P_VI__PERIVENTRICULAR_HYP: None,
+                burr_5_intended.ARH__ARCUATE_HYPOTHALAMIC: None,
+                burr_5_intended.ADP__ANTERODORSAL_PREOPTI: None,
+                burr_5_intended.AVP__ANTEROVENTRAL_PREOPT: None,
+                burr_5_intended.AVPV__ANTEROVENTRAL_PERIV: None,
+                burr_5_intended.DMH__DORSOMEDIAL_NUCLEUS: None,
+                burr_5_intended.MEPO__MEDIAN_PREOPTIC_NUC: None,
+                burr_5_intended.MPO__MEDIAL_PREOPTIC_AREA: None,
+                burr_5_intended.PS__PARASTRIAL_NUCLEUS: None,
+                burr_5_intended.P_VP__PERIVENTRICULAR_HYP: None,
+                burr_5_intended.P_VPO__PERIVENTRICULAR_HY: None,
+                burr_5_intended.SBPV__SUBPARAVENTRICULAR: None,
+                burr_5_intended.SCH__SUPRACHIASMATIC_NUCL: None,
+                burr_5_intended.SFO__SUBFORNICAL_ORGAN: None,
+                burr_5_intended.VMPO__VENTROMEDIAL_PREOPT: None,
+                burr_5_intended.VLPO__VENTROLATERAL_PREOP: None,
+                burr_5_intended.AHN__ANTERIOR_HYPOTHALAMI: None,
+                burr_5_intended.LM__LATERAL_MAMMILLARY_NU: None,
+                burr_5_intended.MM__MEDIAL_MAMMILLARY_NUC: None,
+                burr_5_intended.SUM__SUPRAMAMMILLARY_NUCL: None,
+                burr_5_intended.TM__TUBEROMAMMILLARY_NUCL: None,
+                burr_5_intended.MPN__MEDIAL_PREOPTIC_NUCL: None,
+                burr_5_intended.P_MD__DORSAL_PREMAMMILLAR: None,
+                burr_5_intended.P_MV__VENTRAL_PREMAMMILLA: None,
+                burr_5_intended.PV_HD__PARAVENTRICULAR_HY: None,
+                burr_5_intended.VMH__VENTROMEDIAL_HYPOTHA: None,
+                burr_5_intended.PH__POSTERIOR_HYPOTHALAMI: None,
+                burr_5_intended.LHA__LATERAL_HYPOTHALAMIC: None,
+                burr_5_intended.LPO__LATERAL_PREOPTIC_ARE: None,
+                burr_5_intended.PSTN__PARASUBTHALAMIC_NUC: None,
+                burr_5_intended.PE_F__PERIFORNICAL_NUCLEU: None,
+                burr_5_intended.RCH__RETROCHIASMATIC_AREA: None,
+                burr_5_intended.STN__SUBTHALAMIC_NUCLEUS: None,
+                burr_5_intended.TU__TUBERAL_NUCLEUS: None,
+                burr_5_intended.ZI__ZONA_INCERTA: None,
+                burr_5_intended.S_CS__SUPERIOR_COLLICULUS: None,
+                burr_5_intended.IC__INFERIOR_COLLICULUS: None,
+                burr_5_intended.NB__NUCLEUS_OF_THE_BRACHI: None,
+                burr_5_intended.SAG__NUCLEUS_SAGULUM: None,
+                burr_5_intended.PBG__PARABIGEMINAL_NUCLEU: None,
+                burr_5_intended.S_NR__SUBSTANTIA_NIGRA_RE: None,
+                burr_5_intended.VTA__VENTRAL_TEGMENTAL_AR: None,
+                burr_5_intended.PN__PARANIGRAL_NUCLEUS: None,
+                burr_5_intended.RR__MIDBRAIN_RETICULAR_NU: None,
+                burr_5_intended.MRN__MIDBRAIN_RETICULAR_N: None,
+                burr_5_intended.S_CM__SUPERIOR_COLLICULUS: None,
+                burr_5_intended.PAG__PERIAQUEDUCTAL_GRAY: None,
+                burr_5_intended.APN__ANTERIOR_PRETECTAL_N: None,
+                burr_5_intended.MPT__MEDIAL_PRETECTAL_ARE: None,
+                burr_5_intended.NOT__NUCLEUS_OF_THE_OPTIC: None,
+                burr_5_intended.NPC__NUCLEUS_OF_THE_POSTE: None,
+                burr_5_intended.OP__OLIVARY_PRETECTAL_NUC: None,
+                burr_5_intended.PPT__POSTERIOR_PRETECTAL: None,
+                burr_5_intended.RPF__RETROPARAFASCICULAR: None,
+                burr_5_intended.CUN__CUNEIFORM_NUCLEUS: None,
+                burr_5_intended.RN__RED_NUCLEUS: None,
+                burr_5_intended.III__OCULOMOTOR_NUCLEUS: None,
+                burr_5_intended.MA3__MEDIAL_ACCESORY_OCUL: None,
+                burr_5_intended.EW__EDINGER__WESTPHAL_NUC: None,
+                burr_5_intended.IV__TROCHLEAR_NUCLEUS: None,
+                burr_5_intended.PA4__PARATROCHLEAR_NUCLEU: None,
+                burr_5_intended.VTN__VENTRAL_TEGMENTAL_NU: None,
+                burr_5_intended.AT__ANTERIOR_TEGMENTAL_NU: None,
+                burr_5_intended.LT__LATERAL_TERMINAL_NUCL: None,
+                burr_5_intended.DT__DORSAL_TERMINAL_NUCLE: None,
+                burr_5_intended.MT__MEDIAL_TERMINAL_NUCLE: None,
+                burr_5_intended.S_NC__SUBSTANTIA_NIGRA_CO: None,
+                burr_5_intended.PPN__PEDUNCULOPONTINE_NUC: None,
+                burr_5_intended.IF__INTERFASCICULAR_NUCLE: None,
+                burr_5_intended.IPN__INTERPEDUNCULAR_NUCL: None,
+                burr_5_intended.RL__ROSTRAL_LINEAR_NUCLEU: None,
+                burr_5_intended.CLI__CENTRAL_LINEAR_NUCLE: None,
+                burr_5_intended.DR__DORSAL_NUCLEUS_RAPHE: None,
+                burr_5_intended.NLL__NUCLEUS_OF_THE_LATER: None,
+                burr_5_intended.PSV__PRINCIPAL_SENSORY_NU: None,
+                burr_5_intended.PB__PARABRACHIAL_NUCLEUS: None,
+                burr_5_intended.SOC__SUPERIOR_OLIVARY_COM: None,
+                burr_5_intended.B__BARRINGTON_S_NUCLEUS: None,
+                burr_5_intended.DTN__DORSAL_TEGMENTAL_NUC: None,
+                burr_5_intended.PD_TG__POSTERODORSAL_TEGM: None,
+                burr_5_intended.PCG__PONTINE_CENTRAL_GRAY: None,
+                burr_5_intended.PG__PONTINE_GRAY: None,
+                burr_5_intended.PR_NC__PONTINE_RETICULAR: None,
+                burr_5_intended.SG__SUPRAGENUAL_NUCLEUS: None,
+                burr_5_intended.SUT__SUPRATRIGEMINAL_NUCL: None,
+                burr_5_intended.TRN__TEGMENTAL_RETICULAR: None,
+                burr_5_intended.V__MOTOR_NUCLEUS_OF_TRIGE: None,
+                burr_5_intended.P5__PERITRIGEMINAL_ZONE: None,
+                burr_5_intended.ACS5__ACCESSORY_TRIGEMINA: None,
+                burr_5_intended.PC5__PARVICELLULAR_MOTOR: None,
+                burr_5_intended.I5__INTERTRIGEMINAL_NUCLE: None,
+                burr_5_intended.CS__SUPERIOR_CENTRAL_NUCL: None,
+                burr_5_intended.LC__LOCUS_CERULEUS: None,
+                burr_5_intended.LDT__LATERODORSAL_TEGMENT: None,
+                burr_5_intended.NI__NUCLEUS_INCERTUS: None,
+                burr_5_intended.PR_NR__PONTINE_RETICULAR: None,
+                burr_5_intended.RPO__NUCLEUS_RAPHE_PONTIS: None,
+                burr_5_intended.SLC__SUBCERULEUS_NUCLEUS: None,
+                burr_5_intended.SLD__SUBLATERODORSAL_NUCL: None,
+                burr_5_intended.MY__MEDULLA: None,
+                burr_5_intended.AP__AREA_POSTREMA: None,
+                burr_5_intended.DCO__DORSAL_COCHLEAR_NUCL: None,
+                burr_5_intended.VCO__VENTRAL_COCHLEAR_NUC: None,
+                burr_5_intended.CU__CUNEATE_NUCLEUS: None,
+                burr_5_intended.GR__GRACILE_NUCLEUS: None,
+                burr_5_intended.ECU__EXTERNAL_CUNEATE_NUC: None,
+                burr_5_intended.NTB__NUCLEUS_OF_THE_TRAPE: None,
+                burr_5_intended.NTS__NUCLEUS_OF_THE_SOLIT: None,
+                burr_5_intended.SPVC__SPINAL_NUCLEUS_OF_T: None,
+                burr_5_intended.SPVI__SPINAL_NUCLEUS_OF_T: None,
+                burr_5_intended.SPVO__SPINAL_NUCLEUS_OF_T: None,
+                burr_5_intended.PA5__PARATRIGEMINAL_NUCLE: None,
+                burr_5_intended.VI__ABDUCENS_NUCLEUS: None,
+                burr_5_intended.VII__FACIAL_MOTOR_NUCLEUS: None,
+                burr_5_intended.AMB__NUCLEUS_AMBIGUUS: None,
+                burr_5_intended.DMX__DORSAL_MOTOR_NUCLEUS: None,
+                burr_5_intended.GRN__GIGANTOCELLULAR_RETI: None,
+                burr_5_intended.ICB__INFRACEREBELLAR_NUCL: None,
+                burr_5_intended.IO__INFERIOR_OLIVARY_COMP: None,
+                burr_5_intended.IRN__INTERMEDIATE_RETICUL: None,
+                burr_5_intended.ISN__INFERIOR_SALIVATORY: None,
+                burr_5_intended.LIN__LINEAR_NUCLEUS_OF_TH: None,
+                burr_5_intended.LRN__LATERAL_RETICULAR_NU: None,
+                burr_5_intended.MARN__MAGNOCELLULAR_RETIC: None,
+                burr_5_intended.MDRN__MEDULLARY_RETICULAR: None,
+                burr_5_intended.PARN__PARVICELLULAR_RETIC: None,
+                burr_5_intended.PAS__PARASOLITARY_NUCLEUS: None,
+                burr_5_intended.PGRN__PARAGIGANTOCELLULAR: None,
+                burr_5_intended.NR__NUCLEUS_OF__ROLLER: None,
+                burr_5_intended.PRP__NUCLEUS_PREPOSITUS: None,
+                burr_5_intended.PMR__PARAMEDIAN_RETICULAR: None,
+                burr_5_intended.PPY__PARAPYRAMIDAL_NUCLEU: None,
+                burr_5_intended.LAV__LATERAL_VESTIBULAR_N: None,
+                burr_5_intended.MV__MEDIAL_VESTIBULAR_NUC: None,
+                burr_5_intended.SPIV__SPINAL_VESTIBULAR_N: None,
+                burr_5_intended.SUV__SUPERIOR_VESTIBULAR: None,
+                burr_5_intended.X__NUCLEUS_X: None,
+                burr_5_intended.XII__HYPOGLOSSAL_NUCLEUS: None,
+                burr_5_intended.Y__NUCLEUS_Y: None,
+                burr_5_intended.RM__NUCLEUS_RAPHE_MAGNUS: None,
+                burr_5_intended.RPA__NUCLEUS_RAPHE_PALLID: None,
+                burr_5_intended.RO__NUCLEUS_RAPHE_OBSCURU: None,
+                burr_5_intended.LING__LINGULA_I: None,
+                burr_5_intended.CENT2__LOBULE_II: None,
+                burr_5_intended.CENT3__LOBULE_III: None,
+                burr_5_intended.CUL4_5__LOBULES_IV_V: None,
+                burr_5_intended.DEC__DECLIVE_VI: None,
+                burr_5_intended.FOTU__FOLIUM_TUBER_VERMIS: None,
+                burr_5_intended.PYR__PYRAMUS_VIII: None,
+                burr_5_intended.UVU__UVULA_IX: None,
+                burr_5_intended.NOD__NODULUS_X: None,
+                burr_5_intended.SIM__SIMPLE_LOBULE: None,
+                burr_5_intended.A_NCR1__CRUS_1: None,
+                burr_5_intended.A_NCR2__CRUS_2: None,
+                burr_5_intended.PRM__PARAMEDIAN_LOBULE: None,
+                burr_5_intended.COPY__COPULA_PYRAMIDIS: None,
+                burr_5_intended.PFL__PARAFLOCCULUS: None,
+                burr_5_intended.FL__FLOCCULUS: None,
+                burr_5_intended.FN__FASTIGIAL_NUCLEUS: None,
+                burr_5_intended.IP__INTERPOSED_NUCLEUS: None,
+                burr_5_intended.DN__DENTATE_NUCLEUS: None,
+                burr_5_intended.VE_CB__VESTIBULOCEREBELLA: None,
+            }.get(burr_5_intended, None)
         )
 
     @property
@@ -3284,43 +3281,43 @@ class MappedNSBList:
     @property
     def aind_burr_5_m_l(self) -> Optional[Decimal]:
         """Maps burr_5_m_l to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_5_m_l)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_5_x0020_m_x002f_l)
 
     @property
     def aind_burr_6_a_p(self) -> Optional[Decimal]:
         """Maps burr_6_a_p to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_6_a_p)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_6_x0020_a_x002f_p)
 
     @property
     def aind_burr_6_angle(self) -> Optional[Decimal]:
         """Maps burr_6_angle to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_6_angle)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_6_x0020_angle)
 
     @property
     def aind_burr_6_d_v_x00(self) -> Optional[Decimal]:
         """Maps burr_6_d_v_x00 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_6_d_v_x00)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_6_x0020_d_x002f_v_x00)
 
     @property
     def aind_burr_6_d_v_x000(self) -> Optional[Decimal]:
         """Maps burr_6_d_v_x000 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_6_d_v_x000)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_6_x0020_d_x002f_v_x000)
 
     @property
     def aind_burr_6_d_v_x001(self) -> Optional[Decimal]:
         """Maps burr_6_d_v_x001 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_6_d_v_x001)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_6_x0020_d_x002f_v_x001)
 
     @property
     def aind_burr_6_fiber_t(self) -> Optional[FiberType]:
         """Maps burr_6_fiber_t to aind model"""
         return (
             None
-            if self._nsb.burr_6_fiber_t is None
+            if self._nsb.burr_x0020_6_x0020_fiber_x0020_t is None
             else {
-                self._nsb.burr_6_fiber_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
-                self._nsb.burr_6_fiber_t.CUSTOM: FiberType.CUSTOM,
-            }.get(self._nsb.burr_6_fiber_t, None)
+                self._nsb.burr_x0020_6_x0020_fiber_x0020_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
+                self._nsb.burr_x0020_6_x0020_fiber_x0020_t.CUSTOM: FiberType.CUSTOM,
+            }.get(self._nsb.burr_x0020_6_x0020_fiber_x0020_t, None)
         )
 
     @property
@@ -3328,371 +3325,372 @@ class MappedNSBList:
         """Maps burr_6_hemisphere to aind model"""
         return (
             None
-            if self._nsb.burr_6_hemisphere is None
+            if self._nsb.burr_x0020_6_x0020_hemisphere is None
             else {
-                self._nsb.burr_6_hemisphere.SELECT: None,
-                self._nsb.burr_6_hemisphere.LEFT: Side.LEFT,
-                self._nsb.burr_6_hemisphere.RIGHT: Side.RIGHT,
-            }.get(self._nsb.burr_6_hemisphere, None)
+                self._nsb.burr_x0020_6_x0020_hemisphere.SELECT: None,
+                self._nsb.burr_x0020_6_x0020_hemisphere.LEFT: Side.LEFT,
+                self._nsb.burr_x0020_6_x0020_hemisphere.RIGHT: Side.RIGHT,
+            }.get(self._nsb.burr_x0020_6_x0020_hemisphere, None)
         )
 
     @property
     def aind_burr_6_injectable_x0(self) -> Optional[str]:
         """Maps burr_6_injectable_x0 to aind model."""
-        return self._nsb.burr_6_injectable_x0
+        return self._nsb.burr_x0020_6_x0020_injectable_x0
 
     @property
     def aind_burr_6_injectable_x00(self) -> Optional[str]:
         """Maps burr_6_injectable_x00 to aind model."""
-        return self._nsb.burr_6_injectable_x00
+        return self._nsb.burr_x0020_6_x0020_injectable_x00
 
     @property
     def aind_burr_6_injectable_x01(self) -> Optional[str]:
         """Maps burr_6_injectable_x01 to aind model."""
-        return self._nsb.burr_6_injectable_x01
+        return self._nsb.burr_x0020_6_x0020_injectable_x01
 
     @property
     def aind_burr_6_injectable_x02(self) -> Optional[str]:
         """Maps burr_6_injectable_x02 to aind model."""
-        return self._nsb.burr_6_injectable_x02
+        return self._nsb.burr_x0020_6_x0020_injectable_x02
 
     @property
     def aind_burr_6_injectable_x03(self) -> Optional[str]:
         """Maps burr_6_injectable_x03 to aind model."""
-        return self._nsb.burr_6_injectable_x03
+        return self._nsb.burr_x0020_6_x0020_injectable_x03
 
     @property
     def aind_burr_6_injectable_x04(self) -> Optional[str]:
         """Maps burr_6_injectable_x04 to aind model."""
-        return self._nsb.burr_6_injectable_x04
+        return self._nsb.burr_x0020_6_x0020_injectable_x04
 
     @property
     def aind_burr_6_injectable_x05(self) -> Optional[str]:
         """Maps burr_6_injectable_x05 to aind model."""
-        return self._nsb.burr_6_injectable_x05
+        return self._nsb.burr_x0020_6_x0020_injectable_x05
 
     @property
     def aind_burr_6_injectable_x06(self) -> Optional[str]:
         """Maps burr_6_injectable_x06 to aind model."""
-        return self._nsb.burr_6_injectable_x06
+        return self._nsb.burr_x0020_6_x0020_injectable_x06
 
     @property
     def aind_burr_6_intended(self) -> Optional[Any]:
         """Maps burr_6_intended to aind model."""
+        burr_6_intended = self._nsb.burr_x0020_6_x0020_intended_x002
         return (
             None
-            if self._nsb.burr_6_intended is None
+            if burr_6_intended is None
             else {
-                self._nsb.burr_6_intended.FRP__FRONTAL_POLE_CEREBRA: None,
-                self._nsb.burr_6_intended.M_OP__PRIMARY_MOTOR_AREA: None,
-                self._nsb.burr_6_intended.M_OS__SECONDARY_MOTOR_ARE: None,
-                self._nsb.burr_6_intended.S_SP_N__PRIMARY_SOMATOSEN: None,
-                self._nsb.burr_6_intended.S_SP_BFD__PRIMARY_SOMATOS: None,
-                self._nsb.burr_6_intended.S_SP_LL__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_6_intended.S_SP_M__PRIMARY_SOMATOSEN: None,
-                self._nsb.burr_6_intended.S_SP_UL__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_6_intended.S_SP_TR__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_6_intended.S_SP_UN__PRIMARY_SOMATOSE: None,
-                self._nsb.burr_6_intended.S_SS__SUPPLEMENTAL_SOMATO: None,
-                self._nsb.burr_6_intended.GU__GUSTATORY_AREAS: None,
-                self._nsb.burr_6_intended.VISC__VISCERAL_AREA: None,
-                self._nsb.burr_6_intended.AU_DD__DORSAL_AUDITORY_AR: None,
-                self._nsb.burr_6_intended.AU_DP__PRIMARY_AUDITORY_A: None,
-                self._nsb.burr_6_intended.AU_DPO__POSTERIOR_AUDITOR: None,
-                self._nsb.burr_6_intended.AU_DV__VENTRAL_AUDITORY_A: None,
-                self._nsb.burr_6_intended.VI_SAL__ANTEROLATERAL_VIS: None,
-                self._nsb.burr_6_intended.VI_SAM__ANTEROMEDIAL_VISU: None,
-                self._nsb.burr_6_intended.VI_SL__LATERAL_VISUAL_ARE: None,
-                self._nsb.burr_6_intended.VI_SP__PRIMARY_VISUAL_ARE: None,
-                self._nsb.burr_6_intended.VI_SPL__POSTEROLATERAL_VI: None,
-                self._nsb.burr_6_intended.VI_SPM_POSTEROMEDIAL_VISU: None,
-                self._nsb.burr_6_intended.VI_SLI__LATEROINTERMEDIAT: None,
-                self._nsb.burr_6_intended.VI_SPOR__POSTRHINAL_AREA: None,
-                self._nsb.burr_6_intended.AC_AD__ANTERIOR_CINGULATE: None,
-                self._nsb.burr_6_intended.AC_AV__ANTERIOR_CINGULATE: None,
-                self._nsb.burr_6_intended.PL__PRELIMBIC_AREA: None,
-                self._nsb.burr_6_intended.ILA__INFRALIMBIC_AREA: None,
-                self._nsb.burr_6_intended.OR_BL__ORBITAL_AREA_LATER: None,
-                self._nsb.burr_6_intended.OR_BM__ORBITAL_AREA_MEDIA: None,
-                self._nsb.burr_6_intended.OR_BV__ORBITAL_AREA_VENTR: None,
-                self._nsb.burr_6_intended.OR_BVL__ORBITAL_AREA_VENT: None,
-                self._nsb.burr_6_intended.A_ID__AGRANULAR_INSULAR_A: None,
-                self._nsb.burr_6_intended.A_IP__AGRANULAR_INSULAR_A: None,
-                self._nsb.burr_6_intended.A_IV__AGRANULAR_INSULAR_A: None,
-                self._nsb.burr_6_intended.RS_PAGL__RETROSPLENIAL_AR: None,
-                self._nsb.burr_6_intended.RS_PD__RETROSPLENIAL_AREA: None,
-                self._nsb.burr_6_intended.RS_PV__RETROSPLENIAL_AREA: None,
-                self._nsb.burr_6_intended.VI_SA__ANTERIOR_AREA: None,
-                self._nsb.burr_6_intended.VI_SRL__ROSTROLATERAL_VIS: None,
-                self._nsb.burr_6_intended.T_EA__TEMPORAL_ASSOCIATIO: None,
-                self._nsb.burr_6_intended.PERI__PERIRHINAL_AREA: None,
-                self._nsb.burr_6_intended.ECT__ECTORHINAL_AREA: None,
-                self._nsb.burr_6_intended.MOB__MAIN_OLFACTORY_BULB: None,
-                self._nsb.burr_6_intended.AOB__ACCESSORY_OLFACTORY: None,
-                self._nsb.burr_6_intended.AON__ANTERIOR_OLFACTORY_N: None,
-                self._nsb.burr_6_intended.T_TD__TAENIA_TECTA_DORSAL: None,
-                self._nsb.burr_6_intended.T_TV__TAENIA_TECTA_VENTRA: None,
-                self._nsb.burr_6_intended.DP__DORSAL_PEDUNCULAR_ARE: None,
-                self._nsb.burr_6_intended.PIR__PIRIFORM_AREA: None,
-                self._nsb.burr_6_intended.NLOT__NUCLEUS_OF_THE_LATE: None,
-                self._nsb.burr_6_intended.CO_AA__CORTICAL_AMYGDALAR: None,
-                self._nsb.burr_6_intended.CO_AP__CORTICAL_AMYGDALAR: None,
-                self._nsb.burr_6_intended.PAA__PIRIFORM_AMYGDALAR_A: None,
-                self._nsb.burr_6_intended.TR__POSTPIRIFORM_TRANSITI: None,
-                self._nsb.burr_6_intended.CA1__FIELD_CA1: None,
-                self._nsb.burr_6_intended.CA2__FIELD_CA2: None,
-                self._nsb.burr_6_intended.CA3__FIELD_CA3: None,
-                self._nsb.burr_6_intended.DG__DENTATE_GYRUS: None,
-                self._nsb.burr_6_intended.FC__FASCIOLA_CINEREA: None,
-                self._nsb.burr_6_intended.IG__INDUSEUM_GRISEUM: None,
-                self._nsb.burr_6_intended.EN_TL__ENTORHINAL_AREA_LA: None,
-                self._nsb.burr_6_intended.EN_TM__ENTORHINAL_AREA_ME: None,
-                self._nsb.burr_6_intended.PAR__PARASUBICULUM: None,
-                self._nsb.burr_6_intended.POST__POSTSUBICULUM: None,
-                self._nsb.burr_6_intended.PRE__PRESUBICULUM: None,
-                self._nsb.burr_6_intended.SUB__SUBICULUM: None,
-                self._nsb.burr_6_intended.PRO_S__PROSUBICULUM: None,
-                self._nsb.burr_6_intended.HATA__HIPPOCAMPO_AMYGDALA: None,
-                self._nsb.burr_6_intended.A_PR__AREA_PROSTRIATA: None,
-                self._nsb.burr_6_intended.CLA__CLAUSTRUM: None,
-                self._nsb.burr_6_intended.E_PD__ENDOPIRIFORM_NUCLEU: None,
-                self._nsb.burr_6_intended.E_PV__ENDOPIRIFORM_NUCLEU: None,
-                self._nsb.burr_6_intended.LA__LATERAL_AMYGDALAR_NUC: None,
-                self._nsb.burr_6_intended.BLA__BASOLATERAL_AMYGDALA: None,
-                self._nsb.burr_6_intended.BMA__BASOMEDIAL_AMYGDALAR: None,
-                self._nsb.burr_6_intended.PA__POSTERIOR_AMYGDALAR_N: None,
-                self._nsb.burr_6_intended.CP__CAUDOPUTAMEN: None,
-                self._nsb.burr_6_intended.ACB__NUCLEUS_ACCUMBENS: None,
-                self._nsb.burr_6_intended.FS__FUNDUS_OF_STRIATUM: None,
-                self._nsb.burr_6_intended.OT__OLFACTORY_TUBERCLE: None,
-                self._nsb.burr_6_intended.L_SC__LATERAL_SEPTAL_NUCL: None,
-                self._nsb.burr_6_intended.L_SR__LATERAL_SEPTAL_NUCL: None,
-                self._nsb.burr_6_intended.L_SV__LATERAL_SEPTAL_NUCL: None,
-                self._nsb.burr_6_intended.SF__SEPTOFIMBRIAL_NUCLEUS: None,
-                self._nsb.burr_6_intended.SH__SEPTOHIPPOCAMPAL_NUCL: None,
-                self._nsb.burr_6_intended.AAA__ANTERIOR_AMYGDALAR_A: None,
-                self._nsb.burr_6_intended.BA__BED_NUCLEUS_OF_THE_AC: None,
-                self._nsb.burr_6_intended.CEA__CENTRAL_AMYGDALAR_NU: None,
-                self._nsb.burr_6_intended.IA__INTERCALATED_AMYGDALA: None,
-                self._nsb.burr_6_intended.MEA__MEDIAL_AMYGDALAR_NUC: None,
-                self._nsb.burr_6_intended.G_PE__GLOBUS_PALLIDUS_EXT: None,
-                self._nsb.burr_6_intended.G_PI__GLOBUS_PALLIDUS_INT: None,
-                self._nsb.burr_6_intended.SI__SUBSTANTIA_INNOMINATA: None,
-                self._nsb.burr_6_intended.MA__MAGNOCELLULAR_NUCLEUS: None,
-                self._nsb.burr_6_intended.MS__MEDIAL_SEPTAL_NUCLEUS: None,
-                self._nsb.burr_6_intended.NDB__DIAGONAL_BAND_NUCLEU: None,
-                self._nsb.burr_6_intended.TRS__TRIANGULAR_NUCLEUS_O: None,
-                self._nsb.burr_6_intended.BST__BED_NUCLEI_OF_THE_ST: None,
-                self._nsb.burr_6_intended.VAL__VENTRAL_ANTERIOR_LAT: None,
-                self._nsb.burr_6_intended.VM__VENTRAL_MEDIAL_NUCLEU: None,
-                self._nsb.burr_6_intended.VPL__VENTRAL_POSTEROLATER: None,
-                self._nsb.burr_6_intended.VP_LPC__VENTRAL_POSTEROLA: None,
-                self._nsb.burr_6_intended.VPM__VENTRAL_POSTEROMEDIA: None,
-                self._nsb.burr_6_intended.VP_MPC__VENTRAL_POSTEROME: None,
-                self._nsb.burr_6_intended.PO_T__POSTERIOR_TRIANGULA: None,
-                self._nsb.burr_6_intended.SPF__SUBPARAFASCICULAR_NU: None,
-                self._nsb.burr_6_intended.SPA__SUBPARAFASCICULAR_AR: None,
-                self._nsb.burr_6_intended.PP__PERIPEDUNCULAR_NUCLEU: None,
-                self._nsb.burr_6_intended.MG__MEDIAL_GENICULATE_COM: None,
-                self._nsb.burr_6_intended.L_GD__DORSAL_PART_OF_THE: None,
-                self._nsb.burr_6_intended.LP__LATERAL_POSTERIOR_NUC: None,
-                self._nsb.burr_6_intended.PO__POSTERIOR_COMPLEX_OF: None,
-                self._nsb.burr_6_intended.POL__POSTERIOR_LIMITING_N: None,
-                self._nsb.burr_6_intended.SGN__SUPRAGENICULATE_NUCL: None,
-                self._nsb.burr_6_intended.ETH__ETHMOID_NUCLEUS_OF_T: None,
-                self._nsb.burr_6_intended.AV__ANTEROVENTRAL_NUCLEUS: None,
-                self._nsb.burr_6_intended.AM__ANTEROMEDIAL_NUCLEUS: None,
-                self._nsb.burr_6_intended.AD__ANTERODORSAL_NUCLEUS: None,
-                self._nsb.burr_6_intended.IAM__INTERANTEROMEDIAL_NU: None,
-                self._nsb.burr_6_intended.IAD__INTERANTERODORSAL_NU: None,
-                self._nsb.burr_6_intended.LD__LATERAL_DORSAL_NUCLEU: None,
-                self._nsb.burr_6_intended.IMD__INTERMEDIODORSAL_NUC: None,
-                self._nsb.burr_6_intended.MD__MEDIODORSAL_NUCLEUS_O: None,
-                self._nsb.burr_6_intended.SMT__SUBMEDIAL_NUCLEUS_OF: None,
-                self._nsb.burr_6_intended.PR__PERIREUNENSIS_NUCLEUS: None,
-                self._nsb.burr_6_intended.PVT__PARAVENTRICULAR_NUCL: None,
-                self._nsb.burr_6_intended.PT__PARATAENIAL_NUCLEUS: None,
-                self._nsb.burr_6_intended.RE__NUCLEUS_OF_REUNIENS: None,
-                self._nsb.burr_6_intended.XI__XIPHOID_THALAMIC_NUCL: None,
-                self._nsb.burr_6_intended.RH__RHOMBOID_NUCLEUS: None,
-                self._nsb.burr_6_intended.CM__CENTRAL_MEDIAL_NUCLEU: None,
-                self._nsb.burr_6_intended.PCN__PARACENTRAL_NUCLEUS: None,
-                self._nsb.burr_6_intended.CL__CENTRAL_LATERAL_NUCLE: None,
-                self._nsb.burr_6_intended.PF__PARAFASCICULAR_NUCLEU: None,
-                self._nsb.burr_6_intended.PIL__POSTERIOR_INTRALAMIN: None,
-                self._nsb.burr_6_intended.RT__RETICULAR_NUCLEUS_OF: None,
-                self._nsb.burr_6_intended.IGL__INTERGENICULATE_LEAF: None,
-                self._nsb.burr_6_intended.INT_G__INTERMEDIATE_GENIC: None,
-                self._nsb.burr_6_intended.L_GV__VENTRAL_PART_OF_THE: None,
-                self._nsb.burr_6_intended.SUB_G__SUBGENICULATE_NUCL: None,
-                self._nsb.burr_6_intended.MH__MEDIAL_HABENULA: None,
-                self._nsb.burr_6_intended.LH__LATERAL_HABENULA: None,
-                self._nsb.burr_6_intended.SO__SUPRAOPTIC_NUCLEUS: None,
-                self._nsb.burr_6_intended.PVH__PARAVENTRICULAR_HYPO: None,
-                self._nsb.burr_6_intended.P_VA__PERIVENTRICULAR_HYP: None,
-                self._nsb.burr_6_intended.P_VI__PERIVENTRICULAR_HYP: None,
-                self._nsb.burr_6_intended.ARH__ARCUATE_HYPOTHALAMIC: None,
-                self._nsb.burr_6_intended.ADP__ANTERODORSAL_PREOPTI: None,
-                self._nsb.burr_6_intended.AVP__ANTEROVENTRAL_PREOPT: None,
-                self._nsb.burr_6_intended.AVPV__ANTEROVENTRAL_PERIV: None,
-                self._nsb.burr_6_intended.DMH__DORSOMEDIAL_NUCLEUS: None,
-                self._nsb.burr_6_intended.MEPO__MEDIAN_PREOPTIC_NUC: None,
-                self._nsb.burr_6_intended.MPO__MEDIAL_PREOPTIC_AREA: None,
-                self._nsb.burr_6_intended.PS__PARASTRIAL_NUCLEUS: None,
-                self._nsb.burr_6_intended.P_VP__PERIVENTRICULAR_HYP: None,
-                self._nsb.burr_6_intended.P_VPO__PERIVENTRICULAR_HY: None,
-                self._nsb.burr_6_intended.SBPV__SUBPARAVENTRICULAR: None,
-                self._nsb.burr_6_intended.SCH__SUPRACHIASMATIC_NUCL: None,
-                self._nsb.burr_6_intended.SFO__SUBFORNICAL_ORGAN: None,
-                self._nsb.burr_6_intended.VMPO__VENTROMEDIAL_PREOPT: None,
-                self._nsb.burr_6_intended.VLPO__VENTROLATERAL_PREOP: None,
-                self._nsb.burr_6_intended.AHN__ANTERIOR_HYPOTHALAMI: None,
-                self._nsb.burr_6_intended.LM__LATERAL_MAMMILLARY_NU: None,
-                self._nsb.burr_6_intended.MM__MEDIAL_MAMMILLARY_NUC: None,
-                self._nsb.burr_6_intended.SUM__SUPRAMAMMILLARY_NUCL: None,
-                self._nsb.burr_6_intended.TM__TUBEROMAMMILLARY_NUCL: None,
-                self._nsb.burr_6_intended.MPN__MEDIAL_PREOPTIC_NUCL: None,
-                self._nsb.burr_6_intended.P_MD__DORSAL_PREMAMMILLAR: None,
-                self._nsb.burr_6_intended.P_MV__VENTRAL_PREMAMMILLA: None,
-                self._nsb.burr_6_intended.PV_HD__PARAVENTRICULAR_HY: None,
-                self._nsb.burr_6_intended.VMH__VENTROMEDIAL_HYPOTHA: None,
-                self._nsb.burr_6_intended.PH__POSTERIOR_HYPOTHALAMI: None,
-                self._nsb.burr_6_intended.LHA__LATERAL_HYPOTHALAMIC: None,
-                self._nsb.burr_6_intended.LPO__LATERAL_PREOPTIC_ARE: None,
-                self._nsb.burr_6_intended.PSTN__PARASUBTHALAMIC_NUC: None,
-                self._nsb.burr_6_intended.PE_F__PERIFORNICAL_NUCLEU: None,
-                self._nsb.burr_6_intended.RCH__RETROCHIASMATIC_AREA: None,
-                self._nsb.burr_6_intended.STN__SUBTHALAMIC_NUCLEUS: None,
-                self._nsb.burr_6_intended.TU__TUBERAL_NUCLEUS: None,
-                self._nsb.burr_6_intended.ZI__ZONA_INCERTA: None,
-                self._nsb.burr_6_intended.S_CS__SUPERIOR_COLLICULUS: None,
-                self._nsb.burr_6_intended.IC__INFERIOR_COLLICULUS: None,
-                self._nsb.burr_6_intended.NB__NUCLEUS_OF_THE_BRACHI: None,
-                self._nsb.burr_6_intended.SAG__NUCLEUS_SAGULUM: None,
-                self._nsb.burr_6_intended.PBG__PARABIGEMINAL_NUCLEU: None,
-                self._nsb.burr_6_intended.S_NR__SUBSTANTIA_NIGRA_RE: None,
-                self._nsb.burr_6_intended.VTA__VENTRAL_TEGMENTAL_AR: None,
-                self._nsb.burr_6_intended.PN__PARANIGRAL_NUCLEUS: None,
-                self._nsb.burr_6_intended.RR__MIDBRAIN_RETICULAR_NU: None,
-                self._nsb.burr_6_intended.MRN__MIDBRAIN_RETICULAR_N: None,
-                self._nsb.burr_6_intended.S_CM__SUPERIOR_COLLICULUS: None,
-                self._nsb.burr_6_intended.PAG__PERIAQUEDUCTAL_GRAY: None,
-                self._nsb.burr_6_intended.APN__ANTERIOR_PRETECTAL_N: None,
-                self._nsb.burr_6_intended.MPT__MEDIAL_PRETECTAL_ARE: None,
-                self._nsb.burr_6_intended.NOT__NUCLEUS_OF_THE_OPTIC: None,
-                self._nsb.burr_6_intended.NPC__NUCLEUS_OF_THE_POSTE: None,
-                self._nsb.burr_6_intended.OP__OLIVARY_PRETECTAL_NUC: None,
-                self._nsb.burr_6_intended.PPT__POSTERIOR_PRETECTAL: None,
-                self._nsb.burr_6_intended.RPF__RETROPARAFASCICULAR: None,
-                self._nsb.burr_6_intended.CUN__CUNEIFORM_NUCLEUS: None,
-                self._nsb.burr_6_intended.RN__RED_NUCLEUS: None,
-                self._nsb.burr_6_intended.III__OCULOMOTOR_NUCLEUS: None,
-                self._nsb.burr_6_intended.MA3__MEDIAL_ACCESORY_OCUL: None,
-                self._nsb.burr_6_intended.EW__EDINGER__WESTPHAL_NUC: None,
-                self._nsb.burr_6_intended.IV__TROCHLEAR_NUCLEUS: None,
-                self._nsb.burr_6_intended.PA4__PARATROCHLEAR_NUCLEU: None,
-                self._nsb.burr_6_intended.VTN__VENTRAL_TEGMENTAL_NU: None,
-                self._nsb.burr_6_intended.AT__ANTERIOR_TEGMENTAL_NU: None,
-                self._nsb.burr_6_intended.LT__LATERAL_TERMINAL_NUCL: None,
-                self._nsb.burr_6_intended.DT__DORSAL_TERMINAL_NUCLE: None,
-                self._nsb.burr_6_intended.MT__MEDIAL_TERMINAL_NUCLE: None,
-                self._nsb.burr_6_intended.S_NC__SUBSTANTIA_NIGRA_CO: None,
-                self._nsb.burr_6_intended.PPN__PEDUNCULOPONTINE_NUC: None,
-                self._nsb.burr_6_intended.IF__INTERFASCICULAR_NUCLE: None,
-                self._nsb.burr_6_intended.IPN__INTERPEDUNCULAR_NUCL: None,
-                self._nsb.burr_6_intended.RL__ROSTRAL_LINEAR_NUCLEU: None,
-                self._nsb.burr_6_intended.CLI__CENTRAL_LINEAR_NUCLE: None,
-                self._nsb.burr_6_intended.DR__DORSAL_NUCLEUS_RAPHE: None,
-                self._nsb.burr_6_intended.NLL__NUCLEUS_OF_THE_LATER: None,
-                self._nsb.burr_6_intended.PSV__PRINCIPAL_SENSORY_NU: None,
-                self._nsb.burr_6_intended.PB__PARABRACHIAL_NUCLEUS: None,
-                self._nsb.burr_6_intended.SOC__SUPERIOR_OLIVARY_COM: None,
-                self._nsb.burr_6_intended.B__BARRINGTON_S_NUCLEUS: None,
-                self._nsb.burr_6_intended.DTN__DORSAL_TEGMENTAL_NUC: None,
-                self._nsb.burr_6_intended.PD_TG__POSTERODORSAL_TEGM: None,
-                self._nsb.burr_6_intended.PCG__PONTINE_CENTRAL_GRAY: None,
-                self._nsb.burr_6_intended.PG__PONTINE_GRAY: None,
-                self._nsb.burr_6_intended.PR_NC__PONTINE_RETICULAR: None,
-                self._nsb.burr_6_intended.SG__SUPRAGENUAL_NUCLEUS: None,
-                self._nsb.burr_6_intended.SUT__SUPRATRIGEMINAL_NUCL: None,
-                self._nsb.burr_6_intended.TRN__TEGMENTAL_RETICULAR: None,
-                self._nsb.burr_6_intended.V__MOTOR_NUCLEUS_OF_TRIGE: None,
-                self._nsb.burr_6_intended.P5__PERITRIGEMINAL_ZONE: None,
-                self._nsb.burr_6_intended.ACS5__ACCESSORY_TRIGEMINA: None,
-                self._nsb.burr_6_intended.PC5__PARVICELLULAR_MOTOR: None,
-                self._nsb.burr_6_intended.I5__INTERTRIGEMINAL_NUCLE: None,
-                self._nsb.burr_6_intended.CS__SUPERIOR_CENTRAL_NUCL: None,
-                self._nsb.burr_6_intended.LC__LOCUS_CERULEUS: None,
-                self._nsb.burr_6_intended.LDT__LATERODORSAL_TEGMENT: None,
-                self._nsb.burr_6_intended.NI__NUCLEUS_INCERTUS: None,
-                self._nsb.burr_6_intended.PR_NR__PONTINE_RETICULAR: None,
-                self._nsb.burr_6_intended.RPO__NUCLEUS_RAPHE_PONTIS: None,
-                self._nsb.burr_6_intended.SLC__SUBCERULEUS_NUCLEUS: None,
-                self._nsb.burr_6_intended.SLD__SUBLATERODORSAL_NUCL: None,
-                self._nsb.burr_6_intended.MY__MEDULLA: None,
-                self._nsb.burr_6_intended.AP__AREA_POSTREMA: None,
-                self._nsb.burr_6_intended.DCO__DORSAL_COCHLEAR_NUCL: None,
-                self._nsb.burr_6_intended.VCO__VENTRAL_COCHLEAR_NUC: None,
-                self._nsb.burr_6_intended.CU__CUNEATE_NUCLEUS: None,
-                self._nsb.burr_6_intended.GR__GRACILE_NUCLEUS: None,
-                self._nsb.burr_6_intended.ECU__EXTERNAL_CUNEATE_NUC: None,
-                self._nsb.burr_6_intended.NTB__NUCLEUS_OF_THE_TRAPE: None,
-                self._nsb.burr_6_intended.NTS__NUCLEUS_OF_THE_SOLIT: None,
-                self._nsb.burr_6_intended.SPVC__SPINAL_NUCLEUS_OF_T: None,
-                self._nsb.burr_6_intended.SPVI__SPINAL_NUCLEUS_OF_T: None,
-                self._nsb.burr_6_intended.SPVO__SPINAL_NUCLEUS_OF_T: None,
-                self._nsb.burr_6_intended.PA5__PARATRIGEMINAL_NUCLE: None,
-                self._nsb.burr_6_intended.VI__ABDUCENS_NUCLEUS: None,
-                self._nsb.burr_6_intended.VII__FACIAL_MOTOR_NUCLEUS: None,
-                self._nsb.burr_6_intended.AMB__NUCLEUS_AMBIGUUS: None,
-                self._nsb.burr_6_intended.DMX__DORSAL_MOTOR_NUCLEUS: None,
-                self._nsb.burr_6_intended.GRN__GIGANTOCELLULAR_RETI: None,
-                self._nsb.burr_6_intended.ICB__INFRACEREBELLAR_NUCL: None,
-                self._nsb.burr_6_intended.IO__INFERIOR_OLIVARY_COMP: None,
-                self._nsb.burr_6_intended.IRN__INTERMEDIATE_RETICUL: None,
-                self._nsb.burr_6_intended.ISN__INFERIOR_SALIVATORY: None,
-                self._nsb.burr_6_intended.LIN__LINEAR_NUCLEUS_OF_TH: None,
-                self._nsb.burr_6_intended.LRN__LATERAL_RETICULAR_NU: None,
-                self._nsb.burr_6_intended.MARN__MAGNOCELLULAR_RETIC: None,
-                self._nsb.burr_6_intended.MDRN__MEDULLARY_RETICULAR: None,
-                self._nsb.burr_6_intended.PARN__PARVICELLULAR_RETIC: None,
-                self._nsb.burr_6_intended.PAS__PARASOLITARY_NUCLEUS: None,
-                self._nsb.burr_6_intended.PGRN__PARAGIGANTOCELLULAR: None,
-                self._nsb.burr_6_intended.NR__NUCLEUS_OF__ROLLER: None,
-                self._nsb.burr_6_intended.PRP__NUCLEUS_PREPOSITUS: None,
-                self._nsb.burr_6_intended.PMR__PARAMEDIAN_RETICULAR: None,
-                self._nsb.burr_6_intended.PPY__PARAPYRAMIDAL_NUCLEU: None,
-                self._nsb.burr_6_intended.LAV__LATERAL_VESTIBULAR_N: None,
-                self._nsb.burr_6_intended.MV__MEDIAL_VESTIBULAR_NUC: None,
-                self._nsb.burr_6_intended.SPIV__SPINAL_VESTIBULAR_N: None,
-                self._nsb.burr_6_intended.SUV__SUPERIOR_VESTIBULAR: None,
-                self._nsb.burr_6_intended.X__NUCLEUS_X: None,
-                self._nsb.burr_6_intended.XII__HYPOGLOSSAL_NUCLEUS: None,
-                self._nsb.burr_6_intended.Y__NUCLEUS_Y: None,
-                self._nsb.burr_6_intended.RM__NUCLEUS_RAPHE_MAGNUS: None,
-                self._nsb.burr_6_intended.RPA__NUCLEUS_RAPHE_PALLID: None,
-                self._nsb.burr_6_intended.RO__NUCLEUS_RAPHE_OBSCURU: None,
-                self._nsb.burr_6_intended.LING__LINGULA_I: None,
-                self._nsb.burr_6_intended.CENT2__LOBULE_II: None,
-                self._nsb.burr_6_intended.CENT3__LOBULE_III: None,
-                self._nsb.burr_6_intended.CUL4_5__LOBULES_IV_V: None,
-                self._nsb.burr_6_intended.DEC__DECLIVE_VI: None,
-                self._nsb.burr_6_intended.FOTU__FOLIUM_TUBER_VERMIS: None,
-                self._nsb.burr_6_intended.PYR__PYRAMUS_VIII: None,
-                self._nsb.burr_6_intended.UVU__UVULA_IX: None,
-                self._nsb.burr_6_intended.NOD__NODULUS_X: None,
-                self._nsb.burr_6_intended.SIM__SIMPLE_LOBULE: None,
-                self._nsb.burr_6_intended.A_NCR1__CRUS_1: None,
-                self._nsb.burr_6_intended.A_NCR2__CRUS_2: None,
-                self._nsb.burr_6_intended.PRM__PARAMEDIAN_LOBULE: None,
-                self._nsb.burr_6_intended.COPY__COPULA_PYRAMIDIS: None,
-                self._nsb.burr_6_intended.PFL__PARAFLOCCULUS: None,
-                self._nsb.burr_6_intended.FL__FLOCCULUS: None,
-                self._nsb.burr_6_intended.FN__FASTIGIAL_NUCLEUS: None,
-                self._nsb.burr_6_intended.IP__INTERPOSED_NUCLEUS: None,
-                self._nsb.burr_6_intended.DN__DENTATE_NUCLEUS: None,
-                self._nsb.burr_6_intended.VE_CB__VESTIBULOCEREBELLA: None,
-            }.get(self._nsb.burr_6_intended, None)
+                burr_6_intended.FRP__FRONTAL_POLE_CEREBRA: None,
+                burr_6_intended.M_OP__PRIMARY_MOTOR_AREA: None,
+                burr_6_intended.M_OS__SECONDARY_MOTOR_ARE: None,
+                burr_6_intended.S_SP_N__PRIMARY_SOMATOSEN: None,
+                burr_6_intended.S_SP_BFD__PRIMARY_SOMATOS: None,
+                burr_6_intended.S_SP_LL__PRIMARY_SOMATOSE: None,
+                burr_6_intended.S_SP_M__PRIMARY_SOMATOSEN: None,
+                burr_6_intended.S_SP_UL__PRIMARY_SOMATOSE: None,
+                burr_6_intended.S_SP_TR__PRIMARY_SOMATOSE: None,
+                burr_6_intended.S_SP_UN__PRIMARY_SOMATOSE: None,
+                burr_6_intended.S_SS__SUPPLEMENTAL_SOMATO: None,
+                burr_6_intended.GU__GUSTATORY_AREAS: None,
+                burr_6_intended.VISC__VISCERAL_AREA: None,
+                burr_6_intended.AU_DD__DORSAL_AUDITORY_AR: None,
+                burr_6_intended.AU_DP__PRIMARY_AUDITORY_A: None,
+                burr_6_intended.AU_DPO__POSTERIOR_AUDITOR: None,
+                burr_6_intended.AU_DV__VENTRAL_AUDITORY_A: None,
+                burr_6_intended.VI_SAL__ANTEROLATERAL_VIS: None,
+                burr_6_intended.VI_SAM__ANTEROMEDIAL_VISU: None,
+                burr_6_intended.VI_SL__LATERAL_VISUAL_ARE: None,
+                burr_6_intended.VI_SP__PRIMARY_VISUAL_ARE: None,
+                burr_6_intended.VI_SPL__POSTEROLATERAL_VI: None,
+                burr_6_intended.VI_SPM_POSTEROMEDIAL_VISU: None,
+                burr_6_intended.VI_SLI__LATEROINTERMEDIAT: None,
+                burr_6_intended.VI_SPOR__POSTRHINAL_AREA: None,
+                burr_6_intended.AC_AD__ANTERIOR_CINGULATE: None,
+                burr_6_intended.AC_AV__ANTERIOR_CINGULATE: None,
+                burr_6_intended.PL__PRELIMBIC_AREA: None,
+                burr_6_intended.ILA__INFRALIMBIC_AREA: None,
+                burr_6_intended.OR_BL__ORBITAL_AREA_LATER: None,
+                burr_6_intended.OR_BM__ORBITAL_AREA_MEDIA: None,
+                burr_6_intended.OR_BV__ORBITAL_AREA_VENTR: None,
+                burr_6_intended.OR_BVL__ORBITAL_AREA_VENT: None,
+                burr_6_intended.A_ID__AGRANULAR_INSULAR_A: None,
+                burr_6_intended.A_IP__AGRANULAR_INSULAR_A: None,
+                burr_6_intended.A_IV__AGRANULAR_INSULAR_A: None,
+                burr_6_intended.RS_PAGL__RETROSPLENIAL_AR: None,
+                burr_6_intended.RS_PD__RETROSPLENIAL_AREA: None,
+                burr_6_intended.RS_PV__RETROSPLENIAL_AREA: None,
+                burr_6_intended.VI_SA__ANTERIOR_AREA: None,
+                burr_6_intended.VI_SRL__ROSTROLATERAL_VIS: None,
+                burr_6_intended.T_EA__TEMPORAL_ASSOCIATIO: None,
+                burr_6_intended.PERI__PERIRHINAL_AREA: None,
+                burr_6_intended.ECT__ECTORHINAL_AREA: None,
+                burr_6_intended.MOB__MAIN_OLFACTORY_BULB: None,
+                burr_6_intended.AOB__ACCESSORY_OLFACTORY: None,
+                burr_6_intended.AON__ANTERIOR_OLFACTORY_N: None,
+                burr_6_intended.T_TD__TAENIA_TECTA_DORSAL: None,
+                burr_6_intended.T_TV__TAENIA_TECTA_VENTRA: None,
+                burr_6_intended.DP__DORSAL_PEDUNCULAR_ARE: None,
+                burr_6_intended.PIR__PIRIFORM_AREA: None,
+                burr_6_intended.NLOT__NUCLEUS_OF_THE_LATE: None,
+                burr_6_intended.CO_AA__CORTICAL_AMYGDALAR: None,
+                burr_6_intended.CO_AP__CORTICAL_AMYGDALAR: None,
+                burr_6_intended.PAA__PIRIFORM_AMYGDALAR_A: None,
+                burr_6_intended.TR__POSTPIRIFORM_TRANSITI: None,
+                burr_6_intended.CA1__FIELD_CA1: None,
+                burr_6_intended.CA2__FIELD_CA2: None,
+                burr_6_intended.CA3__FIELD_CA3: None,
+                burr_6_intended.DG__DENTATE_GYRUS: None,
+                burr_6_intended.FC__FASCIOLA_CINEREA: None,
+                burr_6_intended.IG__INDUSEUM_GRISEUM: None,
+                burr_6_intended.EN_TL__ENTORHINAL_AREA_LA: None,
+                burr_6_intended.EN_TM__ENTORHINAL_AREA_ME: None,
+                burr_6_intended.PAR__PARASUBICULUM: None,
+                burr_6_intended.POST__POSTSUBICULUM: None,
+                burr_6_intended.PRE__PRESUBICULUM: None,
+                burr_6_intended.SUB__SUBICULUM: None,
+                burr_6_intended.PRO_S__PROSUBICULUM: None,
+                burr_6_intended.HATA__HIPPOCAMPO_AMYGDALA: None,
+                burr_6_intended.A_PR__AREA_PROSTRIATA: None,
+                burr_6_intended.CLA__CLAUSTRUM: None,
+                burr_6_intended.E_PD__ENDOPIRIFORM_NUCLEU: None,
+                burr_6_intended.E_PV__ENDOPIRIFORM_NUCLEU: None,
+                burr_6_intended.LA__LATERAL_AMYGDALAR_NUC: None,
+                burr_6_intended.BLA__BASOLATERAL_AMYGDALA: None,
+                burr_6_intended.BMA__BASOMEDIAL_AMYGDALAR: None,
+                burr_6_intended.PA__POSTERIOR_AMYGDALAR_N: None,
+                burr_6_intended.CP__CAUDOPUTAMEN: None,
+                burr_6_intended.ACB__NUCLEUS_ACCUMBENS: None,
+                burr_6_intended.FS__FUNDUS_OF_STRIATUM: None,
+                burr_6_intended.OT__OLFACTORY_TUBERCLE: None,
+                burr_6_intended.L_SC__LATERAL_SEPTAL_NUCL: None,
+                burr_6_intended.L_SR__LATERAL_SEPTAL_NUCL: None,
+                burr_6_intended.L_SV__LATERAL_SEPTAL_NUCL: None,
+                burr_6_intended.SF__SEPTOFIMBRIAL_NUCLEUS: None,
+                burr_6_intended.SH__SEPTOHIPPOCAMPAL_NUCL: None,
+                burr_6_intended.AAA__ANTERIOR_AMYGDALAR_A: None,
+                burr_6_intended.BA__BED_NUCLEUS_OF_THE_AC: None,
+                burr_6_intended.CEA__CENTRAL_AMYGDALAR_NU: None,
+                burr_6_intended.IA__INTERCALATED_AMYGDALA: None,
+                burr_6_intended.MEA__MEDIAL_AMYGDALAR_NUC: None,
+                burr_6_intended.G_PE__GLOBUS_PALLIDUS_EXT: None,
+                burr_6_intended.G_PI__GLOBUS_PALLIDUS_INT: None,
+                burr_6_intended.SI__SUBSTANTIA_INNOMINATA: None,
+                burr_6_intended.MA__MAGNOCELLULAR_NUCLEUS: None,
+                burr_6_intended.MS__MEDIAL_SEPTAL_NUCLEUS: None,
+                burr_6_intended.NDB__DIAGONAL_BAND_NUCLEU: None,
+                burr_6_intended.TRS__TRIANGULAR_NUCLEUS_O: None,
+                burr_6_intended.BST__BED_NUCLEI_OF_THE_ST: None,
+                burr_6_intended.VAL__VENTRAL_ANTERIOR_LAT: None,
+                burr_6_intended.VM__VENTRAL_MEDIAL_NUCLEU: None,
+                burr_6_intended.VPL__VENTRAL_POSTEROLATER: None,
+                burr_6_intended.VP_LPC__VENTRAL_POSTEROLA: None,
+                burr_6_intended.VPM__VENTRAL_POSTEROMEDIA: None,
+                burr_6_intended.VP_MPC__VENTRAL_POSTEROME: None,
+                burr_6_intended.PO_T__POSTERIOR_TRIANGULA: None,
+                burr_6_intended.SPF__SUBPARAFASCICULAR_NU: None,
+                burr_6_intended.SPA__SUBPARAFASCICULAR_AR: None,
+                burr_6_intended.PP__PERIPEDUNCULAR_NUCLEU: None,
+                burr_6_intended.MG__MEDIAL_GENICULATE_COM: None,
+                burr_6_intended.L_GD__DORSAL_PART_OF_THE: None,
+                burr_6_intended.LP__LATERAL_POSTERIOR_NUC: None,
+                burr_6_intended.PO__POSTERIOR_COMPLEX_OF: None,
+                burr_6_intended.POL__POSTERIOR_LIMITING_N: None,
+                burr_6_intended.SGN__SUPRAGENICULATE_NUCL: None,
+                burr_6_intended.ETH__ETHMOID_NUCLEUS_OF_T: None,
+                burr_6_intended.AV__ANTEROVENTRAL_NUCLEUS: None,
+                burr_6_intended.AM__ANTEROMEDIAL_NUCLEUS: None,
+                burr_6_intended.AD__ANTERODORSAL_NUCLEUS: None,
+                burr_6_intended.IAM__INTERANTEROMEDIAL_NU: None,
+                burr_6_intended.IAD__INTERANTERODORSAL_NU: None,
+                burr_6_intended.LD__LATERAL_DORSAL_NUCLEU: None,
+                burr_6_intended.IMD__INTERMEDIODORSAL_NUC: None,
+                burr_6_intended.MD__MEDIODORSAL_NUCLEUS_O: None,
+                burr_6_intended.SMT__SUBMEDIAL_NUCLEUS_OF: None,
+                burr_6_intended.PR__PERIREUNENSIS_NUCLEUS: None,
+                burr_6_intended.PVT__PARAVENTRICULAR_NUCL: None,
+                burr_6_intended.PT__PARATAENIAL_NUCLEUS: None,
+                burr_6_intended.RE__NUCLEUS_OF_REUNIENS: None,
+                burr_6_intended.XI__XIPHOID_THALAMIC_NUCL: None,
+                burr_6_intended.RH__RHOMBOID_NUCLEUS: None,
+                burr_6_intended.CM__CENTRAL_MEDIAL_NUCLEU: None,
+                burr_6_intended.PCN__PARACENTRAL_NUCLEUS: None,
+                burr_6_intended.CL__CENTRAL_LATERAL_NUCLE: None,
+                burr_6_intended.PF__PARAFASCICULAR_NUCLEU: None,
+                burr_6_intended.PIL__POSTERIOR_INTRALAMIN: None,
+                burr_6_intended.RT__RETICULAR_NUCLEUS_OF: None,
+                burr_6_intended.IGL__INTERGENICULATE_LEAF: None,
+                burr_6_intended.INT_G__INTERMEDIATE_GENIC: None,
+                burr_6_intended.L_GV__VENTRAL_PART_OF_THE: None,
+                burr_6_intended.SUB_G__SUBGENICULATE_NUCL: None,
+                burr_6_intended.MH__MEDIAL_HABENULA: None,
+                burr_6_intended.LH__LATERAL_HABENULA: None,
+                burr_6_intended.SO__SUPRAOPTIC_NUCLEUS: None,
+                burr_6_intended.PVH__PARAVENTRICULAR_HYPO: None,
+                burr_6_intended.P_VA__PERIVENTRICULAR_HYP: None,
+                burr_6_intended.P_VI__PERIVENTRICULAR_HYP: None,
+                burr_6_intended.ARH__ARCUATE_HYPOTHALAMIC: None,
+                burr_6_intended.ADP__ANTERODORSAL_PREOPTI: None,
+                burr_6_intended.AVP__ANTEROVENTRAL_PREOPT: None,
+                burr_6_intended.AVPV__ANTEROVENTRAL_PERIV: None,
+                burr_6_intended.DMH__DORSOMEDIAL_NUCLEUS: None,
+                burr_6_intended.MEPO__MEDIAN_PREOPTIC_NUC: None,
+                burr_6_intended.MPO__MEDIAL_PREOPTIC_AREA: None,
+                burr_6_intended.PS__PARASTRIAL_NUCLEUS: None,
+                burr_6_intended.P_VP__PERIVENTRICULAR_HYP: None,
+                burr_6_intended.P_VPO__PERIVENTRICULAR_HY: None,
+                burr_6_intended.SBPV__SUBPARAVENTRICULAR: None,
+                burr_6_intended.SCH__SUPRACHIASMATIC_NUCL: None,
+                burr_6_intended.SFO__SUBFORNICAL_ORGAN: None,
+                burr_6_intended.VMPO__VENTROMEDIAL_PREOPT: None,
+                burr_6_intended.VLPO__VENTROLATERAL_PREOP: None,
+                burr_6_intended.AHN__ANTERIOR_HYPOTHALAMI: None,
+                burr_6_intended.LM__LATERAL_MAMMILLARY_NU: None,
+                burr_6_intended.MM__MEDIAL_MAMMILLARY_NUC: None,
+                burr_6_intended.SUM__SUPRAMAMMILLARY_NUCL: None,
+                burr_6_intended.TM__TUBEROMAMMILLARY_NUCL: None,
+                burr_6_intended.MPN__MEDIAL_PREOPTIC_NUCL: None,
+                burr_6_intended.P_MD__DORSAL_PREMAMMILLAR: None,
+                burr_6_intended.P_MV__VENTRAL_PREMAMMILLA: None,
+                burr_6_intended.PV_HD__PARAVENTRICULAR_HY: None,
+                burr_6_intended.VMH__VENTROMEDIAL_HYPOTHA: None,
+                burr_6_intended.PH__POSTERIOR_HYPOTHALAMI: None,
+                burr_6_intended.LHA__LATERAL_HYPOTHALAMIC: None,
+                burr_6_intended.LPO__LATERAL_PREOPTIC_ARE: None,
+                burr_6_intended.PSTN__PARASUBTHALAMIC_NUC: None,
+                burr_6_intended.PE_F__PERIFORNICAL_NUCLEU: None,
+                burr_6_intended.RCH__RETROCHIASMATIC_AREA: None,
+                burr_6_intended.STN__SUBTHALAMIC_NUCLEUS: None,
+                burr_6_intended.TU__TUBERAL_NUCLEUS: None,
+                burr_6_intended.ZI__ZONA_INCERTA: None,
+                burr_6_intended.S_CS__SUPERIOR_COLLICULUS: None,
+                burr_6_intended.IC__INFERIOR_COLLICULUS: None,
+                burr_6_intended.NB__NUCLEUS_OF_THE_BRACHI: None,
+                burr_6_intended.SAG__NUCLEUS_SAGULUM: None,
+                burr_6_intended.PBG__PARABIGEMINAL_NUCLEU: None,
+                burr_6_intended.S_NR__SUBSTANTIA_NIGRA_RE: None,
+                burr_6_intended.VTA__VENTRAL_TEGMENTAL_AR: None,
+                burr_6_intended.PN__PARANIGRAL_NUCLEUS: None,
+                burr_6_intended.RR__MIDBRAIN_RETICULAR_NU: None,
+                burr_6_intended.MRN__MIDBRAIN_RETICULAR_N: None,
+                burr_6_intended.S_CM__SUPERIOR_COLLICULUS: None,
+                burr_6_intended.PAG__PERIAQUEDUCTAL_GRAY: None,
+                burr_6_intended.APN__ANTERIOR_PRETECTAL_N: None,
+                burr_6_intended.MPT__MEDIAL_PRETECTAL_ARE: None,
+                burr_6_intended.NOT__NUCLEUS_OF_THE_OPTIC: None,
+                burr_6_intended.NPC__NUCLEUS_OF_THE_POSTE: None,
+                burr_6_intended.OP__OLIVARY_PRETECTAL_NUC: None,
+                burr_6_intended.PPT__POSTERIOR_PRETECTAL: None,
+                burr_6_intended.RPF__RETROPARAFASCICULAR: None,
+                burr_6_intended.CUN__CUNEIFORM_NUCLEUS: None,
+                burr_6_intended.RN__RED_NUCLEUS: None,
+                burr_6_intended.III__OCULOMOTOR_NUCLEUS: None,
+                burr_6_intended.MA3__MEDIAL_ACCESORY_OCUL: None,
+                burr_6_intended.EW__EDINGER__WESTPHAL_NUC: None,
+                burr_6_intended.IV__TROCHLEAR_NUCLEUS: None,
+                burr_6_intended.PA4__PARATROCHLEAR_NUCLEU: None,
+                burr_6_intended.VTN__VENTRAL_TEGMENTAL_NU: None,
+                burr_6_intended.AT__ANTERIOR_TEGMENTAL_NU: None,
+                burr_6_intended.LT__LATERAL_TERMINAL_NUCL: None,
+                burr_6_intended.DT__DORSAL_TERMINAL_NUCLE: None,
+                burr_6_intended.MT__MEDIAL_TERMINAL_NUCLE: None,
+                burr_6_intended.S_NC__SUBSTANTIA_NIGRA_CO: None,
+                burr_6_intended.PPN__PEDUNCULOPONTINE_NUC: None,
+                burr_6_intended.IF__INTERFASCICULAR_NUCLE: None,
+                burr_6_intended.IPN__INTERPEDUNCULAR_NUCL: None,
+                burr_6_intended.RL__ROSTRAL_LINEAR_NUCLEU: None,
+                burr_6_intended.CLI__CENTRAL_LINEAR_NUCLE: None,
+                burr_6_intended.DR__DORSAL_NUCLEUS_RAPHE: None,
+                burr_6_intended.NLL__NUCLEUS_OF_THE_LATER: None,
+                burr_6_intended.PSV__PRINCIPAL_SENSORY_NU: None,
+                burr_6_intended.PB__PARABRACHIAL_NUCLEUS: None,
+                burr_6_intended.SOC__SUPERIOR_OLIVARY_COM: None,
+                burr_6_intended.B__BARRINGTON_S_NUCLEUS: None,
+                burr_6_intended.DTN__DORSAL_TEGMENTAL_NUC: None,
+                burr_6_intended.PD_TG__POSTERODORSAL_TEGM: None,
+                burr_6_intended.PCG__PONTINE_CENTRAL_GRAY: None,
+                burr_6_intended.PG__PONTINE_GRAY: None,
+                burr_6_intended.PR_NC__PONTINE_RETICULAR: None,
+                burr_6_intended.SG__SUPRAGENUAL_NUCLEUS: None,
+                burr_6_intended.SUT__SUPRATRIGEMINAL_NUCL: None,
+                burr_6_intended.TRN__TEGMENTAL_RETICULAR: None,
+                burr_6_intended.V__MOTOR_NUCLEUS_OF_TRIGE: None,
+                burr_6_intended.P5__PERITRIGEMINAL_ZONE: None,
+                burr_6_intended.ACS5__ACCESSORY_TRIGEMINA: None,
+                burr_6_intended.PC5__PARVICELLULAR_MOTOR: None,
+                burr_6_intended.I5__INTERTRIGEMINAL_NUCLE: None,
+                burr_6_intended.CS__SUPERIOR_CENTRAL_NUCL: None,
+                burr_6_intended.LC__LOCUS_CERULEUS: None,
+                burr_6_intended.LDT__LATERODORSAL_TEGMENT: None,
+                burr_6_intended.NI__NUCLEUS_INCERTUS: None,
+                burr_6_intended.PR_NR__PONTINE_RETICULAR: None,
+                burr_6_intended.RPO__NUCLEUS_RAPHE_PONTIS: None,
+                burr_6_intended.SLC__SUBCERULEUS_NUCLEUS: None,
+                burr_6_intended.SLD__SUBLATERODORSAL_NUCL: None,
+                burr_6_intended.MY__MEDULLA: None,
+                burr_6_intended.AP__AREA_POSTREMA: None,
+                burr_6_intended.DCO__DORSAL_COCHLEAR_NUCL: None,
+                burr_6_intended.VCO__VENTRAL_COCHLEAR_NUC: None,
+                burr_6_intended.CU__CUNEATE_NUCLEUS: None,
+                burr_6_intended.GR__GRACILE_NUCLEUS: None,
+                burr_6_intended.ECU__EXTERNAL_CUNEATE_NUC: None,
+                burr_6_intended.NTB__NUCLEUS_OF_THE_TRAPE: None,
+                burr_6_intended.NTS__NUCLEUS_OF_THE_SOLIT: None,
+                burr_6_intended.SPVC__SPINAL_NUCLEUS_OF_T: None,
+                burr_6_intended.SPVI__SPINAL_NUCLEUS_OF_T: None,
+                burr_6_intended.SPVO__SPINAL_NUCLEUS_OF_T: None,
+                burr_6_intended.PA5__PARATRIGEMINAL_NUCLE: None,
+                burr_6_intended.VI__ABDUCENS_NUCLEUS: None,
+                burr_6_intended.VII__FACIAL_MOTOR_NUCLEUS: None,
+                burr_6_intended.AMB__NUCLEUS_AMBIGUUS: None,
+                burr_6_intended.DMX__DORSAL_MOTOR_NUCLEUS: None,
+                burr_6_intended.GRN__GIGANTOCELLULAR_RETI: None,
+                burr_6_intended.ICB__INFRACEREBELLAR_NUCL: None,
+                burr_6_intended.IO__INFERIOR_OLIVARY_COMP: None,
+                burr_6_intended.IRN__INTERMEDIATE_RETICUL: None,
+                burr_6_intended.ISN__INFERIOR_SALIVATORY: None,
+                burr_6_intended.LIN__LINEAR_NUCLEUS_OF_TH: None,
+                burr_6_intended.LRN__LATERAL_RETICULAR_NU: None,
+                burr_6_intended.MARN__MAGNOCELLULAR_RETIC: None,
+                burr_6_intended.MDRN__MEDULLARY_RETICULAR: None,
+                burr_6_intended.PARN__PARVICELLULAR_RETIC: None,
+                burr_6_intended.PAS__PARASOLITARY_NUCLEUS: None,
+                burr_6_intended.PGRN__PARAGIGANTOCELLULAR: None,
+                burr_6_intended.NR__NUCLEUS_OF__ROLLER: None,
+                burr_6_intended.PRP__NUCLEUS_PREPOSITUS: None,
+                burr_6_intended.PMR__PARAMEDIAN_RETICULAR: None,
+                burr_6_intended.PPY__PARAPYRAMIDAL_NUCLEU: None,
+                burr_6_intended.LAV__LATERAL_VESTIBULAR_N: None,
+                burr_6_intended.MV__MEDIAL_VESTIBULAR_NUC: None,
+                burr_6_intended.SPIV__SPINAL_VESTIBULAR_N: None,
+                burr_6_intended.SUV__SUPERIOR_VESTIBULAR: None,
+                burr_6_intended.X__NUCLEUS_X: None,
+                burr_6_intended.XII__HYPOGLOSSAL_NUCLEUS: None,
+                burr_6_intended.Y__NUCLEUS_Y: None,
+                burr_6_intended.RM__NUCLEUS_RAPHE_MAGNUS: None,
+                burr_6_intended.RPA__NUCLEUS_RAPHE_PALLID: None,
+                burr_6_intended.RO__NUCLEUS_RAPHE_OBSCURU: None,
+                burr_6_intended.LING__LINGULA_I: None,
+                burr_6_intended.CENT2__LOBULE_II: None,
+                burr_6_intended.CENT3__LOBULE_III: None,
+                burr_6_intended.CUL4_5__LOBULES_IV_V: None,
+                burr_6_intended.DEC__DECLIVE_VI: None,
+                burr_6_intended.FOTU__FOLIUM_TUBER_VERMIS: None,
+                burr_6_intended.PYR__PYRAMUS_VIII: None,
+                burr_6_intended.UVU__UVULA_IX: None,
+                burr_6_intended.NOD__NODULUS_X: None,
+                burr_6_intended.SIM__SIMPLE_LOBULE: None,
+                burr_6_intended.A_NCR1__CRUS_1: None,
+                burr_6_intended.A_NCR2__CRUS_2: None,
+                burr_6_intended.PRM__PARAMEDIAN_LOBULE: None,
+                burr_6_intended.COPY__COPULA_PYRAMIDIS: None,
+                burr_6_intended.PFL__PARAFLOCCULUS: None,
+                burr_6_intended.FL__FLOCCULUS: None,
+                burr_6_intended.FN__FASTIGIAL_NUCLEUS: None,
+                burr_6_intended.IP__INTERPOSED_NUCLEUS: None,
+                burr_6_intended.DN__DENTATE_NUCLEUS: None,
+                burr_6_intended.VE_CB__VESTIBULOCEREBELLA: None,
+            }.get(burr_6_intended, None)
         )
 
     @property
@@ -3738,25 +3736,25 @@ class MappedNSBList:
     @property
     def aind_burr_6_m_l(self) -> Optional[Decimal]:
         """Maps burr_6_m_l to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_6_m_l)
+        return self._map_float_to_decimal(self._nsb.burr_x0020_6_x0020_m_x002f_l)
 
     @property
     def aind_burr_hole_1(self) -> Optional[BurrHoleProcedure]:
         """Maps burr_hole_1 to aind model."""
         return (
             None
-            if self._nsb.burr_hole_1 is None
+            if self._nsb.burr_x0020_hole_x0020_1 is None
             else {
-                self._nsb.burr_hole_1.SELECT: None,
-                self._nsb.burr_hole_1.STEREOTAXIC_INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_hole_1.SPINAL_INJECTION: BurrHoleProcedure.SPINAL_INJECTION,
-                self._nsb.burr_hole_1.N_9_GRID_INJECTION: BurrHoleProcedure.GRID_INJECTION_9,
-                self._nsb.burr_hole_1.N_6_GRID_INJECTION: BurrHoleProcedure.GRID_INJECTION_6,
-                self._nsb.burr_hole_1.FIBER_IMPLANT: BurrHoleProcedure.FIBER_IMPLANT,
-                self._nsb.burr_hole_1.STEREOTAXIC_INJECTION_F: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
-                self._nsb.burr_hole_1.INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_hole_1.INJECTION_FIBER_IMPLANT: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
-            }.get(self._nsb.burr_hole_1, None)
+                self._nsb.burr_x0020_hole_x0020_1.SELECT: None,
+                self._nsb.burr_x0020_hole_x0020_1.STEREOTAXIC_INJECTION: BurrHoleProcedure.INJECTION,
+                self._nsb.burr_x0020_hole_x0020_1.SPINAL_INJECTION: BurrHoleProcedure.SPINAL_INJECTION,
+                self._nsb.burr_x0020_hole_x0020_1.N_9_GRID_INJECTION: BurrHoleProcedure.GRID_INJECTION_9,
+                self._nsb.burr_x0020_hole_x0020_1.N_6_GRID_INJECTION: BurrHoleProcedure.GRID_INJECTION_6,
+                self._nsb.burr_x0020_hole_x0020_1.FIBER_IMPLANT: BurrHoleProcedure.FIBER_IMPLANT,
+                self._nsb.burr_x0020_hole_x0020_1.STEREOTAXIC_INJECTION_F: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+                self._nsb.burr_x0020_hole_x0020_1.INJECTION: BurrHoleProcedure.INJECTION,
+                self._nsb.burr_x0020_hole_x0020_1.INJECTION_FIBER_IMPLANT: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+            }.get(self._nsb.burr_x0020_hole_x0020_1, None)
         )
 
     @property
@@ -3764,10 +3762,10 @@ class MappedNSBList:
         """Maps burr_hole_1_st to aind model."""
         return (
             None
-            if self._nsb.burr_hole_1_st is None
+            if self._nsb.burr_x0020_hole_x0020_1_x0020_st is None
             else {
-                self._nsb.burr_hole_1_st.COMPLETE: None,
-            }.get(self._nsb.burr_hole_1_st, None)
+                self._nsb.burr_x0020_hole_x0020_1_x0020_st.COMPLETE: None,
+            }.get(self._nsb.burr_x0020_hole_x0020_1_x0020_st, None)
         )
 
     @property
@@ -3775,16 +3773,16 @@ class MappedNSBList:
         """Maps burr_hole_2 to aind model."""
         return (
             None
-            if self._nsb.burr_hole_2 is None
+            if self._nsb.burr_x0020_hole_x0020_2 is None
             else {
-                self._nsb.burr_hole_2.SELECT: None,
-                self._nsb.burr_hole_2.STEREOTAXIC_INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_hole_2.SPINAL_INJECTION: BurrHoleProcedure.SPINAL_INJECTION,
-                self._nsb.burr_hole_2.FIBER_IMPLANT: BurrHoleProcedure.FIBER_IMPLANT,
-                self._nsb.burr_hole_2.STEREOTAXIC_INJECTION__F: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
-                self._nsb.burr_hole_2.INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_hole_2.INJECTION_FIBER_IMPLANT: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
-            }.get(self._nsb.burr_hole_2, None)
+                self._nsb.burr_x0020_hole_x0020_2.SELECT: None,
+                self._nsb.burr_x0020_hole_x0020_2.STEREOTAXIC_INJECTION: BurrHoleProcedure.INJECTION,
+                self._nsb.burr_x0020_hole_x0020_2.SPINAL_INJECTION: BurrHoleProcedure.SPINAL_INJECTION,
+                self._nsb.burr_x0020_hole_x0020_2.FIBER_IMPLANT: BurrHoleProcedure.FIBER_IMPLANT,
+                self._nsb.burr_x0020_hole_x0020_2.STEREOTAXIC_INJECTION__F: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+                self._nsb.burr_x0020_hole_x0020_2.INJECTION: BurrHoleProcedure.INJECTION,
+                self._nsb.burr_x0020_hole_x0020_2.INJECTION_FIBER_IMPLANT: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+            }.get(self._nsb.burr_x0020_hole_x0020_2, None)
         )
 
     @property
@@ -3792,15 +3790,15 @@ class MappedNSBList:
         """Maps burr_hole_3 to aind model."""
         return (
             None
-            if self._nsb.burr_hole_3 is None
+            if self._nsb.burr_x0020_hole_x0020_3 is None
             else {
-                self._nsb.burr_hole_3.SELECT: None,
-                self._nsb.burr_hole_3.STEREOTAXIC_INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_hole_3.FIBER_IMPLANT: BurrHoleProcedure.FIBER_IMPLANT,
-                self._nsb.burr_hole_3.STEREOTAXIC_INJECTION__F: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
-                self._nsb.burr_hole_3.INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_hole_3.INJECTION_FIBER_IMPLANT: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
-            }.get(self._nsb.burr_hole_3, None)
+                self._nsb.burr_x0020_hole_x0020_3.SELECT: None,
+                self._nsb.burr_x0020_hole_x0020_3.STEREOTAXIC_INJECTION: BurrHoleProcedure.INJECTION,
+                self._nsb.burr_x0020_hole_x0020_3.FIBER_IMPLANT: BurrHoleProcedure.FIBER_IMPLANT,
+                self._nsb.burr_x0020_hole_x0020_3.STEREOTAXIC_INJECTION__F: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+                self._nsb.burr_x0020_hole_x0020_3.INJECTION: BurrHoleProcedure.INJECTION,
+                self._nsb.burr_x0020_hole_x0020_3.INJECTION_FIBER_IMPLANT: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+            }.get(self._nsb.burr_x0020_hole_x0020_3, None)
         )
 
     @property
@@ -3808,15 +3806,15 @@ class MappedNSBList:
         """Maps burr_hole_4 to aind model."""
         return (
             None
-            if self._nsb.burr_hole_4 is None
+            if self._nsb.burr_x0020_hole_x0020_4 is None
             else {
-                self._nsb.burr_hole_4.SELECT: None,
-                self._nsb.burr_hole_4.STEREOTAXIC_INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_hole_4.FIBER_IMPLANT: BurrHoleProcedure.FIBER_IMPLANT,
-                self._nsb.burr_hole_4.STEREOTAXIC_INJECTION__F: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
-                self._nsb.burr_hole_4.INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_hole_4.INJECTION_FIBER_IMPLANT: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
-            }.get(self._nsb.burr_hole_4, None)
+                self._nsb.burr_x0020_hole_x0020_4.SELECT: None,
+                self._nsb.burr_x0020_hole_x0020_4.STEREOTAXIC_INJECTION: BurrHoleProcedure.INJECTION,
+                self._nsb.burr_x0020_hole_x0020_4.FIBER_IMPLANT: BurrHoleProcedure.FIBER_IMPLANT,
+                self._nsb.burr_x0020_hole_x0020_4.STEREOTAXIC_INJECTION__F: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+                self._nsb.burr_x0020_hole_x0020_4.INJECTION: BurrHoleProcedure.INJECTION,
+                self._nsb.burr_x0020_hole_x0020_4.INJECTION_FIBER_IMPLANT: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+            }.get(self._nsb.burr_x0020_hole_x0020_4, None)
         )
 
     @property
@@ -3824,15 +3822,15 @@ class MappedNSBList:
         """Maps burr_hole_5 to aind model."""
         return (
             None
-            if self._nsb.burr_hole_5 is None
+            if self._nsb.burr_x0020_hole_x0020_5 is None
             else {
-                self._nsb.burr_hole_5.SELECT: None,
-                self._nsb.burr_hole_5.STEREOTAXIC_INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_hole_5.FIBER_IMPLANT: BurrHoleProcedure.FIBER_IMPLANT,
-                self._nsb.burr_hole_5.STEREOTAXIC_INJECTION__F: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
-                self._nsb.burr_hole_5.INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_hole_5.INJECTION_FIBER_IMPLANT: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
-            }.get(self._nsb.burr_hole_5, None)
+                self._nsb.burr_x0020_hole_x0020_5.SELECT: None,
+                self._nsb.burr_x0020_hole_x0020_5.STEREOTAXIC_INJECTION: BurrHoleProcedure.INJECTION,
+                self._nsb.burr_x0020_hole_x0020_5.FIBER_IMPLANT: BurrHoleProcedure.FIBER_IMPLANT,
+                self._nsb.burr_x0020_hole_x0020_5.STEREOTAXIC_INJECTION__F: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+                self._nsb.burr_x0020_hole_x0020_5.INJECTION: BurrHoleProcedure.INJECTION,
+                self._nsb.burr_x0020_hole_x0020_5.INJECTION_FIBER_IMPLANT: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+            }.get(self._nsb.burr_x0020_hole_x0020_5, None)
         )
 
     @property
@@ -3840,15 +3838,15 @@ class MappedNSBList:
         """Maps burr_hole_6 to aind model."""
         return (
             None
-            if self._nsb.burr_hole_6 is None
+            if self._nsb.burr_x0020_hole_x0020_6 is None
             else {
-                self._nsb.burr_hole_6.SELECT: None,
-                self._nsb.burr_hole_6.STEREOTAXIC_INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_hole_6.FIBER_IMPLANT: BurrHoleProcedure.FIBER_IMPLANT,
-                self._nsb.burr_hole_6.STEREOTAXIC_INJECTION__F: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
-                self._nsb.burr_hole_6.INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_hole_6.INJECTION_FIBER_IMPLANT: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
-            }.get(self._nsb.burr_hole_6, None)
+                self._nsb.burr_x0020_hole_x0020_6.SELECT: None,
+                self._nsb.burr_x0020_hole_x0020_6.STEREOTAXIC_INJECTION: BurrHoleProcedure.INJECTION,
+                self._nsb.burr_x0020_hole_x0020_6.FIBER_IMPLANT: BurrHoleProcedure.FIBER_IMPLANT,
+                self._nsb.burr_x0020_hole_x0020_6.STEREOTAXIC_INJECTION__F: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+                self._nsb.burr_x0020_hole_x0020_6.INJECTION: BurrHoleProcedure.INJECTION,
+                self._nsb.burr_x0020_hole_x0020_6.INJECTION_FIBER_IMPLANT: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+            }.get(self._nsb.burr_x0020_hole_x0020_6, None)
         )
 
     @property
@@ -3856,16 +3854,16 @@ class MappedNSBList:
         """Maps care_moduele to aind model."""
         return (
             None
-            if self._nsb.care_moduele is None
+            if self._nsb.care_x0020_moduele is None
             else {
-                self._nsb.care_moduele.SELECT: None,
-                self._nsb.care_moduele.CM_S_01_A_B: None,
-                self._nsb.care_moduele.CM_S_01_C_D: None,
-                self._nsb.care_moduele.CM_S_03_A_B: None,
-                self._nsb.care_moduele.CM_S_03_C_D: None,
-                self._nsb.care_moduele.CM_S_04_A_B: None,
-                self._nsb.care_moduele.CM_S_04_C_D: None,
-            }.get(self._nsb.care_moduele, None)
+                self._nsb.care_x0020_moduele.SELECT: None,
+                self._nsb.care_x0020_moduele.CM_S_01_A_B: None,
+                self._nsb.care_x0020_moduele.CM_S_01_C_D: None,
+                self._nsb.care_x0020_moduele.CM_S_03_A_B: None,
+                self._nsb.care_x0020_moduele.CM_S_03_C_D: None,
+                self._nsb.care_x0020_moduele.CM_S_04_A_B: None,
+                self._nsb.care_x0020_moduele.CM_S_04_C_D: None,
+            }.get(self._nsb.care_x0020_moduele, None)
         )
 
     @property
@@ -3952,11 +3950,11 @@ class MappedNSBList:
         """Maps craniotomy_perform_d to aind model"""
         return (
             None
-            if self._nsb.craniotomy_perform_d is None
+            if self._nsb.craniotomy_x0020_perform_x0020_d is None
             else {
-                self._nsb.craniotomy_perform_d.INITIAL_SURGERY: During.INITIAL,
-                self._nsb.craniotomy_perform_d.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
-            }.get(self._nsb.craniotomy_perform_d, None)
+                self._nsb.craniotomy_x0020_perform_x0020_d.INITIAL_SURGERY: During.INITIAL,
+                self._nsb.craniotomy_x0020_perform_x0020_d.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
+            }.get(self._nsb.craniotomy_x0020_perform_x0020_d, None)
         )
 
     @property
@@ -3988,12 +3986,12 @@ class MappedNSBList:
     @property
     def aind_date_of_birth(self) -> Optional[datetime]:
         """Maps date_of_birth to aind model"""
-        return self._nsb.date_of_birth
+        return self._nsb.date_x0020_of_x0020_birth
 
     @property
     def aind_date_of_surgery(self) -> Optional[date]:
         """Maps date_of_surgery to aind model"""
-        return self._parse_datetime_to_date(self._nsb.date_of_surgery)
+        return self._parse_datetime_to_date(self._nsb.date_x0020_of_x0020_surgery)
 
     @property
     def aind_date_range_start(self) -> Optional[datetime]:
@@ -4035,9 +4033,9 @@ class MappedNSBList:
         """Maps fiber_implant1_lengt to aind model"""
         return (
             None
-            if self._nsb.fiber_implant1_lengt is None
+            if self._nsb.fiber_x0020_implant1_x0020_lengt is None
             else self._parse_fiber_length_mm_str(
-                self._nsb.fiber_implant1_lengt.value
+                self._nsb.fiber_x0020_implant1_x0020_lengt.value
             )
         )
 
@@ -4051,73 +4049,73 @@ class MappedNSBList:
         """Maps fiber_implant2_lengt to aind model"""
         return (
             None
-            if self._nsb.fiber_implant2_lengt is None
+            if self._nsb.fiber_x0020_implant2_x0020_lengt is None
             else self._parse_fiber_length_mm_str(
-                self._nsb.fiber_implant2_lengt.value
+                self._nsb.fiber_x0020_implant2_x0020_lengt.value
             )
         )
 
     @property
     def aind_fiber_implant3_d_x00(self) -> Optional[Decimal]:
         """Maps fiber_implant3_d_x00 to aind model"""
-        return self._map_float_to_decimal(self._nsb.fiber_implant3_d_x00)
+        return self._map_float_to_decimal(self._nsb.fiber_x0020_implant3_x0020_d_x00)
 
     @property
     def aind_fiber_implant3_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant3_lengt to aind model"""
         return (
             None
-            if self._nsb.fiber_implant3_lengt is None
+            if self._nsb.fiber_x0020_implant3_x0020_lengt is None
             else self._parse_fiber_length_mm_str(
-                self._nsb.fiber_implant3_lengt.value
+                self._nsb.fiber_x0020_implant3_x0020_lengt.value
             )
         )
 
     @property
     def aind_fiber_implant4_d_x00(self) -> Optional[Decimal]:
         """Maps fiber_implant4_d_x00 to aind model"""
-        return self._map_float_to_decimal(self._nsb.fiber_implant4_d_x00)
+        return self._map_float_to_decimal(self._nsb.fiber_x0020_implant4_x0020_d_x00)
 
     @property
     def aind_fiber_implant4_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant4_lengt to aind model"""
         return (
             None
-            if self._nsb.fiber_implant4_lengt is None
+            if self._nsb.fiber_x0020_implant4_x0020_lengt is None
             else self._parse_fiber_length_mm_str(
-                self._nsb.fiber_implant4_lengt.value
+                self._nsb.fiber_x0020_implant4_x0020_lengt.value
             )
         )
 
     @property
     def aind_fiber_implant5_d_x00(self) -> Optional[Decimal]:
         """Maps fiber_implant5_d_x00 to aind model"""
-        return self._map_float_to_decimal(self._nsb.fiber_implant5_d_x00)
+        return self._map_float_to_decimal(self._nsb.fiber_x0020_implant5_x0020_d_x00)
 
     @property
     def aind_fiber_implant5_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant5_lengt to aind model"""
         return (
             None
-            if self._nsb.fiber_implant5_lengt is None
+            if self._nsb.fiber_x0020_implant5_x0020_lengt is None
             else self._parse_fiber_length_mm_str(
-                self._nsb.fiber_implant5_lengt.value
+                self._nsb.fiber_x0020_implant5_x0020_lengt.value
             )
         )
 
     @property
     def aind_fiber_implant6_d_x00(self) -> Optional[Decimal]:
         """Maps fiber_implant6_d_x00 to aind model"""
-        return self._map_float_to_decimal(self._nsb.fiber_implant6_d_x00)
+        return self._map_float_to_decimal(self._nsb.fiber_x0020_implant6_x0020_d_x00)
 
     @property
     def aind_fiber_implant6_lengt(self) -> Optional[Decimal]:
         """Maps fiber_implant6_lengt to aind model"""
         return (
             None
-            if self._nsb.fiber_implant6_lengt is None
+            if self._nsb.fiber_x0020_implant6_x0020_lengt is None
             else self._parse_fiber_length_mm_str(
-                self._nsb.fiber_implant6_lengt.value
+                self._nsb.fiber_x0020_implant6_x0020_lengt.value
             )
         )
 
@@ -4130,19 +4128,19 @@ class MappedNSBList:
     def aind_first_injection_iso_durat(self) -> Optional[Decimal]:
         """Maps first_injection_iso_durat to aind model"""
         optional_decimal = self._map_float_to_decimal(
-            self._nsb.first_injection_iso_durat
+            self._nsb.first_injection_iso_duration
         )
         return None if optional_decimal is None else optional_decimal * 60
 
     @property
     def aind_first_injection_weight_af(self) -> Optional[Decimal]:
         """Maps first_injection_weight_af to aind model"""
-        return self._map_float_to_decimal(self._nsb.first_injection_weight_af)
+        return self._map_float_to_decimal(self._nsb.first_injection_weight_after)
 
     @property
     def aind_first_injection_weight_be(self) -> Optional[Decimal]:
         """Maps first_injection_weight_be to aind model"""
-        return self._map_float_to_decimal(self._nsb.first_injection_weight_be)
+        return self._map_float_to_decimal(self._nsb.first_injection_weight_befor)
 
     @property
     def aind_folder_child_count(self) -> Optional[str]:
@@ -4177,11 +4175,11 @@ class MappedNSBList:
         """Maps headpost_perform_dur to aind model"""
         return (
             None
-            if self._nsb.headpost_perform_dur is None
+            if self._nsb.headpost_x0020_perform_x0020_dur is None
             else {
-                self._nsb.headpost_perform_dur.INITIAL_SURGERY: During.INITIAL,
-                self._nsb.headpost_perform_dur.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
-            }.get(self._nsb.headpost_perform_dur, None)
+                self._nsb.headpost_x0020_perform_x0020_dur.INITIAL_SURGERY: During.INITIAL,
+                self._nsb.headpost_x0020_perform_x0020_dur.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
+            }.get(self._nsb.headpost_x0020_perform_x0020_dur, None)
         )
 
     @property
@@ -4252,9 +4250,9 @@ class MappedNSBList:
         """Maps iacuc_protocol to aind model."""
         return (
             None
-            if self._nsb.iacuc_protocol is None
-            or self._nsb.iacuc_protocol == self._nsb.iacuc_protocol.SELECT
-            else self._nsb.iacuc_protocol.value
+            if self._nsb.iacuc_x0020_protocol_x0020__x002 is None
+            or self._nsb.iacuc_x0020_protocol_x0020__x002 == self._nsb.iacuc_x0020_protocol_x0020__x002.SELECT
+            else self._nsb.iacuc_x0020_protocol_x0020__x002.value
         )
 
     @property
@@ -4621,7 +4619,7 @@ class MappedNSBList:
     @property
     def aind_iso_on(self) -> Optional[Decimal]:
         """Maps iso_on to aind model"""
-        optional_decimal = self._map_float_to_decimal(self._nsb.iso_on)
+        optional_decimal = self._map_float_to_decimal(self._nsb.iso_x0020_on)
         return None if optional_decimal is None else optional_decimal * 60
 
     @property
@@ -4632,32 +4630,32 @@ class MappedNSBList:
     @property
     def aind_lab_tracks_group(self) -> Optional[str]:
         """Maps lab_tracks_group to aind model."""
-        return self._nsb.lab_tracks_group
+        return self._nsb.lab_tracks_x0020_group
 
     @property
     def aind_lab_tracks_id1(self) -> Optional[str]:
         """Maps lab_tracks_id1 to aind model."""
-        return self._nsb.lab_tracks_id1
+        return self._nsb.lab_tracks_x0020_id1
 
     @property
     def aind_lab_tracks_requestor(self) -> Optional[str]:
         """Maps lab_tracks_requestor to aind model."""
-        return self._nsb.lab_tracks_requestor
+        return self._nsb.lab_tracks_x0020_requestor
 
     @property
     def aind_li_ms_required(self) -> Optional[Any]:
         """Maps li_ms_required to aind model."""
         return (
             None
-            if self._nsb.li_ms_required is None
+            if self._nsb.lims_x0020_required is None
             else {
-                self._nsb.li_ms_required.SELECT: None,
-                self._nsb.li_ms_required.LIMS: None,
-                self._nsb.li_ms_required.SLIMS: None,
-                self._nsb.li_ms_required.N_A: None,
-                self._nsb.li_ms_required.NO: None,
-                self._nsb.li_ms_required.YES: None,
-            }.get(self._nsb.li_ms_required, None)
+                self._nsb.lims_x0020_required.SELECT: None,
+                self._nsb.lims_x0020_required.LIMS: None,
+                self._nsb.lims_x0020_required.SLIMS: None,
+                self._nsb.lims_x0020_required.N_A: None,
+                self._nsb.lims_x0020_required.NO: None,
+                self._nsb.lims_x0020_required.YES: None,
+            }.get(self._nsb.lims_x0020_required, None)
         )
 
     @property
@@ -5033,23 +5031,23 @@ class MappedNSBList:
     @property
     def aind_non_x002d_nsb_surgeon(self) -> Optional[bool]:
         """Maps non_x002d_nsb_surgeon to aind model."""
-        return self._nsb.non_x002d_nsb_surgeon
+        return self._nsb.non_x002d_nsb_x0020_surgeon
 
     @property
     def aind_of_burr(self) -> Optional[int]:
         """Maps of_burr to aind model"""
         return (
             None
-            if self._nsb.of_burr is None
+            if self._nsb.x0023__x0020_of_x0020_burr_x002 is None
             else {
-                self._nsb.of_burr.SELECT: None,
-                self._nsb.of_burr.N_1: 1,
-                self._nsb.of_burr.N_2: 2,
-                self._nsb.of_burr.N_3: 3,
-                self._nsb.of_burr.N_4: 4,
-                self._nsb.of_burr.N_5: 5,
-                self._nsb.of_burr.N_6: 6,
-            }.get(self._nsb.of_burr, None)
+                self._nsb.x0023__x0020_of_x0020_burr_x002.SELECT: None,
+                self._nsb.x0023__x0020_of_x0020_burr_x002.N_1: 1,
+                self._nsb.x0023__x0020_of_x0020_burr_x002.N_2: 2,
+                self._nsb.x0023__x0020_of_x0020_burr_x002.N_3: 3,
+                self._nsb.x0023__x0020_of_x0020_burr_x002.N_4: 4,
+                self._nsb.x0023__x0020_of_x0020_burr_x002.N_5: 5,
+                self._nsb.x0023__x0020_of_x0020_burr_x002.N_6: 6,
+            }.get(self._nsb.x0023__x0020_of_x0020_burr_x002, None)
         )
 
     @property
@@ -5063,26 +5061,26 @@ class MappedNSBList:
         return self._nsb.pi
 
     @property
-    def aind_procedure(self) -> Optional[NSBProcedure]:
+    def aind_procedure(self) -> Optional[NSB2023Procedure]:
         """Maps procedure to aind model"""
         return self._nsb.procedure
 
     @property
-    def aind_procedure_family(self) -> Optional[NSBProcedureCategory]:
+    def aind_procedure_family(self) -> Optional[NSB2023ProcedureCategory]:
         """Maps procedure_family to aind model"""
-        return self._nsb.procedure_family
+        return self._nsb.procedure_x0020_family
 
     @property
     def aind_procedure_slots(self) -> Optional[Any]:
         """Maps procedure_slots to aind model."""
         return (
             None
-            if self._nsb.procedure_slots is None
+            if self._nsb.procedure_x0020_slots is None
             else {
-                self._nsb.procedure_slots.SELECT: None,
-                self._nsb.procedure_slots.SINGLE_SURGICAL_SESSION: None,
-                self._nsb.procedure_slots.INITIAL_SURGERY_WITH_FOLL: None,
-            }.get(self._nsb.procedure_slots, None)
+                self._nsb.procedure_x0020_slots.SELECT: None,
+                self._nsb.procedure_x0020_slots.SINGLE_SURGICAL_SESSION: None,
+                self._nsb.procedure_x0020_slots.INITIAL_SURGERY_WITH_FOLL: None,
+            }.get(self._nsb.procedure_x0020_slots, None)
         )
 
     @property
@@ -5090,13 +5088,13 @@ class MappedNSBList:
         """Maps procedure_t2 to aind model."""
         return (
             None
-            if self._nsb.procedure_t2 is None
+            if self._nsb.procedure_x0020_t2 is None
             else {
-                self._nsb.procedure_t2.SELECT: None,
-                self._nsb.procedure_t2.N_2_P: None,
-                self._nsb.procedure_t2.NP: None,
-                self._nsb.procedure_t2.NA: None,
-            }.get(self._nsb.procedure_t2, None)
+                self._nsb.procedure_x0020_t2.SELECT: None,
+                self._nsb.procedure_x0020_t2.N_2_P: None,
+                self._nsb.procedure_x0020_t2.NP: None,
+                self._nsb.procedure_x0020_t2.NA: None,
+            }.get(self._nsb.procedure_x0020_t2, None)
         )
 
     @property
@@ -5307,17 +5305,17 @@ class MappedNSBList:
     @property
     def aind_initial_surgeon_lookup_id(self) -> Optional[int]:
         """Maps test1_lookup_id to aind model."""
-        return self._nsb.initial_surgeon_lookup_id
+        return self._nsb.test1_lookup_id
 
     @property
     def aind_test_1st_round_x0020(self) -> Optional[str]:
         """Maps test_1st_round_x0020 to aind model."""
-        return self._nsb.test_1st_round_x0020
+        return self._nsb.test_x0020_1st_x0020_round_x0020
 
     @property
     def aind_followup_surgeon_lookup_id(self) -> Optional[int]:
         """Maps followup_surgeon_lookup_id to aind model."""
-        return self._nsb.followup_surgeon_lookup_id
+        return self._nsb.test_x0020_1st_x0020_round_x0020_lookup_id
 
     @property
     def aind_thermistor(self) -> Optional[Any]:
@@ -5344,40 +5342,40 @@ class MappedNSBList:
     @property
     def aind_virus_a_p(self) -> Optional[Decimal]:
         """Maps virus_a_p to aind model"""
-        return self._map_float_to_decimal(self._nsb.virus_a_p)
+        return self._map_float_to_decimal(self._nsb.virus_x0020_a_x002f_p)
 
     @property
     def aind_virus_d_v(self) -> Optional[Decimal]:
         """Maps virus_d_v to aind model"""
-        return self._map_float_to_decimal(self._nsb.virus_d_v)
+        return self._map_float_to_decimal(self._nsb.virus_x0020_d_x002f_v)
 
     @property
     def aind_virus_hemisphere(self) -> Optional[Side]:
         """Maps virus_hemisphere to aind model"""
         return (
             None
-            if self._nsb.virus_hemisphere is None
+            if self._nsb.virus_x0020_hemisphere is None
             else {
-                self._nsb.virus_hemisphere.SELECT: None,
-                self._nsb.virus_hemisphere.LEFT: Side.LEFT,
-                self._nsb.virus_hemisphere.RIGHT: Side.RIGHT,
-            }.get(self._nsb.virus_hemisphere, None)
+                self._nsb.virus_x0020_hemisphere.SELECT: None,
+                self._nsb.virus_x0020_hemisphere.LEFT: Side.LEFT,
+                self._nsb.virus_x0020_hemisphere.RIGHT: Side.RIGHT,
+            }.get(self._nsb.virus_x0020_hemisphere, None)
         )
 
     @property
     def aind_virus_m_l(self) -> Optional[Decimal]:
         """Maps virus_m_l to aind model"""
-        return self._map_float_to_decimal(self._nsb.virus_m_l)
+        return self._map_float_to_decimal(self._nsb.virus_x0020_m_x002f_l)
 
     @property
     def aind_weight_after_surgery(self) -> Optional[Decimal]:
         """Maps weight_after_surgery to aind model"""
-        return self._map_float_to_decimal(self._nsb.weight_after_surgery)
+        return self._map_float_to_decimal(self._nsb.weight_x0020_after_x0020_surgery)
 
     @property
     def aind_weight_before_surger(self) -> Optional[Decimal]:
         """Maps weight_before_surger to aind model"""
-        return self._map_float_to_decimal(self._nsb.weight_before_surger)
+        return self._map_float_to_decimal(self._nsb.weight_x0020_before_x0020_surger)
 
     @property
     def aind_work_station1st_injection(self) -> Optional[Any]:
@@ -5400,51 +5398,51 @@ class MappedNSBList:
     def has_hp_procedure(self) -> bool:
         """Is there a headpost procedure?"""
         return self.aind_procedure in {
-            NSBProcedure.HP_ONLY,
-            NSBProcedure.HP_TRANSCRANIAL,
-            NSBProcedure.FIBER_OPTIC_IMPLANT_WITH,
-            NSBProcedure.INJECTION_FIBER_OPTIC_IMP,
-            NSBProcedure.ISIGUIDED_INJECTION_WITH,
-            NSBProcedure.STEREOTAXIC_INJECTION_WIT,
+            NSB2023Procedure.HP_ONLY,
+            NSB2023Procedure.HP_TRANSCRANIAL,
+            NSB2023Procedure.FIBER_OPTIC_IMPLANT_WITH,
+            NSB2023Procedure.INJECTION_FIBER_OPTIC_IMP,
+            NSB2023Procedure.ISIGUIDED_INJECTION_WITH,
+            NSB2023Procedure.STEREOTAXIC_INJECTION_WIT,
             # Adding new names for supported HPs
-            NSBProcedure.SX_11_19_HP__ONLY,
-            NSBProcedure.SX_11_19_HP__TRANSCRANIAL,
-            NSBProcedure.SX_21__INJECTION__FIBER,
-            NSBProcedure.SX_26_ISI_GUIDED__INJECTI,
-            NSBProcedure.SX_12__STEREOTAXIC__INJEC,
-            NSBProcedure.SX_21__FIBER__OPTIC__IMPL,
-            NSBProcedure.INJECTION_FIBER_OPTIC_IMP_,
+            NSB2023Procedure.SX_11_19_HP__ONLY,
+            NSB2023Procedure.SX_11_19_HP__TRANSCRANIAL,
+            NSB2023Procedure.SX_21__INJECTION__FIBER,
+            NSB2023Procedure.SX_26_ISI_GUIDED__INJECTI,
+            NSB2023Procedure.SX_12__STEREOTAXIC__INJEC,
+            NSB2023Procedure.SX_21__FIBER__OPTIC__IMPL,
+            NSB2023Procedure.INJECTION_FIBER_OPTIC_IMP_,
         }
 
     def has_cran_procedure(self) -> bool:
         """Is there a craniotomy procedure?"""
         return self.aind_procedure in {
-            NSBProcedure.FRONTAL_CTX_2_P,
-            NSBProcedure.INJ_MOTOR_CTX,
-            NSBProcedure.INJ_VISUAL_CTX_2_P,
-            NSBProcedure.INJ_WHC_NP_1_INJECTION_LO,
-            NSBProcedure.MOTOR_CTX,
-            NSBProcedure.VISUAL_CTX_NP,
-            NSBProcedure.VISUAL_CTX_2_P,
-            NSBProcedure.WHC_NP,
+            NSB2023Procedure.FRONTAL_CTX_2_P,
+            NSB2023Procedure.INJ_MOTOR_CTX,
+            NSB2023Procedure.INJ_VISUAL_CTX_2_P,
+            NSB2023Procedure.INJ_WHC_NP_1_INJECTION_LO,
+            NSB2023Procedure.MOTOR_CTX,
+            NSB2023Procedure.VISUAL_CTX_NP,
+            NSB2023Procedure.VISUAL_CTX_2_P,
+            NSB2023Procedure.WHC_NP,
             # Adding new names for supported Craniotomies
-            NSBProcedure.SX_1__VISUAL__CTX_2_P,
-            NSBProcedure.SX_2__FRONTAL__CTX_2_P,
-            NSBProcedure.SX_3__MOTOR__CTX_2_P,
-            NSBProcedure.SX_4_WHC_2_P,
-            NSBProcedure.SX_5_INJ__VISUAL__CTX_2_P,
-            NSBProcedure.SX_6__GRID_INJ_6_OR_9__VI,
-            NSBProcedure.SX_8_INJ__MOTOR__CTX_2_P,
-            NSBProcedure.SX_9__GRID_INJ_6_OR_9__MO,
-            NSBProcedure.SX_14__VISUAL__CTX_NP,
-            NSBProcedure.SX_15_WHC_NP,
-            NSBProcedure.SX_16_INJ_WHC_NP,
-            NSBProcedure.GRID_INJ_6_OR_9_VISUAL,
-            NSBProcedure.MOTOR_CTX_2_P,
-            NSBProcedure.INJ_MOTOR_CTX_2_P,
-            NSBProcedure.GRID_INJ_6_OR_9_MOTOR_C,
-            NSBProcedure.INJ_WHC_NP,
-            NSBProcedure.DHC,
+            NSB2023Procedure.SX_1__VISUAL__CTX_2_P,
+            NSB2023Procedure.SX_2__FRONTAL__CTX_2_P,
+            NSB2023Procedure.SX_3__MOTOR__CTX_2_P,
+            NSB2023Procedure.SX_4_WHC_2_P,
+            NSB2023Procedure.SX_5_INJ__VISUAL__CTX_2_P,
+            NSB2023Procedure.SX_6__GRID_INJ_6_OR_9__VI,
+            NSB2023Procedure.SX_8_INJ__MOTOR__CTX_2_P,
+            NSB2023Procedure.SX_9__GRID_INJ_6_OR_9__MO,
+            NSB2023Procedure.SX_14__VISUAL__CTX_NP,
+            NSB2023Procedure.SX_15_WHC_NP,
+            NSB2023Procedure.SX_16_INJ_WHC_NP,
+            NSB2023Procedure.GRID_INJ_6_OR_9_VISUAL,
+            NSB2023Procedure.MOTOR_CTX_2_P,
+            NSB2023Procedure.INJ_MOTOR_CTX_2_P,
+            NSB2023Procedure.GRID_INJ_6_OR_9_MOTOR_C,
+            NSB2023Procedure.INJ_WHC_NP,
+            NSB2023Procedure.DHC,
         }
 
     def surgery_during_info(
@@ -6060,6 +6058,7 @@ class MappedNSBList:
 
         # Check for craniotomy procedures
         if self.has_cran_procedure():
+            print("HAS CRANIOTOMY")
             craniotomy_type = self.aind_craniotomy_type
             cran_during = self.aind_craniotomy_perform_d
             cran_during_info = self.surgery_during_info(cran_during)

@@ -42,3 +42,13 @@ class ProtocolInformation(BaseModel):
             return None
         else:
             return str(value)
+        
+class IntendedMeasurementInformation(BaseModel):
+    """Intended Measurement information that will be returned to the user that
+    requests information from the NSB2023 Sharepoint."""
+
+    fiber_name: Optional[str] = None
+    intended_measurement_R: Optional[str] = None
+    intended_measurement_G: Optional[str] = None
+    intended_measurement_B: Optional[str] = None
+    intended_measurement_Iso: Optional[str] = None

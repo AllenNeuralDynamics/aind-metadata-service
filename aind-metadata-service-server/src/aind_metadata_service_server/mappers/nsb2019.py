@@ -25,8 +25,10 @@ from aind_data_schema.core.procedures import (
 )
 from aind_data_schema.core.subject import Sex
 
-from aind_sharepoint_service_async_client.models import NSB2019List
-
+from aind_sharepoint_service_async_client.models import (
+    NSB2019List,
+    NSB2019Procedure
+)
 
 @dataclass
 class HeadPostInfo:
@@ -308,12 +310,12 @@ class MappedNSBList:
     @property
     def aind_date_of_birth(self) -> Optional[date]:
         """Maps date_of_birth to aind model"""
-        return self._parse_datetime_to_date(self._nsb.date_of_birth)
+        return self._parse_datetime_to_date(self._nsb.date_x0020_of_x0020_birth)
 
     @property
     def aind_date_of_surgery(self) -> Optional[date]:
         """Maps date_of_surgery to aind model"""
-        return self._parse_datetime_to_date(self._nsb.date_of_surgery)
+        return self._parse_datetime_to_date(self._nsb.date_x0020_of_x0020_surgery)
 
     @property
     def aind_date_range_end(self) -> Optional[datetime]:
@@ -339,7 +341,7 @@ class MappedNSBList:
     @property
     def aind_end_of_week(self) -> Optional[datetime]:
         """Maps end_of_week to aind model"""
-        return self._nsb.end_of_week
+        return self._nsb.end_x0020_of_x0020_week
 
     @property
     def aind_fiber_implant1(self) -> Optional[bool]:
@@ -380,17 +382,17 @@ class MappedNSBList:
     @property
     def aind_first_injection_iso_durat(self) -> Optional[Decimal]:
         """Maps first_injection_iso_durat to aind model"""
-        return self._parse_iso_dur_str(self._nsb.first_injection_iso_durat)
+        return self._parse_iso_dur_str(self._nsb.first_injection_iso_duration)
 
     @property
     def aind_first_injection_weight_af(self) -> Optional[Decimal]:
         """Maps first_injection_weight_af to aind model"""
-        return self._parse_weight_str(self._nsb.first_injection_weight_af)
+        return self._parse_weight_str(self._nsb.first_injection_weight_after)
 
     @property
     def aind_first_injection_weight_be(self) -> Optional[Decimal]:
         """Maps first_injection_weight_be to aind model"""
-        return self._parse_weight_str(self._nsb.first_injection_weight_be)
+        return self._parse_weight_str(self._nsb.first_injection_weight_befor)
 
     @property
     def aind_headpost_type(self) -> HeadPostInfo:
@@ -590,79 +592,79 @@ class MappedNSBList:
         """Maps iacuc_protocol to aind model"""
         return (
             None
-            if self._nsb.iacuc_protocol is None
+            if self._nsb.iacuc_x0020_protocol_x0020__x002 is None
             else {
-                self._nsb.iacuc_protocol.SELECT: None,
-                self._nsb.iacuc_protocol.N_2001: (
-                    self._nsb.iacuc_protocol.N_2001.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.SELECT: None,
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2001: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2001.value
                 ),
-                self._nsb.iacuc_protocol.N_2002: (
-                    self._nsb.iacuc_protocol.N_2002.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2002: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2002.value
                 ),
-                self._nsb.iacuc_protocol.N_2003: (
-                    self._nsb.iacuc_protocol.N_2003.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2003: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2003.value
                 ),
-                self._nsb.iacuc_protocol.N_2004: (
-                    self._nsb.iacuc_protocol.N_2004.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2004: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2004.value
                 ),
-                self._nsb.iacuc_protocol.N_2005: (
-                    self._nsb.iacuc_protocol.N_2005.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2005: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2005.value
                 ),
-                self._nsb.iacuc_protocol.N_2006: (
-                    self._nsb.iacuc_protocol.N_2006.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2006: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2006.value
                 ),
-                self._nsb.iacuc_protocol.N_2011: (
-                    self._nsb.iacuc_protocol.N_2011.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2011: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2011.value
                 ),
-                self._nsb.iacuc_protocol.N_2102: (
-                    self._nsb.iacuc_protocol.N_2102.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2102: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2102.value
                 ),
-                self._nsb.iacuc_protocol.N_2103: (
-                    self._nsb.iacuc_protocol.N_2103.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2103: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2103.value
                 ),
-                self._nsb.iacuc_protocol.N_2104: (
-                    self._nsb.iacuc_protocol.N_2104.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2104: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2104.value
                 ),
-                self._nsb.iacuc_protocol.N_2105: (
-                    self._nsb.iacuc_protocol.N_2105.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2105: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2105.value
                 ),
-                self._nsb.iacuc_protocol.N_2106: (
-                    self._nsb.iacuc_protocol.N_2106.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2106: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2106.value
                 ),
-                self._nsb.iacuc_protocol.N_2107: (
-                    self._nsb.iacuc_protocol.N_2107.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2107: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2107.value
                 ),
-                self._nsb.iacuc_protocol.N_2108: (
-                    self._nsb.iacuc_protocol.N_2108.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2108: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2108.value
                 ),
-                self._nsb.iacuc_protocol.N_2109: (
-                    self._nsb.iacuc_protocol.N_2109.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2109: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2109.value
                 ),
-                self._nsb.iacuc_protocol.N_2110: (
-                    self._nsb.iacuc_protocol.N_2110.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2110: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2110.value
                 ),
-                self._nsb.iacuc_protocol.N_2113: (
-                    self._nsb.iacuc_protocol.N_2113.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2113: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2113.value
                 ),
-                self._nsb.iacuc_protocol.N_2115: (
-                    self._nsb.iacuc_protocol.N_2115.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2115: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2115.value
                 ),
-                self._nsb.iacuc_protocol.N_2117: (
-                    self._nsb.iacuc_protocol.N_2117.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2117: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2117.value
                 ),
-                self._nsb.iacuc_protocol.N_2201: (
-                    self._nsb.iacuc_protocol.N_2201.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2201: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2201.value
                 ),
-                self._nsb.iacuc_protocol.N_2202: (
-                    self._nsb.iacuc_protocol.N_2202.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2202: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2202.value
                 ),
-                self._nsb.iacuc_protocol.N_2205: (
-                    self._nsb.iacuc_protocol.N_2205.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2205: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2205.value
                 ),
-                self._nsb.iacuc_protocol.N_2212: (
-                    self._nsb.iacuc_protocol.N_2212.value
+                self._nsb.iacuc_x0020_protocol_x0020__x002.N_2212: (
+                    self._nsb.iacuc_x0020_protocol_x0020__x002.N_2212.value
                 ),
-            }.get(self._nsb.iacuc_protocol, None)
+            }.get(self._nsb.iacuc_x0020_protocol_x0020__x002, None)
         )
 
     @property
@@ -966,28 +968,28 @@ class MappedNSBList:
     @property
     def aind_iso_on(self) -> Optional[Decimal]:
         """Maps iso_on to aind model"""
-        opt_float = self._nsb.iso_on
+        opt_float = self._nsb.iso_x0020_on
         return None if opt_float is None else Decimal(opt_float)
 
     @property
     def aind_lab_tracks_group(self) -> Optional[str]:
         """Maps lab_tracks_group to aind model"""
-        return self._nsb.lab_tracks_group
+        return self._nsb.lab_tracks_x0020_group
 
     @property
     def aind_lab_tracks_id(self) -> Optional[str]:
         """Maps lab_tracks_id to aind model"""
-        return self._nsb.lab_tracks_id
+        return self._nsb.lab_tracks_x0020_id
 
     @property
     def aind_lab_tracks_requestor(self) -> Optional[str]:
         """Maps lab_tracks_requestor to aind model"""
-        return self._nsb.lab_tracks_requestor
+        return self._nsb.lab_tracks_x0020_requestor
 
     @property
     def aind_lims_link(self) -> Optional[str]:
         """Maps lims_link to aind model"""
-        return self._nsb.lims_link
+        return self._nsb.lims_x0020_link
 
     @property
     def aind_long1st_round_inj_cmts(self) -> Optional[str]:
@@ -1094,7 +1096,7 @@ class MappedNSBList:
     @property
     def aind_nd_roung_injection_commen(self) -> Optional[str]:
         """Maps nd_roung_injection_commen to aind model"""
-        return self._nsb.nd_roung_injection_commen
+        return self._nsb.nd_roung_injection_comments
 
     @property
     def aind_pedigree_name(self) -> Optional[str]:
@@ -1102,7 +1104,7 @@ class MappedNSBList:
         return self._nsb.pedigree_name
 
     @property
-    def aind_procedure(self) -> Optional[NSBProcedure]:
+    def aind_procedure(self) -> Optional[NSB2019Procedure]:
         """Maps procedure to aind model"""
         return self._nsb.procedure
 
@@ -1165,17 +1167,17 @@ class MappedNSBList:
     @property
     def aind_second_injection_iso_dura(self) -> Optional[Decimal]:
         """Maps second_injection_iso_dura to aind model"""
-        return self._parse_iso_dur_str(self._nsb.second_injection_iso_dura)
+        return self._parse_iso_dur_str(self._nsb.second_injection_iso_duration)
 
     @property
     def aind_second_injection_weight_a(self) -> Optional[Decimal]:
         """Maps second_injection_weight_a to aind model"""
-        return self._parse_weight_str(self._nsb.second_injection_weight_a)
+        return self._parse_weight_str(self._nsb.second_injection_weight_after)
 
     @property
     def aind_second_injection_weight_b(self) -> Optional[Decimal]:
         """Maps second_injection_weight_b to aind model"""
-        return self._parse_weight_str(self._nsb.second_injection_weight_b)
+        return self._parse_weight_str(self._nsb.second_injection_weight_before)
 
     @property
     def aind_sex(self) -> Optional[Sex]:
@@ -1193,12 +1195,12 @@ class MappedNSBList:
     @property
     def aind_st_round_injection_commen(self) -> Optional[str]:
         """Maps st_round_injection_commen to aind model"""
-        return self._nsb.st_round_injection_commen
+        return self._nsb.st_round_injection_comments
 
     @property
     def aind_start_of_week(self) -> Optional[datetime]:
         """Maps start_of_week to aind model"""
-        return self._nsb.start_of_week
+        return self._nsb.start_x0020_of_x0020_week
 
     @property
     def aind_title(self) -> Optional[str]:
@@ -1208,12 +1210,12 @@ class MappedNSBList:
     @property
     def aind_touch_up_comp(self) -> Optional[datetime]:
         """Maps touch_up_comp to aind model"""
-        return self._nsb.touch_up_comp
+        return self._nsb.touch_x0020_up_x0020__x0020_comp
 
     @property
     def aind_touch_up_weight(self) -> Optional[Decimal]:
         """Maps touch_up_weight to aind model"""
-        return self._parse_weight_str(self._nsb.touch_up_weight)
+        return self._parse_weight_str(self._nsb.touch_x0020_up_x0020_weight_x002)
 
     @property
     def aind_ui_version_string(self) -> Optional[str]:
@@ -1223,12 +1225,12 @@ class MappedNSBList:
     @property
     def aind_virus_a_p(self) -> Optional[Decimal]:
         """Maps virus_a_p to aind model"""
-        return self._parse_ap_str(self._nsb.virus_a_p)
+        return self._parse_ap_str(self._nsb.virus_x0020_a_x002f_p)
 
     @property
     def aind_virus_d_v(self) -> Optional[List[Decimal]]:
         """Maps virus_d_v to aind model"""
-        dv = self._parse_dv_str(self._nsb.virus_d_v)
+        dv = self._parse_dv_str(self._nsb.virus_x0020_d_x002f_v)
         return [] if dv is None else [dv]
 
     @property
@@ -1236,28 +1238,28 @@ class MappedNSBList:
         """Maps virus_hemisphere to aind model"""
         return (
             None
-            if self._nsb.virus_hemisphere is None
+            if self._nsb.virus_x0020_hemisphere is None
             else {
-                self._nsb.virus_hemisphere.SELECT: None,
-                self._nsb.virus_hemisphere.LEFT: Side.LEFT,
-                self._nsb.virus_hemisphere.RIGHT: Side.RIGHT,
-            }.get(self._nsb.virus_hemisphere, None)
+                self._nsb.virus_x0020_hemisphere.SELECT: None,
+                self._nsb.virus_x0020_hemisphere.LEFT: Side.LEFT,
+                self._nsb.virus_x0020_hemisphere.RIGHT: Side.RIGHT,
+            }.get(self._nsb.virus_x0020_hemisphere, None)
         )
 
     @property
     def aind_virus_m_l(self) -> Optional[Decimal]:
         """Maps virus_m_l to aind model"""
-        return self._parse_ml_str(self._nsb.virus_m_l)
+        return self._parse_ml_str(self._nsb.virus_x0020_m_x002f_l)
 
     @property
     def aind_weight_after_surgery(self) -> Optional[Decimal]:
         """Maps weight_after_surgery to aind model"""
-        return self._parse_weight_str(self._nsb.weight_after_surgery)
+        return self._parse_weight_str(self._nsb.weight_x0020_after_x0020_surgery)
 
     @property
     def aind_weight_before_surger(self) -> Optional[Decimal]:
         """Maps weight_before_surger to aind model"""
-        return self._parse_weight_str(self._nsb.weight_before_surger)
+        return self._parse_weight_str(self._nsb.weight_x0020_before_x0020_surger)
 
     @property
     def aind_work_station1st_injection(self) -> Optional[str]:
@@ -1382,8 +1384,8 @@ class MappedNSBList:
     ) -> Optional[CoordinateReferenceLocation]:
         """Map nsb inj1 field to CoordinateReferenceLocation"""
         if (
-            self._nsb.virus_a_p is not None
-            and "LAMBDA" in self._nsb.virus_a_p.upper()
+            self._nsb.virus_x0020_a_x002f_p is not None
+            and "LAMBDA" in self._nsb.virus_x0020_a_x002f_p.upper()
         ):
             return CoordinateReferenceLocation.LAMBDA
         else:

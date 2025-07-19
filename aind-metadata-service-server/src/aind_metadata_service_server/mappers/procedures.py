@@ -93,7 +93,7 @@ class ProceduresMapper:
         if not (type_name and task_status == LabTracksTaskStatuses.FINISHED.value):
             return None
         
-        if LabTracksProcedures.PERFUSION.value in type_name.lower():
+        if LabTracksProcedures.PERFUSION.value.lower() in type_name.lower():
             output_specimen_ids = {
                 str(task.task_object)
             } if task.task_object else set()
@@ -197,7 +197,7 @@ class ProceduresMapper:
         """
         all_surgeries = []
         if self.labtracks_tasks:
-            labtracks_surgeries = self.map_()
+            labtracks_surgeries = self.map_labtracks_response_to_aind_surgeries()
             all_surgeries.extend(labtracks_surgeries)
             logging.info(f"Found {len(labtracks_surgeries)} surgeries from LabTracks for {subject_id}")
 

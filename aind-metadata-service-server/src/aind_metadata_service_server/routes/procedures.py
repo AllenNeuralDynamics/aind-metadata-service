@@ -16,7 +16,7 @@ router = APIRouter()
 
 
 @router.get("/procedures/{subject_id}")
-async def get_subject(
+async def get_procedures(
     subject_id: str = Path(
         ...,
         openapi_examples={
@@ -24,42 +24,55 @@ async def get_subject(
                 "summary": "A sample subject ID",
                 "description": "Example subject ID for LabTracks",
                 "value": "632269",
-            }
+            },
+            "example_nsb2019": {
+                "summary": "Another sample subject ID",
+                "description": "Example subject ID for LabTracks",
+                "value": "656374",
+            },
+            "example_nsb2023": {
+                "summary": "Another sample subject ID",
+                "description": "Example subject ID for LabTracks",
+                "value": "657849",
+            },
         },
     ),
-    # labtracks_api_instance=Depends(get_labtracks_api_instance),
+    labtracks_api_instance=Depends(get_labtracks_api_instance),
     sharepoint_api_instance=Depends(get_sharepoint_api_instance),
 ):
     """
     ## Procedures
     Return Procedure metadata.
     """
-    # labtracks_response = await labtracks_api_instance.get_tasks(
-    #     subject_id, _request_timeout=10
-    # )
-    nsb_2019_response = await sharepoint_api_instance.get_nsb_2019(
+    labtracks_response = await labtracks_api_instance.get_tasks(
         subject_id, _request_timeout=10
     )
-    nsb_2023_response = await sharepoint_api_instance.get_nsb_2023(
+    nsb_2019_response = await sharepoint_api_instance.get_nsb2019(
+        subject_id, _request_timeout=10
+    )
+    nsb_2023_response = await sharepoint_api_instance.get_nsb2023(
         subject_id, _request_timeout=10
     )
     nsb_present_response = await sharepoint_api_instance.get_nsb_present(
         subject_id, _request_timeout=10
     )
-    las_2020_response = await sharepoint_api_instance.get_las_2020(
+    las_2020_response = await sharepoint_api_instance.get_las2020(
         subject_id, _request_timeout=10
     )
     mapper = ProceduresMapper(
-        # labtracks_tasks=labtracks_response,
+        labtracks_tasks=labtracks_response,
         nsb_2019=nsb_2019_response,
         nsb_2023=nsb_2023_response,
         nsb_present=nsb_present_response,
         las_2020=las_2020_response
     )
     procedures = mapper.map_responses_to_aind_procedures(subject_id)
-    response_handler = ModelResponse(
-        aind_models=procedures, status_code=StatusCodes.DB_RESPONDED
-    )
-    response = response_handler.map_to_json_response()
-    return response
+    if procedures is None:
+        return ModelResponse.no_data_found_error_response()
+    else:
+        response_handler = ModelResponse(
+            aind_models=[procedures], status_code=StatusCodes.DB_RESPONDED
+        )
+        response = response_handler.map_to_json_response()
+        return response
 

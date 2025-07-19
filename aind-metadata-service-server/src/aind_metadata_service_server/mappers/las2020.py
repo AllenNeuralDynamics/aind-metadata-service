@@ -16,10 +16,10 @@ from aind_data_schema.core.procedures import (
     ViralMaterial,
 )
 
-from aind_metadata_service.sharepoint.las2020.models import (
-    Doseroute,
-    LASList,
-    Rosop,
+from aind_sharepoint_service_async_client.models import (
+    LASDoseroute,
+    Las2020List,
+    LASRosop,
 )
 
 
@@ -86,7 +86,7 @@ class RetroOrbitalInjectionInfo:
     """Container for ro injection information"""
 
     # TODO: support "either for eye"
-    ro_sop: Optional[Rosop] = None
+    ro_sop: Optional[LASRosop] = None
     animal_id: Optional[str] = None
     injection_eye: Optional[Side] = None
     injection_volume: Optional[Decimal] = None
@@ -119,7 +119,7 @@ class MappedLASList:
     VALUE_WITH_UNIT_REGEX = re.compile(r"^([\d\.eE+-]+)\s*(\S+)$")
     INTEGER_REGEX = re.compile(r"^[+-]?\d+$")
 
-    def __init__(self, las: LASList):
+    def __init__(self, las: Las2020List):
         """Class constructor"""
         self._las = las
 
@@ -373,7 +373,7 @@ class MappedLASList:
         return self._las.custpresent
 
     @property
-    def aind_dose_route(self) -> Optional[Doseroute]:
+    def aind_dose_route(self) -> Optional[LASDoseroute]:
         """Maps dose_route to aind model"""
         return self._las.dose_route
 
@@ -552,27 +552,27 @@ class MappedLASList:
     @property
     def aind_l_ta_id1(self) -> Optional[str]:
         """Maps l_ta_id1 to aind model"""
-        return self._las.l_ta_id1
+        return self._las.l_tdate1
 
     @property
     def aind_l_ta_id2(self) -> Optional[str]:
         """Maps l_ta_id2 to aind model"""
-        return self._las.l_ta_id2
+        return self._las.l_tdate2
 
     @property
     def aind_l_ta_id3(self) -> Optional[str]:
         """Maps l_ta_id3 to aind model"""
-        return self._las.l_ta_id3
+        return self._las.l_tdate3
 
     @property
     def aind_l_ta_id4(self) -> Optional[str]:
         """Maps l_ta_id4 to aind model"""
-        return self._las.l_ta_id4
+        return self._las.l_tdate4
 
     @property
     def aind_l_ta_id5(self) -> Optional[str]:
         """Maps l_ta_id5 to aind model"""
-        return self._las.l_ta_id5
+        return self._las.l_tdate5
 
     @property
     def aind_l_tdate1(self) -> Optional[datetime]:
@@ -839,25 +839,25 @@ class MappedLASList:
         """Maps lims_workflow_2 to aind model"""
         return (
             None
-            if self._las.lims_workflow_2 is None
+            if self._las.lims_workflow_x0020_2 is None
             else {
-                self._las.lims_workflow_2.N_2P_SERIAL_IMAGING: None,
-                self._las.lims_workflow_2.T6011_RETINA: None,
-                self._las.lims_workflow_2.T6012A_RETROGRADE_CAV2_CR: None,
-                self._las.lims_workflow_2.T6012B_RETROGRADE_RABIESG: None,
-                self._las.lims_workflow_2.T6012C_RETROGRADE_FLUOROG: None,
-                self._las.lims_workflow_2.T6013A_ANTEROGRADE_CRE_DE: None,
-                self._las.lims_workflow_2.T6013B_ANTEROGRADE_CRE_DE: None,
-                self._las.lims_workflow_2.T6014_ANTEROGRADE_TARGET: None,
-                self._las.lims_workflow_2.T6015_TRANSSYNAPTIC: None,
-                self._las.lims_workflow_2.SCREENING: None,
-                self._las.lims_workflow_2.CHARACTERIZATION: None,
-                self._las.lims_workflow_2.T5032_ANTEROGRADE_TARGET: None,
-                self._las.lims_workflow_2.T5033_ALZHEIMERS_PLAQUE: None,
-                self._las.lims_workflow_2.T5033_CONTROL: None,
-                self._las.lims_workflow_2.T503_ANTEROGRADE_CREDEFIN: None,
-                self._las.lims_workflow_2.MGT_ANTEROGRADE_PROJECTIO: None,
-            }.get(self._las.lims_workflow_2, None)
+                self._las.lims_workflow_x0020_2.N_2P_SERIAL_IMAGING: None,
+                self._las.lims_workflow_x0020_2.T6011_RETINA: None,
+                self._las.lims_workflow_x0020_2.T6012A_RETROGRADE_CAV2_CR: None,
+                self._las.lims_workflow_x0020_2.T6012B_RETROGRADE_RABIESG: None,
+                self._las.lims_workflow_x0020_2.T6012C_RETROGRADE_FLUOROG: None,
+                self._las.lims_workflow_x0020_2.T6013A_ANTEROGRADE_CRE_DE: None,
+                self._las.lims_workflow_x0020_2.T6013B_ANTEROGRADE_CRE_DE: None,
+                self._las.lims_workflow_x0020_2.T6014_ANTEROGRADE_TARGET: None,
+                self._las.lims_workflow_x0020_2.T6015_TRANSSYNAPTIC: None,
+                self._las.lims_workflow_x0020_2.SCREENING: None,
+                self._las.lims_workflow_x0020_2.CHARACTERIZATION: None,
+                self._las.lims_workflow_x0020_2.T5032_ANTEROGRADE_TARGET: None,
+                self._las.lims_workflow_x0020_2.T5033_ALZHEIMERS_PLAQUE: None,
+                self._las.lims_workflow_x0020_2.T5033_CONTROL: None,
+                self._las.lims_workflow_x0020_2.T503_ANTEROGRADE_CREDEFIN: None,
+                self._las.lims_workflow_x0020_2.MGT_ANTEROGRADE_PROJECTIO: None,
+            }.get(self._las.lims_workflow_x0020_2, None)
         )
 
     @property
@@ -893,7 +893,7 @@ class MappedLASList:
     @property
     def aind_n_end_date(self) -> Optional[date]:
         """Maps n_end_date to aind model"""
-        return self._parse_datetime_to_date(self._las.n_end_date)
+        return self._parse_datetime_to_date(self._las.n_end_x0020_date)
 
     @property
     def aind_n_roid1(self) -> Optional[str]:
@@ -923,7 +923,7 @@ class MappedLASList:
     @property
     def aind_n_start_date(self) -> Optional[date]:
         """Maps n_start_date to aind model"""
-        return self._parse_datetime_to_date(self._las.n_start_date)
+        return self._parse_datetime_to_date(self._las.n_start_x0020_date)
 
     @property
     def aind_oct(self) -> Optional[bool]:
@@ -2047,20 +2047,20 @@ class MappedLASList:
     @property
     def aind_wellness_report_no_x002_f(self) -> Optional[bool]:
         """Maps wellness_report_no_x002_f to aind model"""
-        return self._las.wellness_report_no_x002_f
+        return self._las.wellness_report_x0028_no_x002_f_ye
 
     @property
     def aind_whereto_obtainsubstance_i(self) -> Optional[Any]:
         """Maps whereto_obtainsubstance_i to aind model"""
         return (
             None
-            if self._las.whereto_obtainsubstance_i is None
+            if self._las.whereto_obtainsubstance_x0028_icv is None
             else {
-                self._las.whereto_obtainsubstance_i.LAS_BLUE_BIN_IN_VIVARIUM: (
+                self._las.whereto_obtainsubstance_x0028_icv.LAS_BLUE_BIN_IN_VIVARIUM: (
                     None
                 ),
-                self._las.whereto_obtainsubstance_i.OTHER_SPECIFY_BELOW: None,
-            }.get(self._las.whereto_obtainsubstance_i, None)
+                self._las.whereto_obtainsubstance_x0028_icv.OTHER_SPECIFY_BELOW: None,
+            }.get(self._las.whereto_obtainsubstance_x0028_icv, None)
         )
 
     def has_ip_injection(self) -> bool:
@@ -2068,7 +2068,7 @@ class MappedLASList:
         return (
             LASProcedure.DOSING
             in [self.aind_req_pro1, self.aind_req_pro2, self.aind_req_pro3]
-            and self.aind_dose_route == Doseroute.INTRAPERITONEAL_IP
+            and self.aind_dose_route == LASDoseroute.INTRAPERITONEAL_IP
         )
 
     def has_ro_injection(self) -> bool:
