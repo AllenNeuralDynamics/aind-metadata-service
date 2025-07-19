@@ -4,6 +4,7 @@ from typing import AsyncGenerator
 
 import aind_labtracks_service_async_client
 import aind_mgi_service_async_client
+import aind_session_json_service_async_client
 import aind_slims_service_async_client
 import aind_smartsheet_service_async_client
 import aind_tars_service_async_client
@@ -94,4 +95,19 @@ async def get_tars_api_instance() -> (
         tars_config
     ) as api_client:
         api_instance = aind_tars_service_async_client.DefaultApi(api_client)
+        yield api_instance
+
+
+async def get_session_json_api_instance() -> (
+    AsyncGenerator[aind_session_json_service_async_client.DefaultApi, None]
+):
+    """
+    Yield an aind_tars_service_async_client.DefaultApi object.
+    """
+    async with aind_session_json_service_async_client.ApiClient(
+        tars_config
+    ) as api_client:
+        api_instance = aind_session_json_service_async_client.DefaultApi(
+            api_client
+        )
         yield api_instance

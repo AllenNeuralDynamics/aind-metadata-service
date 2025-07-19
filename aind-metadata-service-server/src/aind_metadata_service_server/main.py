@@ -18,6 +18,7 @@ from aind_metadata_service_server.routes import (
     perfusion,
     protocol,
     rig_and_instrument,
+    session_json,
     slims,
     subject,
 )
@@ -62,6 +63,7 @@ app.include_router(slims.router)
 app.include_router(rig_and_instrument.router)
 app.include_router(mgi_allele.router)
 app.include_router(injection_materials.router)
+app.include_router(session_json.router)
 app.include_router(index.router)
 
 # Clean up the methods names that is generated in the client code
