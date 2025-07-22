@@ -60,31 +60,26 @@ class TestRoute:
 
     @patch(
         "aind_sharepoint_service_async_client.DefaultApi.get_las2020",
-        new_callable=AsyncMock,
     )
     @patch(
         "aind_sharepoint_service_async_client.DefaultApi.get_nsb_present",
-        new_callable=AsyncMock,
     )
     @patch(
         "aind_sharepoint_service_async_client.DefaultApi.get_nsb2023",
-        new_callable=AsyncMock,
     )
     @patch(
         "aind_sharepoint_service_async_client.DefaultApi.get_nsb2019",
-        new_callable=AsyncMock,
     )
     @patch(
         "aind_labtracks_service_async_client.DefaultApi.get_tasks",
-        new_callable=AsyncMock,
     )
     def test_get_procedures_no_data(
         self,
-        mock_get_tasks,
-        mock_get_nsb2019,
-        mock_get_nsb2023,
-        mock_get_nsb_present,
-        mock_get_las2020,
+        mock_get_tasks: AsyncMock,
+        mock_get_nsb2019: AsyncMock,
+        mock_get_nsb2023: AsyncMock,
+        mock_get_nsb_present: AsyncMock,
+        mock_get_las2020: AsyncMock,
         client: TestClient,
     ):
         """Tests no data found"""

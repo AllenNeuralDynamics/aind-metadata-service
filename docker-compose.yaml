@@ -10,8 +10,7 @@ services:
       - mgi
       - slims
       - smartsheet
-    volumes:
-      - ./aind-metadata-service-server/src:/app/src
+      - sharepoint
       - tars
       - session_json
       - redis
