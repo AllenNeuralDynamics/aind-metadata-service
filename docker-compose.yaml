@@ -10,7 +10,7 @@ services:
       - mgi
       - slims
       - smartsheet
-    volumes:
+      - sharepoint
       - tars
       - session_json
       - redis
