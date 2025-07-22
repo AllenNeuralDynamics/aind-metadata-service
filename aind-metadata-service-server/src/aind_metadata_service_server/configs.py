@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     sharepoint_host: HttpUrl = Field(
         ..., description="Host address for sharepoint endpoint"
     )
+    tars_host: HttpUrl = Field(
+        ..., description="Host address for tars endpoint"
+    )
     smartsheet_host: HttpUrl = Field(
         ..., description="Host address for smartsheet endpoint"
     )

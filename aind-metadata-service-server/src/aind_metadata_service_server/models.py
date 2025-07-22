@@ -3,6 +3,7 @@
 from typing import Literal, Optional
 
 from aind_data_schema.core.data_description import Funding
+from aind_data_schema.core.procedures import ViralMaterial
 from pydantic import BaseModel, Field, field_validator
 
 from aind_metadata_service_server import __version__
@@ -13,6 +14,12 @@ class HealthCheck(BaseModel):
 
     status: Literal["OK"] = "OK"
     service_version: str = __version__
+
+
+class ViralMaterialInformation(ViralMaterial):
+    """Viral Material with Stock Titer."""
+
+    stock_titer: Optional[int] = Field(default=None)
 
 
 class FundingInformation(Funding):

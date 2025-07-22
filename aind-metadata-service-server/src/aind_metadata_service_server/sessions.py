@@ -5,8 +5,10 @@ from typing import AsyncGenerator
 import aind_labtracks_service_async_client
 import aind_mgi_service_async_client
 import aind_sharepoint_service_async_client
+import aind_session_json_service_async_client
 import aind_slims_service_async_client
 import aind_smartsheet_service_async_client
+import aind_tars_service_async_client
 
 from aind_metadata_service_server.configs import get_settings
 
@@ -25,6 +27,9 @@ slims_config = aind_slims_service_async_client.Configuration(
 )
 sharepoint_config = aind_sharepoint_service_async_client.Configuration(
     host=settings.sharepoint_host.unicode_string().strip("/")
+)
+tars_config = aind_tars_service_async_client.Configuration(
+    host=settings.tars_host.unicode_string().strip("/")
 )
 
 
@@ -94,6 +99,34 @@ async def get_sharepoint_api_instance() -> (
         sharepoint_config
     ) as api_client:
         api_instance = aind_sharepoint_service_async_client.DefaultApi(
+            api_client
+        )
+        yield api_instance
+
+
+async def get_tars_api_instance() -> (
+    AsyncGenerator[aind_tars_service_async_client.DefaultApi, None]
+):
+    """
+    Yield an aind_tars_service_async_client.DefaultApi object.
+    """
+    async with aind_tars_service_async_client.ApiClient(
+        tars_config
+    ) as api_client:
+        api_instance = aind_tars_service_async_client.DefaultApi(api_client)
+        yield api_instance
+
+
+async def get_session_json_api_instance() -> (
+    AsyncGenerator[aind_session_json_service_async_client.DefaultApi, None]
+):
+    """
+    Yield an aind_tars_service_async_client.DefaultApi object.
+    """
+    async with aind_session_json_service_async_client.ApiClient(
+        tars_config
+    ) as api_client:
+        api_instance = aind_session_json_service_async_client.DefaultApi(
             api_client
         )
         yield api_instance
