@@ -21,7 +21,7 @@ dependencies = [
     'aind-mgi-service-async-client>=0.1.2',
     'aind-slims-service-async-client>=0.2.4',
     'aind-smartsheet-service-async-client>=0.2.1',
-    'aind_sharepoint_service_async_client>=0.0.10',
+    'aind_sharepoint_service_async_client>=0.0.11',
     'aind-data-schema==1.4.0',
     'aind-data-schema-models==0.7.5',
     'pydantic>=2.0',
@@ -99,5 +99,7 @@ asyncio_default_fixture_loop_scope="function"
 env = [
     "AIND_METADATA_SERVICE_LABTRACKS_HOST=http://example.com/labtracks",
     "AIND_METADATA_SERVICE_MGI_HOST=http://example.com/mgi",
-    "AIND_METADATA_SERVICE_SLIMS_HOST=http://example.com/slims"
+    "AIND_METADATA_SERVICE_SLIMS_HOST=http://example.com/slims",
+    "AIND_METADATA_SERVICE_SHAREPOINT_HOST=http://example.com/sharepoint",
+    "AIND_METADATA_SERVICE_SMARTSHEET_HOST=http://example.com/smartsheet"
 ]

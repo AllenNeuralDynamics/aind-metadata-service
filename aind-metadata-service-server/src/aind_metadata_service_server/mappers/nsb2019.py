@@ -241,7 +241,7 @@ class MappedNSBList:
     @property
     def aind_age_at_injection(self) -> Optional[str]:
         """Maps age_at_injection to aind model"""
-        return self._nsb.age_at_injection
+        return self._nsb.age_x0020_at_x0020_injection
 
     @property
     def aind_ap2nd_inj(self) -> Optional[Decimal]:
@@ -461,12 +461,12 @@ class MappedNSBList:
     @property
     def aind_hp_a_p(self) -> Optional[Decimal]:
         """Maps hp_a_p to aind model"""
-        return self._parse_ap_str(self._nsb.hp_a_p)
+        return self._parse_ap_str(self._nsb.hp_x0020_a_x002f_p)
 
     @property
     def aind_hp_diameter(self) -> Optional[str]:
         """Maps hp_diameter to aind model"""
-        return self._nsb.hp_diameter
+        return self._nsb.hp_x0020_diameter
 
     @property
     def aind_hp_durotomy(self) -> Optional[bool]:
@@ -482,7 +482,7 @@ class MappedNSBList:
         """Maps hp_inj to aind model"""
         return (
             True
-            if self._nsb.hp_inj is not None and self._nsb.hp_inj == "Yes"
+            if self._nsb.hp_x0020__x0026__x0020_inj is not None and self._nsb.hp_x0020__x0026__x0020_inj == "Yes"
             else False
         )
 
@@ -526,7 +526,7 @@ class MappedNSBList:
     @property
     def aind_hp_m_l(self) -> Optional[Decimal]:
         """Maps hp_m_l to aind model"""
-        return self._parse_ml_str(self._nsb.hp_m_l)
+        return self._parse_ml_str(self._nsb.hp_x0020_m_x002f_l)
 
     @property
     def aind_hp_recovery(self) -> Optional[float]:
@@ -537,12 +537,12 @@ class MappedNSBList:
     @property
     def aind_hp_requestor(self) -> Optional[str]:
         """Maps hp_requestor to aind model"""
-        return self._nsb.hp_requestor
+        return self._nsb.x0031_hp_x0020_requestor_x0020_
 
     @property
     def aind_hp_requestor_comments_pla(self) -> Optional[str]:
         """Maps hp_requestor_comments_pla to aind model"""
-        return self._nsb.hp_requestor_comments_pla
+        return self._nsb.hp_requestor_comments_plaintext
 
     @property
     def aind_hp_surgeon_comments(self) -> Optional[str]:

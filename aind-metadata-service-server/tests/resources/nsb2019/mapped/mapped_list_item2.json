@@ -1,0 +1,40 @@
+[
+  {
+    "start_date": "2022-12-06",
+    "experimenter_full_name": "NSB-187",
+    "iacuc_protocol": "2115",
+    "animal_weight_prior": null,
+    "animal_weight_post": null,
+    "anaesthesia": {
+      "type": "isoflurane",
+      "level": null,
+      "duration_unit": "minute"
+    },
+    "workstation_id": "SWS 3",
+    "procedures": [
+      {
+        "headframe_type": "CAM-style",
+        "headframe_part_number": "0160-100-10 Rev A",
+        "well_part_number": null,
+        "well_type": "CAM-style",
+        "procedure_type": "Headframe",
+        "headframe_material": null
+      },
+      {
+        "craniotomy_type": "Whole hemisphere craniotomy",
+        "craniotomy_hemisphere": null,
+        "bregma_to_lambda_distance": null,
+        "dura_removed": false,
+        "procedure_type": "Craniotomy",
+        "bregma_to_lambda_unit": "millimeter",
+        "implant_part_number": null,
+        "protective_material": null,
+        "recovery_time": null,
+        "recovery_time_unit": "minute"
+      }
+    ],
+    "notes": null,
+    "procedure_type": "Surgery",
+    "weight_unit": "gram"
+  }
+]
