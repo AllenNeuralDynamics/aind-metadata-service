@@ -20,8 +20,6 @@ from aind_metadata_service_server.mappers.las2020 import MappedLASList
 if os.getenv("LOG_LEVEL"):  # pragma: no cover
     logging.basicConfig(level=os.getenv("LOG_LEVEL"))
 
-
-# point TEST_DIR at tests/, not project root
 TEST_DIR = Path(__file__).parent / ".."
 DIR_RAW = TEST_DIR / "resources" / "las2020" / "raw"
 DIR_MAP = TEST_DIR / "resources" / "las2020" / "mapped"
