@@ -11,7 +11,6 @@ services:
       - slims
       - smartsheet
     volumes:
-      - ./aind-metadata-service-server/src:/app/src
       - tars
       - session_json
       - redis
