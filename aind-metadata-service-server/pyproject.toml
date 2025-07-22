@@ -102,5 +102,8 @@ env = [
     "AIND_METADATA_SERVICE_LABTRACKS_HOST=http://example.com/labtracks",
     "AIND_METADATA_SERVICE_MGI_HOST=http://example.com/mgi",
     "AIND_METADATA_SERVICE_SLIMS_HOST=http://example.com/slims",
-    "AIND_METADATA_SERVICE_SMARTSHEET_HOST=http://example.com/smartsheet"
+    "AIND_METADATA_SERVICE_SMARTSHEET_HOST=http://example.com/smartsheet",
+    "AIND_METADATA_SERVICE_TARS_HOST=http://example.com/tars",
+    "AIND_METADATA_SERVICE_SESSION_JSON_HOST=http://example.com/session_json",
+    "AIND_METADATA_SERVICE_SHAREPOINT_HOST=http://example.com/sharepoint",
 ]
