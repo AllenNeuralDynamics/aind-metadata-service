@@ -27,14 +27,16 @@ from aind_data_schema.core.procedures import (
 )
 from aind_data_schema.core.subject import Sex
 from aind_data_schema_models.organizations import Organization
-
-from aind_metadata_service_server.models import IntendedMeasurementInformation
+from aind_sharepoint_service_async_client.models import (
+    NSB2023IacucProtocol as IacucProtocol,
+)
 from aind_sharepoint_service_async_client.models import (
     NSB2023List,
-    NSB2023IacucProtocol as IacucProtocol,
     NSB2023Procedure,
     NSB2023ProcedureCategory,
 )
+
+from aind_metadata_service_server.models import IntendedMeasurementInformation
 
 
 class BurrHoleProcedure(Enum):
@@ -358,7 +360,9 @@ class MappedNSBList:
     @property
     def aind_age_at_injection(self) -> Optional[Decimal]:
         """Maps age_at_injection to aind model."""
-        return self._parse_basic_decimal_str(self._nsb.age_x0020_at_x0020_injection)
+        return self._parse_basic_decimal_str(
+            self._nsb.age_x0020_at_x0020_injection
+        )
 
     @property
     def aind_aind_project_name(self) -> Optional[Any]:
@@ -1066,12 +1070,16 @@ class MappedNSBList:
     @property
     def aind_burr_1_d_v_x00(self) -> Optional[Decimal]:
         """Maps burr_1_d_v_x00 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_x0020_1_x0020_d_x002f_v_x00)
+        return self._map_float_to_decimal(
+            self._nsb.burr_x0020_1_x0020_d_x002f_v_x00
+        )
 
     @property
     def aind_burr_1_dv_2(self) -> Optional[Decimal]:
         """Maps burr_1_dv_2 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_x0020_1_x0020_dv_x0020_2)
+        return self._map_float_to_decimal(
+            self._nsb.burr_x0020_1_x0020_dv_x0020_2
+        )
 
     @property
     def aind_burr_1_fiber_t(self) -> Optional[FiberType]:
@@ -1455,7 +1463,9 @@ class MappedNSBList:
     @property
     def aind_burr_1_intended_x0020(self) -> Optional[str]:
         """Maps burr_1_intended_x0020 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_1_x0020_intended_x0020", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_1_x0020_intended_x0020", None
+        )
         return (
             None
             if intended is None
@@ -1466,7 +1476,9 @@ class MappedNSBList:
     @property
     def aind_burr_1_intended_x0021(self) -> Optional[str]:
         """Maps burr_1_intended_x0021 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_1_x0020_intended_x0021", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_1_x0020_intended_x0021", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -1476,7 +1488,9 @@ class MappedNSBList:
     @property
     def aind_burr_1_intended_x0022(self) -> Optional[str]:
         """Maps burr_1_intended_x0022 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_1_x0020_intended_x0022", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_1_x0020_intended_x0022", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -1486,7 +1500,9 @@ class MappedNSBList:
     @property
     def aind_burr_1_intended_x0023(self) -> Optional[str]:
         """Maps burr_1_intended_x0023 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_1_x0020_intended_x0023", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_1_x0020_intended_x0023", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -1515,12 +1531,16 @@ class MappedNSBList:
     @property
     def aind_burr_2_d_v_x00(self) -> Optional[Decimal]:
         """Maps burr_2_d_v_x00 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_x0020_2_x0020_d_x002f_v_x00)
+        return self._map_float_to_decimal(
+            self._nsb.burr_x0020_2_x0020_d_x002f_v_x00
+        )
 
     @property
     def aind_burr_2_d_v_x000(self) -> Optional[Decimal]:
         """Maps burr_2_d_v_x000 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_x0020_2_x0020_d_x002f_v_x000)
+        return self._map_float_to_decimal(
+            self._nsb.burr_x0020_2_x0020_d_x002f_v_x000
+        )
 
     @property
     def aind_burr_2_fiber_t(self) -> Optional[FiberType]:
@@ -1896,7 +1916,9 @@ class MappedNSBList:
     @property
     def aind_burr_2_intended_x0020(self) -> Optional[str]:
         """Maps burr_2_intended_x0020 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_2_x0020_intended_x0020", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_2_x0020_intended_x0020", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -1906,7 +1928,9 @@ class MappedNSBList:
     @property
     def aind_burr_2_intended_x0021(self) -> Optional[str]:
         """Maps burr_2_intended_x0021 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_2_x0020_intended_x0021", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_2_x0020_intended_x0021", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -1916,7 +1940,9 @@ class MappedNSBList:
     @property
     def aind_burr_2_intended_x0022(self) -> Optional[str]:
         """Maps burr_2_intended_x0022 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_2_x0020_intended_x0022", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_2_x0020_intended_x0022", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -1926,7 +1952,9 @@ class MappedNSBList:
     @property
     def aind_burr_2_intended_x0023(self) -> Optional[str]:
         """Maps burr_2_intended_x0023 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_2_x0020_intended_x0023", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_2_x0020_intended_x0023", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -1951,7 +1979,7 @@ class MappedNSBList:
                 self._nsb.burr_x0020_2_x0020_spinal_x0020_.BETWEEN_T1_T2: None,
             }.get(self._nsb.burr_x0020_2_x0020_spinal_x0020_, None)
         )
-    
+
     @property
     def aind_burr_3_angle(self) -> Optional[Decimal]:
         """Maps burr_3_angle to aind model"""
@@ -1960,12 +1988,16 @@ class MappedNSBList:
     @property
     def aind_burr_3_d_v_x00(self) -> Optional[Decimal]:
         """Maps burr_3_d_v_x00 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_x0020_3_x0020_d_x002f_v_x00)
+        return self._map_float_to_decimal(
+            self._nsb.burr_x0020_3_x0020_d_x002f_v_x00
+        )
 
     @property
     def aind_burr_3_d_v_x000(self) -> Optional[Decimal]:
         """Maps burr_3_d_v_x000 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_x0020_3_x0020_d_x002f_v_x000)
+        return self._map_float_to_decimal(
+            self._nsb.burr_x0020_3_x0020_d_x002f_v_x000
+        )
 
     @property
     def aind_burr_3_fiber_t(self) -> Optional[FiberType]:
@@ -2355,7 +2387,9 @@ class MappedNSBList:
     @property
     def aind_burr_3_intended_x0020(self) -> Optional[str]:
         """Maps burr_3_intended_x0020 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_3_x0020_intended_x0020", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_3_x0020_intended_x0020", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -2365,7 +2399,9 @@ class MappedNSBList:
     @property
     def aind_burr_3_intended_x0021(self) -> Optional[str]:
         """Maps burr_3_intended_x0021 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_3_x0020_intended_x0021", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_3_x0020_intended_x0021", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -2375,7 +2411,9 @@ class MappedNSBList:
     @property
     def aind_burr_3_intended_x0022(self) -> Optional[Any]:
         """Maps burr_3_intended_x0022 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_3_x0020_intended_x0022", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_3_x0020_intended_x0022", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -2385,7 +2423,9 @@ class MappedNSBList:
     @property
     def aind_burr_3_intended_x0023(self) -> Optional[str]:
         """Maps burr_3_intended_x0023 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_3_x0020_intended_x0023", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_3_x0020_intended_x0023", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -2400,12 +2440,16 @@ class MappedNSBList:
     @property
     def aind_burr_4_d_v_x00(self) -> Optional[Decimal]:
         """Maps burr_4_d_v_x00 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_x0020_4_x0020_d_x002f_v_x00)
+        return self._map_float_to_decimal(
+            self._nsb.burr_x0020_4_x0020_d_x002f_v_x00
+        )
 
     @property
     def aind_burr_4_d_v_x000(self) -> Optional[Decimal]:
         """Maps burr_4_d_v_x000 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_x0020_4_x0020_d_x002f_v_x000)
+        return self._map_float_to_decimal(
+            self._nsb.burr_x0020_4_x0020_d_x002f_v_x000
+        )
 
     @property
     def aind_burr_4_fiber_t(self) -> Optional[FiberType]:
@@ -2795,7 +2839,9 @@ class MappedNSBList:
     @property
     def aind_burr_4_intended_x0020(self) -> Optional[str]:
         """Maps burr_4_intended_x0020 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_4_x0020_intended_x0020", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_4_x0020_intended_x0020", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -2805,7 +2851,9 @@ class MappedNSBList:
     @property
     def aind_burr_4_intended_x0021(self) -> Optional[str]:
         """Maps burr_4_intended_x0021 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_4_x0020_intended_x0021", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_4_x0020_intended_x0021", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -2815,7 +2863,9 @@ class MappedNSBList:
     @property
     def aind_burr_4_intended_x0022(self) -> Optional[str]:
         """Maps burr_4_intended_x0022 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_4_x0020_intended_x0022", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_4_x0020_intended_x0022", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -2825,7 +2875,9 @@ class MappedNSBList:
     @property
     def aind_burr_4_intended_x0023(self) -> Optional[str]:
         """Maps burr_4_intended_x0023 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_4_x0020_intended_x0023", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_4_x0020_intended_x0023", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -2835,7 +2887,9 @@ class MappedNSBList:
     @property
     def aind_burr_5_a_p(self) -> Optional[Decimal]:
         """Maps burr_5_a_p to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_x0020_5_x0020_a_x002f_p)
+        return self._map_float_to_decimal(
+            self._nsb.burr_x0020_5_x0020_a_x002f_p
+        )
 
     @property
     def aind_burr_5_angle(self) -> Optional[Decimal]:
@@ -2845,17 +2899,23 @@ class MappedNSBList:
     @property
     def aind_burr_5_d_v_x00(self) -> Optional[Decimal]:
         """Maps burr_5_d_v_x00 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_x0020_5_x0020_d_x002f_v_x00)
+        return self._map_float_to_decimal(
+            self._nsb.burr_x0020_5_x0020_d_x002f_v_x00
+        )
 
     @property
     def aind_burr_5_d_v_x000(self) -> Optional[Decimal]:
         """Maps burr_5_d_v_x000 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_x0020_5_x0020_d_x002f_v_x000)
+        return self._map_float_to_decimal(
+            self._nsb.burr_x0020_5_x0020_d_x002f_v_x000
+        )
 
     @property
     def aind_burr_5_d_v_x001(self) -> Optional[Decimal]:
         """Maps burr_5_d_v_x001 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_x0020_5_x0020_d_x002f_v_x001)
+        return self._map_float_to_decimal(
+            self._nsb.burr_x0020_5_x0020_d_x002f_v_x001
+        )
 
     @property
     def aind_burr_5_fiber_t(self) -> Optional[Any]:
@@ -3245,7 +3305,9 @@ class MappedNSBList:
     @property
     def aind_burr_5_intended_x0020(self) -> Optional[str]:
         """Maps burr_5_intended_x0020 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_5_x0020_intended_x0020", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_5_x0020_intended_x0020", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -3255,7 +3317,9 @@ class MappedNSBList:
     @property
     def aind_burr_5_intended_x0021(self) -> Optional[str]:
         """Maps burr_5_intended_x0021 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_5_x0020_intended_x0021", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_5_x0020_intended_x0021", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -3265,7 +3329,9 @@ class MappedNSBList:
     @property
     def aind_burr_5_intended_x0022(self) -> Optional[str]:
         """Maps burr_5_intended_x0022 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_5_x0020_intended_x0022", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_5_x0020_intended_x0022", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -3275,7 +3341,9 @@ class MappedNSBList:
     @property
     def aind_burr_5_intended_x0023(self) -> Optional[str]:
         """Maps burr_5_intended_x0023 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_5_x0020_intended_x0023", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_5_x0020_intended_x0023", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -3285,12 +3353,16 @@ class MappedNSBList:
     @property
     def aind_burr_5_m_l(self) -> Optional[Decimal]:
         """Maps burr_5_m_l to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_x0020_5_x0020_m_x002f_l)
+        return self._map_float_to_decimal(
+            self._nsb.burr_x0020_5_x0020_m_x002f_l
+        )
 
     @property
     def aind_burr_6_a_p(self) -> Optional[Decimal]:
         """Maps burr_6_a_p to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_x0020_6_x0020_a_x002f_p)
+        return self._map_float_to_decimal(
+            self._nsb.burr_x0020_6_x0020_a_x002f_p
+        )
 
     @property
     def aind_burr_6_angle(self) -> Optional[Decimal]:
@@ -3300,17 +3372,23 @@ class MappedNSBList:
     @property
     def aind_burr_6_d_v_x00(self) -> Optional[Decimal]:
         """Maps burr_6_d_v_x00 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_x0020_6_x0020_d_x002f_v_x00)
+        return self._map_float_to_decimal(
+            self._nsb.burr_x0020_6_x0020_d_x002f_v_x00
+        )
 
     @property
     def aind_burr_6_d_v_x000(self) -> Optional[Decimal]:
         """Maps burr_6_d_v_x000 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_x0020_6_x0020_d_x002f_v_x000)
+        return self._map_float_to_decimal(
+            self._nsb.burr_x0020_6_x0020_d_x002f_v_x000
+        )
 
     @property
     def aind_burr_6_d_v_x001(self) -> Optional[Decimal]:
         """Maps burr_6_d_v_x001 to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_x0020_6_x0020_d_x002f_v_x001)
+        return self._map_float_to_decimal(
+            self._nsb.burr_x0020_6_x0020_d_x002f_v_x001
+        )
 
     @property
     def aind_burr_6_fiber_t(self) -> Optional[FiberType]:
@@ -3700,7 +3778,9 @@ class MappedNSBList:
     @property
     def aind_burr_6_intended_x0020(self) -> Optional[str]:
         """Maps burr_6_intended_x0020 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_6_x0020_intended_x0020", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_6_x0020_intended_x0020", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -3710,7 +3790,9 @@ class MappedNSBList:
     @property
     def aind_burr_6_intended_x0021(self) -> Optional[str]:
         """Maps burr_6_intended_x0021 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_6_x0020_intended_x0021", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_6_x0020_intended_x0021", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -3720,7 +3802,9 @@ class MappedNSBList:
     @property
     def aind_burr_6_intended_x0022(self) -> Optional[str]:
         """Maps burr_6_intended_x0022 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_6_x0020_intended_x0022", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_6_x0020_intended_x0022", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -3730,7 +3814,9 @@ class MappedNSBList:
     @property
     def aind_burr_6_intended_x0023(self) -> Optional[str]:
         """Maps burr_6_intended_x0023 to aind model."""
-        intended = getattr(self._nsb, "burr_x0020_6_x0020_intended_x0023", None)
+        intended = getattr(
+            self._nsb, "burr_x0020_6_x0020_intended_x0023", None
+        )
         return (
             None
             if intended is None or intended == getattr(intended, "N_A", None)
@@ -3740,7 +3826,9 @@ class MappedNSBList:
     @property
     def aind_burr_6_m_l(self) -> Optional[Decimal]:
         """Maps burr_6_m_l to aind model"""
-        return self._map_float_to_decimal(self._nsb.burr_x0020_6_x0020_m_x002f_l)
+        return self._map_float_to_decimal(
+            self._nsb.burr_x0020_6_x0020_m_x002f_l
+        )
 
     @property
     def aind_burr_hole_1(self) -> Optional[BurrHoleProcedure]:
@@ -3995,7 +4083,9 @@ class MappedNSBList:
     @property
     def aind_date_of_surgery(self) -> Optional[date]:
         """Maps date_of_surgery to aind model"""
-        return self._parse_datetime_to_date(self._nsb.date_x0020_of_x0020_surgery)
+        return self._parse_datetime_to_date(
+            self._nsb.date_x0020_of_x0020_surgery
+        )
 
     @property
     def aind_date_range_start(self) -> Optional[datetime]:
@@ -4062,7 +4152,9 @@ class MappedNSBList:
     @property
     def aind_fiber_implant3_d_x00(self) -> Optional[Decimal]:
         """Maps fiber_implant3_d_x00 to aind model"""
-        return self._map_float_to_decimal(self._nsb.fiber_x0020_implant3_x0020_d_x00)
+        return self._map_float_to_decimal(
+            self._nsb.fiber_x0020_implant3_x0020_d_x00
+        )
 
     @property
     def aind_fiber_implant3_lengt(self) -> Optional[Decimal]:
@@ -4078,7 +4170,9 @@ class MappedNSBList:
     @property
     def aind_fiber_implant4_d_x00(self) -> Optional[Decimal]:
         """Maps fiber_implant4_d_x00 to aind model"""
-        return self._map_float_to_decimal(self._nsb.fiber_x0020_implant4_x0020_d_x00)
+        return self._map_float_to_decimal(
+            self._nsb.fiber_x0020_implant4_x0020_d_x00
+        )
 
     @property
     def aind_fiber_implant4_lengt(self) -> Optional[Decimal]:
@@ -4094,7 +4188,9 @@ class MappedNSBList:
     @property
     def aind_fiber_implant5_d_x00(self) -> Optional[Decimal]:
         """Maps fiber_implant5_d_x00 to aind model"""
-        return self._map_float_to_decimal(self._nsb.fiber_x0020_implant5_x0020_d_x00)
+        return self._map_float_to_decimal(
+            self._nsb.fiber_x0020_implant5_x0020_d_x00
+        )
 
     @property
     def aind_fiber_implant5_lengt(self) -> Optional[Decimal]:
@@ -4110,7 +4206,9 @@ class MappedNSBList:
     @property
     def aind_fiber_implant6_d_x00(self) -> Optional[Decimal]:
         """Maps fiber_implant6_d_x00 to aind model"""
-        return self._map_float_to_decimal(self._nsb.fiber_x0020_implant6_x0020_d_x00)
+        return self._map_float_to_decimal(
+            self._nsb.fiber_x0020_implant6_x0020_d_x00
+        )
 
     @property
     def aind_fiber_implant6_lengt(self) -> Optional[Decimal]:
@@ -4139,12 +4237,16 @@ class MappedNSBList:
     @property
     def aind_first_injection_weight_af(self) -> Optional[Decimal]:
         """Maps first_injection_weight_af to aind model"""
-        return self._map_float_to_decimal(self._nsb.first_injection_weight_after)
+        return self._map_float_to_decimal(
+            self._nsb.first_injection_weight_after
+        )
 
     @property
     def aind_first_injection_weight_be(self) -> Optional[Decimal]:
         """Maps first_injection_weight_be to aind model"""
-        return self._map_float_to_decimal(self._nsb.first_injection_weight_befor)
+        return self._map_float_to_decimal(
+            self._nsb.first_injection_weight_befor
+        )
 
     @property
     def aind_folder_child_count(self) -> Optional[str]:
@@ -4255,7 +4357,8 @@ class MappedNSBList:
         return (
             None
             if self._nsb.iacuc_x0020_protocol_x0020__x002 is None
-            or self._nsb.iacuc_x0020_protocol_x0020__x002 == self._nsb.iacuc_x0020_protocol_x0020__x002.SELECT
+            or self._nsb.iacuc_x0020_protocol_x0020__x002
+            == self._nsb.iacuc_x0020_protocol_x0020__x002.SELECT
             else self._nsb.iacuc_x0020_protocol_x0020__x002.value
         )
 
@@ -5374,12 +5477,16 @@ class MappedNSBList:
     @property
     def aind_weight_after_surgery(self) -> Optional[Decimal]:
         """Maps weight_after_surgery to aind model"""
-        return self._map_float_to_decimal(self._nsb.weight_x0020_after_x0020_surgery)
+        return self._map_float_to_decimal(
+            self._nsb.weight_x0020_after_x0020_surgery
+        )
 
     @property
     def aind_weight_before_surger(self) -> Optional[Decimal]:
         """Maps weight_before_surger to aind model"""
-        return self._map_float_to_decimal(self._nsb.weight_x0020_before_x0020_surger)
+        return self._map_float_to_decimal(
+            self._nsb.weight_x0020_before_x0020_surger
+        )
 
     @property
     def aind_work_station1st_injection(self) -> Optional[Any]:

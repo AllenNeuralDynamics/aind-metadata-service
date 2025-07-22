@@ -6,17 +6,24 @@ import os
 from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
-from typing import List, Tuple, Callable
+from typing import Callable, List, Tuple
 from unittest import TestCase
 from unittest import main as unittest_main
 
-from aind_data_schema.core.procedures import BrainInjection, CraniotomyType, HeadframeMaterial
-from aind_sharepoint_service_async_client.models.nsb2023_list import NSB2023List
+from aind_data_schema.core.procedures import (
+    BrainInjection,
+    CraniotomyType,
+    HeadframeMaterial,
+)
+from aind_sharepoint_service_async_client.models.nsb2023_list import (
+    NSB2023List,
+)
+
 from aind_metadata_service_server.mappers.nsb2023 import (
-        MappedNSBList,
-        HeadPostInfo,
-        HeadPost,
-        HeadPostType,
+    HeadPost,
+    HeadPostInfo,
+    HeadPostType,
+    MappedNSBList,
 )
 
 if os.getenv("LOG_LEVEL"):  # pragma: no cover
@@ -26,16 +33,10 @@ TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / ".."
 DIR_RAW = TEST_DIR / "resources" / "nsb2023" / "raw"
 DIR_MAP = TEST_DIR / "resources" / "nsb2023" / "mapped"
 INTENDED_RAW = (
-    TEST_DIR
-    / "resources"
-    / "nsb2023"
-    / "nsb2023_intended_measurements.json"
+    TEST_DIR / "resources" / "nsb2023" / "nsb2023_intended_measurements.json"
 )
 TEST_EXAMPLES = (
-    TEST_DIR
-    / "resources"
-    / "nsb2023"
-    / "nsb2023_string_entries.json"
+    TEST_DIR / "resources" / "nsb2023" / "nsb2023_string_entries.json"
 )
 LIST_ITEM_FILE_NAMES = os.listdir(DIR_RAW)
 sorted(LIST_ITEM_FILE_NAMES)
@@ -79,6 +80,7 @@ class TestNSB2023Parsers(TestCase):
             raw_data = list_item[0]
             expected_mapped_data = list_item[1]
             raw_file_name = list_item[2]
+            logging.debug(f"Processing file: {raw_file_name}")
             nsb_model = NSB2023List.model_validate(raw_data)
             mapper = MappedNSBList(nsb=nsb_model)
             mapped_procedure = mapper.get_surgeries()  # Updated method name
@@ -88,9 +90,6 @@ class TestNSB2023Parsers(TestCase):
             mapped_procedure_json_parsed = [
                 json.loads(json_str) for json_str in mapped_procedure_json
             ]
-            if raw_file_name == "list_item5.json":
-                with open("actual_mapped_list_item5.json", "w") as f:
-                    json.dump(mapped_procedure_json_parsed, f, indent=2)
             self.assertEqual(
                 expected_mapped_data, mapped_procedure_json_parsed
             )
@@ -164,18 +163,22 @@ class TestNSB2023Parsers(TestCase):
             MappedNSBList._parse_basic_decimal_str("0.25"), Decimal(0.25)
         )
         self.assertIsNone(MappedNSBList._parse_basic_decimal_str("abc"), None)
-        
+
     def test_craniotomy_edge_case(self):
         """Tests other craniotomy cases"""
         # Check WHC type
-        list_item = self.list_items[2] if len(self.list_items) > 2 else self.list_items[0]
+        list_item = (
+            self.list_items[2]
+            if len(self.list_items) > 2
+            else self.list_items[0]
+        )
         raw_data = deepcopy(list_item[0])
         raw_data["Procedure"] = "WHC NP"
         raw_data["CraniotomyType"] = "WHC NP"
         nsb_model1 = NSB2023List.model_validate(raw_data)
         mapper = MappedNSBList(nsb=nsb_model1)
         mapped_procedure1 = mapper.get_surgeries()
-        
+
         # Find craniotomy procedure
         cran_proc1 = None
         for surgery in mapped_procedure1:
@@ -185,7 +188,7 @@ class TestNSB2023Parsers(TestCase):
                     break
             if cran_proc1:
                 break
-                
+
         if cran_proc1:
             self.assertEqual(
                 CraniotomyType.WHC, getattr(cran_proc1, "craniotomy_type")
@@ -197,7 +200,7 @@ class TestNSB2023Parsers(TestCase):
         nsb_model2 = NSB2023List.model_validate(raw_data)
         mapper = MappedNSBList(nsb=nsb_model2)
         mapped_procedure2 = mapper.get_surgeries()
-        
+
         # Find craniotomy procedure
         cran_proc2 = None
         for surgery in mapped_procedure2:
@@ -207,7 +210,7 @@ class TestNSB2023Parsers(TestCase):
                     break
             if cran_proc2:
                 break
-                
+
         if cran_proc2:
             self.assertIsNone(getattr(cran_proc2, "craniotomy_type"))
 
@@ -215,7 +218,9 @@ class TestNSB2023Parsers(TestCase):
         """Test craniotomy procedure detection"""
         if self.list_items:
             raw_data = deepcopy(self.list_items[0][0])
-            raw_data["Procedure"] = "Visual Ctx 2P"  # Known craniotomy procedure
+            raw_data["Procedure"] = (
+                "Visual Ctx 2P"  # Known craniotomy procedure
+            )
             nsb_model = NSB2023List.model_validate(raw_data)
             mapper = MappedNSBList(nsb=nsb_model)
             self.assertTrue(mapper.has_cran_procedure())
@@ -239,12 +244,12 @@ class TestNSB2023Parsers(TestCase):
             nsb_model = NSB2023List.model_validate(raw_data)
             mapper = MappedNSBList(nsb=nsb_model)
             mapped_procedure = mapper.get_surgeries()
-            
+
             # Check if any procedure is a BrainInjection
             proc_types = []
             for surgery in mapped_procedure:
                 proc_types.extend([type(p) for p in surgery.procedures])
-            
+
             self.assertTrue(BrainInjection in proc_types)
 
     def test_single_file_load(self):
@@ -252,88 +257,81 @@ class TestNSB2023Parsers(TestCase):
         if self.list_items:
             raw_data = self.list_items[0][0]
             raw_file_name = self.list_items[0][2]
-            print(f"Testing single file: {raw_file_name}")
-            
+            logging.debug(f"Processing file: {raw_file_name}")
             nsb_model = NSB2023List.model_validate(raw_data)
             mapper = MappedNSBList(nsb=nsb_model)
-            
+
             # Test basic properties
             self.assertIsNotNone(mapper.aind_procedure)
-            
+
             # Test surgery generation
             surgeries = mapper.get_surgeries()
             self.assertIsInstance(surgeries, list)
-            print(f"Generated {len(surgeries)} surgeries")
-
 
     def test_headpost_info_from_hp_and_hp_type(self):
         """Test HeadPostInfo.from_hp_and_hp_type method"""
         # Test Visual Ctx with Mesoscope
         hp_info = HeadPostInfo.from_hp_and_hp_type(
-            hp=HeadPost.VISUAL_CTX, 
-            hp_type=HeadPostType.MESOSCOPE
+            hp=HeadPost.VISUAL_CTX, hp_type=HeadPostType.MESOSCOPE
         )
         self.assertEqual(hp_info.headframe_type, "Visual Ctx")
         self.assertEqual(hp_info.headframe_part_number, "0160-100-10")
         self.assertEqual(hp_info.well_type, "Mesoscope")
         self.assertEqual(hp_info.well_part_number, "0160-200-20")
         self.assertIsNone(hp_info.headframe_material)
-        
+
         # Test WHC NP with WHC NP well
         hp_info = HeadPostInfo.from_hp_and_hp_type(
-            hp=HeadPost.WHC_NP, 
-            hp_type=HeadPostType.WHC_NP
+            hp=HeadPost.WHC_NP, hp_type=HeadPostType.WHC_NP
         )
         self.assertEqual(hp_info.headframe_type, "WHC NP")
         self.assertEqual(hp_info.headframe_part_number, "0160-100-42")
         self.assertEqual(hp_info.well_type, "WHC NP")
         self.assertEqual(hp_info.well_part_number, "0160-055-08")
         self.assertIsNone(hp_info.headframe_material)
-        
+
         # Test WHC 2P with WHC 2P well
         hp_info = HeadPostInfo.from_hp_and_hp_type(
-            hp=HeadPost.WHC_2P, 
-            hp_type=HeadPostType.WHC_2P
+            hp=HeadPost.WHC_2P, hp_type=HeadPostType.WHC_2P
         )
         self.assertEqual(hp_info.headframe_type, "WHC 2P")
         self.assertEqual(hp_info.headframe_part_number, "0160-100-45")
         self.assertEqual(hp_info.well_type, "WHC 2P")
         self.assertEqual(hp_info.well_part_number, "0160-200-62")
         self.assertIsNone(hp_info.headframe_material)
-        
+
         # Test Frontal Ctx with Neuropixel
         hp_info = HeadPostInfo.from_hp_and_hp_type(
-            hp=HeadPost.FRONTAL_CTX, 
-            hp_type=HeadPostType.NEUROPIXEL
+            hp=HeadPost.FRONTAL_CTX, hp_type=HeadPostType.NEUROPIXEL
         )
         self.assertEqual(hp_info.headframe_type, "Frontal Ctx")
         self.assertEqual(hp_info.headframe_part_number, "0160-100-46")
         self.assertEqual(hp_info.well_type, "Neuropixel")
         self.assertEqual(hp_info.well_part_number, "0160-200-36")
         self.assertIsNone(hp_info.headframe_material)
-        
+
         # Test Motor Ctx with CAM well
         hp_info = HeadPostInfo.from_hp_and_hp_type(
-            hp=HeadPost.MOTOR_CTX, 
-            hp_type=HeadPostType.CAM
+            hp=HeadPost.MOTOR_CTX, hp_type=HeadPostType.CAM
         )
         self.assertEqual(hp_info.headframe_type, "Motor Ctx")
         self.assertEqual(hp_info.headframe_part_number, "0160-100-51")
         self.assertEqual(hp_info.well_type, "Scientifica (CAM)")
         self.assertEqual(hp_info.well_part_number, "Rev A")
         self.assertIsNone(hp_info.headframe_material)
-        
+
         # Test DHC with DHC well (should have titanium material)
         hp_info = HeadPostInfo.from_hp_and_hp_type(
-            hp=HeadPost.DHC, 
-            hp_type=HeadPostType.DHC_WELL
+            hp=HeadPost.DHC, hp_type=HeadPostType.DHC_WELL
         )
         self.assertEqual(hp_info.headframe_type, "DHC")
         self.assertEqual(hp_info.headframe_part_number, "0160-100-57")
         self.assertEqual(hp_info.well_type, "DHC well")
         self.assertEqual(hp_info.well_part_number, "0160-075-01")
-        self.assertEqual(hp_info.headframe_material, HeadframeMaterial.TITANIUM)
-        
+        self.assertEqual(
+            hp_info.headframe_material, HeadframeMaterial.TITANIUM
+        )
+
         # Test with None values
         hp_info = HeadPostInfo.from_hp_and_hp_type(hp=None, hp_type=None)
         self.assertIsNone(hp_info.headframe_type)
@@ -341,27 +339,25 @@ class TestNSB2023Parsers(TestCase):
         self.assertIsNone(hp_info.well_type)
         self.assertIsNone(hp_info.well_part_number)
         self.assertIsNone(hp_info.headframe_material)
-        
-        # Test with unsupported headpost type (should return None for part number)
+
+        # Test with unsupported headpost type
         hp_info = HeadPostInfo.from_hp_and_hp_type(
-            hp=HeadPost.AI_HEADBAR, 
-            hp_type=HeadPostType.NO_WELL
+            hp=HeadPost.AI_HEADBAR, hp_type=HeadPostType.NO_WELL
         )
         self.assertEqual(hp_info.headframe_type, "AI Straight bar")
         self.assertIsNone(hp_info.headframe_part_number)
         self.assertEqual(hp_info.well_type, "No Well")
-        self.assertIsNone(hp_info.well_part_number)  
+        self.assertIsNone(hp_info.well_part_number)
         self.assertIsNone(hp_info.headframe_material)
-        
+
         # Test mixed known/unknown combinations
         hp_info = HeadPostInfo.from_hp_and_hp_type(
-            hp=HeadPost.VISUAL_CTX, 
-            hp_type=HeadPostType.NO_WELL
+            hp=HeadPost.VISUAL_CTX, hp_type=HeadPostType.NO_WELL
         )
         self.assertEqual(hp_info.headframe_type, "Visual Ctx")
         self.assertEqual(hp_info.headframe_part_number, "0160-100-10")
         self.assertEqual(hp_info.well_type, "No Well")
-        self.assertIsNone(hp_info.well_part_number) 
+        self.assertIsNone(hp_info.well_part_number)
         self.assertIsNone(hp_info.headframe_material)
 
     def test_burr_hole_info_edge_case(self):
@@ -377,6 +373,7 @@ class TestNSB2023Parsers(TestCase):
         mapper = MappedNSBList(nsb=nsb_model)
         procedures = mapper.get_surgeries()
         self.assertEqual(len(procedures), 1)
+
 
 class TestNSB2023StringParsers(TestCase):
     """Tests text field parsers in NSB2023Mapping class. Certain fields, such
@@ -442,6 +439,7 @@ class TestNSB2023StringParsers(TestCase):
         """Checks that age at injection fields are parsed correctly"""
         age_keys = ["Age_x0020_at_x0020_Injection"]
         self._test_parser(age_keys, self.blank_model._parse_basic_float_str)
+
 
 if __name__ == "__main__":
     unittest_main()

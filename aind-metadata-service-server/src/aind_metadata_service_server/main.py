@@ -14,11 +14,11 @@ from aind_metadata_service_server.routes import (
     healthcheck,
     mgi_allele,
     perfusion,
+    procedures,
     protocol,
     rig_and_instrument,
     slims,
     subject,
-    procedures,
 )
 
 warnings.filterwarnings(

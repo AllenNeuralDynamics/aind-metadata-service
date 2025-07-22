@@ -24,11 +24,11 @@ from aind_data_schema.core.procedures import (
     ViralMaterial,
 )
 from aind_data_schema.core.subject import Sex
-
 from aind_sharepoint_service_async_client.models import (
     NSB2019List,
-    NSB2019Procedure
+    NSB2019Procedure,
 )
+
 
 @dataclass
 class HeadPostInfo:
@@ -310,12 +310,16 @@ class MappedNSBList:
     @property
     def aind_date_of_birth(self) -> Optional[date]:
         """Maps date_of_birth to aind model"""
-        return self._parse_datetime_to_date(self._nsb.date_x0020_of_x0020_birth)
+        return self._parse_datetime_to_date(
+            self._nsb.date_x0020_of_x0020_birth
+        )
 
     @property
     def aind_date_of_surgery(self) -> Optional[date]:
         """Maps date_of_surgery to aind model"""
-        return self._parse_datetime_to_date(self._nsb.date_x0020_of_x0020_surgery)
+        return self._parse_datetime_to_date(
+            self._nsb.date_x0020_of_x0020_surgery
+        )
 
     @property
     def aind_date_range_end(self) -> Optional[datetime]:
@@ -482,7 +486,8 @@ class MappedNSBList:
         """Maps hp_inj to aind model"""
         return (
             True
-            if self._nsb.hp_x0020__x0026__x0020_inj is not None and self._nsb.hp_x0020__x0026__x0020_inj == "Yes"
+            if self._nsb.hp_x0020__x0026__x0020_inj is not None
+            and self._nsb.hp_x0020__x0026__x0020_inj == "Yes"
             else False
         )
 
@@ -1215,7 +1220,9 @@ class MappedNSBList:
     @property
     def aind_touch_up_weight(self) -> Optional[Decimal]:
         """Maps touch_up_weight to aind model"""
-        return self._parse_weight_str(self._nsb.touch_x0020_up_x0020_weight_x002)
+        return self._parse_weight_str(
+            self._nsb.touch_x0020_up_x0020_weight_x002
+        )
 
     @property
     def aind_ui_version_string(self) -> Optional[str]:
@@ -1254,12 +1261,16 @@ class MappedNSBList:
     @property
     def aind_weight_after_surgery(self) -> Optional[Decimal]:
         """Maps weight_after_surgery to aind model"""
-        return self._parse_weight_str(self._nsb.weight_x0020_after_x0020_surgery)
+        return self._parse_weight_str(
+            self._nsb.weight_x0020_after_x0020_surgery
+        )
 
     @property
     def aind_weight_before_surger(self) -> Optional[Decimal]:
         """Maps weight_before_surger to aind model"""
-        return self._parse_weight_str(self._nsb.weight_x0020_before_x0020_surger)
+        return self._parse_weight_str(
+            self._nsb.weight_x0020_before_x0020_surger
+        )
 
     @property
     def aind_work_station1st_injection(self) -> Optional[str]:

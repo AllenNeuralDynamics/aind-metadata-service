@@ -9,7 +9,7 @@ from aind_metadata_service_server.response_handler import (
 )
 from aind_metadata_service_server.sessions import (
     get_labtracks_api_instance,
-    get_sharepoint_api_instance
+    get_sharepoint_api_instance,
 )
 
 router = APIRouter()
@@ -21,18 +21,18 @@ async def get_procedures(
         ...,
         openapi_examples={
             "default": {
-                "summary": "A sample subject ID",
-                "description": "Example subject ID for LabTracks",
+                "summary": "Subject ID Example 1",
+                "description": "Example subject ID for Procedures",
                 "value": "632269",
             },
             "example_nsb2019": {
-                "summary": "Another sample subject ID",
-                "description": "Example subject ID for LabTracks",
+                "summary": "Subject ID Example 2",
+                "description": "Example subject ID for Procedures",
                 "value": "656374",
             },
             "example_nsb2023": {
-                "summary": "Another sample subject ID",
-                "description": "Example subject ID for LabTracks",
+                "summary": "Subject ID Example 3",
+                "description": "Example subject ID for Procedures",
                 "value": "657849",
             },
         },
@@ -64,7 +64,7 @@ async def get_procedures(
         nsb_2019=nsb_2019_response,
         nsb_2023=nsb_2023_response,
         nsb_present=nsb_present_response,
-        las_2020=las_2020_response
+        las_2020=las_2020_response,
     )
     procedures = mapper.map_responses_to_aind_procedures(subject_id)
     if procedures is None:
@@ -75,4 +75,3 @@ async def get_procedures(
         )
         response = response_handler.map_to_json_response()
         return response
-

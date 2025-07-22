@@ -15,10 +15,9 @@ from aind_data_schema.core.procedures import (
     Surgery,
     ViralMaterial,
 )
-
 from aind_sharepoint_service_async_client.models import (
-    LASDoseroute,
     Las2020List,
+    LASDoseroute,
     LASRosop,
 )
 
@@ -837,27 +836,28 @@ class MappedLASList:
     @property
     def aind_lims_workflow_2(self) -> Optional[Any]:
         """Maps lims_workflow_2 to aind model"""
+        lims_workflow_2 = self._las.lims_workflow_x0020_2
         return (
             None
-            if self._las.lims_workflow_x0020_2 is None
+            if lims_workflow_2 is None
             else {
-                self._las.lims_workflow_x0020_2.N_2P_SERIAL_IMAGING: None,
-                self._las.lims_workflow_x0020_2.T6011_RETINA: None,
-                self._las.lims_workflow_x0020_2.T6012A_RETROGRADE_CAV2_CR: None,
-                self._las.lims_workflow_x0020_2.T6012B_RETROGRADE_RABIESG: None,
-                self._las.lims_workflow_x0020_2.T6012C_RETROGRADE_FLUOROG: None,
-                self._las.lims_workflow_x0020_2.T6013A_ANTEROGRADE_CRE_DE: None,
-                self._las.lims_workflow_x0020_2.T6013B_ANTEROGRADE_CRE_DE: None,
-                self._las.lims_workflow_x0020_2.T6014_ANTEROGRADE_TARGET: None,
-                self._las.lims_workflow_x0020_2.T6015_TRANSSYNAPTIC: None,
-                self._las.lims_workflow_x0020_2.SCREENING: None,
-                self._las.lims_workflow_x0020_2.CHARACTERIZATION: None,
-                self._las.lims_workflow_x0020_2.T5032_ANTEROGRADE_TARGET: None,
-                self._las.lims_workflow_x0020_2.T5033_ALZHEIMERS_PLAQUE: None,
-                self._las.lims_workflow_x0020_2.T5033_CONTROL: None,
-                self._las.lims_workflow_x0020_2.T503_ANTEROGRADE_CREDEFIN: None,
-                self._las.lims_workflow_x0020_2.MGT_ANTEROGRADE_PROJECTIO: None,
-            }.get(self._las.lims_workflow_x0020_2, None)
+                lims_workflow_2.N_2P_SERIAL_IMAGING: None,
+                lims_workflow_2.T6011_RETINA: None,
+                lims_workflow_2.T6012A_RETROGRADE_CAV2_CR: None,
+                lims_workflow_2.T6012B_RETROGRADE_RABIESG: None,
+                lims_workflow_2.T6012C_RETROGRADE_FLUOROG: None,
+                lims_workflow_2.T6013A_ANTEROGRADE_CRE_DE: None,
+                lims_workflow_2.T6013B_ANTEROGRADE_CRE_DE: None,
+                lims_workflow_2.T6014_ANTEROGRADE_TARGET: None,
+                lims_workflow_2.T6015_TRANSSYNAPTIC: None,
+                lims_workflow_2.SCREENING: None,
+                lims_workflow_2.CHARACTERIZATION: None,
+                lims_workflow_2.T5032_ANTEROGRADE_TARGET: None,
+                lims_workflow_2.T5033_ALZHEIMERS_PLAQUE: None,
+                lims_workflow_2.T5033_CONTROL: None,
+                lims_workflow_2.T503_ANTEROGRADE_CREDEFIN: None,
+                lims_workflow_2.MGT_ANTEROGRADE_PROJECTIO: None,
+            }.get(lims_workflow_2, None)
         )
 
     @property
@@ -2052,15 +2052,14 @@ class MappedLASList:
     @property
     def aind_whereto_obtainsubstance_i(self) -> Optional[Any]:
         """Maps whereto_obtainsubstance_i to aind model"""
+        las_whereto = self._las.whereto_obtainsubstance_x0028_icv
         return (
             None
-            if self._las.whereto_obtainsubstance_x0028_icv is None
+            if las_whereto is None
             else {
-                self._las.whereto_obtainsubstance_x0028_icv.LAS_BLUE_BIN_IN_VIVARIUM: (
-                    None
-                ),
-                self._las.whereto_obtainsubstance_x0028_icv.OTHER_SPECIFY_BELOW: None,
-            }.get(self._las.whereto_obtainsubstance_x0028_icv, None)
+                las_whereto.LAS_BLUE_BIN_IN_VIVARIUM: None,
+                las_whereto.OTHER_SPECIFY_BELOW: None,
+            }.get(las_whereto, None)
         )
 
     def has_ip_injection(self) -> bool:

@@ -11,9 +11,11 @@ from unittest import TestCase
 from unittest import main as unittest_main
 
 from aind_data_schema.core.procedures import NonViralMaterial
+from aind_sharepoint_service_async_client.models.las2020_list import (
+    Las2020List,
+)
 
 from aind_metadata_service_server.mappers.las2020 import MappedLASList
-from aind_sharepoint_service_async_client.models.las2020_list import Las2020List
 
 if os.getenv("LOG_LEVEL"):  # pragma: no cover
     logging.basicConfig(level=os.getenv("LOG_LEVEL"))

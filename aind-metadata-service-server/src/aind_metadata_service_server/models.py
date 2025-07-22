@@ -42,7 +42,8 @@ class ProtocolInformation(BaseModel):
             return None
         else:
             return str(value)
-        
+
+
 class IntendedMeasurementInformation(BaseModel):
     """Intended Measurement information that will be returned to the user that
     requests information from the NSB2023 Sharepoint."""

@@ -11,8 +11,11 @@ from unittest import TestCase
 from unittest import main as unittest_main
 
 from aind_data_schema.core.procedures import BrainInjection
+from aind_sharepoint_service_async_client.models.nsb2019_list import (
+    NSB2019List,
+)
+
 from aind_metadata_service_server.mappers.nsb2019 import MappedNSBList
-from aind_sharepoint_service_async_client.models.nsb2019_list import NSB2019List
 
 if os.getenv("LOG_LEVEL"):  # pragma: no cover
     logging.basicConfig(level=os.getenv("LOG_LEVEL"))
@@ -26,7 +29,9 @@ LIST_ITEM_FILE_PATHS = [DIR_RAW / f for f in LIST_ITEM_FILE_NAMES]
 MAPPED_ITEM_FILE_NAMES = os.listdir(DIR_MAP)
 sorted(MAPPED_ITEM_FILE_NAMES)
 MAPPED_FILE_PATHS = [DIR_MAP / f for f in MAPPED_ITEM_FILE_NAMES]
-TEST_EXAMPLES = TEST_DIR / "resources" / "nsb2019" / "nsb2019_string_entries.json"
+TEST_EXAMPLES = (
+    TEST_DIR / "resources" / "nsb2019" / "nsb2019_string_entries.json"
+)
 
 
 class TestNSB2019Parsers(TestCase):
@@ -149,18 +154,27 @@ class TestNSB2019StringParsers(TestCase):
         self.assertIsNone(parser(None))
 
     def test_ap_parser(self):
+        """Tests parsing of AP values"""
         ap_keys = ["AP2ndInj", "HP_x0020_A_x002f_P", "Virus_x0020_A_x002f_P"]
         self._test_parser(ap_keys, self.blank_model._parse_ap_str)
 
     def test_dv_parser(self):
-        dv_keys = ["DV2ndInj", "FiberImplant1DV", "FiberImplant2DV", "Virus_x0020_D_x002f_V"]
+        """Tests parsing of DV values"""
+        dv_keys = [
+            "DV2ndInj",
+            "FiberImplant1DV",
+            "FiberImplant2DV",
+            "Virus_x0020_D_x002f_V",
+        ]
         self._test_parser(dv_keys, self.blank_model._parse_dv_str)
 
     def test_iso_dur_parser(self):
+        """Tests parsing of Iso Duration values"""
         iso_keys = ["FirstInjectionIsoDuration", "SecondInjectionIsoDuration"]
         self._test_parser(iso_keys, self.blank_model._parse_iso_dur_str)
 
     def test_weight_parser(self):
+        """Tests parsing of weight values"""
         w_keys = [
             "FirstInjectionWeightAfter",
             "FirstInjectionWeightBefor",
@@ -173,26 +187,32 @@ class TestNSB2019StringParsers(TestCase):
         self._test_parser(w_keys, self.blank_model._parse_weight_str)
 
     def test_ml_parser(self):
+        """Tests parsing of ml values"""
         ml_keys = ["ML2ndInj", "HP_x0020_M_x002f_L", "Virus_x0020_M_x002f_L"]
         self._test_parser(ml_keys, self.blank_model._parse_ml_str)
 
     def test_alt_time_parser(self):
+        """Tests parsing of alternating time values"""
         at_keys = ["Inj1AlternatingTime", "Inj2AlternatingTime"]
         self._test_parser(at_keys, self.blank_model._parse_alt_time_str)
 
     def test_angle_parser(self):
+        """Tests parsing of angle values"""
         an_keys = ["Inj1Angle_v2", "Inj2Angle_v2"]
         self._test_parser(an_keys, self.blank_model._parse_angle_str)
 
     def test_current_parser(self):
+        """Tests parsing of current values"""
         c_keys = ["Inj1Current", "Inj2Current"]
         self._test_parser(c_keys, self.blank_model._parse_current_str)
 
     def test_length_of_time_parser(self):
+        """Tests parsing of length of time values"""
         lt_keys = ["Inj1LenghtofTime", "Inj2LenghtofTime"]
         self._test_parser(lt_keys, self.blank_model._parse_length_of_time_str)
 
     def test_volume_parser(self):
+        """Tests parsing of volume values"""
         v_keys = ["Inj1Vol", "Inj2Vol", "inj1volperdepth", "inj2volperdepth"]
         self._test_parser(v_keys, self.blank_model._parse_inj_vol_str)
 
