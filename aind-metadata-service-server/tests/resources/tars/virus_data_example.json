@@ -1,0 +1,177 @@
+ [
+  {
+    "createdAt": "2024-05-14T03:00:23.993285Z",
+    "updatedAt": "2025-04-28T19:01:06.306726Z",
+    "createdBy": "person.three@example.com",
+    "updatedBy": "person.one@example.com",
+    "id": "afe94c65-4a3a-42ab-82c3-245ae1628ab6",
+    "rrId": null,
+    "aliases": [
+      {
+        "createdAt": "2024-05-14T03:00:23.993296Z",
+        "updatedAt": "2025-04-28T19:01:06.306726Z",
+        "createdBy": "person.three@example.com",
+        "updatedBy": "person.one@example.com",
+        "id": "c2862262-3f73-49a3-9c9e-c3836b071040",
+        "citation": null,
+        "isPreferred": false,
+        "name": "AiV300001_PHPeB"
+      },
+      {
+        "createdAt": "2024-12-18T19:46:11.457795Z",
+        "updatedAt": "2025-04-28T19:01:06.306726Z",
+        "createdBy": "person.one@example.com",
+        "updatedBy": "person.one@example.com",
+        "id": "6d5420fa-e1a8-4bc3-910a-f7b4e696e747",
+        "citation": null,
+        "isPreferred": false,
+        "name": "pAAV-7x-TRE-tDTomato"
+      },
+      {
+        "createdAt": "2024-12-18T02:20:30.766508Z",
+        "updatedAt": "2025-04-28T19:01:06.306726Z",
+        "createdBy": "person.one@example.com",
+        "updatedBy": "person.one@example.com",
+        "id": "8356a42c-3caf-4dae-b42a-dca5478bcdd6",
+        "citation": null,
+        "isPreferred": true,
+        "name": "VIR300001_PHPeB"
+      }
+    ],
+    "capsid": null,
+    "citations": [],
+    "molecules": [
+      {
+        "moleculeType": null,
+        "state": "InDevelopment",
+        "aliases": [
+          {
+            "name": "pAAV-7x-TRE-tDTomato",
+            "isPreferred": false,
+            "citation": null,
+            "createdAt": "2023-10-06T22:21:48.241192Z",
+            "createdBy": "person.one@example.com",
+            "updatedAt": "2025-02-07T14:57:44.953571Z",
+            "updatedBy": "person.one@example.com",
+            "id": "ef945edb-baef-4358-8da7-2ffd83de1dfd"
+          },
+          {
+            "name": "AiP300001",
+            "isPreferred": false,
+            "citation": null,
+            "createdAt": "2023-10-11T16:31:44.267246Z",
+            "createdBy": "person.one@example.com",
+            "updatedAt": "2025-02-07T14:57:44.953571Z",
+            "updatedBy": "person.one@example.com",
+            "id": "1d0f2751-e2d5-4f38-ba46-5eab72f3c927"
+          },
+          {
+            "name": "ExP300001",
+            "isPreferred": true,
+            "citation": null,
+            "createdAt": "2024-06-18T18:36:12.377426Z",
+            "createdBy": "person.one@example.com",
+            "updatedAt": "2025-02-07T14:57:44.953571Z",
+            "updatedBy": "person.one@example.com",
+            "id": "cf87efbb-f0e9-4ab9-9921-276f336210c7"
+          }
+        ],
+        "citations": [],
+        "rrId": "Addgene_191207",
+        "fullName": "pAAV-7x-TRE-tDTomato",
+        "addgeneId": "191207",
+        "mgiId": null,
+        "notes": null,
+        "sequence": "GATCAGTTGGGTGCACGAGTGGGTT",
+        "genes": [],
+        "loci": [],
+        "species": [],
+        "organizations": [],
+        "shipments": [],
+        "materialTransferAgreements": [],
+        "genBankFiles": [
+          "096981e4-dcba-4d2e-b8e0-2ff51c43c5f4"
+        ],
+        "mapFiles": [],
+        "fastaFiles": [],
+        "parents": [],
+        "children": [],
+        "patents": [],
+        "creators": [],
+        "principalInvestigator": null,
+        "targetedCellPopulations": [],
+        "validatedCellPopulations": [],
+        "targetedRois": [],
+        "validatedRois": [],
+        "genomeCoordinates": null,
+        "createdAt": "2023-10-06T22:21:48.227796Z",
+        "createdBy": "person.one@example.com",
+        "updatedAt": "2025-02-07T14:57:44.953571Z",
+        "updatedBy": "person.one@example.com",
+        "id": "42879b3f-a0c2-4db5-b1a4-ec357e4717b1"
+      }
+    ],
+    "otherMolecules": [
+      {
+        "moleculeType": null,
+        "state": "InDevelopment",
+        "aliases": [
+          {
+            "name": "PHP.eb",
+            "isPreferred": false,
+            "citation": null,
+            "createdAt": "2023-03-03T03:53:38.088429Z",
+            "createdBy": "person.three@example.com",
+            "updatedAt": "2023-03-04T01:44:06.714636Z",
+            "updatedBy": "person.three@example.com",
+            "id": "632a5cbd-f869-41ff-a33d-c5537794350a"
+          },
+          {
+            "name": "PHPeB",
+            "isPreferred": true,
+            "citation": null,
+            "createdAt": "2023-03-03T03:50:00.34206Z",
+            "createdBy": "person.three@example.com",
+            "updatedAt": "2023-03-04T01:44:06.714636Z",
+            "updatedBy": "person.three@example.com",
+            "id": "a791aca1-024d-4dac-b945-f943f1bbbcd3"
+          }
+        ],
+        "citations": [],
+        "rrId": "",
+        "fullName": null,
+        "addgeneId": "",
+        "mgiId": "",
+        "notes": "",
+        "sequence": "GTCGACGGTATCGGGGGAGCT", 
+        "genes": [],
+        "loci": [],
+        "species": [],
+        "organizations": [],
+        "shipments": [],
+        "materialTransferAgreements": [],
+        "genBankFiles": [
+          "c9e46f5e-09b1-4a25-874d-9af425988b8c"
+        ],
+        "mapFiles": [],
+        "fastaFiles": [],
+        "parents": [],
+        "children": [],
+        "patents": [],
+        "creators": [],
+        "principalInvestigator": null,
+        "targetedCellPopulations": [],
+        "validatedCellPopulations": [],
+        "targetedRois": [],
+        "validatedRois": [],
+        "genomeCoordinates": "",
+        "createdAt": "2023-03-03T03:50:00.34206Z",
+        "createdBy": "person.three@example.com",
+        "updatedAt": "2023-03-04T01:44:06.714636Z",
+        "updatedBy": "person.three@example.com",
+        "id": "551cc19e-1636-42b4-ae63-5aec3add4afc"
+      }
+    ],
+    "patents": []
+  }
+]

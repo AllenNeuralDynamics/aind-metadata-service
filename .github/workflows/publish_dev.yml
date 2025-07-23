@@ -27,8 +27,8 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           # relative path to the place where source code with Dockerfile is located
-          context: .
+          context: ./aind-metadata-service-server
           push: true
           tags: |
-            ghcr.io/allenneuraldynamics/aind-metadata-service:${{ env.docker_tag }}
-            ghcr.io/allenneuraldynamics/aind-metadata-service:dev
+            ghcr.io/allenneuraldynamics/aind-metadata-service-server:${{ env.docker_tag }}
+            ghcr.io/allenneuraldynamics/aind-metadata-service-server:dev

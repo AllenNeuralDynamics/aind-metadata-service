@@ -1,0 +1,109 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aind-metadata-service-server"
+description = "Package to serve data from backends."
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Allen Institute for Neural Dynamics"}
+]
+classifiers = [
+    "Programming Language :: Python :: 3"
+]
+readme = "README.md"
+dynamic = ["version"]
+
+dependencies = [
+    'aind-labtracks-service-async-client>=0.2.4',
+    'aind-mgi-service-async-client>=0.1.2',
+    'aind-slims-service-async-client>=0.2.4',
+    'aind-tars-service-async-client>=0.0.5',
+    'aind-smartsheet-service-async-client>=0.2.1',
+    'aind-sharepoint-service-async-client>=0.0.11',
+    'aind-session-json-service-async-client>=0.1.3',
+    'aind-data-schema==1.4.0',
+    'aind-data-schema-models==0.7.5',
+    'pydantic>=2.0',
+    'pydantic-settings>=2.0',
+    'fastapi[standard]>=0.114.0',
+]
+
+[project.optional-dependencies]
+dev = [
+    'black',
+    'coverage',
+    'flake8',
+    'interrogate',
+    'isort',
+    'Sphinx',
+    'furo',
+    'pytest',
+    'pytest-env',
+    'pytest-mock',
+    'pytest_asyncio',
+    'pytest-httpx'
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+version = {attr = "aind_metadata_service_server.__version__"}
+
+[tool.black]
+line-length = 79
+target_version = ['py310']
+exclude = '''
+
+(
+  /(
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | build
+    | dist
+  )/
+  | .gitignore
+)
+'''
+
+[tool.coverage.run]
+omit = ["*__init__*"]
+source = ["aind_metadata_service_server", "tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "if __name__ == .__main__.:",
+    "^from .* import .*",
+    "^import .*",
+    "pragma: no cover"
+]
+fail_under = 100
+
+[tool.isort]
+line_length = 79
+profile = "black"
+
+[tool.interrogate]
+exclude = ["setup.py", "docs", "build"]
+fail-under = 100
+
+[tool.pytest.ini_options]
+asyncio_mode="auto"
+asyncio_default_fixture_loop_scope="function"
+env = [
+    "AIND_METADATA_SERVICE_LABTRACKS_HOST=http://example.com/labtracks",
+    "AIND_METADATA_SERVICE_MGI_HOST=http://example.com/mgi",
+    "AIND_METADATA_SERVICE_SLIMS_HOST=http://example.com/slims",
+    "AIND_METADATA_SERVICE_SMARTSHEET_HOST=http://example.com/smartsheet",
+    "AIND_METADATA_SERVICE_TARS_HOST=http://example.com/tars",
+    "AIND_METADATA_SERVICE_SESSION_JSON_HOST=http://example.com/session_json",
+    "AIND_METADATA_SERVICE_SHAREPOINT_HOST=http://example.com/sharepoint",
+]
