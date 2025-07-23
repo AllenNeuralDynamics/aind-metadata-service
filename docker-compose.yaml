@@ -10,6 +10,7 @@ services:
       - mgi
       - slims
       - smartsheet
+      - sharepoint
       - tars
       - session_json
       - redis
@@ -25,6 +26,9 @@ services:
   slims:
     image: "ghcr.io/allenneuraldynamics/aind-slims-service-server:0.2.4"
     env_file: "env/slims.env"
+  sharepoint:
+    image: "ghcr.io/allenneuraldynamics/aind-sharepoint-service-server:0.0.11"
+    env_file: "env/sharepoint.env"
   tars:
     image: "ghcr.io/allenneuraldynamics/aind-tars-service-server:0.0.5"
     env_file: "env/tars.env"

@@ -22,7 +22,10 @@ from aind_metadata_service_server.mappers.injection_materials import (
 from aind_metadata_service_server.models import ViralMaterialInformation
 
 RESOURCES_DIR = (
-    Path(os.path.dirname(os.path.realpath(__file__))) / ".." / "resources"
+    Path(os.path.dirname(os.path.realpath(__file__)))
+    / ".."
+    / "resources"
+    / "tars"
 )
 
 

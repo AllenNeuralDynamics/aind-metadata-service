@@ -1,0 +1,413 @@
+{
+   "AP2ndInj": {
+      "unique_entries": {
+         "null": null,
+         "1.2": 1.2,
+         "-0.6": -0.6,
+         "posterior part of the craniotomy": null,
+         "1": 1.0,
+         "-5.2 mm": -5.2,
+         "59nl": null,
+         "+0.5mm": 0.5,
+         "2.4(TS)": null,
+         "+2.0": 2.0,
+         "posterior part of cranio": null,
+         "-5.4\t": null
+      }
+   },
+   "Age_x0020_at_x0020_Injection": {
+      "unique_entries": {
+         "44929.0000000000": 44929.0,
+         "57.0000000000000": 57.0,
+         "0": 0.0,
+         "44932.0000000000": 44932.0,
+         "error;#1280": null
+      }
+   },
+   "Burr3_x0020_A_x002f_P": {
+      "unique_entries": {
+         "null": null,
+         "-0.6": -0.6,
+         "0.65": 0.65,
+         "+2.0": 2.0
+      }
+   },
+   "Burr3_x0020_D_x002f_V": {
+      "unique_entries": {
+         "null": null,
+         "+3.6": 3.6,
+         "3.6": 3.6,
+         "-0.5": -0.5,
+         "-2": -2.0,
+         "0": 0.0,
+         "3.1mm ": 3.1
+      }
+   },
+   "Burr3_x0020_M_x002f_L": {
+      "unique_entries": {
+         "null": null,
+         "+2.9": 2.9,
+         "0.85": 0.85,
+         "-1.2": -1.2,
+         "0": 0.0,
+         "1": 1.0,
+         "1.75": 1.75,
+         "-0.9mm": -0.9
+      }
+   },
+   "Burr4_x0020_A_x002f_P": {
+      "unique_entries": {
+         "null": null,
+         "0.65": 0.65,
+         "-1.34": -1.34,
+         "-7.5mm": -7.5
+      }
+   },
+   "Burr4_x0020_D_x002f_V": {
+      "unique_entries": {
+         "null": null,
+         "4.5": 4.5,
+         "-2": -2.0,
+         "-4.1": -4.1,
+         "2.8": 2.8,
+         "3.6mm ": 3.6,
+         "4.1mm and 4.5mm": null
+      }
+   },
+   "Burr4_x0020_M_x002f_L": {
+      "unique_entries": {
+         "null": null,
+         "-0.85": -0.85,
+         "1.2": 1.2,
+         "-1": -1.0,
+         "-": null,
+         "0.8mm": 0.8,
+         "-0.5mm": -0.5
+      }
+   },
+   "Burr_x0020_3_x0020_Angle": {
+      "unique_entries": {
+         "null": null,
+         "30": 30.0,
+         "0": 0.0,
+         "20": 20.0,
+         "15": 15.0,
+         "-15": -15.0,
+         "7 degree lateral": null
+      }
+   },
+   "Burr_x0020_4_x0020_Angle": {
+      "unique_entries": {
+         "null": null,
+         "0": 0.0,
+         "-15": -15.0,
+         "15": 15.0
+      }
+   },
+   "DV2ndInj": {
+      "unique_entries": {
+         "null": null,
+         "4.1": 4.1,
+         "300 microns from brain surface": null,
+         "300 microns": null,
+         "-4.2": -4.2,
+         "-3.10; -3.00": null,
+         "2.8/3.1 mm": null,
+         "4.4mm": 4.4,
+         "-2 from pial surface": null,
+         "0.8": 0.8,
+         "-1.75 and -0.9": null,
+         "-1": -1.0,
+         "0": 0.0,
+         "-3.0mm": -3.0,
+         "1": 1.0,
+         "NA": null,
+         "-3.1, -3.0, -2.8": null,
+         "0.5": 0.5,
+         "0.9mm": 0.9,
+         "+0.8": 0.8,
+         "2.75 (brain surface)": null
+      }
+   },
+   "FiberImplant1DV": {
+      "unique_entries": {
+         "null": null,
+         "4": 4.0,
+         "0.5": 0.5,
+         "-4": -4.0,
+         "2.5": 2.5,
+         "3.5mm": 3.5,
+         "-4.3": -4.3
+      }
+   },
+   "FiberImplant2DV": {
+      "unique_entries": {
+         "null": null,
+         "4.0": 4.0,
+         "-4.0": -4.0
+      }
+   },
+   "Fiber_x0020_Implant3_x0020_D_x00": {
+      "unique_entries": {
+         "null": null,
+         "2.9": 2.9,
+         "-1.85": -1.85
+      }
+   },
+   "Fiber_x0020_Implant4_x0020_D_x00": {
+      "unique_entries": {
+         "null": null,
+         "2.9": 2.9,
+         "2.8": 2.8
+      }
+   },
+   "Inj1AlternatingTime": {
+      "unique_entries": {
+         "null": null,
+         "7s on/7s off": 7.0,
+         "7/7": 7.0,
+         "one": null
+      }
+   },
+   "Inj1Angle_v2": {
+      "unique_entries": {
+         "null": null,
+         "0": 0.0,
+         "normal": null,
+         "-15": -15.0,
+         "N/A": null,
+         "-15 degree": -15.0,
+         "15": 15.0,
+         "one": null
+      }
+   },
+   "Inj1Current": {
+      "unique_entries": {
+         "null": null,
+         "5 uA": 5.0,
+         "5uA": 5.0,
+         "one": null
+      }
+   },
+   "Inj1IontoTime": {
+      "unique_entries": {
+         "null": null,
+         "10min": 10.0,
+         "8 min": 8.0,
+         "one": null
+      }
+   },
+   "Inj2AlternatingTime": {
+      "unique_entries": {
+         "null": null,
+         "7s on/7s off": 7.0,
+         "2": null
+      }
+   },
+   "Inj2Angle_v2": {
+      "unique_entries": {
+         "null": null,
+         "0": 0.0,
+         "normal": null,
+         "N/A": null,
+         "15 degree": 15.0,
+         "2": 2.0
+      }
+   },
+   "Inj2Current": {
+      "unique_entries": {
+         "null": null,
+         "-5 uA": -5.0,
+         "5uA": 5.0,
+         "2": 2.0
+      }
+   },
+   "Inj2IontoTime": {
+      "unique_entries": {
+         "null": null,
+         "8 min": 8.0,
+         "5min": 5.0,
+         "2": null
+      }
+   },
+   "Inj3AlternatingTime": {
+      "unique_entries": {
+         "null": null,
+         "7s on/7s off": 7.0
+      }
+   },
+   "Inj3Current": {
+      "unique_entries": {
+         "null": null,
+         "-5uA and 5uA": null
+      }
+   },
+   "Inj3IontoTime": {
+      "unique_entries": {
+         "null": null,
+         "8 min and 8 min": null
+      }
+   },
+   "Inj3volperdepth": {
+      "unique_entries": {
+         "null": null,
+         "200 nL": 200,
+         "200nl": 200,
+         "50": null,
+         "23nl x 4 times, 92nl in total": null,
+         "150 nl": 150
+      }
+   },
+   "Inj4AlternatingTime": {
+      "unique_entries": {
+         "null": null
+      }
+   },
+   "Inj4Current": {
+      "unique_entries": {
+         "null": null
+      }
+   },
+   "Inj4IontoTime": {
+      "unique_entries": {
+         "null": null
+      }
+   },
+   "Inj4volperdepth": {
+      "unique_entries": {
+         "null": null,
+         "100nl": 100,
+         "23nl per depth, 46nl in total": null
+      }
+   },
+   "ML2ndInj": {
+      "unique_entries": {
+         "null": null,
+         "1.3": 1.3,
+         "-1.8": -1.8,
+         "close to center, away from big vessels": null,
+         "3": 3.0,
+         "+0.85 mm": 0.85,
+         "0.7mm": 0.7,
+         "-1": -1.0,
+         "-3.3mm": -3.3,
+         "+0.2": 0.2,
+         "close to center of cranio, avoid big vessels": null,
+         "+2.2mm": 2.2
+      }
+   },
+   "Virus_x0020_A_x002f_P": {
+      "unique_entries": {
+         "null": null,
+         "1.2": 1.2,
+         "-0.7": -0.7,
+         "anterior part of craniotomy": null,
+         "anterior part of the craniotomy": null,
+         "-4": -4.0,
+         "9 spots in a grid pattern with 600 microns spacing": null,
+         "9 injections around center in a grid pattern, 600 microns spacing": null,
+         "1": 1.0,
+         "-5.2 mm": -5.2,
+         "-1.6mm": -1.6,
+         "ISI": null,
+         "59nl": null,
+         "+0.5mm": 0.5,
+         "0": 0.0,
+         "+2.2mm": 2.2,
+         "around CW center": null,
+         "Anterior part of the craniotomy": null,
+         "-5.4\t": null,
+         "0.8\t": null,
+         "one": null
+      }
+   },
+   "Virus_x0020_D_x002f_V": {
+      "unique_entries": {
+         "null": null,
+         "4.1": 4.1,
+         "-2.7": -2.7,
+         "300 microns from brain surface": null,
+         "300 microns": null,
+         "0.3": 0.3,
+         "-2.45; -2.40": null,
+         "2.8/3.1 mm": null,
+         "3": 3.0,
+         "3.5mm": 3.5,
+         ".6 and .3": null,
+         "-2.75; -3.0": null,
+         "-3.1 from pial surface": null,
+         "-0.3, -0.7": null,
+         "4": 4.0,
+         "-1.75 and -0.9": null,
+         "-1": -1.0,
+         "-1.0mm": -1.0,
+         "-2.7, -2.9, -3.1": null,
+         "0.7mm": 0.7,
+         "-0.5": -0.5,
+         "-3.95; - 3.85": null,
+         "1.0mm": 1.0,
+         "- 300 um from pial surface": null,
+         "2.75 (brain surface)": null,
+         "one": null,
+         "+1.0": 1.0
+      }
+   },
+   "Virus_x0020_M_x002f_L": {
+      "unique_entries": {
+         "null": null,
+         "-1.3": -1.3,
+         "0.35": 0.35,
+         "close to center, away from big vessels": null,
+         "9 spots in a grid pattern with 600 microns spacing": null,
+         "9 injections around center in a grid pattern, 600 microns spacing": null,
+         "3": 3.0,
+         "-3": -3.0,
+         "-0.85 mm": -0.85,
+         "3.5": 3.5,
+         "-1.0mm": -1.0,
+         "-1mm": -1.0,
+         "ISI": null,
+         "0.05, 0.35": null,
+         "0.44 & 0.74": null,
+         "around CW center": null,
+         "close to center of cranio, avoid big vessels": null,
+         "one": null,
+         "+0.2": 0.2
+      }
+   },
+   "inj1volperdepth": {
+      "unique_entries": {
+         "null": null,
+         "100": null,
+         "200nl": 200.0,
+         "500 nL": 500.0,
+         "25 nL": 25.0,
+         "300nl": 300.0,
+         "1.5uL": null,
+         "101.2nl": 101.2,
+         "200nl/depth": null,
+         "250 nL per site x 2 sites, 100 nL /min": null,
+         "0": null,
+         "200n": null,
+         "250nl per site x 2 sites, 100nl/min": null,
+         "500 nL ": 500.0,
+         "500nL single bolus": null
+      }
+   },
+   "inj2volperdepth": {
+      "unique_entries": {
+         "null": null,
+         "100": null,
+         "50nl": 50.0,
+         "100 nl": 100.0,
+         "200 nL": 200.0,
+         "101.2nl": 101.2,
+         "0": null,
+         "100l": null,
+         "None": null,
+         "500nL": 500.0,
+         "140nl per site x 2 sites, 100nl/min": null,
+         "500nL single bolus": null
+      }
+   }
+}

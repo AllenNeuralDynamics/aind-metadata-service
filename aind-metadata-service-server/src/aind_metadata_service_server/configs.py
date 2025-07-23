@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     slims_host: HttpUrl = Field(
         ..., description="Host address for slims endpoint"
     )
+    sharepoint_host: HttpUrl = Field(
+        ..., description="Host address for sharepoint endpoint"
+    )
     tars_host: HttpUrl = Field(
         ..., description="Host address for tars endpoint"
     )

@@ -22,6 +22,9 @@ class TestSettings(unittest.TestCase):
             ),
             "AIND_METADATA_SERVICE_SLIMS_HOST": "http://example.com/slims",
             "AIND_METADATA_SERVICE_TARS_HOST": "http://example.com/tars",
+            "AIND_METADATA_SERVICE_SHAREPOINT_HOST": (
+                "http://example.com/sharepoint"
+            ),
         },
         clear=True,
     )
@@ -34,6 +37,7 @@ class TestSettings(unittest.TestCase):
             smartsheet_host="http://example.com/smartsheet",
             slims_host="http://example.com/slims",
             tars_host="http://example.com/tars",
+            sharepoint_host="http://example.com/sharepoint",
         )
         self.assertEqual(expected_settings, settings)
 

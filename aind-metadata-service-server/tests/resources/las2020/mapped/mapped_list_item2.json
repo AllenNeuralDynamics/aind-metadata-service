@@ -1,0 +1,143 @@
+{
+  "anaesthesia": null,
+  "animal_weight_post": null,
+  "animal_weight_prior": null,
+  "experimenter_full_name": "LAS-5358",
+  "iacuc_protocol": "2212",
+  "notes": null,
+  "procedure_type": "Surgery",
+  "procedures": [
+    {
+      "injection_duration": null,
+      "injection_duration_unit": "minute",
+      "injection_eye": "Left",
+      "injection_materials": [
+        {
+          "addgene_id": null,
+          "material_type": "Virus",
+          "name": "GT340C",
+          "tars_identifiers": null,
+          "titer": 50,
+          "titer_unit": "gc/mL"
+        },
+        {
+          "addgene_id": null,
+          "material_type": "Virus",
+          "name": null,
+          "tars_identifiers": null,
+          "titer": 50,
+          "titer_unit": "gc/mL"
+        },
+        {
+          "addgene_id": null,
+          "material_type": "Virus",
+          "name": null,
+          "tars_identifiers": null,
+          "titer": null,
+          "titer_unit": "gc/mL"
+        },
+        {
+          "addgene_id": null,
+          "material_type": "Virus",
+          "name": null,
+          "tars_identifiers": null,
+          "titer": null,
+          "titer_unit": "gc/mL"
+        }
+      ],
+      "injection_volume": "90",
+      "injection_volume_unit": "microliter",
+      "instrument_id": null,
+      "procedure_type": "Retro-orbital injection",
+      "recovery_time": null,
+      "recovery_time_unit": "minute"
+    },
+    {
+      "injection_duration": null,
+      "injection_duration_unit": "minute",
+      "injection_eye": "Right",
+      "injection_materials": [
+        {
+          "addgene_id": null,
+          "material_type": "Virus",
+          "name": null,
+          "tars_identifiers": null,
+          "titer": null,
+          "titer_unit": "gc/mL"
+        }
+      ],
+      "injection_volume": null,
+      "injection_volume_unit": "microliter",
+      "instrument_id": null,
+      "procedure_type": "Retro-orbital injection",
+      "recovery_time": null,
+      "recovery_time_unit": "minute"
+    },
+    {
+      "injection_duration": null,
+      "injection_duration_unit": "minute",
+      "injection_eye": null,
+      "injection_materials": [
+        {
+          "addgene_id": null,
+          "material_type": "Virus",
+          "name": null,
+          "tars_identifiers": null,
+          "titer": null,
+          "titer_unit": "gc/mL"
+        }
+      ],
+      "injection_volume": "89.9",
+      "injection_volume_unit": "microliter",
+      "instrument_id": null,
+      "procedure_type": "Retro-orbital injection",
+      "recovery_time": null,
+      "recovery_time_unit": "minute"
+    },
+    {
+      "injection_duration": null,
+      "injection_duration_unit": "minute",
+      "injection_eye": null,
+      "injection_materials": [
+        {
+          "addgene_id": null,
+          "material_type": "Virus",
+          "name": null,
+          "tars_identifiers": null,
+          "titer": null,
+          "titer_unit": "gc/mL"
+        }
+      ],
+      "injection_volume": "90",
+      "injection_volume_unit": "microliter",
+      "instrument_id": null,
+      "procedure_type": "Retro-orbital injection",
+      "recovery_time": null,
+      "recovery_time_unit": "minute"
+    },
+    {
+      "injection_duration": null,
+      "injection_duration_unit": "minute",
+      "injection_eye": null,
+      "injection_materials": [
+        {
+          "addgene_id": null,
+          "material_type": "Virus",
+          "name": null,
+          "tars_identifiers": null,
+          "titer": null,
+          "titer_unit": "gc/mL"
+        }
+      ],
+      "injection_volume": "90",
+      "injection_volume_unit": "microliter",
+      "instrument_id": null,
+      "procedure_type": "Retro-orbital injection",
+      "recovery_time": null,
+      "recovery_time_unit": "minute"
+    }
+  ],
+  "start_date": "2024-06-21",
+  "weight_unit": "gram",
+  "workstation_id": null
+}
