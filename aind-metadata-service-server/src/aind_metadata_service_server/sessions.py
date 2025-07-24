@@ -127,7 +127,7 @@ async def get_session_json_api_instance() -> (
     Yield an aind_tars_service_async_client.DefaultApi object.
     """
     async with aind_session_json_service_async_client.ApiClient(
-        tars_config
+        session_json_config
     ) as api_client:
         api_instance = aind_session_json_service_async_client.DefaultApi(
             api_client
