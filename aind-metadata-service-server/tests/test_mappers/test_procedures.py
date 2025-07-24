@@ -24,9 +24,7 @@ from aind_sharepoint_service_async_client.models.nsb2023_list import (
     NSB2023List,
 )
 
-from aind_metadata_service_server.mappers.procedures import (
-    ProceduresMapper,
-)
+from aind_metadata_service_server.mappers.procedures import ProceduresMapper
 
 TEST_DIR = Path(__file__).parent / ".."
 EXAMPLE_NSB2019_JSON = (

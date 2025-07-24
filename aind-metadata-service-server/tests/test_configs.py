@@ -25,6 +25,9 @@ class TestSettings(unittest.TestCase):
             "AIND_METADATA_SERVICE_SHAREPOINT_HOST": (
                 "http://example.com/sharepoint"
             ),
+            "AIND_METADATA_SERVICE_SESSION_JSON_HOST": (
+                "http://example.com/session_json"
+            ),
         },
         clear=True,
     )
@@ -38,6 +41,7 @@ class TestSettings(unittest.TestCase):
             slims_host="http://example.com/slims",
             tars_host="http://example.com/tars",
             sharepoint_host="http://example.com/sharepoint",
+            session_json_host="http://example.com/session_json",
         )
         self.assertEqual(expected_settings, settings)
 
