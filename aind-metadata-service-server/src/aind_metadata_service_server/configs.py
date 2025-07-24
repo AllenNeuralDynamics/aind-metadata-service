@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     smartsheet_host: HttpUrl = Field(
         ..., description="Host address for smartsheet endpoint"
     )
+    session_json_host: HttpUrl = Field(
+        ..., description="Host address for metadata mapper service"
+    )
 
 
 def get_settings():

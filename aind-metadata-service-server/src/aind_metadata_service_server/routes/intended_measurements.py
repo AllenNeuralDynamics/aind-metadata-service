@@ -9,9 +9,7 @@ from aind_metadata_service_server.response_handler import (
     ModelResponse,
     StatusCodes,
 )
-from aind_metadata_service_server.sessions import (
-    get_sharepoint_api_instance,
-)
+from aind_metadata_service_server.sessions import get_sharepoint_api_instance
 
 router = APIRouter()
 

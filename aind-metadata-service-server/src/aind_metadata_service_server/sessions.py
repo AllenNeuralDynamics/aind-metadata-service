@@ -4,8 +4,8 @@ from typing import AsyncGenerator
 
 import aind_labtracks_service_async_client
 import aind_mgi_service_async_client
-import aind_sharepoint_service_async_client
 import aind_session_json_service_async_client
+import aind_sharepoint_service_async_client
 import aind_slims_service_async_client
 import aind_smartsheet_service_async_client
 import aind_tars_service_async_client
@@ -30,6 +30,9 @@ sharepoint_config = aind_sharepoint_service_async_client.Configuration(
 )
 tars_config = aind_tars_service_async_client.Configuration(
     host=settings.tars_host.unicode_string().strip("/")
+)
+session_json_config = aind_tars_service_async_client.Configuration(
+    host=settings.session_json_host.unicode_string().strip("/")
 )
 
 
@@ -124,7 +127,7 @@ async def get_session_json_api_instance() -> (
     Yield an aind_tars_service_async_client.DefaultApi object.
     """
     async with aind_session_json_service_async_client.ApiClient(
-        tars_config
+        session_json_config
     ) as api_client:
         api_instance = aind_session_json_service_async_client.DefaultApi(
             api_client
