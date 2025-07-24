@@ -6,9 +6,7 @@ from typing import Optional
 
 from aind_smartsheet_service_async_client.models import ProtocolsModel
 from pydantic import ValidationError
-
 from aind_metadata_service_server.models import ProtocolInformation
-
 
 class ProtocolMapper:
     """Class to handle mapping protocol information"""

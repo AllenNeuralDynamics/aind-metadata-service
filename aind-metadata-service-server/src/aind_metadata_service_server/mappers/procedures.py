@@ -3,18 +3,35 @@
 import logging
 from enum import Enum
 from typing import List, Optional, Union
-
+from decimal import Decimal
 from aind_data_schema.core.procedures import (
     Perfusion,
     Procedures,
     RetroOrbitalInjection,
     Surgery,
+    WaterRestriction,
+    SpecimenProcedure,
+    SpecimenProcedureType,
+    Reagent,
+    Craniotomy,
+    NanojectInjection,
+    IontophoresisInjection,
+    ProtectiveMaterial
 )
+from aind_data_schema_models.organizations import Organization
+from aind_data_schema_models.units import MassUnit
 from aind_labtracks_service_async_client.models import Task as LabTracksTask
 from aind_sharepoint_service_async_client.models import (
     Las2020List,
     NSB2019List,
     NSB2023List,
+)
+from aind_slims_service_async_client.models import (
+    SlimsWaterRestrictionData,
+    SlimsHistologyData,
+)
+from aind_smartsheet_service_async_client.models import (
+    PerfusionsModel,
 )
 from aind_metadata_service_server.mappers.las2020 import (
     MappedLASList as MappedLAS2020,
@@ -25,8 +42,10 @@ from aind_metadata_service_server.mappers.nsb2019 import (
 from aind_metadata_service_server.mappers.nsb2023 import (
     MappedNSBList as MappedNSB2023,
 )
-
-
+from aind_metadata_service_server.mappers.specimen_procedures import (
+    SpecimenProcedureMapper
+)
+from aind_metadata_service_server.mappers.perfusion import PerfusionMapper
 class LabTracksTaskStatuses(Enum):
     """LabTracks Task Status Options"""
 
@@ -44,6 +63,38 @@ class LabTracksProcedures(Enum):
     PERFUSION = "Perfusion"
     RO_INJECTION = "RO Injection"
 
+class ProtocolNames(Enum):
+    """Enum of Protocol Names in Smartsheet"""
+
+    IMMUNOLABELING = "Immunolabeling of a Whole Mouse Brain"
+    DELIPIDATION = (
+        "Tetrahydrofuran and Dichloromethane Delipidation of a"
+        " Whole Mouse Brain"
+    )
+    SBIP_DELIPADATION = "Aqueous (SBiP) Delipidation of a Whole Mouse Brain"
+    GELATIN_PREVIOUS = (
+        "Whole Mouse Brain Delipidation, Immunolabeling,"
+        " and Expansion Microscopy"
+    )
+    INJECTION_NANOJECT = "Injection of Viral Tracers by Nanoject V.4"
+    INJECTION_IONTOPHORESIS = (
+        "Stereotaxic Surgery for Delivery of Tracers by Iontophoresis V.3"
+    )
+    PERFUSION = "Mouse Cardiac Perfusion Fixation and Brain Collection V.5"
+    SMARTSPIM_IMAGING = "Imaging cleared mouse brains on SmartSPIM"
+    SMARTSPIM_SETUP = "SmartSPIM setup and alignment"
+    SURGERY = "General Set-Up and Take-Down for Rodent Neurosurgery"
+    PROTOCOL_COLLECTION = (
+        "Protocol Collection: Perfusing, Sectioning, IHC,"
+        " Mounting and Coverslipping Mouse Brain Specimens"
+    )
+    SECTIONING = "Sectioning Mouse Brain with Sliding Microtome"
+    MOUNTING_COVERSLIPPING = "Mounting and Coverslipping Mouse Brain Sections"
+    IHC_SECTIONS = "Immunohistochemistry (IHC) Staining Mouse Brain Sections"
+    DAPI_STAINING = "DAPI Staining Mouse Brain Sections"
+    DURAGEL_APPLICATION = (
+        "Duragel application for acute electrophysiological recordings"
+    )
 
 class ProceduresMapper:
     """Class to handle mapping of data."""
@@ -55,6 +106,9 @@ class ProceduresMapper:
         nsb_2023: List[NSB2023List] = [],
         nsb_present: List[NSB2023List] = [],
         las_2020: List[Las2020List] = [],
+        slims_wr: List[SlimsWaterRestrictionData] = [],
+        slims_histology: List[SlimsHistologyData] = [],
+        smartsheet_perfusion: List[PerfusionsModel] = [],
     ):
         """
         Class constructor.
@@ -67,6 +121,9 @@ class ProceduresMapper:
         self.nsb_2023 = nsb_2023
         self.nsb_present = nsb_present
         self.las_2020 = las_2020
+        self.slims_water_restriction = slims_wr
+        self.slims_histology = slims_histology
+        self.smartsheet_perfusion = smartsheet_perfusion
 
     @staticmethod
     def _map_labtracks_task_to_aind_surgery(
@@ -147,6 +204,51 @@ class ProceduresMapper:
 
         return None
 
+    def map_slims_response_to_aind_water_restrictions(self) -> List[WaterRestriction]:
+        """Maps response from slims into WaterRestriction models"""
+        water_restrictions = []
+        for data in self.slims_water_restriction:
+            wr = WaterRestriction.model_construct(
+                start_date=data.start_date.date() if data.start_date else None,
+                end_date=data.end_date.date() if data.end_date else None,
+                assigned_by=data.assigned_by,
+                target_fraction_weight=(
+                    int(float(data.target_weight_fraction) * 100)
+                    if data.target_weight_fraction
+                    else None
+                ),
+                baseline_weight=data.baseline_weight,
+                weight_unit=self._parse_mass_unit(data.weight_unit),
+                minimum_water_per_day=Decimal("1.0"),  # default value
+            )
+            water_restrictions.append(wr)
+        return water_restrictions
+
+    @staticmethod
+    def _parse_mass_unit(
+        value: Optional[str],
+    ) -> Optional[Union[MassUnit, str]]:
+        """Parse mass unit from string to MassUnit enum."""
+        mass_unit_abbreviations = {
+            "kg": MassUnit.KG,
+            "g": MassUnit.G,
+            "mg": MassUnit.MG,
+            "ug": MassUnit.UG,
+            "µg": MassUnit.UG,
+            "ng": MassUnit.NG,
+        }
+        if not value:
+            return MassUnit.G
+        else:
+            try:
+                return mass_unit_abbreviations[value.lower()]
+            except KeyError:
+                logging.warning(
+                    f"Mass unit {value} not recognized. Returning it as is."
+                )
+                return value
+
+
     @staticmethod
     def map_sharepoint_response_to_aind_surgeries(
         response: List, mapper_cls: type, subject_id: Optional[str] = None
@@ -180,6 +282,62 @@ class ProceduresMapper:
             surgeries.extend(procedures)
 
         return surgeries
+    
+    @staticmethod
+    def _get_protocol_name(procedure):
+        """Gets protocol name based on procedure type"""
+        if isinstance(procedure, NanojectInjection):
+            return ProtocolNames.INJECTION_NANOJECT.value
+        elif isinstance(procedure, IontophoresisInjection):
+            return ProtocolNames.INJECTION_IONTOPHORESIS.value
+        elif isinstance(procedure, Perfusion):
+            return ProtocolNames.PERFUSION.value
+        elif isinstance(procedure, Craniotomy):
+            if procedure.protective_material == ProtectiveMaterial.DURAGEL:
+                return ProtocolNames.DURAGEL_APPLICATION.value
+        else:
+            return None
+
+    def get_protocols_list(self, subject_procedures: list) -> list:
+        """Creates a list of protocol names from procedures list"""
+        protocol_list = []
+        for subject_procedure in subject_procedures:
+            if isinstance(subject_procedure, Surgery):
+                protocol_list.append(ProtocolNames.SURGERY.value)
+            if not hasattr(subject_procedure, "procedures"):
+                continue
+            for procedure in subject_procedure.procedures:
+                protocol_name = self._get_protocol_name(procedure)
+                if protocol_name:
+                    protocol_list.append(protocol_name)
+        return protocol_list
+
+    def integrate_protocols_into_aind_procedures(
+        self, procedures: Procedures, protocols_mapping: dict
+    ) -> Procedures:
+        """
+        Merges protocols responses with procedures response.
+        protocols_mapping: dict of protocol_name -> ProtocolsModel
+        """
+        for subject_procedure in procedures.subject_procedures:
+            if (
+                isinstance(subject_procedure, Surgery)
+                and hasattr(subject_procedure, "experimenter_full_name")
+                and getattr(subject_procedure, "experimenter_full_name", None)
+                and "NSB" in subject_procedure.experimenter_full_name
+            ):
+                protocol_name = ProtocolNames.SURGERY.value
+                protocol_model = protocols_mapping.get(protocol_name)
+                if protocol_model and getattr(protocol_model, "doi", None):
+                    subject_procedure.protocol_id = protocol_model.doi
+            if not hasattr(subject_procedure, "procedures"):
+                continue
+            for procedure in subject_procedure.procedures:
+                protocol_name = self._get_protocol_name(procedure)
+                protocol_model = protocols_mapping.get(protocol_name)
+                if protocol_model and getattr(protocol_model, "doi", None):
+                    procedure.protocol_id = protocol_model.doi
+        return procedures
 
     def map_responses_to_aind_procedures(
         self, subject_id: str
@@ -197,14 +355,15 @@ class ProceduresMapper:
         Procedures
             Complete procedures model with all surgeries
         """
-        all_surgeries = []
+        subject_procedures = []
+        specimen_procedures = []
         if self.labtracks_tasks:
             labtracks_surgeries = [
                 self._map_labtracks_task_to_aind_surgery(task)
                 for task in self.labtracks_tasks
                 if self._map_labtracks_task_to_aind_surgery(task) is not None
             ]
-            all_surgeries.extend(labtracks_surgeries)
+            subject_procedures.extend(labtracks_surgeries)
             logging.info(
                 f"Found {len(labtracks_surgeries)} surgeries "
                 f"from LabTracks for {subject_id}"
@@ -217,7 +376,7 @@ class ProceduresMapper:
                     mapper_cls=MappedNSB2019,
                 )
             )
-            all_surgeries.extend(nsb_2019_surgeries)
+            subject_procedures.extend(nsb_2019_surgeries)
             logging.info(
                 f"Found {len(nsb_2019_surgeries)} surgeries "
                 f"from NSB2019 for {subject_id}"
@@ -230,7 +389,7 @@ class ProceduresMapper:
                     mapper_cls=MappedNSB2023,
                 )
             )
-            all_surgeries.extend(nsb_2023_surgeries)
+            subject_procedures.extend(nsb_2023_surgeries)
             logging.info(
                 f"Found {len(nsb_2023_surgeries)} surgeries "
                 f"from NSB2023 for {subject_id}"
@@ -243,7 +402,7 @@ class ProceduresMapper:
                     mapper_cls=MappedNSB2023,
                 )
             )
-            all_surgeries.extend(nsb_present_surgeries)
+            subject_procedures.extend(nsb_present_surgeries)
             logging.info(
                 f"Found {len(nsb_present_surgeries)} surgeries "
                 f"from NSB Present for {subject_id}"
@@ -257,14 +416,49 @@ class ProceduresMapper:
                     subject_id=subject_id,
                 )
             )
-            all_surgeries.extend(las_2020_surgeries)
+            subject_procedures.extend(las_2020_surgeries)
             logging.info(
                 f"Found {len(las_2020_surgeries)} surgeries "
                 f"from LAS2020 for {subject_id}"
             )
+        if self.slims_water_restriction:
+            slims_water_restrictions = self.map_slims_response_to_aind_water_restrictions()
+            subject_procedures.extend(slims_water_restrictions)
+            logging.info(
+                f"Found {len(slims_water_restrictions)} water restrictions "
+                f"from SLIMS for {subject_id}"
+            )
+        if self.slims_histology:
+            specimen_procedure_mapper = SpecimenProcedureMapper(
+                slims_histology=self.slims_histology
+            )
+            slims_specimen_procedures = (
+                specimen_procedure_mapper.map_slims_response_to_aind_specimen_procedures()
+            )
+            specimen_procedures.extend(slims_specimen_procedures)
+            logging.info(
+                f"Found {len(slims_specimen_procedures)} specimen procedures "
+                f"from SLIMS for {subject_id}"
+            )
+        if self.smartsheet_perfusion:
+            perfusion_mappers = [
+                PerfusionMapper(
+                    smartsheet_perfusion=smartsheet_perfusion
+                ) for smartsheet_perfusion in self.smartsheet_perfusion
+            ]
+            smartsheet_perfusion_procedures = [
+                perfusion_mapper.map_to_aind_surgery()
+                for perfusion_mapper in perfusion_mappers
+            ]
+            subject_procedures.extend(smartsheet_perfusion_procedures)
+            logging.info(
+                f"Found {len(smartsheet_perfusion_procedures)} perfusions "
+                f"from Smartsheet for {subject_id}"
+            )
 
-        if not all_surgeries:
+
+        if not subject_procedures and not specimen_procedures:
             return None
         return Procedures(
-            subject_id=subject_id, subject_procedures=all_surgeries
+            subject_id=subject_id, subject_procedures=subject_procedures, specimen_procedures=specimen_procedures
         )

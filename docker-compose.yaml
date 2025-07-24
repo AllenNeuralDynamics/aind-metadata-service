@@ -14,6 +14,8 @@ services:
       - tars
       - session_json
       - redis
+    volumes:
+      - ./aind-metadata-service-server/src:/app/src
     env_file: "env/webapp.env"
   labtracks:
     image: "ghcr.io/allenneuraldynamics/aind-labtracks-service-server:0.3.0"
@@ -24,7 +26,7 @@ services:
     image: "ghcr.io/allenneuraldynamics/aind-smartsheet-service-server:0.2.2"
     env_file: "env/smartsheet.env"
   slims:
-    image: "ghcr.io/allenneuraldynamics/aind-slims-service-server:0.2.5"
+    image: "ghcr.io/allenneuraldynamics/aind-slims-service-server:0.2.6"
     env_file: "env/slims.env"
   sharepoint:
     image: "ghcr.io/allenneuraldynamics/aind-sharepoint-service-server:0.1.0"
