@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Generic, List, Optional, TypeVar, Union
 
 from aind_data_schema.core.instrument import Instrument
-from aind_data_schema.core.procedures import Surgery
+from aind_data_schema.core.procedures import Procedures, Surgery
 from aind_data_schema.core.rig import Rig
 from aind_data_schema.core.subject import Subject
 from aind_data_schema_models.pid_names import PIDName
@@ -23,6 +23,7 @@ from aind_metadata_service_server.models import (
 T = TypeVar(
     "T",
     Subject,
+    Procedures,
     PIDName,
     Rig,
     Instrument,
