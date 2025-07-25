@@ -3,6 +3,7 @@
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Path, Query
+from starlette.responses import JSONResponse
 
 from aind_metadata_service_server.mappers.funding import FundingMapper
 from aind_metadata_service_server.response_handler import (
@@ -59,7 +60,7 @@ async def get_funding(
 @router.get("/project_names")
 async def get_project_names(
     smartsheet_api_instance=Depends(get_smartsheet_api_instance),
-) -> list:
+) -> JSONResponse:
     """
     Get a list of project names from the Smartsheet API.
     """
@@ -67,5 +68,9 @@ async def get_project_names(
         _request_timeout=10
     )
     mapper = FundingMapper(smartsheet_funding=funding_response)
-    response = mapper.get_project_names()
+    project_names_list = mapper.get_project_names()
+    response = JSONResponse(
+        status_code=200,
+        content=({"message": "Success", "data": project_names_list}),
+    )
     return response
