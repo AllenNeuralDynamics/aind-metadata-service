@@ -3,7 +3,7 @@ name: Run dev tests for server code
 on:
   pull_request:
     branches:
-      - main
+      - dev
     paths:
       - aind-metadata-service-server/**
 
