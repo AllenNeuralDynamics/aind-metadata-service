@@ -149,7 +149,7 @@ class TestRoute:
         mock_get_viruses.return_value = []
 
         response = client.get("/procedures/nonexistent_subject")
-        assert response.status_code == 200
+        assert response.status_code == 404
         assert "No Data Found" in response.json()["message"]
 
 
