@@ -89,7 +89,8 @@ async def get_procedures(
     )
     procedures = mapper.map_responses_to_aind_procedures(subject_id)
     if procedures is None:
-        return ModelResponse.no_data_found_error_response()
+        no_data_response = ModelResponse.no_data_found_error_response()
+        return no_data_response.map_to_json_response()
 
     # integrate protocols from smartsheet
     protocol_names = mapper.get_protocols_list(procedures)
