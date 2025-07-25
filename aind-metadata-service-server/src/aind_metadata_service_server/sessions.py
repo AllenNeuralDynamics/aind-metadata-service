@@ -4,8 +4,8 @@ from typing import AsyncGenerator
 
 import aind_labtracks_service_async_client
 import aind_mgi_service_async_client
-import aind_sharepoint_service_async_client
 import aind_session_json_service_async_client
+import aind_sharepoint_service_async_client
 import aind_slims_service_async_client
 import aind_smartsheet_service_async_client
 import aind_tars_service_async_client

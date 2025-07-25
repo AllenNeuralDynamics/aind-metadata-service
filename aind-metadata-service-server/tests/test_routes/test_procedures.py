@@ -7,14 +7,24 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from aind_labtracks_service_async_client.models import Task as LabTracksTask
-from aind_sharepoint_service_async_client.models.nsb2019_list import (
+from aind_sharepoint_service_async_client.models import (
     NSB2019List,
+    NSB2023List,
+)
+from aind_tars_service_async_client import (
+    Alias,
+    PrepLotData,
+    ViralPrep,
+    VirusData,
 )
 from fastapi.testclient import TestClient
 
 TEST_DIR = Path(__file__).parent / ".."
 EXAMPLE_NSB2019_JSON = (
     TEST_DIR / "resources" / "nsb2019" / "raw" / "list_item1.json"
+)
+EXAMPLE_NSB2023_JSON = (
+    TEST_DIR / "resources" / "nsb2023" / "raw" / "list_item2.json"
 )
 
 
@@ -26,8 +36,22 @@ class TestRoute:
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2023")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb_present")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_las2020")
+    @patch(
+        "aind_slims_service_async_client.DefaultApi.get_water_restriction_data"
+    )
+    @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
+    @patch("aind_tars_service_async_client.DefaultApi.get_viral_prep_lots")
+    @patch("aind_tars_service_async_client.DefaultApi.get_viruses")
     def test_get_procedures_success(
         self,
+        mock_get_viruses: AsyncMock,
+        mock_get_viral_prep_lots: AsyncMock,
+        mock_get_protocols: AsyncMock,
+        mock_get_perfusions: AsyncMock,
+        mock_get_histology_data: AsyncMock,
+        mock_get_water_restriction_data: AsyncMock,
         mock_las: AsyncMock,
         mock_nsb_present: AsyncMock,
         mock_nsb2023: AsyncMock,
@@ -49,48 +73,83 @@ class TestRoute:
             )
         ]
         with open(EXAMPLE_NSB2019_JSON) as f:
-            contents = json.load(f)
-        mock_nsb2019.return_value = [NSB2019List.model_validate(contents)]
-        mock_nsb2023.return_value = []
+            contents_nsb2019 = json.load(f)
+        with open(EXAMPLE_NSB2023_JSON) as f:
+            contents_nsb2023 = json.load(f)
+        mock_nsb2019.return_value = [
+            NSB2019List.model_validate(contents_nsb2019)
+        ]
+        mock_nsb2023.return_value = [
+            NSB2023List.model_validate(contents_nsb2023)
+        ]
         mock_nsb_present.return_value = []
         mock_las.return_value = []
+        mock_get_water_restriction_data.return_value = []
+        mock_get_histology_data.return_value = []
+        mock_get_perfusions.return_value = []
+        mock_get_protocols.return_value = []
+        mock_get_viral_prep_lots.return_value = [
+            PrepLotData(
+                lot="230929-12",
+                viral_prep=ViralPrep(
+                    virus=VirusData(
+                        aliases=[Alias(is_preferred=True, name="v_123")]
+                    )
+                ),
+            )
+        ]
+        mock_get_viruses.return_value = []
 
         response = client.get("/procedures/000000")
         assert response.status_code == 406
+        assert (
+            "Procedures" in response.json()["message"]
+            or "procedures" in response.json()
+        )
 
+    @patch("aind_labtracks_service_async_client.DefaultApi.get_tasks")
+    @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2019")
+    @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2023")
+    @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb_present")
+    @patch("aind_sharepoint_service_async_client.DefaultApi.get_las2020")
     @patch(
-        "aind_sharepoint_service_async_client.DefaultApi.get_las2020",
+        "aind_slims_service_async_client.DefaultApi.get_water_restriction_data"
     )
-    @patch(
-        "aind_sharepoint_service_async_client.DefaultApi.get_nsb_present",
-    )
-    @patch(
-        "aind_sharepoint_service_async_client.DefaultApi.get_nsb2023",
-    )
-    @patch(
-        "aind_sharepoint_service_async_client.DefaultApi.get_nsb2019",
-    )
-    @patch(
-        "aind_labtracks_service_async_client.DefaultApi.get_tasks",
-    )
+    @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
+    @patch("aind_tars_service_async_client.DefaultApi.get_viral_prep_lots")
+    @patch("aind_tars_service_async_client.DefaultApi.get_viruses")
     def test_get_procedures_no_data(
         self,
-        mock_get_tasks: AsyncMock,
-        mock_get_nsb2019: AsyncMock,
-        mock_get_nsb2023: AsyncMock,
-        mock_get_nsb_present: AsyncMock,
-        mock_get_las2020: AsyncMock,
+        mock_get_viruses: AsyncMock,
+        mock_get_viral_prep_lots: AsyncMock,
+        mock_get_protocols: AsyncMock,
+        mock_get_perfusions: AsyncMock,
+        mock_get_histology_data: AsyncMock,
+        mock_get_water_restriction_data: AsyncMock,
+        mock_las: AsyncMock,
+        mock_nsb_present: AsyncMock,
+        mock_nsb2023: AsyncMock,
+        mock_nsb2019: AsyncMock,
+        mock_labtracks: AsyncMock,
         client: TestClient,
     ):
         """Tests no data found"""
-        mock_get_tasks.return_value = []
-        mock_get_nsb2019.return_value = []
-        mock_get_nsb2023.return_value = []
-        mock_get_nsb_present.return_value = []
-        mock_get_las2020.return_value = []
+        mock_labtracks.return_value = []
+        mock_nsb2019.return_value = []
+        mock_nsb2023.return_value = []
+        mock_nsb_present.return_value = []
+        mock_las.return_value = []
+        mock_get_water_restriction_data.return_value = []
+        mock_get_histology_data.return_value = []
+        mock_get_perfusions.return_value = []
+        mock_get_protocols.return_value = []
+        mock_get_viral_prep_lots.return_value = []
+        mock_get_viruses.return_value = []
 
         response = client.get("/procedures/nonexistent_subject")
-        assert 200 == response.status_code
+        assert response.status_code == 200
         assert "No Data Found" in response.json()["message"]
 
 

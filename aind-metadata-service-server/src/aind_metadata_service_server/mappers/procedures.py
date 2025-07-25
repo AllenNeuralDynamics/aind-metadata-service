@@ -1,24 +1,23 @@
 """Maps information to aind-data-schema Procedures model."""
 
 import logging
+from decimal import Decimal
 from enum import Enum
 from typing import List, Optional, Union
-from decimal import Decimal
+
 from aind_data_schema.core.procedures import (
+    Craniotomy,
+    Injection,
+    IontophoresisInjection,
+    NanojectInjection,
     Perfusion,
     Procedures,
+    ProtectiveMaterial,
     RetroOrbitalInjection,
     Surgery,
+    ViralMaterial,
     WaterRestriction,
-    SpecimenProcedure,
-    SpecimenProcedureType,
-    Reagent,
-    Craniotomy,
-    NanojectInjection,
-    IontophoresisInjection,
-    ProtectiveMaterial
 )
-from aind_data_schema_models.organizations import Organization
 from aind_data_schema_models.units import MassUnit
 from aind_labtracks_service_async_client.models import Task as LabTracksTask
 from aind_sharepoint_service_async_client.models import (
@@ -27,12 +26,13 @@ from aind_sharepoint_service_async_client.models import (
     NSB2023List,
 )
 from aind_slims_service_async_client.models import (
-    SlimsWaterRestrictionData,
     SlimsHistologyData,
+    SlimsWaterRestrictionData,
 )
 from aind_smartsheet_service_async_client.models import (
     PerfusionsModel,
 )
+
 from aind_metadata_service_server.mappers.las2020 import (
     MappedLASList as MappedLAS2020,
 )
@@ -42,10 +42,12 @@ from aind_metadata_service_server.mappers.nsb2019 import (
 from aind_metadata_service_server.mappers.nsb2023 import (
     MappedNSBList as MappedNSB2023,
 )
-from aind_metadata_service_server.mappers.specimen_procedures import (
-    SpecimenProcedureMapper
-)
 from aind_metadata_service_server.mappers.perfusion import PerfusionMapper
+from aind_metadata_service_server.mappers.specimen_procedures import (
+    SpecimenProcedureMapper,
+)
+
+
 class LabTracksTaskStatuses(Enum):
     """LabTracks Task Status Options"""
 
@@ -62,6 +64,7 @@ class LabTracksProcedures(Enum):
 
     PERFUSION = "Perfusion"
     RO_INJECTION = "RO Injection"
+
 
 class ProtocolNames(Enum):
     """Enum of Protocol Names in Smartsheet"""
@@ -96,8 +99,9 @@ class ProtocolNames(Enum):
         "Duragel application for acute electrophysiological recordings"
     )
 
+
 class ProceduresMapper:
-    """Class to handle mapping of data."""
+    """Class to handle mapping of procedures data."""
 
     def __init__(
         self,
@@ -106,7 +110,7 @@ class ProceduresMapper:
         nsb_2023: List[NSB2023List] = [],
         nsb_present: List[NSB2023List] = [],
         las_2020: List[Las2020List] = [],
-        slims_wr: List[SlimsWaterRestrictionData] = [],
+        slims_water_restriction: List[SlimsWaterRestrictionData] = [],
         slims_histology: List[SlimsHistologyData] = [],
         smartsheet_perfusion: List[PerfusionsModel] = [],
     ):
@@ -121,7 +125,7 @@ class ProceduresMapper:
         self.nsb_2023 = nsb_2023
         self.nsb_present = nsb_present
         self.las_2020 = las_2020
-        self.slims_water_restriction = slims_wr
+        self.slims_water_restriction = slims_water_restriction
         self.slims_histology = slims_histology
         self.smartsheet_perfusion = smartsheet_perfusion
 
@@ -204,7 +208,9 @@ class ProceduresMapper:
 
         return None
 
-    def map_slims_response_to_aind_water_restrictions(self) -> List[WaterRestriction]:
+    def map_slims_response_to_aind_water_restrictions(
+        self,
+    ) -> List[WaterRestriction]:
         """Maps response from slims into WaterRestriction models"""
         water_restrictions = []
         for data in self.slims_water_restriction:
@@ -217,7 +223,11 @@ class ProceduresMapper:
                     if data.target_weight_fraction
                     else None
                 ),
-                baseline_weight=data.baseline_weight,
+                baseline_weight=(
+                    Decimal(data.baseline_weight)
+                    if data.baseline_weight
+                    else None
+                ),
                 weight_unit=self._parse_mass_unit(data.weight_unit),
                 minimum_water_per_day=Decimal("1.0"),  # default value
             )
@@ -247,7 +257,6 @@ class ProceduresMapper:
                     f"Mass unit {value} not recognized. Returning it as is."
                 )
                 return value
-
 
     @staticmethod
     def map_sharepoint_response_to_aind_surgeries(
@@ -282,62 +291,6 @@ class ProceduresMapper:
             surgeries.extend(procedures)
 
         return surgeries
-    
-    @staticmethod
-    def _get_protocol_name(procedure):
-        """Gets protocol name based on procedure type"""
-        if isinstance(procedure, NanojectInjection):
-            return ProtocolNames.INJECTION_NANOJECT.value
-        elif isinstance(procedure, IontophoresisInjection):
-            return ProtocolNames.INJECTION_IONTOPHORESIS.value
-        elif isinstance(procedure, Perfusion):
-            return ProtocolNames.PERFUSION.value
-        elif isinstance(procedure, Craniotomy):
-            if procedure.protective_material == ProtectiveMaterial.DURAGEL:
-                return ProtocolNames.DURAGEL_APPLICATION.value
-        else:
-            return None
-
-    def get_protocols_list(self, subject_procedures: list) -> list:
-        """Creates a list of protocol names from procedures list"""
-        protocol_list = []
-        for subject_procedure in subject_procedures:
-            if isinstance(subject_procedure, Surgery):
-                protocol_list.append(ProtocolNames.SURGERY.value)
-            if not hasattr(subject_procedure, "procedures"):
-                continue
-            for procedure in subject_procedure.procedures:
-                protocol_name = self._get_protocol_name(procedure)
-                if protocol_name:
-                    protocol_list.append(protocol_name)
-        return protocol_list
-
-    def integrate_protocols_into_aind_procedures(
-        self, procedures: Procedures, protocols_mapping: dict
-    ) -> Procedures:
-        """
-        Merges protocols responses with procedures response.
-        protocols_mapping: dict of protocol_name -> ProtocolsModel
-        """
-        for subject_procedure in procedures.subject_procedures:
-            if (
-                isinstance(subject_procedure, Surgery)
-                and hasattr(subject_procedure, "experimenter_full_name")
-                and getattr(subject_procedure, "experimenter_full_name", None)
-                and "NSB" in subject_procedure.experimenter_full_name
-            ):
-                protocol_name = ProtocolNames.SURGERY.value
-                protocol_model = protocols_mapping.get(protocol_name)
-                if protocol_model and getattr(protocol_model, "doi", None):
-                    subject_procedure.protocol_id = protocol_model.doi
-            if not hasattr(subject_procedure, "procedures"):
-                continue
-            for procedure in subject_procedure.procedures:
-                protocol_name = self._get_protocol_name(procedure)
-                protocol_model = protocols_mapping.get(protocol_name)
-                if protocol_model and getattr(protocol_model, "doi", None):
-                    procedure.protocol_id = protocol_model.doi
-        return procedures
 
     def map_responses_to_aind_procedures(
         self, subject_id: str
@@ -422,18 +375,20 @@ class ProceduresMapper:
                 f"from LAS2020 for {subject_id}"
             )
         if self.slims_water_restriction:
-            slims_water_restrictions = self.map_slims_response_to_aind_water_restrictions()
+            slims_water_restrictions = (
+                self.map_slims_response_to_aind_water_restrictions()
+            )
             subject_procedures.extend(slims_water_restrictions)
             logging.info(
                 f"Found {len(slims_water_restrictions)} water restrictions "
                 f"from SLIMS for {subject_id}"
             )
         if self.slims_histology:
-            specimen_procedure_mapper = SpecimenProcedureMapper(
+            sp_mapper = SpecimenProcedureMapper(
                 slims_histology=self.slims_histology
             )
             slims_specimen_procedures = (
-                specimen_procedure_mapper.map_slims_response_to_aind_specimen_procedures()
+                sp_mapper.map_slims_response_to_aind_specimen_procedures()
             )
             specimen_procedures.extend(slims_specimen_procedures)
             logging.info(
@@ -442,9 +397,8 @@ class ProceduresMapper:
             )
         if self.smartsheet_perfusion:
             perfusion_mappers = [
-                PerfusionMapper(
-                    smartsheet_perfusion=smartsheet_perfusion
-                ) for smartsheet_perfusion in self.smartsheet_perfusion
+                PerfusionMapper(smartsheet_perfusion=smartsheet_perfusion)
+                for smartsheet_perfusion in self.smartsheet_perfusion
             ]
             smartsheet_perfusion_procedures = [
                 perfusion_mapper.map_to_aind_surgery()
@@ -456,9 +410,135 @@ class ProceduresMapper:
                 f"from Smartsheet for {subject_id}"
             )
 
-
         if not subject_procedures and not specimen_procedures:
             return None
         return Procedures(
-            subject_id=subject_id, subject_procedures=subject_procedures, specimen_procedures=specimen_procedures
+            subject_id=subject_id,
+            subject_procedures=subject_procedures,
+            specimen_procedures=specimen_procedures,
         )
+
+    @staticmethod
+    def _get_protocol_name(procedure):
+        """Gets protocol name based on procedure type"""
+        if isinstance(procedure, NanojectInjection):
+            return ProtocolNames.INJECTION_NANOJECT.value
+        elif isinstance(procedure, IontophoresisInjection):
+            return ProtocolNames.INJECTION_IONTOPHORESIS.value
+        elif isinstance(procedure, Perfusion):
+            return ProtocolNames.PERFUSION.value
+        elif isinstance(procedure, Craniotomy):
+            if procedure.protective_material == ProtectiveMaterial.DURAGEL:
+                return ProtocolNames.DURAGEL_APPLICATION.value
+        else:
+            return None
+
+    def get_protocols_list(self, procedures: Procedures) -> list:
+        """Creates a list of protocol names from procedures list"""
+        protocol_list = []
+        for subject_procedure in procedures.subject_procedures:
+            if isinstance(subject_procedure, Surgery):
+                protocol_list.append(ProtocolNames.SURGERY.value)
+            if not hasattr(subject_procedure, "procedures"):
+                continue
+            for procedure in subject_procedure.procedures:
+                protocol_name = self._get_protocol_name(procedure)
+                if protocol_name:
+                    protocol_list.append(protocol_name)
+        return protocol_list
+
+    def integrate_protocols_into_aind_procedures(
+        self, procedures: Procedures, protocols_mapping: dict
+    ) -> Procedures:
+        """
+        Merges protocols responses with procedures response.
+        protocols_mapping: dict of protocol_name -> ProtocolsModel
+        """
+        for subject_procedure in procedures.subject_procedures:
+            if (
+                isinstance(subject_procedure, Surgery)
+                and hasattr(subject_procedure, "experimenter_full_name")
+                and getattr(subject_procedure, "experimenter_full_name", None)
+                and "NSB" in subject_procedure.experimenter_full_name
+            ):
+                protocol_name = ProtocolNames.SURGERY.value
+                protocol_model = protocols_mapping.get(protocol_name)
+                if protocol_model and getattr(protocol_model, "doi", None):
+                    subject_procedure.protocol_id = protocol_model.doi
+            if not hasattr(subject_procedure, "procedures"):
+                continue
+            for procedure in subject_procedure.procedures:
+                protocol_name = self._get_protocol_name(procedure)
+                protocol_model = protocols_mapping.get(protocol_name)
+                if protocol_model and getattr(protocol_model, "doi", None):
+                    procedure.protocol_id = protocol_model.doi
+        return procedures
+
+    @staticmethod
+    def get_virus_strains(procedures: Procedures) -> List:
+        """
+        Iterates through procedures response and creates list of
+        virus strains.
+        Parameters
+        ---------
+        response : ModelResponse
+        """
+        viruses = []
+        for subject_procedure in procedures.subject_procedures:
+            if not hasattr(subject_procedure, "procedures"):
+                continue
+            for procedure in subject_procedure.procedures:
+                if (
+                    isinstance(procedure, Injection)
+                    and hasattr(procedure, "injection_materials")
+                    and isinstance(procedure.injection_materials, list)
+                    and procedure.injection_materials
+                ):
+                    virus_strains = [
+                        getattr(material, "name").strip()
+                        for material in procedure.injection_materials
+                        if getattr(material, "name", None)
+                    ]
+                    viruses.extend(virus_strains)
+        return viruses
+
+    @staticmethod
+    def integrate_injection_materials_into_aind_procedures(
+        procedures: Procedures, tars_mapping: dict
+    ) -> Procedures:
+        """
+        Updates Procedures with ViralMaterialInformation from tars_mapping.
+        tars_mapping: dict of virus_strain -> ViralMaterialInformation
+        """
+        for subject_procedure in procedures.subject_procedures:
+            if not hasattr(subject_procedure, "procedures"):
+                continue
+            for procedure in subject_procedure.procedures:
+                if (
+                    isinstance(procedure, Injection)
+                    and hasattr(procedure, "injection_materials")
+                    and isinstance(procedure.injection_materials, list)
+                ):
+                    for idx, injection_material in enumerate(
+                        procedure.injection_materials
+                    ):
+                        if isinstance(
+                            injection_material, ViralMaterial
+                        ) and getattr(injection_material, "name", None):
+                            virus_strain = injection_material.name.strip()
+                            viral_info = tars_mapping.get(virus_strain)
+                            if viral_info:
+                                info_dict = viral_info.model_dump()
+                                info_dict.pop("stock_titer", None)
+                                titer = getattr(
+                                    injection_material, "titer", None
+                                )
+                                if titer is not None:
+                                    info_dict["titer"] = titer
+                                new_material = ViralMaterial.model_construct(
+                                    **info_dict
+                                )
+                                procedure.injection_materials[idx] = (
+                                    new_material
+                                )
+        return procedures

@@ -2,11 +2,13 @@
 
 import logging
 from typing import List
-from aind_metadata_service_server.models import IntendedMeasurementInformation
+
 from aind_sharepoint_service_async_client.models import (
     NSB2023List,
 )
+
 from aind_metadata_service_server.mappers.nsb2023 import MappedNSBList
+from aind_metadata_service_server.models import IntendedMeasurementInformation
 
 
 class IntendedMeasurementMapper:
