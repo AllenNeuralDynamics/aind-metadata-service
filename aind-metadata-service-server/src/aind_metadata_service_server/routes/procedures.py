@@ -64,13 +64,13 @@ async def get_procedures(
         subject_id, _request_timeout=10
     )
     las_2020_response = await sharepoint_api_instance.get_las2020(
-        subject_id, _request_timeout=10
+        subject_id, _request_timeout=20
     )
     slims_wr_response = await slims_api_instance.get_water_restriction_data(
-        subject_id, _request_timeout=10
+        subject_id, _request_timeout=30
     )
     slims_histology_response = await slims_api_instance.get_histology_data(
-        subject_id, _request_timeout=10
+        subject_id, _request_timeout=30
     )
     smartsheet_perfusion_response = (
         await smartsheet_api_instance.get_perfusions(

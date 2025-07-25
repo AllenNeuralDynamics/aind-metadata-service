@@ -40,13 +40,11 @@ from aind_slims_service_async_client.models.slims_histology_data import (
     HistologyWashData,
     SlimsHistologyData,
 )
-from aind_smartsheet_service_async_client.models import (
-    PerfusionsModel,
-)
+from aind_smartsheet_service_async_client.models import PerfusionsModel
 
 from aind_metadata_service_server.mappers.procedures import (
-    ProtocolNames,
     ProceduresMapper,
+    ProtocolNames,
 )
 from aind_metadata_service_server.models import (
     ProtocolInformation,

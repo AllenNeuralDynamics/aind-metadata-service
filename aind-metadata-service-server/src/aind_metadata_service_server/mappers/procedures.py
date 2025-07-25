@@ -29,9 +29,7 @@ from aind_slims_service_async_client.models import (
     SlimsHistologyData,
     SlimsWaterRestrictionData,
 )
-from aind_smartsheet_service_async_client.models import (
-    PerfusionsModel,
-)
+from aind_smartsheet_service_async_client.models import PerfusionsModel
 
 from aind_metadata_service_server.mappers.las2020 import (
     MappedLASList as MappedLAS2020,
