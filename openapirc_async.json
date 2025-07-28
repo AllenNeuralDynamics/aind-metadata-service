@@ -2,5 +2,5 @@
    "packageName": "aind_metadata_service_async_client",
    "projectName": "aind-metadata-service-async-client",
    "library": "asyncio",
-   "packageVersion": "1.0.0"
+   "packageVersion": "1.0.7"
 }
