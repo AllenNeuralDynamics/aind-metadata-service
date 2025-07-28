@@ -1,0 +1,61 @@
+[
+  {
+    "procedure_type": "Surgery",
+    "start_date": "2022-01-03",
+    "experimenter_full_name": "NSB",
+    "iacuc_protocol": "2103",
+    "animal_weight_prior": "25.2",
+    "animal_weight_post": "25.2",
+    "weight_unit": "gram",
+    "anaesthesia": {
+      "type": "isoflurane",
+      "duration": "90.0",
+      "duration_unit": "minute",
+      "level": "2.0"
+    },
+    "workstation_id": "SWS 4",
+    "procedures": [
+      {
+        "injection_materials": [
+          {
+            "material_type": "Virus",
+            "name": "230929-12",
+            "tars_identifiers": null,
+            "addgene_id": null,
+            "titer": 7000000000000,
+            "titer_unit": "gc/mL"
+          },
+          {
+            "name": "2690587",
+            "rrid": null,
+            "expiration_date": null,
+            "material_type": "Reagent",
+            "concentration": "0.5",
+            "concentration_unit": "mg/mL"
+          }
+        ],
+        "recovery_time": null,
+        "recovery_time_unit": "minute",
+        "injection_duration": null,
+        "injection_duration_unit": "minute",
+        "instrument_id": "Ionto #1",
+        "injection_coordinate_ml": "4.72",
+        "injection_coordinate_ap": "-2.3",
+        "injection_coordinate_depth": null,
+        "injection_coordinate_unit": "millimeter",
+        "injection_coordinate_reference": "Bregma",
+        "bregma_to_lambda_distance": "6.1",
+        "bregma_to_lambda_unit": "millimeter",
+        "injection_angle": "0.0",
+        "injection_angle_unit": "degrees",
+        "targeted_structure": null,
+        "injection_hemisphere": "Right",
+        "procedure_type": "Iontophoresis injection",
+        "injection_current": "5",
+        "injection_current_unit": "microamps",
+        "alternating_current": "7/7"
+      }
+    ],
+    "notes": null
+  }
+]
