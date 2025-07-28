@@ -68,10 +68,11 @@ jobs:
     outputs:
       new_version: ${{ steps.output_version.outputs.new_version }}
     steps:
+    - name: Show directory
+      run: ls .
     - name: Get version
       id: output_version
       run: |
-        ls .
         init_file="./aind-metadata-service-server/src/aind_metadata_service_server/__init__.py"
         pkg_version=$(grep -Po '[0-9]+\.[0-9]+\.[0-9]+' "$init_file")
         echo "new_version=$pkg_version" >> "$GITHUB_OUTPUT"
