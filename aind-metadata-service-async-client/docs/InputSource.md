@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 **anyof_schema_3_validator** | **List[str]** |  | [optional] 
 **anyof_schema_4_validator** | **List[str]** |  | [optional] 
 **actual_instance** | **object** |  | [optional] 
-**any_of_schemas** | **List[str]** |  | [optional] [default to [str, List[str]]]
+**any_of_schemas** | **List[str]** |  | [optional] [default to [List[str], str]]
 
 ## Example
 
