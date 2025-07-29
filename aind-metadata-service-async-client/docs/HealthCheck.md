@@ -7,7 +7,7 @@ Response model to validate and return when performing a health check.
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **status** | **str** |  | [optional] [default to 'OK']
-**service_version** | **str** |  | [optional] [default to '1.0.7']
+**service_version** | **str** |  | [optional] [default to '1.0.8']
 
 ## Example
 
