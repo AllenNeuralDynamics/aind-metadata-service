@@ -1,10 +1,12 @@
 """Models and schema definitions for backend data structures"""
 
+from datetime import datetime
 from enum import Enum
 from typing import Literal, Optional
 
 from aind_data_schema.core.data_description import Funding
 from aind_data_schema.core.procedures import ViralMaterial
+from aind_slims_service_async_client import SlimsSpimData
 from pydantic import BaseModel, Field, field_validator
 
 from aind_metadata_service_server import __version__
@@ -95,3 +97,9 @@ class ProtocolNames(Enum):
     DURAGEL_APPLICATION = (
         "Duragel application for acute electrophysiological recordings"
     )
+
+
+class SpimData(SlimsSpimData):
+    """Class to for Slims Spim Data with proper datetime info."""
+
+    date_performed: Optional[datetime] = Field(default=None)

@@ -6,6 +6,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Path, Query
 from starlette.responses import JSONResponse
 
+from aind_metadata_service_server.models import SpimData
 from aind_metadata_service_server.response_handler import (
     ModelResponse,
     StatusCodes,
@@ -141,7 +142,7 @@ async def get_slims_workflow(
     }
     if workflow == SlimsWorkflow.ECEPHYS_SESSIONS:
         kwargs["session_name"] = session_name
-    data = None
+    data = []
     match workflow:
         case SlimsWorkflow.ECEPHYS_SESSIONS:
             data = await slims_api_instance.get_ecephys_sessions(**kwargs)
@@ -149,6 +150,7 @@ async def get_slims_workflow(
             data = await slims_api_instance.get_histology_data(**kwargs)
         case SlimsWorkflow.SMARTSPIM_IMAGING:
             data = await slims_api_instance.get_smartspim_imaging(**kwargs)
+            data = [SpimData(**d.model_dump()) for d in data]
         case SlimsWorkflow.WATER_RESTRICTION:
             data = await slims_api_instance.get_water_restriction_data(
                 **kwargs
