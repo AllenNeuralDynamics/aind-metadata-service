@@ -1,8 +1,10 @@
 """Models and schema definitions for backend data structures"""
 
+import logging
+import xml.etree.ElementTree as ET
 from datetime import datetime
 from enum import Enum
-from typing import Literal, Optional
+from typing import Any, Literal, Optional
 
 from aind_data_schema.core.data_description import Funding
 from aind_data_schema.core.procedures import ViralMaterial
@@ -103,3 +105,20 @@ class SpimData(SlimsSpimData):
     """Class to for Slims Spim Data with proper datetime info."""
 
     date_performed: Optional[datetime] = Field(default=None)
+
+    @field_validator("protocol_id", mode="before")
+    @classmethod
+    def parse_protocol_id(cls, v: Any) -> Optional[str]:
+        """Parses protocol id from html"""
+        if v is None:
+            return None
+        try:
+            root = ET.fromstring(v)
+            return root.get("href")
+        except ET.ParseError:
+            return v
+        except Exception as e:
+            logging.warning(
+                f"There was an exception parsing the protocol_id field: {e}"
+            )
+            return None
