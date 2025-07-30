@@ -152,6 +152,7 @@ class HistologyData(SlimsHistologyData):
 
 
 class EcephysStreamModuleData(EcephysStreamModule):
+    """Class for Slims Ecephys Stream Data with proper unit"""
     @field_validator(
         "ccf_coordinate_unit",
         "bregma_target_unit",
@@ -168,6 +169,6 @@ class EcephysStreamModuleData(EcephysStreamModule):
 
 
 class EcephysData(SlimsEcephysData):
-    """Class to for Slims Ecephys Data with proper stream data"""
+    """Class for Slims Ecephys Data with proper stream data"""
 
     stream_modules: Optional[List[EcephysStreamModuleData]] = None
