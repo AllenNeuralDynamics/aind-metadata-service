@@ -153,7 +153,7 @@ class TestRoute:
             end_date_lte=None,
             _request_timeout=30,
         )
-        assert  200 == response.status_code
+        assert 200 == response.status_code
         assert "No Data Found" in response.json()["message"]
 
     def test_non_workflow_response(
