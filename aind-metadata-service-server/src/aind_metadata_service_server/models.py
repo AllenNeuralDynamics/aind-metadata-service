@@ -5,15 +5,15 @@ import logging
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from enum import Enum
-from typing import Any, Literal, Optional, List
+from typing import Any, List, Literal, Optional
 
 from aind_data_schema.core.data_description import Funding
 from aind_data_schema.core.procedures import ViralMaterial
 from aind_slims_service_async_client import (
-    SlimsSpimData,
-    SlimsHistologyData,
     EcephysStreamModule,
-    SlimsEcephysData
+    SlimsEcephysData,
+    SlimsHistologyData,
+    SlimsSpimData,
 )
 from pydantic import BaseModel, Field, field_validator
 
@@ -151,24 +151,30 @@ class HistologyData(SlimsHistologyData):
             return None
 
 
-class EcephysStreamModuleData(EcephysStreamModule):
-    """Class for Slims Ecephys Stream Data with proper unit"""
-    @field_validator(
-        "ccf_coordinate_unit",
-        "bregma_target_unit",
-        "surface_z_unit",
-        "manipulator_unit",
-        mode="before",
-    )
-    @classmethod
-    def parse_micrometer_unit(cls, v):
-        """Parse HTML entity for micrometer"""
-        if isinstance(v, str):
-            v = html.unescape(v)
-        return v
-
-
 class EcephysData(SlimsEcephysData):
     """Class for Slims Ecephys Data with proper stream data"""
 
-    stream_modules: Optional[List[EcephysStreamModuleData]] = None
+    @field_validator("stream_modules", mode="after")
+    @classmethod
+    def parse_micrometer_units(
+        cls, v: Optional[List[EcephysStreamModule]]
+    ) -> Optional[List[EcephysStreamModule]]:
+        """Converts html mu into unicode mu in units."""
+        if v is None:
+            return None
+        for module in v:
+            if module.ccf_coordinate_unit:
+                module.ccf_coordinate_unit = html.unescape(
+                    module.ccf_coordinate_unit
+                )
+            if module.bregma_target_unit:
+                module.bregma_target_unit = html.unescape(
+                    module.bregma_target_unit
+                )
+            if module.surface_z_unit:
+                module.surface_z_unit = html.unescape(module.surface_z_unit)
+            if module.manipulator_unit:
+                module.manipulator_unit = html.unescape(
+                    module.manipulator_unit
+                )
+        return v
