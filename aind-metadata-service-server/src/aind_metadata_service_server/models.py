@@ -1,14 +1,20 @@
 """Models and schema definitions for backend data structures"""
 
+import html
 import logging
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from enum import Enum
-from typing import Any, Literal, Optional
+from typing import Any, Literal, Optional, List
 
 from aind_data_schema.core.data_description import Funding
 from aind_data_schema.core.procedures import ViralMaterial
-from aind_slims_service_async_client import SlimsSpimData
+from aind_slims_service_async_client import (
+    SlimsSpimData,
+    SlimsHistologyData,
+    EcephysStreamModule,
+    SlimsEcephysData
+)
 from pydantic import BaseModel, Field, field_validator
 
 from aind_metadata_service_server import __version__
@@ -122,3 +128,46 @@ class SpimData(SlimsSpimData):
                 f"There was an exception parsing the protocol_id field: {e}"
             )
             return None
+
+
+class HistologyData(SlimsHistologyData):
+    """Class to for Slims Histology Data with proper protocol id."""
+
+    @field_validator("protocol_id", mode="before")
+    @classmethod
+    def parse_protocol_id(cls, v: Any) -> Optional[str]:
+        """Parses protocol id from html"""
+        if v is None:
+            return None
+        try:
+            root = ET.fromstring(v)
+            return root.get("href")
+        except ET.ParseError:
+            return v
+        except Exception as e:
+            logging.warning(
+                f"There was an exception parsing the protocol_id field: {e}"
+            )
+            return None
+
+
+class EcephysStreamModuleData(EcephysStreamModule):
+    @field_validator(
+        "ccf_coordinate_unit",
+        "bregma_target_unit",
+        "surface_z_unit",
+        "manipulator_unit",
+        mode="before",
+    )
+    @classmethod
+    def parse_micrometer_unit(cls, v):
+        """Parse HTML entity for micrometer"""
+        if isinstance(v, str):
+            v = html.unescape(v)
+        return v
+
+
+class EcephysData(SlimsEcephysData):
+    """Class to for Slims Ecephys Data with proper stream data"""
+
+    stream_modules: Optional[List[EcephysStreamModuleData]] = None

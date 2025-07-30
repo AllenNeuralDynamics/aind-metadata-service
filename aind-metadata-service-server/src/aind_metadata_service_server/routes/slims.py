@@ -6,7 +6,12 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Path, Query
 from starlette.responses import JSONResponse
 
-from aind_metadata_service_server.models import SpimData
+from aind_metadata_service_server.models import (
+    SpimData,
+    HistologyData,
+    EcephysStreamModuleData,
+    EcephysData
+)
 from aind_metadata_service_server.response_handler import (
     ModelResponse,
     StatusCodes,
@@ -93,7 +98,7 @@ async def get_slims_workflow(
             },
             "viral_injections_example": {
                 "summary": "Viral injections example start date",
-                "value": "2025-04-10",
+                "value": "2025-04-23",
             },
             "ecephys_session_example": {
                 "summary": "Ecephys example start date",
@@ -120,7 +125,7 @@ async def get_slims_workflow(
             },
             "viral_injections_example": {
                 "summary": "Viral injections example end date",
-                "value": "2025-04-11",
+                "value": "2025-04-24",
             },
             "ecephys_session_example": {
                 "summary": "Ecephys example end date",
@@ -146,8 +151,19 @@ async def get_slims_workflow(
     match workflow:
         case SlimsWorkflow.ECEPHYS_SESSIONS:
             data = await slims_api_instance.get_ecephys_sessions(**kwargs)
+            processed = []
+            for d in data:
+                d_dict = d.model_dump()
+                if "stream_modules" in d_dict and d_dict["stream_modules"]:
+                    d_dict["stream_modules"] = [
+                        EcephysStreamModuleData(**sm)
+                        for sm in d_dict["stream_modules"]
+                    ]
+                processed.append(EcephysData(**d_dict))
+            data = processed
         case SlimsWorkflow.HISTOLOGY:
             data = await slims_api_instance.get_histology_data(**kwargs)
+            data = [HistologyData(**d.model_dump()) for d in data]
         case SlimsWorkflow.SMARTSPIM_IMAGING:
             data = await slims_api_instance.get_smartspim_imaging(**kwargs)
             data = [SpimData(**d.model_dump()) for d in data]
