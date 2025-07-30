@@ -121,7 +121,7 @@ class TestEcephysData(unittest.TestCase):
 
     def test_ecephys_data_with_no_stream_modules(self):
         """Tests EcephysData initialization with no stream modules"""
-        parsed = EcephysData()
+        parsed = EcephysData(**{"stream_modules": None})
         self.assertIsNone(parsed.stream_modules)
 
 
