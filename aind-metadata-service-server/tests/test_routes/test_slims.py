@@ -38,7 +38,7 @@ class TestRoute:
             _request_timeout=30,
             session_name=None,
         )
-        assert response.status_code == 200
+        assert 200 == response.status_code
         data = response.json()["data"][0]
         # Check that micrometer units are unescaped
         assert data["stream_modules"][0]["ccf_coordinate_unit"] == "μm"
@@ -66,7 +66,7 @@ class TestRoute:
             end_date_lte=None,
             _request_timeout=30,
         )
-        assert response.status_code == 200
+        assert 200 == response.status_code
         data = response.json()["data"][0]
         assert data["protocol_id"] == "https://example.com"
 
@@ -89,7 +89,7 @@ class TestRoute:
             end_date_lte=None,
             _request_timeout=30,
         )
-        assert response.status_code == 200
+        assert 200 == response.status_code
 
     @patch(
         "aind_slims_service_async_client.DefaultApi.get_water_restriction_data"
@@ -112,7 +112,7 @@ class TestRoute:
             end_date_lte=None,
             _request_timeout=30,
         )
-        assert response.status_code == 200
+        assert 200 == response.status_code
 
     @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
     def test_get_histology_workflow(
@@ -134,7 +134,7 @@ class TestRoute:
             end_date_lte=None,
             _request_timeout=30,
         )
-        assert response.status_code == 200
+        assert 200 == response.status_code
         data = response.json()["data"][0]
         assert data["protocol_id"] == "https://histology.com"
 
@@ -153,7 +153,7 @@ class TestRoute:
             end_date_lte=None,
             _request_timeout=30,
         )
-        assert response.status_code == 200
+        assert  200 == response.status_code
         assert "No Data Found" in response.json()["message"]
 
     def test_non_workflow_response(
@@ -162,7 +162,7 @@ class TestRoute:
     ):
         """Tests a non-existent workflow"""
         response = client.get("/slims/NO_WORKFLOW")
-        assert response.status_code == 422
+        assert 422 == response.status_code
 
 
 if __name__ == "__main__":
