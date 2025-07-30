@@ -91,7 +91,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_funding**
-> object get_funding(project_name, subproject=subproject)
+> object get_funding(project_name)
 
 Get Funding
 
@@ -118,11 +118,10 @@ with aind_metadata_service_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = aind_metadata_service_client.DefaultApi(api_client)
     project_name = 'Discovery-Neuromodulator circuit dynamics during foraging' # str | 
-    subproject = 'Subproject 2 Molecular Anatomy Cell Types' # str |  (optional)
 
     try:
         # Get Funding
-        api_response = api_instance.get_funding(project_name, subproject=subproject)
+        api_response = api_instance.get_funding(project_name)
         print("The response of DefaultApi->get_funding:\n")
         pprint(api_response)
     except Exception as e:
@@ -137,7 +136,6 @@ with aind_metadata_service_client.ApiClient(configuration) as api_client:
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **project_name** | **str**|  | 
- **subproject** | **str**|  | [optional] 
 
 ### Return type
 
