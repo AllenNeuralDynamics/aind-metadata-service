@@ -2,7 +2,8 @@
 aind-data-schema Funding model."""
 
 import logging
-from typing import List, Optional, Union
+import re
+from typing import List, Optional, Tuple, Union
 
 from aind_data_schema_models.organizations import Organization
 from aind_smartsheet_service_async_client.models import FundingModel
@@ -22,6 +23,16 @@ class FundingMapper:
          smartsheet_funding : List[FundingModel]
         """
         self.smartsheet_funding = smartsheet_funding
+
+    @staticmethod
+    def split_name(input_name: str) -> Tuple[str, Optional[str]]:
+        """Splits name into project name and subproject name"""
+        name_pattern = r"(.*) - ([Project|Subproject].*)"
+        if not re.match(name_pattern, input_name):
+            return input_name, None
+        else:
+            groups = re.match(name_pattern, input_name).groups()
+            return groups[0], groups[1]
 
     @staticmethod
     def _parse_institution(

@@ -1,8 +1,6 @@
 """Module to handle funding endpoints"""
 
-from typing import Optional
-
-from fastapi import APIRouter, Depends, Path, Query
+from fastapi import APIRouter, Depends, Path
 from starlette.responses import JSONResponse
 
 from aind_metadata_service_server.mappers.funding import FundingMapper
@@ -29,24 +27,17 @@ async def get_funding(
             }
         },
     ),
-    subproject: Optional[str] = Query(
-        default=None,
-        openapi_examples={
-            "default": {
-                "summary": "A sample subproject",
-                "description": "Example subproject name",
-                "value": "Subproject 2 Molecular Anatomy Cell Types",
-            }
-        },
-    ),
     smartsheet_api_instance=Depends(get_smartsheet_api_instance),
 ):
     """
     ## Funding
     Return Funding metadata.
     """
+    main_project_name, subproject = FundingMapper.split_name(project_name)
     funding_response = await smartsheet_api_instance.get_funding(
-        project_name=project_name, subproject=subproject, _request_timeout=10
+        project_name=main_project_name,
+        subproject=subproject,
+        _request_timeout=10,
     )
     mapper = FundingMapper(smartsheet_funding=funding_response)
     funding_information = mapper.get_funding_list()

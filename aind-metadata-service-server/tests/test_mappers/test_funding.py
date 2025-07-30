@@ -69,6 +69,35 @@ class TestFundingMapper(unittest.TestCase):
             ),
         ]
 
+    def test_split_name(self):
+        """
+        Tests that a user-input project name is split into a project and
+        sub-project.
+        """
+
+        project_a = "Thalamus in the middle - Project 6 Molecular Science Core"
+        project_b = (
+            "Discovery-Neuromodulator circuit dynamics during"
+            " foraging - Subproject 2 Molecular Anatomy Cell Types"
+        )
+        project_c = "Ophys Platform - FIP, HSFP and indicator testing"
+
+        self.assertEqual(
+            ("Thalamus in the middle", "Project 6 Molecular Science Core"),
+            FundingMapper.split_name(project_a),
+        )
+        self.assertEqual(
+            (
+                "Discovery-Neuromodulator circuit dynamics during foraging",
+                "Subproject 2 Molecular Anatomy Cell Types",
+            ),
+            FundingMapper.split_name(project_b),
+        )
+        self.assertEqual(
+            ("Ophys Platform - FIP, HSFP and indicator testing", None),
+            FundingMapper.split_name(project_c),
+        )
+
     def test_mapping_success(self):
         """Tests successful mapping of funding data"""
         discovery_funding_rows = self.funding_sheet[3:5]
