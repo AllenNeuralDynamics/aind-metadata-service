@@ -7,10 +7,9 @@ from fastapi import APIRouter, Depends, Path, Query
 from starlette.responses import JSONResponse
 
 from aind_metadata_service_server.models import (
-    SpimData,
+    EcephysData,
     HistologyData,
-    EcephysStreamModuleData,
-    EcephysData
+    SpimData,
 )
 from aind_metadata_service_server.response_handler import (
     ModelResponse,
@@ -151,16 +150,7 @@ async def get_slims_workflow(
     match workflow:
         case SlimsWorkflow.ECEPHYS_SESSIONS:
             data = await slims_api_instance.get_ecephys_sessions(**kwargs)
-            processed = []
-            for d in data:
-                d_dict = d.model_dump()
-                if "stream_modules" in d_dict and d_dict["stream_modules"]:
-                    d_dict["stream_modules"] = [
-                        EcephysStreamModuleData(**sm)
-                        for sm in d_dict["stream_modules"]
-                    ]
-                processed.append(EcephysData(**d_dict))
-            data = processed
+            data = [EcephysData(**d.model_dump()) for d in data]
         case SlimsWorkflow.HISTOLOGY:
             data = await slims_api_instance.get_histology_data(**kwargs)
             data = [HistologyData(**d.model_dump()) for d in data]
