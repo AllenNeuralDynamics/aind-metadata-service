@@ -6,7 +6,11 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Path, Query
 from starlette.responses import JSONResponse
 
-from aind_metadata_service_server.models import SpimData
+from aind_metadata_service_server.models import (
+    EcephysData,
+    HistologyData,
+    SpimData,
+)
 from aind_metadata_service_server.response_handler import (
     ModelResponse,
     StatusCodes,
@@ -93,7 +97,7 @@ async def get_slims_workflow(
             },
             "viral_injections_example": {
                 "summary": "Viral injections example start date",
-                "value": "2025-04-10",
+                "value": "2025-04-23",
             },
             "ecephys_session_example": {
                 "summary": "Ecephys example start date",
@@ -120,7 +124,7 @@ async def get_slims_workflow(
             },
             "viral_injections_example": {
                 "summary": "Viral injections example end date",
-                "value": "2025-04-11",
+                "value": "2025-04-24",
             },
             "ecephys_session_example": {
                 "summary": "Ecephys example end date",
@@ -146,8 +150,10 @@ async def get_slims_workflow(
     match workflow:
         case SlimsWorkflow.ECEPHYS_SESSIONS:
             data = await slims_api_instance.get_ecephys_sessions(**kwargs)
+            data = [EcephysData(**d.model_dump()) for d in data]
         case SlimsWorkflow.HISTOLOGY:
             data = await slims_api_instance.get_histology_data(**kwargs)
+            data = [HistologyData(**d.model_dump()) for d in data]
         case SlimsWorkflow.SMARTSPIM_IMAGING:
             data = await slims_api_instance.get_smartspim_imaging(**kwargs)
             data = [SpimData(**d.model_dump()) for d in data]
