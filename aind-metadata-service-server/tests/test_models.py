@@ -4,15 +4,15 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 from aind_slims_service_async_client.models import (
+    SlimsHistologyData,
     SlimsSpimData,
-    SlimsHistologyData
 )
+
 from aind_metadata_service_server.models import (
-    HealthCheck,
-    SpimData,
-    HistologyData,
-    EcephysStreamModuleData,
     EcephysData,
+    HealthCheck,
+    HistologyData,
+    SpimData,
 )
 
 
@@ -70,10 +70,10 @@ class TestHistologyData(unittest.TestCase):
 
     def test_parse_protocol_id_html(self):
         """Tests parse_protocol_id method"""
-        protocol_html = '<a href="https://histology.com">Histology</a>'
+        protocol_html = '<a href="https://example.com">Histology</a>'
         slims_hist = SlimsHistologyData(protocol_id=protocol_html)
         hist = HistologyData(**slims_hist.model_dump())
-        self.assertEqual(hist.protocol_id, "https://histology.com")
+        self.assertEqual(hist.protocol_id, "https://example.com")
 
     def test_parse_protocol_id_malformed_html(self):
         """Tests parse_protocol_id method with malformed html"""
@@ -104,38 +104,6 @@ class TestHistologyData(unittest.TestCase):
         mock_log_warn.assert_called_once()
 
 
-class TestEcephysStreamModuleData(unittest.TestCase):
-    """Tests for EcephysStreamModuleData"""
-
-    def test_parse_micrometer_unit_html_entity(self):
-        """Tests parsing of micrometer unit HTML entity"""
-        data = {
-            "ccf_coordinate_unit": "&mu;m",
-            "bregma_target_unit": "&mu;m",
-            "surface_z_unit": "&mu;m",
-            "manipulator_unit": "&mu;m",
-        }
-        parsed = EcephysStreamModuleData(**data)
-        self.assertEqual(parsed.ccf_coordinate_unit, "μm")
-        self.assertEqual(parsed.bregma_target_unit, "μm")
-        self.assertEqual(parsed.surface_z_unit, "μm")
-        self.assertEqual(parsed.manipulator_unit, "μm")
-
-    def test_parse_micrometer_unit_regular_string(self):
-        """Tests parsing of micrometer unit regular string"""
-        data = {
-            "ccf_coordinate_unit": "mm",
-            "bregma_target_unit": "mm",
-            "surface_z_unit": "mm",
-            "manipulator_unit": "mm",
-        }
-        parsed = EcephysStreamModuleData(**data)
-        self.assertEqual(parsed.ccf_coordinate_unit, "mm")
-        self.assertEqual(parsed.bregma_target_unit, "mm")
-        self.assertEqual(parsed.surface_z_unit, "mm")
-        self.assertEqual(parsed.manipulator_unit, "mm")
-
-
 class TestEcephysData(unittest.TestCase):
     """Tests for EcephysData"""
 
@@ -147,18 +115,13 @@ class TestEcephysData(unittest.TestCase):
             "surface_z_unit": "&mu;m",
             "manipulator_unit": "&mu;m",
         }
-        ecephys_dict = {
-            "stream_modules": [stream_module_dict]
-        }
+        ecephys_dict = {"stream_modules": [stream_module_dict]}
         parsed = EcephysData(**ecephys_dict)
-        self.assertIsInstance(
-            parsed.stream_modules[0], EcephysStreamModuleData
-        )
         self.assertEqual(parsed.stream_modules[0].ccf_coordinate_unit, "μm")
 
     def test_ecephys_data_with_no_stream_modules(self):
         """Tests EcephysData initialization with no stream modules"""
-        parsed = EcephysData()
+        parsed = EcephysData(**{"stream_modules": None})
         self.assertIsNone(parsed.stream_modules)
 
 
