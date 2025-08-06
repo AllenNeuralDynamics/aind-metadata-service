@@ -171,10 +171,7 @@ async def get_slims_workflow(
             content=(
                 {
                     "message": "Data from SLIMS",
-                    "data": [
-                        d.model_dump(mode="json", exclude_none=True)
-                        for d in data
-                    ],
+                    "data": [d.model_dump(mode="json") for d in data],
                 }
             ),
         )
