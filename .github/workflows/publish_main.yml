@@ -12,7 +12,7 @@ jobs:
       run:
         working-directory: ./aind-metadata-service-server
     steps:
-    - uses: actions/checkout@v4.2.2
+    - uses: actions/checkout@v4
       with:
         ref: ${{ env.DEFAULT_BRANCH }}
         fetch-depth: 0
@@ -23,6 +23,7 @@ jobs:
         python-version: '3.10'
     - name: Install dependencies
       run: | 
+        pip install --upgrade setuptools wheel
         python -m pip install -e .[dev] --no-cache-dir
     - name: Get Python version and Update README.md
       run: |
@@ -68,7 +69,7 @@ jobs:
     outputs:
       new_version: ${{ steps.output_version.outputs.new_version }}
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4
       - name: Get version
         id: output_version
         run: |
@@ -80,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: get_version
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.default_branch }}
           fetch-depth: 0
@@ -97,6 +98,7 @@ jobs:
           python-version: '3.10'
       - name: Install dependencies
         run: | 
+          pip install --upgrade setuptools wheel
           python -m pip install -e aind-metadata-service-server --no-cache-dir
           python -m pip install toml
       - name: Generate OpenAPI file
@@ -144,7 +146,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [get_version, build_client]
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4
       - name: Pull latest changes
         run: git pull origin main
       - name: Update tag
@@ -158,7 +160,7 @@ jobs:
       run:
         working-directory: ./aind-metadata-service-server
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4
       - name: Pull latest changes
         run: git pull origin main
       - name: Set up Docker Buildx
@@ -186,7 +188,7 @@ jobs:
       run:
         working-directory: ./aind-metadata-service-client
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4
       - name: Pull latest changes
         run: git pull origin main
       - name: Set up Python 3.10
@@ -210,7 +212,7 @@ jobs:
       run:
         working-directory: ./aind-metadata-service-async-client
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4
       - name: Pull latest changes
         run: git pull origin main
       - name: Set up Python 3.10

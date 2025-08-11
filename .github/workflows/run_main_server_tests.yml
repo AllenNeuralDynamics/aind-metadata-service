@@ -16,13 +16,14 @@ jobs:
       run:
         working-directory: ./aind-metadata-service-server
     steps:
-    - uses: actions/checkout@v4.2.2
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: | 
+        pip install --upgrade setuptools wheel
         python -m pip install -e .[dev] --no-cache-dir
     - name: Run linter checks
       run: flake8 . && interrogate --verbose .
@@ -31,7 +32,7 @@ jobs:
   verify_version:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4
       - name: Check version incremented
         run: |
           init_file="./aind-metadata-service-server/src/aind_metadata_service_server/__init__.py"
