@@ -23,7 +23,6 @@ jobs:
         python-version: '3.10'
     - name: Install dependencies
       run: | 
-        pip install --upgrade setuptools wheel
         python -m pip install -e .[dev] --no-cache-dir
     - name: Get Python version and Update README.md
       run: |
@@ -98,7 +97,6 @@ jobs:
           python-version: '3.10'
       - name: Install dependencies
         run: | 
-          pip install --upgrade setuptools wheel
           python -m pip install -e aind-metadata-service-server --no-cache-dir
           python -m pip install toml
       - name: Generate OpenAPI file
