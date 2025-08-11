@@ -12,7 +12,7 @@ jobs:
       run:
         working-directory: ./aind-metadata-service-server
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v4.2.2
       with:
         ref: ${{ env.DEFAULT_BRANCH }}
         fetch-depth: 0
@@ -68,7 +68,7 @@ jobs:
     outputs:
       new_version: ${{ steps.output_version.outputs.new_version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
       - name: Get version
         id: output_version
         run: |
@@ -80,7 +80,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: get_version
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
         with:
           ref: ${{ inputs.default_branch }}
           fetch-depth: 0
@@ -144,7 +144,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [get_version, build_client]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
       - name: Pull latest changes
         run: git pull origin main
       - name: Update tag
@@ -158,7 +158,7 @@ jobs:
       run:
         working-directory: ./aind-metadata-service-server
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
       - name: Pull latest changes
         run: git pull origin main
       - name: Set up Docker Buildx
@@ -186,7 +186,7 @@ jobs:
       run:
         working-directory: ./aind-metadata-service-client
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
       - name: Pull latest changes
         run: git pull origin main
       - name: Set up Python 3.10
@@ -210,7 +210,7 @@ jobs:
       run:
         working-directory: ./aind-metadata-service-async-client
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
       - name: Pull latest changes
         run: git pull origin main
       - name: Set up Python 3.10
