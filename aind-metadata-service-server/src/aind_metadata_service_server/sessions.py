@@ -9,6 +9,7 @@ import aind_sharepoint_service_async_client
 import aind_slims_service_async_client
 import aind_smartsheet_service_async_client
 import aind_tars_service_async_client
+from httpx import AsyncClient
 
 from aind_metadata_service_server.configs import get_settings
 
@@ -133,3 +134,16 @@ async def get_session_json_api_instance() -> (
             api_client
         )
         yield api_instance
+
+
+async def get_aind_data_schema_v1_session() -> (
+    AsyncGenerator[aind_session_json_service_async_client.DefaultApi, None]
+):
+    """
+    Yield an async session object. This will automatically close the session
+    when finished.
+    """
+    async with AsyncClient(
+            base_url=settings.aind_data_schema_v1_host.unicode_string()
+    ) as session:
+        yield session

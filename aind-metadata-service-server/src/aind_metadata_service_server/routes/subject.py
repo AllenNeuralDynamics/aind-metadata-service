@@ -15,7 +15,7 @@ from aind_metadata_service_server.sessions import (
 router = APIRouter()
 
 
-@router.get("/subject/{subject_id}")
+@router.get("/api/v2/subject/{subject_id}")
 async def get_subject(
     subject_id: str = Path(
         ...,

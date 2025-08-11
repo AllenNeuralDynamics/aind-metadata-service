@@ -4,20 +4,16 @@ import re
 from decimal import Decimal
 from typing import List, Optional
 
-from aind_data_schema.core.subject import (
-    BackgroundStrain,
-    BreedingInfo,
-    Housing,
-    Sex,
-    Subject,
-)
+from aind_data_schema.components.subjects import MouseSubject, BreedingInfo, Housing, Sex
 from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.species import Species
+from aind_data_schema_models.pid_names import PIDName
+from aind_data_schema_models.species import Species, Strain
 from aind_labtracks_service_async_client.models.subject import (
     Subject as LabTracksSubject,
 )
 from aind_mgi_service_async_client.models import MgiSummaryRow
 from pydantic import ValidationError
+from aind_data_schema.core.subject import Subject
 
 from aind_metadata_service_server.mappers.mgi_allele import MgiMapper
 
@@ -66,7 +62,7 @@ class SubjectMapper:
     @staticmethod
     def _map_to_background_strain(
         bg_strain: Optional[str],
-    ) -> Optional[BackgroundStrain]:
+    ) -> Strain:
         """
         Maps the LabTracks BG Strain enum to the
         aind_data_schema.subject.BackgroundStrain
@@ -81,11 +77,11 @@ class SubjectMapper:
 
         match bg_strain:
             case "C57BL/6J":
-                return BackgroundStrain.C57BL_6J
+                return Strain.C57BL_6J
             case "BALB/C" | "BALB/c":
-                return BackgroundStrain.BALB_c
+                return Strain.BALB_C
             case _:
-                return None
+                return Strain.UNKNOWN
 
     @staticmethod
     def _map_species(species: Optional[str]) -> Optional[Species]:
@@ -104,7 +100,7 @@ class SubjectMapper:
         """
         match species:
             case "mouse":
-                return Species.MUS_MUSCULUS
+                return Species.HOUSE_MOUSE
             case _:
                 return None
 
