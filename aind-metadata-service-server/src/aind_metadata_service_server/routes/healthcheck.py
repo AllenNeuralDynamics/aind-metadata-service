@@ -8,7 +8,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/healthcheck",
+    "/api/v2/healthcheck",
     tags=["healthcheck"],
     summary="Perform a Health Check",
     response_description="Return HTTP Status Code 200 (OK)",

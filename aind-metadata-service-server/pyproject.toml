@@ -106,4 +106,5 @@ env = [
     "AIND_METADATA_SERVICE_TARS_HOST=http://example.com/tars",
     "AIND_METADATA_SERVICE_SESSION_JSON_HOST=http://example.com/session_json",
     "AIND_METADATA_SERVICE_SHAREPOINT_HOST=http://example.com/sharepoint",
+    "AIND_METADATA_SERVICE_AIND_DATA_SCHEMA_V1_HOST=http://example.com/v1",
 ]

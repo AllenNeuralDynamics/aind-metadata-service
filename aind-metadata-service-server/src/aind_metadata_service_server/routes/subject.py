@@ -1,12 +1,10 @@
 """Module to handle subject endpoints"""
+from typing import List
 
+from aind_data_schema.core.subject import Subject
 from fastapi import APIRouter, Depends, Path
 
 from aind_metadata_service_server.mappers.subject import SubjectMapper
-from aind_metadata_service_server.response_handler import (
-    ModelResponse,
-    StatusCodes,
-)
 from aind_metadata_service_server.sessions import (
     get_labtracks_api_instance,
     get_mgi_api_instance,
@@ -15,7 +13,7 @@ from aind_metadata_service_server.sessions import (
 router = APIRouter()
 
 
-@router.get("/api/v2/subject/{subject_id}")
+@router.get("/api/v2/subject/{subject_id}", response_model=List[Subject])
 async def get_subject(
     subject_id: str = Path(
         ...,
@@ -54,8 +52,4 @@ async def get_subject(
         mapper.mgi_info = mgi_info
 
     subjects = [mapper.map_to_aind_subject() for mapper in mappers]
-    response_handler = ModelResponse(
-        aind_models=subjects, status_code=StatusCodes.DB_RESPONDED
-    )
-    response = response_handler.map_to_json_response()
-    return response
+    return subjects

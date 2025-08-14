@@ -137,7 +137,7 @@ async def get_session_json_api_instance() -> (
 
 
 async def get_aind_data_schema_v1_session() -> (
-    AsyncGenerator[aind_session_json_service_async_client.DefaultApi, None]
+    AsyncGenerator[AsyncClient, None]
 ):
     """
     Yield an async session object. This will automatically close the session

@@ -6,7 +6,6 @@ from typing import List, Optional
 
 from aind_data_schema.components.subjects import MouseSubject, BreedingInfo, Housing, Sex
 from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.pid_names import PIDName
 from aind_data_schema_models.species import Species, Strain
 from aind_labtracks_service_async_client.models.subject import (
     Subject as LabTracksSubject,
@@ -245,28 +244,36 @@ class SubjectMapper:
             if pid_name is not None:
                 alleles.append(pid_name)
         try:
+            subject_details = MouseSubject(
+                sex=sex,
+                date_of_birth=datetime_of_birth.date(),
+                strain=bg_strain,
+                species=species,
+                alleles=alleles,
+                genotype=genotype,
+                breeding_info=breeding_info,
+                housing=housing,
+                source=source
+            )
+        except ValidationError:
+            subject_details = MouseSubject.model_construct(
+                sex=sex,
+                date_of_birth=datetime_of_birth.date(),
+                strain=bg_strain,
+                species=species,
+                alleles=alleles,
+                genotype=genotype,
+                breeding_info=breeding_info,
+                housing=housing,
+                source=source
+            )
+        try:
             return Subject(
                 subject_id=subject_id,
-                date_of_birth=date_of_birth,
-                sex=sex,
-                species=species,
-                housing=housing,
-                genotype=genotype,
-                background_strain=bg_strain,
-                breeding_info=breeding_info,
-                source=source,
-                alleles=alleles,
+                subject_details=subject_details
             )
         except ValidationError:
             return Subject.model_construct(
                 subject_id=subject_id,
-                date_of_birth=date_of_birth,
-                sex=sex,
-                species=species,
-                housing=housing,
-                genotype=genotype,
-                background_strain=bg_strain,
-                breeding_info=breeding_info,
-                source=source,
-                alleles=alleles,
+                subject_details=subject_details
             )
