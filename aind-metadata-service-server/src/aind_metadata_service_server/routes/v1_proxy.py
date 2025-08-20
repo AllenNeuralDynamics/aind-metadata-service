@@ -495,7 +495,10 @@ async def get_v1_subject(
     ),
     aind_data_schema_v1_session=Depends(get_aind_data_schema_v1_session),
 ):
-    """Proxy subject request"""
+    """
+    ## Subject V1
+    Return Subject metadata.
+    """
     return await proxy(
         request, f"/subject/{subject_id}", aind_data_schema_v1_session
     )
