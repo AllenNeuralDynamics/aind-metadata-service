@@ -8,7 +8,7 @@
   "ComplianceAssetId": null,
   "AuthorId": 5358,
   "RequestStatus2": "New",
-  "Protocol": "2212 - Investigating Brain States",
+  "Protocol": null,
   "ProjectID": "AAV production 102-88-004-10",
   "AccommodationComment": "This animal will be used for an acute ephys experiment on Friday morning.",
   "ACSFID1": null,
@@ -85,12 +85,8 @@
   "TAM": false,
   "TAMAge": null,
   "TAMFreq": null,
-  "TCPrep": {
-    "0": "Mouse Cardiac Perfusion (SOP AF0075)"
-  },
-  "TCTiss": {
-    "0": "Brain"
-  },
+  "TCPrep": ["Mouse Cardiac Perfusion (SOP AF0075)"],
+  "TCTiss": ["Brain"],
   "TMP": false,
   "TMPAge": null,
   "TMPFreq": null,

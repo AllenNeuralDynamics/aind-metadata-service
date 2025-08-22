@@ -85,12 +85,8 @@
   "TAM": false,
   "TAMAge": null,
   "TAMFreq": null,
-  "TCPrep": {
-    "0": "Mouse Cardiac Perfusion (SOP AF0075)"
-  },
-  "TCTiss": {
-    "0": "Brain"
-  },
+  "TCPrep": ["Mouse Cardiac Perfusion (SOP AF0075)"],
+  "TCTiss": ["Brain"],
   "TMP": false,
   "TMPAge": null,
   "TMPFreq": null,

@@ -95,7 +95,7 @@ class TestLASParsers(TestCase):
             attr = getattr(cls, k)
             if isinstance(attr, property):
                 props.append(getattr(mapped_model, k))
-        self.assertEqual(234, len(props))
+        self.assertEqual(261, len(props))
 
     def test_parse_basic_decimal_str(self):
         """Tests parsing of basic decimal strings"""
@@ -150,6 +150,18 @@ class TestLASParsers(TestCase):
         self.assertEqual(parsed_data[7], expected_heparin)
         self.assertEqual(parsed_data[8], expected_heparin)
         self.assertIsNone(parsed_data[9])
+
+    def test_parse_iacuc_protocol(self):
+        """Tests parsing of IACUC protocols"""
+        self.assertEqual(
+            MappedLASList._parse_iacuc_protocol(
+                "2212 - Investigating Brain States"
+            ),
+            "2212",
+        )
+        self.assertIsNone(
+            MappedLASList._parse_iacuc_protocol("Invalid Protocol"), None
+        )
 
 
 if __name__ == "__main__":
