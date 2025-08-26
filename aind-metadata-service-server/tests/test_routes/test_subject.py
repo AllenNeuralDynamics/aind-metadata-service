@@ -68,10 +68,47 @@ class TestRoute:
             )
         ]
         mock_mg_api_get.return_value = []
-        response = client.get("/subject/632269")
+        response = client.get("api/v2/subject/632269")
         assert 200 == response.status_code
         assert 1 == len(mock_lb_api_get.mock_calls)
         assert 2 == len(mock_mg_api_get.mock_calls)
+
+    @patch("aind_labtracks_service_async_client.DefaultApi.get_subject")
+    def test_get_missing_subject(
+        self,
+        mock_lb_api_get: AsyncMock,
+        client: TestClient,
+    ):
+        """Tests a missing data response"""
+
+        mock_lb_api_get.return_value = []
+        response = client.get("api/v2/subject/0")
+        expected_response = {"detail": "Not found"}
+        assert 404 == response.status_code
+        assert expected_response == response.json()
+
+    @patch("aind_mgi_service_async_client.DefaultApi.get_allele_info")
+    @patch("aind_labtracks_service_async_client.DefaultApi.get_subject")
+    def test_get_subject_edge_case(
+        self,
+        mock_lb_api_get: AsyncMock,
+        mock_mg_api_get: AsyncMock,
+        client: TestClient,
+    ):
+        """
+        Unlikely to ever happen, but we raise a 500 error if there are more
+        than one subjects returned from LabTracks."""
+        mock_lb_api_get.return_value = [
+            LabtrackSubject.model_construct(
+                id="632269",
+            ),
+            LabtrackSubject.model_construct(
+                id="632269",
+            ),
+        ]
+        mock_mg_api_get.return_value = []
+        response = client.get("api/v2/subject/632269")
+        assert 500 == response.status_code
 
 
 if __name__ == "__main__":

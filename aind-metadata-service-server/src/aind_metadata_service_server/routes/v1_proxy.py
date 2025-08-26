@@ -1,15 +1,15 @@
 """Module to proxy requests v1 aind-metadata-service-server"""
 
-from typing import Optional, Dict, Any
+from enum import Enum
+from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, Depends, Path, Request, Response, Query
+from fastapi import APIRouter, Depends, Path, Query, Request, Response
 from httpx import AsyncClient, RequestError
 from starlette.datastructures import QueryParams
 
 from aind_metadata_service_server.sessions import (
     get_aind_data_schema_v1_session,
 )
-from enum import Enum
 
 router = APIRouter()
 
@@ -319,7 +319,7 @@ async def get_v1_instrument(
         },
     ),
     partial_match: bool = Query(False, alias="partial_match"),
-    aind_data_schema_v1_session=Depends(get_aind_data_schema_v1_session)
+    aind_data_schema_v1_session=Depends(get_aind_data_schema_v1_session),
 ):
     """
     ## Instrument v1
@@ -331,7 +331,7 @@ async def get_v1_instrument(
         request,
         f"/instrument/{instrument_id}",
         aind_data_schema_v1_session,
-        query_params
+        query_params,
     )
 
 
@@ -339,7 +339,7 @@ async def get_v1_instrument(
 async def get_v1_bergamo_session(
     request: Request,
     job_settings: Dict[str, Any],
-    aind_data_schema_v1_session=Depends(get_aind_data_schema_v1_session)
+    aind_data_schema_v1_session=Depends(get_aind_data_schema_v1_session),
 ):
     """
     ## Session
@@ -347,10 +347,7 @@ async def get_v1_bergamo_session(
     """
     query_params = QueryParams(job_settings)
     return await proxy(
-        request,
-        "/bergamo_session",
-        aind_data_schema_v1_session,
-        query_params
+        request, "/bergamo_session", aind_data_schema_v1_session, query_params
     )
 
 
@@ -457,7 +454,7 @@ async def get_v1_slims_workflow(
             },
         },
     ),
-    aind_data_schema_v1_session=Depends(get_aind_data_schema_v1_session)
+    aind_data_schema_v1_session=Depends(get_aind_data_schema_v1_session),
 ):
     """
     ## SLIMS V1
@@ -476,7 +473,7 @@ async def get_v1_slims_workflow(
         request,
         f"/slims/{workflow}",
         aind_data_schema_v1_session,
-        query_params
+        query_params,
     )
 
 

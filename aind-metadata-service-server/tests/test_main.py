@@ -8,7 +8,7 @@ class TestMain:
 
     def test_get_healthcheck(self, client):
         """Tests healthcheck"""
-        response = client.get("/healthcheck")
+        response = client.get("/api/v2/healthcheck")
         assert 200 == response.status_code
 
 

@@ -1,4 +1,5 @@
 """Models and schema definitions for backend data structures"""
+
 from typing import Literal
 
 from pydantic import BaseModel

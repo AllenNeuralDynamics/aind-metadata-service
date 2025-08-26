@@ -4,7 +4,13 @@ import re
 from decimal import Decimal
 from typing import List, Optional
 
-from aind_data_schema.components.subjects import MouseSubject, BreedingInfo, Housing, Sex
+from aind_data_schema.components.subjects import (
+    BreedingInfo,
+    Housing,
+    MouseSubject,
+    Sex,
+)
+from aind_data_schema.core.subject import Subject
 from aind_data_schema_models.organizations import Organization
 from aind_data_schema_models.species import Species, Strain
 from aind_labtracks_service_async_client.models.subject import (
@@ -12,7 +18,6 @@ from aind_labtracks_service_async_client.models.subject import (
 )
 from aind_mgi_service_async_client.models import MgiSummaryRow
 from pydantic import ValidationError
-from aind_data_schema.core.subject import Subject
 
 from aind_metadata_service_server.mappers.mgi_allele import MgiMapper
 
@@ -246,34 +251,30 @@ class SubjectMapper:
         try:
             subject_details = MouseSubject(
                 sex=sex,
-                date_of_birth=datetime_of_birth.date(),
+                date_of_birth=date_of_birth,
                 strain=bg_strain,
                 species=species,
                 alleles=alleles,
                 genotype=genotype,
                 breeding_info=breeding_info,
                 housing=housing,
-                source=source
+                source=source,
+            )
+            return Subject(
+                subject_id=subject_id, subject_details=subject_details
             )
         except ValidationError:
             subject_details = MouseSubject.model_construct(
                 sex=sex,
-                date_of_birth=datetime_of_birth.date(),
+                date_of_birth=date_of_birth,
                 strain=bg_strain,
                 species=species,
                 alleles=alleles,
                 genotype=genotype,
                 breeding_info=breeding_info,
                 housing=housing,
-                source=source
+                source=source,
             )
-        try:
-            return Subject(
-                subject_id=subject_id,
-                subject_details=subject_details
-            )
-        except ValidationError:
             return Subject.model_construct(
-                subject_id=subject_id,
-                subject_details=subject_details
+                subject_id=subject_id, subject_details=subject_details
             )

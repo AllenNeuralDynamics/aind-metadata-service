@@ -1,8 +1,7 @@
 """Module to handle subject endpoints"""
-from typing import List
 
 from aind_data_schema.core.subject import Subject
-from fastapi import APIRouter, Depends, Path
+from fastapi import APIRouter, Depends, HTTPException, Path
 
 from aind_metadata_service_server.mappers.subject import SubjectMapper
 from aind_metadata_service_server.sessions import (
@@ -13,7 +12,7 @@ from aind_metadata_service_server.sessions import (
 router = APIRouter()
 
 
-@router.get("/api/v2/subject/{subject_id}", response_model=List[Subject])
+@router.get("/api/v2/subject/{subject_id}", response_model=Subject)
 async def get_subject(
     subject_id: str = Path(
         ...,
@@ -52,4 +51,9 @@ async def get_subject(
         mapper.mgi_info = mgi_info
 
     subjects = [mapper.map_to_aind_subject() for mapper in mappers]
-    return subjects
+    if len(subjects) == 0:
+        raise HTTPException(status_code=404, detail="Not found")
+    elif len(subjects) > 1:
+        raise HTTPException(status_code=500)
+    else:
+        return subjects[0]
