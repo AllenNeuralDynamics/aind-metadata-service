@@ -10,19 +10,10 @@ from fastapi.routing import APIRoute
 
 from aind_metadata_service_server import __version__ as service_version
 from aind_metadata_service_server.routes import (
-    funding,
     healthcheck,
     index,
-    injection_materials,
-    intended_measurements,
-    mgi_allele,
-    perfusion,
-    procedures,
-    protocol,
-    rig_and_instrument,
-    session_json,
-    slims,
     subject,
+    v1_proxy,
 )
 
 warnings.filterwarnings(
@@ -56,18 +47,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(v1_proxy.router)
 app.include_router(healthcheck.router)
 app.include_router(subject.router)
-app.include_router(perfusion.router)
-app.include_router(protocol.router)
-app.include_router(funding.router)
-app.include_router(slims.router)
-app.include_router(rig_and_instrument.router)
-app.include_router(mgi_allele.router)
-app.include_router(procedures.router)
-app.include_router(injection_materials.router)
-app.include_router(session_json.router)
-app.include_router(intended_measurements.router)
 app.include_router(index.router)
 
 # Clean up the methods names that is generated in the client code
