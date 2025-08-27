@@ -25,6 +25,7 @@ from aind_sharepoint_service_async_client.models import (
     LASDoseroute,
     LASRosop,
 )
+from pydantic_core import ValidationError
 
 
 class IacucProtocol(Enum):
@@ -2405,17 +2406,30 @@ class MappedLASList:
         if self.has_ip_injection():
             targeted_structure=InjectionTargets.INTRAPERITONEAL
             injection_materials=[self.aind_dose_sub] if self.aind_dose_sub else []
-            dynamics = InjectionDynamics.model_construct(
-                    profile=InjectionProfile.BOLUS, # confirm
+            try:
+                dynamics = InjectionDynamics(
+                    profile=InjectionProfile.BOLUS,
                     volume=self.aind_dosevolume,
                     volume_unit=VolumeUnit.UL, 
                     duration=self.aind_doseduration,
                 )
-            ip_injection = Injection.model_construct(
-                targeted_structure=InjectionTargets.INTRAPERITONEAL,
-                injection_materials=injection_materials,
-                dynamics=dynamics,
-            )
+                ip_injection = Injection(
+                    targeted_structure=InjectionTargets.INTRAPERITONEAL,
+                    injection_materials=injection_materials,
+                    dynamics=[dynamics],
+                )
+            except ValidationError:
+                dynamics = InjectionDynamics.model_construct(
+                    profile=InjectionProfile.BOLUS,
+                    volume=self.aind_dosevolume,
+                    volume_unit=VolumeUnit.UL, 
+                    duration=self.aind_doseduration,
+                )
+                ip_injection = Injection.model_construct(
+                    targeted_structure=InjectionTargets.INTRAPERITONEAL,
+                    injection_materials=injection_materials,
+                    dynamics=[dynamics],
+                )
             procedures.append(ip_injection)
         if self.has_ro_injection():
             # Check if there are ro injections in 1 thorugh 5
@@ -2425,17 +2439,31 @@ class MappedLASList:
                     injection_materials = self.map_viral_materials(
                         injectable_materials=ro_info.injectable_materials
                     )
-                    dynamics = InjectionDynamics.model_construct(
-                        profile=InjectionProfile.BOLUS, # confirm
+                    targeted_structure = InjectionTargets.RETRO_ORBITAL
+                    try:
+                        dynamics = InjectionDynamics(
+                        profile=InjectionProfile.BOLUS,
                         volume=ro_info.injection_volume,
                         volume_unit=VolumeUnit.UL, 
                     )
-                    targeted_structure = InjectionTargets.RETRO_ORBITAL 
-                    ro_injection = Injection.model_construct(
-                        targeted_structure=targeted_structure,
-                        dynamics=dynamics,
-                        relative_position=ro_info.injection_eye,
-                        injection_materials=injection_materials,
+                        ro_injection = Injection(
+                            targeted_structure=targeted_structure,
+                            dynamics=[dynamics],
+                            relative_position=[ro_info.injection_eye] if ro_info.injection_eye else None,
+                            injection_materials=injection_materials,
+                        )
+                    except ValidationError as e:
+                        print(f"Validation error in RO injection, {e}")
+                        dynamics = InjectionDynamics.model_construct(
+                        profile=InjectionProfile.BOLUS,
+                        volume=ro_info.injection_volume,
+                        volume_unit=VolumeUnit.UL, 
+                    )
+                        ro_injection = Injection.model_construct(
+                            targeted_structure=targeted_structure,
+                            dynamics=[dynamics],
+                            relative_position=[ro_info.injection_eye] if ro_info.injection_eye else None,
+                            injection_materials=injection_materials,
                     )
                     procedures.append(ro_injection)
         if procedures:
@@ -2444,12 +2472,20 @@ class MappedLASList:
                 if self.aind_author_id
                 else self.aind_author_lookup_id
             )
-            return Surgery.model_construct(
-                experimenters=[name],
-                ethics_review_id=self.aind_protocol,
-                start_date=self.aind_n_start_date,
-                end_date=self.aind_n_end_date,
-                procedures=procedures,
-            )
+            try:
+                return Surgery(
+                    experimenters=[name],
+                    ethics_review_id=self.aind_protocol,
+                    start_date=self.aind_n_start_date,
+                    procedures=procedures,
+                )
+            except ValidationError as e:
+                print(f"Validation error in Surgery, {e}")
+                return Surgery.model_construct(
+                    experimenters=[name],
+                    ethics_review_id=self.aind_protocol,
+                    start_date=self.aind_n_start_date,
+                    procedures=procedures,
+                )
         else:
             return None
