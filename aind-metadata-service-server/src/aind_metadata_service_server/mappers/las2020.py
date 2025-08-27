@@ -2413,11 +2413,6 @@ class MappedLASList:
                     volume_unit=VolumeUnit.UL,
                     duration=self.aind_doseduration,
                 )
-                ip_injection = Injection(
-                    targeted_structure=InjectionTargets.INTRAPERITONEAL,
-                    injection_materials=injection_materials,
-                    dynamics=[dynamics],
-                )
             except ValidationError:
                 dynamics = InjectionDynamics.model_construct(
                     profile=InjectionProfile.BOLUS,
@@ -2425,11 +2420,12 @@ class MappedLASList:
                     volume_unit=VolumeUnit.UL,
                     duration=self.aind_doseduration,
                 )
-                ip_injection = Injection.model_construct(
-                    targeted_structure=InjectionTargets.INTRAPERITONEAL,
-                    injection_materials=injection_materials,
-                    dynamics=[dynamics],
-                )
+            # Source is missing for injection materials 
+            ip_injection = Injection.model_construct(
+                targeted_structure=InjectionTargets.INTRAPERITONEAL,
+                injection_materials=injection_materials,
+                dynamics=[dynamics],
+            )
             procedures.append(ip_injection)
         if self.has_ro_injection():
             # Check if there are ro injections in 1 thorugh 5
