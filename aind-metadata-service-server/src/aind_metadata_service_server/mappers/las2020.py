@@ -2420,7 +2420,7 @@ class MappedLASList:
                     volume_unit=VolumeUnit.UL,
                     duration=self.aind_doseduration,
                 )
-            # Source is missing for injection materials 
+            # Source is missing for injection materials
             ip_injection = Injection.model_construct(
                 targeted_structure=InjectionTargets.INTRAPERITONEAL,
                 injection_materials=injection_materials,
