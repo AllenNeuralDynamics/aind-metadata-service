@@ -48,6 +48,7 @@ async def get_mgi_api_instance() -> (
         api_instance = aind_mgi_service_async_client.DefaultApi(api_client)
         yield api_instance
 
+
 async def get_sharepoint_api_instance() -> (
     AsyncGenerator[aind_sharepoint_service_async_client.DefaultApi, None]
 ):
@@ -61,6 +62,7 @@ async def get_sharepoint_api_instance() -> (
             api_client
         )
         yield api_instance
+
 
 async def get_aind_data_schema_v1_session() -> (
     AsyncGenerator[AsyncClient, None]

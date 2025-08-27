@@ -7,9 +7,7 @@ from decimal import Decimal, DecimalException
 from enum import Enum
 from typing import Any, List, Optional
 
-from aind_data_schema.components.subject_procedures import (
-    Surgery
-)
+from aind_data_schema.components.subject_procedures import Surgery
 from aind_data_schema.components.injection_procedures import (
     ViralMaterial,
     NonViralMaterial,
@@ -166,7 +164,7 @@ class MappedLASList:
                 if parens_match:
                     concentration_value = parens_match.group(1)
                     concentration_unit = parens_match.group(3).lower()
-            # TODO: can we assume source? 
+            # use construct bc missing source
             return NonViralMaterial.model_construct(
                 name=material,
                 concentration=self._parse_basic_decimal_str(
@@ -2404,13 +2402,15 @@ class MappedLASList:
         """Return Surgery as best as possible from a record."""
         procedures = []
         if self.has_ip_injection():
-            targeted_structure=InjectionTargets.INTRAPERITONEAL
-            injection_materials=[self.aind_dose_sub] if self.aind_dose_sub else []
+            targeted_structure = InjectionTargets.INTRAPERITONEAL
+            injection_materials = (
+                [self.aind_dose_sub] if self.aind_dose_sub else []
+            )
             try:
                 dynamics = InjectionDynamics(
                     profile=InjectionProfile.BOLUS,
                     volume=self.aind_dosevolume,
-                    volume_unit=VolumeUnit.UL, 
+                    volume_unit=VolumeUnit.UL,
                     duration=self.aind_doseduration,
                 )
                 ip_injection = Injection(
@@ -2422,7 +2422,7 @@ class MappedLASList:
                 dynamics = InjectionDynamics.model_construct(
                     profile=InjectionProfile.BOLUS,
                     volume=self.aind_dosevolume,
-                    volume_unit=VolumeUnit.UL, 
+                    volume_unit=VolumeUnit.UL,
                     duration=self.aind_doseduration,
                 )
                 ip_injection = Injection.model_construct(
@@ -2442,29 +2442,36 @@ class MappedLASList:
                     targeted_structure = InjectionTargets.RETRO_ORBITAL
                     try:
                         dynamics = InjectionDynamics(
-                        profile=InjectionProfile.BOLUS,
-                        volume=ro_info.injection_volume,
-                        volume_unit=VolumeUnit.UL, 
-                    )
+                            profile=InjectionProfile.BOLUS,
+                            volume=ro_info.injection_volume,
+                            volume_unit=VolumeUnit.UL,
+                        )
                         ro_injection = Injection(
                             targeted_structure=targeted_structure,
                             dynamics=[dynamics],
-                            relative_position=[ro_info.injection_eye] if ro_info.injection_eye else None,
+                            relative_position=(
+                                [ro_info.injection_eye]
+                                if ro_info.injection_eye
+                                else None
+                            ),
                             injection_materials=injection_materials,
                         )
-                    except ValidationError as e:
-                        print(f"Validation error in RO injection, {e}")
+                    except ValidationError:
                         dynamics = InjectionDynamics.model_construct(
-                        profile=InjectionProfile.BOLUS,
-                        volume=ro_info.injection_volume,
-                        volume_unit=VolumeUnit.UL, 
-                    )
+                            profile=InjectionProfile.BOLUS,
+                            volume=ro_info.injection_volume,
+                            volume_unit=VolumeUnit.UL,
+                        )
                         ro_injection = Injection.model_construct(
                             targeted_structure=targeted_structure,
                             dynamics=[dynamics],
-                            relative_position=[ro_info.injection_eye] if ro_info.injection_eye else None,
+                            relative_position=(
+                                [ro_info.injection_eye]
+                                if ro_info.injection_eye
+                                else None
+                            ),
                             injection_materials=injection_materials,
-                    )
+                        )
                     procedures.append(ro_injection)
         if procedures:
             name = (
@@ -2479,8 +2486,7 @@ class MappedLASList:
                     start_date=self.aind_n_start_date,
                     procedures=procedures,
                 )
-            except ValidationError as e:
-                print(f"Validation error in Surgery, {e}")
+            except ValidationError:
                 return Surgery.model_construct(
                     experimenters=[name],
                     ethics_review_id=self.aind_protocol,

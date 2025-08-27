@@ -3,11 +3,11 @@
 from fastapi import APIRouter, Depends, Path, HTTPException
 
 from aind_metadata_service_server.mappers.procedures import ProceduresMapper
-
+from aind_metadata_service_server.mappers.responses import map_to_response
 from aind_metadata_service_server.sessions import (
     get_labtracks_api_instance,
     get_sharepoint_api_instance,
-) 
+)
 
 router = APIRouter()
 
@@ -21,6 +21,11 @@ async def get_procedures(
                 "summary": "Subject ID Example 1",
                 "description": "Example subject ID for Procedures",
                 "value": "823508",
+            },
+            "example2": {
+                "summary": "Subject ID Example 2",
+                "description": "Example subject ID for Procedures",
+                "value": "632269",
             },
         },
     ),
@@ -45,4 +50,4 @@ async def get_procedures(
     if not procedures:
         raise HTTPException(status_code=404, detail="Not found")
     else:
-        return procedures
+        return map_to_response(procedures)

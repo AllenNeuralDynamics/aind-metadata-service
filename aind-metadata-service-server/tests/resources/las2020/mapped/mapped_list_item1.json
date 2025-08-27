@@ -16,7 +16,17 @@
     "procedures": [
         {
             "object_type": "Injection",
-            "injection_materials": [],
+            "injection_materials": [
+                {
+                "object_type": "Non viral material",
+                "name": "Heparin1000U/mL",
+                "rrid": null,
+                "lot_number": null,
+                "expiration_date": null,
+                "concentration": null,
+                "concentration_unit": null
+                }
+            ],
             "targeted_structure": {
                 "name": "peritoneal cavity",
                 "registry": "Edinburgh Mouse Atlas Project (EMAPA)",

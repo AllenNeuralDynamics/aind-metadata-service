@@ -1,11 +1,11 @@
 {
     "object_type": "Surgery",
     "protocol_id": null,
-    "start_date": "2024-06-21",
+    "start_date": null,
     "experimenters": [
         "LAS-5358"
     ],
-    "ethics_review_id": "2212",
+    "ethics_review_id": null,
     "animal_weight_prior": null,
     "animal_weight_post": null,
     "weight_unit": "gram",

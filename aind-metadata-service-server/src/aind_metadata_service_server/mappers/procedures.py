@@ -1,7 +1,6 @@
 """Maps information to aind-data-schema Procedures model."""
 
 import logging
-from decimal import Decimal
 from enum import Enum
 from typing import List, Optional, Union
 
@@ -10,29 +9,18 @@ from aind_data_schema.core.procedures import (
     Surgery,
 )
 from aind_data_schema.components.injection_procedures import Injection
-from aind_data_schema.components.surgery_procedures import (
-    BrainInjection
-)
 from aind_data_schema_models.mouse_anatomy import InjectionTargets
 from aind_data_schema.components.subject_procedures import (
     Perfusion,
 )
-from aind_data_schema_models.units import MassUnit
 from aind_labtracks_service_async_client.models import Task as LabTracksTask
 from aind_sharepoint_service_async_client.models import (
     Las2020List,
-    NSB2019List,
-    NSB2023List,
 )
-from aind_slims_service_async_client.models import (
-    SlimsHistologyData,
-    SlimsWaterRestrictionData,
-)
-from aind_smartsheet_service_async_client.models import PerfusionsModel
-
 from aind_metadata_service_server.mappers.las2020 import (
     MappedLASList as MappedLAS2020,
 )
+
 
 class LabTracksTaskStatuses(Enum):
     """LabTracks Task Status Options"""
@@ -149,7 +137,7 @@ class ProceduresMapper:
 
             return Surgery.model_construct(
                 start_date=start_date,
-                experimenter_full_name=experimenter_full_name,
+                experimenters=[experimenter_full_name],
                 iacuc_protocol=iacuc_protocol,
                 animal_weight_prior=None,
                 animal_weight_post=None,
@@ -167,7 +155,7 @@ class ProceduresMapper:
         ):
             return Surgery.model_construct(
                 start_date=start_date,
-                experimenter_full_name=experimenter_full_name,
+                experimenters=[experimenter_full_name],
                 iacuc_protocol=iacuc_protocol,
                 animal_weight_prior=None,
                 animal_weight_post=None,
@@ -176,7 +164,6 @@ class ProceduresMapper:
                 procedures=[
                     Injection.model_construct(
                         targeted_structure=InjectionTargets.RETRO_ORBITAL,
-                        injection_volume=None, injection_eye=None
                     )
                 ],
             )
@@ -211,8 +198,6 @@ class ProceduresMapper:
             if isinstance(mapped_model, MappedLAS2020):
                 procedure = mapped_model.get_surgery(subject_id)
                 procedures = [procedure] if procedure else []
-            else:
-                procedures = mapped_model.get_surgeries()
             surgeries.extend(procedures)
 
         return surgeries
