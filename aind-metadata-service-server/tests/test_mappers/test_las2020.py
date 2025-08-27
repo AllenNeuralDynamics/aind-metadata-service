@@ -1,7 +1,6 @@
 """Tests LAS data model is parsed correctly"""
 
 import json
-import logging
 import os
 from copy import deepcopy
 from decimal import Decimal
@@ -14,11 +13,7 @@ from aind_data_schema.components.injection_procedures import NonViralMaterial
 from aind_sharepoint_service_async_client.models.las2020_list import (
     Las2020List,
 )
-
 from aind_metadata_service_server.mappers.las2020 import MappedLASList
-
-if os.getenv("LOG_LEVEL"):  # pragma: no cover
-    logging.basicConfig(level=os.getenv("LOG_LEVEL"))
 
 TEST_DIR = Path(__file__).parent / ".."
 DIR_RAW = TEST_DIR / "resources" / "las2020" / "raw"
@@ -64,8 +59,6 @@ class TestLASParsers(TestCase):
         for list_item in self.list_items:
             raw_data = list_item[0]
             expected_mapped_data = list_item[1]
-            raw_file_name = list_item[2]
-            logging.debug(f"Processing file: {raw_file_name}")
             las_model = Las2020List.model_validate(raw_data)
             mapper = MappedLASList(las=las_model)
             mapped_procedure = mapper.get_surgery(subject_id="000000")
