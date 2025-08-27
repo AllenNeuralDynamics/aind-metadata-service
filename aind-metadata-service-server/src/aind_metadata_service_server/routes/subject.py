@@ -1,8 +1,10 @@
 """Module to handle subject endpoints"""
 
-from aind_data_schema.core.subject import Subject
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, Path
 
+from aind_metadata_service_server.mappers.responses import map_to_response
 from aind_metadata_service_server.mappers.subject import SubjectMapper
 from aind_metadata_service_server.sessions import (
     get_labtracks_api_instance,
@@ -12,7 +14,7 @@ from aind_metadata_service_server.sessions import (
 router = APIRouter()
 
 
-@router.get("/api/v2/subject/{subject_id}", response_model=Subject)
+@router.get("/api/v2/subject/{subject_id}")
 async def get_subject(
     subject_id: str = Path(
         ...,
@@ -54,6 +56,7 @@ async def get_subject(
     if len(subjects) == 0:
         raise HTTPException(status_code=404, detail="Not found")
     elif len(subjects) > 1:
+        logging.error(f"Too many responses for {subject_id}!")
         raise HTTPException(status_code=500)
     else:
-        return subjects[0]
+        return map_to_response(subjects[0])
