@@ -113,6 +113,17 @@ async def get_v1_funding(
     )
 
 
+@router.get("/project_names")
+async def get_v1_project_names(
+    request: Request,
+    aind_data_schema_v1_session=Depends(get_aind_data_schema_v1_session),
+):
+    """
+    Get a list of project names from the Smartsheet API.
+    """
+    return await proxy(request, "/project_names", aind_data_schema_v1_session)
+
+
 @router.get("/tars_injection_materials/{prep_lot_number}")
 async def get_v1_injection_materials(
     request: Request,

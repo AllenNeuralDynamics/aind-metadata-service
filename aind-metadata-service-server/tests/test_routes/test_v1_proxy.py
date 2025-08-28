@@ -19,6 +19,16 @@ class TestV1ProxyRoute:
         mock_proxy.assert_called_once()
         assert 200 == response.status_code
 
+    def test_get_v1_project_names(
+        self,
+        mock_proxy: AsyncMock,
+        client: TestClient,
+    ):
+        """Tests a get request"""
+        response = client.get("/project_names")
+        mock_proxy.assert_called_once()
+        assert 200 == response.status_code
+
     def test_get_v1_injection_materials(
         self,
         mock_proxy: AsyncMock,
