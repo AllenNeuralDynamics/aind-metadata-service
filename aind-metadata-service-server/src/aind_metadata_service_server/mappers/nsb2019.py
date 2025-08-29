@@ -20,14 +20,26 @@ from aind_data_schema.components.surgery_procedures import (
 from aind_data_schema.components.injection_procedures import (
     ViralMaterial,
     NonViralMaterial,
-    Injection,
     InjectionDynamics,
     InjectionProfile,
 )
 from aind_data_schema.components.coordinates import (
-    CoordinateSystemLibrary
+    CoordinateSystemLibrary,
+    CoordinateSystem,
+    Translation,
+    Rotation,
+    Axis,
+    AxisName,
+    Direction
 )
-from aind_data_schema_models.units import SizeUnit, VolumeUnit
+from aind_data_schema_models.units import (
+    SizeUnit,
+    VolumeUnit,
+    TimeUnit,
+    CurrentUnit,
+    AngleUnit,
+)
+from aind_data_schema.components.configs import ProbeConfig
 from aind_data_schema_models.mouse_anatomy import InjectionTargets
 from aind_data_schema_models.coordinates import AnatomicalRelative, Origin
 from aind_data_schema.components.subjects import Sex
@@ -263,8 +275,8 @@ class MappedNSBList:
     @property
     def aind_breg2_lamb(self) -> Optional[Decimal]:
         """Maps breg2_lamb to aind model"""
-        return self._parse_basic_decimal_str(self._nsb.breg2_lamb)
-
+        parsed = self._parse_basic_decimal_str(self._nsb.breg2_lamb)
+        return abs(parsed) if parsed else None
 
     @property
     def aind_craniotomy_type(self) -> Optional[CraniotomyType]:
@@ -1229,282 +1241,149 @@ class MappedNSBList:
             }.get(self.aind_craniotomy_type, None)
         )
 
-    # TODO: what do we do with this? 
     @property
     def aind_craniotomy_coordinates_reference(
         self,
-    ) -> Optional[Origin]:
+    ) -> Optional[CoordinateSystem]:
         """Map craniotomy type to Origin"""
-        return (
-            None
-            if self.aind_craniotomy_type is None
-            else {
-                self.aind_craniotomy_type.CIRCLE: (
-                    Origin.LAMBDA
-                )
-            }.get(self.aind_craniotomy_type, None)
-        )
-
+        if self._nsb.craniotomy_type.VISUAL_CORTEX_5MM:
+            return CoordinateSystem(
+                name="LAMBDA_ARI",
+                origin=Origin.LAMBDA,
+                axis_unit=SizeUnit.MM,
+                axes=[
+                    Axis(name=AxisName.AP, direction=Direction.PA),
+                    Axis(name=AxisName.ML, direction=Direction.LR),
+                    Axis(name=AxisName.SI, direction=Direction.SI),
+                ],
+            )
+        elif self._nsb.craniotomy_type.FRONTAL_WINDOW_3MM:
+            # coordinate system?
+            return None
+        else:
+            return None
+        
     @property
     def aind_inj1_coordinates_reference(
         self,
-    ) -> Optional[Origin]:
-        """Map nsb inj1 field to Origin"""
+    ) -> Optional[CoordinateSystem]:
+        """Map nsb inj1 field to Coordinate System"""
         if (
             self._nsb.virus_x0020_a_x002f_p is not None
             and "LAMBDA" in self._nsb.virus_x0020_a_x002f_p.upper()
         ):
-            return Origin.LAMBDA
+            return CoordinateSystem(
+                name="LAMBDA_ARID",
+                origin=Origin.LAMBDA,
+                axis_unit=SizeUnit.MM,
+                axes=[
+                    Axis(name=AxisName.AP, direction=Direction.PA),
+                    Axis(name=AxisName.ML, direction=Direction.LR),
+                    Axis(name=AxisName.SI, direction=Direction.SI),
+                    Axis(name=AxisName.DEPTH, direction=Direction.UD),
+                ],
+            )
+        elif(
+            self._nsb.virus_x0020_a_x002f_p and
+            self._nsb.virus_x0020_m_x002f_l and 
+            not self._nsb.virus_x0020_d_x002f_v
+        ):
+            return CoordinateSystemLibrary.BREGMA_ARI
+        elif(
+            self._nsb.virus_x0020_a_x002f_p and
+            self._nsb.virus_x0020_m_x002f_l and
+            self._nsb.virus_x0020_d_x002f_v
+        ):
+            return CoordinateSystemLibrary.BREGMA_ARID
         else:
             return None
+        
+    @property
+    def aind_inj1_dynamics(self) -> InjectionDynamics:
+        """Get injection dynamics for first injection"""
+        dynamics_kwargs = {
+            "profile": InjectionProfile.BOLUS,
+            "duration": self.aind_inj1_lenghtof_time,
+            "duration_unit": TimeUnit.M,
+        }
+
+        if self.aind_inj1_type == InjectionType.NANOJECT:
+            dynamics_kwargs.update({
+                "volume": self.aind_inj1_vol,
+                "volume_unit": VolumeUnit.NL,
+            })
+        elif self.aind_inj1_type == InjectionType.IONTOPHORESIS:
+            dynamics_kwargs.update({
+                "injection_current": self.aind_inj1_current,
+                "injection_current_unit": CurrentUnit.UA,
+                "alternating_current": self.aind_inj1_alternating_time,
+            })
+            
+        try:
+            return [InjectionDynamics(**dynamics_kwargs)]
+        except ValidationError:
+            return [InjectionDynamics.model_construct(**dynamics_kwargs)]
 
     @property
     def aind_inj2_coordinates_reference(
         self,
-    ) -> Optional[Origin]:
-        """Map nsb inj2 field to Origin"""
+    ) -> Optional[CoordinateSystem]:
+        """Map nsb inj2 field to Coordinate System"""
         if (
             self._nsb.ap2nd_inj is not None
             and "LAMBDA" in self._nsb.ap2nd_inj.upper()
         ):
-            return Origin.LAMBDA
+            return CoordinateSystem(
+                name="LAMBDA_ARID",
+                origin=Origin.LAMBDA,
+                axis_unit=SizeUnit.MM,
+                axes=[
+                    Axis(name=AxisName.AP, direction=Direction.PA),
+                    Axis(name=AxisName.ML, direction=Direction.LR),
+                    Axis(name=AxisName.SI, direction=Direction.SI),
+                    Axis(name=AxisName.DEPTH, direction=Direction.UD),
+                ],
+            )
+        elif(
+            self._nsb.ap2nd_inj is not None
+            and self._nsb.ml2nd_inj is not None
+            and self._nsb.dv2nd_inj is None
+        ):
+            return CoordinateSystemLibrary.BREGMA_ARI
+        elif(
+            self._nsb.ap2nd_inj is not None
+            and self._nsb.ml2nd_inj is not None
+            and self._nsb.dv2nd_inj is not None
+        ):
+            return CoordinateSystemLibrary.BREGMA_ARID
         else:
             return None
-
-    def get_head_frame_procedure(self) -> Headframe:
-        """Get head frame procedure"""
-        try:
-            return Headframe(
-                headframe_type=self.aind_headpost_type.headframe_type,
-                headframe_part_number=self.aind_headpost_type.headframe_part_number,
-                well_part_number=self.aind_headpost_type.well_part_number,
-                well_type=self.aind_headpost_type.well_type,
-            )
-        except ValidationError:
-            return Headframe.model_construct(
-                headframe_type=self.aind_headpost_type.headframe_type,
-                headframe_part_number=(
-                    self.aind_headpost_type.headframe_part_number
-                ),
-                well_part_number=self.aind_headpost_type.well_part_number,
-                well_type=self.aind_headpost_type.well_type,
-            )
-
-    def get_craniotomy_procedure(self) -> Craniotomy:
-        """Get craniotomy procedure"""
-        # TODO: dont forget to change the coordinate system field in the surgery!
-        # TODO: confrim whether we still want LAMBDA for visual ctx craniotomies
-        # TODO: what do we do with bregma to lambda?  
-        coordinate_system_name = (
-            self.aind_inj1_coordinates_reference.name
-            if self.aind_inj1_coordinates_reference is not None
-            else CoordinateSystemLibrary.BREGMA_ARID.name
-        )
-        try:
-            return Craniotomy(
-                craniotomy_type=self.aind_craniotomy_type,
-                coordinate_system_name=coordinate_system_name,
-                position=self.aind_hp_loc,
-                size=self.aind_craniotomy_size,
-                size_unit=SizeUnit.MM if self.aind_craniotomy_size is not None else None,
-                # bregma_to_lambda_distance=self.aind_breg2_lamb, 
-                dura_removed=self.aind_hp_durotomy,
-            )
-        except ValidationError:
-            return Craniotomy.model_construct(
-                craniotomy_type=self.aind_craniotomy_type,
-                coordinate_system_name=coordinate_system_name,
-                position=self.aind_hp_loc,
-                size=self.aind_craniotomy_size,
-                size_unit=SizeUnit.MM if self.aind_craniotomy_size is not None else None,
-                # bregma_to_lambda_distance=self.aind_breg2_lamb,
-                dura_removed=self.aind_hp_durotomy,
-            )
         
-    # TODO: continue here!
-    def get_first_injection_procedure(self) -> BrainInjection:
-        """Get first injection procedure"""
-        injection_materials = (
-            []
-            if self.aind_inj1_virus_strain_rt is None
-            else [
-                ViralMaterial(
-                    name=self.aind_inj1_virus_strain_rt
-                )
-            ]
-        )
-        if self.aind_inj1_type == InjectionType.NANOJECT:
-            # Missing protocol_id
-            injection_volume = (
-                [] if self.aind_inj1_vol is None else [self.aind_inj1_vol]
-            )
-            return NanojectInjection.model_construct(
-                injection_materials=injection_materials,
-                recovery_time=self.aind_first_inj_recovery,
-                injection_duration=self.aind_inj1_lenghtof_time,
-                instrument_id=self.aind_nanoject_number_inj10,
-                injection_coordinate_ml=self.aind_virus_m_l,
-                injection_coordinate_ap=self.aind_virus_a_p,
-                injection_coordinate_depth=self.aind_virus_d_v,
-                injection_coordinate_reference=(
-                    self.aind_inj1_coordinates_reference
-                ),
-                bregma_to_lambda_distance=self.aind_breg2_lamb,
-                injection_angle=self.aind_inj1angle0,
-                injection_hemisphere=self.aind_virus_hemisphere,
-                injection_volume=injection_volume,
-            )
-        elif self.aind_inj1_type == InjectionType.IONTOPHORESIS:
-            return IontophoresisInjection.model_construct(
-                injection_materials=injection_materials,
-                recovery_time=self.aind_first_inj_recovery,
-                injection_duration=self.aind_inj1_lenghtof_time,
-                instrument_id=self.aind_ionto_number_inj1,
-                injection_coordinate_ml=self.aind_virus_m_l,
-                injection_coordinate_ap=self.aind_virus_a_p,
-                injection_coordinate_depth=self.aind_virus_d_v,
-                injection_coordinate_reference=(
-                    self.aind_inj1_coordinates_reference
-                ),
-                bregma_to_lambda_distance=self.aind_breg2_lamb,
-                injection_angle=self.aind_inj1angle0,
-                injection_hemisphere=self.aind_virus_hemisphere,
-                injection_current=self.aind_inj1_current,
-                alternating_current=self.aind_inj1_alternating_time,
-            )
-        else:
-            return BrainInjection.model_construct(
-                injection_materials=injection_materials,
-                recovery_time=self.aind_first_inj_recovery,
-                injection_duration=self.aind_inj1_lenghtof_time,
-                injection_coordinate_ml=self.aind_virus_m_l,
-                injection_coordinate_ap=self.aind_virus_a_p,
-                injection_coordinate_depth=self.aind_virus_d_v,
-                injection_coordinate_reference=(
-                    self.aind_inj1_coordinates_reference
-                ),
-                bregma_to_lambda_distance=self.aind_breg2_lamb,
-                injection_angle=self.aind_inj1angle0,
-                injection_hemisphere=self.aind_virus_hemisphere,
-            )
+    @property
+    def aind_inj2_dynamics(self) -> InjectionDynamics:
+        """Get injection dynamics for second injection"""
+        dynamics_kwargs = {
+            "profile": InjectionProfile.BOLUS,
+            "duration": self.aind_inj2_lenghtof_time,
+            "duration_unit": TimeUnit.M,
+        }
 
-    def get_second_injection_procedure(self) -> BrainInjection:
-        """Get second injection procedure"""
-        injection_materials = (
-            []
-            if self.aind_inj2_virus_strain_rt is None
-            else [
-                ViralMaterial.model_construct(
-                    name=self.aind_inj2_virus_strain_rt
-                )
-            ]
-        )
         if self.aind_inj2_type == InjectionType.NANOJECT:
-            injection_volume = (
-                [] if self.aind_inj2_vol is None else [self.aind_inj2_vol]
-            )
-            return NanojectInjection.model_construct(
-                injection_materials=injection_materials,
-                recovery_time=self.aind_second_inj_recover,
-                injection_duration=self.aind_inj2_lenghtof_time,
-                instrument_id=self.aind_nanoject_number_inj2,
-                injection_coordinate_ml=self.aind_ml2nd_inj,
-                injection_coordinate_ap=self.aind_ap2nd_inj,
-                injection_coordinate_depth=self.aind_dv2nd_inj,
-                injection_coordinate_reference=(
-                    self.aind_inj2_coordinates_reference
-                ),
-                bregma_to_lambda_distance=self.aind_breg2_lamb,
-                injection_angle=self.aind_inj2angle0,
-                injection_hemisphere=self.aind_hemisphere2nd_inj,
-                injection_volume=injection_volume,
-            )
+            dynamics_kwargs.update({
+                "volume": self.aind_inj2_vol,
+                "volume_unit": VolumeUnit.NL,
+            })
         elif self.aind_inj2_type == InjectionType.IONTOPHORESIS:
-            return IontophoresisInjection.model_construct(
-                injection_materials=injection_materials,
-                recovery_time=self.aind_second_inj_recover,
-                injection_duration=self.aind_inj2_lenghtof_time,
-                instrument_id=self.aind_ionto_number_inj2,
-                injection_coordinate_ml=self.aind_ml2nd_inj,
-                injection_coordinate_ap=self.aind_ap2nd_inj,
-                injection_coordinate_depth=self.aind_dv2nd_inj,
-                injection_coordinate_reference=(
-                    self.aind_inj2_coordinates_reference
-                ),
-                bregma_to_lambda_distance=self.aind_breg2_lamb,
-                injection_angle=self.aind_inj2angle0,
-                injection_hemisphere=self.aind_hemisphere2nd_inj,
-                injection_current=self.aind_inj2_current,
-                alternating_current=self.aind_inj2_alternating_time,
-            )
-        else:
-            return BrainInjection.model_construct(
-                injection_materials=injection_materials,
-                recovery_time=self.aind_second_inj_recover,
-                injection_duration=self.aind_inj2_lenghtof_time,
-                injection_coordinate_ml=self.aind_ml2nd_inj,
-                injection_coordinate_ap=self.aind_ap2nd_inj,
-                injection_coordinate_depth=self.aind_dv2nd_inj,
-                injection_coordinate_reference=(
-                    self.aind_inj2_coordinates_reference
-                ),
-                bregma_to_lambda_distance=self.aind_breg2_lamb,
-                injection_angle=self.aind_inj2angle0,
-                injection_hemisphere=self.aind_hemisphere2nd_inj,
-            )
-
-    def get_fiber_implant(self):
-        """Get a fiber implant procedure"""
-
-        # Need to figure out core_diameter, numerical_aperture, total_length,
-        # and targeted_structure
-        ophys_probes = []
-        if self.aind_fiber_implant1:
-            fiber_probe = FiberProbe.model_construct(
-                name="Probe A",
-                core_diameter=None,
-                numerical_aperture=None,
-                total_length=None,
-            )
-            ophys_probes.append(
-                OphysProbe.model_construct(
-                    fiber_probe=fiber_probe,
-                    targeted_structure=None,
-                    stereotactic_coordinate_ap=self.aind_virus_a_p,
-                    stereotactic_coordinate_ml=self.aind_virus_m_l,
-                    stereotactic_coordinate_dv=self.aind_fiber_implant1_dv,
-                    stereotactic_coordinate_reference=(
-                        self.aind_inj1_coordinates_reference
-                    ),
-                    bregma_to_lambda_distance=self.aind_breg2_lamb,
-                    angle=self.aind_inj1_angle_v2,
-                )
-            )
-        if self.aind_fiber_implant2:
-            fiber_probe = FiberProbe.model_construct(
-                name="Probe B",
-                core_diameter=None,
-                numerical_aperture=None,
-                total_length=None,
-            )
-            ophys_probes.append(
-                OphysProbe.model_construct(
-                    fiber_probe=fiber_probe,
-                    targeted_structure=None,
-                    stereotactic_coordinate_ap=self.aind_ap2nd_inj,
-                    stereotactic_coordinate_ml=self.aind_ml2nd_inj,
-                    stereotactic_coordinate_dv=self.aind_fiber_implant2_dv,
-                    stereotactic_coordinate_reference=(
-                        self.aind_inj2_coordinates_reference
-                    ),
-                    bregma_to_lambda_distance=self.aind_breg2_lamb,
-                    angle=self.aind_inj2_angle_v2,
-                )
-            )
-        # Missing protocol_id
-        return FiberImplant.model_construct(
-            probes=ophys_probes,
-        )
+            dynamics_kwargs.update({
+                "injection_current": self.aind_inj2_current,
+                "injection_current_unit": CurrentUnit.UA,
+                "alternating_current": self.aind_inj2_alternating_time,
+            })
+            
+        try:
+            return [InjectionDynamics(**dynamics_kwargs)]
+        except ValidationError:
+            return [InjectionDynamics.model_construct(**dynamics_kwargs)]
 
     @property
     def has_injection_procedure(self) -> bool:
@@ -1594,14 +1473,216 @@ class MappedNSBList:
                 or self.has_craniotomy_procedure
                 or self.has_head_frame_procedure
             )
+        
+    def get_head_frame_procedure(self) -> Headframe:
+        """Get head frame procedure"""
+        try:
+            return Headframe(
+                headframe_type=self.aind_headpost_type.headframe_type,
+                headframe_part_number=self.aind_headpost_type.headframe_part_number,
+                well_part_number=self.aind_headpost_type.well_part_number,
+                well_type=self.aind_headpost_type.well_type,
+            )
+        except ValidationError:
+            return Headframe.model_construct(
+                headframe_type=self.aind_headpost_type.headframe_type,
+                headframe_part_number=(
+                    self.aind_headpost_type.headframe_part_number
+                ),
+                well_part_number=self.aind_headpost_type.well_part_number,
+                well_type=self.aind_headpost_type.well_type,
+            )
+
+    def get_craniotomy_procedure(self) -> Craniotomy:
+        """Get craniotomy procedure"""
+        coordinate_system_name = (
+            self.aind_craniotomy_coordinates_reference.name
+            if self.aind_craniotomy_coordinates_reference is not None
+            else CoordinateSystemLibrary.BREGMA_ARID.name
+        )
+        try:
+            return Craniotomy(
+                craniotomy_type=self.aind_craniotomy_type,
+                coordinate_system_name=coordinate_system_name,
+                position=self.aind_hp_loc,
+                size=self.aind_craniotomy_size,
+                size_unit=SizeUnit.MM if self.aind_craniotomy_size else None,
+                dura_removed=self.aind_hp_durotomy,
+            )
+        except ValidationError:
+            return Craniotomy.model_construct(
+                craniotomy_type=self.aind_craniotomy_type,
+                coordinate_system_name=coordinate_system_name,
+                position=self.aind_hp_loc,
+                size=self.aind_craniotomy_size,
+                size_unit=SizeUnit.MM if self.aind_craniotomy_size else None,
+                dura_removed=self.aind_hp_durotomy,
+            )
+        
+    @staticmethod
+    def _get_transform(
+        angle: Optional[Decimal], ml: Optional[Decimal], ap: Optional[Decimal], depth: Optional[Decimal],
+    ) -> List[Translation, Rotation]:
+        """Get injection coordinates"""
+        
+        ap = ap if ap is not None else 0
+        ml = ml if ml is not None else 0
+        angle = angle if angle is not None else 0
+
+        if depth is None:
+            translation = Translation(translation=[ap, ml, 0])
+        else:
+            translation = Translation(translation=[ap, ml, 0, depth])
+        rotation = Rotation(angles=[angle, 0, 0, 0], angle_unit=AngleUnit.DEG)
+        return [translation, rotation]
+
+    def get_first_injection_procedure(self) -> BrainInjection:
+        """Get first injection procedure"""
+        injection_materials = []
+        if self.aind_inj1_virus_strain_rt is not None:
+            injection_materials.append(ViralMaterial(name=self.aind_inj1_virus_strain_rt))
+
+        coordinates = self._get_transform(
+            injection_angle=self.aind_inj1angle0,
+            injection_coordinate_ml=self.aind_virus_m_l,
+            injection_coordinate_ap=self.aind_virus_a_p,
+            injection_coordinate_depth=self.aind_virus_d_v,
+        )
+        coordinate_system_name = self.aind_inj1_coordinates_reference.name if self.aind_inj1_coordinates_reference else None
+    
+        try:
+            return BrainInjection(
+                injection_materials=injection_materials,
+                relative_position=[self.aind_virus_hemisphere],
+                dynamics=[self.aind_inj1_dynamics],
+                coordinate_system_name=coordinate_system_name,
+                coordinates=coordinates,
+            )
+        except ValidationError:
+            return BrainInjection.model_construct(
+                injection_materials=injection_materials,
+                relative_position=[self.aind_virus_hemisphere],
+                dynamics=[self.aind_inj1_dynamics],
+                coordinate_system_name=coordinate_system_name,
+                coordinates=coordinates,
+            )
+
+    def get_second_injection_procedure(self) -> BrainInjection:
+        """Get second injection procedure"""
+        injection_materials = []
+        if self.aind_inj2_virus_strain_rt is not None:
+            injection_materials.append(ViralMaterial(name=self.aind_inj2_virus_strain_rt))
+
+        coordinates = self._get_transform(
+            injection_angle=self.aind_inj2angle0,
+            injection_coordinate_ml=self.aind_ml2nd_inj,
+            injection_coordinate_ap=self.aind_ap2nd_inj,
+            injection_coordinate_depth=self.aind_dv2nd_inj,
+        )
+        coordinate_system_name = (
+            self.aind_inj2_coordinates_reference.name
+            if self.aind_inj2_coordinates_reference else None
+        )
+
+        try:
+            return BrainInjection(
+                injection_materials=injection_materials,
+                relative_position=[self.aind_hemisphere2nd_inj],
+                dynamics=[self.aind_inj2_dynamics],
+                coordinate_system_name=coordinate_system_name,
+                coordinates=coordinates,
+            )
+        except ValidationError:
+            return BrainInjection.model_construct(
+                injection_materials=injection_materials,
+                relative_position=[self.aind_hemisphere2nd_inj],
+                dynamics=[self.aind_inj2_dynamics],
+                coordinate_system_name=coordinate_system_name,
+                coordinates=coordinates,
+            )
+    
+    def get_fiber_implants(self) -> List[ProbeImplant]:
+        """Get a fiber implant procedure"""
+        # Need to figure out core_diameter, numerical_aperture, total_length,
+        probe_implants = []
+        coordinate_system = CoordinateSystem(
+            name="FIBER_PROBE_RSAB",
+            origin=Origin.TIP,
+            axis_unit=SizeUnit.MM,
+            axes=[
+                Axis(name=AxisName.X, direction=Direction.LR),
+                Axis(name=AxisName.Y, direction=Direction.IS),
+                Axis(name=AxisName.Z, direction=Direction.PA),
+                Axis(name=AxisName.DEPTH, direction=Direction.UD),
+            ],
+        )
+        if self.aind_fiber_implant1:
+            fiber_probe = FiberProbe.model_construct(
+                name="Probe A",
+                core_diameter=None,
+                numerical_aperture=None,
+                total_length=None,
+            )
+            transform = self._get_transform(
+                injection_angle=self.aind_inj1_angle_v2,
+                injection_coordinate_ml=self.aind_virus_m_l,
+                injection_coordinate_ap=self.aind_virus_a_p,
+                injection_coordinate_depth=self.aind_fiber_implant1_dv,
+            )
+            probe_implants.append(
+                ProbeImplant(
+                    fiber_probe=fiber_probe,
+                    device_config=ProbeConfig(
+                        primary_targeted_structure="ROOT",
+                        device_name="Probe A",
+                        coordinate_system=coordinate_system,
+                        transform=transform,
+                    )
+                )
+            )
+        if self.aind_fiber_implant2:
+            fiber_probe = FiberProbe.model_construct(
+                name="Probe B",
+                core_diameter=None,
+                numerical_aperture=None,
+                total_length=None,
+            )
+            transform = self._get_transform(
+                injection_angle=self.aind_inj2_angle_v2,
+                injection_coordinate_ml=self.aind_virus_m_l,
+                injection_coordinate_ap=self.aind_virus_a_p,
+                injection_coordinate_depth=self.aind_fiber_implant2_dv,
+            )
+            probe_implants.append(
+                ProbeImplant(
+                    fiber_probe=fiber_probe,
+                    device_config=ProbeConfig(
+                        primary_targeted_structure="ROOT",
+                        device_name="Probe B",
+                        coordinate_system=coordinate_system,
+                        transform=transform,
+                    )
+                )
+            )
+        return probe_implants
+
+    @staticmethod
+    def get_measured_coordinates(b2l_dist: Decimal, coordinate_system_name: str) -> Dict[Origin, Translation]:
+        """Get measured coordinates"""
+        if "LAMBDA" in coordinate_system_name:
+            b2l_dist = -b2l_dist
+            origin = Origin.LAMBDA
+        else:
+            origin = Origin.BREGMA
+        return {origin: Translation(b2l_dist, 0, 0)}
+
 
     def get_surgeries(self) -> List[Surgery]:
         """Return Surgery as best as possible from a record."""
 
         # Surgery info
-        experimenter_full_name = self.aind_experimenter_full_name
-        iacuc_protocol = self.aind_iacuc_protocol
-        notes = None
+        experimenters = [self.aind_experimenter_full_name]
+        ethics_review_id = self.aind_iacuc_protocol
         surgeries = []
 
         # Add craniotomy, headframe, and fiber implant into one surgery
@@ -1611,7 +1692,7 @@ class MappedNSBList:
         if self.has_craniotomy_procedure:
             procedures.append(self.get_craniotomy_procedure())
         if self.has_fiber_implant_procedure:
-            procedures.append(self.get_fiber_implant())
+            procedures.extend(self.get_fiber_implants())
         if (
             self.has_head_frame_procedure
             or self.has_craniotomy_procedure
@@ -1625,21 +1706,21 @@ class MappedNSBList:
                 level=self.aind_hp_iso_level,
             )
             workstation_id = self.aind_hp_work_station
-            surgery = Surgery.model_construct(
+            surgery = Surgery(
                 start_date=start_date,
-                experimenter_full_name=experimenter_full_name,
-                iacuc_protocol=iacuc_protocol,
+                experimenter_full_name=experimenters,
+                ethics_review_id=ethics_review_id,
                 animal_weight_prior=animal_weight_prior,
                 animal_weight_post=animal_weight_post,
                 anaesthesia=anaesthesia,
                 workstation_id=workstation_id,
-                notes=notes,
                 procedures=procedures,
             )
             surgeries.append(surgery)
 
         # create a surgery for 1st injection
         if self.has_injection_procedure:
+            injection = self.get_first_injection_procedure()
             start_date = self.aind_date1st_injection
             animal_weight_prior = self.aind_first_injection_weight_be
             animal_weight_post = self.aind_first_injection_weight_af
@@ -1649,16 +1730,20 @@ class MappedNSBList:
                 level=self.aind_hp_iso_level,
             )
             workstation_id = self.aind_work_station1st_injection
+            measured_coordinates = self.get_measured_coordinates(
+                b2l_dist=self.aind_breg2_lamb,
+                coordinate_system_name=injection.coordinate_system_name
+            )
             surgery = Surgery.model_construct(
                 start_date=start_date,
-                experimenter_full_name=experimenter_full_name,
-                iacuc_protocol=iacuc_protocol,
+                experimenters=experimenters,
+                ethics_review_id=ethics_review_id,
                 animal_weight_prior=animal_weight_prior,
                 animal_weight_post=animal_weight_post,
                 anaesthesia=anaesthesia,
                 workstation_id=workstation_id,
-                notes=notes,
-                procedures=[self.get_first_injection_procedure()],
+                procedures=[injection],
+                measured_coordinates=measured_coordinates
             )
             surgeries.append(surgery)
 
@@ -1667,6 +1752,7 @@ class MappedNSBList:
             self.has_injection_procedure
             and self.has_second_injection_procedure
         ):
+            injection = self.get_second_injection_procedure()
             start_date = self.aind_date2nd_injection
             animal_weight_prior = self.aind_second_injection_weight_b
             animal_weight_post = self.aind_second_injection_weight_a
@@ -1676,16 +1762,19 @@ class MappedNSBList:
                 level=self.aind_hp_iso_level,
             )
             workstation_id = self.aind_work_station2nd_injection
+            measured_coordinates = self.get_measured_coordinates(
+                b2l_dist=self.aind_breg2_lamb,
+                coordinate_system_name=injection.coordinate_system_name
+            )
             surgery = Surgery.model_construct(
                 start_date=start_date,
-                experimenter_full_name=experimenter_full_name,
-                iacuc_protocol=iacuc_protocol,
+                experimenters=experimenters,
+                ethics_review_id=ethics_review_id,
                 animal_weight_prior=animal_weight_prior,
                 animal_weight_post=animal_weight_post,
                 anaesthesia=anaesthesia,
                 workstation_id=workstation_id,
-                notes=notes,
-                procedures=[self.get_second_injection_procedure()],
+                procedures=[injection],
             )
             surgeries.append(surgery)
         if self.has_unknown_surgery:
