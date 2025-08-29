@@ -29,22 +29,26 @@ async def get_procedures(
             },
         },
     ),
-    labtracks_api_instance=Depends(get_labtracks_api_instance),
+    # labtracks_api_instance=Depends(get_labtracks_api_instance),
     sharepoint_api_instance=Depends(get_sharepoint_api_instance),
 ):
     """
     ## Procedures
     Return Procedure metadata.
     """
-    labtracks_response = await labtracks_api_instance.get_tasks(
-        subject_id, _request_timeout=10
-    )
+    # labtracks_response = await labtracks_api_instance.get_tasks(
+    #     subject_id, _request_timeout=10
+    # )
     las_2020_response = await sharepoint_api_instance.get_las2020(
         subject_id, _request_timeout=20
     )
+    nsb_2019_response = await sharepoint_api_instance.get_nsb2019(
+        subject_id, _request_timeout=10
+    )
     mapper = ProceduresMapper(
-        labtracks_tasks=labtracks_response,
+        # labtracks_tasks=labtracks_response,
         las_2020=las_2020_response,
+        nsb_2019=nsb_2019_response,
     )
     procedures = mapper.map_responses_to_aind_procedures(subject_id)
     if not procedures:

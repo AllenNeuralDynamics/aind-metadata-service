@@ -3,7 +3,7 @@
 import logging
 from enum import Enum
 from typing import List, Optional, Union
-
+from pydantic import ValidationError
 from aind_data_schema.core.procedures import (
     Procedures,
     Surgery,
@@ -16,9 +16,13 @@ from aind_data_schema.components.subject_procedures import (
 from aind_labtracks_service_async_client.models import Task as LabTracksTask
 from aind_sharepoint_service_async_client.models import (
     Las2020List,
+    NSB2019List,
 )
 from aind_metadata_service_server.mappers.las2020 import (
     MappedLASList as MappedLAS2020,
+)
+from aind_metadata_service_server.mappers.nsb2019 import (
+    MappedNSBList as MappedNSB2019,
 )
 
 
@@ -81,6 +85,7 @@ class ProceduresMapper:
         self,
         labtracks_tasks: List[LabTracksTask] = [],
         las_2020: List[Las2020List] = [],
+        nsb_2019: List[NSB2019List] = [],
     ):
         """
         Class constructor.
@@ -90,6 +95,8 @@ class ProceduresMapper:
         """
         self.labtracks_tasks = labtracks_tasks
         self.las_2020 = las_2020
+        self.nsb_2019 = nsb_2019
+
 
     @staticmethod
     def _map_labtracks_task_to_aind_surgery(
@@ -198,8 +205,10 @@ class ProceduresMapper:
             if isinstance(mapped_model, MappedLAS2020):
                 procedure = mapped_model.get_surgery(subject_id)
                 procedures = [procedure] if procedure else []
+            else:
+                procedures = mapped_model.get_surgeries()
             surgeries.extend(procedures)
-
+                
         return surgeries
 
     def map_responses_to_aind_procedures(
@@ -245,11 +254,30 @@ class ProceduresMapper:
                 f"Found {len(las_2020_surgeries)} surgeries "
                 f"from LAS2020 for {subject_id}"
             )
+        if self.nsb_2019:
+            nsb_2019_surgeries = (
+                self.map_sharepoint_response_to_aind_surgeries(
+                    response=self.nsb_2019,
+                    mapper_cls=MappedNSB2019,
+                )
+            )
+            subject_procedures.extend(nsb_2019_surgeries)
+            logging.info(
+                f"Found {len(nsb_2019_surgeries)} surgeries "
+                f"from NSB2019 for {subject_id}"
+            )
 
         if not subject_procedures and not specimen_procedures:
             return None
-        return Procedures(
-            subject_id=subject_id,
-            subject_procedures=subject_procedures,
-            specimen_procedures=specimen_procedures,
-        )
+        try: 
+            return Procedures(
+                subject_id=subject_id,
+                subject_procedures=subject_procedures,
+                specimen_procedures=specimen_procedures,
+            )
+        except ValidationError:
+            return Procedures.model_construct(
+                subject_id=subject_id,
+                subject_procedures=subject_procedures,
+                specimen_procedures=specimen_procedures,
+            )

@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal, DecimalException
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Union, Dict
 from pydantic import ValidationError
 
 from aind_data_schema.components.devices import FiberProbe
@@ -39,6 +39,7 @@ from aind_data_schema_models.units import (
     CurrentUnit,
     AngleUnit,
 )
+from aind_data_schema_models.brain_atlas import CCFv3
 from aind_data_schema.components.configs import ProbeConfig
 from aind_data_schema_models.mouse_anatomy import InjectionTargets
 from aind_data_schema_models.coordinates import AnatomicalRelative, Origin
@@ -58,19 +59,17 @@ class HeadPostInfo:
     well_type: Optional[str] = None
     well_part_number: Optional[str] = None
 
+class InjectionRound(Enum):
+    """Enum class for Injection Rounds"""
+
+    FIRST = "First"
+    SECOND = "Second"
 
 class InjectionType(Enum):
     """Enum class for Injection Types"""
 
     NANOJECT = "Nanoject"
     IONTOPHORESIS = "Iontophoresis"
-
-
-class InjectionRound(Enum):
-    """Enum class for Injection Rounds"""
-
-    FIRST = "First"
-    SECOND = "Second"
 
 
 class MappedNSBList:
@@ -308,13 +307,6 @@ class MappedNSBList:
         return self._parse_datetime_to_date(self._nsb.date2nd_injection)
 
     @property
-    def aind_date_of_birth(self) -> Optional[date]:
-        """Maps date_of_birth to aind model"""
-        return self._parse_datetime_to_date(
-            self._nsb.date_x0020_of_x0020_birth
-        )
-
-    @property
     def aind_date_of_surgery(self) -> Optional[date]:
         """Maps date_of_surgery to aind model"""
         return self._parse_datetime_to_date(
@@ -322,10 +314,9 @@ class MappedNSBList:
         )
 
     @property
-    def aind_dv2nd_inj(self) -> Optional[List[Decimal]]:
+    def aind_dv2nd_inj(self) -> Optional[Decimal]:
         """Maps dv2nd_inj to aind model"""
-        dv = self._parse_dv_str(self._nsb.dv2nd_inj)
-        return [] if dv is None else [dv]
+        return self._parse_dv_str(self._nsb.dv2nd_inj)
 
     @property
     def aind_fiber_implant1(self) -> Optional[bool]:
@@ -648,20 +639,6 @@ class MappedNSBList:
         return self._parse_length_of_time_str(self._nsb.inj1_lenghtof_time)
 
     @property
-    def aind_inj1_round(self) -> Optional[InjectionRound]:
-        """Maps inj1_round to aind model"""
-        return (
-            None
-            if self._nsb.inj1_round is None
-            else {
-                self._nsb.inj1_round.SELECT: None,
-                self._nsb.inj1_round.N_1ST: InjectionRound.FIRST,
-                self._nsb.inj1_round.N_2ND: InjectionRound.SECOND,
-                self._nsb.inj1_round.NA: None,
-            }.get(self._nsb.inj1_round, None)
-        )
-
-    @property
     def aind_inj1_type(self) -> Optional[InjectionType]:
         """Maps inj1_type to aind model"""
         return (
@@ -727,7 +704,7 @@ class MappedNSBList:
     def aind_inj2_lenghtof_time(self) -> Optional[Decimal]:
         """Maps inj2_lenghtof_time to aind model"""
         return self._parse_length_of_time_str(self._nsb.inj2_lenghtof_time)
-
+    
     @property
     def aind_inj2_round(self) -> Optional[InjectionRound]:
         """Maps inj2_round to aind model"""
@@ -916,12 +893,6 @@ class MappedNSBList:
         )
 
     @property
-    def aind_iso_on(self) -> Optional[Decimal]:
-        """Maps iso_on to aind model"""
-        opt_float = self._nsb.iso_x0020_on
-        return None if opt_float is None else Decimal(opt_float)
-
-    @property
     def aind_lab_tracks_id(self) -> Optional[str]:
         """Maps lab_tracks_id to aind model"""
         return self._nsb.lab_tracks_x0020_id
@@ -1080,28 +1051,14 @@ class MappedNSBList:
         return self._parse_weight_str(self._nsb.second_injection_weight_before)
 
     @property
-    def aind_sex(self) -> Optional[Sex]:
-        """Maps sex to aind model"""
-        return (
-            None
-            if self._nsb.sex is None
-            else {
-                self._nsb.sex.SELECT: None,
-                self._nsb.sex.MALE: Sex.MALE,
-                self._nsb.sex.FEMALE: Sex.FEMALE,
-            }.get(self._nsb.sex, None)
-        )
-
-    @property
     def aind_virus_a_p(self) -> Optional[Decimal]:
         """Maps virus_a_p to aind model"""
         return self._parse_ap_str(self._nsb.virus_x0020_a_x002f_p)
 
     @property
-    def aind_virus_d_v(self) -> Optional[List[Decimal]]:
+    def aind_virus_d_v(self) -> Optional[Decimal]:
         """Maps virus_d_v to aind model"""
-        dv = self._parse_dv_str(self._nsb.virus_x0020_d_x002f_v)
-        return [] if dv is None else [dv]
+        return self._parse_dv_str(self._nsb.virus_x0020_d_x002f_v)
 
     @property
     def aind_virus_hemisphere(self) -> Optional[AnatomicalRelative]:
@@ -1258,7 +1215,7 @@ class MappedNSBList:
                 ],
             )
         elif self._nsb.craniotomy_type.FRONTAL_WINDOW_3MM:
-            # coordinate system?
+            # TODO: fill this in
             return None
         else:
             return None
@@ -1295,8 +1252,6 @@ class MappedNSBList:
             self._nsb.virus_x0020_d_x002f_v
         ):
             return CoordinateSystemLibrary.BREGMA_ARID
-        else:
-            return None
         
     @property
     def aind_inj1_dynamics(self) -> InjectionDynamics:
@@ -1453,8 +1408,8 @@ class MappedNSBList:
         """Get a basic surgery if non-procedures info is available."""
         return Surgery.model_construct(
             start_date=self.aind_date_of_surgery,
-            experimenter_full_name=self.aind_experimenter_full_name,
-            iacuc_protocol=self.aind_iacuc_protocol,
+            experimenters=[self.aind_experimenter_full_name],
+            ethics_review_id=self.aind_iacuc_protocol,
             animal_weight_prior=self.aind_weight_before_surger,
             animal_weight_post=self.aind_weight_after_surgery,
         )
@@ -1522,18 +1477,19 @@ class MappedNSBList:
     @staticmethod
     def _get_transform(
         angle: Optional[Decimal], ml: Optional[Decimal], ap: Optional[Decimal], depth: Optional[Decimal],
-    ) -> List[Translation, Rotation]:
-        """Get injection coordinates"""
+    ) -> List[Union[Translation, Rotation]]:
+        """Get transform"""
         
         ap = ap if ap is not None else 0
         ml = ml if ml is not None else 0
         angle = angle if angle is not None else 0
-
+        print("ap: ", ap, ", ml: ", ml, ", angle: ", angle, ", depth: ", depth)
         if depth is None:
             translation = Translation(translation=[ap, ml, 0])
+            rotation = Rotation(angles=[angle, 0, 0], angles_unit=AngleUnit.DEG)
         else:
             translation = Translation(translation=[ap, ml, 0, depth])
-        rotation = Rotation(angles=[angle, 0, 0, 0], angle_unit=AngleUnit.DEG)
+            rotation = Rotation(angles=[angle, 0, 0, 0], angles_unit=AngleUnit.DEG)
         return [translation, rotation]
 
     def get_first_injection_procedure(self) -> BrainInjection:
@@ -1542,14 +1498,15 @@ class MappedNSBList:
         if self.aind_inj1_virus_strain_rt is not None:
             injection_materials.append(ViralMaterial(name=self.aind_inj1_virus_strain_rt))
 
-        coordinates = self._get_transform(
-            injection_angle=self.aind_inj1angle0,
-            injection_coordinate_ml=self.aind_virus_m_l,
-            injection_coordinate_ap=self.aind_virus_a_p,
-            injection_coordinate_depth=self.aind_virus_d_v,
-        )
         coordinate_system_name = self.aind_inj1_coordinates_reference.name if self.aind_inj1_coordinates_reference else None
-    
+        coordinates = (
+            self._get_transform(
+                angle=self.aind_inj1angle0, ml=self.aind_virus_m_l,
+                ap=self.aind_virus_a_p, depth=self.aind_virus_d_v,
+            )
+            if coordinate_system_name is not None else None
+        )
+        
         try:
             return BrainInjection(
                 injection_materials=injection_materials,
@@ -1573,15 +1530,16 @@ class MappedNSBList:
         if self.aind_inj2_virus_strain_rt is not None:
             injection_materials.append(ViralMaterial(name=self.aind_inj2_virus_strain_rt))
 
-        coordinates = self._get_transform(
-            injection_angle=self.aind_inj2angle0,
-            injection_coordinate_ml=self.aind_ml2nd_inj,
-            injection_coordinate_ap=self.aind_ap2nd_inj,
-            injection_coordinate_depth=self.aind_dv2nd_inj,
-        )
         coordinate_system_name = (
             self.aind_inj2_coordinates_reference.name
             if self.aind_inj2_coordinates_reference else None
+        )
+        coordinates = (
+            self._get_transform(
+                angle=self.aind_inj2angle0, ml=self.aind_ml2nd_inj,
+                ap=self.aind_ap2nd_inj, depth=self.aind_dv2nd_inj,
+            )
+            if coordinate_system_name is not None else None
         )
 
         try:
@@ -1624,16 +1582,14 @@ class MappedNSBList:
                 total_length=None,
             )
             transform = self._get_transform(
-                injection_angle=self.aind_inj1_angle_v2,
-                injection_coordinate_ml=self.aind_virus_m_l,
-                injection_coordinate_ap=self.aind_virus_a_p,
-                injection_coordinate_depth=self.aind_fiber_implant1_dv,
+                angle=self.aind_inj1_angle_v2, ml=self.aind_virus_m_l,
+                ap=self.aind_virus_a_p, depth=self.aind_fiber_implant1_dv,
             )
             probe_implants.append(
                 ProbeImplant(
-                    fiber_probe=fiber_probe,
+                    implanted_device=fiber_probe,
                     device_config=ProbeConfig(
-                        primary_targeted_structure="ROOT",
+                        primary_targeted_structure=CCFv3.ROOT,
                         device_name="Probe A",
                         coordinate_system=coordinate_system,
                         transform=transform,
@@ -1648,16 +1604,14 @@ class MappedNSBList:
                 total_length=None,
             )
             transform = self._get_transform(
-                injection_angle=self.aind_inj2_angle_v2,
-                injection_coordinate_ml=self.aind_virus_m_l,
-                injection_coordinate_ap=self.aind_virus_a_p,
-                injection_coordinate_depth=self.aind_fiber_implant2_dv,
+                angle=self.aind_inj2_angle_v2, ml=self.aind_virus_m_l,
+                ap=self.aind_virus_a_p, depth=self.aind_fiber_implant2_dv,
             )
             probe_implants.append(
                 ProbeImplant(
-                    fiber_probe=fiber_probe,
+                    implanted_device=fiber_probe,
                     device_config=ProbeConfig(
-                        primary_targeted_structure="ROOT",
+                        primary_targeted_structure=CCFv3.ROOT,
                         device_name="Probe B",
                         coordinate_system=coordinate_system,
                         transform=transform,
@@ -1669,18 +1623,20 @@ class MappedNSBList:
     @staticmethod
     def get_measured_coordinates(b2l_dist: Decimal, coordinate_system_name: str) -> Dict[Origin, Translation]:
         """Get measured coordinates"""
-        if "LAMBDA" in coordinate_system_name:
-            b2l_dist = -b2l_dist
-            origin = Origin.LAMBDA
+        if b2l_dist is None:
+            return None
         else:
-            origin = Origin.BREGMA
-        return {origin: Translation(b2l_dist, 0, 0)}
+            if "LAMBDA" in coordinate_system_name:
+                b2l_dist = -b2l_dist
+                origin = Origin.LAMBDA
+            else:
+                origin = Origin.BREGMA
+            return {origin: Translation(translation=[b2l_dist, 0, 0])}
 
 
     def get_surgeries(self) -> List[Surgery]:
         """Return Surgery as best as possible from a record."""
 
-        # Surgery info
         experimenters = [self.aind_experimenter_full_name]
         ethics_review_id = self.aind_iacuc_protocol
         surgeries = []
@@ -1706,16 +1662,28 @@ class MappedNSBList:
                 level=self.aind_hp_iso_level,
             )
             workstation_id = self.aind_hp_work_station
-            surgery = Surgery(
-                start_date=start_date,
-                experimenter_full_name=experimenters,
-                ethics_review_id=ethics_review_id,
-                animal_weight_prior=animal_weight_prior,
-                animal_weight_post=animal_weight_post,
-                anaesthesia=anaesthesia,
-                workstation_id=workstation_id,
-                procedures=procedures,
-            )
+            try:
+                surgery = Surgery(
+                    start_date=start_date,
+                    experimenters=experimenters,
+                    ethics_review_id=ethics_review_id,
+                    animal_weight_prior=animal_weight_prior,
+                    animal_weight_post=animal_weight_post,
+                    anaesthesia=anaesthesia,
+                    workstation_id=workstation_id,
+                    procedures=procedures,
+                )
+            except ValidationError:
+                surgery = Surgery.model_construct(
+                    start_date=start_date,
+                    experimenters=experimenters,
+                    ethics_review_id=ethics_review_id,
+                    animal_weight_prior=animal_weight_prior,
+                    animal_weight_post=animal_weight_post,
+                    anaesthesia=anaesthesia,
+                    workstation_id=workstation_id,
+                    procedures=procedures,
+                )
             surgeries.append(surgery)
 
         # create a surgery for 1st injection
@@ -1727,24 +1695,37 @@ class MappedNSBList:
             anaesthesia = Anaesthetic.model_construct(
                 type=self.aind_anaesthetic_type,
                 duration=self.aind_first_injection_iso_durat,
-                level=self.aind_hp_iso_level,
+                level=self.aind_round1_inj_isolevel,
             )
             workstation_id = self.aind_work_station1st_injection
             measured_coordinates = self.get_measured_coordinates(
                 b2l_dist=self.aind_breg2_lamb,
                 coordinate_system_name=injection.coordinate_system_name
             )
-            surgery = Surgery.model_construct(
-                start_date=start_date,
-                experimenters=experimenters,
-                ethics_review_id=ethics_review_id,
-                animal_weight_prior=animal_weight_prior,
-                animal_weight_post=animal_weight_post,
-                anaesthesia=anaesthesia,
-                workstation_id=workstation_id,
-                procedures=[injection],
-                measured_coordinates=measured_coordinates
-            )
+            try:
+                surgery = Surgery(
+                    start_date=start_date,
+                    experimenters=experimenters,
+                    ethics_review_id=ethics_review_id,
+                    animal_weight_prior=animal_weight_prior,
+                    animal_weight_post=animal_weight_post,
+                    anaesthesia=anaesthesia,
+                    workstation_id=workstation_id,
+                    procedures=[injection],
+                    measured_coordinates=measured_coordinates
+                )
+            except ValidationError:
+                surgery = Surgery.model_construct(
+                    start_date=start_date,
+                    experimenters=experimenters,
+                    ethics_review_id=ethics_review_id,
+                    animal_weight_prior=animal_weight_prior,
+                    animal_weight_post=animal_weight_post,
+                    anaesthesia=anaesthesia,
+                    workstation_id=workstation_id,
+                    procedures=[injection],
+                    measured_coordinates=measured_coordinates
+                )
             surgeries.append(surgery)
 
         # create a surgery for 2nd injection
@@ -1759,24 +1740,48 @@ class MappedNSBList:
             anaesthesia = Anaesthetic.model_construct(
                 type=self.aind_anaesthetic_type,
                 duration=self.aind_second_injection_iso_dura,
-                level=self.aind_hp_iso_level,
+                level=self.aind_round2_inj_isolevel,
             )
             workstation_id = self.aind_work_station2nd_injection
             measured_coordinates = self.get_measured_coordinates(
                 b2l_dist=self.aind_breg2_lamb,
                 coordinate_system_name=injection.coordinate_system_name
             )
-            surgery = Surgery.model_construct(
-                start_date=start_date,
-                experimenters=experimenters,
-                ethics_review_id=ethics_review_id,
-                animal_weight_prior=animal_weight_prior,
-                animal_weight_post=animal_weight_post,
-                anaesthesia=anaesthesia,
-                workstation_id=workstation_id,
-                procedures=[injection],
-            )
+            try:
+                surgery = Surgery(
+                    start_date=start_date,
+                    experimenters=experimenters,
+                    ethics_review_id=ethics_review_id,
+                    animal_weight_prior=animal_weight_prior,
+                    animal_weight_post=animal_weight_post,
+                    anaesthesia=anaesthesia,
+                    workstation_id=workstation_id,
+                    procedures=[injection],
+                    measured_coordinates=measured_coordinates
+                )
+            except ValidationError:
+                surgery = Surgery.model_construct(
+                    start_date=start_date,
+                    experimenters=experimenters,
+                    ethics_review_id=ethics_review_id,
+                    animal_weight_prior=animal_weight_prior,
+                    animal_weight_post=animal_weight_post,
+                    anaesthesia=anaesthesia,
+                    workstation_id=workstation_id,
+                    procedures=[injection],
+                    measured_coordinates=measured_coordinates
+                )
             surgeries.append(surgery)
+
         if self.has_unknown_surgery:
-            surgeries.append(self.get_basic_surgery())
+            try:
+                surgeries.append(self.get_basic_surgery())
+            except ValidationError:
+                surgeries.append(Surgery.model_construct(
+                    start_date=self.aind_date_of_surgery,
+                    experimenters=[self.aind_experimenter_full_name],
+                    ethics_review_id=self.aind_iacuc_protocol,
+                    animal_weight_prior=self.aind_weight_before_surger,
+                    animal_weight_post=self.aind_weight_after_surgery,
+                ))
         return surgeries

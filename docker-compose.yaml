@@ -15,6 +15,8 @@ services:
       - session_json
       - redis
       - aind_metadata_service_v1
+    volumes:
+      - ./aind-metadata-service-server/src:/app/src
     env_file: "env/webapp.env"
   labtracks:
     image: "ghcr.io/allenneuraldynamics/aind-labtracks-service-server:0.3.0"
