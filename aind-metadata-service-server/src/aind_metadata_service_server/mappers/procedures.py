@@ -208,7 +208,6 @@ class ProceduresMapper:
             else:
                 procedures = mapped_model.get_surgeries()
             surgeries.extend(procedures)
-                
         return surgeries
 
     def map_responses_to_aind_procedures(
@@ -269,15 +268,8 @@ class ProceduresMapper:
 
         if not subject_procedures and not specimen_procedures:
             return None
-        try: 
-            return Procedures(
-                subject_id=subject_id,
-                subject_procedures=subject_procedures,
-                specimen_procedures=specimen_procedures,
-            )
-        except ValidationError:
-            return Procedures.model_construct(
-                subject_id=subject_id,
-                subject_procedures=subject_procedures,
-                specimen_procedures=specimen_procedures,
-            )
+        return Procedures(
+            subject_id=subject_id,
+            subject_procedures=subject_procedures,
+            specimen_procedures=specimen_procedures,
+        )
