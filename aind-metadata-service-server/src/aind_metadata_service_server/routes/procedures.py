@@ -1,6 +1,6 @@
 """Module to handle subject endpoints"""
 
-from fastapi import APIRouter, Depends, Path, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Path
 
 from aind_metadata_service_server.mappers.procedures import ProceduresMapper
 from aind_metadata_service_server.mappers.responses import map_to_response

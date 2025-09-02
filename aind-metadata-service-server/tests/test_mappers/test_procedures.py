@@ -5,10 +5,15 @@ import unittest
 from datetime import date, datetime
 from pathlib import Path
 
+from aind_data_schema.components.injection_procedures import Injection
+from aind_data_schema.components.subject_procedures import (
+    Perfusion,
+)
 from aind_data_schema.core.procedures import (
     Procedures,
     Surgery,
 )
+from aind_data_schema_models.mouse_anatomy import InjectionTargets
 from aind_labtracks_service_async_client.models.task import (
     Task as LabTracksTask,
 )
@@ -18,11 +23,7 @@ from aind_sharepoint_service_async_client.models.las2020_list import (
 from aind_sharepoint_service_async_client.models.nsb2019_list import (
     NSB2019List,
 )
-from aind_data_schema.components.subject_procedures import (
-    Perfusion,
-)
-from aind_data_schema.components.injection_procedures import Injection
-from aind_data_schema_models.mouse_anatomy import InjectionTargets
+
 from aind_metadata_service_server.mappers.procedures import (
     ProceduresMapper,
 )

@@ -1,7 +1,6 @@
 """Tests NSB 2019 data model is parsed correctly"""
 
 import json
-import logging
 import os
 from copy import deepcopy
 from decimal import Decimal
@@ -10,13 +9,13 @@ from typing import Callable, List, Tuple
 from unittest import TestCase
 from unittest import main as unittest_main
 
+from aind_data_schema.components.coordinates import CoordinateSystemLibrary
 from aind_data_schema.components.surgery_procedures import BrainInjection
 from aind_sharepoint_service_async_client.models.nsb2019_list import (
     NSB2019List,
 )
 
 from aind_metadata_service_server.mappers.nsb2019 import MappedNSBList
-
 
 TEST_DIR = Path(__file__).parent / ".."
 DIR_RAW = TEST_DIR / "resources" / "nsb2019" / "raw"
@@ -63,7 +62,6 @@ class TestNSB2019Parsers(TestCase):
         for list_item in self.list_items:
             raw_data = list_item[0]
             expected_mapped_data = list_item[1]
-            raw_file_name = list_item[2]
             nsb_model = NSB2019List.model_validate(raw_data)
             mapped_model = MappedNSBList(nsb=nsb_model)
             mapped_procedure = mapped_model.get_surgeries()
@@ -117,6 +115,29 @@ class TestNSB2019Parsers(TestCase):
         self.assertTrue(isinstance(procedures[0], BrainInjection))
         self.assertIsNone(mapper._parse_basic_float_str("one"))
 
+    def test_inj2_coordinates_reference_edge_cases(self):
+        """Test aind_inj2_coordinates_reference edge cases."""
+        nsb_data_1 = {
+            "AP2ndInj": "1.0",
+            "ML2ndInj": "2.0",
+            "DV2ndInj": None,
+        }
+        nsb_model_1 = NSB2019List.model_construct(**nsb_data_1)
+        mapped_1 = MappedNSBList(nsb=nsb_model_1)
+        nsb_data_2 = {
+            "AP2ndInj": None,
+            "ML2ndInj": None,
+            "DV2ndInj": None,
+        }
+        nsb_model_2 = NSB2019List.model_construct(**nsb_data_2)
+        mapped_2 = MappedNSBList(nsb=nsb_model_2)
+
+        self.assertEqual(
+            mapped_1.aind_inj2_coordinates_reference,
+            CoordinateSystemLibrary.BREGMA_ARI,
+        )
+        self.assertIsNone(mapped_2.aind_inj2_coordinates_reference)
+
     def test_unknown_surgery_edge_case(self):
         """Tests the case where there is an unknown surgery type."""
         list_item = self.list_items[0]
@@ -130,8 +151,11 @@ class TestNSB2019Parsers(TestCase):
 
     def test_get_measured_coordinates_edge_case(self):
         """Tests the case where measured coordinates are not present."""
-        coords = MappedNSBList.get_measured_coordinates(b2l_dist=None, coordinate_system_name=None)
+        coords = MappedNSBList.get_measured_coordinates(
+            b2l_dist=None, coordinate_system_name=None
+        )
         self.assertIsNone(coords)
+
 
 class TestNSB2019StringParsers(TestCase):
     """Tests text field parsers in NSB2019Mapping class."""

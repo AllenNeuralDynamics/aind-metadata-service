@@ -3,21 +3,22 @@
 import logging
 from enum import Enum
 from typing import List, Optional, Union
-from pydantic import ValidationError
+
+from aind_data_schema.components.injection_procedures import Injection
+from aind_data_schema.components.subject_procedures import (
+    Perfusion,
+)
 from aind_data_schema.core.procedures import (
     Procedures,
     Surgery,
 )
-from aind_data_schema.components.injection_procedures import Injection
 from aind_data_schema_models.mouse_anatomy import InjectionTargets
-from aind_data_schema.components.subject_procedures import (
-    Perfusion,
-)
 from aind_labtracks_service_async_client.models import Task as LabTracksTask
 from aind_sharepoint_service_async_client.models import (
     Las2020List,
     NSB2019List,
 )
+
 from aind_metadata_service_server.mappers.las2020 import (
     MappedLASList as MappedLAS2020,
 )
@@ -96,7 +97,6 @@ class ProceduresMapper:
         self.labtracks_tasks = labtracks_tasks
         self.las_2020 = las_2020
         self.nsb_2019 = nsb_2019
-
 
     @staticmethod
     def _map_labtracks_task_to_aind_surgery(
