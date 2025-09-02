@@ -28,6 +28,9 @@ class TestSettings(unittest.TestCase):
             "AIND_METADATA_SERVICE_SESSION_JSON_HOST": (
                 "http://example.com/session_json"
             ),
+            "AIND_METADATA_SERVICE_AIND_DATA_SCHEMA_V1_HOST": (
+                "http://example.com/v1"
+            ),
         },
         clear=True,
     )

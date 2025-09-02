@@ -4,15 +4,15 @@ import re
 from decimal import Decimal
 from typing import List, Optional
 
-from aind_data_schema.core.subject import (
-    BackgroundStrain,
+from aind_data_schema.components.subjects import (
     BreedingInfo,
     Housing,
+    MouseSubject,
     Sex,
-    Subject,
 )
+from aind_data_schema.core.subject import Subject
 from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.species import Species
+from aind_data_schema_models.species import Species, Strain
 from aind_labtracks_service_async_client.models.subject import (
     Subject as LabTracksSubject,
 )
@@ -66,7 +66,7 @@ class SubjectMapper:
     @staticmethod
     def _map_to_background_strain(
         bg_strain: Optional[str],
-    ) -> Optional[BackgroundStrain]:
+    ) -> Strain:
         """
         Maps the LabTracks BG Strain enum to the
         aind_data_schema.subject.BackgroundStrain
@@ -81,11 +81,11 @@ class SubjectMapper:
 
         match bg_strain:
             case "C57BL/6J":
-                return BackgroundStrain.C57BL_6J
+                return Strain.C57BL_6J
             case "BALB/C" | "BALB/c":
-                return BackgroundStrain.BALB_c
+                return Strain.BALB_C
             case _:
-                return None
+                return Strain.UNKNOWN
 
     @staticmethod
     def _map_species(species: Optional[str]) -> Optional[Species]:
@@ -104,7 +104,7 @@ class SubjectMapper:
         """
         match species:
             case "mouse":
-                return Species.MUS_MUSCULUS
+                return Species.HOUSE_MOUSE
             case _:
                 return None
 
@@ -249,28 +249,32 @@ class SubjectMapper:
             if pid_name is not None:
                 alleles.append(pid_name)
         try:
-            return Subject(
-                subject_id=subject_id,
-                date_of_birth=date_of_birth,
+            subject_details = MouseSubject(
                 sex=sex,
+                date_of_birth=date_of_birth,
+                strain=bg_strain,
                 species=species,
-                housing=housing,
-                genotype=genotype,
-                background_strain=bg_strain,
-                breeding_info=breeding_info,
-                source=source,
                 alleles=alleles,
+                genotype=genotype,
+                breeding_info=breeding_info,
+                housing=housing,
+                source=source,
+            )
+            return Subject(
+                subject_id=subject_id, subject_details=subject_details
             )
         except ValidationError:
-            return Subject.model_construct(
-                subject_id=subject_id,
-                date_of_birth=date_of_birth,
+            subject_details = MouseSubject.model_construct(
                 sex=sex,
+                date_of_birth=date_of_birth,
+                strain=bg_strain,
                 species=species,
-                housing=housing,
-                genotype=genotype,
-                background_strain=bg_strain,
-                breeding_info=breeding_info,
-                source=source,
                 alleles=alleles,
+                genotype=genotype,
+                breeding_info=breeding_info,
+                housing=housing,
+                source=source,
+            )
+            return Subject.model_construct(
+                subject_id=subject_id, subject_details=subject_details
             )

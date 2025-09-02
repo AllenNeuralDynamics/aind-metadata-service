@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     session_json_host: HttpUrl = Field(
         ..., description="Host address for metadata mapper service"
     )
+    aind_data_schema_v1_host: HttpUrl = Field(
+        ..., description="Host address for v1 service"
+    )
 
 
 def get_settings():
