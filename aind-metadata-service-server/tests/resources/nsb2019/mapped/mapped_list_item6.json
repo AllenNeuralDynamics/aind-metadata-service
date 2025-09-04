@@ -17,29 +17,7 @@
             "level": null
         },
         "workstation_id": "SWS 3",
-        "coordinate_system": {
-            "object_type": "Coordinate system",
-            "name": "LAMBDA_ARI",
-            "origin": "Lambda",
-            "axes": [
-                {
-                    "object_type": "Axis",
-                    "name": "AP",
-                    "direction": "Posterior_to_anterior"
-                },
-                {
-                    "object_type": "Axis",
-                    "name": "ML",
-                    "direction": "Left_to_right"
-                },
-                {
-                    "object_type": "Axis",
-                    "name": "SI",
-                    "direction": "Superior_to_inferior"
-                }
-            ],
-            "axis_unit": "millimeter"
-        },
+        "coordinate_system": null,
         "measured_coordinates": null,
         "procedures": [
             {
@@ -228,14 +206,14 @@
         "anaesthesia": {
             "object_type": "Anaesthetic",
             "anaesthetic_type": "isoflurane",
-            "duration": 60.0,
+            "duration": null,
             "duration_unit": "minute",
             "level": null
         },
         "workstation_id": "SWS 3",
         "coordinate_system": {
             "object_type": "Coordinate system",
-            "name": "BREGMA_ARID",
+            "name": "BREGMA_ARI",
             "origin": "Bregma",
             "axes": [
                 {
@@ -252,11 +230,6 @@
                     "object_type": "Axis",
                     "name": "SI",
                     "direction": "Superior_to_inferior"
-                },
-                {
-                    "object_type": "Axis",
-                    "name": "Depth",
-                    "direction": "Up_to_down"
                 }
             ],
             "axis_unit": "millimeter"
@@ -295,7 +268,7 @@
                     }
                 ],
                 "protocol_id": null,
-                "coordinate_system_name": "BREGMA_ARID",
+                "coordinate_system_name": "BREGMA_ARI",
                 "coordinates": [
                     [
                         {
@@ -309,117 +282,6 @@
                         {
                             "object_type": "Rotation",
                             "angles": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "angles_unit": "degrees"
-                        }
-                    ]
-                ]
-            }
-        ],
-        "notes": null
-    },
-    {
-        "object_type": "Surgery",
-        "protocol_id": null,
-        "start_date": null,
-        "experimenters": [
-            "NSB-187"
-        ],
-        "ethics_review_id": "2115",
-        "animal_weight_prior": 19.6,
-        "animal_weight_post": 19.6,
-        "weight_unit": "gram",
-        "anaesthesia": {
-            "object_type": "Anaesthetic",
-            "anaesthetic_type": "isoflurane",
-            "duration": 60.0,
-            "duration_unit": "minute",
-            "level": null
-        },
-        "workstation_id": null,
-        "coordinate_system": {
-            "object_type": "Coordinate system",
-            "name": "BREGMA_ARID",
-            "origin": "Bregma",
-            "axes": [
-                {
-                    "object_type": "Axis",
-                    "name": "AP",
-                    "direction": "Posterior_to_anterior"
-                },
-                {
-                    "object_type": "Axis",
-                    "name": "ML",
-                    "direction": "Left_to_right"
-                },
-                {
-                    "object_type": "Axis",
-                    "name": "SI",
-                    "direction": "Superior_to_inferior"
-                },
-                {
-                    "object_type": "Axis",
-                    "name": "Depth",
-                    "direction": "Up_to_down"
-                }
-            ],
-            "axis_unit": "millimeter"
-        },
-        "measured_coordinates": {
-            "Bregma": {
-                "object_type": "Translation",
-                "translation": [
-                    4.0,
-                    0.0,
-                    0.0
-                ]
-            }
-        },
-        "procedures": [
-            {
-                "object_type": "Brain injection",
-                "injection_materials": [],
-                "targeted_structure": null,
-                "relative_position": [
-                    "Left"
-                ],
-                "dynamics": [
-                    [
-                        {
-                            "object_type": "Injection dynamics",
-                            "profile": "Bolus",
-                            "volume": null,
-                            "volume_unit": null,
-                            "rate": null,
-                            "rate_unit": null,
-                            "duration": 4.0,
-                            "duration_unit": "minute",
-                            "injection_current": null,
-                            "injection_current_unit": "microamps",
-                            "alternating_current": "7/7"
-                        }
-                    ]
-                ],
-                "protocol_id": null,
-                "coordinate_system_name": "BREGMA_ARID",
-                "coordinates": [
-                    [
-                        {
-                            "object_type": "Translation",
-                            "translation": [
-                                -3.05,
-                                -0.6,
-                                0.0,
-                                4.3
-                            ]
-                        },
-                        {
-                            "object_type": "Rotation",
-                            "angles": [
-                                0.0,
                                 0.0,
                                 0.0,
                                 0.0
