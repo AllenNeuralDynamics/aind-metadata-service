@@ -6,7 +6,7 @@ from pydantic import ValidationError
 from datetime import date, datetime
 from decimal import Decimal, DecimalException
 from enum import Enum
-from typing import Any, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from aind_data_schema.components.configs import ProbeConfig
 from aind_data_schema.components.coordinates import (
@@ -408,7 +408,8 @@ class MappedNSBList:
     @property
     def aind_breg2_lamb(self) -> Optional[Decimal]:
         """Maps breg2_lamb to aind model"""
-        return self._map_float_to_decimal(self._nsb.breg2_lamb)
+        parsed = self._map_float_to_decimal(self._nsb.breg2_lamb)
+        return abs(parsed) if parsed else None
 
     @property
     def aind_burr1_perform_during(self) -> Optional[During]:
@@ -2759,25 +2760,42 @@ class MappedNSBList:
                 total_length=burr_info.fiber_implant_length,
             )
 
-    # TODO: will need to come back here based on coords 
     @staticmethod
     def assign_fiber_probe_names(procedures: List) -> None:
-        """Assigns ordered names to FiberProbe objects within each fiber implant"""
-        all_probes = []
+        """
+        Iterates through list of procedures and assigns ordered names to FiberProbe objects within each ProbeImplant.
+        """
+        probes_with_coords = []
         for proc in procedures:
             if isinstance(proc, ProbeImplant):
-                all_probes.extend(proc.probes)
+                fiber_probe = getattr(proc, "implanted_device", None)
+                if isinstance(fiber_probe, FiberProbe):
+                    probe_config = getattr(proc, "device_config", None)
+                    if isinstance(probe_config, ProbeConfig) and hasattr(probe_config, "transform"):
+                        # Find the Translation object in transform
+                        translation = None
+                        for t, _ in probe_config.transform:
+                            if isinstance(t, Translation):
+                                # Assumption: there's only one depth for single probe
+                                translation = t
+                                break
+                        if translation and len(translation.translation) >= 2:
+                            ap = float(translation.translation[0])
+                            ml = float(translation.translation[1])
+                        else:
+                            ap = 0.0
+                            ml = 0.0
+                        probes_with_coords.append((proc, fiber_probe, probe_config, ap, ml))
 
-        # Sort all probes based on ap (descending) and ml (ascending)
+        # Sort by AP descending, ML ascending
         sorted_probes = sorted(
-            all_probes,
-            key=lambda probe: (
-                -float(probe.stereotactic_coordinate_ap),
-                float(probe.stereotactic_coordinate_ml),
-            ),
+            probes_with_coords,
+            key=lambda x: (-x[3], x[4])
         )
-        for probe_index, probe in enumerate(sorted_probes):
-            probe.ophys_probe.name = f"Fiber_{probe_index}"
+        for idx, (proc, fiber_probe, probe_config, ap, ml) in enumerate(sorted_probes):
+            name = f"Fiber_{idx}"
+            fiber_probe.name = name
+            probe_config.device_name = name
 
         return None
 
@@ -2866,6 +2884,61 @@ class MappedNSBList:
             self._get_intended_measurements(followup_measurements)
         )
         return all_intended_measurements
+    
+    @staticmethod
+    def map_measured_coordinates(
+        b2l_dist: Optional[Decimal], procedures: List
+    ) -> Optional[Dict[Origin, Translation]]:
+        """
+        Maps measured coordinates, handling lambda/bregma reference and re-referencing if mixed.
+        Parameters
+        ----------
+        b2l_dist: Optional[Decimal]
+            The distance from bregma to lambda.
+        procedures: List
+            The list of procedures to map coordinates for.
+        Returns
+        -------
+            Optional[Dict[Origin, Translation]]
+        """
+        if b2l_dist is None:
+            return None
+
+        lambda_names = {"LAMBDA_ARID", "LAMBDA_ARI"}
+        bregma_names = {"BREGMA_ARID", "BREGMA_ARI"}
+
+        coordinate_system_names = [
+            getattr(proc, "coordinate_system_name", None)
+            for proc in procedures
+            if getattr(proc, "coordinate_system_name", None)
+        ]
+        unique_names = set(coordinate_system_names)
+
+        # Only lambda
+        if unique_names and all(name in lambda_names for name in unique_names):
+            origin = Origin.LAMBDA
+            dist = -abs(b2l_dist)
+            return {origin: Translation(translation=[dist, 0, 0])}
+
+        # Only bregma
+        elif unique_names and all(name in bregma_names for name in unique_names):
+            origin = Origin.BREGMA
+            dist = b2l_dist
+            return {origin: Translation(translation=[dist, 0, 0])}
+
+        # Mixed: re-reference lambda coords to bregma
+        else:
+            origin = Origin.BREGMA
+            for proc in procedures:
+                coord_sys = getattr(proc, "coordinate_system_name", None)
+                coords = getattr(proc, "coordinates", None)
+                if coord_sys in lambda_names and coords and isinstance(coords, list):
+                    for coord in coords:
+                        if isinstance(coord, list) and len(coord) > 0:
+                            coord[0] = float(coord[0]) - abs(float(b2l_dist))
+            dist = b2l_dist
+            return {origin: Translation(translation=[dist, 0, 0])}
+        
 
     def get_surgeries(self) -> List[Surgery]:
         """Get a List of Surgeries"""
@@ -3221,40 +3294,72 @@ class MappedNSBList:
                     other_procedures.append(probe_implant_proc)
 
         surgeries = []
-        # TODO: WIP (continue from here)
-        # TODO: fix assign fiber probe names
         if initial_procedures:
             self.assign_fiber_probe_names(initial_procedures)
-            initial_surgery = Surgery.model_construct(
-                start_date=initial_start_date,
-                experimenter_full_name=initial_surgeon,
-                iacuc_protocol=iacuc_protocol,
-                animal_weight_prior=initial_animal_weight_prior,
-                animal_weight_post=initial_animal_weight_post,
-                anaesthesia=initial_anaesthesia,
-                workstation_id=initial_workstation_id,
-                notes=notes,
-                procedures=initial_procedures,
-            )
+            measured_coordinates = self.map_measured_coordinates(b2l_dist=self.aind_breg2_lamb, procedures=initial_procedures)
+            try:
+                # TODO: add measured coordinates
+                initial_surgery = Surgery(
+                    start_date=initial_start_date,
+                    experimenters=[initial_surgeon],
+                    ethics_review_id=iacuc_protocol,
+                    animal_weight_prior=initial_animal_weight_prior,
+                    animal_weight_post=initial_animal_weight_post,
+                    anaesthesia=initial_anaesthesia,
+                    workstation_id=initial_workstation_id,
+                    notes=notes,
+                    procedures=initial_procedures,
+                    measured_coordinates=measured_coordinates
+                )
+            except ValidationError:
+                initial_surgery = Surgery.model_construct(
+                    start_date=initial_start_date,
+                    experimenters=[initial_surgeon],
+                    ethics_review_id=iacuc_protocol,
+                    animal_weight_prior=initial_animal_weight_prior,
+                    animal_weight_post=initial_animal_weight_post,
+                    anaesthesia=initial_anaesthesia,
+                    workstation_id=initial_workstation_id,
+                    notes=notes,
+                    procedures=initial_procedures,
+                    measured_coordinates=measured_coordinates
+                )
             surgeries.append(initial_surgery)
         if followup_procedures:
             self.assign_fiber_probe_names(followup_procedures)
-            followup_surgery = Surgery.model_construct(
-                start_date=followup_start_date,
-                experimenter_full_name=followup_surgeon,
-                iacuc_protocol=iacuc_protocol,
-                animal_weight_prior=followup_animal_weight_prior,
-                animal_weight_post=followup_animal_weight_post,
-                anaesthesia=followup_anaesthesia,
-                workstation_id=followup_workstation_id,
-                notes=notes,
-                procedures=followup_procedures,
-            )
+            followup_measured_coordinates = self.map_measured_coordinates(b2l_dist=self.aind_breg2_lamb, procedures=followup_procedures)
+            try:
+                followup_surgery = Surgery(
+                    start_date=followup_start_date,
+                    experimenters=[followup_surgeon],
+                    ethics_review_id=iacuc_protocol,
+                    animal_weight_prior=followup_animal_weight_prior,
+                    animal_weight_post=followup_animal_weight_post,
+                    anaesthesia=followup_anaesthesia,
+                    workstation_id=followup_workstation_id,
+                    notes=notes,
+                    procedures=followup_procedures,
+                    measured_coordinates=followup_measured_coordinates
+                )
+            except ValidationError:
+                followup_surgery = Surgery.model_construct(
+                    start_date=followup_start_date,
+                    experimenters=[followup_surgeon],
+                    ethics_review_id=iacuc_protocol,
+                    animal_weight_prior=followup_animal_weight_prior,
+                    animal_weight_post=followup_animal_weight_post,
+                    anaesthesia=followup_anaesthesia,
+                    workstation_id=followup_workstation_id,
+                    notes=notes,
+                    procedures=followup_procedures,
+                    measured_coordinates=followup_measured_coordinates
+                )
             surgeries.append(followup_surgery)
 
         # any other mapped procedures without During info will be put into one surgery object
         if other_procedures:
             self.assign_fiber_probe_names(other_procedures)
+            other_measured_coordinates = self.map_measured_coordinates(b2l_dist=self.aind_breg2_lamb, procedures=other_procedures)
             other_surgery = Surgery.model_construct(
                 start_date=None,
                 experimenter_full_name="NSB",
@@ -3265,6 +3370,7 @@ class MappedNSBList:
                 workstation_id=None,
                 notes=notes,
                 procedures=other_procedures,
+                measured_coordinates=other_measured_coordinates
             )
             surgeries.append(other_surgery)
 
