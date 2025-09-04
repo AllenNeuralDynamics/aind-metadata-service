@@ -2,6 +2,7 @@
 
 import re
 from dataclasses import dataclass
+from pydantic import ValidationError
 from datetime import date, datetime
 from decimal import Decimal, DecimalException
 from enum import Enum
@@ -33,7 +34,7 @@ from aind_data_schema.components.surgery_procedures import (
     HeadframeMaterial,
     ProbeImplant,
 )
-from aind_data_schema_models.brain_atlas import CCFv3
+from aind_data_schema_models.organizations import Organization
 from aind_data_schema_models.coordinates import AnatomicalRelative, Origin
 from aind_data_schema_models.units import (
     AngleUnit,
@@ -45,12 +46,13 @@ from aind_data_schema_models.units import (
 from aind_sharepoint_service_async_client.models import (
     NSB2023IacucProtocol as IacucProtocol,
 )
+from aind_data_schema_models.devices import FerruleMaterial
 from aind_sharepoint_service_async_client.models import (
     NSB2023List,
     NSB2023Procedure,
     NSB2023ProcedureCategory,
 )
-
+from aind_data_schema_models.brain_atlas import BrainStructureModel, CCFv3
 from aind_metadata_service_server.models import IntendedMeasurementInformation
 
 
@@ -173,7 +175,7 @@ class BurrHoleInfo:
     inj_current: Optional[Decimal] = None
     alternating_current: Optional[str] = None
     inj_duration: Optional[Decimal] = None
-    inj_volume: Optional[List[Decimal]] = None
+    inj_volume: Optional[Decimal] = None
     inj_materials: Optional[List[InjectableMaterial]] = None
     fiber_implant_depth: Optional[Decimal] = None
     fiber_type: Optional[FiberType] = None
@@ -182,7 +184,9 @@ class BurrHoleInfo:
     intended_measurement_g: Optional[str] = None
     intended_measurement_b: Optional[str] = None
     intended_measurement_iso: Optional[str] = None
-
+    transforms: Optional[List[Union[Translation, Rotation]]] = None
+    targeted_structure: Optional[BrainStructureModel] = None
+    coordinate_system: Optional[CoordinateSystem] = None
 
 @dataclass
 class HeadPostInfo:
@@ -372,6 +376,22 @@ class MappedNSBList:
         """Parse string representation of concentration into Decimal."""
         return None if con_str is None else Decimal(str(float(con_str)))
 
+    @staticmethod
+    def _map_targeted_structure(
+        structure_str: Optional[str],
+    ) -> Optional[BrainStructureModel]:
+        """
+        Parse a string like 'MOp - Primary motor area' and return the corresponding BrainStructureModel.
+        """
+        if not structure_str:
+            return None
+        try:
+            acronym = structure_str.split(" - ")[0].strip()
+            return CCFv3.by_acronym(acronym)
+        except (ValueError, AttributeError, IndexError):
+            return None
+            
+
     @property
     def aind_age_at_injection(self) -> Optional[Decimal]:
         """Maps age_at_injection to aind model."""
@@ -559,15 +579,11 @@ class MappedNSBList:
         """Maps burr_1_injectable_x06 to aind model."""
         return self._nsb.burr_x0020_1_x0020_injectable_x06
 
-    # TODO: IS intended CCF target supposed to go somewhere in the data-schema? 
     @property
-    def aind_burr_1_intended(self) -> Optional[str]:
+    def aind_burr_1_intended(self) -> Optional[BrainStructureModel]:
         """Maps burr_1_intended to aind model."""
         burr_1_intended = self._nsb.burr_x0020_1_x0020_intended_x002
-        return (
-            None if burr_1_intended is None
-            else burr_1_intended.value
-        )
+        return self._map_targeted_structure(burr_1_intended)
 
     @property
     def aind_burr_1_intended_x0020(self) -> Optional[str]:
@@ -685,13 +701,10 @@ class MappedNSBList:
         return self._nsb.burr_x0020_2_x0020_injectable_x06
 
     @property
-    def aind_burr_2_intended(self) -> Optional[Any]:
+    def aind_burr_2_intended(self) -> Optional[BrainStructureModel]:
         """Maps burr_2_intended to aind model."""
-        return (
-            None
-            if self._nsb.burr_x0020_2_x0020_intended_x002 is None
-            else self._nsb.burr_x0020_2_x0020_intended_x002.value
-        )
+        burr_2_intended = self._nsb.burr_x0020_2_x0020_intended_x002
+        return self._map_targeted_structure(burr_2_intended)
 
     @property
     def aind_burr_2_intended_x0020(self) -> Optional[str]:
@@ -825,326 +838,11 @@ class MappedNSBList:
         """Maps burr_3_injectable_x06 to aind model."""
         return self._nsb.burr_x0020_3_x0020_injectable_x06
 
-    # TODO: WIP start here
     @property
-    def aind_burr_3_intended(self) -> Optional[Any]:
+    def aind_burr_3_intended(self) -> Optional[BrainStructureModel]:
         """Maps burr_3_intended to aind model."""
         burr_3_intended = self._nsb.burr_x0020_3_x0020_intended_x002
-        return (
-            None
-            if burr_3_intended is None
-            else {
-                burr_3_intended.FRP__FRONTAL_POLE_CEREBRA: None,
-                burr_3_intended.M_OP__PRIMARY_MOTOR_AREA: None,
-                burr_3_intended.M_OS__SECONDARY_MOTOR_ARE: None,
-                burr_3_intended.S_SP_N__PRIMARY_SOMATOSEN: None,
-                burr_3_intended.S_SP_BFD__PRIMARY_SOMATOS: None,
-                burr_3_intended.S_SP_LL__PRIMARY_SOMATOSE: None,
-                burr_3_intended.S_SP_M__PRIMARY_SOMATOSEN: None,
-                burr_3_intended.S_SP_UL__PRIMARY_SOMATOSE: None,
-                burr_3_intended.S_SP_TR__PRIMARY_SOMATOSE: None,
-                burr_3_intended.S_SP_UN__PRIMARY_SOMATOSE: None,
-                burr_3_intended.S_SS__SUPPLEMENTAL_SOMATO: None,
-                burr_3_intended.GU__GUSTATORY_AREAS: None,
-                burr_3_intended.VISC__VISCERAL_AREA: None,
-                burr_3_intended.AU_DD__DORSAL_AUDITORY_AR: None,
-                burr_3_intended.AU_DP__PRIMARY_AUDITORY_A: None,
-                burr_3_intended.AU_DPO__POSTERIOR_AUDITOR: None,
-                burr_3_intended.AU_DV__VENTRAL_AUDITORY_A: None,
-                burr_3_intended.VI_SAL__ANTEROLATERAL_VIS: None,
-                burr_3_intended.VI_SAM__ANTEROMEDIAL_VISU: None,
-                burr_3_intended.VI_SL__LATERAL_VISUAL_ARE: None,
-                burr_3_intended.VI_SP__PRIMARY_VISUAL_ARE: None,
-                burr_3_intended.VI_SPL__POSTEROLATERAL_VI: None,
-                burr_3_intended.VI_SPM_POSTEROMEDIAL_VISU: None,
-                burr_3_intended.VI_SLI__LATEROINTERMEDIAT: None,
-                burr_3_intended.VI_SPOR__POSTRHINAL_AREA: None,
-                burr_3_intended.AC_AD__ANTERIOR_CINGULATE: None,
-                burr_3_intended.AC_AV__ANTERIOR_CINGULATE: None,
-                burr_3_intended.PL__PRELIMBIC_AREA: None,
-                burr_3_intended.ILA__INFRALIMBIC_AREA: None,
-                burr_3_intended.OR_BL__ORBITAL_AREA_LATER: None,
-                burr_3_intended.OR_BM__ORBITAL_AREA_MEDIA: None,
-                burr_3_intended.OR_BV__ORBITAL_AREA_VENTR: None,
-                burr_3_intended.OR_BVL__ORBITAL_AREA_VENT: None,
-                burr_3_intended.A_ID__AGRANULAR_INSULAR_A: None,
-                burr_3_intended.A_IP__AGRANULAR_INSULAR_A: None,
-                burr_3_intended.A_IV__AGRANULAR_INSULAR_A: None,
-                burr_3_intended.RS_PAGL__RETROSPLENIAL_AR: None,
-                burr_3_intended.RS_PD__RETROSPLENIAL_AREA: None,
-                burr_3_intended.RS_PV__RETROSPLENIAL_AREA: None,
-                burr_3_intended.VI_SA__ANTERIOR_AREA: None,
-                burr_3_intended.VI_SRL__ROSTROLATERAL_VIS: None,
-                burr_3_intended.T_EA__TEMPORAL_ASSOCIATIO: None,
-                burr_3_intended.PERI__PERIRHINAL_AREA: None,
-                burr_3_intended.ECT__ECTORHINAL_AREA: None,
-                burr_3_intended.MOB__MAIN_OLFACTORY_BULB: None,
-                burr_3_intended.AOB__ACCESSORY_OLFACTORY: None,
-                burr_3_intended.AON__ANTERIOR_OLFACTORY_N: None,
-                burr_3_intended.T_TD__TAENIA_TECTA_DORSAL: None,
-                burr_3_intended.T_TV__TAENIA_TECTA_VENTRA: None,
-                burr_3_intended.DP__DORSAL_PEDUNCULAR_ARE: None,
-                burr_3_intended.PIR__PIRIFORM_AREA: None,
-                burr_3_intended.NLOT__NUCLEUS_OF_THE_LATE: None,
-                burr_3_intended.CO_AA__CORTICAL_AMYGDALAR: None,
-                burr_3_intended.CO_AP__CORTICAL_AMYGDALAR: None,
-                burr_3_intended.PAA__PIRIFORM_AMYGDALAR_A: None,
-                burr_3_intended.TR__POSTPIRIFORM_TRANSITI: None,
-                burr_3_intended.CA1__FIELD_CA1: None,
-                burr_3_intended.CA2__FIELD_CA2: None,
-                burr_3_intended.CA3__FIELD_CA3: None,
-                burr_3_intended.DG__DENTATE_GYRUS: None,
-                burr_3_intended.FC__FASCIOLA_CINEREA: None,
-                burr_3_intended.IG__INDUSEUM_GRISEUM: None,
-                burr_3_intended.EN_TL__ENTORHINAL_AREA_LA: None,
-                burr_3_intended.EN_TM__ENTORHINAL_AREA_ME: None,
-                burr_3_intended.PAR__PARASUBICULUM: None,
-                burr_3_intended.POST__POSTSUBICULUM: None,
-                burr_3_intended.PRE__PRESUBICULUM: None,
-                burr_3_intended.SUB__SUBICULUM: None,
-                burr_3_intended.PRO_S__PROSUBICULUM: None,
-                burr_3_intended.HATA__HIPPOCAMPO_AMYGDALA: None,
-                burr_3_intended.A_PR__AREA_PROSTRIATA: None,
-                burr_3_intended.CLA__CLAUSTRUM: None,
-                burr_3_intended.E_PD__ENDOPIRIFORM_NUCLEU: None,
-                burr_3_intended.E_PV__ENDOPIRIFORM_NUCLEU: None,
-                burr_3_intended.LA__LATERAL_AMYGDALAR_NUC: None,
-                burr_3_intended.BLA__BASOLATERAL_AMYGDALA: None,
-                burr_3_intended.BMA__BASOMEDIAL_AMYGDALAR: None,
-                burr_3_intended.PA__POSTERIOR_AMYGDALAR_N: None,
-                burr_3_intended.CP__CAUDOPUTAMEN: None,
-                burr_3_intended.ACB__NUCLEUS_ACCUMBENS: None,
-                burr_3_intended.FS__FUNDUS_OF_STRIATUM: None,
-                burr_3_intended.OT__OLFACTORY_TUBERCLE: None,
-                burr_3_intended.L_SC__LATERAL_SEPTAL_NUCL: None,
-                burr_3_intended.L_SR__LATERAL_SEPTAL_NUCL: None,
-                burr_3_intended.L_SV__LATERAL_SEPTAL_NUCL: None,
-                burr_3_intended.SF__SEPTOFIMBRIAL_NUCLEUS: None,
-                burr_3_intended.SH__SEPTOHIPPOCAMPAL_NUCL: None,
-                burr_3_intended.AAA__ANTERIOR_AMYGDALAR_A: None,
-                burr_3_intended.BA__BED_NUCLEUS_OF_THE_AC: None,
-                burr_3_intended.CEA__CENTRAL_AMYGDALAR_NU: None,
-                burr_3_intended.IA__INTERCALATED_AMYGDALA: None,
-                burr_3_intended.MEA__MEDIAL_AMYGDALAR_NUC: None,
-                burr_3_intended.G_PE__GLOBUS_PALLIDUS_EXT: None,
-                burr_3_intended.G_PI__GLOBUS_PALLIDUS_INT: None,
-                burr_3_intended.SI__SUBSTANTIA_INNOMINATA: None,
-                burr_3_intended.MA__MAGNOCELLULAR_NUCLEUS: None,
-                burr_3_intended.MS__MEDIAL_SEPTAL_NUCLEUS: None,
-                burr_3_intended.NDB__DIAGONAL_BAND_NUCLEU: None,
-                burr_3_intended.TRS__TRIANGULAR_NUCLEUS_O: None,
-                burr_3_intended.BST__BED_NUCLEI_OF_THE_ST: None,
-                burr_3_intended.VAL__VENTRAL_ANTERIOR_LAT: None,
-                burr_3_intended.VM__VENTRAL_MEDIAL_NUCLEU: None,
-                burr_3_intended.VPL__VENTRAL_POSTEROLATER: None,
-                burr_3_intended.VP_LPC__VENTRAL_POSTEROLA: None,
-                burr_3_intended.VPM__VENTRAL_POSTEROMEDIA: None,
-                burr_3_intended.VP_MPC__VENTRAL_POSTEROME: None,
-                burr_3_intended.PO_T__POSTERIOR_TRIANGULA: None,
-                burr_3_intended.SPF__SUBPARAFASCICULAR_NU: None,
-                burr_3_intended.SPA__SUBPARAFASCICULAR_AR: None,
-                burr_3_intended.PP__PERIPEDUNCULAR_NUCLEU: None,
-                burr_3_intended.MG__MEDIAL_GENICULATE_COM: None,
-                burr_3_intended.L_GD__DORSAL_PART_OF_THE: None,
-                burr_3_intended.LP__LATERAL_POSTERIOR_NUC: None,
-                burr_3_intended.PO__POSTERIOR_COMPLEX_OF: None,
-                burr_3_intended.POL__POSTERIOR_LIMITING_N: None,
-                burr_3_intended.SGN__SUPRAGENICULATE_NUCL: None,
-                burr_3_intended.ETH__ETHMOID_NUCLEUS_OF_T: None,
-                burr_3_intended.AV__ANTEROVENTRAL_NUCLEUS: None,
-                burr_3_intended.AM__ANTEROMEDIAL_NUCLEUS: None,
-                burr_3_intended.AD__ANTERODORSAL_NUCLEUS: None,
-                burr_3_intended.IAM__INTERANTEROMEDIAL_NU: None,
-                burr_3_intended.IAD__INTERANTERODORSAL_NU: None,
-                burr_3_intended.LD__LATERAL_DORSAL_NUCLEU: None,
-                burr_3_intended.IMD__INTERMEDIODORSAL_NUC: None,
-                burr_3_intended.MD__MEDIODORSAL_NUCLEUS_O: None,
-                burr_3_intended.SMT__SUBMEDIAL_NUCLEUS_OF: None,
-                burr_3_intended.PR__PERIREUNENSIS_NUCLEUS: None,
-                burr_3_intended.PVT__PARAVENTRICULAR_NUCL: None,
-                burr_3_intended.PT__PARATAENIAL_NUCLEUS: None,
-                burr_3_intended.RE__NUCLEUS_OF_REUNIENS: None,
-                burr_3_intended.XI__XIPHOID_THALAMIC_NUCL: None,
-                burr_3_intended.RH__RHOMBOID_NUCLEUS: None,
-                burr_3_intended.CM__CENTRAL_MEDIAL_NUCLEU: None,
-                burr_3_intended.PCN__PARACENTRAL_NUCLEUS: None,
-                burr_3_intended.CL__CENTRAL_LATERAL_NUCLE: None,
-                burr_3_intended.PF__PARAFASCICULAR_NUCLEU: None,
-                burr_3_intended.PIL__POSTERIOR_INTRALAMIN: None,
-                burr_3_intended.RT__RETICULAR_NUCLEUS_OF: None,
-                burr_3_intended.IGL__INTERGENICULATE_LEAF: None,
-                burr_3_intended.INT_G__INTERMEDIATE_GENIC: None,
-                burr_3_intended.L_GV__VENTRAL_PART_OF_THE: None,
-                burr_3_intended.SUB_G__SUBGENICULATE_NUCL: None,
-                burr_3_intended.MH__MEDIAL_HABENULA: None,
-                burr_3_intended.LH__LATERAL_HABENULA: None,
-                burr_3_intended.SO__SUPRAOPTIC_NUCLEUS: None,
-                burr_3_intended.PVH__PARAVENTRICULAR_HYPO: None,
-                burr_3_intended.P_VA__PERIVENTRICULAR_HYP: None,
-                burr_3_intended.P_VI__PERIVENTRICULAR_HYP: None,
-                burr_3_intended.ARH__ARCUATE_HYPOTHALAMIC: None,
-                burr_3_intended.ADP__ANTERODORSAL_PREOPTI: None,
-                burr_3_intended.AVP__ANTEROVENTRAL_PREOPT: None,
-                burr_3_intended.AVPV__ANTEROVENTRAL_PERIV: None,
-                burr_3_intended.DMH__DORSOMEDIAL_NUCLEUS: None,
-                burr_3_intended.MEPO__MEDIAN_PREOPTIC_NUC: None,
-                burr_3_intended.MPO__MEDIAL_PREOPTIC_AREA: None,
-                burr_3_intended.PS__PARASTRIAL_NUCLEUS: None,
-                burr_3_intended.P_VP__PERIVENTRICULAR_HYP: None,
-                burr_3_intended.P_VPO__PERIVENTRICULAR_HY: None,
-                burr_3_intended.SBPV__SUBPARAVENTRICULAR: None,
-                burr_3_intended.SCH__SUPRACHIASMATIC_NUCL: None,
-                burr_3_intended.SFO__SUBFORNICAL_ORGAN: None,
-                burr_3_intended.VMPO__VENTROMEDIAL_PREOPT: None,
-                burr_3_intended.VLPO__VENTROLATERAL_PREOP: None,
-                burr_3_intended.AHN__ANTERIOR_HYPOTHALAMI: None,
-                burr_3_intended.LM__LATERAL_MAMMILLARY_NU: None,
-                burr_3_intended.MM__MEDIAL_MAMMILLARY_NUC: None,
-                burr_3_intended.SUM__SUPRAMAMMILLARY_NUCL: None,
-                burr_3_intended.TM__TUBEROMAMMILLARY_NUCL: None,
-                burr_3_intended.MPN__MEDIAL_PREOPTIC_NUCL: None,
-                burr_3_intended.P_MD__DORSAL_PREMAMMILLAR: None,
-                burr_3_intended.P_MV__VENTRAL_PREMAMMILLA: None,
-                burr_3_intended.PV_HD__PARAVENTRICULAR_HY: None,
-                burr_3_intended.VMH__VENTROMEDIAL_HYPOTHA: None,
-                burr_3_intended.PH__POSTERIOR_HYPOTHALAMI: None,
-                burr_3_intended.LHA__LATERAL_HYPOTHALAMIC: None,
-                burr_3_intended.LPO__LATERAL_PREOPTIC_ARE: None,
-                burr_3_intended.PSTN__PARASUBTHALAMIC_NUC: None,
-                burr_3_intended.PE_F__PERIFORNICAL_NUCLEU: None,
-                burr_3_intended.RCH__RETROCHIASMATIC_AREA: None,
-                burr_3_intended.STN__SUBTHALAMIC_NUCLEUS: None,
-                burr_3_intended.TU__TUBERAL_NUCLEUS: None,
-                burr_3_intended.ZI__ZONA_INCERTA: None,
-                burr_3_intended.S_CS__SUPERIOR_COLLICULUS: None,
-                burr_3_intended.IC__INFERIOR_COLLICULUS: None,
-                burr_3_intended.NB__NUCLEUS_OF_THE_BRACHI: None,
-                burr_3_intended.SAG__NUCLEUS_SAGULUM: None,
-                burr_3_intended.PBG__PARABIGEMINAL_NUCLEU: None,
-                burr_3_intended.S_NR__SUBSTANTIA_NIGRA_RE: None,
-                burr_3_intended.VTA__VENTRAL_TEGMENTAL_AR: None,
-                burr_3_intended.PN__PARANIGRAL_NUCLEUS: None,
-                burr_3_intended.RR__MIDBRAIN_RETICULAR_NU: None,
-                burr_3_intended.MRN__MIDBRAIN_RETICULAR_N: None,
-                burr_3_intended.S_CM__SUPERIOR_COLLICULUS: None,
-                burr_3_intended.PAG__PERIAQUEDUCTAL_GRAY: None,
-                burr_3_intended.APN__ANTERIOR_PRETECTAL_N: None,
-                burr_3_intended.MPT__MEDIAL_PRETECTAL_ARE: None,
-                burr_3_intended.NOT__NUCLEUS_OF_THE_OPTIC: None,
-                burr_3_intended.NPC__NUCLEUS_OF_THE_POSTE: None,
-                burr_3_intended.OP__OLIVARY_PRETECTAL_NUC: None,
-                burr_3_intended.PPT__POSTERIOR_PRETECTAL: None,
-                burr_3_intended.RPF__RETROPARAFASCICULAR: None,
-                burr_3_intended.CUN__CUNEIFORM_NUCLEUS: None,
-                burr_3_intended.RN__RED_NUCLEUS: None,
-                burr_3_intended.III__OCULOMOTOR_NUCLEUS: None,
-                burr_3_intended.MA3__MEDIAL_ACCESORY_OCUL: None,
-                burr_3_intended.EW__EDINGER__WESTPHAL_NUC: None,
-                burr_3_intended.IV__TROCHLEAR_NUCLEUS: None,
-                burr_3_intended.PA4__PARATROCHLEAR_NUCLEU: None,
-                burr_3_intended.VTN__VENTRAL_TEGMENTAL_NU: None,
-                burr_3_intended.AT__ANTERIOR_TEGMENTAL_NU: None,
-                burr_3_intended.LT__LATERAL_TERMINAL_NUCL: None,
-                burr_3_intended.DT__DORSAL_TERMINAL_NUCLE: None,
-                burr_3_intended.MT__MEDIAL_TERMINAL_NUCLE: None,
-                burr_3_intended.S_NC__SUBSTANTIA_NIGRA_CO: None,
-                burr_3_intended.PPN__PEDUNCULOPONTINE_NUC: None,
-                burr_3_intended.IF__INTERFASCICULAR_NUCLE: None,
-                burr_3_intended.IPN__INTERPEDUNCULAR_NUCL: None,
-                burr_3_intended.RL__ROSTRAL_LINEAR_NUCLEU: None,
-                burr_3_intended.CLI__CENTRAL_LINEAR_NUCLE: None,
-                burr_3_intended.DR__DORSAL_NUCLEUS_RAPHE: None,
-                burr_3_intended.NLL__NUCLEUS_OF_THE_LATER: None,
-                burr_3_intended.PSV__PRINCIPAL_SENSORY_NU: None,
-                burr_3_intended.PB__PARABRACHIAL_NUCLEUS: None,
-                burr_3_intended.SOC__SUPERIOR_OLIVARY_COM: None,
-                burr_3_intended.B__BARRINGTON_S_NUCLEUS: None,
-                burr_3_intended.DTN__DORSAL_TEGMENTAL_NUC: None,
-                burr_3_intended.PD_TG__POSTERODORSAL_TEGM: None,
-                burr_3_intended.PCG__PONTINE_CENTRAL_GRAY: None,
-                burr_3_intended.PG__PONTINE_GRAY: None,
-                burr_3_intended.PR_NC__PONTINE_RETICULAR: None,
-                burr_3_intended.SG__SUPRAGENUAL_NUCLEUS: None,
-                burr_3_intended.SUT__SUPRATRIGEMINAL_NUCL: None,
-                burr_3_intended.TRN__TEGMENTAL_RETICULAR: None,
-                burr_3_intended.V__MOTOR_NUCLEUS_OF_TRIGE: None,
-                burr_3_intended.P5__PERITRIGEMINAL_ZONE: None,
-                burr_3_intended.ACS5__ACCESSORY_TRIGEMINA: None,
-                burr_3_intended.PC5__PARVICELLULAR_MOTOR: None,
-                burr_3_intended.I5__INTERTRIGEMINAL_NUCLE: None,
-                burr_3_intended.CS__SUPERIOR_CENTRAL_NUCL: None,
-                burr_3_intended.LC__LOCUS_CERULEUS: None,
-                burr_3_intended.LDT__LATERODORSAL_TEGMENT: None,
-                burr_3_intended.NI__NUCLEUS_INCERTUS: None,
-                burr_3_intended.PR_NR__PONTINE_RETICULAR: None,
-                burr_3_intended.RPO__NUCLEUS_RAPHE_PONTIS: None,
-                burr_3_intended.SLC__SUBCERULEUS_NUCLEUS: None,
-                burr_3_intended.SLD__SUBLATERODORSAL_NUCL: None,
-                burr_3_intended.MY__MEDULLA: None,
-                burr_3_intended.AP__AREA_POSTREMA: None,
-                burr_3_intended.DCO__DORSAL_COCHLEAR_NUCL: None,
-                burr_3_intended.VCO__VENTRAL_COCHLEAR_NUC: None,
-                burr_3_intended.CU__CUNEATE_NUCLEUS: None,
-                burr_3_intended.GR__GRACILE_NUCLEUS: None,
-                burr_3_intended.ECU__EXTERNAL_CUNEATE_NUC: None,
-                burr_3_intended.NTB__NUCLEUS_OF_THE_TRAPE: None,
-                burr_3_intended.NTS__NUCLEUS_OF_THE_SOLIT: None,
-                burr_3_intended.SPVC__SPINAL_NUCLEUS_OF_T: None,
-                burr_3_intended.SPVI__SPINAL_NUCLEUS_OF_T: None,
-                burr_3_intended.SPVO__SPINAL_NUCLEUS_OF_T: None,
-                burr_3_intended.PA5__PARATRIGEMINAL_NUCLE: None,
-                burr_3_intended.VI__ABDUCENS_NUCLEUS: None,
-                burr_3_intended.VII__FACIAL_MOTOR_NUCLEUS: None,
-                burr_3_intended.AMB__NUCLEUS_AMBIGUUS: None,
-                burr_3_intended.DMX__DORSAL_MOTOR_NUCLEUS: None,
-                burr_3_intended.GRN__GIGANTOCELLULAR_RETI: None,
-                burr_3_intended.ICB__INFRACEREBELLAR_NUCL: None,
-                burr_3_intended.IO__INFERIOR_OLIVARY_COMP: None,
-                burr_3_intended.IRN__INTERMEDIATE_RETICUL: None,
-                burr_3_intended.ISN__INFERIOR_SALIVATORY: None,
-                burr_3_intended.LIN__LINEAR_NUCLEUS_OF_TH: None,
-                burr_3_intended.LRN__LATERAL_RETICULAR_NU: None,
-                burr_3_intended.MARN__MAGNOCELLULAR_RETIC: None,
-                burr_3_intended.MDRN__MEDULLARY_RETICULAR: None,
-                burr_3_intended.PARN__PARVICELLULAR_RETIC: None,
-                burr_3_intended.PAS__PARASOLITARY_NUCLEUS: None,
-                burr_3_intended.PGRN__PARAGIGANTOCELLULAR: None,
-                burr_3_intended.NR__NUCLEUS_OF__ROLLER: None,
-                burr_3_intended.PRP__NUCLEUS_PREPOSITUS: None,
-                burr_3_intended.PMR__PARAMEDIAN_RETICULAR: None,
-                burr_3_intended.PPY__PARAPYRAMIDAL_NUCLEU: None,
-                burr_3_intended.LAV__LATERAL_VESTIBULAR_N: None,
-                burr_3_intended.MV__MEDIAL_VESTIBULAR_NUC: None,
-                burr_3_intended.SPIV__SPINAL_VESTIBULAR_N: None,
-                burr_3_intended.SUV__SUPERIOR_VESTIBULAR: None,
-                burr_3_intended.X__NUCLEUS_X: None,
-                burr_3_intended.XII__HYPOGLOSSAL_NUCLEUS: None,
-                burr_3_intended.Y__NUCLEUS_Y: None,
-                burr_3_intended.RM__NUCLEUS_RAPHE_MAGNUS: None,
-                burr_3_intended.RPA__NUCLEUS_RAPHE_PALLID: None,
-                burr_3_intended.RO__NUCLEUS_RAPHE_OBSCURU: None,
-                burr_3_intended.LING__LINGULA_I: None,
-                burr_3_intended.CENT2__LOBULE_II: None,
-                burr_3_intended.CENT3__LOBULE_III: None,
-                burr_3_intended.CUL4_5__LOBULES_IV_V: None,
-                burr_3_intended.DEC__DECLIVE_VI: None,
-                burr_3_intended.FOTU__FOLIUM_TUBER_VERMIS: None,
-                burr_3_intended.PYR__PYRAMUS_VIII: None,
-                burr_3_intended.UVU__UVULA_IX: None,
-                burr_3_intended.NOD__NODULUS_X: None,
-                burr_3_intended.SIM__SIMPLE_LOBULE: None,
-                burr_3_intended.A_NCR1__CRUS_1: None,
-                burr_3_intended.A_NCR2__CRUS_2: None,
-                burr_3_intended.PRM__PARAMEDIAN_LOBULE: None,
-                burr_3_intended.COPY__COPULA_PYRAMIDIS: None,
-                burr_3_intended.PFL__PARAFLOCCULUS: None,
-                burr_3_intended.FL__FLOCCULUS: None,
-                burr_3_intended.FN__FASTIGIAL_NUCLEUS: None,
-                burr_3_intended.IP__INTERPOSED_NUCLEUS: None,
-                burr_3_intended.DN__DENTATE_NUCLEUS: None,
-                burr_3_intended.VE_CB__VESTIBULOCEREBELLA: None,
-            }.get(burr_3_intended, None)
-        )
+        return self._map_targeted_structure(burr_3_intended)
 
     @property
     def aind_burr_3_intended_x0020(self) -> Optional[str]:
@@ -1279,324 +977,10 @@ class MappedNSBList:
         return self._nsb.burr_x0020_4_x0020_injectable_x06
 
     @property
-    def aind_burr_4_intended(self) -> Optional[Any]:
+    def aind_burr_4_intended(self) -> Optional[BrainStructureModel]:
         """Maps burr_4_intended to aind model."""
         burr_4_intended = self._nsb.burr_x0020_4_x0020_intended_x002
-        return (
-            None
-            if burr_4_intended is None
-            else {
-                burr_4_intended.FRP__FRONTAL_POLE_CEREBRA: None,
-                burr_4_intended.M_OP__PRIMARY_MOTOR_AREA: None,
-                burr_4_intended.M_OS__SECONDARY_MOTOR_ARE: None,
-                burr_4_intended.S_SP_N__PRIMARY_SOMATOSEN: None,
-                burr_4_intended.S_SP_BFD__PRIMARY_SOMATOS: None,
-                burr_4_intended.S_SP_LL__PRIMARY_SOMATOSE: None,
-                burr_4_intended.S_SP_M__PRIMARY_SOMATOSEN: None,
-                burr_4_intended.S_SP_UL__PRIMARY_SOMATOSE: None,
-                burr_4_intended.S_SP_TR__PRIMARY_SOMATOSE: None,
-                burr_4_intended.S_SP_UN__PRIMARY_SOMATOSE: None,
-                burr_4_intended.S_SS__SUPPLEMENTAL_SOMATO: None,
-                burr_4_intended.GU__GUSTATORY_AREAS: None,
-                burr_4_intended.VISC__VISCERAL_AREA: None,
-                burr_4_intended.AU_DD__DORSAL_AUDITORY_AR: None,
-                burr_4_intended.AU_DP__PRIMARY_AUDITORY_A: None,
-                burr_4_intended.AU_DPO__POSTERIOR_AUDITOR: None,
-                burr_4_intended.AU_DV__VENTRAL_AUDITORY_A: None,
-                burr_4_intended.VI_SAL__ANTEROLATERAL_VIS: None,
-                burr_4_intended.VI_SAM__ANTEROMEDIAL_VISU: None,
-                burr_4_intended.VI_SL__LATERAL_VISUAL_ARE: None,
-                burr_4_intended.VI_SP__PRIMARY_VISUAL_ARE: None,
-                burr_4_intended.VI_SPL__POSTEROLATERAL_VI: None,
-                burr_4_intended.VI_SPM_POSTEROMEDIAL_VISU: None,
-                burr_4_intended.VI_SLI__LATEROINTERMEDIAT: None,
-                burr_4_intended.VI_SPOR__POSTRHINAL_AREA: None,
-                burr_4_intended.AC_AD__ANTERIOR_CINGULATE: None,
-                burr_4_intended.AC_AV__ANTERIOR_CINGULATE: None,
-                burr_4_intended.PL__PRELIMBIC_AREA: None,
-                burr_4_intended.ILA__INFRALIMBIC_AREA: None,
-                burr_4_intended.OR_BL__ORBITAL_AREA_LATER: None,
-                burr_4_intended.OR_BM__ORBITAL_AREA_MEDIA: None,
-                burr_4_intended.OR_BV__ORBITAL_AREA_VENTR: None,
-                burr_4_intended.OR_BVL__ORBITAL_AREA_VENT: None,
-                burr_4_intended.A_ID__AGRANULAR_INSULAR_A: None,
-                burr_4_intended.A_IP__AGRANULAR_INSULAR_A: None,
-                burr_4_intended.A_IV__AGRANULAR_INSULAR_A: None,
-                burr_4_intended.RS_PAGL__RETROSPLENIAL_AR: None,
-                burr_4_intended.RS_PD__RETROSPLENIAL_AREA: None,
-                burr_4_intended.RS_PV__RETROSPLENIAL_AREA: None,
-                burr_4_intended.VI_SA__ANTERIOR_AREA: None,
-                burr_4_intended.VI_SRL__ROSTROLATERAL_VIS: None,
-                burr_4_intended.T_EA__TEMPORAL_ASSOCIATIO: None,
-                burr_4_intended.PERI__PERIRHINAL_AREA: None,
-                burr_4_intended.ECT__ECTORHINAL_AREA: None,
-                burr_4_intended.MOB__MAIN_OLFACTORY_BULB: None,
-                burr_4_intended.AOB__ACCESSORY_OLFACTORY: None,
-                burr_4_intended.AON__ANTERIOR_OLFACTORY_N: None,
-                burr_4_intended.T_TD__TAENIA_TECTA_DORSAL: None,
-                burr_4_intended.T_TV__TAENIA_TECTA_VENTRA: None,
-                burr_4_intended.DP__DORSAL_PEDUNCULAR_ARE: None,
-                burr_4_intended.PIR__PIRIFORM_AREA: None,
-                burr_4_intended.NLOT__NUCLEUS_OF_THE_LATE: None,
-                burr_4_intended.CO_AA__CORTICAL_AMYGDALAR: None,
-                burr_4_intended.CO_AP__CORTICAL_AMYGDALAR: None,
-                burr_4_intended.PAA__PIRIFORM_AMYGDALAR_A: None,
-                burr_4_intended.TR__POSTPIRIFORM_TRANSITI: None,
-                burr_4_intended.CA1__FIELD_CA1: None,
-                burr_4_intended.CA2__FIELD_CA2: None,
-                burr_4_intended.CA3__FIELD_CA3: None,
-                burr_4_intended.DG__DENTATE_GYRUS: None,
-                burr_4_intended.FC__FASCIOLA_CINEREA: None,
-                burr_4_intended.IG__INDUSEUM_GRISEUM: None,
-                burr_4_intended.EN_TL__ENTORHINAL_AREA_LA: None,
-                burr_4_intended.EN_TM__ENTORHINAL_AREA_ME: None,
-                burr_4_intended.PAR__PARASUBICULUM: None,
-                burr_4_intended.POST__POSTSUBICULUM: None,
-                burr_4_intended.PRE__PRESUBICULUM: None,
-                burr_4_intended.SUB__SUBICULUM: None,
-                burr_4_intended.PRO_S__PROSUBICULUM: None,
-                burr_4_intended.HATA__HIPPOCAMPO_AMYGDALA: None,
-                burr_4_intended.A_PR__AREA_PROSTRIATA: None,
-                burr_4_intended.CLA__CLAUSTRUM: None,
-                burr_4_intended.E_PD__ENDOPIRIFORM_NUCLEU: None,
-                burr_4_intended.E_PV__ENDOPIRIFORM_NUCLEU: None,
-                burr_4_intended.LA__LATERAL_AMYGDALAR_NUC: None,
-                burr_4_intended.BLA__BASOLATERAL_AMYGDALA: None,
-                burr_4_intended.BMA__BASOMEDIAL_AMYGDALAR: None,
-                burr_4_intended.PA__POSTERIOR_AMYGDALAR_N: None,
-                burr_4_intended.CP__CAUDOPUTAMEN: None,
-                burr_4_intended.ACB__NUCLEUS_ACCUMBENS: None,
-                burr_4_intended.FS__FUNDUS_OF_STRIATUM: None,
-                burr_4_intended.OT__OLFACTORY_TUBERCLE: None,
-                burr_4_intended.L_SC__LATERAL_SEPTAL_NUCL: None,
-                burr_4_intended.L_SR__LATERAL_SEPTAL_NUCL: None,
-                burr_4_intended.L_SV__LATERAL_SEPTAL_NUCL: None,
-                burr_4_intended.SF__SEPTOFIMBRIAL_NUCLEUS: None,
-                burr_4_intended.SH__SEPTOHIPPOCAMPAL_NUCL: None,
-                burr_4_intended.AAA__ANTERIOR_AMYGDALAR_A: None,
-                burr_4_intended.BA__BED_NUCLEUS_OF_THE_AC: None,
-                burr_4_intended.CEA__CENTRAL_AMYGDALAR_NU: None,
-                burr_4_intended.IA__INTERCALATED_AMYGDALA: None,
-                burr_4_intended.MEA__MEDIAL_AMYGDALAR_NUC: None,
-                burr_4_intended.G_PE__GLOBUS_PALLIDUS_EXT: None,
-                burr_4_intended.G_PI__GLOBUS_PALLIDUS_INT: None,
-                burr_4_intended.SI__SUBSTANTIA_INNOMINATA: None,
-                burr_4_intended.MA__MAGNOCELLULAR_NUCLEUS: None,
-                burr_4_intended.MS__MEDIAL_SEPTAL_NUCLEUS: None,
-                burr_4_intended.NDB__DIAGONAL_BAND_NUCLEU: None,
-                burr_4_intended.TRS__TRIANGULAR_NUCLEUS_O: None,
-                burr_4_intended.BST__BED_NUCLEI_OF_THE_ST: None,
-                burr_4_intended.VAL__VENTRAL_ANTERIOR_LAT: None,
-                burr_4_intended.VM__VENTRAL_MEDIAL_NUCLEU: None,
-                burr_4_intended.VPL__VENTRAL_POSTEROLATER: None,
-                burr_4_intended.VP_LPC__VENTRAL_POSTEROLA: None,
-                burr_4_intended.VPM__VENTRAL_POSTEROMEDIA: None,
-                burr_4_intended.VP_MPC__VENTRAL_POSTEROME: None,
-                burr_4_intended.PO_T__POSTERIOR_TRIANGULA: None,
-                burr_4_intended.SPF__SUBPARAFASCICULAR_NU: None,
-                burr_4_intended.SPA__SUBPARAFASCICULAR_AR: None,
-                burr_4_intended.PP__PERIPEDUNCULAR_NUCLEU: None,
-                burr_4_intended.MG__MEDIAL_GENICULATE_COM: None,
-                burr_4_intended.L_GD__DORSAL_PART_OF_THE: None,
-                burr_4_intended.LP__LATERAL_POSTERIOR_NUC: None,
-                burr_4_intended.PO__POSTERIOR_COMPLEX_OF: None,
-                burr_4_intended.POL__POSTERIOR_LIMITING_N: None,
-                burr_4_intended.SGN__SUPRAGENICULATE_NUCL: None,
-                burr_4_intended.ETH__ETHMOID_NUCLEUS_OF_T: None,
-                burr_4_intended.AV__ANTEROVENTRAL_NUCLEUS: None,
-                burr_4_intended.AM__ANTEROMEDIAL_NUCLEUS: None,
-                burr_4_intended.AD__ANTERODORSAL_NUCLEUS: None,
-                burr_4_intended.IAM__INTERANTEROMEDIAL_NU: None,
-                burr_4_intended.IAD__INTERANTERODORSAL_NU: None,
-                burr_4_intended.LD__LATERAL_DORSAL_NUCLEU: None,
-                burr_4_intended.IMD__INTERMEDIODORSAL_NUC: None,
-                burr_4_intended.MD__MEDIODORSAL_NUCLEUS_O: None,
-                burr_4_intended.SMT__SUBMEDIAL_NUCLEUS_OF: None,
-                burr_4_intended.PR__PERIREUNENSIS_NUCLEUS: None,
-                burr_4_intended.PVT__PARAVENTRICULAR_NUCL: None,
-                burr_4_intended.PT__PARATAENIAL_NUCLEUS: None,
-                burr_4_intended.RE__NUCLEUS_OF_REUNIENS: None,
-                burr_4_intended.XI__XIPHOID_THALAMIC_NUCL: None,
-                burr_4_intended.RH__RHOMBOID_NUCLEUS: None,
-                burr_4_intended.CM__CENTRAL_MEDIAL_NUCLEU: None,
-                burr_4_intended.PCN__PARACENTRAL_NUCLEUS: None,
-                burr_4_intended.CL__CENTRAL_LATERAL_NUCLE: None,
-                burr_4_intended.PF__PARAFASCICULAR_NUCLEU: None,
-                burr_4_intended.PIL__POSTERIOR_INTRALAMIN: None,
-                burr_4_intended.RT__RETICULAR_NUCLEUS_OF: None,
-                burr_4_intended.IGL__INTERGENICULATE_LEAF: None,
-                burr_4_intended.INT_G__INTERMEDIATE_GENIC: None,
-                burr_4_intended.L_GV__VENTRAL_PART_OF_THE: None,
-                burr_4_intended.SUB_G__SUBGENICULATE_NUCL: None,
-                burr_4_intended.MH__MEDIAL_HABENULA: None,
-                burr_4_intended.LH__LATERAL_HABENULA: None,
-                burr_4_intended.SO__SUPRAOPTIC_NUCLEUS: None,
-                burr_4_intended.PVH__PARAVENTRICULAR_HYPO: None,
-                burr_4_intended.P_VA__PERIVENTRICULAR_HYP: None,
-                burr_4_intended.P_VI__PERIVENTRICULAR_HYP: None,
-                burr_4_intended.ARH__ARCUATE_HYPOTHALAMIC: None,
-                burr_4_intended.ADP__ANTERODORSAL_PREOPTI: None,
-                burr_4_intended.AVP__ANTEROVENTRAL_PREOPT: None,
-                burr_4_intended.AVPV__ANTEROVENTRAL_PERIV: None,
-                burr_4_intended.DMH__DORSOMEDIAL_NUCLEUS: None,
-                burr_4_intended.MEPO__MEDIAN_PREOPTIC_NUC: None,
-                burr_4_intended.MPO__MEDIAL_PREOPTIC_AREA: None,
-                burr_4_intended.PS__PARASTRIAL_NUCLEUS: None,
-                burr_4_intended.P_VP__PERIVENTRICULAR_HYP: None,
-                burr_4_intended.P_VPO__PERIVENTRICULAR_HY: None,
-                burr_4_intended.SBPV__SUBPARAVENTRICULAR: None,
-                burr_4_intended.SCH__SUPRACHIASMATIC_NUCL: None,
-                burr_4_intended.SFO__SUBFORNICAL_ORGAN: None,
-                burr_4_intended.VMPO__VENTROMEDIAL_PREOPT: None,
-                burr_4_intended.VLPO__VENTROLATERAL_PREOP: None,
-                burr_4_intended.AHN__ANTERIOR_HYPOTHALAMI: None,
-                burr_4_intended.LM__LATERAL_MAMMILLARY_NU: None,
-                burr_4_intended.MM__MEDIAL_MAMMILLARY_NUC: None,
-                burr_4_intended.SUM__SUPRAMAMMILLARY_NUCL: None,
-                burr_4_intended.TM__TUBEROMAMMILLARY_NUCL: None,
-                burr_4_intended.MPN__MEDIAL_PREOPTIC_NUCL: None,
-                burr_4_intended.P_MD__DORSAL_PREMAMMILLAR: None,
-                burr_4_intended.P_MV__VENTRAL_PREMAMMILLA: None,
-                burr_4_intended.PV_HD__PARAVENTRICULAR_HY: None,
-                burr_4_intended.VMH__VENTROMEDIAL_HYPOTHA: None,
-                burr_4_intended.PH__POSTERIOR_HYPOTHALAMI: None,
-                burr_4_intended.LHA__LATERAL_HYPOTHALAMIC: None,
-                burr_4_intended.LPO__LATERAL_PREOPTIC_ARE: None,
-                burr_4_intended.PSTN__PARASUBTHALAMIC_NUC: None,
-                burr_4_intended.PE_F__PERIFORNICAL_NUCLEU: None,
-                burr_4_intended.RCH__RETROCHIASMATIC_AREA: None,
-                burr_4_intended.STN__SUBTHALAMIC_NUCLEUS: None,
-                burr_4_intended.TU__TUBERAL_NUCLEUS: None,
-                burr_4_intended.ZI__ZONA_INCERTA: None,
-                burr_4_intended.S_CS__SUPERIOR_COLLICULUS: None,
-                burr_4_intended.IC__INFERIOR_COLLICULUS: None,
-                burr_4_intended.NB__NUCLEUS_OF_THE_BRACHI: None,
-                burr_4_intended.SAG__NUCLEUS_SAGULUM: None,
-                burr_4_intended.PBG__PARABIGEMINAL_NUCLEU: None,
-                burr_4_intended.S_NR__SUBSTANTIA_NIGRA_RE: None,
-                burr_4_intended.VTA__VENTRAL_TEGMENTAL_AR: None,
-                burr_4_intended.PN__PARANIGRAL_NUCLEUS: None,
-                burr_4_intended.RR__MIDBRAIN_RETICULAR_NU: None,
-                burr_4_intended.MRN__MIDBRAIN_RETICULAR_N: None,
-                burr_4_intended.S_CM__SUPERIOR_COLLICULUS: None,
-                burr_4_intended.PAG__PERIAQUEDUCTAL_GRAY: None,
-                burr_4_intended.APN__ANTERIOR_PRETECTAL_N: None,
-                burr_4_intended.MPT__MEDIAL_PRETECTAL_ARE: None,
-                burr_4_intended.NOT__NUCLEUS_OF_THE_OPTIC: None,
-                burr_4_intended.NPC__NUCLEUS_OF_THE_POSTE: None,
-                burr_4_intended.OP__OLIVARY_PRETECTAL_NUC: None,
-                burr_4_intended.PPT__POSTERIOR_PRETECTAL: None,
-                burr_4_intended.RPF__RETROPARAFASCICULAR: None,
-                burr_4_intended.CUN__CUNEIFORM_NUCLEUS: None,
-                burr_4_intended.RN__RED_NUCLEUS: None,
-                burr_4_intended.III__OCULOMOTOR_NUCLEUS: None,
-                burr_4_intended.MA3__MEDIAL_ACCESORY_OCUL: None,
-                burr_4_intended.EW__EDINGER__WESTPHAL_NUC: None,
-                burr_4_intended.IV__TROCHLEAR_NUCLEUS: None,
-                burr_4_intended.PA4__PARATROCHLEAR_NUCLEU: None,
-                burr_4_intended.VTN__VENTRAL_TEGMENTAL_NU: None,
-                burr_4_intended.AT__ANTERIOR_TEGMENTAL_NU: None,
-                burr_4_intended.LT__LATERAL_TERMINAL_NUCL: None,
-                burr_4_intended.DT__DORSAL_TERMINAL_NUCLE: None,
-                burr_4_intended.MT__MEDIAL_TERMINAL_NUCLE: None,
-                burr_4_intended.S_NC__SUBSTANTIA_NIGRA_CO: None,
-                burr_4_intended.PPN__PEDUNCULOPONTINE_NUC: None,
-                burr_4_intended.IF__INTERFASCICULAR_NUCLE: None,
-                burr_4_intended.IPN__INTERPEDUNCULAR_NUCL: None,
-                burr_4_intended.RL__ROSTRAL_LINEAR_NUCLEU: None,
-                burr_4_intended.CLI__CENTRAL_LINEAR_NUCLE: None,
-                burr_4_intended.DR__DORSAL_NUCLEUS_RAPHE: None,
-                burr_4_intended.NLL__NUCLEUS_OF_THE_LATER: None,
-                burr_4_intended.PSV__PRINCIPAL_SENSORY_NU: None,
-                burr_4_intended.PB__PARABRACHIAL_NUCLEUS: None,
-                burr_4_intended.SOC__SUPERIOR_OLIVARY_COM: None,
-                burr_4_intended.B__BARRINGTON_S_NUCLEUS: None,
-                burr_4_intended.DTN__DORSAL_TEGMENTAL_NUC: None,
-                burr_4_intended.PD_TG__POSTERODORSAL_TEGM: None,
-                burr_4_intended.PCG__PONTINE_CENTRAL_GRAY: None,
-                burr_4_intended.PG__PONTINE_GRAY: None,
-                burr_4_intended.PR_NC__PONTINE_RETICULAR: None,
-                burr_4_intended.SG__SUPRAGENUAL_NUCLEUS: None,
-                burr_4_intended.SUT__SUPRATRIGEMINAL_NUCL: None,
-                burr_4_intended.TRN__TEGMENTAL_RETICULAR: None,
-                burr_4_intended.V__MOTOR_NUCLEUS_OF_TRIGE: None,
-                burr_4_intended.P5__PERITRIGEMINAL_ZONE: None,
-                burr_4_intended.ACS5__ACCESSORY_TRIGEMINA: None,
-                burr_4_intended.PC5__PARVICELLULAR_MOTOR: None,
-                burr_4_intended.I5__INTERTRIGEMINAL_NUCLE: None,
-                burr_4_intended.CS__SUPERIOR_CENTRAL_NUCL: None,
-                burr_4_intended.LC__LOCUS_CERULEUS: None,
-                burr_4_intended.LDT__LATERODORSAL_TEGMENT: None,
-                burr_4_intended.NI__NUCLEUS_INCERTUS: None,
-                burr_4_intended.PR_NR__PONTINE_RETICULAR: None,
-                burr_4_intended.RPO__NUCLEUS_RAPHE_PONTIS: None,
-                burr_4_intended.SLC__SUBCERULEUS_NUCLEUS: None,
-                burr_4_intended.SLD__SUBLATERODORSAL_NUCL: None,
-                burr_4_intended.MY__MEDULLA: None,
-                burr_4_intended.AP__AREA_POSTREMA: None,
-                burr_4_intended.DCO__DORSAL_COCHLEAR_NUCL: None,
-                burr_4_intended.VCO__VENTRAL_COCHLEAR_NUC: None,
-                burr_4_intended.CU__CUNEATE_NUCLEUS: None,
-                burr_4_intended.GR__GRACILE_NUCLEUS: None,
-                burr_4_intended.ECU__EXTERNAL_CUNEATE_NUC: None,
-                burr_4_intended.NTB__NUCLEUS_OF_THE_TRAPE: None,
-                burr_4_intended.NTS__NUCLEUS_OF_THE_SOLIT: None,
-                burr_4_intended.SPVC__SPINAL_NUCLEUS_OF_T: None,
-                burr_4_intended.SPVI__SPINAL_NUCLEUS_OF_T: None,
-                burr_4_intended.SPVO__SPINAL_NUCLEUS_OF_T: None,
-                burr_4_intended.PA5__PARATRIGEMINAL_NUCLE: None,
-                burr_4_intended.VI__ABDUCENS_NUCLEUS: None,
-                burr_4_intended.VII__FACIAL_MOTOR_NUCLEUS: None,
-                burr_4_intended.AMB__NUCLEUS_AMBIGUUS: None,
-                burr_4_intended.DMX__DORSAL_MOTOR_NUCLEUS: None,
-                burr_4_intended.GRN__GIGANTOCELLULAR_RETI: None,
-                burr_4_intended.ICB__INFRACEREBELLAR_NUCL: None,
-                burr_4_intended.IO__INFERIOR_OLIVARY_COMP: None,
-                burr_4_intended.IRN__INTERMEDIATE_RETICUL: None,
-                burr_4_intended.ISN__INFERIOR_SALIVATORY: None,
-                burr_4_intended.LIN__LINEAR_NUCLEUS_OF_TH: None,
-                burr_4_intended.LRN__LATERAL_RETICULAR_NU: None,
-                burr_4_intended.MARN__MAGNOCELLULAR_RETIC: None,
-                burr_4_intended.MDRN__MEDULLARY_RETICULAR: None,
-                burr_4_intended.PARN__PARVICELLULAR_RETIC: None,
-                burr_4_intended.PAS__PARASOLITARY_NUCLEUS: None,
-                burr_4_intended.PGRN__PARAGIGANTOCELLULAR: None,
-                burr_4_intended.NR__NUCLEUS_OF__ROLLER: None,
-                burr_4_intended.PRP__NUCLEUS_PREPOSITUS: None,
-                burr_4_intended.PMR__PARAMEDIAN_RETICULAR: None,
-                burr_4_intended.PPY__PARAPYRAMIDAL_NUCLEU: None,
-                burr_4_intended.LAV__LATERAL_VESTIBULAR_N: None,
-                burr_4_intended.MV__MEDIAL_VESTIBULAR_NUC: None,
-                burr_4_intended.SPIV__SPINAL_VESTIBULAR_N: None,
-                burr_4_intended.SUV__SUPERIOR_VESTIBULAR: None,
-                burr_4_intended.X__NUCLEUS_X: None,
-                burr_4_intended.XII__HYPOGLOSSAL_NUCLEUS: None,
-                burr_4_intended.Y__NUCLEUS_Y: None,
-                burr_4_intended.RM__NUCLEUS_RAPHE_MAGNUS: None,
-                burr_4_intended.RPA__NUCLEUS_RAPHE_PALLID: None,
-                burr_4_intended.RO__NUCLEUS_RAPHE_OBSCURU: None,
-                burr_4_intended.LING__LINGULA_I: None,
-                burr_4_intended.CENT2__LOBULE_II: None,
-                burr_4_intended.CENT3__LOBULE_III: None,
-                burr_4_intended.CUL4_5__LOBULES_IV_V: None,
-                burr_4_intended.DEC__DECLIVE_VI: None,
-                burr_4_intended.FOTU__FOLIUM_TUBER_VERMIS: None,
-                burr_4_intended.PYR__PYRAMUS_VIII: None,
-                burr_4_intended.UVU__UVULA_IX: None,
-                burr_4_intended.NOD__NODULUS_X: None,
-                burr_4_intended.SIM__SIMPLE_LOBULE: None,
-                burr_4_intended.A_NCR1__CRUS_1: None,
-                burr_4_intended.A_NCR2__CRUS_2: None,
-                burr_4_intended.PRM__PARAMEDIAN_LOBULE: None,
-                burr_4_intended.COPY__COPULA_PYRAMIDIS: None,
-                burr_4_intended.PFL__PARAFLOCCULUS: None,
-                burr_4_intended.FL__FLOCCULUS: None,
-                burr_4_intended.FN__FASTIGIAL_NUCLEUS: None,
-                burr_4_intended.IP__INTERPOSED_NUCLEUS: None,
-                burr_4_intended.DN__DENTATE_NUCLEUS: None,
-                burr_4_intended.VE_CB__VESTIBULOCEREBELLA: None,
-            }.get(burr_4_intended, None)
-        )
+        return self._map_targeted_structure(burr_4_intended)
 
     @property
     def aind_burr_4_intended_x0020(self) -> Optional[str]:
@@ -1745,324 +1129,10 @@ class MappedNSBList:
         return self._nsb.burr_x0020_5_x0020_injectable_x06
 
     @property
-    def aind_burr_5_intended(self) -> Optional[Any]:
+    def aind_burr_5_intended(self) -> Optional[BrainStructureModel]:
         """Maps burr_5_intended to aind model."""
         burr_5_intended = self._nsb.burr_x0020_5_x0020_intended_x002
-        return (
-            None
-            if burr_5_intended is None
-            else {
-                burr_5_intended.FRP__FRONTAL_POLE_CEREBRA: None,
-                burr_5_intended.M_OP__PRIMARY_MOTOR_AREA: None,
-                burr_5_intended.M_OS__SECONDARY_MOTOR_ARE: None,
-                burr_5_intended.S_SP_N__PRIMARY_SOMATOSEN: None,
-                burr_5_intended.S_SP_BFD__PRIMARY_SOMATOS: None,
-                burr_5_intended.S_SP_LL__PRIMARY_SOMATOSE: None,
-                burr_5_intended.S_SP_M__PRIMARY_SOMATOSEN: None,
-                burr_5_intended.S_SP_UL__PRIMARY_SOMATOSE: None,
-                burr_5_intended.S_SP_TR__PRIMARY_SOMATOSE: None,
-                burr_5_intended.S_SP_UN__PRIMARY_SOMATOSE: None,
-                burr_5_intended.S_SS__SUPPLEMENTAL_SOMATO: None,
-                burr_5_intended.GU__GUSTATORY_AREAS: None,
-                burr_5_intended.VISC__VISCERAL_AREA: None,
-                burr_5_intended.AU_DD__DORSAL_AUDITORY_AR: None,
-                burr_5_intended.AU_DP__PRIMARY_AUDITORY_A: None,
-                burr_5_intended.AU_DPO__POSTERIOR_AUDITOR: None,
-                burr_5_intended.AU_DV__VENTRAL_AUDITORY_A: None,
-                burr_5_intended.VI_SAL__ANTEROLATERAL_VIS: None,
-                burr_5_intended.VI_SAM__ANTEROMEDIAL_VISU: None,
-                burr_5_intended.VI_SL__LATERAL_VISUAL_ARE: None,
-                burr_5_intended.VI_SP__PRIMARY_VISUAL_ARE: None,
-                burr_5_intended.VI_SPL__POSTEROLATERAL_VI: None,
-                burr_5_intended.VI_SPM_POSTEROMEDIAL_VISU: None,
-                burr_5_intended.VI_SLI__LATEROINTERMEDIAT: None,
-                burr_5_intended.VI_SPOR__POSTRHINAL_AREA: None,
-                burr_5_intended.AC_AD__ANTERIOR_CINGULATE: None,
-                burr_5_intended.AC_AV__ANTERIOR_CINGULATE: None,
-                burr_5_intended.PL__PRELIMBIC_AREA: None,
-                burr_5_intended.ILA__INFRALIMBIC_AREA: None,
-                burr_5_intended.OR_BL__ORBITAL_AREA_LATER: None,
-                burr_5_intended.OR_BM__ORBITAL_AREA_MEDIA: None,
-                burr_5_intended.OR_BV__ORBITAL_AREA_VENTR: None,
-                burr_5_intended.OR_BVL__ORBITAL_AREA_VENT: None,
-                burr_5_intended.A_ID__AGRANULAR_INSULAR_A: None,
-                burr_5_intended.A_IP__AGRANULAR_INSULAR_A: None,
-                burr_5_intended.A_IV__AGRANULAR_INSULAR_A: None,
-                burr_5_intended.RS_PAGL__RETROSPLENIAL_AR: None,
-                burr_5_intended.RS_PD__RETROSPLENIAL_AREA: None,
-                burr_5_intended.RS_PV__RETROSPLENIAL_AREA: None,
-                burr_5_intended.VI_SA__ANTERIOR_AREA: None,
-                burr_5_intended.VI_SRL__ROSTROLATERAL_VIS: None,
-                burr_5_intended.T_EA__TEMPORAL_ASSOCIATIO: None,
-                burr_5_intended.PERI__PERIRHINAL_AREA: None,
-                burr_5_intended.ECT__ECTORHINAL_AREA: None,
-                burr_5_intended.MOB__MAIN_OLFACTORY_BULB: None,
-                burr_5_intended.AOB__ACCESSORY_OLFACTORY: None,
-                burr_5_intended.AON__ANTERIOR_OLFACTORY_N: None,
-                burr_5_intended.T_TD__TAENIA_TECTA_DORSAL: None,
-                burr_5_intended.T_TV__TAENIA_TECTA_VENTRA: None,
-                burr_5_intended.DP__DORSAL_PEDUNCULAR_ARE: None,
-                burr_5_intended.PIR__PIRIFORM_AREA: None,
-                burr_5_intended.NLOT__NUCLEUS_OF_THE_LATE: None,
-                burr_5_intended.CO_AA__CORTICAL_AMYGDALAR: None,
-                burr_5_intended.CO_AP__CORTICAL_AMYGDALAR: None,
-                burr_5_intended.PAA__PIRIFORM_AMYGDALAR_A: None,
-                burr_5_intended.TR__POSTPIRIFORM_TRANSITI: None,
-                burr_5_intended.CA1__FIELD_CA1: None,
-                burr_5_intended.CA2__FIELD_CA2: None,
-                burr_5_intended.CA3__FIELD_CA3: None,
-                burr_5_intended.DG__DENTATE_GYRUS: None,
-                burr_5_intended.FC__FASCIOLA_CINEREA: None,
-                burr_5_intended.IG__INDUSEUM_GRISEUM: None,
-                burr_5_intended.EN_TL__ENTORHINAL_AREA_LA: None,
-                burr_5_intended.EN_TM__ENTORHINAL_AREA_ME: None,
-                burr_5_intended.PAR__PARASUBICULUM: None,
-                burr_5_intended.POST__POSTSUBICULUM: None,
-                burr_5_intended.PRE__PRESUBICULUM: None,
-                burr_5_intended.SUB__SUBICULUM: None,
-                burr_5_intended.PRO_S__PROSUBICULUM: None,
-                burr_5_intended.HATA__HIPPOCAMPO_AMYGDALA: None,
-                burr_5_intended.A_PR__AREA_PROSTRIATA: None,
-                burr_5_intended.CLA__CLAUSTRUM: None,
-                burr_5_intended.E_PD__ENDOPIRIFORM_NUCLEU: None,
-                burr_5_intended.E_PV__ENDOPIRIFORM_NUCLEU: None,
-                burr_5_intended.LA__LATERAL_AMYGDALAR_NUC: None,
-                burr_5_intended.BLA__BASOLATERAL_AMYGDALA: None,
-                burr_5_intended.BMA__BASOMEDIAL_AMYGDALAR: None,
-                burr_5_intended.PA__POSTERIOR_AMYGDALAR_N: None,
-                burr_5_intended.CP__CAUDOPUTAMEN: None,
-                burr_5_intended.ACB__NUCLEUS_ACCUMBENS: None,
-                burr_5_intended.FS__FUNDUS_OF_STRIATUM: None,
-                burr_5_intended.OT__OLFACTORY_TUBERCLE: None,
-                burr_5_intended.L_SC__LATERAL_SEPTAL_NUCL: None,
-                burr_5_intended.L_SR__LATERAL_SEPTAL_NUCL: None,
-                burr_5_intended.L_SV__LATERAL_SEPTAL_NUCL: None,
-                burr_5_intended.SF__SEPTOFIMBRIAL_NUCLEUS: None,
-                burr_5_intended.SH__SEPTOHIPPOCAMPAL_NUCL: None,
-                burr_5_intended.AAA__ANTERIOR_AMYGDALAR_A: None,
-                burr_5_intended.BA__BED_NUCLEUS_OF_THE_AC: None,
-                burr_5_intended.CEA__CENTRAL_AMYGDALAR_NU: None,
-                burr_5_intended.IA__INTERCALATED_AMYGDALA: None,
-                burr_5_intended.MEA__MEDIAL_AMYGDALAR_NUC: None,
-                burr_5_intended.G_PE__GLOBUS_PALLIDUS_EXT: None,
-                burr_5_intended.G_PI__GLOBUS_PALLIDUS_INT: None,
-                burr_5_intended.SI__SUBSTANTIA_INNOMINATA: None,
-                burr_5_intended.MA__MAGNOCELLULAR_NUCLEUS: None,
-                burr_5_intended.MS__MEDIAL_SEPTAL_NUCLEUS: None,
-                burr_5_intended.NDB__DIAGONAL_BAND_NUCLEU: None,
-                burr_5_intended.TRS__TRIANGULAR_NUCLEUS_O: None,
-                burr_5_intended.BST__BED_NUCLEI_OF_THE_ST: None,
-                burr_5_intended.VAL__VENTRAL_ANTERIOR_LAT: None,
-                burr_5_intended.VM__VENTRAL_MEDIAL_NUCLEU: None,
-                burr_5_intended.VPL__VENTRAL_POSTEROLATER: None,
-                burr_5_intended.VP_LPC__VENTRAL_POSTEROLA: None,
-                burr_5_intended.VPM__VENTRAL_POSTEROMEDIA: None,
-                burr_5_intended.VP_MPC__VENTRAL_POSTEROME: None,
-                burr_5_intended.PO_T__POSTERIOR_TRIANGULA: None,
-                burr_5_intended.SPF__SUBPARAFASCICULAR_NU: None,
-                burr_5_intended.SPA__SUBPARAFASCICULAR_AR: None,
-                burr_5_intended.PP__PERIPEDUNCULAR_NUCLEU: None,
-                burr_5_intended.MG__MEDIAL_GENICULATE_COM: None,
-                burr_5_intended.L_GD__DORSAL_PART_OF_THE: None,
-                burr_5_intended.LP__LATERAL_POSTERIOR_NUC: None,
-                burr_5_intended.PO__POSTERIOR_COMPLEX_OF: None,
-                burr_5_intended.POL__POSTERIOR_LIMITING_N: None,
-                burr_5_intended.SGN__SUPRAGENICULATE_NUCL: None,
-                burr_5_intended.ETH__ETHMOID_NUCLEUS_OF_T: None,
-                burr_5_intended.AV__ANTEROVENTRAL_NUCLEUS: None,
-                burr_5_intended.AM__ANTEROMEDIAL_NUCLEUS: None,
-                burr_5_intended.AD__ANTERODORSAL_NUCLEUS: None,
-                burr_5_intended.IAM__INTERANTEROMEDIAL_NU: None,
-                burr_5_intended.IAD__INTERANTERODORSAL_NU: None,
-                burr_5_intended.LD__LATERAL_DORSAL_NUCLEU: None,
-                burr_5_intended.IMD__INTERMEDIODORSAL_NUC: None,
-                burr_5_intended.MD__MEDIODORSAL_NUCLEUS_O: None,
-                burr_5_intended.SMT__SUBMEDIAL_NUCLEUS_OF: None,
-                burr_5_intended.PR__PERIREUNENSIS_NUCLEUS: None,
-                burr_5_intended.PVT__PARAVENTRICULAR_NUCL: None,
-                burr_5_intended.PT__PARATAENIAL_NUCLEUS: None,
-                burr_5_intended.RE__NUCLEUS_OF_REUNIENS: None,
-                burr_5_intended.XI__XIPHOID_THALAMIC_NUCL: None,
-                burr_5_intended.RH__RHOMBOID_NUCLEUS: None,
-                burr_5_intended.CM__CENTRAL_MEDIAL_NUCLEU: None,
-                burr_5_intended.PCN__PARACENTRAL_NUCLEUS: None,
-                burr_5_intended.CL__CENTRAL_LATERAL_NUCLE: None,
-                burr_5_intended.PF__PARAFASCICULAR_NUCLEU: None,
-                burr_5_intended.PIL__POSTERIOR_INTRALAMIN: None,
-                burr_5_intended.RT__RETICULAR_NUCLEUS_OF: None,
-                burr_5_intended.IGL__INTERGENICULATE_LEAF: None,
-                burr_5_intended.INT_G__INTERMEDIATE_GENIC: None,
-                burr_5_intended.L_GV__VENTRAL_PART_OF_THE: None,
-                burr_5_intended.SUB_G__SUBGENICULATE_NUCL: None,
-                burr_5_intended.MH__MEDIAL_HABENULA: None,
-                burr_5_intended.LH__LATERAL_HABENULA: None,
-                burr_5_intended.SO__SUPRAOPTIC_NUCLEUS: None,
-                burr_5_intended.PVH__PARAVENTRICULAR_HYPO: None,
-                burr_5_intended.P_VA__PERIVENTRICULAR_HYP: None,
-                burr_5_intended.P_VI__PERIVENTRICULAR_HYP: None,
-                burr_5_intended.ARH__ARCUATE_HYPOTHALAMIC: None,
-                burr_5_intended.ADP__ANTERODORSAL_PREOPTI: None,
-                burr_5_intended.AVP__ANTEROVENTRAL_PREOPT: None,
-                burr_5_intended.AVPV__ANTEROVENTRAL_PERIV: None,
-                burr_5_intended.DMH__DORSOMEDIAL_NUCLEUS: None,
-                burr_5_intended.MEPO__MEDIAN_PREOPTIC_NUC: None,
-                burr_5_intended.MPO__MEDIAL_PREOPTIC_AREA: None,
-                burr_5_intended.PS__PARASTRIAL_NUCLEUS: None,
-                burr_5_intended.P_VP__PERIVENTRICULAR_HYP: None,
-                burr_5_intended.P_VPO__PERIVENTRICULAR_HY: None,
-                burr_5_intended.SBPV__SUBPARAVENTRICULAR: None,
-                burr_5_intended.SCH__SUPRACHIASMATIC_NUCL: None,
-                burr_5_intended.SFO__SUBFORNICAL_ORGAN: None,
-                burr_5_intended.VMPO__VENTROMEDIAL_PREOPT: None,
-                burr_5_intended.VLPO__VENTROLATERAL_PREOP: None,
-                burr_5_intended.AHN__ANTERIOR_HYPOTHALAMI: None,
-                burr_5_intended.LM__LATERAL_MAMMILLARY_NU: None,
-                burr_5_intended.MM__MEDIAL_MAMMILLARY_NUC: None,
-                burr_5_intended.SUM__SUPRAMAMMILLARY_NUCL: None,
-                burr_5_intended.TM__TUBEROMAMMILLARY_NUCL: None,
-                burr_5_intended.MPN__MEDIAL_PREOPTIC_NUCL: None,
-                burr_5_intended.P_MD__DORSAL_PREMAMMILLAR: None,
-                burr_5_intended.P_MV__VENTRAL_PREMAMMILLA: None,
-                burr_5_intended.PV_HD__PARAVENTRICULAR_HY: None,
-                burr_5_intended.VMH__VENTROMEDIAL_HYPOTHA: None,
-                burr_5_intended.PH__POSTERIOR_HYPOTHALAMI: None,
-                burr_5_intended.LHA__LATERAL_HYPOTHALAMIC: None,
-                burr_5_intended.LPO__LATERAL_PREOPTIC_ARE: None,
-                burr_5_intended.PSTN__PARASUBTHALAMIC_NUC: None,
-                burr_5_intended.PE_F__PERIFORNICAL_NUCLEU: None,
-                burr_5_intended.RCH__RETROCHIASMATIC_AREA: None,
-                burr_5_intended.STN__SUBTHALAMIC_NUCLEUS: None,
-                burr_5_intended.TU__TUBERAL_NUCLEUS: None,
-                burr_5_intended.ZI__ZONA_INCERTA: None,
-                burr_5_intended.S_CS__SUPERIOR_COLLICULUS: None,
-                burr_5_intended.IC__INFERIOR_COLLICULUS: None,
-                burr_5_intended.NB__NUCLEUS_OF_THE_BRACHI: None,
-                burr_5_intended.SAG__NUCLEUS_SAGULUM: None,
-                burr_5_intended.PBG__PARABIGEMINAL_NUCLEU: None,
-                burr_5_intended.S_NR__SUBSTANTIA_NIGRA_RE: None,
-                burr_5_intended.VTA__VENTRAL_TEGMENTAL_AR: None,
-                burr_5_intended.PN__PARANIGRAL_NUCLEUS: None,
-                burr_5_intended.RR__MIDBRAIN_RETICULAR_NU: None,
-                burr_5_intended.MRN__MIDBRAIN_RETICULAR_N: None,
-                burr_5_intended.S_CM__SUPERIOR_COLLICULUS: None,
-                burr_5_intended.PAG__PERIAQUEDUCTAL_GRAY: None,
-                burr_5_intended.APN__ANTERIOR_PRETECTAL_N: None,
-                burr_5_intended.MPT__MEDIAL_PRETECTAL_ARE: None,
-                burr_5_intended.NOT__NUCLEUS_OF_THE_OPTIC: None,
-                burr_5_intended.NPC__NUCLEUS_OF_THE_POSTE: None,
-                burr_5_intended.OP__OLIVARY_PRETECTAL_NUC: None,
-                burr_5_intended.PPT__POSTERIOR_PRETECTAL: None,
-                burr_5_intended.RPF__RETROPARAFASCICULAR: None,
-                burr_5_intended.CUN__CUNEIFORM_NUCLEUS: None,
-                burr_5_intended.RN__RED_NUCLEUS: None,
-                burr_5_intended.III__OCULOMOTOR_NUCLEUS: None,
-                burr_5_intended.MA3__MEDIAL_ACCESORY_OCUL: None,
-                burr_5_intended.EW__EDINGER__WESTPHAL_NUC: None,
-                burr_5_intended.IV__TROCHLEAR_NUCLEUS: None,
-                burr_5_intended.PA4__PARATROCHLEAR_NUCLEU: None,
-                burr_5_intended.VTN__VENTRAL_TEGMENTAL_NU: None,
-                burr_5_intended.AT__ANTERIOR_TEGMENTAL_NU: None,
-                burr_5_intended.LT__LATERAL_TERMINAL_NUCL: None,
-                burr_5_intended.DT__DORSAL_TERMINAL_NUCLE: None,
-                burr_5_intended.MT__MEDIAL_TERMINAL_NUCLE: None,
-                burr_5_intended.S_NC__SUBSTANTIA_NIGRA_CO: None,
-                burr_5_intended.PPN__PEDUNCULOPONTINE_NUC: None,
-                burr_5_intended.IF__INTERFASCICULAR_NUCLE: None,
-                burr_5_intended.IPN__INTERPEDUNCULAR_NUCL: None,
-                burr_5_intended.RL__ROSTRAL_LINEAR_NUCLEU: None,
-                burr_5_intended.CLI__CENTRAL_LINEAR_NUCLE: None,
-                burr_5_intended.DR__DORSAL_NUCLEUS_RAPHE: None,
-                burr_5_intended.NLL__NUCLEUS_OF_THE_LATER: None,
-                burr_5_intended.PSV__PRINCIPAL_SENSORY_NU: None,
-                burr_5_intended.PB__PARABRACHIAL_NUCLEUS: None,
-                burr_5_intended.SOC__SUPERIOR_OLIVARY_COM: None,
-                burr_5_intended.B__BARRINGTON_S_NUCLEUS: None,
-                burr_5_intended.DTN__DORSAL_TEGMENTAL_NUC: None,
-                burr_5_intended.PD_TG__POSTERODORSAL_TEGM: None,
-                burr_5_intended.PCG__PONTINE_CENTRAL_GRAY: None,
-                burr_5_intended.PG__PONTINE_GRAY: None,
-                burr_5_intended.PR_NC__PONTINE_RETICULAR: None,
-                burr_5_intended.SG__SUPRAGENUAL_NUCLEUS: None,
-                burr_5_intended.SUT__SUPRATRIGEMINAL_NUCL: None,
-                burr_5_intended.TRN__TEGMENTAL_RETICULAR: None,
-                burr_5_intended.V__MOTOR_NUCLEUS_OF_TRIGE: None,
-                burr_5_intended.P5__PERITRIGEMINAL_ZONE: None,
-                burr_5_intended.ACS5__ACCESSORY_TRIGEMINA: None,
-                burr_5_intended.PC5__PARVICELLULAR_MOTOR: None,
-                burr_5_intended.I5__INTERTRIGEMINAL_NUCLE: None,
-                burr_5_intended.CS__SUPERIOR_CENTRAL_NUCL: None,
-                burr_5_intended.LC__LOCUS_CERULEUS: None,
-                burr_5_intended.LDT__LATERODORSAL_TEGMENT: None,
-                burr_5_intended.NI__NUCLEUS_INCERTUS: None,
-                burr_5_intended.PR_NR__PONTINE_RETICULAR: None,
-                burr_5_intended.RPO__NUCLEUS_RAPHE_PONTIS: None,
-                burr_5_intended.SLC__SUBCERULEUS_NUCLEUS: None,
-                burr_5_intended.SLD__SUBLATERODORSAL_NUCL: None,
-                burr_5_intended.MY__MEDULLA: None,
-                burr_5_intended.AP__AREA_POSTREMA: None,
-                burr_5_intended.DCO__DORSAL_COCHLEAR_NUCL: None,
-                burr_5_intended.VCO__VENTRAL_COCHLEAR_NUC: None,
-                burr_5_intended.CU__CUNEATE_NUCLEUS: None,
-                burr_5_intended.GR__GRACILE_NUCLEUS: None,
-                burr_5_intended.ECU__EXTERNAL_CUNEATE_NUC: None,
-                burr_5_intended.NTB__NUCLEUS_OF_THE_TRAPE: None,
-                burr_5_intended.NTS__NUCLEUS_OF_THE_SOLIT: None,
-                burr_5_intended.SPVC__SPINAL_NUCLEUS_OF_T: None,
-                burr_5_intended.SPVI__SPINAL_NUCLEUS_OF_T: None,
-                burr_5_intended.SPVO__SPINAL_NUCLEUS_OF_T: None,
-                burr_5_intended.PA5__PARATRIGEMINAL_NUCLE: None,
-                burr_5_intended.VI__ABDUCENS_NUCLEUS: None,
-                burr_5_intended.VII__FACIAL_MOTOR_NUCLEUS: None,
-                burr_5_intended.AMB__NUCLEUS_AMBIGUUS: None,
-                burr_5_intended.DMX__DORSAL_MOTOR_NUCLEUS: None,
-                burr_5_intended.GRN__GIGANTOCELLULAR_RETI: None,
-                burr_5_intended.ICB__INFRACEREBELLAR_NUCL: None,
-                burr_5_intended.IO__INFERIOR_OLIVARY_COMP: None,
-                burr_5_intended.IRN__INTERMEDIATE_RETICUL: None,
-                burr_5_intended.ISN__INFERIOR_SALIVATORY: None,
-                burr_5_intended.LIN__LINEAR_NUCLEUS_OF_TH: None,
-                burr_5_intended.LRN__LATERAL_RETICULAR_NU: None,
-                burr_5_intended.MARN__MAGNOCELLULAR_RETIC: None,
-                burr_5_intended.MDRN__MEDULLARY_RETICULAR: None,
-                burr_5_intended.PARN__PARVICELLULAR_RETIC: None,
-                burr_5_intended.PAS__PARASOLITARY_NUCLEUS: None,
-                burr_5_intended.PGRN__PARAGIGANTOCELLULAR: None,
-                burr_5_intended.NR__NUCLEUS_OF__ROLLER: None,
-                burr_5_intended.PRP__NUCLEUS_PREPOSITUS: None,
-                burr_5_intended.PMR__PARAMEDIAN_RETICULAR: None,
-                burr_5_intended.PPY__PARAPYRAMIDAL_NUCLEU: None,
-                burr_5_intended.LAV__LATERAL_VESTIBULAR_N: None,
-                burr_5_intended.MV__MEDIAL_VESTIBULAR_NUC: None,
-                burr_5_intended.SPIV__SPINAL_VESTIBULAR_N: None,
-                burr_5_intended.SUV__SUPERIOR_VESTIBULAR: None,
-                burr_5_intended.X__NUCLEUS_X: None,
-                burr_5_intended.XII__HYPOGLOSSAL_NUCLEUS: None,
-                burr_5_intended.Y__NUCLEUS_Y: None,
-                burr_5_intended.RM__NUCLEUS_RAPHE_MAGNUS: None,
-                burr_5_intended.RPA__NUCLEUS_RAPHE_PALLID: None,
-                burr_5_intended.RO__NUCLEUS_RAPHE_OBSCURU: None,
-                burr_5_intended.LING__LINGULA_I: None,
-                burr_5_intended.CENT2__LOBULE_II: None,
-                burr_5_intended.CENT3__LOBULE_III: None,
-                burr_5_intended.CUL4_5__LOBULES_IV_V: None,
-                burr_5_intended.DEC__DECLIVE_VI: None,
-                burr_5_intended.FOTU__FOLIUM_TUBER_VERMIS: None,
-                burr_5_intended.PYR__PYRAMUS_VIII: None,
-                burr_5_intended.UVU__UVULA_IX: None,
-                burr_5_intended.NOD__NODULUS_X: None,
-                burr_5_intended.SIM__SIMPLE_LOBULE: None,
-                burr_5_intended.A_NCR1__CRUS_1: None,
-                burr_5_intended.A_NCR2__CRUS_2: None,
-                burr_5_intended.PRM__PARAMEDIAN_LOBULE: None,
-                burr_5_intended.COPY__COPULA_PYRAMIDIS: None,
-                burr_5_intended.PFL__PARAFLOCCULUS: None,
-                burr_5_intended.FL__FLOCCULUS: None,
-                burr_5_intended.FN__FASTIGIAL_NUCLEUS: None,
-                burr_5_intended.IP__INTERPOSED_NUCLEUS: None,
-                burr_5_intended.DN__DENTATE_NUCLEUS: None,
-                burr_5_intended.VE_CB__VESTIBULOCEREBELLA: None,
-            }.get(burr_5_intended, None)
-        )
+        return self._map_targeted_structure(burr_5_intended)
 
     @property
     def aind_burr_5_intended_x0020(self) -> Optional[str]:
@@ -2218,324 +1288,10 @@ class MappedNSBList:
         return self._nsb.burr_x0020_6_x0020_injectable_x06
 
     @property
-    def aind_burr_6_intended(self) -> Optional[Any]:
+    def aind_burr_6_intended(self) -> Optional[BrainStructureModel]:
         """Maps burr_6_intended to aind model."""
         burr_6_intended = self._nsb.burr_x0020_6_x0020_intended_x002
-        return (
-            None
-            if burr_6_intended is None
-            else {
-                burr_6_intended.FRP__FRONTAL_POLE_CEREBRA: None,
-                burr_6_intended.M_OP__PRIMARY_MOTOR_AREA: None,
-                burr_6_intended.M_OS__SECONDARY_MOTOR_ARE: None,
-                burr_6_intended.S_SP_N__PRIMARY_SOMATOSEN: None,
-                burr_6_intended.S_SP_BFD__PRIMARY_SOMATOS: None,
-                burr_6_intended.S_SP_LL__PRIMARY_SOMATOSE: None,
-                burr_6_intended.S_SP_M__PRIMARY_SOMATOSEN: None,
-                burr_6_intended.S_SP_UL__PRIMARY_SOMATOSE: None,
-                burr_6_intended.S_SP_TR__PRIMARY_SOMATOSE: None,
-                burr_6_intended.S_SP_UN__PRIMARY_SOMATOSE: None,
-                burr_6_intended.S_SS__SUPPLEMENTAL_SOMATO: None,
-                burr_6_intended.GU__GUSTATORY_AREAS: None,
-                burr_6_intended.VISC__VISCERAL_AREA: None,
-                burr_6_intended.AU_DD__DORSAL_AUDITORY_AR: None,
-                burr_6_intended.AU_DP__PRIMARY_AUDITORY_A: None,
-                burr_6_intended.AU_DPO__POSTERIOR_AUDITOR: None,
-                burr_6_intended.AU_DV__VENTRAL_AUDITORY_A: None,
-                burr_6_intended.VI_SAL__ANTEROLATERAL_VIS: None,
-                burr_6_intended.VI_SAM__ANTEROMEDIAL_VISU: None,
-                burr_6_intended.VI_SL__LATERAL_VISUAL_ARE: None,
-                burr_6_intended.VI_SP__PRIMARY_VISUAL_ARE: None,
-                burr_6_intended.VI_SPL__POSTEROLATERAL_VI: None,
-                burr_6_intended.VI_SPM_POSTEROMEDIAL_VISU: None,
-                burr_6_intended.VI_SLI__LATEROINTERMEDIAT: None,
-                burr_6_intended.VI_SPOR__POSTRHINAL_AREA: None,
-                burr_6_intended.AC_AD__ANTERIOR_CINGULATE: None,
-                burr_6_intended.AC_AV__ANTERIOR_CINGULATE: None,
-                burr_6_intended.PL__PRELIMBIC_AREA: None,
-                burr_6_intended.ILA__INFRALIMBIC_AREA: None,
-                burr_6_intended.OR_BL__ORBITAL_AREA_LATER: None,
-                burr_6_intended.OR_BM__ORBITAL_AREA_MEDIA: None,
-                burr_6_intended.OR_BV__ORBITAL_AREA_VENTR: None,
-                burr_6_intended.OR_BVL__ORBITAL_AREA_VENT: None,
-                burr_6_intended.A_ID__AGRANULAR_INSULAR_A: None,
-                burr_6_intended.A_IP__AGRANULAR_INSULAR_A: None,
-                burr_6_intended.A_IV__AGRANULAR_INSULAR_A: None,
-                burr_6_intended.RS_PAGL__RETROSPLENIAL_AR: None,
-                burr_6_intended.RS_PD__RETROSPLENIAL_AREA: None,
-                burr_6_intended.RS_PV__RETROSPLENIAL_AREA: None,
-                burr_6_intended.VI_SA__ANTERIOR_AREA: None,
-                burr_6_intended.VI_SRL__ROSTROLATERAL_VIS: None,
-                burr_6_intended.T_EA__TEMPORAL_ASSOCIATIO: None,
-                burr_6_intended.PERI__PERIRHINAL_AREA: None,
-                burr_6_intended.ECT__ECTORHINAL_AREA: None,
-                burr_6_intended.MOB__MAIN_OLFACTORY_BULB: None,
-                burr_6_intended.AOB__ACCESSORY_OLFACTORY: None,
-                burr_6_intended.AON__ANTERIOR_OLFACTORY_N: None,
-                burr_6_intended.T_TD__TAENIA_TECTA_DORSAL: None,
-                burr_6_intended.T_TV__TAENIA_TECTA_VENTRA: None,
-                burr_6_intended.DP__DORSAL_PEDUNCULAR_ARE: None,
-                burr_6_intended.PIR__PIRIFORM_AREA: None,
-                burr_6_intended.NLOT__NUCLEUS_OF_THE_LATE: None,
-                burr_6_intended.CO_AA__CORTICAL_AMYGDALAR: None,
-                burr_6_intended.CO_AP__CORTICAL_AMYGDALAR: None,
-                burr_6_intended.PAA__PIRIFORM_AMYGDALAR_A: None,
-                burr_6_intended.TR__POSTPIRIFORM_TRANSITI: None,
-                burr_6_intended.CA1__FIELD_CA1: None,
-                burr_6_intended.CA2__FIELD_CA2: None,
-                burr_6_intended.CA3__FIELD_CA3: None,
-                burr_6_intended.DG__DENTATE_GYRUS: None,
-                burr_6_intended.FC__FASCIOLA_CINEREA: None,
-                burr_6_intended.IG__INDUSEUM_GRISEUM: None,
-                burr_6_intended.EN_TL__ENTORHINAL_AREA_LA: None,
-                burr_6_intended.EN_TM__ENTORHINAL_AREA_ME: None,
-                burr_6_intended.PAR__PARASUBICULUM: None,
-                burr_6_intended.POST__POSTSUBICULUM: None,
-                burr_6_intended.PRE__PRESUBICULUM: None,
-                burr_6_intended.SUB__SUBICULUM: None,
-                burr_6_intended.PRO_S__PROSUBICULUM: None,
-                burr_6_intended.HATA__HIPPOCAMPO_AMYGDALA: None,
-                burr_6_intended.A_PR__AREA_PROSTRIATA: None,
-                burr_6_intended.CLA__CLAUSTRUM: None,
-                burr_6_intended.E_PD__ENDOPIRIFORM_NUCLEU: None,
-                burr_6_intended.E_PV__ENDOPIRIFORM_NUCLEU: None,
-                burr_6_intended.LA__LATERAL_AMYGDALAR_NUC: None,
-                burr_6_intended.BLA__BASOLATERAL_AMYGDALA: None,
-                burr_6_intended.BMA__BASOMEDIAL_AMYGDALAR: None,
-                burr_6_intended.PA__POSTERIOR_AMYGDALAR_N: None,
-                burr_6_intended.CP__CAUDOPUTAMEN: None,
-                burr_6_intended.ACB__NUCLEUS_ACCUMBENS: None,
-                burr_6_intended.FS__FUNDUS_OF_STRIATUM: None,
-                burr_6_intended.OT__OLFACTORY_TUBERCLE: None,
-                burr_6_intended.L_SC__LATERAL_SEPTAL_NUCL: None,
-                burr_6_intended.L_SR__LATERAL_SEPTAL_NUCL: None,
-                burr_6_intended.L_SV__LATERAL_SEPTAL_NUCL: None,
-                burr_6_intended.SF__SEPTOFIMBRIAL_NUCLEUS: None,
-                burr_6_intended.SH__SEPTOHIPPOCAMPAL_NUCL: None,
-                burr_6_intended.AAA__ANTERIOR_AMYGDALAR_A: None,
-                burr_6_intended.BA__BED_NUCLEUS_OF_THE_AC: None,
-                burr_6_intended.CEA__CENTRAL_AMYGDALAR_NU: None,
-                burr_6_intended.IA__INTERCALATED_AMYGDALA: None,
-                burr_6_intended.MEA__MEDIAL_AMYGDALAR_NUC: None,
-                burr_6_intended.G_PE__GLOBUS_PALLIDUS_EXT: None,
-                burr_6_intended.G_PI__GLOBUS_PALLIDUS_INT: None,
-                burr_6_intended.SI__SUBSTANTIA_INNOMINATA: None,
-                burr_6_intended.MA__MAGNOCELLULAR_NUCLEUS: None,
-                burr_6_intended.MS__MEDIAL_SEPTAL_NUCLEUS: None,
-                burr_6_intended.NDB__DIAGONAL_BAND_NUCLEU: None,
-                burr_6_intended.TRS__TRIANGULAR_NUCLEUS_O: None,
-                burr_6_intended.BST__BED_NUCLEI_OF_THE_ST: None,
-                burr_6_intended.VAL__VENTRAL_ANTERIOR_LAT: None,
-                burr_6_intended.VM__VENTRAL_MEDIAL_NUCLEU: None,
-                burr_6_intended.VPL__VENTRAL_POSTEROLATER: None,
-                burr_6_intended.VP_LPC__VENTRAL_POSTEROLA: None,
-                burr_6_intended.VPM__VENTRAL_POSTEROMEDIA: None,
-                burr_6_intended.VP_MPC__VENTRAL_POSTEROME: None,
-                burr_6_intended.PO_T__POSTERIOR_TRIANGULA: None,
-                burr_6_intended.SPF__SUBPARAFASCICULAR_NU: None,
-                burr_6_intended.SPA__SUBPARAFASCICULAR_AR: None,
-                burr_6_intended.PP__PERIPEDUNCULAR_NUCLEU: None,
-                burr_6_intended.MG__MEDIAL_GENICULATE_COM: None,
-                burr_6_intended.L_GD__DORSAL_PART_OF_THE: None,
-                burr_6_intended.LP__LATERAL_POSTERIOR_NUC: None,
-                burr_6_intended.PO__POSTERIOR_COMPLEX_OF: None,
-                burr_6_intended.POL__POSTERIOR_LIMITING_N: None,
-                burr_6_intended.SGN__SUPRAGENICULATE_NUCL: None,
-                burr_6_intended.ETH__ETHMOID_NUCLEUS_OF_T: None,
-                burr_6_intended.AV__ANTEROVENTRAL_NUCLEUS: None,
-                burr_6_intended.AM__ANTEROMEDIAL_NUCLEUS: None,
-                burr_6_intended.AD__ANTERODORSAL_NUCLEUS: None,
-                burr_6_intended.IAM__INTERANTEROMEDIAL_NU: None,
-                burr_6_intended.IAD__INTERANTERODORSAL_NU: None,
-                burr_6_intended.LD__LATERAL_DORSAL_NUCLEU: None,
-                burr_6_intended.IMD__INTERMEDIODORSAL_NUC: None,
-                burr_6_intended.MD__MEDIODORSAL_NUCLEUS_O: None,
-                burr_6_intended.SMT__SUBMEDIAL_NUCLEUS_OF: None,
-                burr_6_intended.PR__PERIREUNENSIS_NUCLEUS: None,
-                burr_6_intended.PVT__PARAVENTRICULAR_NUCL: None,
-                burr_6_intended.PT__PARATAENIAL_NUCLEUS: None,
-                burr_6_intended.RE__NUCLEUS_OF_REUNIENS: None,
-                burr_6_intended.XI__XIPHOID_THALAMIC_NUCL: None,
-                burr_6_intended.RH__RHOMBOID_NUCLEUS: None,
-                burr_6_intended.CM__CENTRAL_MEDIAL_NUCLEU: None,
-                burr_6_intended.PCN__PARACENTRAL_NUCLEUS: None,
-                burr_6_intended.CL__CENTRAL_LATERAL_NUCLE: None,
-                burr_6_intended.PF__PARAFASCICULAR_NUCLEU: None,
-                burr_6_intended.PIL__POSTERIOR_INTRALAMIN: None,
-                burr_6_intended.RT__RETICULAR_NUCLEUS_OF: None,
-                burr_6_intended.IGL__INTERGENICULATE_LEAF: None,
-                burr_6_intended.INT_G__INTERMEDIATE_GENIC: None,
-                burr_6_intended.L_GV__VENTRAL_PART_OF_THE: None,
-                burr_6_intended.SUB_G__SUBGENICULATE_NUCL: None,
-                burr_6_intended.MH__MEDIAL_HABENULA: None,
-                burr_6_intended.LH__LATERAL_HABENULA: None,
-                burr_6_intended.SO__SUPRAOPTIC_NUCLEUS: None,
-                burr_6_intended.PVH__PARAVENTRICULAR_HYPO: None,
-                burr_6_intended.P_VA__PERIVENTRICULAR_HYP: None,
-                burr_6_intended.P_VI__PERIVENTRICULAR_HYP: None,
-                burr_6_intended.ARH__ARCUATE_HYPOTHALAMIC: None,
-                burr_6_intended.ADP__ANTERODORSAL_PREOPTI: None,
-                burr_6_intended.AVP__ANTEROVENTRAL_PREOPT: None,
-                burr_6_intended.AVPV__ANTEROVENTRAL_PERIV: None,
-                burr_6_intended.DMH__DORSOMEDIAL_NUCLEUS: None,
-                burr_6_intended.MEPO__MEDIAN_PREOPTIC_NUC: None,
-                burr_6_intended.MPO__MEDIAL_PREOPTIC_AREA: None,
-                burr_6_intended.PS__PARASTRIAL_NUCLEUS: None,
-                burr_6_intended.P_VP__PERIVENTRICULAR_HYP: None,
-                burr_6_intended.P_VPO__PERIVENTRICULAR_HY: None,
-                burr_6_intended.SBPV__SUBPARAVENTRICULAR: None,
-                burr_6_intended.SCH__SUPRACHIASMATIC_NUCL: None,
-                burr_6_intended.SFO__SUBFORNICAL_ORGAN: None,
-                burr_6_intended.VMPO__VENTROMEDIAL_PREOPT: None,
-                burr_6_intended.VLPO__VENTROLATERAL_PREOP: None,
-                burr_6_intended.AHN__ANTERIOR_HYPOTHALAMI: None,
-                burr_6_intended.LM__LATERAL_MAMMILLARY_NU: None,
-                burr_6_intended.MM__MEDIAL_MAMMILLARY_NUC: None,
-                burr_6_intended.SUM__SUPRAMAMMILLARY_NUCL: None,
-                burr_6_intended.TM__TUBEROMAMMILLARY_NUCL: None,
-                burr_6_intended.MPN__MEDIAL_PREOPTIC_NUCL: None,
-                burr_6_intended.P_MD__DORSAL_PREMAMMILLAR: None,
-                burr_6_intended.P_MV__VENTRAL_PREMAMMILLA: None,
-                burr_6_intended.PV_HD__PARAVENTRICULAR_HY: None,
-                burr_6_intended.VMH__VENTROMEDIAL_HYPOTHA: None,
-                burr_6_intended.PH__POSTERIOR_HYPOTHALAMI: None,
-                burr_6_intended.LHA__LATERAL_HYPOTHALAMIC: None,
-                burr_6_intended.LPO__LATERAL_PREOPTIC_ARE: None,
-                burr_6_intended.PSTN__PARASUBTHALAMIC_NUC: None,
-                burr_6_intended.PE_F__PERIFORNICAL_NUCLEU: None,
-                burr_6_intended.RCH__RETROCHIASMATIC_AREA: None,
-                burr_6_intended.STN__SUBTHALAMIC_NUCLEUS: None,
-                burr_6_intended.TU__TUBERAL_NUCLEUS: None,
-                burr_6_intended.ZI__ZONA_INCERTA: None,
-                burr_6_intended.S_CS__SUPERIOR_COLLICULUS: None,
-                burr_6_intended.IC__INFERIOR_COLLICULUS: None,
-                burr_6_intended.NB__NUCLEUS_OF_THE_BRACHI: None,
-                burr_6_intended.SAG__NUCLEUS_SAGULUM: None,
-                burr_6_intended.PBG__PARABIGEMINAL_NUCLEU: None,
-                burr_6_intended.S_NR__SUBSTANTIA_NIGRA_RE: None,
-                burr_6_intended.VTA__VENTRAL_TEGMENTAL_AR: None,
-                burr_6_intended.PN__PARANIGRAL_NUCLEUS: None,
-                burr_6_intended.RR__MIDBRAIN_RETICULAR_NU: None,
-                burr_6_intended.MRN__MIDBRAIN_RETICULAR_N: None,
-                burr_6_intended.S_CM__SUPERIOR_COLLICULUS: None,
-                burr_6_intended.PAG__PERIAQUEDUCTAL_GRAY: None,
-                burr_6_intended.APN__ANTERIOR_PRETECTAL_N: None,
-                burr_6_intended.MPT__MEDIAL_PRETECTAL_ARE: None,
-                burr_6_intended.NOT__NUCLEUS_OF_THE_OPTIC: None,
-                burr_6_intended.NPC__NUCLEUS_OF_THE_POSTE: None,
-                burr_6_intended.OP__OLIVARY_PRETECTAL_NUC: None,
-                burr_6_intended.PPT__POSTERIOR_PRETECTAL: None,
-                burr_6_intended.RPF__RETROPARAFASCICULAR: None,
-                burr_6_intended.CUN__CUNEIFORM_NUCLEUS: None,
-                burr_6_intended.RN__RED_NUCLEUS: None,
-                burr_6_intended.III__OCULOMOTOR_NUCLEUS: None,
-                burr_6_intended.MA3__MEDIAL_ACCESORY_OCUL: None,
-                burr_6_intended.EW__EDINGER__WESTPHAL_NUC: None,
-                burr_6_intended.IV__TROCHLEAR_NUCLEUS: None,
-                burr_6_intended.PA4__PARATROCHLEAR_NUCLEU: None,
-                burr_6_intended.VTN__VENTRAL_TEGMENTAL_NU: None,
-                burr_6_intended.AT__ANTERIOR_TEGMENTAL_NU: None,
-                burr_6_intended.LT__LATERAL_TERMINAL_NUCL: None,
-                burr_6_intended.DT__DORSAL_TERMINAL_NUCLE: None,
-                burr_6_intended.MT__MEDIAL_TERMINAL_NUCLE: None,
-                burr_6_intended.S_NC__SUBSTANTIA_NIGRA_CO: None,
-                burr_6_intended.PPN__PEDUNCULOPONTINE_NUC: None,
-                burr_6_intended.IF__INTERFASCICULAR_NUCLE: None,
-                burr_6_intended.IPN__INTERPEDUNCULAR_NUCL: None,
-                burr_6_intended.RL__ROSTRAL_LINEAR_NUCLEU: None,
-                burr_6_intended.CLI__CENTRAL_LINEAR_NUCLE: None,
-                burr_6_intended.DR__DORSAL_NUCLEUS_RAPHE: None,
-                burr_6_intended.NLL__NUCLEUS_OF_THE_LATER: None,
-                burr_6_intended.PSV__PRINCIPAL_SENSORY_NU: None,
-                burr_6_intended.PB__PARABRACHIAL_NUCLEUS: None,
-                burr_6_intended.SOC__SUPERIOR_OLIVARY_COM: None,
-                burr_6_intended.B__BARRINGTON_S_NUCLEUS: None,
-                burr_6_intended.DTN__DORSAL_TEGMENTAL_NUC: None,
-                burr_6_intended.PD_TG__POSTERODORSAL_TEGM: None,
-                burr_6_intended.PCG__PONTINE_CENTRAL_GRAY: None,
-                burr_6_intended.PG__PONTINE_GRAY: None,
-                burr_6_intended.PR_NC__PONTINE_RETICULAR: None,
-                burr_6_intended.SG__SUPRAGENUAL_NUCLEUS: None,
-                burr_6_intended.SUT__SUPRATRIGEMINAL_NUCL: None,
-                burr_6_intended.TRN__TEGMENTAL_RETICULAR: None,
-                burr_6_intended.V__MOTOR_NUCLEUS_OF_TRIGE: None,
-                burr_6_intended.P5__PERITRIGEMINAL_ZONE: None,
-                burr_6_intended.ACS5__ACCESSORY_TRIGEMINA: None,
-                burr_6_intended.PC5__PARVICELLULAR_MOTOR: None,
-                burr_6_intended.I5__INTERTRIGEMINAL_NUCLE: None,
-                burr_6_intended.CS__SUPERIOR_CENTRAL_NUCL: None,
-                burr_6_intended.LC__LOCUS_CERULEUS: None,
-                burr_6_intended.LDT__LATERODORSAL_TEGMENT: None,
-                burr_6_intended.NI__NUCLEUS_INCERTUS: None,
-                burr_6_intended.PR_NR__PONTINE_RETICULAR: None,
-                burr_6_intended.RPO__NUCLEUS_RAPHE_PONTIS: None,
-                burr_6_intended.SLC__SUBCERULEUS_NUCLEUS: None,
-                burr_6_intended.SLD__SUBLATERODORSAL_NUCL: None,
-                burr_6_intended.MY__MEDULLA: None,
-                burr_6_intended.AP__AREA_POSTREMA: None,
-                burr_6_intended.DCO__DORSAL_COCHLEAR_NUCL: None,
-                burr_6_intended.VCO__VENTRAL_COCHLEAR_NUC: None,
-                burr_6_intended.CU__CUNEATE_NUCLEUS: None,
-                burr_6_intended.GR__GRACILE_NUCLEUS: None,
-                burr_6_intended.ECU__EXTERNAL_CUNEATE_NUC: None,
-                burr_6_intended.NTB__NUCLEUS_OF_THE_TRAPE: None,
-                burr_6_intended.NTS__NUCLEUS_OF_THE_SOLIT: None,
-                burr_6_intended.SPVC__SPINAL_NUCLEUS_OF_T: None,
-                burr_6_intended.SPVI__SPINAL_NUCLEUS_OF_T: None,
-                burr_6_intended.SPVO__SPINAL_NUCLEUS_OF_T: None,
-                burr_6_intended.PA5__PARATRIGEMINAL_NUCLE: None,
-                burr_6_intended.VI__ABDUCENS_NUCLEUS: None,
-                burr_6_intended.VII__FACIAL_MOTOR_NUCLEUS: None,
-                burr_6_intended.AMB__NUCLEUS_AMBIGUUS: None,
-                burr_6_intended.DMX__DORSAL_MOTOR_NUCLEUS: None,
-                burr_6_intended.GRN__GIGANTOCELLULAR_RETI: None,
-                burr_6_intended.ICB__INFRACEREBELLAR_NUCL: None,
-                burr_6_intended.IO__INFERIOR_OLIVARY_COMP: None,
-                burr_6_intended.IRN__INTERMEDIATE_RETICUL: None,
-                burr_6_intended.ISN__INFERIOR_SALIVATORY: None,
-                burr_6_intended.LIN__LINEAR_NUCLEUS_OF_TH: None,
-                burr_6_intended.LRN__LATERAL_RETICULAR_NU: None,
-                burr_6_intended.MARN__MAGNOCELLULAR_RETIC: None,
-                burr_6_intended.MDRN__MEDULLARY_RETICULAR: None,
-                burr_6_intended.PARN__PARVICELLULAR_RETIC: None,
-                burr_6_intended.PAS__PARASOLITARY_NUCLEUS: None,
-                burr_6_intended.PGRN__PARAGIGANTOCELLULAR: None,
-                burr_6_intended.NR__NUCLEUS_OF__ROLLER: None,
-                burr_6_intended.PRP__NUCLEUS_PREPOSITUS: None,
-                burr_6_intended.PMR__PARAMEDIAN_RETICULAR: None,
-                burr_6_intended.PPY__PARAPYRAMIDAL_NUCLEU: None,
-                burr_6_intended.LAV__LATERAL_VESTIBULAR_N: None,
-                burr_6_intended.MV__MEDIAL_VESTIBULAR_NUC: None,
-                burr_6_intended.SPIV__SPINAL_VESTIBULAR_N: None,
-                burr_6_intended.SUV__SUPERIOR_VESTIBULAR: None,
-                burr_6_intended.X__NUCLEUS_X: None,
-                burr_6_intended.XII__HYPOGLOSSAL_NUCLEUS: None,
-                burr_6_intended.Y__NUCLEUS_Y: None,
-                burr_6_intended.RM__NUCLEUS_RAPHE_MAGNUS: None,
-                burr_6_intended.RPA__NUCLEUS_RAPHE_PALLID: None,
-                burr_6_intended.RO__NUCLEUS_RAPHE_OBSCURU: None,
-                burr_6_intended.LING__LINGULA_I: None,
-                burr_6_intended.CENT2__LOBULE_II: None,
-                burr_6_intended.CENT3__LOBULE_III: None,
-                burr_6_intended.CUL4_5__LOBULES_IV_V: None,
-                burr_6_intended.DEC__DECLIVE_VI: None,
-                burr_6_intended.FOTU__FOLIUM_TUBER_VERMIS: None,
-                burr_6_intended.PYR__PYRAMUS_VIII: None,
-                burr_6_intended.UVU__UVULA_IX: None,
-                burr_6_intended.NOD__NODULUS_X: None,
-                burr_6_intended.SIM__SIMPLE_LOBULE: None,
-                burr_6_intended.A_NCR1__CRUS_1: None,
-                burr_6_intended.A_NCR2__CRUS_2: None,
-                burr_6_intended.PRM__PARAMEDIAN_LOBULE: None,
-                burr_6_intended.COPY__COPULA_PYRAMIDIS: None,
-                burr_6_intended.PFL__PARAFLOCCULUS: None,
-                burr_6_intended.FL__FLOCCULUS: None,
-                burr_6_intended.FN__FASTIGIAL_NUCLEUS: None,
-                burr_6_intended.IP__INTERPOSED_NUCLEUS: None,
-                burr_6_intended.DN__DENTATE_NUCLEUS: None,
-                burr_6_intended.VE_CB__VESTIBULOCEREBELLA: None,
-            }.get(burr_6_intended, None)
-        )
+        return self._map_targeted_structure(burr_6_intended)
 
     @property
     def aind_burr_6_intended_x0020(self) -> Optional[str]:
@@ -2609,17 +1365,6 @@ class MappedNSBList:
                 self._nsb.burr_x0020_hole_x0020_1.INJECTION: BurrHoleProcedure.INJECTION,
                 self._nsb.burr_x0020_hole_x0020_1.INJECTION_FIBER_IMPLANT: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
             }.get(self._nsb.burr_x0020_hole_x0020_1, None)
-        )
-
-    @property
-    def aind_burr_hole_1_st(self) -> Optional[Any]:
-        """Maps burr_hole_1_st to aind model."""
-        return (
-            None
-            if self._nsb.burr_x0020_hole_x0020_1_x0020_st is None
-            else {
-                self._nsb.burr_x0020_hole_x0020_1_x0020_st.COMPLETE: None,
-            }.get(self._nsb.burr_x0020_hole_x0020_1_x0020_st, None)
         )
 
     @property
@@ -2704,102 +1449,6 @@ class MappedNSBList:
         )
 
     @property
-    def aind_care_moduele(self) -> Optional[Any]:
-        """Maps care_moduele to aind model."""
-        return (
-            None
-            if self._nsb.care_x0020_moduele is None
-            else {
-                self._nsb.care_x0020_moduele.SELECT: None,
-                self._nsb.care_x0020_moduele.CM_S_01_A_B: None,
-                self._nsb.care_x0020_moduele.CM_S_01_C_D: None,
-                self._nsb.care_x0020_moduele.CM_S_03_A_B: None,
-                self._nsb.care_x0020_moduele.CM_S_03_C_D: None,
-                self._nsb.care_x0020_moduele.CM_S_04_A_B: None,
-                self._nsb.care_x0020_moduele.CM_S_04_C_D: None,
-            }.get(self._nsb.care_x0020_moduele, None)
-        )
-
-    @property
-    def aind_color_tag(self) -> Optional[str]:
-        """Maps color_tag to aind model."""
-        return self._nsb.color_tag
-
-    @property
-    def aind_com_coplanar(self) -> Optional[Any]:
-        """Maps com_coplanar to aind model."""
-        return (
-            None
-            if self._nsb.com_coplanar is None
-            else {
-                self._nsb.com_coplanar.SELECT: None,
-                self._nsb.com_coplanar.NONE: None,
-                self._nsb.com_coplanar.MILD: None,
-                self._nsb.com_coplanar.MODERATE: None,
-                self._nsb.com_coplanar.SEVERE: None,
-                self._nsb.com_coplanar.N_A: None,
-            }.get(self._nsb.com_coplanar, None)
-        )
-
-    @property
-    def aind_com_sinusbleed(self) -> Optional[Any]:
-        """Maps com_sinusbleed to aind model."""
-        return (
-            None
-            if self._nsb.com_sinusbleed is None
-            else {
-                self._nsb.com_sinusbleed.SELECT: None,
-                self._nsb.com_sinusbleed.NONE: None,
-                self._nsb.com_sinusbleed.MILD: None,
-                self._nsb.com_sinusbleed.MODERATE: None,
-                self._nsb.com_sinusbleed.SEVERE: None,
-                self._nsb.com_sinusbleed.N_A: None,
-            }.get(self._nsb.com_sinusbleed, None)
-        )
-
-    @property
-    def aind_com_swelling(self) -> Optional[Any]:
-        """Maps com_swelling to aind model."""
-        return (
-            None
-            if self._nsb.com_swelling is None
-            else {
-                self._nsb.com_swelling.SELECT: None,
-                self._nsb.com_swelling.NONE: None,
-                self._nsb.com_swelling.MILD: None,
-                self._nsb.com_swelling.MODERATE: None,
-                self._nsb.com_swelling.SEVERE: None,
-                self._nsb.com_swelling.N_A: None,
-            }.get(self._nsb.com_swelling, None)
-        )
-
-    @property
-    def aind_compliance_asset_id(self) -> Optional[str]:
-        """Maps compliance_asset_id to aind model."""
-        return self._nsb.compliance_asset_id
-
-    @property
-    def aind_content_type(self) -> Optional[str]:
-        """Maps content_type to aind model."""
-        return self._nsb.content_type
-
-    @property
-    def aind_contusion(self) -> Optional[Any]:
-        """Maps contusion to aind model."""
-        return (
-            None
-            if self._nsb.contusion is None
-            else {
-                self._nsb.contusion.SELECT: None,
-                self._nsb.contusion.NONE: None,
-                self._nsb.contusion.MILD: None,
-                self._nsb.contusion.MODERATE: None,
-                self._nsb.contusion.SEVERE: None,
-                self._nsb.contusion.N_A: None,
-            }.get(self._nsb.contusion, None)
-        )
-
-    @property
     def aind_craniotomy_perform_d(self) -> Optional[During]:
         """Maps craniotomy_perform_d to aind model"""
         return (
@@ -2819,18 +1468,13 @@ class MappedNSBList:
             if self._nsb.craniotomy_type is None
             else {
                 self._nsb.craniotomy_type.SELECT: None,
-                self._nsb.craniotomy_type.N_3MM: CraniotomyType.THREE_MM,
-                self._nsb.craniotomy_type.N_5MM: CraniotomyType.FIVE_MM,
+                self._nsb.craniotomy_type.N_3MM: CraniotomyType.CIRCLE,
+                self._nsb.craniotomy_type.N_5MM: CraniotomyType.CIRCLE,
                 self._nsb.craniotomy_type.WHC_2_P: CraniotomyType.WHC,
                 self._nsb.craniotomy_type.WHC_NP: CraniotomyType.WHC,
                 self._nsb.craniotomy_type.DHC: CraniotomyType.DHC,
             }.get(self._nsb.craniotomy_type, None)
         )
-
-    @property
-    def aind_created(self) -> Optional[datetime]:
-        """Maps created to aind model"""
-        return self._nsb.created
 
     @property
     def aind_date1st_injection(self) -> Optional[date]:
@@ -2850,34 +1494,9 @@ class MappedNSBList:
         )
 
     @property
-    def aind_date_range_start(self) -> Optional[datetime]:
-        """Maps date_range_start to aind model"""
-        return self._nsb.date_range_start
-
-    @property
-    def aind_doc_icon(self) -> Optional[str]:
-        """Maps doc_icon to aind model."""
-        return self._nsb.doc_icon
-
-    @property
     def aind_dv2nd_inj(self) -> Optional[Decimal]:
         """Maps dv2nd_inj to aind model"""
         return self._map_float_to_decimal(self._nsb.dv2nd_inj)
-
-    @property
-    def aind_edit(self) -> Optional[str]:
-        """Maps edit to aind model."""
-        return self._nsb.edit
-
-    @property
-    def aind_editor(self) -> Optional[str]:
-        """Maps editor to aind model."""
-        return self._nsb.editor
-
-    @property
-    def aind_editor_id(self) -> Optional[int]:
-        """Maps editor_id to aind model."""
-        return self._nsb.editor_id
 
     @property
     def aind_fiber_implant1_dv(self) -> Optional[Decimal]:
@@ -3011,11 +1630,6 @@ class MappedNSBList:
         )
 
     @property
-    def aind_folder_child_count(self) -> Optional[str]:
-        """Maps folder_child_count to aind model."""
-        return self._nsb.folder_child_count
-
-    @property
     def aind_headpost(self) -> Optional[HeadPost]:
         """Maps headpost to aind model."""
         return (
@@ -3099,11 +1713,6 @@ class MappedNSBList:
         return self._map_float_to_decimal(self._nsb.hp_recovery)
 
     @property
-    def aind_hp_surgeon_comments(self) -> Optional[str]:
-        """Maps hp_surgeon_comments to aind model"""
-        return self._nsb.hp_surgeon_comments
-
-    @property
     def aind_hp_work_station(self) -> Optional[str]:
         """Maps hp_work_station to aind model"""
         return (
@@ -3123,11 +1732,6 @@ class MappedNSBList:
             == self._nsb.iacuc_x0020_protocol_x0020__x002.SELECT
             else self._nsb.iacuc_x0020_protocol_x0020__x002.value
         )
-
-    @property
-    def aind_id(self) -> Optional[str]:
-        """Maps id to aind model."""
-        return self._nsb.id
 
     @property
     def aind_implant_id_coverslip_type(self) -> Optional[Any]:
@@ -3159,11 +1763,6 @@ class MappedNSBList:
     def aind_inj1_ionto_time(self) -> Optional[Decimal]:
         """Maps inj1_ionto_time to aind model"""
         return self._parse_length_of_time_str(self._nsb.inj1_ionto_time)
-
-    @property
-    def aind_inj1_storage_location(self) -> Optional[str]:
-        """Maps inj1_storage_location to aind model."""
-        return self._nsb.inj1_storage_location
 
     @property
     def aind_inj1_type(self) -> Optional[InjectionType]:
@@ -3209,11 +1808,6 @@ class MappedNSBList:
         return self._parse_length_of_time_str(self._nsb.inj2_ionto_time)
 
     @property
-    def aind_inj2_storage_location(self) -> Optional[str]:
-        """Maps inj2_storage_location to aind model."""
-        return self._nsb.inj2_storage_location
-
-    @property
     def aind_inj2_type(self) -> Optional[InjectionType]:
         """Maps inj2_type to aind model"""
         return (
@@ -3252,11 +1846,6 @@ class MappedNSBList:
         return self._parse_length_of_time_str(self._nsb.inj3_ionto_time)
 
     @property
-    def aind_inj3_storage_location(self) -> Optional[str]:
-        """Maps inj3_storage_location to aind model."""
-        return self._nsb.inj3_storage_location
-
-    @property
     def aind_inj3_type(self) -> Optional[InjectionType]:
         """Maps inj3_type to aind model"""
         return (
@@ -3267,18 +1856,6 @@ class MappedNSBList:
                 self._nsb.inj3_type.IONTOPHORESIS: InjectionType.IONTOPHORESIS,
                 self._nsb.inj3_type.NANOJECT_PRESSURE: InjectionType.NANOJECT,
             }.get(self._nsb.inj3_type, None)
-        )
-
-    @property
-    def aind_inj3ret_setting(self) -> Optional[Any]:
-        """Maps inj3ret_setting to aind model."""
-        return (
-            None
-            if self._nsb.inj3ret_setting is None
-            else {
-                self._nsb.inj3ret_setting.OFF: None,
-                self._nsb.inj3ret_setting.ON: None,
-            }.get(self._nsb.inj3ret_setting, None)
         )
 
     @property
@@ -3302,11 +1879,6 @@ class MappedNSBList:
         return self._parse_length_of_time_str(self._nsb.inj4_ionto_time)
 
     @property
-    def aind_inj4_storage_location(self) -> Optional[str]:
-        """Maps inj4_storage_location to aind model"""
-        return self._nsb.inj4_storage_location
-
-    @property
     def aind_inj4_type(self) -> Optional[InjectionType]:
         """Maps inj4_type to aind model"""
         return (
@@ -3323,18 +1895,6 @@ class MappedNSBList:
     def aind_inj4_virus_strain_rt(self) -> Optional[str]:
         """Maps inj4_virus_strain_rt to aind model"""
         return self._parse_virus_strain_str(self._nsb.inj4_virus_strain_rt)
-
-    @property
-    def aind_inj4ret_setting(self) -> Optional[Any]:
-        """Maps inj4ret_setting to aind model."""
-        return (
-            None
-            if self._nsb.inj4ret_setting is None
-            else {
-                self._nsb.inj4ret_setting.OFF: None,
-                self._nsb.inj4ret_setting.ON: None,
-            }.get(self._nsb.inj4ret_setting, None)
-        )
 
     @property
     def aind_inj4volperdepth(self) -> Optional[Decimal]:
@@ -3357,11 +1917,6 @@ class MappedNSBList:
         return self._parse_length_of_time_str(self._nsb.inj5_ionto_time)
 
     @property
-    def aind_inj5_storage_location(self) -> Optional[str]:
-        """Maps inj5_storage_location to aind model"""
-        return self._nsb.inj5_storage_location
-
-    @property
     def aind_inj5_type(self) -> Optional[InjectionType]:
         """Maps inj5_type to aind model"""
         return (
@@ -3378,18 +1933,6 @@ class MappedNSBList:
     def aind_inj5_virus_strain_rt(self) -> Optional[str]:
         """Maps inj5_virus_strain_rt to aind model"""
         return self._parse_virus_strain_str(self._nsb.inj5_virus_strain_rt)
-
-    @property
-    def aind_inj5ret_setting(self) -> Optional[Any]:
-        """Maps inj5ret_setting to aind model."""
-        return (
-            None
-            if self._nsb.inj5ret_setting is None
-            else {
-                self._nsb.inj5ret_setting.OFF: None,
-                self._nsb.inj5ret_setting.ON: None,
-            }.get(self._nsb.inj5ret_setting, None)
-        )
 
     @property
     def aind_inj5volperdepth(self) -> Optional[Decimal]:
@@ -3411,10 +1954,6 @@ class MappedNSBList:
         """Maps inj6_ionto_time to aind model"""
         return self._parse_length_of_time_str(self._nsb.inj6_ionto_time)
 
-    @property
-    def aind_inj6_storage_location(self) -> Optional[str]:
-        """Maps inj6_storage_location to aind model"""
-        return self._nsb.inj6_storage_location
 
     @property
     def aind_inj6_type(self) -> Optional[InjectionType]:
@@ -3433,18 +1972,6 @@ class MappedNSBList:
     def aind_inj6_virus_strain_rt(self) -> Optional[str]:
         """Maps inj6_virus_strain_rt to aind model"""
         return self._parse_virus_strain_str(self._nsb.inj6_virus_strain_rt)
-
-    @property
-    def aind_inj6ret_setting(self) -> Optional[Any]:
-        """Maps inj6ret_setting to aind model."""
-        return (
-            None
-            if self._nsb.inj6ret_setting is None
-            else {
-                self._nsb.inj6ret_setting.OFF: None,
-                self._nsb.inj6ret_setting.ON: None,
-            }.get(self._nsb.inj6ret_setting, None)
-        )
 
     @property
     def aind_inj6volperdepth(self) -> Optional[Decimal]:
@@ -3481,380 +2008,15 @@ class MappedNSBList:
         )
 
     @property
-    def aind_is_record(self) -> Optional[str]:
-        """Maps is_record to aind model."""
-        return self._nsb.is_record
-
-    @property
     def aind_iso_on(self) -> Optional[Decimal]:
         """Maps iso_on to aind model"""
         optional_decimal = self._map_float_to_decimal(self._nsb.iso_x0020_on)
         return None if optional_decimal is None else optional_decimal * 60
 
     @property
-    def aind_item_child_count(self) -> Optional[str]:
-        """Maps item_child_count to aind model."""
-        return self._nsb.item_child_count
-
-    @property
-    def aind_lab_tracks_group(self) -> Optional[str]:
-        """Maps lab_tracks_group to aind model."""
-        return self._nsb.lab_tracks_x0020_group
-
-    @property
     def aind_lab_tracks_id1(self) -> Optional[str]:
         """Maps lab_tracks_id1 to aind model."""
         return self._nsb.lab_tracks_x0020_id1
-
-    @property
-    def aind_lab_tracks_requestor(self) -> Optional[str]:
-        """Maps lab_tracks_requestor to aind model."""
-        return self._nsb.lab_tracks_x0020_requestor
-
-    @property
-    def aind_li_ms_required(self) -> Optional[Any]:
-        """Maps li_ms_required to aind model."""
-        return (
-            None
-            if self._nsb.lims_x0020_required is None
-            else {
-                self._nsb.lims_x0020_required.SELECT: None,
-                self._nsb.lims_x0020_required.LIMS: None,
-                self._nsb.lims_x0020_required.SLIMS: None,
-                self._nsb.lims_x0020_required.N_A: None,
-                self._nsb.lims_x0020_required.NO: None,
-                self._nsb.lims_x0020_required.YES: None,
-            }.get(self._nsb.lims_x0020_required, None)
-        )
-
-    @property
-    def aind_light_cycle(self) -> Optional[Any]:
-        """Maps light_cycle to aind model."""
-        return (
-            None
-            if self._nsb.light_cycle is None
-            else {
-                self._nsb.light_cycle.STANDARD__LIGHT__CYCLE_6A: None,
-                self._nsb.light_cycle.REVERSE__LIGHT__CYCLE_9PM: None,
-                self._nsb.light_cycle.N_249_ABSL2: None,
-                self._nsb.light_cycle.REVERSE_9PM_TO_9AM: None,
-                self._nsb.light_cycle.STANDARD_6AM_TO_8PM: None,
-            }.get(self._nsb.light_cycle, None)
-        )
-
-    @property
-    def aind_lims_project(self) -> Optional[Any]:
-        """Maps lims_project to aind model."""
-        return (
-            None
-            if self._nsb.lims_project is None
-            else {
-                self._nsb.lims_project.N_0200: None,
-                self._nsb.lims_project.N_0309: None,
-                self._nsb.lims_project.N_0310: None,
-                self._nsb.lims_project.N_0311: None,
-                self._nsb.lims_project.N_0312: None,
-                self._nsb.lims_project.N_0314: None,
-                self._nsb.lims_project.N_0316: None,
-                self._nsb.lims_project.N_0319: None,
-                self._nsb.lims_project.N_0320: None,
-                self._nsb.lims_project.N_0321: None,
-                self._nsb.lims_project.N_03212: None,
-                self._nsb.lims_project.N_03213: None,
-                self._nsb.lims_project.N_03214: None,
-                self._nsb.lims_project.N_0322: None,
-                self._nsb.lims_project.N_0324: None,
-                self._nsb.lims_project.N_0325: None,
-                self._nsb.lims_project.N_0326: None,
-                self._nsb.lims_project.N_0327: None,
-                self._nsb.lims_project.N_03272: None,
-                self._nsb.lims_project.N_0328: None,
-                self._nsb.lims_project.N_0329: None,
-                self._nsb.lims_project.N_0331: None,
-                self._nsb.lims_project.N_0334: None,
-                self._nsb.lims_project.N_03342: None,
-                self._nsb.lims_project.N_0335: None,
-                self._nsb.lims_project.N_0336: None,
-                self._nsb.lims_project.N_0338: None,
-                self._nsb.lims_project.N_0339: None,
-                self._nsb.lims_project.N_03392: None,
-                self._nsb.lims_project.N_0340: None,
-                self._nsb.lims_project.N_0342: None,
-                self._nsb.lims_project.N_03422: None,
-                self._nsb.lims_project.N_0343: None,
-                self._nsb.lims_project.N_0344: None,
-                self._nsb.lims_project.N_0345: None,
-                self._nsb.lims_project.N_0346: None,
-                self._nsb.lims_project.N_0350: None,
-                self._nsb.lims_project.N_0350X: None,
-                self._nsb.lims_project.N_0351: None,
-                self._nsb.lims_project.N_0351X: None,
-                self._nsb.lims_project.N_0354: None,
-                self._nsb.lims_project.N_0355: None,
-                self._nsb.lims_project.N_0357: None,
-                self._nsb.lims_project.N_0358: None,
-                self._nsb.lims_project.N_0359: None,
-                self._nsb.lims_project.N_0360: None,
-                self._nsb.lims_project.N_03602: None,
-                self._nsb.lims_project.N_0362: None,
-                self._nsb.lims_project.N_0363: None,
-                self._nsb.lims_project.N_0364: None,
-                self._nsb.lims_project.N_0365: None,
-                self._nsb.lims_project.N_0365X: None,
-                self._nsb.lims_project.N_0366: None,
-                self._nsb.lims_project.N_0366X: None,
-                self._nsb.lims_project.N_0367: None,
-                self._nsb.lims_project.N_0369: None,
-                self._nsb.lims_project.N_0371: None,
-                self._nsb.lims_project.N_0372: None,
-                self._nsb.lims_project.N_0372X: None,
-                self._nsb.lims_project.N_0374: None,
-                self._nsb.lims_project.N_0376: None,
-                self._nsb.lims_project.N_0376A: None,
-                self._nsb.lims_project.N_0376X: None,
-                self._nsb.lims_project.N_0378: None,
-                self._nsb.lims_project.N_0378X: None,
-                self._nsb.lims_project.N_0380: None,
-                self._nsb.lims_project.N_0384: None,
-                self._nsb.lims_project.N_0386: None,
-                self._nsb.lims_project.N_0388: None,
-                self._nsb.lims_project.AIND_MSMA: None,
-                self._nsb.lims_project.AIND_DISCOVERY: None,
-                self._nsb.lims_project.AIND_EPHYS: None,
-                self._nsb.lims_project.AIND_OPHYS: None,
-                self._nsb.lims_project.APR_OX: None,
-                self._nsb.lims_project.A_XL_OX: None,
-                self._nsb.lims_project.BA_RSEQ_GENETIC_TOOLS: None,
-                self._nsb.lims_project.BRAIN_STIM: None,
-                self._nsb.lims_project.BRAINTV_VIRAL_STRATEGIES: None,
-                self._nsb.lims_project.C200: None,
-                self._nsb.lims_project.C600: None,
-                self._nsb.lims_project.C600_LATERAL: None,
-                self._nsb.lims_project.C600X: None,
-                self._nsb.lims_project.CELLTYPES_TRANSGENIC_CHAR: None,
-                self._nsb.lims_project.CITRICACIDPILOT: None,
-                self._nsb.lims_project.CON_9999: None,
-                self._nsb.lims_project.CON_C505: None,
-                self._nsb.lims_project.CON_CS04: None,
-                self._nsb.lims_project.DEEPSCOPE_SLM_DEVELOPMENT: None,
-                self._nsb.lims_project.DYNAMIC_ROUTING_BEHAVIOR: None,
-                self._nsb.lims_project.DYNAMIC_ROUTING_OPTO_DEV: None,
-                self._nsb.lims_project.DYNAMIC_ROUTING_SURGICAL: None,
-                self._nsb.lims_project.DYNAMIC_ROUTING_TASK1_PRO: None,
-                self._nsb.lims_project.DYNAMIC_ROUTING_TASK2_PRO: None,
-                self._nsb.lims_project.DYNAMIC_ROUTING_ULTRA_OPT: None,
-                self._nsb.lims_project.H120: None,
-                self._nsb.lims_project.H200: None,
-                self._nsb.lims_project.H301: None,
-                self._nsb.lims_project.H301T: None,
-                self._nsb.lims_project.H301_X: None,
-                self._nsb.lims_project.H501_X: None,
-                self._nsb.lims_project.H504: None,
-                self._nsb.lims_project.IS_IX: None,
-                self._nsb.lims_project.LARGE_SCALE_VOLTAGE: None,
-                self._nsb.lims_project.LEARNINGM_FISH_DEVELOPMEN: None,
-                self._nsb.lims_project.LEARNINGM_FISH_TASK1_A: None,
-                self._nsb.lims_project.M301T: None,
-                self._nsb.lims_project.MESOSCOPE_DEVELOPMENT: None,
-                self._nsb.lims_project.M_FISH_PLATFORM_DEVELOPME: None,
-                self._nsb.lims_project.MINDSCOPE_TRANSGENIC_CHAR: None,
-                self._nsb.lims_project.M_IVSCC_MET: None,
-                self._nsb.lims_project.M_IVSCC_ME_TX: None,
-                self._nsb.lims_project.M_M_PATCHX: None,
-                self._nsb.lims_project.M_MPATC_HX: None,
-                self._nsb.lims_project.MOUSE_BRAIN_CELL_ATLAS_CH: None,
-                self._nsb.lims_project.MOUSE_BRAIN_CELL_ATLAS_CH_2: None,
-                self._nsb.lims_project.MOUSE_BRAIN_CELL_ATLAS_TR: None,
-                self._nsb.lims_project.MOUSE_FULL_MORPHOLOGY_FMO: None,
-                self._nsb.lims_project.MOUSE_GENETIC_TOOLS_PROJE: None,
-                self._nsb.lims_project.M_VISP_TAXL_O: None,
-                self._nsb.lims_project.MULTISCOPE_SIGNAL_NOISE: None,
-                self._nsb.lims_project.N200: None,
-                self._nsb.lims_project.N310: None,
-                self._nsb.lims_project.NEUROPIXEL_VISUAL_BEHAVIO: None,
-                self._nsb.lims_project.NEUROPIXEL_VISUAL_BEHAVIO_2: None,
-                self._nsb.lims_project.NEUROPIXEL_VISUAL_CODING: None,
-                self._nsb.lims_project.OLVSX: None,
-                self._nsb.lims_project.OM_FIS_HCOREGISTRATIONPIL: None,
-                self._nsb.lims_project.OM_FISH_CUX2_MESO: None,
-                self._nsb.lims_project.OM_FISH_GAD2_MESO: None,
-                self._nsb.lims_project.OM_FISH_GAD2_PILOT: None,
-                self._nsb.lims_project.OM_FISH_RBP4_MESO: None,
-                self._nsb.lims_project.OM_FISH_RORB_PILOT: None,
-                self._nsb.lims_project.OM_FISHRO_BINJECTIONVIRUS: None,
-                self._nsb.lims_project.OM_FISH_SST_MESO: None,
-                self._nsb.lims_project.OM_FISH_VIP_MESO: None,
-                self._nsb.lims_project.OPEN_SCOPE_DENDRITE_COUPL: None,
-                self._nsb.lims_project.OPENSCOPE_DEVELOPMENT: None,
-                self._nsb.lims_project.OPEN_SCOPE_ILLUSION: None,
-                self._nsb.lims_project.OPEN_SCOPE_GLOBAL_LOCAL_O: None,
-                self._nsb.lims_project.OPENSCOPE_GAMMA_PILOT: None,
-                self._nsb.lims_project.OPENSCOPE_GAMMA_PRODUCTLO: None,
-                self._nsb.lims_project.OPENSCOPELNJECTION_PILOT: None,
-                self._nsb.lims_project.OPEN_SCOPE_LOOP: None,
-                self._nsb.lims_project.OPENSCOPE_MOTION_PLLOT: None,
-                self._nsb.lims_project.OPENSCOPE_MOTION_PRODUCTI: None,
-                self._nsb.lims_project.OPENSCOPE_MULTIPLEX_PILOT: None,
-                self._nsb.lims_project.OPENSCOPE_MULTIPLEX_PRODU: None,
-                self._nsb.lims_project.OPEN_SCOPE_PSYCODE: None,
-                self._nsb.lims_project.OPEN_SCOPE_SEQUENCE_LEARN: None,
-                self._nsb.lims_project.OPEN_SCOPE_TEMPORAL_BARCO: None,
-                self._nsb.lims_project.OPEN_SCOPE_TEXTURE: None,
-                self._nsb.lims_project.OPEN_SCOPE_VISION2_HIPPOC: None,
-                self._nsb.lims_project.OPEN_SCOPE_VISMO: None,
-                self._nsb.lims_project.OPH5_X: None,
-                self._nsb.lims_project.SLC6_A1_NEUROPIXEL: None,
-                self._nsb.lims_project.SMART_SPIM__GENETIC_TOOLS: None,
-                self._nsb.lims_project.SURGERY_X: None,
-                self._nsb.lims_project.T301: None,
-                self._nsb.lims_project.T301T: None,
-                self._nsb.lims_project.T301_X: None,
-                self._nsb.lims_project.T503: None,
-                self._nsb.lims_project.T503_X: None,
-                self._nsb.lims_project.T504: None,
-                self._nsb.lims_project.T504_X: None,
-                self._nsb.lims_project.T600: None,
-                self._nsb.lims_project.T601: None,
-                self._nsb.lims_project.T601_X: None,
-                self._nsb.lims_project.TCYTX: None,
-                self._nsb.lims_project.TASK_TRAINED_NETWORKS_MUL: None,
-                self._nsb.lims_project.TASK_TRAINED_NETWORKS_NEU: None,
-                self._nsb.lims_project.TEMPLETON_PSYCHEDELICS: None,
-                self._nsb.lims_project.TEMPLETON_TTOC: None,
-                self._nsb.lims_project.TINY_BLUE_DOT_BEHAVIOR: None,
-                self._nsb.lims_project.U01_BFCT: None,
-                self._nsb.lims_project.VARIABILITY_AIM1: None,
-                self._nsb.lims_project.VARIABILITY_AIM1_PILOT: None,
-                self._nsb.lims_project.VARIABILITY_SPONTANEOUS: None,
-                self._nsb.lims_project.VI_DEEP_DIVE_EM_VOLUME: None,
-                self._nsb.lims_project.VI_DEEPDLVE_DEEPSCOPE_PIE: None,
-                self._nsb.lims_project.VIP_AXONAL_V1_PHASE1: None,
-                self._nsb.lims_project.VIP_SOMATIC_V1_MESO: None,
-                self._nsb.lims_project.VIP_SOMATIC_V1_PHASE1: None,
-                self._nsb.lims_project.VIP_SOMATIC_V1_PHASE2: None,
-                self._nsb.lims_project.VISUAL_BEHAVIOR: None,
-                self._nsb.lims_project.VISUAL_BEHAVIOR_DEVELOPME: None,
-                self._nsb.lims_project.VISUAL_BEHAVIOR_MULTISCOP: None,
-                self._nsb.lims_project.VISUAL_BEHAVIOR_MULTISCOP_2: None,
-                self._nsb.lims_project.VISUAL_BEHAV_IOR_MULTISCO: None,
-                self._nsb.lims_project.VISUAL_BEHAVIOR_TASK1_B: None,
-                self._nsb.lims_project.S200_C: None,
-            }.get(self._nsb.lims_project, None)
-        )
-
-    @property
-    def aind_lims_taskflow(self) -> Optional[Any]:
-        """Maps lims_taskflow to aind model."""
-        return (
-            None
-            if self._nsb.lims_taskflow is None
-            else {
-                self._nsb.lims_taskflow.AIND_EPHYS_SURGERY_ONLY: None,
-                self._nsb.lims_taskflow.AIND_EPHYS_PASSIVE_BEHAVIOR: None,
-                self._nsb.lims_taskflow.AIND_U19_AAV_RETROGRADE: None,
-                self._nsb.lims_taskflow.AIND_U19_RAB_V_RETROGRADE: None,
-                self._nsb.lims_taskflow.AIND_U19_THALAMUS: None,
-                self._nsb.lims_taskflow.AIND_WATERLOG: None,
-                self._nsb.lims_taskflow.BRAIN_LARGE_SCALE_RECORDING: None,
-                self._nsb.lims_taskflow.BRAIN_MOUSE_BRAIN_CELL_ATLAS_TRANS_SYNAPTIC: None,
-                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_DEEPSCOPE: None,
-                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_EPHYS_DEV: None,
-                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_MAPSCOPE: None,
-                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_MESOSCOPE: None,
-                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_MESOSCOPE_1G: None,
-                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_NEUROPIXEL_DEV: None,
-                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_TRANSGENIC_CHARACTERIZATION: None,
-                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_V1_DD: None,
-                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_VISUAL_BEHAVIOR: None,
-                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_VISUAL_BEHAVIOR_1B: None,
-                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_VISUAL_BEHAVIOR_NEUROPIXEL: None,
-                self._nsb.lims_taskflow.BRAIN_OBSERVATORY_VISUAL_CODING: None,
-                self._nsb.lims_taskflow.BTV_BRAIN_VIRAL_STRATEGIES: None,
-                self._nsb.lims_taskflow.CITRIC_ACID_PILOT: None,
-                self._nsb.lims_taskflow.EPHYS_DEV_VISUAL_BEHAVIOR: None,
-                self._nsb.lims_taskflow.EPHYS_DEV_VISUAL_BEHAVIOR_2: None,
-                self._nsb.lims_taskflow.EPHYS_TASK_DEV_DYNAMIC_ROUTING_DOC_LEFT_EYE: None,
-                self._nsb.lims_taskflow.EPHYS_TASK_DEV_DYANMIC_ROUTING_NSB_BEH: None,
-                self._nsb.lims_taskflow.EPHYS_TASK_DEV_DYNAMIC_ROUTING_SC_BEH: None,
-                self._nsb.lims_taskflow.IVSCC_HVA_RETRO_PATCHSEQ: None,
-                self._nsb.lims_taskflow.IVSCCM_INJECTION: None,
-                self._nsb.lims_taskflow.IVSPCM_INJECTION: None,
-                self._nsb.lims_taskflow.MGT_LAB: None,
-                self._nsb.lims_taskflow.MGT_TISSUECYTE: None,
-                self._nsb.lims_taskflow.MINDSCOPE_2P_TESTING: None,
-                self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_BEHAVIOR_DEVELOPMENT: None,
-                self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_OPTO_DEV: None,
-                self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_SURGICAL_DEVELOPMENT: None,
-                self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_ULTRA_OPTOTAGGING_BEHAVIOR: None,
-                self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_TASK_1_PRODUCTION: None,
-                self._nsb.lims_taskflow.MSP_DYNAMIC_ROUTING_TASK_2_PRODUCTION: None,
-                self._nsb.lims_taskflow.MSP_GCAMP8_TESTING: None,
-                self._nsb.lims_taskflow.MSP_GCAMP8_TESTING_RO: None,
-                self._nsb.lims_taskflow.MSP_LEARNING_MFISH_DEVELOPMENT: None,
-                self._nsb.lims_taskflow.MSP_LEARNING_MFISH_DEVELOPMENT_DOX: None,
-                self._nsb.lims_taskflow.MSP_LEARNING_MFISH_FRONTAL_WINDOW_DEV: None,
-                self._nsb.lims_taskflow.MSP_LEARNING_MFISH_VIRUS_TESTING: None,
-                self._nsb.lims_taskflow.MSP_OMFISH_COREGISTRATION_PILOT: None,
-                self._nsb.lims_taskflow.MSP_OMFISH_CUX2_PILOT: None,
-                self._nsb.lims_taskflow.MSP_OMFISH_GAD2_MESO: None,
-                self._nsb.lims_taskflow.MSP_OMFISH_GAD2_PILOT: None,
-                self._nsb.lims_taskflow.MSP_OMFISH_RBP4_MESO: None,
-                self._nsb.lims_taskflow.MSP_OMFISH_RORB_PILOT: None,
-                self._nsb.lims_taskflow.MSP_OMFISH_ROB_INJECTION_VIRUS_PILOT: None,
-                self._nsb.lims_taskflow.MSP_OMFISH_SST_MESO_GAMMASTIM: None,
-                self._nsb.lims_taskflow.MSP_OMFISH_VIP_MESO_GAMMASTIM: None,
-                self._nsb.lims_taskflow.MSP_OPENSCOPE_DENDRITE_COUPLING: None,
-                self._nsb.lims_taskflow.MSP_OPENSCOPE_ILLUSION: None,
-                self._nsb.lims_taskflow.MSP_OPENSCOPE_GLOBAL_LOCAL_ODDBALLS_COHORT_1: None,
-                self._nsb.lims_taskflow.MSP_OPENSCOPE_GLOBAL_LOCAL_ODDBALLS_COHORT_2: None,
-                self._nsb.lims_taskflow.MSP_TASK_TRAINED_NETWORKS_MULTISCOPE: None,
-                self._nsb.lims_taskflow.MSP_TASK_TRAINED_NETWORKS_NEUROPIXEL: None,
-                self._nsb.lims_taskflow.MSP_U01_BRIDGING_FUNCTION_CONNECTIVITY_TRANSCRIPTOMICS: None,
-                self._nsb.lims_taskflow.MSP_VARIABILITY_AIM_1: None,
-                self._nsb.lims_taskflow.MSP_VARIABILITY_AIM_1_PILOT: None,
-                self._nsb.lims_taskflow.MSP_VARIABILITY_SPONTANEOUS: None,
-                self._nsb.lims_taskflow.MSP_VIP_AXONAL_V1: None,
-                self._nsb.lims_taskflow.MSP_VIP_SOMATIC_V1: None,
-                self._nsb.lims_taskflow.OPENSCOPE_GAMMA_PILOT: None,
-                self._nsb.lims_taskflow.OPENSCOPE_GAMMA_PRODUCTION: None,
-                self._nsb.lims_taskflow.OPENSCOPE_INJECTION_VOLUME_PILOT: None,
-                self._nsb.lims_taskflow.OPENSCOPE_MOTION_PILOT: None,
-                self._nsb.lims_taskflow.OPENSCOPE_MULTIPLEX_PILOT_INJECTION: None,
-                self._nsb.lims_taskflow.OPENSCOPE_MULTIPLEX_PILOT_NOINJECTION: None,
-                self._nsb.lims_taskflow.OPENSCOPE_MULTIPLEX_PRODUCTION_NOINJECTION: None,
-                self._nsb.lims_taskflow.OPENSCOPE_MULTIPLEX_PRODUCTION: None,
-                self._nsb.lims_taskflow.OPENSCOPE_LOOP: None,
-                self._nsb.lims_taskflow.OPENSCOPE_MOTION_PRODUCTION: None,
-                self._nsb.lims_taskflow.OPENSCOPE_PSYCODE: None,
-                self._nsb.lims_taskflow.OPENSCOPE_SEQUENCE_LEARNING: None,
-                self._nsb.lims_taskflow.OPENSCOPE_TEMPORAL_BARCODE: None,
-                self._nsb.lims_taskflow.OPENSCOPE_TEMPORAL_BARCODE_TESTING: None,
-                self._nsb.lims_taskflow.OPENSCOPE_TEXTURE_ACTIVE: None,
-                self._nsb.lims_taskflow.OPENSCOPE_TEXTURE_PASSIVE: None,
-                self._nsb.lims_taskflow.OPENSCOPE_VIRUS_VALIDATION: None,
-                self._nsb.lims_taskflow.OPENSCOPE_VISION_2_HIPPOCAMPUS: None,
-                self._nsb.lims_taskflow.OPENSCOPE_VISMO: None,
-                self._nsb.lims_taskflow.OPENSCOPE_WHC_2P_DEV: None,
-                self._nsb.lims_taskflow.TEMPLETON_PSYCHEDELICS: None,
-                self._nsb.lims_taskflow.TILTY_MOUSE: None,
-                self._nsb.lims_taskflow.TINY_BLUE_DOT_BEHAVIOR: None,
-                self._nsb.lims_taskflow.TRANSGENIC_CHARACTERIZATION_PASSIVE: None,
-                self._nsb.lims_taskflow.VISB_DEV_CONTROL_GROUP: None,
-                self._nsb.lims_taskflow.VISB_LATERAL_PREP_DEVELOPMENT: None,
-                self._nsb.lims_taskflow.VISB_TASK_2_DEVELOPMENT: None,
-                self._nsb.lims_taskflow.VGT_ENHANCERS_TRANSSYNAPTIC: None,
-            }.get(self._nsb.lims_taskflow, None)
-        )
-
-    @property
-    def aind_link_title(self) -> Optional[str]:
-        """Maps link_title to aind model."""
-        return self._nsb.link_title
-
-    @property
-    def aind_link_title_no_menu(self) -> Optional[str]:
-        """Maps link_title_no_menu to aind model."""
-        return self._nsb.link_title_no_menu
 
     @property
     def aind_long_requestor_comments(self) -> Optional[str]:
@@ -3865,11 +2027,6 @@ class MappedNSBList:
     def aind_ml2nd_inj(self) -> Optional[Decimal]:
         """Maps ml2nd_inj to aind model"""
         return self._map_float_to_decimal(self._nsb.ml2nd_inj)
-
-    @property
-    def aind_modified(self) -> Optional[str]:
-        """Maps modified to aind model."""
-        return self._nsb.modified
 
     @property
     def aind_nanoject_number_inj10(self) -> Optional[Any]:
@@ -3903,33 +2060,6 @@ class MappedNSBList:
         return self._nsb.non_x002d_nsb_x0020_surgeon
 
     @property
-    def aind_of_burr(self) -> Optional[int]:
-        """Maps of_burr to aind model"""
-        return (
-            None
-            if self._nsb.x0023__x0020_of_x0020_burr_x002 is None
-            else {
-                self._nsb.x0023__x0020_of_x0020_burr_x002.SELECT: None,
-                self._nsb.x0023__x0020_of_x0020_burr_x002.N_1: 1,
-                self._nsb.x0023__x0020_of_x0020_burr_x002.N_2: 2,
-                self._nsb.x0023__x0020_of_x0020_burr_x002.N_3: 3,
-                self._nsb.x0023__x0020_of_x0020_burr_x002.N_4: 4,
-                self._nsb.x0023__x0020_of_x0020_burr_x002.N_5: 5,
-                self._nsb.x0023__x0020_of_x0020_burr_x002.N_6: 6,
-            }.get(self._nsb.x0023__x0020_of_x0020_burr_x002, None)
-        )
-
-    @property
-    def aind_pedigree_name(self) -> Optional[str]:
-        """Maps pedigree_name to aind model."""
-        return self._nsb.pedigree_name
-
-    @property
-    def aind_pi(self) -> Optional[str]:
-        """Maps pi to aind model."""
-        return self._nsb.pi
-
-    @property
     def aind_procedure(self) -> Optional[NSB2023Procedure]:
         """Maps procedure to aind model"""
         return self._nsb.procedure
@@ -3938,136 +2068,6 @@ class MappedNSBList:
     def aind_procedure_family(self) -> Optional[NSB2023ProcedureCategory]:
         """Maps procedure_family to aind model"""
         return self._nsb.procedure_x0020_family
-
-    @property
-    def aind_procedure_slots(self) -> Optional[Any]:
-        """Maps procedure_slots to aind model."""
-        return (
-            None
-            if self._nsb.procedure_x0020_slots is None
-            else {
-                self._nsb.procedure_x0020_slots.SELECT: None,
-                self._nsb.procedure_x0020_slots.SINGLE_SURGICAL_SESSION: None,
-                self._nsb.procedure_x0020_slots.INITIAL_SURGERY_WITH_FOLL: None,
-            }.get(self._nsb.procedure_x0020_slots, None)
-        )
-
-    @property
-    def aind_procedure_t2(self) -> Optional[Any]:
-        """Maps procedure_t2 to aind model."""
-        return (
-            None
-            if self._nsb.procedure_x0020_t2 is None
-            else {
-                self._nsb.procedure_x0020_t2.SELECT: None,
-                self._nsb.procedure_x0020_t2.N_2_P: None,
-                self._nsb.procedure_x0020_t2.NP: None,
-                self._nsb.procedure_x0020_t2.NA: None,
-            }.get(self._nsb.procedure_x0020_t2, None)
-        )
-
-    @property
-    def aind_project_id(self) -> Optional[Any]:
-        """Maps project_id to aind model."""
-        return (
-            None
-            if self._nsb.project_id is None
-            else {
-                self._nsb.project_id.N_101_03_001_10__COSTA_PG: None,
-                self._nsb.project_id.N_102_01_009_10_CTY__MORP: None,
-                self._nsb.project_id.N_102_01_011_10_CTY__CONN: None,
-                self._nsb.project_id.N_102_01_012_10_CTY__CONN: None,
-                self._nsb.project_id.N_102_01_016_10_CTY__TAXO: None,
-                self._nsb.project_id.N_102_01_029_20_CTY_BRAIN: None,
-                self._nsb.project_id.N_102_01_031_20_W4_CTY_EU: None,
-                self._nsb.project_id.N_102_01_031_20_W5_CTY_EU: None,
-                self._nsb.project_id.N_102_01_032_20_CTY__MOUS: None,
-                self._nsb.project_id.N_102_01_036_20_CTY__DISS: None,
-                self._nsb.project_id.N_102_01_040_20_CTY_BRAIN: None,
-                self._nsb.project_id.N_102_01_043_20_CTY__OPTI: None,
-                self._nsb.project_id.N_102_01_044_10_CTY__GENO: None,
-                self._nsb.project_id.N_102_01_045_10_CTY_IVSCC: None,
-                self._nsb.project_id.N_102_01_046_20_CTY__WEIL: None,
-                self._nsb.project_id.N_102_01_048_10_CTY__BARC: None,
-                self._nsb.project_id.N_102_01_049_20_CTY__OPIO: None,
-                self._nsb.project_id.N_102_01_054_20_CTY_PFAC: None,
-                self._nsb.project_id.N_102_01_055_20_CTY_EM__M: None,
-                self._nsb.project_id.N_102_01_059_20_CTY_SCORC: None,
-                self._nsb.project_id.N_102_01_060_20_CTY__BRAI: None,
-                self._nsb.project_id.N_102_01_061_20_CTY_BICAN: None,
-                self._nsb.project_id.N_102_01_062_20_CTY_BICAN: None,
-                self._nsb.project_id.N_102_01_064_10_CTY__GENE: None,
-                self._nsb.project_id.N_102_01_066_20_AIBS_CTY: None,
-                self._nsb.project_id.N_102_01_066_20_AIND_CTY: None,
-                self._nsb.project_id.N_102_01_068_20_CTY_CONNE: None,
-                self._nsb.project_id.N_102_01_069_20__PRE__SPE: None,
-                self._nsb.project_id.N_102_01_070_20_CTY_CONNE: None,
-                self._nsb.project_id.N_102_01_078_20_AIBS__VOC: None,
-                self._nsb.project_id.N_102_01_079_20_AIBS_CONN: None,
-                self._nsb.project_id.N_102_01_999_10_CTY__PROG: None,
-                self._nsb.project_id.N_102_02_004_10_BTV__VISU: None,
-                self._nsb.project_id.N_102_02_012_20_BTV_BRAIN: None,
-                self._nsb.project_id.N_102_04_004_10_OTH__MERI: None,
-                self._nsb.project_id.N_102_04_006_20_OTH__MEAS: None,
-                self._nsb.project_id.N_102_04_007_10_APLD__TAR: None,
-                self._nsb.project_id.N_102_04_010_10_CTY_SR_SL: None,
-                self._nsb.project_id.N_102_04_011_10_CTY_SR_SY: None,
-                self._nsb.project_id.N_102_04_012_10_CTY_SR__F: None,
-                self._nsb.project_id.N_102_04_014_10_CTY__PARK: None,
-                self._nsb.project_id.N_102_04_016_20_CTY__DRAV: None,
-                self._nsb.project_id.N_102_88_001_10_XPG__CORE: None,
-                self._nsb.project_id.N_102_88_003_10__ANIMAL: None,
-                self._nsb.project_id.N_102_88_005_10__TRANSGEN: None,
-                self._nsb.project_id.N_102_88_008_10__LAB__ANI: None,
-                self._nsb.project_id.N_106_01_001_10__IMMUNOLO: None,
-                self._nsb.project_id.N_110_01_001_10_PG__PROTE: None,
-                self._nsb.project_id.N_121_01_016_20_MSP_BRAIN: None,
-                self._nsb.project_id.N_121_01_018_20_MSP__EPHA: None,
-                self._nsb.project_id.N_121_01_023_20_MSP__TEMP: None,
-                self._nsb.project_id.N_121_01_025_20_MSP_U01: None,
-                self._nsb.project_id.N_121_01_026_20_MSP__TEMP: None,
-                self._nsb.project_id.N_122_01_001_10_AIND__SCI: None,
-                self._nsb.project_id.N_122_01_002_20__MOLECULA: None,
-                self._nsb.project_id.N_122_01_002_20__PROJECT: None,
-                self._nsb.project_id.N_122_01_002_20__PROJECT_2: None,
-                self._nsb.project_id.N_122_01_002_20__PROJECT_3: None,
-                self._nsb.project_id.N_122_01_004_20_AIND__BRA: None,
-                self._nsb.project_id.N_122_01_010_20_AIND__POO: None,
-                self._nsb.project_id.N_122_01_011_20_AIND__COH: None,
-                self._nsb.project_id.N_122_01_012_20_AIND_RF1: None,
-                self._nsb.project_id.N_122_01_013_10_MSP__SCIE: None,
-                self._nsb.project_id.N_122_01_014_20_AIND__SIE: None,
-                self._nsb.project_id.N_122_01_019_20_AIND_CZI: None,
-                self._nsb.project_id.N_122_01_020_20_AIBS__COH: None,
-                self._nsb.project_id.N_122_01_020_20_AIND__COH: None,
-                self._nsb.project_id.N_122_01_022_20_AIND__POD: None,
-                self._nsb.project_id.N_123_01_003_20__MOTOR__C: None,
-                self._nsb.project_id.N_124_01_001_10__BRAIN__C: None,
-                self._nsb.project_id.N_125_01_001_10__SEA_HUB: None,
-                self._nsb.project_id.AAV_PRODUCTION_102_88_004: None,
-                self._nsb.project_id.R_D_102_88_004_10: None,
-                self._nsb.project_id.N_1020400910_CAPSID_SCREE: None,
-                self._nsb.project_id.N_1020400910_DRAVET_SYNDR: None,
-                self._nsb.project_id.CVS_PRODUCTION_1028800410: None,
-                self._nsb.project_id.N_1210100110_MSP_DEEP_INT: None,
-                self._nsb.project_id.N_1210100210_MSP_BEHAVIOR: None,
-                self._nsb.project_id.N_1210100310_MSP_X_AREA_F: None,
-                self._nsb.project_id.N_1210100410_MSP_VIP_REGU: None,
-                self._nsb.project_id.N_1210100510_MSP_SURROUND: None,
-                self._nsb.project_id.N_1210100610_MSP_AUTOMATI: None,
-                self._nsb.project_id.N_1210100710_MSP_TASK_TRA: None,
-                self._nsb.project_id.N_1210100810_MSP_NEURAL_E: None,
-                self._nsb.project_id.N_1210100910_MSP_BIO_REAL: None,
-                self._nsb.project_id.N_1210101010_MSP_V1_OM_FI: None,
-                self._nsb.project_id.N_1210101110_MSP_DYNAMIC: None,
-                self._nsb.project_id.N_1210101210_MSP_LEARNING: None,
-                self._nsb.project_id.N_1210101420_MSP_BRAIN_MO: None,
-                self._nsb.project_id.N_1210101510_MSP_FALCONWO: None,
-                self._nsb.project_id.N_1210199910_MSP_CROSS_PR: None,
-                self._nsb.project_id.N_1210199910_MSP_CROS_001: None,
-                self._nsb.project_id.N_1210101210_LEARNING_MFISH: None,
-            }.get(self._nsb.project_id, None)
-        )
 
     @property
     def aind_protocol(self) -> Optional[str]:
@@ -4108,68 +2108,9 @@ class MappedNSBList:
         )
 
     @property
-    def aind_ret_setting0(self) -> Optional[Any]:
-        """Maps ret_setting0 to aind model."""
-        return (
-            None
-            if self._nsb.ret_setting0 is None
-            else {
-                self._nsb.ret_setting0.OFF: None,
-                self._nsb.ret_setting0.ON: None,
-            }.get(self._nsb.ret_setting0, None)
-        )
-
-    @property
-    def aind_ret_setting1(self) -> Optional[Any]:
-        """Maps ret_setting1 to aind model."""
-        return (
-            None
-            if self._nsb.ret_setting1 is None
-            else {
-                self._nsb.ret_setting1.OFF: None,
-                self._nsb.ret_setting1.ON: None,
-            }.get(self._nsb.ret_setting1, None)
-        )
-
-    @property
     def aind_round1_inj_isolevel(self) -> Optional[Decimal]:
         """Maps round1_inj_isolevel to aind model"""
         return self._map_float_to_decimal(self._nsb.round1_inj_isolevel)
-
-    @property
-    def aind_sex(self) -> Optional[Sex]:
-        """Maps sex to aind model"""
-        return (
-            None
-            if self._nsb.sex is None
-            else {
-                self._nsb.sex.SELECT: None,
-                self._nsb.sex.MALE: Sex.MALE,
-                self._nsb.sex.FEMALE: Sex.FEMALE,
-            }.get(self._nsb.sex, None)
-        )
-
-    @property
-    def aind_surgery_status(self) -> Optional[Any]:
-        """Maps surgery_status to aind model."""
-        return (
-            None
-            if self._nsb.surgery_status is None
-            else {
-                self._nsb.surgery_status.NEW: None,
-                self._nsb.surgery_status.INJECTION_PENDING: None,
-                self._nsb.surgery_status.NO_SURGERY: None,
-                self._nsb.surgery_status.PHASE_2_PENDING: None,
-                self._nsb.surgery_status.PLANNED_ACUTE: None,
-                self._nsb.surgery_status.READY_FOR_FEEDBACK: None,
-                self._nsb.surgery_status.UNPLANNED_ACUTE: None,
-            }.get(self._nsb.surgery_status, None)
-        )
-
-    @property
-    def aind_test1(self) -> Optional[str]:
-        """Maps test1 to aind model."""
-        return self._nsb.test1
 
     @property
     def aind_initial_surgeon_lookup_id(self) -> Optional[int]:
@@ -4177,36 +2118,9 @@ class MappedNSBList:
         return self._nsb.test1_lookup_id
 
     @property
-    def aind_test_1st_round_x0020(self) -> Optional[str]:
-        """Maps test_1st_round_x0020 to aind model."""
-        return self._nsb.test_x0020_1st_x0020_round_x0020
-
-    @property
     def aind_followup_surgeon_lookup_id(self) -> Optional[int]:
         """Maps followup_surgeon_lookup_id to aind model."""
         return self._nsb.test_x0020_1st_x0020_round_x0020_lookup_id
-
-    @property
-    def aind_thermistor(self) -> Optional[Any]:
-        """Maps thermistor to aind model."""
-        return (
-            None
-            if self._nsb.thermistor is None
-            else {
-                self._nsb.thermistor.NO: None,
-                self._nsb.thermistor.YES: None,
-            }.get(self._nsb.thermistor, None)
-        )
-
-    @property
-    def aind_title(self) -> Optional[str]:
-        """Maps title to aind model."""
-        return self._nsb.title
-
-    @property
-    def aind_ui_version_string(self) -> Optional[str]:
-        """Maps ui_version_string to aind model."""
-        return self._nsb.ui_version_string
 
     @property
     def aind_virus_a_p(self) -> Optional[Decimal]:
@@ -4266,6 +2180,42 @@ class MappedNSBList:
     def aind_experimenter_full_name(surgeon_id: Optional[str]) -> str:
         """Map surgeon to experimenter name"""
         return "NSB" if surgeon_id is None else f"NSB-{surgeon_id}"
+    
+    @property
+    def aind_craniotomy_coordinates_reference(
+        self,
+    ) -> Optional[CoordinateSystem]:
+        """Map craniotomy type to Origin"""
+        # TODO: need to handle frontal window 3mm
+        if (
+            self._nsb.craniotomy_type is not None
+            and self._nsb.craniotomy_type
+            == self._nsb.craniotomy_type.N_5MM
+        ):
+            return CoordinateSystem(
+                name="LAMBDA_ARI",
+                origin=Origin.LAMBDA,
+                axis_unit=SizeUnit.MM,
+                axes=[
+                    Axis(name=AxisName.AP, direction=Direction.PA),
+                    Axis(name=AxisName.ML, direction=Direction.LR),
+                    Axis(name=AxisName.SI, direction=Direction.SI),
+                ],
+            )
+        else:
+            return None
+
+    @property
+    def aind_craniotomy_size(self) -> Optional[Decimal]:
+        """Map craniotomy type to size in mm"""
+        return (
+            None
+            if self.aind_craniotomy_type is None
+            else {
+                self._nsb.craniotomy_type.N_5MM: (Decimal(5)),
+                self._nsb.craniotomy_type.N_3MM: (Decimal(3)),
+            }.get(self.aind_craniotomy_type, None)
+        )
 
     # TODO: support new Procedures (EMG Array, Grid Injections, Testes, Oviduct)
     def has_hp_procedure(self) -> bool:
@@ -4343,7 +2293,6 @@ class MappedNSBList:
             else:
                 instrument_id = None
             # backend fields titled "1st injection" correlate with followup
-            # procedures
             return SurgeryDuringInfo(
                 anaesthetic_duration_in_minutes=(
                     self.aind_first_injection_iso_durat
@@ -4410,6 +2359,13 @@ class MappedNSBList:
                     self.aind_burr_1_injectable_x06,
                 ],
             )
+            transforms=self._map_burr_hole_transforms(
+                    angle=self.aind_inj1_angle_v2,
+                    ml=self.aind_virus_m_l,
+                    ap=self.aind_virus_a_p,
+                    depth=coordinate_depth,
+            )
+            coordinate_system = CoordinateSystemLibrary.BREGMA_ARID if coordinate_depth else CoordinateSystemLibrary.BREGMA_ARI
             return BurrHoleInfo(
                 hemisphere=self.aind_virus_hemisphere,
                 coordinate_ml=self.aind_virus_m_l,
@@ -4422,9 +2378,7 @@ class MappedNSBList:
                 inj_current=self.aind_inj1_current,
                 alternating_current=self.aind_inj1_alternating_time,
                 inj_duration=self.aind_inj1_ionto_time,
-                inj_volume=self._map_burr_hole_volume(
-                    vol=self.aind_inj1volperdepth, dv=coordinate_depth
-                ),
+                inj_volume=self.aind_inj1volperdepth,
                 inj_materials=injectable_materials,
                 fiber_implant_depth=self.aind_fiber_implant1_dv,
                 fiber_type=self.aind_burr_1_fiber_t,
@@ -4433,6 +2387,9 @@ class MappedNSBList:
                 intended_measurement_g=self.aind_burr_1_intended_x0021,
                 intended_measurement_b=self.aind_burr_1_intended_x0022,
                 intended_measurement_iso=self.aind_burr_1_intended_x0023,
+                transforms=transforms,
+                targeted_structure=self.aind_burr_1_intended,
+                coordinate_system=coordinate_system
             )
         elif burr_hole_num == 2:
             coordinate_depth = self._map_burr_hole_dv(
@@ -4454,6 +2411,7 @@ class MappedNSBList:
                     self.aind_burr_2_injectable_x06,
                 ],
             )
+            coordinate_system = CoordinateSystemLibrary.BREGMA_ARID if coordinate_depth else CoordinateSystemLibrary.BREGMA_ARI
             return BurrHoleInfo(
                 hemisphere=self.aind_hemisphere2nd_inj,
                 coordinate_ml=self.aind_ml2nd_inj,
@@ -4466,9 +2424,7 @@ class MappedNSBList:
                 inj_current=self.aind_inj2_current,
                 alternating_current=self.aind_inj2_alternating_time,
                 inj_duration=self.aind_inj2_ionto_time,
-                inj_volume=self._map_burr_hole_volume(
-                    vol=self.aind_inj2volperdepth, dv=coordinate_depth
-                ),
+                inj_volume=self.aind_inj2volperdepth,
                 inj_materials=injectable_materials,
                 fiber_implant_depth=self.aind_fiber_implant2_dv,
                 fiber_type=self.aind_burr_2_fiber_t,
@@ -4477,6 +2433,13 @@ class MappedNSBList:
                 intended_measurement_g=self.aind_burr_2_intended_x0021,
                 intended_measurement_b=self.aind_burr_2_intended_x0022,
                 intended_measurement_iso=self.aind_burr_2_intended_x0023,
+                transforms=self._map_burr_hole_transforms(
+                    angle=self.aind_inj2_angle_v2,
+                    ml=self.aind_ml2nd_inj,
+                    ap=self.aind_ap2nd_inj,
+                    depth=coordinate_depth,
+                ),
+                targeted_structure=self.aind_burr_2_intended
             )
         elif burr_hole_num == 3:
             coordinate_depth = self._map_burr_hole_dv(
@@ -4498,6 +2461,7 @@ class MappedNSBList:
                     self.aind_burr_3_injectable_x06,
                 ],
             )
+            coordinate_system = CoordinateSystemLibrary.BREGMA_ARID if coordinate_depth else CoordinateSystemLibrary.BREGMA_ARI
             return BurrHoleInfo(
                 hemisphere=self.aind_burr_3_hemisphere,
                 coordinate_ml=self.aind_burr3_m_l,
@@ -4510,9 +2474,7 @@ class MappedNSBList:
                 inj_current=self.aind_inj3_current,
                 alternating_current=self.aind_inj3_alternating_time,
                 inj_duration=self.aind_inj3_ionto_time,
-                inj_volume=self._map_burr_hole_volume(
-                    vol=self.aind_inj3volperdepth, dv=coordinate_depth
-                ),
+                inj_volume=self.aind_inj3volperdepth,
                 inj_materials=injectable_materials,
                 fiber_implant_depth=self.aind_fiber_implant3_d_x00,
                 fiber_type=self.aind_burr_3_fiber_t,
@@ -4521,6 +2483,13 @@ class MappedNSBList:
                 intended_measurement_g=self.aind_burr_3_intended_x0021,
                 intended_measurement_b=self.aind_burr_3_intended_x0022,
                 intended_measurement_iso=self.aind_burr_3_intended_x0023,
+                transforms=self._map_burr_hole_transforms(
+                    angle=self.aind_burr_3_angle,
+                    ml=self.aind_burr3_m_l,
+                    ap=self.aind_burr3_a_p,
+                    depth=coordinate_depth,
+                ),
+                targeted_structure=self.aind_burr_3_intended
             )
         elif burr_hole_num == 4:
             coordinate_depth = self._map_burr_hole_dv(
@@ -4542,6 +2511,7 @@ class MappedNSBList:
                     self.aind_burr_4_injectable_x06,
                 ],
             )
+            coordinate_system = CoordinateSystemLibrary.BREGMA_ARID if coordinate_depth else CoordinateSystemLibrary.BREGMA_ARI
             return BurrHoleInfo(
                 hemisphere=self.aind_burr_4_hemisphere,
                 coordinate_ml=self.aind_burr4_m_l,
@@ -4554,9 +2524,7 @@ class MappedNSBList:
                 inj_current=self.aind_inj4_current,
                 alternating_current=self.aind_inj4_alternating_time,
                 inj_duration=self.aind_inj4_ionto_time,
-                inj_volume=self._map_burr_hole_volume(
-                    vol=self.aind_inj4volperdepth, dv=coordinate_depth
-                ),
+                inj_volume=self.aind_inj4volperdepth,
                 inj_materials=injectable_materials,
                 fiber_implant_depth=self.aind_fiber_implant4_d_x00,
                 fiber_type=self.aind_burr_4_fiber_t,
@@ -4565,6 +2533,13 @@ class MappedNSBList:
                 intended_measurement_g=self.aind_burr_4_intended_x0021,
                 intended_measurement_b=self.aind_burr_4_intended_x0022,
                 intended_measurement_iso=self.aind_burr_4_intended_x0023,
+                transforms=self._map_burr_hole_transforms(
+                    angle=self.aind_burr_4_angle,
+                    ml=self.aind_burr4_m_l,
+                    ap=self.aind_burr4_a_p,
+                    depth=coordinate_depth,
+                ),
+                targeted_structure=self.aind_burr_4_intended
             )
         elif burr_hole_num == 5:
             coordinate_depth = self._map_burr_hole_dv(
@@ -4586,6 +2561,7 @@ class MappedNSBList:
                     self.aind_burr_5_injectable_x06,
                 ],
             )
+            coordinate_system = CoordinateSystemLibrary.BREGMA_ARID if coordinate_depth else CoordinateSystemLibrary.BREGMA_ARI
             return BurrHoleInfo(
                 hemisphere=self.aind_burr_5_hemisphere,
                 coordinate_ml=self.aind_burr_5_m_l,
@@ -4598,9 +2574,7 @@ class MappedNSBList:
                 inj_current=self.aind_inj5_current,
                 alternating_current=self.aind_inj5_alternating_time,
                 inj_duration=self.aind_inj5_ionto_time,
-                inj_volume=self._map_burr_hole_volume(
-                    vol=self.aind_inj5volperdepth, dv=coordinate_depth
-                ),
+                inj_volume=self.aind_inj5volperdepth,
                 inj_materials=injectable_materials,
                 fiber_implant_depth=self.aind_fiber_implant5_d_x00,
                 fiber_type=self.aind_burr_5_fiber_t,
@@ -4609,6 +2583,13 @@ class MappedNSBList:
                 intended_measurement_g=self.aind_burr_5_intended_x0021,
                 intended_measurement_b=self.aind_burr_5_intended_x0022,
                 intended_measurement_iso=self.aind_burr_5_intended_x0023,
+                transforms=self._map_burr_hole_transforms(
+                    angle=self.aind_burr_5_angle,
+                    ml=self.aind_burr_5_m_l,
+                    ap=self.aind_burr_5_a_p,
+                    depth=coordinate_depth,
+                ),
+                targeted_structure=self.aind_burr_5_intended
             )
         elif burr_hole_num == 6:
             coordinate_depth = self._map_burr_hole_dv(
@@ -4630,6 +2611,7 @@ class MappedNSBList:
                     self.aind_burr_6_injectable_x06,
                 ],
             )
+            coordinate_system = CoordinateSystemLibrary.BREGMA_ARID if coordinate_depth else CoordinateSystemLibrary.BREGMA_ARI
             return BurrHoleInfo(
                 hemisphere=self.aind_burr_6_hemisphere,
                 coordinate_ml=self.aind_burr_6_m_l,
@@ -4642,9 +2624,7 @@ class MappedNSBList:
                 inj_current=self.aind_inj6_current,
                 alternating_current=self.aind_inj6_alternating_time,
                 inj_duration=self.aind_inj6_ionto_time,
-                inj_volume=self._map_burr_hole_volume(
-                    vol=self.aind_inj6volperdepth, dv=coordinate_depth
-                ),
+                inj_volume=self.aind_inj6volperdepth,
                 inj_materials=injectable_materials,
                 fiber_implant_depth=self.aind_fiber_implant6_d_x00,
                 fiber_type=self.aind_burr_6_fiber_t,
@@ -4653,6 +2633,13 @@ class MappedNSBList:
                 intended_measurement_g=self.aind_burr_6_intended_x0021,
                 intended_measurement_b=self.aind_burr_6_intended_x0022,
                 intended_measurement_iso=self.aind_burr_6_intended_x0023,
+                transforms=self._map_burr_hole_transforms(
+                    angle=self.aind_burr_6_angle,
+                    ml=self.aind_burr_6_m_l,
+                    ap=self.aind_burr_6_a_p,
+                    depth=coordinate_depth,
+                ),
+                targeted_structure=self.aind_burr_6_intended
             )
         else:
             return BurrHoleInfo()
@@ -4665,15 +2652,39 @@ class MappedNSBList:
         else:
             return [dv for dv in (dv1, dv2, dv3) if dv is not None]
 
+    # TODO: check this assumption of 0 instead of None
     @staticmethod
-    def _map_burr_hole_volume(vol, dv):
-        """Maps volume to a list per depth"""
-        if vol is None and dv is None:
-            return None
-        elif vol is None:
-            return None
+    def _map_burr_hole_transforms(
+        angle: Optional[Decimal],
+        ml: Optional[Decimal],
+        ap: Optional[Decimal],
+        depth: Optional[Union[Decimal, List[Decimal]]],
+    ) -> List[List[Union[Translation, Rotation]]]:
+        """
+        Maps transforms for a burr hole.
+        Returns a list of [Translation, Rotation] pairs, one per depth.
+        If depth is None, returns a single [Translation, Rotation] pair with no depth.
+        """
+        ap = ap if ap is not None else 0
+        ml = ml if ml is not None else 0
+        angle = angle if angle is not None else 0
+
+        if depth is None:
+            translation = Translation(translation=[ap, ml, 0])
+            rotation = Rotation(
+                angles=[angle, 0, 0], angles_unit=AngleUnit.DEG
+            )
+            return [[translation, rotation]]
         else:
-            return [vol] * len(dv) if dv is not None else [vol]
+            transforms = []
+            for d in depth:
+                translation = Translation(translation=[ap, ml, 0, d])
+                rotation = Rotation(
+                    angles=[angle, 0, 0, 0], angles_unit=AngleUnit.DEG
+                )
+                transforms.append([translation, rotation])
+            return transforms
+
 
     def map_burr_hole_injection_materials(
         self, injectable_materials: List[InjectableMaterial]
@@ -4690,7 +2701,7 @@ class MappedNSBList:
                     self.SCIENTIFIC_NOTATION_REGEX,
                     injectable_material.titer_str,
                 ).group(0)
-                viral = ViralMaterial.model_construct(
+                viral = ViralMaterial(
                     name=injectable_material.material,
                     titer=self._parse_titer_str(titer),
                 )
@@ -4703,7 +2714,7 @@ class MappedNSBList:
                 concentration = re.search(
                     self.CONCENTRATION_REGEX, injectable_material.titer_str
                 ).group(1)
-                non_viral = NonViralMaterial.model_construct(
+                non_viral = NonViralMaterial(
                     name=injectable_material.material,
                     concentration=self._parse_concentration_str(concentration),
                 )
@@ -4729,6 +2740,7 @@ class MappedNSBList:
     def _map_burr_fiber_probe(self, burr_info: BurrHoleInfo) -> FiberProbe:
         """Constructs a fiber probe"""
         if burr_info.fiber_type == FiberType.STANDARD:
+            # construct because fiber probe names are assigned at the end
             return FiberProbe.model_construct(
                 manufacturer=Organization.NEUROPHOTOMETRICS,
                 core_diameter=200,
@@ -4747,12 +2759,13 @@ class MappedNSBList:
                 total_length=burr_info.fiber_implant_length,
             )
 
+    # TODO: will need to come back here based on coords 
     @staticmethod
     def assign_fiber_probe_names(procedures: List) -> None:
         """Assigns ordered names to FiberProbe objects within each fiber implant"""
         all_probes = []
         for proc in procedures:
-            if isinstance(proc, FiberImplant):
+            if isinstance(proc, ProbeImplant):
                 all_probes.extend(proc.probes)
 
         # Sort all probes based on ap (descending) and ml (ascending)
@@ -4897,31 +2910,57 @@ class MappedNSBList:
                 hp=self.aind_headpost, hp_type=self.aind_headpost_type
             )
 
-            # Missing protocol_id
-            headframe_procedure = Headframe.model_construct(
-                headframe_type=headpost_info.headframe_type,
-                headframe_part_number=headpost_info.headframe_part_number,
-                headframe_material=headpost_info.headframe_material,
-                well_type=headpost_info.well_type,
-                well_part_number=headpost_info.well_part_number,
-            )
+            try:
+                headframe_procedure = Headframe(
+                    headframe_type=headpost_info.headframe_type,
+                    headframe_part_number=headpost_info.headframe_part_number,
+                    headframe_material=headpost_info.headframe_material,
+                    well_type=headpost_info.well_type,
+                    well_part_number=headpost_info.well_part_number,
+                )
+            except ValidationError:
+                headframe_procedure = Headframe.model_construct(
+                    headframe_type=headpost_info.headframe_type,
+                    headframe_part_number=headpost_info.headframe_part_number,
+                    headframe_material=headpost_info.headframe_material,
+                    well_type=headpost_info.well_type,
+                    well_part_number=headpost_info.well_part_number,
+                )
             # add to respective surgery
             if hp_during == During.INITIAL:
-                initial_anaesthesia = Anaesthetic.model_construct(
-                    type="isoflurane",
-                    duration=(
-                        hf_surgery_during_info.anaesthetic_duration_in_minutes
-                    ),
-                    level=hf_surgery_during_info.anaesthetic_level,
-                )
+                try: 
+                    initial_anaesthesia = Anaesthetic(
+                        anaesthetic_type="isoflurane",
+                        duration=(
+                            hf_surgery_during_info.anaesthetic_duration_in_minutes
+                        ),
+                        level=hf_surgery_during_info.anaesthetic_level,
+                    )
+                except ValidationError:
+                    initial_anaesthesia = Anaesthetic.model_construct(
+                        anaesthetic_type="isoflurane",
+                        duration=(
+                            hf_surgery_during_info.anaesthetic_duration_in_minutes
+                        ),
+                        level=hf_surgery_during_info.anaesthetic_level,
+                    )
                 initial_workstation_id = self.aind_hp_work_station
                 initial_procedures.append(headframe_procedure)
             elif hp_during == During.FOLLOW_UP:
-                followup_anaesthesia = Anaesthetic.model_construct(
-                    type="isoflurane",
-                    duration=(
-                        hf_surgery_during_info.anaesthetic_duration_in_minutes
-                    ),
+                try:
+                    followup_anaesthesia = Anaesthetic(
+                        anaesthetic_type="isoflurane",
+                        duration=(
+                            hf_surgery_during_info.anaesthetic_duration_in_minutes
+                        ),
+                        level=hf_surgery_during_info.anaesthetic_level,
+                    )
+                except ValidationError:
+                    followup_anaesthesia = Anaesthetic.model_construct(
+                        anaesthetic_type="isoflurane",
+                        duration=(
+                            hf_surgery_during_info.anaesthetic_duration_in_minutes
+                        ),
                     level=hf_surgery_during_info.anaesthetic_level,
                 )
                 followup_workstation_id = self.aind_hp_work_station
@@ -4931,61 +2970,78 @@ class MappedNSBList:
 
         # Check for craniotomy procedures
         if self.has_cran_procedure():
-            craniotomy_type = self.aind_craniotomy_type
             cran_during = self.aind_craniotomy_perform_d
             cran_during_info = self.surgery_during_info(cran_during)
             bregma_to_lambda_distance = self.aind_breg2_lamb
             implant_part_number = self.aind_implant_id_coverslip_type
-            if craniotomy_type == CraniotomyType.FIVE_MM:
-                craniotomy_coordinates_reference = (
-                    CoordinateReferenceLocation.LAMBDA
-                )
-                craniotomy_size = Decimal("5")
-            elif craniotomy_type == CraniotomyType.THREE_MM:
-                craniotomy_coordinates_reference = None
-                craniotomy_size = Decimal("3")
-            else:
-                craniotomy_coordinates_reference = None
-                craniotomy_size = None
-
-            cran_procedure = Craniotomy.model_construct(
-                craniotomy_type=craniotomy_type,
-                craniotomy_size=craniotomy_size,
-                recovery_time=cran_during_info.recovery_time,
-                bregma_to_lambda_distance=bregma_to_lambda_distance,
-                craniotomy_coordinates_reference=(
-                    craniotomy_coordinates_reference
-                ),
-                implant_part_number=implant_part_number,
-            )
+            # All craniotomies are done with headframe
             headpost_info = HeadPostInfo.from_hp_and_hp_type(
-                hp=self.aind_headpost, hp_type=self.aind_headpost_type
-            )
-
-            # all craniotomies are done with headframe.
-            headframe_procedure = Headframe.model_construct(
-                headframe_type=headpost_info.headframe_type,
-                headframe_part_number=headpost_info.headframe_part_number,
-                headframe_material=headpost_info.headframe_material,
-                well_type=headpost_info.well_type,
-                well_part_number=headpost_info.well_part_number,
-            )
+                    hp=self.aind_headpost, hp_type=self.aind_headpost_type
+                )
+            try:
+                cran_procedure = Craniotomy(
+                    craniotomy_type=self.aind_craniotomy_type,
+                    size=self.aind_craniotomy_size,
+                    size_unit=SizeUnit.MM if self.aind_craniotomy_size else None,
+                    coordinate_system_name=self.aind_craniotomy_coordinates_reference.name if self.aind_craniotomy_coordinates_reference else None,
+                    recovery_time=cran_during_info.recovery_time,
+                    bregma_to_lambda_distance=bregma_to_lambda_distance,
+                    implant_part_number=implant_part_number,
+                )
+                headframe_procedure = Headframe(
+                    headframe_type=headpost_info.headframe_type,
+                    headframe_part_number=headpost_info.headframe_part_number,
+                    headframe_material=headpost_info.headframe_material,
+                    well_type=headpost_info.well_type,
+                    well_part_number=headpost_info.well_part_number,
+                )
+            except ValidationError:
+                cran_procedure = Craniotomy.model_construct(
+                    craniotomy_type=self.aind_craniotomy_type,
+                    size=self.aind_craniotomy_size,
+                    size_unit=SizeUnit.MM if self.aind_craniotomy_size else None,
+                    coordinate_system_name=self.aind_craniotomy_coordinates_reference.name if self.aind_craniotomy_coordinates_reference else None,
+                    recovery_time=cran_during_info.recovery_time,
+                    bregma_to_lambda_distance=bregma_to_lambda_distance,
+                    implant_part_number=implant_part_number,
+                )
+                headframe_procedure = Headframe.model_construct(
+                    headframe_type=headpost_info.headframe_type,
+                    headframe_part_number=headpost_info.headframe_part_number,
+                    headframe_material=headpost_info.headframe_material,
+                    well_type=headpost_info.well_type,
+                    well_part_number=headpost_info.well_part_number,
+                )
 
             if cran_during == During.INITIAL:
-                initial_anaesthesia = Anaesthetic.model_construct(
-                    type="isoflurane",
-                    duration=cran_during_info.anaesthetic_duration_in_minutes,
-                    level=cran_during_info.anaesthetic_level,
-                )
+                try:
+                    initial_anaesthesia = Anaesthetic(
+                        anaesthetic_type="isoflurane",
+                        duration=cran_during_info.anaesthetic_duration_in_minutes,
+                        level=cran_during_info.anaesthetic_level,
+                    )
+                except ValidationError:
+                    initial_anaesthesia = Anaesthetic.model_construct(
+                        anaesthetic_type="isoflurane",
+                        duration=cran_during_info.anaesthetic_duration_in_minutes,
+                        level=cran_during_info.anaesthetic_level,
+                    )
                 initial_workstation_id = self.aind_hp_work_station
                 initial_procedures.append(cran_procedure)
                 initial_procedures.append(headframe_procedure)
             elif cran_during == During.FOLLOW_UP:
-                followup_anaesthesia = Anaesthetic.model_construct(
-                    type="isoflurane",
-                    duration=cran_during_info.anaesthetic_duration_in_minutes,
-                    level=cran_during_info.anaesthetic_level,
-                )
+                try:
+                    followup_anaesthesia = Anaesthetic(
+                        anaesthetic_type="isoflurane",
+                        duration=cran_during_info.anaesthetic_duration_in_minutes,
+                        level=cran_during_info.anaesthetic_level,
+                    )
+                except ValidationError:
+                    followup_anaesthesia = Anaesthetic.model_construct(
+                        anaesthetic_type="isoflurane",
+                        duration=cran_during_info.anaesthetic_duration_in_minutes,
+                        level=cran_during_info.anaesthetic_level,
+                    )
                 followup_workstation_id = self.aind_hp_work_station
                 followup_procedures.append(cran_procedure)
                 followup_procedures.append(headframe_procedure)
@@ -5010,82 +3066,94 @@ class MappedNSBList:
                     burr_hole_info.inj_materials
                 )
                 if burr_hole_info.inj_type == InjectionType.IONTOPHORESIS:
-                    injection_proc = IontophoresisInjection.model_construct(
-                        injection_hemisphere=burr_hole_info.hemisphere,
-                        injection_coordinate_ml=burr_hole_info.coordinate_ml,
-                        injection_coordinate_ap=burr_hole_info.coordinate_ap,
-                        injection_coordinate_depth=(
-                            burr_hole_info.coordinate_depth
-                        ),
-                        injection_angle=burr_hole_info.angle,
-                        injection_current=burr_hole_info.inj_current,
-                        injection_duration=burr_hole_info.inj_duration,
-                        alternating_current=burr_hole_info.alternating_current,
-                        recovery_time=burr_during_info.recovery_time,
-                        instrument_id=burr_during_info.instrument_id,
-                        bregma_to_lambda_distance=self.aind_breg2_lamb,
-                        injection_coordinate_reference=(
-                            CoordinateReferenceLocation.BREGMA
-                        ),
+                    try:
+                        dynamics = InjectionDynamics(
+                            profile=InjectionProfile.BOLUS,
+                            duration=burr_hole_info.inj_duration,
+                            injection_current=burr_hole_info.inj_current,
+                            alternating_current=burr_hole_info.alternating_current,
+                        )
+                    except ValidationError:
+                        dynamics = InjectionDynamics.model_construct(
+                            profile=InjectionProfile.BOLUS,
+                            duration=burr_hole_info.inj_duration,
+                            injection_current=burr_hole_info.inj_current,
+                            alternating_current=burr_hole_info.alternating_current,
+                        )
+                    # length of dynamics need to match length of coordinates (1 vol per depth)
+                    coordinates = burr_hole_info.transforms
+                    dynamics = [dynamics] * len(coordinates) if coordinates else [dynamics]
+                    injection_proc = BrainInjection(
                         injection_materials=injection_materials,
+                        targeted_structure=burr_hole_info.targeted_structure,
+                        relative_position=burr_hole_info.hemisphere,
+                        dynamics=dynamics,
+                        coordinate_system_name=CoordinateSystemLibrary.BREGMA_ARID.name,
+                        coordinates=burr_hole_info.transforms,
                     )
                 elif burr_hole_info.inj_type == InjectionType.NANOJECT:
-                    injection_proc = NanojectInjection.model_construct(
-                        injection_hemisphere=burr_hole_info.hemisphere,
-                        injection_coordinate_ml=burr_hole_info.coordinate_ml,
-                        injection_coordinate_ap=burr_hole_info.coordinate_ap,
-                        injection_coordinate_depth=(
-                            burr_hole_info.coordinate_depth
-                        ),
-                        injection_angle=burr_hole_info.angle,
-                        injection_current=burr_hole_info.inj_current,
-                        injection_duration=burr_hole_info.inj_duration,
-                        injection_volume=burr_hole_info.inj_volume,
-                        alternating_current=burr_hole_info.alternating_current,
-                        recovery_time=burr_during_info.recovery_time,
-                        instrument_id=burr_during_info.instrument_id,
-                        bregma_to_lambda_distance=self.aind_breg2_lamb,
-                        injection_coordinate_reference=(
-                            CoordinateReferenceLocation.BREGMA
-                        ),
-                        injection_materials=injection_materials,
-                    )
+                    try:
+                        dynamics = InjectionDynamics(
+                            profile=InjectionProfile.BOLUS,
+                            duration=burr_hole_info.inj_duration,
+                            volume=burr_hole_info.inj_volume,
+                            volume_unit=VolumeUnit.NL,
+                        )
+                    except ValidationError:
+                        dynamics = InjectionDynamics.model_construct(
+                            profile=InjectionProfile.BOLUS,
+                            duration=burr_hole_info.inj_duration,
+                            injection_current=burr_hole_info.inj_current,
+                            alternating_current=burr_hole_info.alternating_current,
+                            injection_current_unit=CurrentUnit.UA,
+                        )
                 else:
-                    injection_proc = BrainInjection.model_construct(
-                        injection_hemisphere=burr_hole_info.hemisphere,
-                        injection_coordinate_ml=burr_hole_info.coordinate_ml,
-                        injection_coordinate_ap=burr_hole_info.coordinate_ap,
-                        injection_coordinate_depth=(
-                            burr_hole_info.coordinate_depth
-                        ),
-                        injection_angle=burr_hole_info.angle,
-                        injection_duration=burr_hole_info.inj_duration,
-                        recovery_time=burr_during_info.recovery_time,
-                        instrument_id=burr_during_info.instrument_id,
-                        bregma_to_lambda_distance=self.aind_breg2_lamb,
-                        injection_coordinate_reference=(
-                            CoordinateReferenceLocation.BREGMA
-                        ),
-                        injection_materials=injection_materials,
-                    )
+                    dynamics = []
+                coordinates = burr_hole_info.transforms
+                if dynamics:
+                    dynamics = [dynamics] * len(coordinates) if coordinates else [dynamics]
+                injection_proc = BrainInjection(
+                    injection_materials=injection_materials,
+                    targeted_structure=burr_hole_info.targeted_structure,
+                    relative_position=burr_hole_info.hemisphere,
+                    dynamics=dynamics,
+                    coordinate_system_name=burr_hole_info.coordinate_system.name,
+                    coordinates=burr_hole_info.transforms,
+                )
+                
                 if burr_hole_info.during == During.INITIAL:
-                    initial_anaesthesia = Anaesthetic.model_construct(
-                        type="isoflurane",
-                        duration=burr_during_info.anaesthetic_duration_in_minutes,
-                        level=burr_during_info.anaesthetic_level,
-                    )
+                    try:
+                        initial_anaesthesia = Anaesthetic(
+                            anaesthetic_type="isoflurane",
+                            duration=burr_during_info.anaesthetic_duration_in_minutes,
+                            level=burr_during_info.anaesthetic_level,
+                        )
+                    except ValidationError:
+                        initial_anaesthesia = Anaesthetic.model_construct(
+                            anaesthetic_type="isoflurane",
+                            duration=burr_during_info.anaesthetic_duration_in_minutes,
+                            level=burr_during_info.anaesthetic_level,
+                        )
                     initial_workstation_id = burr_during_info.workstation_id
                     initial_procedures.append(injection_proc)
                 elif burr_hole_info.during == During.FOLLOW_UP:
-                    followup_anaesthesia = Anaesthetic.model_construct(
-                        type="isoflurane",
-                        duration=burr_during_info.anaesthetic_duration_in_minutes,
-                        level=burr_during_info.anaesthetic_level,
-                    )
+                    try:
+                        followup_anaesthesia = Anaesthetic(
+                            anaesthetic_type="isoflurane",
+                            duration=burr_during_info.anaesthetic_duration_in_minutes,
+                            level=burr_during_info.anaesthetic_level,
+                        )
+                    except ValidationError:
+                        followup_anaesthesia = Anaesthetic.model_construct(
+                            anaesthetic_type="isoflurane",
+                            duration=burr_during_info.anaesthetic_duration_in_minutes,
+                            level=burr_during_info.anaesthetic_level,
+                        )
                     followup_workstation_id = burr_during_info.workstation_id
                     followup_procedures.append(injection_proc)
                 else:
                     other_procedures.append(injection_proc)
+
             if getattr(self, f"aind_burr_hole_{burr_hole_num}") in {
                 BurrHoleProcedure.FIBER_IMPLANT,
                 BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
@@ -5099,43 +3167,62 @@ class MappedNSBList:
                 )
                 bregma_to_lambda_distance = self.aind_breg2_lamb
                 fiber_probe = self._map_burr_fiber_probe(burr_hole_info)
-                ophys_probe = OphysProbe.model_construct(
-                    ophys_probe=fiber_probe,
-                    targeted_structure=None,
-                    stereotactic_coordinate_ml=burr_hole_info.coordinate_ml,
-                    stereotactic_coordinate_ap=burr_hole_info.coordinate_ap,
-                    stereotactic_coordinate_dv=(
-                        burr_hole_info.fiber_implant_depth
-                    ),
-                    angle=burr_hole_info.angle,
-                    bregma_to_lambda_distance=bregma_to_lambda_distance,
-                    stereotactic_coordinate_reference=(
-                        CoordinateReferenceLocation.BREGMA
-                    ),
+                coordinate_system = CoordinateSystem(
+                    name="FIBER_PROBE_RSAB",
+                    origin=Origin.TIP,
+                    axis_unit=SizeUnit.MM,
+                    axes=[
+                        Axis(name=AxisName.X, direction=Direction.LR),
+                        Axis(name=AxisName.Y, direction=Direction.IS),
+                        Axis(name=AxisName.Z, direction=Direction.PA),
+                        Axis(name=AxisName.DEPTH, direction=Direction.UD),
+                    ],
                 )
-                fiber_implant_proc = FiberImplant.model_construct(
-                    probes=[ophys_probe]
+                probe_implant_proc = ProbeImplant.model_construct(
+                    implanted_device=fiber_probe,
+                    device_config=ProbeConfig.model_construct(
+                        primary_targeted_structure=burr_hole_info.targeted_structure,
+                        device_name=None, # TODO: this needs to get filled in at the end (fix up assign names)
+                        coordinate_system=coordinate_system,
+                        transform=burr_hole_info.transforms,
+                    )
                 )
                 if burr_hole_info.during == During.INITIAL:
-                    initial_anaesthesia = Anaesthetic.model_construct(
-                        type="isoflurane",
-                        duration=burr_during_info.anaesthetic_duration_in_minutes,
-                        level=burr_during_info.anaesthetic_level,
-                    )
+                    try:
+                        initial_anaesthesia = Anaesthetic.model_construct(
+                            anaesthetic_type="isoflurane",
+                            duration=burr_during_info.anaesthetic_duration_in_minutes,
+                            level=burr_during_info.anaesthetic_level,
+                        )
+                    except ValidationError:
+                        initial_anaesthesia = Anaesthetic.model_construct(
+                            anaesthetic_type="isoflurane",
+                            duration=burr_during_info.anaesthetic_duration_in_minutes,
+                            level=burr_during_info.anaesthetic_level,
+                        )
                     initial_workstation_id = burr_during_info.workstation_id
-                    initial_procedures.append(fiber_implant_proc)
+                    initial_procedures.append(probe_implant_proc)
                 elif burr_hole_info.during == During.FOLLOW_UP:
-                    followup_anaesthesia = Anaesthetic.model_construct(
-                        type="isoflurane",
-                        duration=burr_during_info.anaesthetic_duration_in_minutes,
-                        level=burr_during_info.anaesthetic_level,
-                    )
+                    try:
+                        followup_anaesthesia = Anaesthetic.model_construct(
+                            anaesthetic_type="isoflurane",
+                            duration=burr_during_info.anaesthetic_duration_in_minutes,
+                            level=burr_during_info.anaesthetic_level,
+                        )
+                    except ValidationError:
+                        followup_anaesthesia = Anaesthetic.model_construct(
+                            anaesthetic_type="isoflurane",
+                            duration=burr_during_info.anaesthetic_duration_in_minutes,
+                            level=burr_during_info.anaesthetic_level,
+                        )
                     followup_workstation_id = burr_during_info.workstation_id
-                    followup_procedures.append(fiber_implant_proc)
+                    followup_procedures.append(probe_implant_proc)
                 else:
-                    other_procedures.append(fiber_implant_proc)
+                    other_procedures.append(probe_implant_proc)
 
         surgeries = []
+        # TODO: WIP (continue from here)
+        # TODO: fix assign fiber probe names
         if initial_procedures:
             self.assign_fiber_probe_names(initial_procedures)
             initial_surgery = Surgery.model_construct(
