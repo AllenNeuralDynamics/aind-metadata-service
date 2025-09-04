@@ -12,8 +12,8 @@ from aind_metadata_service_server import __version__ as service_version
 from aind_metadata_service_server.routes import (
     healthcheck,
     index,
-    subject,
     procedures,
+    subject,
     v1_proxy,
 )
 
