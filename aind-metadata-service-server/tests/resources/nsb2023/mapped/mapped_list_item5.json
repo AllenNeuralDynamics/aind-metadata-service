@@ -1,439 +1,856 @@
 [
-  {
-    "procedure_type": "Surgery",
-    "start_date": "2022-01-03",
-    "experimenter_full_name": "NSB-2846",
-    "iacuc_protocol": "2103",
-    "animal_weight_prior": "25.2",
-    "animal_weight_post": "28.2",
-    "weight_unit": "gram",
-    "anaesthesia": {
-      "type": "isoflurane",
-      "duration": "90.0",
-      "duration_unit": "minute",
-      "level": "2.0"
-    },
-    "workstation_id": "SWS 3",
-    "procedures": [
-      {
-        "procedure_type": "Craniotomy",
-        "craniotomy_type": "3 mm",
-        "craniotomy_hemisphere": null,
-        "bregma_to_lambda_distance": null,
-        "bregma_to_lambda_unit": "millimeter",
-        "implant_part_number": "3mm stacked coverslip",
-        "dura_removed": null,
-        "protective_material": null,
-        "recovery_time": "25.0",
-        "recovery_time_unit": "minute"
-      },
-      {
-        "procedure_type": "Headframe",
-        "headframe_type": "Motor Ctx",
-        "headframe_part_number": "0160-100-51",
-        "headframe_material": null,
-        "well_part_number": "Rev A",
-        "well_type": "Scientifica (CAM)"
-      },
-      {
-        "injection_materials": [],
-        "recovery_time": "25.0",
-        "recovery_time_unit": "minute",
-        "injection_duration": null,
-        "injection_duration_unit": "minute",
-        "instrument_id": null,
-        "injection_coordinate_ml": "-5.2",
-        "injection_coordinate_ap": "-0.85",
-        "injection_coordinate_depth": [
-          "-3.1"
-        ],
-        "injection_coordinate_unit": "millimeter",
-        "injection_coordinate_reference": "Bregma",
-        "bregma_to_lambda_distance": null,
-        "bregma_to_lambda_unit": "millimeter",
-        "injection_angle": "0.0",
-        "injection_angle_unit": "degrees",
-        "targeted_structure": null,
-        "injection_hemisphere": "Left",
-        "procedure_type": "Nanoject injection",
-        "injection_volume": [
-          "600.0"
-        ],
-        "injection_volume_unit": "nanoliter"
-      },
-      {
-        "procedure_type": "Fiber implant",
-        "probes": [
-          {
-            "ophys_probe": {
-              "device_type": "Fiber optic probe",
-              "serial_number": null,
-              "manufacturer": {
-                "name": "Neurophotometrics",
-                "abbreviation": null,
-                "registry": null,
-                "registry_identifier": null
-              },
-              "model": null,
-              "path_to_cad": null,
-              "port_index": null,
-              "additional_settings": {},
-              "notes": null,
-              "core_diameter": 200,
-              "core_diameter_unit": "micrometer",
-              "numerical_aperture": 0.37,
-              "ferrule_material": "Ceramic",
-              "active_length": null,
-              "total_length": null,
-              "length_unit": "millimeter",
-              "name": "Fiber_2"
+   {
+      "object_type": "Surgery",
+      "protocol_id": null,
+      "start_date": "2022-01-03",
+      "experimenters": [
+         "NSB-2846"
+      ],
+      "ethics_review_id": "2103",
+      "animal_weight_prior": 25.2,
+      "animal_weight_post": 28.2,
+      "weight_unit": "gram",
+      "anaesthesia": null,
+      "workstation_id": null,
+      "coordinate_system": {
+         "object_type": "Coordinate system",
+         "name": "BREGMA_ARID",
+         "origin": "Bregma",
+         "axes": [
+            {
+               "object_type": "Axis",
+               "name": "AP",
+               "direction": "Posterior_to_anterior"
             },
-            "targeted_structure": null,
-            "stereotactic_coordinate_ap": "-0.85",
-            "stereotactic_coordinate_ml": "-5.2",
-            "stereotactic_coordinate_dv": "-2.95",
-            "stereotactic_coordinate_unit": "millimeter",
-            "stereotactic_coordinate_reference": "Bregma",
-            "bregma_to_lambda_distance": null,
-            "bregma_to_lambda_unit": "millimeter",
-            "angle": "0.0",
-            "angle_unit": "degrees",
-            "notes": null
-          }
-        ]
-      },
-      {
-        "injection_materials": [],
-        "recovery_time": "25.0",
-        "recovery_time_unit": "minute",
-        "injection_duration": null,
-        "injection_duration_unit": "minute",
-        "instrument_id": null,
-        "injection_coordinate_ml": "-0.5",
-        "injection_coordinate_ap": "2.0",
-        "injection_coordinate_depth": [
-          "5.0"
-        ],
-        "injection_coordinate_unit": "millimeter",
-        "injection_coordinate_reference": "Bregma",
-        "bregma_to_lambda_distance": null,
-        "bregma_to_lambda_unit": "millimeter",
-        "injection_angle": "0.0",
-        "injection_angle_unit": "degrees",
-        "targeted_structure": null,
-        "injection_hemisphere": "Left",
-        "procedure_type": "Iontophoresis injection",
-        "injection_current": null,
-        "injection_current_unit": "microamps",
-        "alternating_current": "7/7"
-      },
-      {
-        "procedure_type": "Fiber implant",
-        "probes": [
-          {
-            "ophys_probe": {
-              "device_type": "Fiber optic probe",
-              "serial_number": null,
-              "manufacturer": {
-                "name": "Neurophotometrics",
-                "abbreviation": null,
-                "registry": null,
-                "registry_identifier": null
-              },
-              "model": null,
-              "path_to_cad": null,
-              "port_index": null,
-              "additional_settings": {},
-              "notes": null,
-              "core_diameter": 200,
-              "core_diameter_unit": "micrometer",
-              "numerical_aperture": 0.37,
-              "ferrule_material": "Ceramic",
-              "active_length": null,
-              "total_length": "2.5",
-              "length_unit": "millimeter",
-              "name": "Fiber_0"
+            {
+               "object_type": "Axis",
+               "name": "ML",
+               "direction": "Left_to_right"
             },
-            "targeted_structure": null,
-            "stereotactic_coordinate_ap": "2.0",
-            "stereotactic_coordinate_ml": "-0.5",
-            "stereotactic_coordinate_dv": "-1.05",
-            "stereotactic_coordinate_unit": "millimeter",
-            "stereotactic_coordinate_reference": "Bregma",
-            "bregma_to_lambda_distance": null,
-            "bregma_to_lambda_unit": "millimeter",
-            "angle": "0.0",
-            "angle_unit": "degrees",
-            "notes": null
-          }
-        ]
-      },
-      {
-        "injection_materials": [],
-        "recovery_time": "25.0",
-        "recovery_time_unit": "minute",
-        "injection_duration": null,
-        "injection_duration_unit": "minute",
-        "instrument_id": null,
-        "injection_coordinate_ml": "-2.2",
-        "injection_coordinate_ap": "-6.1",
-        "injection_coordinate_depth": [
-          "3.1"
-        ],
-        "injection_coordinate_unit": "millimeter",
-        "injection_coordinate_reference": "Bregma",
-        "bregma_to_lambda_distance": null,
-        "bregma_to_lambda_unit": "millimeter",
-        "injection_angle": "0.0",
-        "injection_angle_unit": "degrees",
-        "targeted_structure": null,
-        "injection_hemisphere": "Left",
-        "procedure_type": "Iontophoresis injection",
-        "injection_current": "5",
-        "injection_current_unit": "microamps",
-        "alternating_current": "7/7"
-      },
-      {
-        "procedure_type": "Fiber implant",
-        "probes": [
-          {
-            "ophys_probe": {
-              "device_type": "Fiber optic probe",
-              "serial_number": null,
-              "manufacturer": {
-                "name": "Neurophotometrics",
-                "abbreviation": null,
-                "registry": null,
-                "registry_identifier": null
-              },
-              "model": null,
-              "path_to_cad": null,
-              "port_index": null,
-              "additional_settings": {},
-              "notes": null,
-              "core_diameter": 200,
-              "core_diameter_unit": "micrometer",
-              "numerical_aperture": 0.37,
-              "ferrule_material": "Ceramic",
-              "active_length": null,
-              "total_length": null,
-              "length_unit": "millimeter",
-              "name": "Fiber_3"
+            {
+               "object_type": "Axis",
+               "name": "SI",
+               "direction": "Superior_to_inferior"
             },
+            {
+               "object_type": "Axis",
+               "name": "Depth",
+               "direction": "Up_to_down"
+            }
+         ],
+         "axis_unit": "millimeter"
+      },
+      "measured_coordinates": null,
+      "procedures": [
+         {
+            "object_type": "Craniotomy",
+            "protocol_id": null,
+            "craniotomy_type": "Circle",
+            "coordinate_system_name": "BREGMA_ARID",
+            "position": null,
+            "size": null,
+            "size_unit": null,
+            "protective_material": null,
+            "implant_part_number": "3mm stacked coverslip",
+            "dura_removed": null
+         },
+         {
+            "object_type": "Headframe",
+            "protocol_id": null,
+            "headframe_type": "Motor Ctx",
+            "headframe_part_number": "0160-100-51",
+            "headframe_material": null,
+            "well_part_number": "Rev A",
+            "well_type": "Scientifica (CAM)"
+         },
+         {
+            "object_type": "Brain injection",
+            "injection_materials": [],
             "targeted_structure": null,
-            "stereotactic_coordinate_ap": "-6.1",
-            "stereotactic_coordinate_ml": "-2.2",
-            "stereotactic_coordinate_dv": "-1.85",
-            "stereotactic_coordinate_unit": "millimeter",
-            "stereotactic_coordinate_reference": "Bregma",
-            "bregma_to_lambda_distance": null,
-            "bregma_to_lambda_unit": "millimeter",
-            "angle": "0.0",
-            "angle_unit": "degrees",
-            "notes": null
-          }
-        ]
-      },
-      {
-        "injection_materials": [],
-        "recovery_time": "25.0",
-        "recovery_time_unit": "minute",
-        "injection_duration": null,
-        "injection_duration_unit": "minute",
-        "instrument_id": null,
-        "injection_coordinate_ml": "-2.5",
-        "injection_coordinate_ap": "1.0",
-        "injection_coordinate_depth": [
-          "3.0"
-        ],
-        "injection_coordinate_unit": "millimeter",
-        "injection_coordinate_reference": "Bregma",
-        "bregma_to_lambda_distance": null,
-        "bregma_to_lambda_unit": "millimeter",
-        "injection_angle": "0.0",
-        "injection_angle_unit": "degrees",
-        "targeted_structure": null,
-        "injection_hemisphere": "Right",
-        "procedure_type": "Iontophoresis injection",
-        "injection_current": "5",
-        "injection_current_unit": "microamps",
-        "alternating_current": "7/7"
-      },
-      {
-        "procedure_type": "Fiber implant",
-        "probes": [
-          {
-            "ophys_probe": {
-              "device_type": "Fiber optic probe",
-              "serial_number": null,
-              "manufacturer": {
-                "name": "Neurophotometrics",
-                "abbreviation": null,
-                "registry": null,
-                "registry_identifier": null
-              },
-              "model": null,
-              "path_to_cad": null,
-              "port_index": null,
-              "additional_settings": {},
-              "notes": null,
-              "core_diameter": 200,
-              "core_diameter_unit": "micrometer",
-              "numerical_aperture": 0.37,
-              "ferrule_material": "Ceramic",
-              "active_length": null,
-              "total_length": null,
-              "length_unit": "millimeter",
-              "name": "Fiber_1"
+            "relative_position": [
+               "Left"
+            ],
+            "dynamics": [
+               {
+                  "object_type": "Injection dynamics",
+                  "profile": "Bolus",
+                  "volume": 600.0,
+                  "volume_unit": "nanoliter",
+                  "rate": null,
+                  "rate_unit": null,
+                  "duration": null,
+                  "duration_unit": null,
+                  "injection_current": null,
+                  "injection_current_unit": null,
+                  "alternating_current": null
+               }
+            ],
+            "protocol_id": null,
+            "coordinate_system_name": "BREGMA_ARID",
+            "coordinates": [
+               [
+                  {
+                     "object_type": "Translation",
+                     "translation": [
+                        -0.85,
+                        -5.2,
+                        0.0,
+                        -3.1
+                     ]
+                  },
+                  {
+                     "object_type": "Rotation",
+                     "angles": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0
+                     ],
+                     "angles_unit": "degrees"
+                  }
+               ]
+            ]
+         },
+         {
+            "object_type": "Probe implant",
+            "protocol_id": null,
+            "implanted_device": {
+               "object_type": "Fiber probe",
+               "serial_number": null,
+               "manufacturer": {
+                  "name": "Neurophotometrics",
+                  "abbreviation": null,
+                  "registry": null,
+                  "registry_identifier": null
+               },
+               "model": null,
+               "additional_settings": null,
+               "notes": null,
+               "core_diameter": 200,
+               "core_diameter_unit": "micrometer",
+               "numerical_aperture": 0.37,
+               "ferrule_material": "Ceramic",
+               "active_length": null,
+               "total_length": null,
+               "length_unit": "millimeter",
+               "name": "Fiber_2"
             },
+            "device_config": {
+               "object_type": "Probe config",
+               "device_name": "Fiber_2",
+               "primary_targeted_structure": null,
+               "other_targeted_structure": null,
+               "atlas_coordinate": null,
+               "coordinate_system": {
+                  "object_type": "Coordinate system",
+                  "name": "FIBER_PROBE_RSAB",
+                  "origin": "Tip",
+                  "axes": [
+                     {
+                        "object_type": "Axis",
+                        "name": "X",
+                        "direction": "Left_to_right"
+                     },
+                     {
+                        "object_type": "Axis",
+                        "name": "Y",
+                        "direction": "Inferior_to_superior"
+                     },
+                     {
+                        "object_type": "Axis",
+                        "name": "Z",
+                        "direction": "Posterior_to_anterior"
+                     },
+                     {
+                        "object_type": "Axis",
+                        "name": "Depth",
+                        "direction": "Up_to_down"
+                     }
+                  ],
+                  "axis_unit": "millimeter"
+               },
+               "transform": [
+                  [
+                     {
+                        "object_type": "Translation",
+                        "translation": [
+                           -0.85,
+                           -5.2,
+                           0.0
+                        ]
+                     },
+                     {
+                        "object_type": "Rotation",
+                        "angles": [
+                           0.0,
+                           0.0,
+                           0.0
+                        ],
+                        "angles_unit": "degrees"
+                     }
+                  ]
+               ],
+               "dye": null,
+               "notes": null
+            }
+         },
+         {
+            "object_type": "Brain injection",
+            "injection_materials": [],
             "targeted_structure": null,
-            "stereotactic_coordinate_ap": "1.0",
-            "stereotactic_coordinate_ml": "-2.5",
-            "stereotactic_coordinate_dv": "-1.8",
-            "stereotactic_coordinate_unit": "millimeter",
-            "stereotactic_coordinate_reference": "Bregma",
-            "bregma_to_lambda_distance": null,
-            "bregma_to_lambda_unit": "millimeter",
-            "angle": "0.0",
-            "angle_unit": "degrees",
-            "notes": null
-          }
-        ]
-      }
-    ],
-    "notes": null
-  },
-  {
-    "procedure_type": "Surgery",
-    "start_date": null,
-    "experimenter_full_name": "NSB",
-    "iacuc_protocol": "2103",
-    "animal_weight_prior": null,
-    "animal_weight_post": null,
-    "weight_unit": "gram",
-    "anaesthesia": null,
-    "workstation_id": null,
-    "procedures": [
-      {
-        "injection_materials": [],
-        "recovery_time": null,
-        "recovery_time_unit": "minute",
-        "injection_duration": null,
-        "injection_duration_unit": "minute",
-        "instrument_id": null,
-        "injection_coordinate_ml": "2.5",
-        "injection_coordinate_ap": "-3.0",
-        "injection_coordinate_depth": [
-          "-1.5"
-        ],
-        "injection_coordinate_unit": "millimeter",
-        "injection_coordinate_reference": "Bregma",
-        "bregma_to_lambda_distance": null,
-        "bregma_to_lambda_unit": "millimeter",
-        "injection_angle": null,
-        "injection_angle_unit": "degrees",
-        "targeted_structure": null,
-        "injection_hemisphere": "Right",
-        "procedure_type": "Nanoject injection",
-        "injection_volume": [
-          "500.0"
-        ],
-        "injection_volume_unit": "nanoliter"
-      },
-      {
-        "procedure_type": "Fiber implant",
-        "probes": [
-          {
-            "ophys_probe": {
-              "device_type": "Fiber optic probe",
-              "serial_number": null,
-              "manufacturer": null,
-              "model": null,
-              "path_to_cad": null,
-              "port_index": null,
-              "additional_settings": {},
-              "notes": null,
-              "core_diameter_unit": "micrometer",
-              "ferrule_material": null,
-              "active_length": null,
-              "total_length": "4.0",
-              "length_unit": "millimeter",
-              "name": "Fiber_1"
+            "relative_position": [
+               "Left"
+            ],
+            "dynamics": [
+               {
+                  "object_type": "Injection dynamics",
+                  "profile": "Bolus",
+                  "volume": null,
+                  "volume_unit": null,
+                  "rate": null,
+                  "rate_unit": null,
+                  "duration": null,
+                  "duration_unit": null,
+                  "injection_current": null,
+                  "injection_current_unit": null,
+                  "alternating_current": "7/7"
+               }
+            ],
+            "protocol_id": null,
+            "coordinate_system_name": "BREGMA_ARID",
+            "coordinates": [
+               [
+                  {
+                     "object_type": "Translation",
+                     "translation": [
+                        2.0,
+                        -0.5,
+                        0.0,
+                        5.0
+                     ]
+                  },
+                  {
+                     "object_type": "Rotation",
+                     "angles": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0
+                     ],
+                     "angles_unit": "degrees"
+                  }
+               ]
+            ]
+         },
+         {
+            "object_type": "Probe implant",
+            "protocol_id": null,
+            "implanted_device": {
+               "object_type": "Fiber probe",
+               "serial_number": null,
+               "manufacturer": {
+                  "name": "Neurophotometrics",
+                  "abbreviation": null,
+                  "registry": null,
+                  "registry_identifier": null
+               },
+               "model": null,
+               "additional_settings": null,
+               "notes": null,
+               "core_diameter": 200,
+               "core_diameter_unit": "micrometer",
+               "numerical_aperture": 0.37,
+               "ferrule_material": "Ceramic",
+               "active_length": null,
+               "total_length": "2.5",
+               "length_unit": "millimeter",
+               "name": "Fiber_0"
             },
+            "device_config": {
+               "object_type": "Probe config",
+               "device_name": "Fiber_0",
+               "primary_targeted_structure": null,
+               "other_targeted_structure": null,
+               "atlas_coordinate": null,
+               "coordinate_system": {
+                  "object_type": "Coordinate system",
+                  "name": "FIBER_PROBE_RSAB",
+                  "origin": "Tip",
+                  "axes": [
+                     {
+                        "object_type": "Axis",
+                        "name": "X",
+                        "direction": "Left_to_right"
+                     },
+                     {
+                        "object_type": "Axis",
+                        "name": "Y",
+                        "direction": "Inferior_to_superior"
+                     },
+                     {
+                        "object_type": "Axis",
+                        "name": "Z",
+                        "direction": "Posterior_to_anterior"
+                     },
+                     {
+                        "object_type": "Axis",
+                        "name": "Depth",
+                        "direction": "Up_to_down"
+                     }
+                  ],
+                  "axis_unit": "millimeter"
+               },
+               "transform": [
+                  [
+                     {
+                        "object_type": "Translation",
+                        "translation": [
+                           2.0,
+                           -0.5,
+                           0.0
+                        ]
+                     },
+                     {
+                        "object_type": "Rotation",
+                        "angles": [
+                           0.0,
+                           0.0,
+                           0.0
+                        ],
+                        "angles_unit": "degrees"
+                     }
+                  ]
+               ],
+               "dye": null,
+               "notes": null
+            }
+         },
+         {
+            "object_type": "Brain injection",
+            "injection_materials": [],
             "targeted_structure": null,
-            "stereotactic_coordinate_ap": "-3.0",
-            "stereotactic_coordinate_ml": "2.5",
-            "stereotactic_coordinate_dv": "-1.2",
-            "stereotactic_coordinate_unit": "millimeter",
-            "stereotactic_coordinate_reference": "Bregma",
-            "bregma_to_lambda_distance": null,
-            "bregma_to_lambda_unit": "millimeter",
-            "angle": null,
-            "angle_unit": "degrees",
-            "notes": null
-          }
-        ]
-      },
-      {
-        "injection_materials": [],
-        "recovery_time": null,
-        "recovery_time_unit": "minute",
-        "injection_duration": null,
-        "injection_duration_unit": "minute",
-        "instrument_id": null,
-        "injection_coordinate_ml": "1.8",
-        "injection_coordinate_ap": "-2.1",
-        "injection_coordinate_depth": [
-          "-2.0"
-        ],
-        "injection_coordinate_unit": "millimeter",
-        "injection_coordinate_reference": "Bregma",
-        "bregma_to_lambda_distance": null,
-        "bregma_to_lambda_unit": "millimeter",
-        "injection_angle": null,
-        "injection_angle_unit": "degrees",
-        "targeted_structure": null,
-        "injection_hemisphere": "Left",
-        "procedure_type": "Iontophoresis injection",
-        "injection_current": "10",
-        "injection_current_unit": "microamps",
-        "alternating_current": "5/5"
-      },
-      {
-        "procedure_type": "Fiber implant",
-        "probes": [
-          {
-            "ophys_probe": {
-              "device_type": "Fiber optic probe",
-              "serial_number": null,
-              "manufacturer": null,
-              "model": null,
-              "path_to_cad": null,
-              "port_index": null,
-              "additional_settings": {},
-              "notes": null,
-              "core_diameter_unit": "micrometer",
-              "ferrule_material": null,
-              "active_length": null,
-              "total_length": "3.5",
-              "length_unit": "millimeter",
-              "name": "Fiber_0"
+            "relative_position": [
+               "Left"
+            ],
+            "dynamics": [
+               {
+                  "object_type": "Injection dynamics",
+                  "profile": "Bolus",
+                  "volume": null,
+                  "volume_unit": null,
+                  "rate": null,
+                  "rate_unit": null,
+                  "duration": null,
+                  "duration_unit": null,
+                  "injection_current": 5.0,
+                  "injection_current_unit": null,
+                  "alternating_current": "7/7"
+               }
+            ],
+            "protocol_id": null,
+            "coordinate_system_name": "BREGMA_ARID",
+            "coordinates": [
+               [
+                  {
+                     "object_type": "Translation",
+                     "translation": [
+                        -6.1,
+                        -2.2,
+                        0.0,
+                        3.1
+                     ]
+                  },
+                  {
+                     "object_type": "Rotation",
+                     "angles": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0
+                     ],
+                     "angles_unit": "degrees"
+                  }
+               ]
+            ]
+         },
+         {
+            "object_type": "Probe implant",
+            "protocol_id": null,
+            "implanted_device": {
+               "object_type": "Fiber probe",
+               "serial_number": null,
+               "manufacturer": {
+                  "name": "Neurophotometrics",
+                  "abbreviation": null,
+                  "registry": null,
+                  "registry_identifier": null
+               },
+               "model": null,
+               "additional_settings": null,
+               "notes": null,
+               "core_diameter": 200,
+               "core_diameter_unit": "micrometer",
+               "numerical_aperture": 0.37,
+               "ferrule_material": "Ceramic",
+               "active_length": null,
+               "total_length": null,
+               "length_unit": "millimeter",
+               "name": "Fiber_3"
             },
+            "device_config": {
+               "object_type": "Probe config",
+               "device_name": "Fiber_3",
+               "primary_targeted_structure": null,
+               "other_targeted_structure": null,
+               "atlas_coordinate": null,
+               "coordinate_system": {
+                  "object_type": "Coordinate system",
+                  "name": "FIBER_PROBE_RSAB",
+                  "origin": "Tip",
+                  "axes": [
+                     {
+                        "object_type": "Axis",
+                        "name": "X",
+                        "direction": "Left_to_right"
+                     },
+                     {
+                        "object_type": "Axis",
+                        "name": "Y",
+                        "direction": "Inferior_to_superior"
+                     },
+                     {
+                        "object_type": "Axis",
+                        "name": "Z",
+                        "direction": "Posterior_to_anterior"
+                     },
+                     {
+                        "object_type": "Axis",
+                        "name": "Depth",
+                        "direction": "Up_to_down"
+                     }
+                  ],
+                  "axis_unit": "millimeter"
+               },
+               "transform": [
+                  [
+                     {
+                        "object_type": "Translation",
+                        "translation": [
+                           -6.1,
+                           -2.2,
+                           0.0
+                        ]
+                     },
+                     {
+                        "object_type": "Rotation",
+                        "angles": [
+                           0.0,
+                           0.0,
+                           0.0
+                        ],
+                        "angles_unit": "degrees"
+                     }
+                  ]
+               ],
+               "dye": null,
+               "notes": null
+            }
+         },
+         {
+            "object_type": "Brain injection",
+            "injection_materials": [],
             "targeted_structure": null,
-            "stereotactic_coordinate_ap": "-2.1",
-            "stereotactic_coordinate_ml": "1.8",
-            "stereotactic_coordinate_dv": "-2.3",
-            "stereotactic_coordinate_unit": "millimeter",
-            "stereotactic_coordinate_reference": "Bregma",
-            "bregma_to_lambda_distance": null,
-            "bregma_to_lambda_unit": "millimeter",
-            "angle": null,
-            "angle_unit": "degrees",
-            "notes": null
-          }
-        ]
-      }
-    ],
-    "notes": null
-  }
+            "relative_position": [
+               "Right"
+            ],
+            "dynamics": [
+               {
+                  "object_type": "Injection dynamics",
+                  "profile": "Bolus",
+                  "volume": null,
+                  "volume_unit": null,
+                  "rate": null,
+                  "rate_unit": null,
+                  "duration": null,
+                  "duration_unit": null,
+                  "injection_current": 5.0,
+                  "injection_current_unit": null,
+                  "alternating_current": "7/7"
+               }
+            ],
+            "protocol_id": null,
+            "coordinate_system_name": "BREGMA_ARID",
+            "coordinates": [
+               [
+                  {
+                     "object_type": "Translation",
+                     "translation": [
+                        1.0,
+                        -2.5,
+                        0.0,
+                        3.0
+                     ]
+                  },
+                  {
+                     "object_type": "Rotation",
+                     "angles": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0
+                     ],
+                     "angles_unit": "degrees"
+                  }
+               ]
+            ]
+         },
+         {
+            "object_type": "Probe implant",
+            "protocol_id": null,
+            "implanted_device": {
+               "object_type": "Fiber probe",
+               "serial_number": null,
+               "manufacturer": {
+                  "name": "Neurophotometrics",
+                  "abbreviation": null,
+                  "registry": null,
+                  "registry_identifier": null
+               },
+               "model": null,
+               "additional_settings": null,
+               "notes": null,
+               "core_diameter": 200,
+               "core_diameter_unit": "micrometer",
+               "numerical_aperture": 0.37,
+               "ferrule_material": "Ceramic",
+               "active_length": null,
+               "total_length": null,
+               "length_unit": "millimeter",
+               "name": "Fiber_1"
+            },
+            "device_config": {
+               "object_type": "Probe config",
+               "device_name": "Fiber_1",
+               "primary_targeted_structure": null,
+               "other_targeted_structure": null,
+               "atlas_coordinate": null,
+               "coordinate_system": {
+                  "object_type": "Coordinate system",
+                  "name": "FIBER_PROBE_RSAB",
+                  "origin": "Tip",
+                  "axes": [
+                     {
+                        "object_type": "Axis",
+                        "name": "X",
+                        "direction": "Left_to_right"
+                     },
+                     {
+                        "object_type": "Axis",
+                        "name": "Y",
+                        "direction": "Inferior_to_superior"
+                     },
+                     {
+                        "object_type": "Axis",
+                        "name": "Z",
+                        "direction": "Posterior_to_anterior"
+                     },
+                     {
+                        "object_type": "Axis",
+                        "name": "Depth",
+                        "direction": "Up_to_down"
+                     }
+                  ],
+                  "axis_unit": "millimeter"
+               },
+               "transform": [
+                  [
+                     {
+                        "object_type": "Translation",
+                        "translation": [
+                           1.0,
+                           -2.5,
+                           0.0
+                        ]
+                     },
+                     {
+                        "object_type": "Rotation",
+                        "angles": [
+                           0.0,
+                           0.0,
+                           0.0
+                        ],
+                        "angles_unit": "degrees"
+                     }
+                  ]
+               ],
+               "dye": null,
+               "notes": null
+            }
+         }
+      ],
+      "notes": null
+   },
+   {
+      "object_type": "Surgery",
+      "protocol_id": null,
+      "start_date": null,
+      "experimenters": [
+         "NSB"
+      ],
+      "ethics_review_id": "2103",
+      "animal_weight_prior": null,
+      "animal_weight_post": null,
+      "weight_unit": "gram",
+      "anaesthesia": null,
+      "workstation_id": null,
+      "coordinate_system": null,
+      "measured_coordinates": null,
+      "procedures": [
+         {
+            "object_type": "Brain injection",
+            "injection_materials": [],
+            "targeted_structure": null,
+            "relative_position": [
+               "Right"
+            ],
+            "dynamics": [
+               {
+                  "object_type": "Injection dynamics",
+                  "profile": "Bolus",
+                  "volume": 500.0,
+                  "volume_unit": "nanoliter",
+                  "rate": null,
+                  "rate_unit": null,
+                  "duration": null,
+                  "duration_unit": null,
+                  "injection_current": null,
+                  "injection_current_unit": null,
+                  "alternating_current": null
+               }
+            ],
+            "protocol_id": null,
+            "coordinate_system_name": null,
+            "coordinates": [
+               [
+                  {
+                     "object_type": "Translation",
+                     "translation": [
+                        -3.0,
+                        2.5,
+                        0.0
+                     ]
+                  },
+                  {
+                     "object_type": "Rotation",
+                     "angles": [
+                        0.0,
+                        0.0,
+                        0.0
+                     ],
+                     "angles_unit": "degrees"
+                  }
+               ]
+            ]
+         },
+         {
+            "object_type": "Probe implant",
+            "protocol_id": null,
+            "implanted_device": {
+               "object_type": "Fiber probe",
+               "serial_number": null,
+               "manufacturer": null,
+               "model": null,
+               "additional_settings": null,
+               "notes": null,
+               "core_diameter_unit": "micrometer",
+               "ferrule_material": null,
+               "active_length": null,
+               "total_length": "4.0",
+               "length_unit": "millimeter",
+               "name": "Fiber_1"
+            },
+            "device_config": {
+               "object_type": "Probe config",
+               "device_name": "Fiber_1",
+               "primary_targeted_structure": null,
+               "other_targeted_structure": null,
+               "atlas_coordinate": null,
+               "coordinate_system": {
+                  "object_type": "Coordinate system",
+                  "name": "FIBER_PROBE_RSAB",
+                  "origin": "Tip",
+                  "axes": [
+                     {
+                        "object_type": "Axis",
+                        "name": "X",
+                        "direction": "Left_to_right"
+                     },
+                     {
+                        "object_type": "Axis",
+                        "name": "Y",
+                        "direction": "Inferior_to_superior"
+                     },
+                     {
+                        "object_type": "Axis",
+                        "name": "Z",
+                        "direction": "Posterior_to_anterior"
+                     },
+                     {
+                        "object_type": "Axis",
+                        "name": "Depth",
+                        "direction": "Up_to_down"
+                     }
+                  ],
+                  "axis_unit": "millimeter"
+               },
+               "transform": [
+                  [
+                     {
+                        "object_type": "Translation",
+                        "translation": [
+                           -3.0,
+                           2.5,
+                           0.0
+                        ]
+                     },
+                     {
+                        "object_type": "Rotation",
+                        "angles": [
+                           0.0,
+                           0.0,
+                           0.0
+                        ],
+                        "angles_unit": "degrees"
+                     }
+                  ]
+               ],
+               "dye": null,
+               "notes": null
+            }
+         },
+         {
+            "object_type": "Brain injection",
+            "injection_materials": [],
+            "targeted_structure": null,
+            "relative_position": [
+               "Left"
+            ],
+            "dynamics": [
+               {
+                  "object_type": "Injection dynamics",
+                  "profile": "Bolus",
+                  "volume": null,
+                  "volume_unit": null,
+                  "rate": null,
+                  "rate_unit": null,
+                  "duration": null,
+                  "duration_unit": null,
+                  "injection_current": 10.0,
+                  "injection_current_unit": null,
+                  "alternating_current": "5/5"
+               }
+            ],
+            "protocol_id": null,
+            "coordinate_system_name": null,
+            "coordinates": [
+               [
+                  {
+                     "object_type": "Translation",
+                     "translation": [
+                        -2.1,
+                        1.8,
+                        0.0
+                     ]
+                  },
+                  {
+                     "object_type": "Rotation",
+                     "angles": [
+                        0.0,
+                        0.0,
+                        0.0
+                     ],
+                     "angles_unit": "degrees"
+                  }
+               ]
+            ]
+         },
+         {
+            "object_type": "Probe implant",
+            "protocol_id": null,
+            "implanted_device": {
+               "object_type": "Fiber probe",
+               "serial_number": null,
+               "manufacturer": null,
+               "model": null,
+               "additional_settings": null,
+               "notes": null,
+               "core_diameter_unit": "micrometer",
+               "ferrule_material": null,
+               "active_length": null,
+               "total_length": "3.5",
+               "length_unit": "millimeter",
+               "name": "Fiber_0"
+            },
+            "device_config": {
+               "object_type": "Probe config",
+               "device_name": "Fiber_0",
+               "primary_targeted_structure": null,
+               "other_targeted_structure": null,
+               "atlas_coordinate": null,
+               "coordinate_system": {
+                  "object_type": "Coordinate system",
+                  "name": "FIBER_PROBE_RSAB",
+                  "origin": "Tip",
+                  "axes": [
+                     {
+                        "object_type": "Axis",
+                        "name": "X",
+                        "direction": "Left_to_right"
+                     },
+                     {
+                        "object_type": "Axis",
+                        "name": "Y",
+                        "direction": "Inferior_to_superior"
+                     },
+                     {
+                        "object_type": "Axis",
+                        "name": "Z",
+                        "direction": "Posterior_to_anterior"
+                     },
+                     {
+                        "object_type": "Axis",
+                        "name": "Depth",
+                        "direction": "Up_to_down"
+                     }
+                  ],
+                  "axis_unit": "millimeter"
+               },
+               "transform": [
+                  [
+                     {
+                        "object_type": "Translation",
+                        "translation": [
+                           -2.1,
+                           1.8,
+                           0.0
+                        ]
+                     },
+                     {
+                        "object_type": "Rotation",
+                        "angles": [
+                           0.0,
+                           0.0,
+                           0.0
+                        ],
+                        "angles_unit": "degrees"
+                     }
+                  ]
+               ],
+               "dye": null,
+               "notes": null
+            }
+         }
+      ],
+      "notes": null
+   }
 ]

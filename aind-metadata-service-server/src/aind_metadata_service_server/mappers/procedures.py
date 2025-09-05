@@ -3,7 +3,7 @@
 import logging
 from enum import Enum
 from typing import List, Optional, Union
-
+from pydantic import ValidationError
 from aind_data_schema.components.injection_procedures import Injection
 from aind_data_schema.components.subject_procedures import (
     Perfusion,
@@ -17,6 +17,7 @@ from aind_labtracks_service_async_client.models import Task as LabTracksTask
 from aind_sharepoint_service_async_client.models import (
     Las2020List,
     NSB2019List,
+    NSB2023List,
 )
 
 from aind_metadata_service_server.mappers.las2020 import (
@@ -25,7 +26,9 @@ from aind_metadata_service_server.mappers.las2020 import (
 from aind_metadata_service_server.mappers.nsb2019 import (
     MappedNSBList as MappedNSB2019,
 )
-
+from aind_metadata_service_server.mappers.nsb2023 import (
+    MappedNSBList as MappedNSB2023,
+)
 
 class LabTracksTaskStatuses(Enum):
     """LabTracks Task Status Options"""
@@ -87,6 +90,8 @@ class ProceduresMapper:
         labtracks_tasks: List[LabTracksTask] = [],
         las_2020: List[Las2020List] = [],
         nsb_2019: List[NSB2019List] = [],
+        nsb_2023: List[NSB2023List] = [],
+        nsb_present: List[NSB2023List] = []
     ):
         """
         Class constructor.
@@ -97,6 +102,8 @@ class ProceduresMapper:
         self.labtracks_tasks = labtracks_tasks
         self.las_2020 = las_2020
         self.nsb_2019 = nsb_2019
+        self.nsb_2023 = nsb_2023
+        self.nsb_present = nsb_present
 
     @staticmethod
     def _map_labtracks_task_to_aind_surgery(
@@ -266,8 +273,35 @@ class ProceduresMapper:
                 f"from NSB2019 for {subject_id}"
             )
 
+        if self.nsb_2023:
+            nsb_2023_surgeries = (
+                self.map_sharepoint_response_to_aind_surgeries(
+                    response=self.nsb_2023,
+                    mapper_cls=MappedNSB2023,
+                )
+            )
+            subject_procedures.extend(nsb_2023_surgeries)
+            logging.info(
+                f"Found {len(nsb_2023_surgeries)} surgeries "
+                f"from NSB2023 for {subject_id}"
+            )
+
+        if self.nsb_present:
+            nsb_present_surgeries = (
+                self.map_sharepoint_response_to_aind_surgeries(
+                    response=self.nsb_present,
+                    mapper_cls=MappedNSB2023,
+                )
+            )
+            subject_procedures.extend(nsb_present_surgeries)
+            logging.info(
+                f"Found {len(nsb_present_surgeries)} surgeries "
+                f"from NSB Present for {subject_id}"
+            )
+
         if not subject_procedures and not specimen_procedures:
             return None
+        
         return Procedures(
             subject_id=subject_id,
             subject_procedures=subject_procedures,
