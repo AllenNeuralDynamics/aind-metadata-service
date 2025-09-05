@@ -2,7 +2,6 @@
 
 import re
 from dataclasses import dataclass
-from pydantic import ValidationError
 from datetime import date, datetime
 from decimal import Decimal, DecimalException
 from enum import Enum
@@ -22,8 +21,8 @@ from aind_data_schema.components.devices import FiberProbe
 from aind_data_schema.components.injection_procedures import (
     InjectionDynamics,
     InjectionProfile,
+    NonViralMaterial,
     ViralMaterial,
-    NonViralMaterial
 )
 from aind_data_schema.components.subject_procedures import Anaesthetic, Surgery
 from aind_data_schema.components.surgery_procedures import (
@@ -34,8 +33,10 @@ from aind_data_schema.components.surgery_procedures import (
     HeadframeMaterial,
     ProbeImplant,
 )
-from aind_data_schema_models.organizations import Organization
+from aind_data_schema_models.brain_atlas import BrainStructureModel, CCFv3
 from aind_data_schema_models.coordinates import AnatomicalRelative, Origin
+from aind_data_schema_models.devices import FerruleMaterial
+from aind_data_schema_models.organizations import Organization
 from aind_data_schema_models.units import (
     AngleUnit,
     CurrentUnit,
@@ -46,13 +47,13 @@ from aind_data_schema_models.units import (
 from aind_sharepoint_service_async_client.models import (
     NSB2023IacucProtocol as IacucProtocol,
 )
-from aind_data_schema_models.devices import FerruleMaterial
 from aind_sharepoint_service_async_client.models import (
     NSB2023List,
     NSB2023Procedure,
     NSB2023ProcedureCategory,
 )
-from aind_data_schema_models.brain_atlas import BrainStructureModel, CCFv3
+from pydantic import ValidationError
+
 from aind_metadata_service_server.models import IntendedMeasurementInformation
 
 
@@ -148,7 +149,6 @@ class SurgeryDuringInfo:
     recovery_time: Optional[Decimal] = None
     weight_prior: Optional[Decimal] = None
     weight_post: Optional[Decimal] = None
-    instrument_id: Optional[str] = None
 
 
 @dataclass
@@ -187,6 +187,7 @@ class BurrHoleInfo:
     transforms: Optional[List[Union[Translation, Rotation]]] = None
     targeted_structure: Optional[BrainStructureModel] = None
     coordinate_system: Optional[CoordinateSystem] = None
+
 
 @dataclass
 class HeadPostInfo:
@@ -390,7 +391,6 @@ class MappedNSBList:
             return CCFv3.by_acronym(acronym)
         except (ValueError, AttributeError, IndexError):
             return None
-            
 
     @property
     def aind_age_at_injection(self) -> Optional[Decimal]:
@@ -403,7 +403,6 @@ class MappedNSBList:
     def aind_ap2nd_inj(self) -> Optional[Decimal]:
         """Maps ap2nd_inj to aind model."""
         return self._map_float_to_decimal(self._nsb.ap2nd_inj)
-
 
     @property
     def aind_breg2_lamb(self) -> Optional[Decimal]:
@@ -1955,7 +1954,6 @@ class MappedNSBList:
         """Maps inj6_ionto_time to aind model"""
         return self._parse_length_of_time_str(self._nsb.inj6_ionto_time)
 
-
     @property
     def aind_inj6_type(self) -> Optional[InjectionType]:
         """Maps inj6_type to aind model"""
@@ -2181,7 +2179,7 @@ class MappedNSBList:
     def aind_experimenter_full_name(surgeon_id: Optional[str]) -> str:
         """Map surgeon to experimenter name"""
         return "NSB" if surgeon_id is None else f"NSB-{surgeon_id}"
-    
+
     @property
     def aind_craniotomy_coordinates_reference(
         self,
@@ -2190,8 +2188,7 @@ class MappedNSBList:
         # TODO: need to handle frontal window 3mm
         if (
             self._nsb.craniotomy_type is not None
-            and self._nsb.craniotomy_type
-            == self._nsb.craniotomy_type.N_5MM
+            and self._nsb.craniotomy_type == self._nsb.craniotomy_type.N_5MM
         ):
             return CoordinateSystem(
                 name="LAMBDA_ARI",
@@ -2207,21 +2204,28 @@ class MappedNSBList:
             return None
 
     @property
-    def aind_craniotomy_size(self) -> Optional[Decimal]:
+    def aind_craniotomy_size(self) -> Optional[float]:
         """Map craniotomy type to size in mm"""
-        return (
-            None
-            if self.aind_craniotomy_type is None
-            else {
-                self._nsb.craniotomy_type.N_5MM: (Decimal(5)),
-                self._nsb.craniotomy_type.N_3MM: (Decimal(3)),
-            }.get(self.aind_craniotomy_type, None)
-        )
-    
+        if (
+            self._nsb.craniotomy_type
+            and self._nsb.craniotomy_type == self._nsb.craniotomy_type.N_5MM
+        ):
+            return 5.0
+        elif (
+            self._nsb.craniotomy_type
+            and self._nsb.craniotomy_type == self._nsb.craniotomy_type.N_3MM
+        ):
+            return 3.0
+        else:
+            return None
+
     @property
     def aind_craniotomy_coordinates(self) -> Optional[Translation]:
         """Map craniotomy type to position in mm"""
-        if self._nsb.craniotomy_type and self._nsb.craniotomy_type == self._nsb.craniotomy_type.N_5MM:
+        if (
+            self._nsb.craniotomy_type
+            and self._nsb.craniotomy_type == self._nsb.craniotomy_type.N_5MM
+        ):
             return Translation(translation=[1.3, -2.8, 0])
         else:
             return None
@@ -2295,12 +2299,6 @@ class MappedNSBList:
 
         """
         if during == During.FOLLOW_UP:
-            if inj_type == InjectionType.NANOJECT:
-                instrument_id = self.aind_nanoject_number_inj2
-            elif inj_type == InjectionType.IONTOPHORESIS:
-                instrument_id = self.aind_ionto_number_inj2
-            else:
-                instrument_id = None
             # backend fields titled "1st injection" correlate with followup
             return SurgeryDuringInfo(
                 anaesthetic_duration_in_minutes=(
@@ -2312,15 +2310,8 @@ class MappedNSBList:
                 recovery_time=self.aind_first_inj_recovery,
                 weight_prior=self.aind_first_injection_weight_be,
                 weight_post=self.aind_first_injection_weight_af,
-                instrument_id=instrument_id,
             )
         elif during == During.INITIAL:
-            if inj_type == InjectionType.NANOJECT:
-                instrument_id = self.aind_nanoject_number_inj10
-            elif inj_type == InjectionType.IONTOPHORESIS:
-                instrument_id = self.aind_ionto_number_inj1
-            else:
-                instrument_id = None
             # backend fields titled "HP" correlate with initial procedures
             return SurgeryDuringInfo(
                 anaesthetic_duration_in_minutes=self.aind_iso_on,
@@ -2330,7 +2321,6 @@ class MappedNSBList:
                 recovery_time=self.aind_hp_recovery,
                 weight_prior=self.aind_weight_before_surger,
                 weight_post=self.aind_weight_after_surgery,
-                instrument_id=instrument_id,
             )
         else:
             return SurgeryDuringInfo()
@@ -2368,13 +2358,11 @@ class MappedNSBList:
                     self.aind_burr_1_injectable_x06,
                 ],
             )
-            transforms=self._map_burr_hole_transforms(
-                    angle=self.aind_inj1_angle_v2,
-                    ml=self.aind_virus_m_l,
-                    ap=self.aind_virus_a_p,
-                    depth=coordinate_depth,
+            coordinate_system = (
+                CoordinateSystemLibrary.BREGMA_ARID
+                if coordinate_depth
+                else CoordinateSystemLibrary.BREGMA_ARI
             )
-            coordinate_system = CoordinateSystemLibrary.BREGMA_ARID if coordinate_depth else CoordinateSystemLibrary.BREGMA_ARI
             return BurrHoleInfo(
                 hemisphere=self.aind_virus_hemisphere,
                 coordinate_ml=self.aind_virus_m_l,
@@ -2396,7 +2384,6 @@ class MappedNSBList:
                 intended_measurement_g=self.aind_burr_1_intended_x0021,
                 intended_measurement_b=self.aind_burr_1_intended_x0022,
                 intended_measurement_iso=self.aind_burr_1_intended_x0023,
-                transforms=transforms,
                 targeted_structure=self.aind_burr_1_intended,
                 coordinate_system=coordinate_system,
             )
@@ -2420,7 +2407,11 @@ class MappedNSBList:
                     self.aind_burr_2_injectable_x06,
                 ],
             )
-            coordinate_system = CoordinateSystemLibrary.BREGMA_ARID if coordinate_depth else CoordinateSystemLibrary.BREGMA_ARI
+            coordinate_system = (
+                CoordinateSystemLibrary.BREGMA_ARID
+                if coordinate_depth
+                else CoordinateSystemLibrary.BREGMA_ARI
+            )
             return BurrHoleInfo(
                 hemisphere=self.aind_hemisphere2nd_inj,
                 coordinate_ml=self.aind_ml2nd_inj,
@@ -2442,14 +2433,8 @@ class MappedNSBList:
                 intended_measurement_g=self.aind_burr_2_intended_x0021,
                 intended_measurement_b=self.aind_burr_2_intended_x0022,
                 intended_measurement_iso=self.aind_burr_2_intended_x0023,
-                transforms=self._map_burr_hole_transforms(
-                    angle=self.aind_inj2_angle_v2,
-                    ml=self.aind_ml2nd_inj,
-                    ap=self.aind_ap2nd_inj,
-                    depth=coordinate_depth,
-                ),
                 targeted_structure=self.aind_burr_2_intended,
-                coordinate_system=coordinate_system
+                coordinate_system=coordinate_system,
             )
         elif burr_hole_num == 3:
             coordinate_depth = self._map_burr_hole_dv(
@@ -2471,7 +2456,11 @@ class MappedNSBList:
                     self.aind_burr_3_injectable_x06,
                 ],
             )
-            coordinate_system = CoordinateSystemLibrary.BREGMA_ARID if coordinate_depth else CoordinateSystemLibrary.BREGMA_ARI
+            coordinate_system = (
+                CoordinateSystemLibrary.BREGMA_ARID
+                if coordinate_depth
+                else CoordinateSystemLibrary.BREGMA_ARI
+            )
             return BurrHoleInfo(
                 hemisphere=self.aind_burr_3_hemisphere,
                 coordinate_ml=self.aind_burr3_m_l,
@@ -2493,14 +2482,8 @@ class MappedNSBList:
                 intended_measurement_g=self.aind_burr_3_intended_x0021,
                 intended_measurement_b=self.aind_burr_3_intended_x0022,
                 intended_measurement_iso=self.aind_burr_3_intended_x0023,
-                transforms=self._map_burr_hole_transforms(
-                    angle=self.aind_burr_3_angle,
-                    ml=self.aind_burr3_m_l,
-                    ap=self.aind_burr3_a_p,
-                    depth=coordinate_depth,
-                ),
                 targeted_structure=self.aind_burr_3_intended,
-                coordinate_system=coordinate_system
+                coordinate_system=coordinate_system,
             )
         elif burr_hole_num == 4:
             coordinate_depth = self._map_burr_hole_dv(
@@ -2522,7 +2505,11 @@ class MappedNSBList:
                     self.aind_burr_4_injectable_x06,
                 ],
             )
-            coordinate_system = CoordinateSystemLibrary.BREGMA_ARID if coordinate_depth else CoordinateSystemLibrary.BREGMA_ARI
+            coordinate_system = (
+                CoordinateSystemLibrary.BREGMA_ARID
+                if coordinate_depth
+                else CoordinateSystemLibrary.BREGMA_ARI
+            )
             return BurrHoleInfo(
                 hemisphere=self.aind_burr_4_hemisphere,
                 coordinate_ml=self.aind_burr4_m_l,
@@ -2544,14 +2531,8 @@ class MappedNSBList:
                 intended_measurement_g=self.aind_burr_4_intended_x0021,
                 intended_measurement_b=self.aind_burr_4_intended_x0022,
                 intended_measurement_iso=self.aind_burr_4_intended_x0023,
-                transforms=self._map_burr_hole_transforms(
-                    angle=self.aind_burr_4_angle,
-                    ml=self.aind_burr4_m_l,
-                    ap=self.aind_burr4_a_p,
-                    depth=coordinate_depth,
-                ),
                 targeted_structure=self.aind_burr_4_intended,
-                coordinate_system=coordinate_system
+                coordinate_system=coordinate_system,
             )
         elif burr_hole_num == 5:
             coordinate_depth = self._map_burr_hole_dv(
@@ -2573,7 +2554,11 @@ class MappedNSBList:
                     self.aind_burr_5_injectable_x06,
                 ],
             )
-            coordinate_system = CoordinateSystemLibrary.BREGMA_ARID if coordinate_depth else CoordinateSystemLibrary.BREGMA_ARI
+            coordinate_system = (
+                CoordinateSystemLibrary.BREGMA_ARID
+                if coordinate_depth
+                else CoordinateSystemLibrary.BREGMA_ARI
+            )
             return BurrHoleInfo(
                 hemisphere=self.aind_burr_5_hemisphere,
                 coordinate_ml=self.aind_burr_5_m_l,
@@ -2595,14 +2580,8 @@ class MappedNSBList:
                 intended_measurement_g=self.aind_burr_5_intended_x0021,
                 intended_measurement_b=self.aind_burr_5_intended_x0022,
                 intended_measurement_iso=self.aind_burr_5_intended_x0023,
-                transforms=self._map_burr_hole_transforms(
-                    angle=self.aind_burr_5_angle,
-                    ml=self.aind_burr_5_m_l,
-                    ap=self.aind_burr_5_a_p,
-                    depth=coordinate_depth,
-                ),
                 targeted_structure=self.aind_burr_5_intended,
-                coordinate_system=coordinate_system
+                coordinate_system=coordinate_system,
             )
         elif burr_hole_num == 6:
             coordinate_depth = self._map_burr_hole_dv(
@@ -2624,7 +2603,11 @@ class MappedNSBList:
                     self.aind_burr_6_injectable_x06,
                 ],
             )
-            coordinate_system = CoordinateSystemLibrary.BREGMA_ARID if coordinate_depth else CoordinateSystemLibrary.BREGMA_ARI
+            coordinate_system = (
+                CoordinateSystemLibrary.BREGMA_ARID
+                if coordinate_depth
+                else CoordinateSystemLibrary.BREGMA_ARI
+            )
             return BurrHoleInfo(
                 hemisphere=self.aind_burr_6_hemisphere,
                 coordinate_ml=self.aind_burr_6_m_l,
@@ -2646,14 +2629,8 @@ class MappedNSBList:
                 intended_measurement_g=self.aind_burr_6_intended_x0021,
                 intended_measurement_b=self.aind_burr_6_intended_x0022,
                 intended_measurement_iso=self.aind_burr_6_intended_x0023,
-                transforms=self._map_burr_hole_transforms(
-                    angle=self.aind_burr_6_angle,
-                    ml=self.aind_burr_6_m_l,
-                    ap=self.aind_burr_6_a_p,
-                    depth=coordinate_depth,
-                ),
                 targeted_structure=self.aind_burr_6_intended,
-                coordinate_system=coordinate_system
+                coordinate_system=coordinate_system,
             )
         else:
             return BurrHoleInfo()
@@ -2665,40 +2642,6 @@ class MappedNSBList:
             return None
         else:
             return [dv for dv in (dv1, dv2, dv3) if dv is not None]
-
-    # TODO: check this assumption of 0 instead of None
-    # @staticmethod
-    # def _map_burr_hole_transforms(
-    #     angle: Optional[Decimal],
-    #     ml: Optional[Decimal],
-    #     ap: Optional[Decimal],
-    #     depth: Optional[Union[Decimal, List[Decimal]]],
-    # ) -> List[List[Union[Translation, Rotation]]]:
-    #     """
-    #     Maps transforms for a burr hole.
-    #     Returns a list of [Translation, Rotation] pairs, one per depth.
-    #     If depth is None, returns a single [Translation, Rotation] pair with no depth.
-    #     """
-    #     ap = ap if ap is not None else 0
-    #     ml = ml if ml is not None else 0
-    #     angle = angle if angle is not None else 0
-
-    #     if depth is None:
-    #         translation = Translation(translation=[ap, ml, 0])
-    #         rotation = Rotation(
-    #             angles=[angle, 0, 0], angles_unit=AngleUnit.DEG
-    #         )
-    #         return [[translation, rotation]]
-    #     else:
-    #         transforms = []
-    #         for d in depth:
-    #             translation = Translation(translation=[ap, ml, 0, d])
-    #             rotation = Rotation(
-    #                 angles=[angle, 0, 0, 0], angles_unit=AngleUnit.DEG
-    #             )
-    #             transforms.append([translation, rotation])
-    #         return transforms
-
 
     def map_burr_hole_injection_materials(
         self, injectable_materials: List[InjectableMaterial]
@@ -2785,28 +2728,26 @@ class MappedNSBList:
                 fiber_probe = getattr(proc, "implanted_device", None)
                 if isinstance(fiber_probe, FiberProbe):
                     probe_config = getattr(proc, "device_config", None)
-                    if isinstance(probe_config, ProbeConfig) and hasattr(probe_config, "transform"):
-                        # Find the Translation object in transform
-                        translation = None
-                        for t, _ in probe_config.transform:
-                            if isinstance(t, Translation):
-                                # Assumption: there's only one depth for single probe
-                                translation = t
-                                break
-                        if translation and len(translation.translation) >= 2:
-                            ap = float(translation.translation[0])
-                            ml = float(translation.translation[1])
-                        else:
-                            ap = 0.0
-                            ml = 0.0
-                        probes_with_coords.append((proc, fiber_probe, probe_config, ap, ml))
+                    if isinstance(probe_config, ProbeConfig) and hasattr(
+                        probe_config, "transform"
+                    ):
+                        t, _ = probe_config.transform[0]
+                        if (
+                            isinstance(t, Translation)
+                            and len(t.translation) >= 2
+                        ):
+                            ap = float(t.translation[0])
+                            ml = float(t.translation[1])
+
+                        probes_with_coords.append(
+                            (proc, fiber_probe, probe_config, ap, ml)
+                        )
 
         # Sort by AP descending, ML ascending
-        sorted_probes = sorted(
-            probes_with_coords,
-            key=lambda x: (-x[3], x[4])
-        )
-        for idx, (proc, fiber_probe, probe_config, ap, ml) in enumerate(sorted_probes):
+        sorted_probes = sorted(probes_with_coords, key=lambda x: (-x[3], x[4]))
+        for idx, (proc, fiber_probe, probe_config, ap, ml) in enumerate(
+            sorted_probes
+        ):
             name = f"Fiber_{idx}"
             fiber_probe.name = name
             probe_config.device_name = name
@@ -2898,64 +2839,42 @@ class MappedNSBList:
             self._get_intended_measurements(followup_measurements)
         )
         return all_intended_measurements
-    
+
     @staticmethod
     def map_measured_coordinates(
-        b2l_dist: Optional[Decimal], procedures: List
+        b2l_dist: Optional[Decimal],
+        surgery_coordinate_system: Optional[CoordinateSystem],
     ) -> Optional[Dict[Origin, Translation]]:
         """
-        Maps measured coordinates, handling lambda/bregma reference and re-referencing if mixed.
+        Maps measured coordinates using the surgery's coordinate system.
         Parameters
         ----------
         b2l_dist: Optional[Decimal]
             The distance from bregma to lambda.
-        procedures: List
-            The list of procedures to map coordinates for.
+        surgery_coordinate_system: Optional[CoordinateSystem]
+            The coordinate system object for the surgery.
         Returns
         -------
             Optional[Dict[Origin, Translation]]
         """
-        if b2l_dist is None:
+        if b2l_dist is None or surgery_coordinate_system is None:
             return None
 
-        lambda_names = {"LAMBDA_ARID", "LAMBDA_ARI"}
-        bregma_names = {"BREGMA_ARID", "BREGMA_ARI"}
-
-        coordinate_system_names = [
-            getattr(proc, "coordinate_system_name", None)
-            for proc in procedures
-            if getattr(proc, "coordinate_system_name", None)
-        ]
-        unique_names = set(coordinate_system_names)
-
-        # Only lambda
-        if unique_names and all(name in lambda_names for name in unique_names):
+        name = surgery_coordinate_system.name
+        if name.startswith("LAMBDA"):
             origin = Origin.LAMBDA
             dist = -abs(b2l_dist)
             return {origin: Translation(translation=[dist, 0, 0])}
-
-        # Only bregma
-        elif unique_names and all(name in bregma_names for name in unique_names):
+        elif name.startswith("BREGMA"):
             origin = Origin.BREGMA
             dist = b2l_dist
             return {origin: Translation(translation=[dist, 0, 0])}
-
-        # Mixed: re-reference lambda coords to bregma
         else:
-            origin = Origin.BREGMA
-            for proc in procedures:
-                coord_sys = getattr(proc, "coordinate_system_name", None)
-                if isinstance(proc, Craniotomy) and coord_sys in lambda_names:
-                    # re-reference from lambda to bregma
-                    coord_sys = "BREGMA_ARID"
-                    coords = getattr(proc, "position", [])
-                    for coord in coords:
-                        if isinstance(coord, list) and len(coord) > 0:
-                            coord[0] = float(coord[0]) - abs(float(b2l_dist))
-            dist = b2l_dist
-            return {origin: Translation(translation=[dist, 0, 0])}
-        
-    def determine_surgery_coordinate_system(self, during: During) -> Optional[CoordinateSystem]:
+            return None
+
+    def determine_surgery_coordinate_system(
+        self, during: During
+    ) -> Optional[CoordinateSystem]:
         """
         Determines the dominant coordinate system for a surgery by inspecting raw fields.
         Returns the CoordinateSystem object (e.g., CoordinateSystemLibrary.BREGMA_ARID).
@@ -2963,7 +2882,10 @@ class MappedNSBList:
         systems = []
 
         # Craniotomy
-        if self.has_cran_procedure() and self.aind_craniotomy_perform_d == during:
+        if (
+            self.has_cran_procedure()
+            and self.aind_craniotomy_perform_d == during
+        ):
             ref = self.aind_craniotomy_coordinates_reference
             if ref:
                 systems.append(ref)
@@ -3007,22 +2929,29 @@ class MappedNSBList:
         ap = ap if ap is not None else 0
         ml = ml if ml is not None else 0
         angle = angle if angle is not None else 0
-        is_arid = surgery_coordinate_system is not None and surgery_coordinate_system.name.endswith("ARID")
+        is_arid = (
+            surgery_coordinate_system is not None
+            and surgery_coordinate_system.name.endswith("ARID")
+        )
 
         transforms = []
         if depth is None:
             translation = Translation(translation=[ap, ml, 0])
-            rotation = Rotation(angles=[angle, 0, 0], angles_unit=AngleUnit.DEG)
+            rotation = Rotation(
+                angles=[angle, 0, 0], angles_unit=AngleUnit.DEG
+            )
             if is_arid:
                 translation.translation.append(0)
                 rotation.angles.append(0)
             transforms.append([translation, rotation])
         else:
             for d in depth:
-                translation = Translation(translation=[ap, ml, 0, d] if is_arid else [ap, ml, 0])
+                translation = Translation(
+                    translation=[ap, ml, 0, d] if is_arid else [ap, ml, 0]
+                )
                 rotation = Rotation(
                     angles=[angle, 0, 0, 0] if is_arid else [angle, 0, 0],
-                    angles_unit=AngleUnit.DEG
+                    angles_unit=AngleUnit.DEG,
                 )
                 transforms.append([translation, rotation])
         return transforms
@@ -3036,14 +2965,22 @@ class MappedNSBList:
         initial_start_date = self.aind_date_of_surgery
         initial_animal_weight_prior = self.aind_weight_before_surger
         initial_animal_weight_post = self.aind_weight_after_surgery
-        initial_surgeon = self.aind_experimenter_full_name(self.aind_initial_surgeon_lookup_id)
+        initial_surgeon = self.aind_experimenter_full_name(
+            self.aind_initial_surgeon_lookup_id
+        )
 
         followup_start_date = self.aind_date1st_injection
         followup_animal_weight_prior = self.aind_first_injection_weight_be
         followup_animal_weight_post = self.aind_first_injection_weight_af
-        followup_surgeon = self.aind_experimenter_full_name(self.aind_followup_surgeon_lookup_id)
+        followup_surgeon = self.aind_experimenter_full_name(
+            self.aind_followup_surgeon_lookup_id
+        )
 
-        iacuc_protocol = self.aind_iacuc_protocol if self.aind_iacuc_protocol else self.aind_protocol
+        iacuc_protocol = (
+            self.aind_iacuc_protocol
+            if self.aind_iacuc_protocol
+            else self.aind_protocol
+        )
 
         notes = None
         initial_anaesthesia = None
@@ -3056,8 +2993,12 @@ class MappedNSBList:
         other_procedures = []
 
         # --- 1. Determine coordinate system for each surgery ---
-        initial_coord_system = self.determine_surgery_coordinate_system(During.INITIAL)
-        followup_coord_system = self.determine_surgery_coordinate_system(During.FOLLOW_UP)
+        initial_coord_system = self.determine_surgery_coordinate_system(
+            During.INITIAL
+        )
+        followup_coord_system = self.determine_surgery_coordinate_system(
+            During.FOLLOW_UP
+        )
 
         # --- 2. Build procedures for initial surgery ---
         if self.has_hp_procedure():
@@ -3082,34 +3023,25 @@ class MappedNSBList:
                     well_type=headpost_info.well_type,
                     well_part_number=headpost_info.well_part_number,
                 )
+            try:
+                anaesthesia = Anaesthetic(
+                    anaesthetic_type="isoflurane",
+                    duration=hf_surgery_during_info.anaesthetic_duration_in_minutes,
+                    level=hf_surgery_during_info.anaesthetic_level,
+                )
+            except ValidationError:
+                anaesthesia = Anaesthetic.model_construct(
+                    anaesthetic_type="isoflurane",
+                    duration=hf_surgery_during_info.anaesthetic_duration_in_minutes,
+                    level=hf_surgery_during_info.anaesthetic_level,
+                )
+
             if hp_during == During.INITIAL:
-                try:
-                    initial_anaesthesia = Anaesthetic(
-                        anaesthetic_type="isoflurane",
-                        duration=hf_surgery_during_info.anaesthetic_duration_in_minutes,
-                        level=hf_surgery_during_info.anaesthetic_level,
-                    )
-                except ValidationError:
-                    initial_anaesthesia = Anaesthetic.model_construct(
-                        anaesthetic_type="isoflurane",
-                        duration=hf_surgery_during_info.anaesthetic_duration_in_minutes,
-                        level=hf_surgery_during_info.anaesthetic_level,
-                    )
+                initial_anaesthesia = anaesthesia
                 initial_workstation_id = self.aind_hp_work_station
                 initial_procedures.append(headframe_procedure)
             elif hp_during == During.FOLLOW_UP:
-                try:
-                    followup_anaesthesia = Anaesthetic(
-                        anaesthetic_type="isoflurane",
-                        duration=hf_surgery_during_info.anaesthetic_duration_in_minutes,
-                        level=hf_surgery_during_info.anaesthetic_level,
-                    )
-                except ValidationError:
-                    followup_anaesthesia = Anaesthetic.model_construct(
-                        anaesthetic_type="isoflurane",
-                        duration=hf_surgery_during_info.anaesthetic_duration_in_minutes,
-                        level=hf_surgery_during_info.anaesthetic_level,
-                    )
+                followup_anaesthesia = anaesthesia
                 followup_workstation_id = self.aind_hp_work_station
                 followup_procedures.append(headframe_procedure)
             else:
@@ -3117,24 +3049,28 @@ class MappedNSBList:
 
         if self.has_cran_procedure():
             cran_during = self.aind_craniotomy_perform_d
-            cran_during_info = self.surgery_during_info(cran_during)
-            bregma_to_lambda_distance = self.aind_breg2_lamb
             implant_part_number = self.aind_implant_id_coverslip_type
             headpost_info = HeadPostInfo.from_hp_and_hp_type(
                 hp=self.aind_headpost, hp_type=self.aind_headpost_type
             )
             coordinate_system_name = (
-                initial_coord_system.name if cran_during == During.INITIAL and initial_coord_system
-                else followup_coord_system.name if cran_during == During.FOLLOW_UP and followup_coord_system
-                else None
+                initial_coord_system.name
+                if cran_during == During.INITIAL and initial_coord_system
+                else (
+                    followup_coord_system.name
+                    if cran_during == During.FOLLOW_UP
+                    and followup_coord_system
+                    else None
+                )
             )
             try:
                 cran_procedure = Craniotomy(
                     craniotomy_type=self.aind_craniotomy_type,
                     size=self.aind_craniotomy_size,
-                    size_unit=SizeUnit.MM if self.aind_craniotomy_size else None,
+                    size_unit=(
+                        SizeUnit.MM if self.aind_craniotomy_size else None
+                    ),
                     coordinate_system_name=coordinate_system_name,
-                    bregma_to_lambda_distance=bregma_to_lambda_distance,
                     implant_part_number=implant_part_number,
                     position=self.aind_craniotomy_coordinates,
                 )
@@ -3149,9 +3085,10 @@ class MappedNSBList:
                 cran_procedure = Craniotomy.model_construct(
                     craniotomy_type=self.aind_craniotomy_type,
                     size=self.aind_craniotomy_size,
-                    size_unit=SizeUnit.MM if self.aind_craniotomy_size else None,
+                    size_unit=(
+                        SizeUnit.MM if self.aind_craniotomy_size else None
+                    ),
                     coordinate_system_name=coordinate_system_name,
-                    bregma_to_lambda_distance=bregma_to_lambda_distance,
                     implant_part_number=implant_part_number,
                     position=self.aind_craniotomy_coordinates,
                 )
@@ -3185,23 +3122,33 @@ class MappedNSBList:
                 surgery_coord_system = None
 
             # Only build if procedure type is injection or fiber implant
-            if burr_hole_type in {BurrHoleProcedure.INJECTION, BurrHoleProcedure.INJECTION_FIBER_IMPLANT}:
-                transforms = self._map_burr_hole_transforms(
-                    angle=burr_hole_info.angle,
-                    ml=burr_hole_info.coordinate_ml,
-                    ap=burr_hole_info.coordinate_ap,
-                    depth=burr_hole_info.coordinate_depth,
-                    surgery_coordinate_system=surgery_coord_system
-                ) if surgery_coord_system else burr_hole_info.transforms
+            if burr_hole_type in {
+                BurrHoleProcedure.INJECTION,
+                BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+            }:
+                transforms = (
+                    self._map_burr_hole_transforms(
+                        angle=burr_hole_info.angle,
+                        ml=burr_hole_info.coordinate_ml,
+                        ap=burr_hole_info.coordinate_ap,
+                        depth=burr_hole_info.coordinate_depth,
+                        surgery_coordinate_system=surgery_coord_system,
+                    )
+                    if surgery_coord_system
+                    else burr_hole_info.transforms
+                )
 
-                injection_materials = self.map_burr_hole_injection_materials(burr_hole_info.inj_materials)
+                injection_materials = self.map_burr_hole_injection_materials(
+                    burr_hole_info.inj_materials
+                )
                 dynamics = []
                 if burr_hole_info.inj_type == InjectionType.IONTOPHORESIS:
-                    try: 
+                    try:
                         dynamics_obj = InjectionDynamics(
                             profile=InjectionProfile.BOLUS,
                             duration=burr_hole_info.inj_duration,
                             injection_current=burr_hole_info.inj_current,
+                            injection_current_unit=CurrentUnit.UA if burr_hole_info.inj_current else None,
                             alternating_current=burr_hole_info.alternating_current,
                         )
                     except ValidationError:
@@ -3209,9 +3156,14 @@ class MappedNSBList:
                             profile=InjectionProfile.BOLUS,
                             duration=burr_hole_info.inj_duration,
                             injection_current=burr_hole_info.inj_current,
+                            injection_current_unit=CurrentUnit.UA if burr_hole_info.inj_current else None,
                             alternating_current=burr_hole_info.alternating_current,
                         )
-                    dynamics = [dynamics_obj] * len(transforms) if transforms else [dynamics_obj]
+                    dynamics = (
+                        [dynamics_obj] * len(transforms)
+                        if transforms
+                        else [dynamics_obj]
+                    )
                 elif burr_hole_info.inj_type == InjectionType.NANOJECT:
                     try:
                         dynamics_obj = InjectionDynamics(
@@ -3227,14 +3179,22 @@ class MappedNSBList:
                             volume=burr_hole_info.inj_volume,
                             volume_unit=VolumeUnit.NL,
                         )
-                    dynamics = [dynamics_obj] * len(transforms) if transforms else [dynamics_obj]
+                    dynamics = (
+                        [dynamics_obj] * len(transforms)
+                        if transforms
+                        else [dynamics_obj]
+                    )
                 try:
                     injection_proc = BrainInjection(
                         injection_materials=injection_materials,
                         targeted_structure=burr_hole_info.targeted_structure,
                         relative_position=[burr_hole_info.hemisphere],
                         dynamics=dynamics,
-                        coordinate_system_name=surgery_coord_system.name if surgery_coord_system else None,
+                        coordinate_system_name=(
+                            surgery_coord_system.name
+                            if surgery_coord_system
+                            else None
+                        ),
                         coordinates=transforms,
                     )
                 except ValidationError:
@@ -3243,7 +3203,11 @@ class MappedNSBList:
                         targeted_structure=burr_hole_info.targeted_structure,
                         relative_position=[burr_hole_info.hemisphere],
                         dynamics=dynamics,
-                        coordinate_system_name=surgery_coord_system.name if surgery_coord_system else None,
+                        coordinate_system_name=(
+                            surgery_coord_system.name
+                            if surgery_coord_system
+                            else None
+                        ),
                         coordinates=transforms,
                     )
                 if burr_hole_info.during == During.INITIAL:
@@ -3253,7 +3217,10 @@ class MappedNSBList:
                 else:
                     other_procedures.append(injection_proc)
 
-            if burr_hole_type in {BurrHoleProcedure.FIBER_IMPLANT, BurrHoleProcedure.INJECTION_FIBER_IMPLANT}:
+            if burr_hole_type in {
+                BurrHoleProcedure.FIBER_IMPLANT,
+                BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+            }:
                 fiber_probe = self._map_burr_fiber_probe(burr_hole_info)
                 coordinate_system = CoordinateSystem(
                     name="FIBER_PROBE_RSAB",
@@ -3279,7 +3246,7 @@ class MappedNSBList:
                         device_name=None,
                         coordinate_system=coordinate_system,
                         transform=transforms,
-                    )
+                    ),
                 )
                 if burr_hole_info.during == During.INITIAL:
                     initial_procedures.append(probe_implant_proc)
@@ -3291,7 +3258,9 @@ class MappedNSBList:
         # --- 4. Surgery objects ---
         if initial_procedures:
             self.assign_fiber_probe_names(initial_procedures)
-            measured_coordinates = self.map_measured_coordinates(self.aind_breg2_lamb, initial_procedures)
+            measured_coordinates = self.map_measured_coordinates(
+                self.aind_breg2_lamb, initial_coord_system
+            )
             try:
                 initial_surgery = Surgery(
                     start_date=initial_start_date,
@@ -3304,7 +3273,7 @@ class MappedNSBList:
                     notes=notes,
                     procedures=initial_procedures,
                     measured_coordinates=measured_coordinates,
-                    coordinate_system=initial_coord_system
+                    coordinate_system=initial_coord_system,
                 )
             except ValidationError:
                 initial_surgery = Surgery.model_construct(
@@ -3318,13 +3287,15 @@ class MappedNSBList:
                     notes=notes,
                     procedures=initial_procedures,
                     measured_coordinates=measured_coordinates,
-                    coordinate_system=initial_coord_system
+                    coordinate_system=initial_coord_system,
                 )
             surgeries.append(initial_surgery)
 
         if followup_procedures:
             self.assign_fiber_probe_names(followup_procedures)
-            measured_coordinates = self.map_measured_coordinates(self.aind_breg2_lamb, followup_procedures)
+            measured_coordinates = self.map_measured_coordinates(
+                self.aind_breg2_lamb, followup_coord_system
+            )
             try:
                 followup_surgery = Surgery(
                     start_date=followup_start_date,
@@ -3337,7 +3308,7 @@ class MappedNSBList:
                     notes=notes,
                     procedures=followup_procedures,
                     measured_coordinates=measured_coordinates,
-                    coordinate_system=followup_coord_system
+                    coordinate_system=followup_coord_system,
                 )
             except ValidationError:
                 followup_surgery = Surgery.model_construct(
@@ -3351,13 +3322,15 @@ class MappedNSBList:
                     notes=notes,
                     procedures=followup_procedures,
                     measured_coordinates=measured_coordinates,
-                    coordinate_system=followup_coord_system
+                    coordinate_system=followup_coord_system,
                 )
             surgeries.append(followup_surgery)
 
         if other_procedures:
             self.assign_fiber_probe_names(other_procedures)
-            measured_coordinates = self.map_measured_coordinates(self.aind_breg2_lamb, other_procedures)
+            measured_coordinates = self.map_measured_coordinates(
+                self.aind_breg2_lamb, CoordinateSystemLibrary.BREGMA_ARID
+            )
             other_surgery = Surgery.model_construct(
                 start_date=None,
                 experimenters=["NSB"],
@@ -3368,8 +3341,7 @@ class MappedNSBList:
                 workstation_id=None,
                 notes=notes,
                 procedures=other_procedures,
-                measured_coordinates=measured_coordinates
+                measured_coordinates=measured_coordinates,
             )
             surgeries.append(other_surgery)
         return surgeries
-    

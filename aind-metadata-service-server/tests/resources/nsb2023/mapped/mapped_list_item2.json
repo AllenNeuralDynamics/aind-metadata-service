@@ -82,7 +82,7 @@
                   "duration": null,
                   "duration_unit": null,
                   "injection_current": 5.0,
-                  "injection_current_unit": null,
+                  "injection_current_unit": "microamps",
                   "alternating_current": "7/7"
                }
             ],

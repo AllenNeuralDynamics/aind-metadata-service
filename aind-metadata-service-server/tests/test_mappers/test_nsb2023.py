@@ -10,6 +10,16 @@ from typing import Callable, List, Tuple
 from unittest import TestCase
 from unittest import main as unittest_main
 
+from aind_data_schema.components.coordinates import (
+    Axis,
+    AxisName,
+    CoordinateSystem,
+    CoordinateSystemLibrary,
+    Direction,
+    Origin,
+    SizeUnit,
+    Translation,
+)
 from aind_data_schema.components.surgery_procedures import (
     BrainInjection,
     CraniotomyType,
@@ -368,6 +378,53 @@ class TestNSB2023Parsers(TestCase):
         mapper = MappedNSBList(nsb=nsb_model)
         procedures = mapper.get_surgeries()
         self.assertEqual(len(procedures), 1)
+
+    def test_map_targeted_structure_error(self):
+        """Tests case when error is raised mapping structure"""
+        bad_structure = MappedNSBList._map_targeted_structure(
+            "invalid_structure"
+        )
+        self.assertIsNone(bad_structure)
+
+    def test_map_measured_coordinates(self):
+        """Tests map measured coordinates"""
+        lambda_ari = CoordinateSystem(
+            name="LAMBDA_ARI",
+            origin=Origin.LAMBDA,
+            axis_unit=SizeUnit.MM,
+            axes=[
+                Axis(name=AxisName.AP, direction=Direction.PA),
+                Axis(name=AxisName.ML, direction=Direction.LR),
+                Axis(name=AxisName.SI, direction=Direction.SI),
+            ],
+        )
+        lambda_case = MappedNSBList.map_measured_coordinates(
+            b2l_dist=4.1, surgery_coordinate_system=lambda_ari
+        )
+        expected_measured_coordinates = {
+            Origin.LAMBDA: Translation(translation=[-4.1, 0.0, 0.0])
+        }
+        self.assertEqual(lambda_case, expected_measured_coordinates)
+        self.assertIsNone(
+            MappedNSBList.map_measured_coordinates(
+                b2l_dist=4.0,
+                surgery_coordinate_system=CoordinateSystemLibrary.IMAGE_XYZ,
+            )
+        )
+
+    def test_map_burr_hole_transforms_edge_case(self):
+        """Tests edge case when ARID coordinate system but no depth"""
+        transforms = MappedNSBList._map_burr_hole_transforms(
+            angle=None,
+            ml=None,
+            ap=None,
+            depth=None,
+            surgery_coordinate_system=CoordinateSystemLibrary.BREGMA_ARID,
+        )
+        translation = transforms[0][0]
+        rotation = transforms[0][1]
+        self.assertEqual(translation.translation, [0, 0, 0, 0])
+        self.assertEqual(rotation.angles, [0, 0, 0, 0])
 
 
 class TestNSB2023StringParsers(TestCase):

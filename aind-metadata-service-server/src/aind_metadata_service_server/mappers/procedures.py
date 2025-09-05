@@ -3,7 +3,7 @@
 import logging
 from enum import Enum
 from typing import List, Optional, Union
-from pydantic import ValidationError
+
 from aind_data_schema.components.injection_procedures import Injection
 from aind_data_schema.components.subject_procedures import (
     Perfusion,
@@ -19,7 +19,6 @@ from aind_sharepoint_service_async_client.models import (
     NSB2019List,
     NSB2023List,
 )
-
 from aind_metadata_service_server.mappers.las2020 import (
     MappedLASList as MappedLAS2020,
 )
@@ -29,6 +28,7 @@ from aind_metadata_service_server.mappers.nsb2019 import (
 from aind_metadata_service_server.mappers.nsb2023 import (
     MappedNSBList as MappedNSB2023,
 )
+
 
 class LabTracksTaskStatuses(Enum):
     """LabTracks Task Status Options"""
@@ -91,7 +91,7 @@ class ProceduresMapper:
         las_2020: List[Las2020List] = [],
         nsb_2019: List[NSB2019List] = [],
         nsb_2023: List[NSB2023List] = [],
-        nsb_present: List[NSB2023List] = []
+        nsb_present: List[NSB2023List] = [],
     ):
         """
         Class constructor.
@@ -301,7 +301,7 @@ class ProceduresMapper:
 
         if not subject_procedures and not specimen_procedures:
             return None
-        
+
         return Procedures(
             subject_id=subject_id,
             subject_procedures=subject_procedures,

@@ -56,7 +56,7 @@ async def get_procedures(
         las_2020=las_2020_response,
         nsb_2019=nsb_2019_response,
         nsb_2023=nsb_2023_response,
-        nsb_present=nsb_present_response
+        nsb_present=nsb_present_response,
     )
     procedures = mapper.map_responses_to_aind_procedures(subject_id)
     if not procedures:

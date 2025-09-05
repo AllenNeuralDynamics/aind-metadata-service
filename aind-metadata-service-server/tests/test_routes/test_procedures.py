@@ -9,7 +9,7 @@ import pytest
 from aind_labtracks_service_async_client.models import Task as LabTracksTask
 from aind_sharepoint_service_async_client.models import (
     NSB2019List,
-    NSB2023List
+    NSB2023List,
 )
 from fastapi.testclient import TestClient
 

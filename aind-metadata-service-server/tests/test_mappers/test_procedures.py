@@ -142,12 +142,13 @@ class TestProcedures(unittest.TestCase):
             las_2020=self.las2020,
             nsb_2019=self.nsb2019,
             nsb_2023=self.nsb_2023,
+            nsb_present=self.nsb_2023,
         )
         procedures = mapper.map_responses_to_aind_procedures("115977")
 
         self.assertIsInstance(procedures, Procedures)
         self.assertEqual(procedures.subject_id, "115977")
-        self.assertEqual(len(procedures.subject_procedures), 7)
+        self.assertEqual(len(procedures.subject_procedures), 8)
         self.assertEqual(len(procedures.specimen_procedures), 0)
 
     def test_map_responses_no_data(self):

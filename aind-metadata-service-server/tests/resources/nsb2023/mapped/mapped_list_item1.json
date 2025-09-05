@@ -50,8 +50,8 @@
                   0.0
                ]
             },
-            "size": null,
-            "size_unit": null,
+            "size": 5.0,
+            "size_unit": "millimeter",
             "protective_material": null,
             "implant_part_number": "5mm stacked coverslip",
             "dura_removed": null
