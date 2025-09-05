@@ -41,7 +41,6 @@ from aind_data_schema_models.units import (
     AngleUnit,
     CurrentUnit,
     SizeUnit,
-    TimeUnit,
     VolumeUnit,
 )
 from aind_sharepoint_service_async_client.models import (
@@ -199,7 +198,6 @@ class HeadPostInfo:
     well_type: Optional[str] = None
     well_part_number: Optional[str] = None
 
-    # flake8: noqa: C901
     @classmethod
     def from_hp_and_hp_type(
         cls, hp: Optional[HeadPost], hp_type: Optional[HeadPostType]
@@ -382,7 +380,7 @@ class MappedNSBList:
         structure_str: Optional[str],
     ) -> Optional[BrainStructureModel]:
         """
-        Parse a string like 'MOp - Primary motor area' and return the corresponding BrainStructureModel.
+        Maps targeted structure from string to BrainStructureModel.
         """
         if not structure_str:
             return None
@@ -417,8 +415,12 @@ class MappedNSBList:
             None
             if self._nsb.burr1_x0020_perform_x0020_during is None
             else {
-                self._nsb.burr1_x0020_perform_x0020_during.INITIAL_SURGERY: During.INITIAL,
-                self._nsb.burr1_x0020_perform_x0020_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
+                self._nsb.burr1_x0020_perform_x0020_during.INITIAL_SURGERY: (
+                    During.INITIAL
+                ),
+                self._nsb.burr1_x0020_perform_x0020_during.FOLLOW_UP_SURGERY: (
+                    During.FOLLOW_UP
+                ),
             }.get(self._nsb.burr1_x0020_perform_x0020_during, None)
         )
 
@@ -429,8 +431,12 @@ class MappedNSBList:
             None
             if self._nsb.burr2_x0020_perform_x0020_during is None
             else {
-                self._nsb.burr2_x0020_perform_x0020_during.INITIAL_SURGERY: During.INITIAL,
-                self._nsb.burr2_x0020_perform_x0020_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
+                self._nsb.burr2_x0020_perform_x0020_during.INITIAL_SURGERY: (
+                    During.INITIAL
+                ),
+                self._nsb.burr2_x0020_perform_x0020_during.FOLLOW_UP_SURGERY: (
+                    During.FOLLOW_UP
+                ),
             }.get(self._nsb.burr2_x0020_perform_x0020_during, None)
         )
 
@@ -456,8 +462,12 @@ class MappedNSBList:
             None
             if self._nsb.burr3_x0020_perform_x0020_during is None
             else {
-                self._nsb.burr3_x0020_perform_x0020_during.INITIAL_SURGERY: During.INITIAL,
-                self._nsb.burr3_x0020_perform_x0020_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
+                self._nsb.burr3_x0020_perform_x0020_during.INITIAL_SURGERY: (
+                    During.INITIAL
+                ),
+                self._nsb.burr3_x0020_perform_x0020_during.FOLLOW_UP_SURGERY: (
+                    During.FOLLOW_UP
+                ),
             }.get(self._nsb.burr3_x0020_perform_x0020_during, None)
         )
 
@@ -483,8 +493,12 @@ class MappedNSBList:
             None
             if self._nsb.burr4_x0020_perform_x0020_during is None
             else {
-                self._nsb.burr4_x0020_perform_x0020_during.INITIAL_SURGERY: During.INITIAL,
-                self._nsb.burr4_x0020_perform_x0020_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
+                self._nsb.burr4_x0020_perform_x0020_during.INITIAL_SURGERY: (
+                    During.INITIAL
+                ),
+                self._nsb.burr4_x0020_perform_x0020_during.FOLLOW_UP_SURGERY: (
+                    During.FOLLOW_UP
+                ),
             }.get(self._nsb.burr4_x0020_perform_x0020_during, None)
         )
 
@@ -495,8 +509,12 @@ class MappedNSBList:
             None
             if self._nsb.burr5_x0020_perform_x0020_during is None
             else {
-                self._nsb.burr5_x0020_perform_x0020_during.INITIAL_SURGERY: During.INITIAL,
-                self._nsb.burr5_x0020_perform_x0020_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
+                self._nsb.burr5_x0020_perform_x0020_during.INITIAL_SURGERY: (
+                    During.INITIAL
+                ),
+                self._nsb.burr5_x0020_perform_x0020_during.FOLLOW_UP_SURGERY: (
+                    During.FOLLOW_UP
+                ),
             }.get(self._nsb.burr5_x0020_perform_x0020_during, None)
         )
 
@@ -507,8 +525,12 @@ class MappedNSBList:
             None
             if self._nsb.burr6_x0020_perform_x0020_during is None
             else {
-                self._nsb.burr6_x0020_perform_x0020_during.INITIAL_SURGERY: During.INITIAL,
-                self._nsb.burr6_x0020_perform_x0020_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
+                self._nsb.burr6_x0020_perform_x0020_during.INITIAL_SURGERY: (
+                    During.INITIAL
+                ),
+                self._nsb.burr6_x0020_perform_x0020_during.FOLLOW_UP_SURGERY: (
+                    During.FOLLOW_UP
+                ),
             }.get(self._nsb.burr6_x0020_perform_x0020_during, None)
         )
 
@@ -529,13 +551,14 @@ class MappedNSBList:
     @property
     def aind_burr_1_fiber_t(self) -> Optional[FiberType]:
         """Maps burr_1_fiber_t to aind model"""
+        fiber_type = self._nsb.burr_x0020_1_x0020_fiber_x0020_t
         return (
             None
-            if self._nsb.burr_x0020_1_x0020_fiber_x0020_t is None
+            if fiber_type is None
             else {
-                self._nsb.burr_x0020_1_x0020_fiber_x0020_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
-                self._nsb.burr_x0020_1_x0020_fiber_x0020_t.CUSTOM: FiberType.CUSTOM,
-            }.get(self._nsb.burr_x0020_1_x0020_fiber_x0020_t, None)
+                fiber_type.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
+                fiber_type.CUSTOM: FiberType.CUSTOM,
+            }.get(fiber_type, None)
         )
 
     @property
@@ -651,13 +674,14 @@ class MappedNSBList:
     @property
     def aind_burr_2_fiber_t(self) -> Optional[FiberType]:
         """Maps burr_2_fiber_t to aind model"""
+        fiber_type = self._nsb.burr_x0020_2_x0020_fiber_x0020_t
         return (
             None
-            if self._nsb.burr_x0020_2_x0020_fiber_x0020_t is None
+            if fiber_type is None
             else {
-                self._nsb.burr_x0020_2_x0020_fiber_x0020_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
-                self._nsb.burr_x0020_2_x0020_fiber_x0020_t.CUSTOM: FiberType.CUSTOM,
-            }.get(self._nsb.burr_x0020_2_x0020_fiber_x0020_t, None)
+                fiber_type.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
+                fiber_type.CUSTOM: FiberType.CUSTOM,
+            }.get(fiber_type, None)
         )
 
     @property
@@ -776,13 +800,14 @@ class MappedNSBList:
     @property
     def aind_burr_3_fiber_t(self) -> Optional[FiberType]:
         """Maps burr_3_fiber_t to aind model"""
+        fiber_type = self._nsb.burr_x0020_3_x0020_fiber_x0020_t
         return (
             None
-            if self._nsb.burr_x0020_3_x0020_fiber_x0020_t is None
+            if fiber_type is None
             else {
-                self._nsb.burr_x0020_3_x0020_fiber_x0020_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
-                self._nsb.burr_x0020_3_x0020_fiber_x0020_t.CUSTOM: FiberType.CUSTOM,
-            }.get(self._nsb.burr_x0020_3_x0020_fiber_x0020_t, None)
+                fiber_type.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
+                fiber_type.CUSTOM: FiberType.CUSTOM,
+            }.get(fiber_type, None)
         )
 
     @property
@@ -793,8 +818,12 @@ class MappedNSBList:
             if self._nsb.burr_x0020_3_x0020_hemisphere is None
             else {
                 self._nsb.burr_x0020_3_x0020_hemisphere.SELECT: None,
-                self._nsb.burr_x0020_3_x0020_hemisphere.LEFT: AnatomicalRelative.LEFT,
-                self._nsb.burr_x0020_3_x0020_hemisphere.RIGHT: AnatomicalRelative.RIGHT,
+                self._nsb.burr_x0020_3_x0020_hemisphere.LEFT: (
+                    AnatomicalRelative.LEFT
+                ),
+                self._nsb.burr_x0020_3_x0020_hemisphere.RIGHT: (
+                    AnatomicalRelative.RIGHT
+                ),
             }.get(self._nsb.burr_x0020_3_x0020_hemisphere, None)
         )
 
@@ -914,13 +943,14 @@ class MappedNSBList:
     @property
     def aind_burr_4_fiber_t(self) -> Optional[FiberType]:
         """Maps burr_4_fiber_t to aind model"""
+        fiber_type = self._nsb.burr_x0020_4_x0020_fiber_x0020_t
         return (
             None
-            if self._nsb.burr_x0020_4_x0020_fiber_x0020_t is None
+            if fiber_type is None
             else {
-                self._nsb.burr_x0020_4_x0020_fiber_x0020_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
-                self._nsb.burr_x0020_4_x0020_fiber_x0020_t.CUSTOM: FiberType.CUSTOM,
-            }.get(self._nsb.burr_x0020_4_x0020_fiber_x0020_t, None)
+                fiber_type.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
+                fiber_type.CUSTOM: FiberType.CUSTOM,
+            }.get(fiber_type, None)
         )
 
     @property
@@ -931,8 +961,12 @@ class MappedNSBList:
             if self._nsb.burr_x0020_4_x0020_hemisphere is None
             else {
                 self._nsb.burr_x0020_4_x0020_hemisphere.SELECT: None,
-                self._nsb.burr_x0020_4_x0020_hemisphere.LEFT: AnatomicalRelative.LEFT,
-                self._nsb.burr_x0020_4_x0020_hemisphere.RIGHT: AnatomicalRelative.RIGHT,
+                self._nsb.burr_x0020_4_x0020_hemisphere.LEFT: (
+                    AnatomicalRelative.LEFT,
+                ),
+                self._nsb.burr_x0020_4_x0020_hemisphere.RIGHT: (
+                    AnatomicalRelative.RIGHT
+                ),
             }.get(self._nsb.burr_x0020_4_x0020_hemisphere, None)
         )
 
@@ -1066,13 +1100,14 @@ class MappedNSBList:
     @property
     def aind_burr_5_fiber_t(self) -> Optional[Any]:
         """Maps burr_5_fiber_t to aind model"""
+        fiber_type = self._nsb.burr_x0020_5_x0020_fiber_x0020_t
         return (
             None
-            if self._nsb.burr_x0020_5_x0020_fiber_x0020_t is None
+            if fiber_type is None
             else {
-                self._nsb.burr_x0020_5_x0020_fiber_x0020_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
-                self._nsb.burr_x0020_5_x0020_fiber_x0020_t.CUSTOM: FiberType.CUSTOM,
-            }.get(self._nsb.burr_x0020_5_x0020_fiber_x0020_t, None)
+                fiber_type.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
+                fiber_type.CUSTOM: FiberType.CUSTOM,
+            }.get(fiber_type, None)
         )
 
     @property
@@ -1083,8 +1118,12 @@ class MappedNSBList:
             if self._nsb.burr_x0020_5_x0020_hemisphere is None
             else {
                 self._nsb.burr_x0020_5_x0020_hemisphere.SELECT: None,
-                self._nsb.burr_x0020_5_x0020_hemisphere.LEFT: AnatomicalRelative.LEFT,
-                self._nsb.burr_x0020_5_x0020_hemisphere.RIGHT: AnatomicalRelative.RIGHT,
+                self._nsb.burr_x0020_5_x0020_hemisphere.LEFT: (
+                    AnatomicalRelative.LEFT
+                ),
+                self._nsb.burr_x0020_5_x0020_hemisphere.RIGHT: (
+                    AnatomicalRelative.RIGHT
+                ),
             }.get(self._nsb.burr_x0020_5_x0020_hemisphere, None)
         )
 
@@ -1225,13 +1264,18 @@ class MappedNSBList:
     @property
     def aind_burr_6_fiber_t(self) -> Optional[FiberType]:
         """Maps burr_6_fiber_t to aind model"""
+        fiber_type = self._nsb.burr_x0020_6_x0020_fiber_x0020_t
         return (
             None
-            if self._nsb.burr_x0020_6_x0020_fiber_x0020_t is None
+            if fiber_type is None
             else {
-                self._nsb.burr_x0020_6_x0020_fiber_x0020_t.STANDARD_PROVIDED_BY_NSB: FiberType.STANDARD,
-                self._nsb.burr_x0020_6_x0020_fiber_x0020_t.CUSTOM: FiberType.CUSTOM,
-            }.get(self._nsb.burr_x0020_6_x0020_fiber_x0020_t, None)
+                fiber_type.STANDARD_PROVIDED_BY_NSB: (
+                    FiberType.STANDARD
+                ),
+                fiber_type.CUSTOM: (
+                    FiberType.CUSTOM
+                ),
+            }.get(fiber_type, None)
         )
 
     @property
@@ -1242,8 +1286,12 @@ class MappedNSBList:
             if self._nsb.burr_x0020_6_x0020_hemisphere is None
             else {
                 self._nsb.burr_x0020_6_x0020_hemisphere.SELECT: None,
-                self._nsb.burr_x0020_6_x0020_hemisphere.LEFT: AnatomicalRelative.LEFT,
-                self._nsb.burr_x0020_6_x0020_hemisphere.RIGHT: AnatomicalRelative.RIGHT,
+                self._nsb.burr_x0020_6_x0020_hemisphere.LEFT: (
+                    AnatomicalRelative.LEFT
+                ),
+                self._nsb.burr_x0020_6_x0020_hemisphere.RIGHT: (
+                    AnatomicalRelative.RIGHT
+                ),
             }.get(self._nsb.burr_x0020_6_x0020_hemisphere, None)
         )
 
@@ -1356,14 +1404,30 @@ class MappedNSBList:
             if self._nsb.burr_x0020_hole_x0020_1 is None
             else {
                 self._nsb.burr_x0020_hole_x0020_1.SELECT: None,
-                self._nsb.burr_x0020_hole_x0020_1.STEREOTAXIC_INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_x0020_hole_x0020_1.SPINAL_INJECTION: BurrHoleProcedure.SPINAL_INJECTION,
-                self._nsb.burr_x0020_hole_x0020_1.N_9_GRID_INJECTION: BurrHoleProcedure.GRID_INJECTION_9,
-                self._nsb.burr_x0020_hole_x0020_1.N_6_GRID_INJECTION: BurrHoleProcedure.GRID_INJECTION_6,
-                self._nsb.burr_x0020_hole_x0020_1.FIBER_IMPLANT: BurrHoleProcedure.FIBER_IMPLANT,
-                self._nsb.burr_x0020_hole_x0020_1.STEREOTAXIC_INJECTION_F: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
-                self._nsb.burr_x0020_hole_x0020_1.INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_x0020_hole_x0020_1.INJECTION_FIBER_IMPLANT: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+                self._nsb.burr_x0020_hole_x0020_1.STEREOTAXIC_INJECTION: (
+                    BurrHoleProcedure.INJECTION
+                ),
+                self._nsb.burr_x0020_hole_x0020_1.SPINAL_INJECTION: (
+                    BurrHoleProcedure.SPINAL_INJECTION
+                ),
+                self._nsb.burr_x0020_hole_x0020_1.N_9_GRID_INJECTION: (
+                    BurrHoleProcedure.GRID_INJECTION_9
+                ),
+                self._nsb.burr_x0020_hole_x0020_1.N_6_GRID_INJECTION: (
+                    BurrHoleProcedure.GRID_INJECTION_6
+                ),
+                self._nsb.burr_x0020_hole_x0020_1.FIBER_IMPLANT: (
+                    BurrHoleProcedure.FIBER_IMPLANT
+                ),
+                self._nsb.burr_x0020_hole_x0020_1.STEREOTAXIC_INJECTION_F: (
+                    BurrHoleProcedure.INJECTION_FIBER_IMPLANT
+                ),
+                self._nsb.burr_x0020_hole_x0020_1.INJECTION: (
+                    BurrHoleProcedure.INJECTION
+                ),
+                self._nsb.burr_x0020_hole_x0020_1.INJECTION_FIBER_IMPLANT: (
+                    BurrHoleProcedure.INJECTION_FIBER_IMPLANT
+                ),
             }.get(self._nsb.burr_x0020_hole_x0020_1, None)
         )
 
@@ -1375,12 +1439,24 @@ class MappedNSBList:
             if self._nsb.burr_x0020_hole_x0020_2 is None
             else {
                 self._nsb.burr_x0020_hole_x0020_2.SELECT: None,
-                self._nsb.burr_x0020_hole_x0020_2.STEREOTAXIC_INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_x0020_hole_x0020_2.SPINAL_INJECTION: BurrHoleProcedure.SPINAL_INJECTION,
-                self._nsb.burr_x0020_hole_x0020_2.FIBER_IMPLANT: BurrHoleProcedure.FIBER_IMPLANT,
-                self._nsb.burr_x0020_hole_x0020_2.STEREOTAXIC_INJECTION__F: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
-                self._nsb.burr_x0020_hole_x0020_2.INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_x0020_hole_x0020_2.INJECTION_FIBER_IMPLANT: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+                self._nsb.burr_x0020_hole_x0020_2.STEREOTAXIC_INJECTION: (
+                    BurrHoleProcedure.INJECTION,
+                ),
+                self._nsb.burr_x0020_hole_x0020_2.SPINAL_INJECTION: (
+                    BurrHoleProcedure.SPINAL_INJECTION
+                ),
+                self._nsb.burr_x0020_hole_x0020_2.FIBER_IMPLANT: (
+                    BurrHoleProcedure.FIBER_IMPLANT
+                ),
+                self._nsb.burr_x0020_hole_x0020_2.STEREOTAXIC_INJECTION__F: (
+                    BurrHoleProcedure.INJECTION_FIBER_IMPLANT
+                ),
+                self._nsb.burr_x0020_hole_x0020_2.INJECTION: (
+                    BurrHoleProcedure.INJECTION
+                ),
+                self._nsb.burr_x0020_hole_x0020_2.INJECTION_FIBER_IMPLANT: (
+                    BurrHoleProcedure.INJECTION_FIBER_IMPLANT
+                ),
             }.get(self._nsb.burr_x0020_hole_x0020_2, None)
         )
 
@@ -1392,11 +1468,21 @@ class MappedNSBList:
             if self._nsb.burr_x0020_hole_x0020_3 is None
             else {
                 self._nsb.burr_x0020_hole_x0020_3.SELECT: None,
-                self._nsb.burr_x0020_hole_x0020_3.STEREOTAXIC_INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_x0020_hole_x0020_3.FIBER_IMPLANT: BurrHoleProcedure.FIBER_IMPLANT,
-                self._nsb.burr_x0020_hole_x0020_3.STEREOTAXIC_INJECTION__F: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
-                self._nsb.burr_x0020_hole_x0020_3.INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_x0020_hole_x0020_3.INJECTION_FIBER_IMPLANT: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+                self._nsb.burr_x0020_hole_x0020_3.STEREOTAXIC_INJECTION: (
+                    BurrHoleProcedure.INJECTION
+                ),
+                self._nsb.burr_x0020_hole_x0020_3.FIBER_IMPLANT: (
+                    BurrHoleProcedure.FIBER_IMPLANT
+                ),
+                self._nsb.burr_x0020_hole_x0020_3.STEREOTAXIC_INJECTION__F: (
+                    BurrHoleProcedure.INJECTION_FIBER_IMPLANT
+                ),
+                self._nsb.burr_x0020_hole_x0020_3.INJECTION: (
+                    BurrHoleProcedure.INJECTION
+                ),
+                self._nsb.burr_x0020_hole_x0020_3.INJECTION_FIBER_IMPLANT: (
+                    BurrHoleProcedure.INJECTION_FIBER_IMPLANT
+                ),
             }.get(self._nsb.burr_x0020_hole_x0020_3, None)
         )
 
@@ -1408,11 +1494,21 @@ class MappedNSBList:
             if self._nsb.burr_x0020_hole_x0020_4 is None
             else {
                 self._nsb.burr_x0020_hole_x0020_4.SELECT: None,
-                self._nsb.burr_x0020_hole_x0020_4.STEREOTAXIC_INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_x0020_hole_x0020_4.FIBER_IMPLANT: BurrHoleProcedure.FIBER_IMPLANT,
-                self._nsb.burr_x0020_hole_x0020_4.STEREOTAXIC_INJECTION__F: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
-                self._nsb.burr_x0020_hole_x0020_4.INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_x0020_hole_x0020_4.INJECTION_FIBER_IMPLANT: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+                self._nsb.burr_x0020_hole_x0020_4.STEREOTAXIC_INJECTION: (
+                    BurrHoleProcedure.INJECTION
+                ),
+                self._nsb.burr_x0020_hole_x0020_4.FIBER_IMPLANT: (
+                    BurrHoleProcedure.FIBER_IMPLANT
+                ),
+                self._nsb.burr_x0020_hole_x0020_4.STEREOTAXIC_INJECTION__F: (
+                    BurrHoleProcedure.INJECTION_FIBER_IMPLANT
+                ),
+                self._nsb.burr_x0020_hole_x0020_4.INJECTION: (
+                    BurrHoleProcedure.INJECTION
+                ),
+                self._nsb.burr_x0020_hole_x0020_4.INJECTION_FIBER_IMPLANT: (
+                    BurrHoleProcedure.INJECTION_FIBER_IMPLANT
+                ),
             }.get(self._nsb.burr_x0020_hole_x0020_4, None)
         )
 
@@ -1424,11 +1520,21 @@ class MappedNSBList:
             if self._nsb.burr_x0020_hole_x0020_5 is None
             else {
                 self._nsb.burr_x0020_hole_x0020_5.SELECT: None,
-                self._nsb.burr_x0020_hole_x0020_5.STEREOTAXIC_INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_x0020_hole_x0020_5.FIBER_IMPLANT: BurrHoleProcedure.FIBER_IMPLANT,
-                self._nsb.burr_x0020_hole_x0020_5.STEREOTAXIC_INJECTION__F: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
-                self._nsb.burr_x0020_hole_x0020_5.INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_x0020_hole_x0020_5.INJECTION_FIBER_IMPLANT: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+                self._nsb.burr_x0020_hole_x0020_5.STEREOTAXIC_INJECTION: (
+                    BurrHoleProcedure.INJECTION
+                ),
+                self._nsb.burr_x0020_hole_x0020_5.FIBER_IMPLANT: (
+                    BurrHoleProcedure.FIBER_IMPLANT
+                ),
+                self._nsb.burr_x0020_hole_x0020_5.STEREOTAXIC_INJECTION__F: (
+                    BurrHoleProcedure.INJECTION_FIBER_IMPLANT
+                ),
+                self._nsb.burr_x0020_hole_x0020_5.INJECTION: (
+                    BurrHoleProcedure.INJECTION
+                ),
+                self._nsb.burr_x0020_hole_x0020_5.INJECTION_FIBER_IMPLANT: (
+                    BurrHoleProcedure.INJECTION_FIBER_IMPLANT
+                ),
             }.get(self._nsb.burr_x0020_hole_x0020_5, None)
         )
 
@@ -1440,24 +1546,35 @@ class MappedNSBList:
             if self._nsb.burr_x0020_hole_x0020_6 is None
             else {
                 self._nsb.burr_x0020_hole_x0020_6.SELECT: None,
-                self._nsb.burr_x0020_hole_x0020_6.STEREOTAXIC_INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_x0020_hole_x0020_6.FIBER_IMPLANT: BurrHoleProcedure.FIBER_IMPLANT,
-                self._nsb.burr_x0020_hole_x0020_6.STEREOTAXIC_INJECTION__F: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
-                self._nsb.burr_x0020_hole_x0020_6.INJECTION: BurrHoleProcedure.INJECTION,
-                self._nsb.burr_x0020_hole_x0020_6.INJECTION_FIBER_IMPLANT: BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+                self._nsb.burr_x0020_hole_x0020_6.STEREOTAXIC_INJECTION: (
+                    BurrHoleProcedure.INJECTION
+                ),
+                self._nsb.burr_x0020_hole_x0020_6.FIBER_IMPLANT: (
+                    BurrHoleProcedure.FIBER_IMPLANT
+                ),
+                self._nsb.burr_x0020_hole_x0020_6.STEREOTAXIC_INJECTION__F: (
+                    BurrHoleProcedure.INJECTION_FIBER_IMPLANT
+                ),
+                self._nsb.burr_x0020_hole_x0020_6.INJECTION: (
+                    BurrHoleProcedure.INJECTION
+                ),
+                self._nsb.burr_x0020_hole_x0020_6.INJECTION_FIBER_IMPLANT: (
+                    BurrHoleProcedure.INJECTION_FIBER_IMPLANT
+                ),
             }.get(self._nsb.burr_x0020_hole_x0020_6, None)
         )
 
     @property
     def aind_craniotomy_perform_d(self) -> Optional[During]:
         """Maps craniotomy_perform_d to aind model"""
+        craniotomy_during = self._nsb.craniotomy_x0020_perform_x0020_d
         return (
             None
-            if self._nsb.craniotomy_x0020_perform_x0020_d is None
+            if craniotomy_during is None
             else {
-                self._nsb.craniotomy_x0020_perform_x0020_d.INITIAL_SURGERY: During.INITIAL,
-                self._nsb.craniotomy_x0020_perform_x0020_d.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
-            }.get(self._nsb.craniotomy_x0020_perform_x0020_d, None)
+                craniotomy_during.INITIAL_SURGERY: During.INITIAL,
+                craniotomy_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
+            }.get(craniotomy_during, None)
         )
 
     @property
@@ -1655,38 +1772,46 @@ class MappedNSBList:
     @property
     def aind_headpost_perform_dur(self) -> Optional[During]:
         """Maps headpost_perform_dur to aind model"""
+        headpost_during = self._nsb.headpost_x0020_perform_x0020_dur
         return (
             None
-            if self._nsb.headpost_x0020_perform_x0020_dur is None
+            if headpost_during is None
             else {
-                self._nsb.headpost_x0020_perform_x0020_dur.INITIAL_SURGERY: During.INITIAL,
-                self._nsb.headpost_x0020_perform_x0020_dur.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
-            }.get(self._nsb.headpost_x0020_perform_x0020_dur, None)
+                headpost_during.INITIAL_SURGERY: During.INITIAL,
+                headpost_during.FOLLOW_UP_SURGERY: During.FOLLOW_UP,
+            }.get(headpost_during, None)
         )
 
     @property
     def aind_headpost_type(self) -> Optional[HeadPostType]:
         """Maps headpost_type to aind model."""
         # TODO: Add new headpost types and handle mappings
+        hp_type = self._nsb.headpost_type
         return (
             None
-            if self._nsb.headpost_type is None
+            if hp_type is None
             else {
-                self._nsb.headpost_type.SELECT: None,
-                self._nsb.headpost_type.NO_WELL: HeadPostType.NO_WELL,
-                self._nsb.headpost_type.SCIENTIFICA_CAM: HeadPostType.CAM,
-                self._nsb.headpost_type.MESOSCOPE: HeadPostType.MESOSCOPE,
-                self._nsb.headpost_type.NEUROPIXEL: HeadPostType.NEUROPIXEL,
-                self._nsb.headpost_type.WHC_2_P: HeadPostType.WHC_2P,
-                self._nsb.headpost_type.WHC_NP: HeadPostType.WHC_NP,
-                self._nsb.headpost_type.WHC_NP_ZIRCONIA: HeadPostType.WHC_NP_ZIRCONIA,
-                self._nsb.headpost_type.AI_STRAIGHT_BAR_WELL: HeadPostType.AI_STRAIGHT_BAR_WELL,
-                self._nsb.headpost_type.LC_WELL: HeadPostType.LC_WELL,
-                self._nsb.headpost_type.DHC_WELL: HeadPostType.DHC_WELL,
-                self._nsb.headpost_type.MOTOR__CTX_SLAP2_WELL: HeadPostType.MOTOR_CTX_SLAP2_WELL,
-                self._nsb.headpost_type.VISUAL__CTX_SLAP2_WELL: HeadPostType.VISUAL_CTX_SLAP2_WELL,
-                self._nsb.headpost_type.OTHER_SEE_REQUESTOR_COMM: None,
-            }.get(self._nsb.headpost_type, None)
+                hp_type.SELECT: None,
+                hp_type.NO_WELL: HeadPostType.NO_WELL,
+                hp_type.SCIENTIFICA_CAM: HeadPostType.CAM,
+                hp_type.MESOSCOPE: HeadPostType.MESOSCOPE,
+                hp_type.NEUROPIXEL: HeadPostType.NEUROPIXEL,
+                hp_type.WHC_2_P: HeadPostType.WHC_2P,
+                hp_type.WHC_NP: HeadPostType.WHC_NP,
+                hp_type.WHC_NP_ZIRCONIA: HeadPostType.WHC_NP_ZIRCONIA,
+                hp_type.AI_STRAIGHT_BAR_WELL: (
+                    HeadPostType.AI_STRAIGHT_BAR_WELL
+                ),
+                hp_type.LC_WELL: HeadPostType.LC_WELL,
+                hp_type.DHC_WELL: HeadPostType.DHC_WELL,
+                hp_type.MOTOR__CTX_SLAP2_WELL: (
+                    HeadPostType.MOTOR_CTX_SLAP2_WELL
+                ),
+                hp_type.VISUAL__CTX_SLAP2_WELL: (
+                    HeadPostType.VISUAL_CTX_SLAP2_WELL
+                ),
+                hp_type.OTHER_SEE_REQUESTOR_COMM: None,
+            }.get(hp_type, None)
         )
 
     @property
@@ -2071,38 +2196,39 @@ class MappedNSBList:
     @property
     def aind_protocol(self) -> Optional[str]:
         """Maps protocol to aind iacuc protocol."""
+        protocol = self._nsb.protocol
         return (
             None
-            if self._nsb.protocol is None
+            if protocol is None
             else {
-                self._nsb.protocol.SELECT: None,
-                self._nsb.protocol.N_2119__TRAINING_AND_QUAL: IacucProtocol.N_2119.value,
-                self._nsb.protocol.N_2201__INTERROGATING_PRO: IacucProtocol.N_2201.value,
-                self._nsb.protocol.N_2202__TESTING_AA_VS_IN: IacucProtocol.N_2202.value,
-                self._nsb.protocol.N_2204__PRIMARY_NEURON_AN: IacucProtocol.N_2204.value,
-                self._nsb.protocol.N_2205__OPTIMIZATION_AND: IacucProtocol.N_2205.value,
-                self._nsb.protocol.N_2207__IN__VITRO__BRAIN: IacucProtocol.N_2207.value,
-                self._nsb.protocol.N_2212__INVESTIGATING__BR: IacucProtocol.N_2212.value,
-                self._nsb.protocol.N_2301__TESTING_OF_ENHANC: IacucProtocol.N_2301.value,
-                self._nsb.protocol.N_2304__NEUROSURGERY__BEH: IacucProtocol.N_2304.value,
-                self._nsb.protocol.N_2305__IN__VIVO__BRAIN: IacucProtocol.N_2305.value,
-                self._nsb.protocol.N_2306__PATCH_SEQ_CHARACT: IacucProtocol.N_2306.value,
-                self._nsb.protocol.N_2307__DISSECTING_THE_NE: IacucProtocol.N_2307.value,
-                self._nsb.protocol.N_2308__INDUCTION_OF__IMM: IacucProtocol.N_2308.value,
-                self._nsb.protocol.N_2401__THE_USE_OF_MICE_F: IacucProtocol.N_2401.value,
-                self._nsb.protocol.N_2402__BRAIN__OBSERVATOR: IacucProtocol.N_2402.value,
-                self._nsb.protocol.N_2403__ELECTROPHYSIOLOGY: IacucProtocol.N_2403.value,
-                self._nsb.protocol.N_2405__ANALYSIS_OF__INTE: IacucProtocol.N_2405.value,
-                self._nsb.protocol.N_2406__CHARACTERIZATION: IacucProtocol.N_2406.value,
-                self._nsb.protocol.N_2410__VALIDATION_OF_BRA: IacucProtocol.N_2410.value,
-                self._nsb.protocol.N_2412__CIRCUIT_TRACING_A: IacucProtocol.N_2412.value,
-                self._nsb.protocol.N_2413__NEUROPHYSIOLOGY_O: IacucProtocol.N_2413.value,
-                self._nsb.protocol.N_2414__ELECTROPHYSIOLOGI: IacucProtocol.N_2414.value,
-                self._nsb.protocol.N_2415__OPTOPHYSIOLOGICAL: IacucProtocol.N_2415.value,
-                self._nsb.protocol.N_2416__ANATOMICAL_ANALYS: IacucProtocol.N_2416.value,
-                self._nsb.protocol.N_2417__CHARACTERIZATION: IacucProtocol.N_2417.value,
-                self._nsb.protocol.N_2418__IN__VITRO__SINGLE: IacucProtocol.N_2418.value,
-                self._nsb.protocol.N_2427__OPEN_SCOPE__MINDS: IacucProtocol.N_2427.value,
+                protocol.SELECT: None,
+                protocol.N_2119__TRAINING_AND_QUAL: IacucProtocol.N_2119.value,
+                protocol.N_2201__INTERROGATING_PRO: IacucProtocol.N_2201.value,
+                protocol.N_2202__TESTING_AA_VS_IN: IacucProtocol.N_2202.value,
+                protocol.N_2204__PRIMARY_NEURON_AN: IacucProtocol.N_2204.value,
+                protocol.N_2205__OPTIMIZATION_AND: IacucProtocol.N_2205.value,
+                protocol.N_2207__IN__VITRO__BRAIN: IacucProtocol.N_2207.value,
+                protocol.N_2212__INVESTIGATING__BR: IacucProtocol.N_2212.value,
+                protocol.N_2301__TESTING_OF_ENHANC: IacucProtocol.N_2301.value,
+                protocol.N_2304__NEUROSURGERY__BEH: IacucProtocol.N_2304.value,
+                protocol.N_2305__IN__VIVO__BRAIN: IacucProtocol.N_2305.value,
+                protocol.N_2306__PATCH_SEQ_CHARACT: IacucProtocol.N_2306.value,
+                protocol.N_2307__DISSECTING_THE_NE: IacucProtocol.N_2307.value,
+                protocol.N_2308__INDUCTION_OF__IMM: IacucProtocol.N_2308.value,
+                protocol.N_2401__THE_USE_OF_MICE_F: IacucProtocol.N_2401.value,
+                protocol.N_2402__BRAIN__OBSERVATOR: IacucProtocol.N_2402.value,
+                protocol.N_2403__ELECTROPHYSIOLOGY: IacucProtocol.N_2403.value,
+                protocol.N_2405__ANALYSIS_OF__INTE: IacucProtocol.N_2405.value,
+                protocol.N_2406__CHARACTERIZATION: IacucProtocol.N_2406.value,
+                protocol.N_2410__VALIDATION_OF_BRA: IacucProtocol.N_2410.value,
+                protocol.N_2412__CIRCUIT_TRACING_A: IacucProtocol.N_2412.value,
+                protocol.N_2413__NEUROPHYSIOLOGY_O: IacucProtocol.N_2413.value,
+                protocol.N_2414__ELECTROPHYSIOLOGI: IacucProtocol.N_2414.value,
+                protocol.N_2415__OPTOPHYSIOLOGICAL: IacucProtocol.N_2415.value,
+                protocol.N_2416__ANATOMICAL_ANALYS: IacucProtocol.N_2416.value,
+                protocol.N_2417__CHARACTERIZATION: IacucProtocol.N_2417.value,
+                protocol.N_2418__IN__VITRO__SINGLE: IacucProtocol.N_2418.value,
+                protocol.N_2427__OPEN_SCOPE__MINDS: IacucProtocol.N_2427.value,
             }.get(self._nsb.protocol, None)
         )
 
@@ -2140,7 +2266,9 @@ class MappedNSBList:
             else {
                 self._nsb.virus_x0020_hemisphere.SELECT: None,
                 self._nsb.virus_x0020_hemisphere.LEFT: AnatomicalRelative.LEFT,
-                self._nsb.virus_x0020_hemisphere.RIGHT: AnatomicalRelative.RIGHT,
+                self._nsb.virus_x0020_hemisphere.RIGHT: (
+                    AnatomicalRelative.RIGHT
+                ),
             }.get(self._nsb.virus_x0020_hemisphere, None)
         )
 
@@ -2230,7 +2358,8 @@ class MappedNSBList:
         else:
             return None
 
-    # TODO: support new Procedures (EMG Array, Grid Injections, Testes, Oviduct)
+    # TODO: support new Procedures
+    # (EMG Array, Grid Injections, Testes, Oviduct)
     def has_hp_procedure(self) -> bool:
         """Is there a headpost procedure?"""
         return self.aind_procedure in {
@@ -2720,7 +2849,8 @@ class MappedNSBList:
     @staticmethod
     def assign_fiber_probe_names(procedures: List) -> None:
         """
-        Iterates through list of procedures and assigns ordered names to FiberProbe objects within each ProbeImplant.
+        Iterates through list of procedures and assigns ordered names to
+        FiberProbe objects within each ProbeImplant.
         """
         probes_with_coords = []
         for proc in procedures:
@@ -2789,47 +2919,52 @@ class MappedNSBList:
         """Get a List of Intended Measurements"""
 
         all_intended_measurements = []
-        initial_measurements = []  #
+        initial_measurements = []
         followup_measurements = []
         for burr_hole_num in range(1, 7):
-            # TODO: check if we need this type check, or if we should check procedues list
             if getattr(self, f"aind_burr_hole_{burr_hole_num}") in {
                 BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
                 BurrHoleProcedure.FIBER_IMPLANT,
             }:
-                burr_hole_info = self.burr_hole_info(
+                burr = self.burr_hole_info(
                     burr_hole_num=burr_hole_num
                 )
-                if burr_hole_info.during == During.INITIAL:
+                if burr.during == During.INITIAL:
                     initial_measurements.append(
                         IntendedMeasurementandCoords(
-                            intended_measurement_R=burr_hole_info.intended_measurement_r,
-                            intended_measurement_B=burr_hole_info.intended_measurement_b,
-                            intended_measurement_G=burr_hole_info.intended_measurement_g,
-                            intended_measurement_Iso=burr_hole_info.intended_measurement_iso,
-                            coordinate_ap=burr_hole_info.coordinate_ap,
-                            coordinate_ml=burr_hole_info.coordinate_ml,
+                            intended_measurement_R=burr.intended_measurement_r,
+                            intended_measurement_B=burr.intended_measurement_b,
+                            intended_measurement_G=burr.intended_measurement_g,
+                            intended_measurement_Iso=(
+                                burr.intended_measurement_iso
+                            ),
+                            coordinate_ap=burr.coordinate_ap,
+                            coordinate_ml=burr.coordinate_ml,
                         )
                     )
-                elif burr_hole_info.during == During.FOLLOW_UP:
+                elif burr.during == During.FOLLOW_UP:
                     followup_measurements.append(
                         IntendedMeasurementandCoords(
-                            intended_measurement_R=burr_hole_info.intended_measurement_r,
-                            intended_measurement_B=burr_hole_info.intended_measurement_b,
-                            intended_measurement_G=burr_hole_info.intended_measurement_g,
-                            intended_measurement_Iso=burr_hole_info.intended_measurement_iso,
-                            coordinate_ap=burr_hole_info.coordinate_ap,
-                            coordinate_ml=burr_hole_info.coordinate_ml,
+                            intended_measurement_R=burr.intended_measurement_r,
+                            intended_measurement_B=burr.intended_measurement_b,
+                            intended_measurement_G=burr.intended_measurement_g,
+                            intended_measurement_Iso=(
+                                burr.intended_measurement_iso
+                            ),
+                            coordinate_ap=burr.coordinate_ap,
+                            coordinate_ml=burr.coordinate_ml,
                         )
                     )
                 else:
                     # skip fiber name assignment if no During info
                     all_intended_measurements.append(
                         IntendedMeasurementInformation(
-                            intended_measurement_R=burr_hole_info.intended_measurement_r,
-                            intended_measurement_B=burr_hole_info.intended_measurement_b,
-                            intended_measurement_G=burr_hole_info.intended_measurement_g,
-                            intended_measurement_Iso=burr_hole_info.intended_measurement_iso,
+                            intended_measurement_R=burr.intended_measurement_r,
+                            intended_measurement_B=burr.intended_measurement_b,
+                            intended_measurement_G=burr.intended_measurement_g,
+                            intended_measurement_Iso=(
+                                burr.intended_measurement_iso
+                            ),
                         )
                     )
         all_intended_measurements.extend(
@@ -2876,8 +3011,15 @@ class MappedNSBList:
         self, during: During
     ) -> Optional[CoordinateSystem]:
         """
-        Determines the dominant coordinate system for a surgery by inspecting raw fields.
-        Returns the CoordinateSystem object (e.g., CoordinateSystemLibrary.BREGMA_ARID).
+        Determines the dominant coordinate system for a surgery by inspecting
+        the relevant surgery information.
+        Parameters
+        ----------
+        during: During
+            The phase of the surgery (initial, followup).
+        Returns
+        -------
+            Optional[CoordinateSystem]
         """
         systems = []
 
@@ -2924,7 +3066,22 @@ class MappedNSBList:
         surgery_coordinate_system: Optional[CoordinateSystem] = None,
     ) -> List[List[Union[Translation, Rotation]]]:
         """
-        Maps transforms for a burr hole, ensuring ARID includes a depth (0 if missing).
+        Maps transforms (translations and rotations) for a burr hole.
+        Parameters
+        ----------
+        angle: Optional[Decimal]
+            The angle of rotation.
+        ml: Optional[Decimal]
+            The mediolateral position.
+        ap: Optional[Decimal]
+            The anteroposterior position.
+        depth: Optional[Union[Decimal, List[Decimal]]]
+            The depth of the burr hole.
+        surgery_coordinate_system: Optional[CoordinateSystem]
+            The coordinate system for the surgery.
+        Returns
+        -------
+        List[List[Union[Translation, Rotation]]]
         """
         ap = ap if ap is not None else 0
         ml = ml if ml is not None else 0
@@ -2957,7 +3114,7 @@ class MappedNSBList:
         return transforms
 
     def get_surgeries(self) -> List[Surgery]:
-        """Get a List of Surgeries, ensuring all procedures use the correct coordinate system."""
+        """Get a List of Surgeries."""
 
         surgeries = []
 
@@ -3026,13 +3183,17 @@ class MappedNSBList:
             try:
                 anaesthesia = Anaesthetic(
                     anaesthetic_type="isoflurane",
-                    duration=hf_surgery_during_info.anaesthetic_duration_in_minutes,
+                    duration=(
+                        hf_surgery_during_info.anaesthetic_duration_in_minutes
+                    ),
                     level=hf_surgery_during_info.anaesthetic_level,
                 )
             except ValidationError:
                 anaesthesia = Anaesthetic.model_construct(
                     anaesthetic_type="isoflurane",
-                    duration=hf_surgery_during_info.anaesthetic_duration_in_minutes,
+                    duration=(
+                        hf_surgery_during_info.anaesthetic_duration_in_minutes
+                    ),
                     level=hf_surgery_during_info.anaesthetic_level,
                 )
 
@@ -3148,16 +3309,28 @@ class MappedNSBList:
                             profile=InjectionProfile.BOLUS,
                             duration=burr_hole_info.inj_duration,
                             injection_current=burr_hole_info.inj_current,
-                            injection_current_unit=CurrentUnit.UA if burr_hole_info.inj_current else None,
-                            alternating_current=burr_hole_info.alternating_current,
+                            injection_current_unit=(
+                                CurrentUnit.UA
+                                if burr_hole_info.inj_current
+                                else None
+                            ),
+                            alternating_current=(
+                                burr_hole_info.alternating_current
+                            ),
                         )
                     except ValidationError:
                         dynamics_obj = InjectionDynamics.model_construct(
                             profile=InjectionProfile.BOLUS,
                             duration=burr_hole_info.inj_duration,
                             injection_current=burr_hole_info.inj_current,
-                            injection_current_unit=CurrentUnit.UA if burr_hole_info.inj_current else None,
-                            alternating_current=burr_hole_info.alternating_current,
+                            injection_current_unit=(
+                                CurrentUnit.UA
+                                if burr_hole_info.inj_current
+                                else None
+                            ),
+                            alternating_current=(
+                                burr_hole_info.alternating_current
+                            ),
                         )
                     dynamics = (
                         [dynamics_obj] * len(transforms)
@@ -3242,7 +3415,9 @@ class MappedNSBList:
                 probe_implant_proc = ProbeImplant.model_construct(
                     implanted_device=fiber_probe,
                     device_config=ProbeConfig.model_construct(
-                        primary_targeted_structure=burr_hole_info.targeted_structure,
+                        primary_targeted_structure=(
+                            burr_hole_info.targeted_structure,
+                        ),
                         device_name=None,
                         coordinate_system=coordinate_system,
                         transform=transforms,
