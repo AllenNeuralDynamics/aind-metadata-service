@@ -3416,7 +3416,7 @@ class MappedNSBList:
                     implanted_device=fiber_probe,
                     device_config=ProbeConfig.model_construct(
                         primary_targeted_structure=(
-                            burr_hole_info.targeted_structure,
+                            burr_hole_info.targeted_structure
                         ),
                         device_name=None,
                         coordinate_system=coordinate_system,
