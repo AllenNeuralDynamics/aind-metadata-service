@@ -12,6 +12,7 @@ from aind_data_schema.core.procedures import (
     Procedures,
     Surgery,
 )
+from aind_data_schema.utils.validators import CoordinateSystemException
 from aind_data_schema_models.mouse_anatomy import InjectionTargets
 from aind_labtracks_service_async_client.models import Task as LabTracksTask
 from aind_sharepoint_service_async_client.models import (
@@ -19,6 +20,8 @@ from aind_sharepoint_service_async_client.models import (
     NSB2019List,
     NSB2023List,
 )
+from pydantic import ValidationError
+
 from aind_metadata_service_server.mappers.las2020 import (
     MappedLASList as MappedLAS2020,
 )
@@ -301,9 +304,15 @@ class ProceduresMapper:
 
         if not subject_procedures and not specimen_procedures:
             return None
-
-        return Procedures(
-            subject_id=subject_id,
-            subject_procedures=subject_procedures,
-            specimen_procedures=specimen_procedures,
-        )
+        try:
+            return Procedures(
+                subject_id=subject_id,
+                subject_procedures=subject_procedures,
+                specimen_procedures=specimen_procedures,
+            )
+        except (ValidationError, CoordinateSystemException):
+            return Procedures.model_construct(
+                subject_id=subject_id,
+                subject_procedures=subject_procedures,
+                specimen_procedures=specimen_procedures,
+            )
