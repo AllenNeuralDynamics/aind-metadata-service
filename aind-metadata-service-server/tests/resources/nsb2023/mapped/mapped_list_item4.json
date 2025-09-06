@@ -149,7 +149,6 @@
                   "axis_unit": "millimeter"
                },
                "transform": [
-                  [
                      {
                         "object_type": "Translation",
                         "translation": [
@@ -167,7 +166,6 @@
                         ],
                         "angles_unit": "degrees"
                      }
-                  ]
                ],
                "dye": null,
                "notes": null
@@ -280,7 +278,6 @@
                   "axis_unit": "millimeter"
                },
                "transform": [
-                  [
                      {
                         "object_type": "Translation",
                         "translation": [
@@ -298,7 +295,6 @@
                         ],
                         "angles_unit": "degrees"
                      }
-                  ]
                ],
                "dye": null,
                "notes": null
@@ -472,7 +468,6 @@
                   "axis_unit": "millimeter"
                },
                "transform": [
-                  [
                      {
                         "object_type": "Translation",
                         "translation": [
@@ -490,7 +485,6 @@
                         ],
                         "angles_unit": "degrees"
                      }
-                  ]
                ],
                "dye": null,
                "notes": null
@@ -603,7 +597,6 @@
                   "axis_unit": "millimeter"
                },
                "transform": [
-                  [
                      {
                         "object_type": "Translation",
                         "translation": [
@@ -621,8 +614,7 @@
                         ],
                         "angles_unit": "degrees"
                      }
-                  ]
-               ],
+                  ],
                "dye": null,
                "notes": null
             }

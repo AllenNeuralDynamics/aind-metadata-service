@@ -2861,7 +2861,7 @@ class MappedNSBList:
                     if isinstance(probe_config, ProbeConfig) and hasattr(
                         probe_config, "transform"
                     ):
-                        t, _ = probe_config.transform[0]
+                        t = probe_config.transform[0]
                         if (
                             isinstance(t, Translation)
                             and len(t.translation) >= 2
@@ -2869,9 +2869,9 @@ class MappedNSBList:
                             ap = float(t.translation[0])
                             ml = float(t.translation[1])
 
-                        probes_with_coords.append(
-                            (proc, fiber_probe, probe_config, ap, ml)
-                        )
+                            probes_with_coords.append(
+                                (proc, fiber_probe, probe_config, ap, ml)
+                            )
 
         # Sort by AP descending, ML ascending
         sorted_probes = sorted(probes_with_coords, key=lambda x: (-x[3], x[4]))
@@ -3420,7 +3420,7 @@ class MappedNSBList:
                         ),
                         device_name=None,
                         coordinate_system=coordinate_system,
-                        transform=transforms,
+                        transform=transforms[0],
                     ),
                 )
                 if burr_hole_info.during == During.INITIAL:
