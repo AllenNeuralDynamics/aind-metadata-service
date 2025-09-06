@@ -27,6 +27,11 @@ async def get_procedures(
                 "description": "Example subject ID for Procedures",
                 "value": "632269",
             },
+            "example3": {
+                "summary": "Subject ID Example 3",
+                "description": "Example subject ID for Procedures",
+                "value": "656374",
+            },
         },
     ),
     labtracks_api_instance=Depends(get_labtracks_api_instance),
@@ -45,10 +50,18 @@ async def get_procedures(
     nsb_2019_response = await sharepoint_api_instance.get_nsb2019(
         subject_id, _request_timeout=10
     )
+    nsb_2023_response = await sharepoint_api_instance.get_nsb2023(
+        subject_id, _request_timeout=10
+    )
+    nsb_present_response = await sharepoint_api_instance.get_nsb_present(
+        subject_id, _request_timeout=10
+    )
     mapper = ProceduresMapper(
         labtracks_tasks=labtracks_response,
         las_2020=las_2020_response,
         nsb_2019=nsb_2019_response,
+        nsb_2023=nsb_2023_response,
+        nsb_present=nsb_present_response,
     )
     procedures = mapper.map_responses_to_aind_procedures(subject_id)
     if not procedures:
