@@ -7,6 +7,7 @@ from typing import List, Optional, Union
 from aind_data_schema.components.injection_procedures import Injection
 from aind_data_schema.components.subject_procedures import (
     Perfusion,
+    WaterRestriction
 )
 from aind_data_schema.core.procedures import (
     Procedures,
@@ -18,14 +19,16 @@ from aind_sharepoint_service_async_client.models import (
     Las2020List,
     NSB2019List,
 )
-
+from aind_slims_service_async_client.models import (
+    SlimsHistologyData,
+    SlimsWaterRestrictionData,
+)
 from aind_metadata_service_server.mappers.las2020 import (
     MappedLASList as MappedLAS2020,
 )
 from aind_metadata_service_server.mappers.nsb2019 import (
     MappedNSBList as MappedNSB2019,
 )
-
 
 class LabTracksTaskStatuses(Enum):
     """LabTracks Task Status Options"""
@@ -87,6 +90,8 @@ class ProceduresMapper:
         labtracks_tasks: List[LabTracksTask] = [],
         las_2020: List[Las2020List] = [],
         nsb_2019: List[NSB2019List] = [],
+        slims_water_restriction: List[SlimsWaterRestrictionData] = [],
+        slims_histology: List[SlimsHistologyData] = [],
     ):
         """
         Class constructor.
@@ -97,6 +102,8 @@ class ProceduresMapper:
         self.labtracks_tasks = labtracks_tasks
         self.las_2020 = las_2020
         self.nsb_2019 = nsb_2019
+        self.slims_water_restriction = slims_water_restriction
+        self.slims_histology = slims_histology
 
     @staticmethod
     def _map_labtracks_task_to_aind_surgery(
@@ -176,6 +183,33 @@ class ProceduresMapper:
             )
 
         return None
+    
+    def _map_slims_response_to_aind_water_restrictions(
+        self,
+    ) -> List[WaterRestriction]:
+        """Maps response from slims into WaterRestriction models"""
+        water_restrictions = []
+        for data in self.slims_water_restriction:
+            # missing ethics review id
+            wr = WaterRestriction.model_construct(
+                start_date=data.start_date.date() if data.start_date else None,
+                end_date=data.end_date.date() if data.end_date else None,
+                target_fraction_weight=(
+                    int(float(data.target_weight_fraction) * 100)
+                    if data.target_weight_fraction
+                    else None
+                ),
+                baseline_weight=(
+                    float(data.baseline_weight)
+                    if data.baseline_weight
+                    else None
+                ),
+                weight_unit=self._parse_mass_unit(data.weight_unit),
+                minimum_water_per_day=float("1.0"),  # default value
+                )
+            water_restrictions.append(wr)
+        return water_restrictions
+
 
     @staticmethod
     def map_sharepoint_response_to_aind_surgeries(
@@ -264,6 +298,16 @@ class ProceduresMapper:
             logging.info(
                 f"Found {len(nsb_2019_surgeries)} surgeries "
                 f"from NSB2019 for {subject_id}"
+            )
+
+        if self.slims_water_restriction:
+            slims_water_restrictions = (
+                self._map_slims_response_to_aind_water_restrictions()
+            )
+            subject_procedures.extend(slims_water_restrictions)
+            logging.info(
+                f"Found {len(slims_water_restrictions)} water restrictions "
+                f"from SLIMS for {subject_id}"
             )
 
         if not subject_procedures and not specimen_procedures:
