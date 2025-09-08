@@ -24,8 +24,12 @@ class TestRoute:
     @patch("aind_labtracks_service_async_client.DefaultApi.get_tasks")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_las2020")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2019")
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
     def test_get_procedures_valid_data(
         self,
+        mock_get_protocols: AsyncMock,
+        mock_get_perfusions: AsyncMock,
         mock_nsb2019: AsyncMock,
         mock_las: AsyncMock,
         mock_labtracks: AsyncMock,
@@ -46,6 +50,8 @@ class TestRoute:
         ]
         mock_las.return_value = []
         mock_nsb2019.return_value = []
+        mock_get_perfusions.return_value = []
+        mock_get_protocols.return_value = []
 
         response = client.get("api/v2/procedures/000000")
         assert response.status_code == 200
@@ -53,8 +59,12 @@ class TestRoute:
     @patch("aind_labtracks_service_async_client.DefaultApi.get_tasks")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_las2020")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2019")
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
     def test_get_procedures_invalid_data(
         self,
+        mock_get_protocols: AsyncMock,
+        mock_get_perfusions: AsyncMock,
         mock_nsb2019: AsyncMock,
         mock_las: AsyncMock,
         mock_labtracks: AsyncMock,
@@ -74,6 +84,9 @@ class TestRoute:
             )
         ]
         mock_las.return_value = []
+        mock_get_protocols.return_value = []
+        mock_get_perfusions.return_value = []
+
         with open(EXAMPLE_NSB2019_JSON) as f:
             contents_nsb2019 = json.load(f)
         mock_nsb2019.return_value = [
@@ -86,8 +99,12 @@ class TestRoute:
     @patch("aind_labtracks_service_async_client.DefaultApi.get_tasks")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_las2020")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2019")
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
     def test_get_procedures_no_data(
         self,
+        mock_get_protocols: AsyncMock,
+        mock_get_perfusions: AsyncMock,
         mock_nsb2019: AsyncMock,
         mock_las: AsyncMock,
         mock_labtracks: AsyncMock,
@@ -97,6 +114,8 @@ class TestRoute:
         mock_labtracks.return_value = []
         mock_las.return_value = []
         mock_nsb2019.return_value = []
+        mock_get_perfusions.return_value = []
+        mock_get_protocols.return_value = []
 
         response = client.get("api/v2/procedures/nonexistent_subject")
         assert response.status_code == 404

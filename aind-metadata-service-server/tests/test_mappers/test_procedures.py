@@ -5,9 +5,17 @@ import unittest
 from datetime import date, datetime
 from pathlib import Path
 
-from aind_data_schema.components.injection_procedures import Injection
+from aind_data_schema.components.injection_procedures import (
+    Injection,
+    InjectionDynamics,
+)
 from aind_data_schema.components.subject_procedures import (
     Perfusion,
+)
+from aind_data_schema.components.surgery_procedures import (
+    BrainInjection,
+    Craniotomy,
+    ProtectiveMaterial,
 )
 from aind_data_schema.core.procedures import (
     Procedures,
@@ -23,9 +31,14 @@ from aind_sharepoint_service_async_client.models.las2020_list import (
 from aind_sharepoint_service_async_client.models.nsb2019_list import (
     NSB2019List,
 )
+from aind_smartsheet_service_async_client.models import PerfusionsModel
 
 from aind_metadata_service_server.mappers.procedures import (
     ProceduresMapper,
+    ProtocolNames,
+)
+from aind_metadata_service_server.models import (
+    ProtocolInformation,
 )
 
 TEST_DIR = Path(__file__).parent / ".."
@@ -73,6 +86,21 @@ class TestProcedures(unittest.TestCase):
                 protocol_number="2002",
                 task_status="F",
             ),
+        ]
+        self.perfusions_sheet = [
+            PerfusionsModel(
+                subject_id="115977.0",
+                var_date=date(2023, 10, 2),
+                experimenter="Person S",
+                iacuc_protocol=(
+                    "2109 - Analysis of brain - wide neural circuits in the"
+                    " mouse"
+                ),
+                animal_weight_prior__g="22.0",
+                output_specimen_id_s="115977.0",
+                postfix_solution="1xPBS",
+                notes="Good",
+            )
         ]
         with open(EXAMPLE_LAS2020_JSON) as f:
             las2020_contents = json.load(f)
@@ -136,12 +164,13 @@ class TestProcedures(unittest.TestCase):
             labtracks_tasks=self.labtracks_tasks,
             las_2020=self.las2020,
             nsb_2019=self.nsb2019,
+            smartsheet_perfusion=self.perfusions_sheet,
         )
         procedures = mapper.map_responses_to_aind_procedures("115977")
 
         self.assertIsInstance(procedures, Procedures)
         self.assertEqual(procedures.subject_id, "115977")
-        self.assertEqual(len(procedures.subject_procedures), 6)
+        self.assertEqual(len(procedures.subject_procedures), 7)
         self.assertEqual(len(procedures.specimen_procedures), 0)
 
     def test_map_responses_no_data(self):
@@ -154,6 +183,109 @@ class TestProcedures(unittest.TestCase):
 
         procedures = mapper.map_responses_to_aind_procedures("0")
         self.assertIsNone(procedures)
+
+    def test_integrate_protocols(self):
+        """Tests that protocols are integrated into procedures as expected"""
+        nano_protocol = ProtocolInformation(
+            protocol_type="Surgical Procedures",
+            procedure_name="Injection Nanoject",
+            protocol_name="Injection Nanoject",
+            doi="dx.doi.org/some/doi/1",
+            version=1.0,
+            protocol_collection=None,
+        )
+        surgery_protocol = ProtocolInformation.model_construct(
+            protocol_type="Surgical Procedures",
+            procedure_name="Surgery",
+            protocol_name="Surgery",
+            doi="dx.doi.org/some/doi/2",
+            version=None,
+            protocol_collection=None,
+        )
+        nano_name = "Injection of Viral Tracers by Nanoject V.4"
+        surgery_name = "General Set-Up and Take-Down for Rodent Neurosurgery"
+        protocols_mapping = {
+            nano_name: nano_protocol,
+            surgery_name: surgery_protocol,
+        }
+        dynamics = InjectionDynamics.model_construct(
+            volume=50,
+        )
+        nanoject_inj = BrainInjection.model_construct(dynamics=[dynamics])
+        surgery = Surgery.model_construct(
+            experimenters=["NSB-123"], procedures=[nanoject_inj]
+        )
+        procedures = Procedures.model_construct(
+            subject_id="12345",
+            subject_procedures=[surgery],
+        )
+        merged = ProceduresMapper().integrate_protocols_into_aind_procedures(
+            procedures, protocols_mapping
+        )
+        self.assertEqual(
+            merged.subject_procedures[0].protocol_id, "dx.doi.org/some/doi/2"
+        )
+        self.assertEqual(
+            merged.subject_procedures[0].procedures[0].protocol_id,
+            "dx.doi.org/some/doi/1",
+        )
+
+    def test_integrate_protocols_no_procedures(self):
+        """Tests protocol integration when Surgery has no procedures"""
+        surgery_protocol = ProtocolInformation.model_construct(
+            protocol_type="Surgical Procedures",
+            procedure_name="Surgery",
+            protocol_name="Surgery",
+            doi="dx.doi.org/some/doi/2",
+            version="1.0",
+            protocol_collection=None,
+        )
+        surgery_name = "General Set-Up and Take-Down for Rodent Neurosurgery"
+        protocols_mapping = {
+            surgery_name: surgery_protocol,
+        }
+        surgery = Surgery.model_construct(experimenters=["NSB-123"])
+        procedures = Procedures.model_construct(
+            subject_id="12345", subject_procedures=[surgery]
+        )
+        merged = ProceduresMapper().integrate_protocols_into_aind_procedures(
+            procedures, protocols_mapping
+        )
+        self.assertEqual(
+            merged.subject_procedures[0].protocol_id, "dx.doi.org/some/doi/2"
+        )
+
+    def test_get_protocols_list(self):
+        """Tests that protocols list is created as expected"""
+        ionto_inj = BrainInjection.model_construct(
+            dynamics=[InjectionDynamics.model_construct(injection_current=50)]
+        )
+        cran = Craniotomy.model_construct(
+            protective_material=ProtectiveMaterial.DURAGEL
+        )
+        surgery = Surgery.model_construct(procedures=[ionto_inj, cran])
+        procedures = Procedures.model_construct(
+            subject_id="000000", subject_procedures=[surgery]
+        )
+        protocols_list = ProceduresMapper().get_protocols_list(procedures)
+        expected_list = [
+            ProtocolNames.SURGERY.value,
+            ProtocolNames.INJECTION_IONTOPHORESIS.value,
+            ProtocolNames.DURAGEL_APPLICATION.value,
+        ]
+        self.assertEqual(expected_list, protocols_list)
+
+    def test_get_protocols_list_missing_procedures(self):
+        """Tests protocols list when Surgery has no procedures attribute"""
+        surgery = Surgery.model_construct()
+        procedures = Procedures(
+            subject_id="000000", subject_procedures=[surgery]
+        )
+        protocols_list = ProceduresMapper().get_protocols_list(procedures)
+        expected_list = [
+            ProtocolNames.SURGERY.value,
+        ]
+        self.assertEqual(expected_list, protocols_list)
 
 
 if __name__ == "__main__":
