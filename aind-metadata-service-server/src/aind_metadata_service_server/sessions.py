@@ -5,6 +5,7 @@ from typing import AsyncGenerator
 import aind_labtracks_service_async_client
 import aind_mgi_service_async_client
 import aind_sharepoint_service_async_client
+import aind_slims_service_async_client
 import aind_smartsheet_service_async_client
 from httpx import AsyncClient
 
@@ -22,6 +23,9 @@ sharepoint_config = aind_sharepoint_service_async_client.Configuration(
 )
 smartsheet_config = aind_smartsheet_service_async_client.Configuration(
     host=settings.smartsheet_host.unicode_string().strip("/")
+)
+slims_config = aind_slims_service_async_client.Configuration(
+    host=settings.slims_host.unicode_string().strip("/")
 )
 
 
@@ -94,3 +98,16 @@ async def get_aind_data_schema_v1_session() -> (
         base_url=settings.aind_data_schema_v1_host.unicode_string()
     ) as session:
         yield session
+
+
+async def get_slims_api_instance() -> (
+    AsyncGenerator[aind_slims_service_async_client.DefaultApi, None]
+):
+    """
+    Yield an aind_slims_service_async_client.DefaultApi object.
+    """
+    async with aind_slims_service_async_client.ApiClient(
+        slims_config
+    ) as api_client:
+        api_instance = aind_slims_service_async_client.DefaultApi(api_client)
+        yield api_instance

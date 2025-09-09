@@ -3,16 +3,14 @@
 import logging
 import xml.etree.ElementTree as ET
 from datetime import datetime
-from decimal import Decimal
+from pydantic import ValidationError
 from typing import List, Optional, Union
 
 from aind_data_schema.components.specimen_procedures import (
     SpecimenProcedure,
 )
 from aind_data_schema.components.reagent import (
-    ProbeReagent,
     Reagent,
-    ProteinProbe,
 )
 from aind_data_schema_models.specimen_procedure_types import SpecimenProcedureType
 from aind_data_schema_models.organizations import Organization
@@ -77,9 +75,8 @@ class SpecimenProcedureMapper:
             if procedure_type is None:
                 continue
             elif procedure_type == SpecimenProcedureType.IMMUNOLABELING:
-                specimen_procedures.extend(
-                    self._map_immunolabeling_procedure(data)
-                )
+                # smartspim is not doing immunolabeling
+                continue
             else:
                 specimen_procedures.append(
                     self._map_specimen_procedure(
@@ -97,22 +94,41 @@ class SpecimenProcedureMapper:
         ]
         start_time = data.washes[0].start_time if data.washes else None
         end_time = self._get_last_valid_end_time(data.washes)
-        return SpecimenProcedure.model_construct(
-            specimen_id=data.subject_id,
-            procedure_type=procedure_type,
-            protocol_id=self._parse_html(data.protocol_id),
-            procedure_name=(
-                data.protocol_name
-                if getattr(data, "protocol_name", None)
-                else data.procedure_name
-            ),
-            experimenter_full_name=(
-                data.washes[0].modified_by if data.washes else None
-            ),
-            start_date=start_time.date() if start_time else None,
-            end_date=end_time.date() if end_time else None,
-            reagents=self._map_reagents(reagents),
-        )
+        protocol_id = self._parse_html(data.protocol_id)
+        try: 
+            return SpecimenProcedure(
+                specimen_id=data.subject_id,
+                procedure_type=procedure_type,
+                protocol_id=[protocol_id] if protocol_id else None,
+                procedure_name=(
+                    data.protocol_name
+                    if getattr(data, "protocol_name", None)
+                    else data.procedure_name
+                ),
+                experimenters=(
+                    [data.washes[0].modified_by] if data.washes else None
+                ),
+                start_date=start_time.date() if start_time else None,
+                end_date=end_time.date() if end_time else None,
+                reagents=self._map_reagents(reagents),
+            )
+        except ValidationError:
+            return SpecimenProcedure.model_construct(
+                specimen_id=data.subject_id,
+                procedure_type=procedure_type,
+                protocol_id=[protocol_id] if protocol_id else None,
+                procedure_name=(
+                    data.protocol_name
+                    if getattr(data, "protocol_name", None)
+                    else data.procedure_name
+                ),
+                experimenters=(
+                    [data.washes[0].modified_by] if data.washes else None
+                ),
+                start_date=start_time.date() if start_time else None,
+                end_date=end_time.date() if end_time else None,
+                reagents=self._map_reagents(reagents),
+            )
 
     def _map_reagents(
         self, reagents: List[HistologyReagentData]
@@ -137,74 +153,3 @@ class SpecimenProcedureMapper:
                 return wash.end_time
         return None
 
-    def _map_immunolabeling_procedure(
-        self, data: SlimsHistologyData
-    ) -> List[SpecimenProcedure]:
-        """Maps histology data to SpecimenProcedure for immunolabeling."""
-        immunolabeling_procedures = []
-        for wash in data.washes:
-            immunolabeling_procedures.append(
-                SpecimenProcedure.model_construct(
-                    specimen_id=data.subject_id,
-                    procedure_type=SpecimenProcedureType.IMMUNOLABELING,
-                    protocol_id=self._parse_html(data.protocol_id),
-                    procedure_name=(
-                        data.protocol_name
-                        if getattr(data, "protocol_name", None)
-                        else data.procedure_name
-                    ),
-                    start_date=(
-                        wash.start_time.date() if wash.start_time else None
-                    ),
-                    end_date=wash.end_time.date() if wash.end_time else None,
-                    experimenter_full_name=wash.modified_by,
-                    antibodies=self._map_antibody(wash),
-                )
-            )
-        return immunolabeling_procedures
-
-
-    # TODO: need to figure this out with data-schema
-    def _map_antibody(self, wash: HistologyWashData) -> Optional[ProbeReagent, ]:
-        """Maps immunolabeling antibody"""
-        if wash.wash_name == "Primary Antibody Wash":
-            # label = ImmunolabelClass.PRIMARY
-            mass = getattr(wash, "mass", None)
-            target = ProteinProbe(
-                    protein=PIDName(name="GFP", registry=Registry.UNIPROT, registry_identifier="P42212"),
-                    mass=float(mass) if mass is not None else 0,
-                    mass_unit=MassUnit.UG,
-                    species=Species.CHICKEN,
-                )
-            return ProbeReagent(
-                target=target,
-                name="Chicken polyclonal to GFP",
-                source=None, # can we assume a source? 
-                rrid=PIDName(name="Chicken polyclonal to GFP", registry=Registry.RRID, registry_identifier="ab13970"),
-            )
-
-        elif wash.wash_name == "Secondary Antibody Wash":
-            probe = ProteinProbe(
-                    protein=PIDName(name="TODO", registry=Registry.UNIPROT, registry_identifier="unknown"),
-                    mass=4,
-                    mass_unit="microgram",
-                    species=Species.CHICKEN,
-                )
-
-            fluorophore = Fluorophore(
-                    fluorophore_type=FluorophoreType.ALEXA,
-                    excitation_wavelength=488,
-                    excitation_wavelength_unit=SizeUnit.NM,
-                )
-            return FluorescentStain.model_construct(
-                    name=upgraded_data["rrid"]["name"],
-                    source=None,
-                    stain_type=StainType.PROTEIN,
-                    fluorophore=fluorophore,
-                )
-        else:
-            return None
-        return Antibody.model_construct(
-            immunolabel_class=label,
-            mass=Decimal(wash.mass) if wash.mass else None,
-        )

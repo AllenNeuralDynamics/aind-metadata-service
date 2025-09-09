@@ -14,16 +14,13 @@ from aind_data_schema.components.surgery_procedures import (
     Craniotomy,
     ProtectiveMaterial,
 )
-from aind_data_schema.components.surgery_procedures import (
-    BrainInjection,
-    Craniotomy,
-    ProtectiveMaterial,
-)
+
 from aind_data_schema.core.procedures import (
     Procedures,
     Surgery,
 )
 from aind_data_schema_models.mouse_anatomy import InjectionTargets
+from aind_data_schema_models.units import MassUnit
 from aind_labtracks_service_async_client.models import Task as LabTracksTask
 from aind_sharepoint_service_async_client.models import (
     Las2020List,
@@ -41,6 +38,9 @@ from aind_metadata_service_server.mappers.nsb2019 import (
     MappedNSBList as MappedNSB2019,
 )
 from aind_metadata_service_server.mappers.perfusion import PerfusionMapper
+from aind_metadata_service_server.mappers.specimen_procedures import (
+    SpecimenProcedureMapper,
+)
 
 class LabTracksTaskStatuses(Enum):
     """LabTracks Task Status Options"""
@@ -223,6 +223,30 @@ class ProceduresMapper:
                 )
             water_restrictions.append(wr)
         return water_restrictions
+    
+    @staticmethod
+    def _parse_mass_unit(
+        value: Optional[str],
+    ) -> Optional[Union[MassUnit, str]]:
+        """Parse mass unit from string to MassUnit enum."""
+        mass_unit_abbreviations = {
+            "kg": MassUnit.KG,
+            "g": MassUnit.G,
+            "mg": MassUnit.MG,
+            "ug": MassUnit.UG,
+            "µg": MassUnit.UG,
+            "ng": MassUnit.NG,
+        }
+        if not value:
+            return MassUnit.G
+        else:
+            try:
+                return mass_unit_abbreviations[value.lower()]
+            except KeyError:
+                logging.warning(
+                    f"Mass unit {value} not recognized. Returning it as is."
+                )
+                return value
 
 
     @staticmethod
@@ -338,23 +362,33 @@ class ProceduresMapper:
                 f"from SLIMS for {subject_id}"
             )
 
-        if self.slims_water_restriction:
-            slims_water_restrictions = (
-                self._map_slims_response_to_aind_water_restrictions()
+        if self.slims_histology:
+            sp_mapper = SpecimenProcedureMapper(
+                slims_histology=self.slims_histology
             )
-            subject_procedures.extend(slims_water_restrictions)
+            slims_specimen_procedures = (
+                sp_mapper.map_slims_response_to_aind_specimen_procedures()
+            )
+            specimen_procedures.extend(slims_specimen_procedures)
             logging.info(
-                f"Found {len(slims_water_restrictions)} water restrictions "
+                f"Found {len(slims_specimen_procedures)} specimen procedures "
                 f"from SLIMS for {subject_id}"
             )
-
+        
         if not subject_procedures and not specimen_procedures:
             return None
-        return Procedures(
-            subject_id=subject_id,
-            subject_procedures=subject_procedures,
-            specimen_procedures=specimen_procedures,
-        )
+        try:
+            return Procedures(
+                subject_id=subject_id,
+                subject_procedures=subject_procedures,
+                specimen_procedures=specimen_procedures,
+            )
+        except Exception as e:
+            return Procedures.model_construct(
+                subject_id=subject_id,
+                subject_procedures=subject_procedures,
+                specimen_procedures=specimen_procedures,
+            )
 
     @staticmethod
     def _get_protocol_name(procedure):

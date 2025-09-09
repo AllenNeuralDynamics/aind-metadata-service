@@ -8,6 +8,7 @@ from aind_metadata_service_server.sessions import (
     get_labtracks_api_instance,
     get_sharepoint_api_instance,
     get_smartsheet_api_instance,
+    get_slims_api_instance,
 )
 
 router = APIRouter()
@@ -32,20 +33,27 @@ async def get_procedures(
     ),
     labtracks_api_instance=Depends(get_labtracks_api_instance),
     sharepoint_api_instance=Depends(get_sharepoint_api_instance),
+    slims_api_instance=Depends(get_slims_api_instance),
     smartsheet_api_instance=Depends(get_smartsheet_api_instance),
 ):
     """
     ## Procedures
     Return Procedure metadata.
     """
-    labtracks_response = await labtracks_api_instance.get_tasks(
-        subject_id, _request_timeout=10
-    )
+    # labtracks_response = await labtracks_api_instance.get_tasks(
+    #     subject_id, _request_timeout=10
+    # )
     las_2020_response = await sharepoint_api_instance.get_las2020(
         subject_id, _request_timeout=20
     )
     nsb_2019_response = await sharepoint_api_instance.get_nsb2019(
         subject_id, _request_timeout=10
+    )
+    slims_wr_response = await slims_api_instance.get_water_restriction_data(
+        subject_id, _request_timeout=30
+    )
+    slims_histology_response = await slims_api_instance.get_histology_data(
+        subject_id, _request_timeout=30
     )
     smartsheet_perfusion_response = (
         await smartsheet_api_instance.get_perfusions(
@@ -53,9 +61,11 @@ async def get_procedures(
         )
     )
     mapper = ProceduresMapper(
-        labtracks_tasks=labtracks_response,
+        #labtracks_tasks=labtracks_response,
         las_2020=las_2020_response,
         nsb_2019=nsb_2019_response,
+        slims_water_restriction=slims_wr_response,
+        slims_histology=slims_histology_response,
         smartsheet_perfusion=smartsheet_perfusion_response,
     )
     procedures = mapper.map_responses_to_aind_procedures(subject_id)
