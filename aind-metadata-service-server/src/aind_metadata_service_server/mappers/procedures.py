@@ -9,6 +9,16 @@ from aind_data_schema.components.subject_procedures import (
     Perfusion,
     WaterRestriction
 )
+from aind_data_schema.components.surgery_procedures import (
+    BrainInjection,
+    Craniotomy,
+    ProtectiveMaterial,
+)
+from aind_data_schema.components.surgery_procedures import (
+    BrainInjection,
+    Craniotomy,
+    ProtectiveMaterial,
+)
 from aind_data_schema.core.procedures import (
     Procedures,
     Surgery,
@@ -19,6 +29,7 @@ from aind_sharepoint_service_async_client.models import (
     Las2020List,
     NSB2019List,
 )
+from aind_smartsheet_service_async_client.models import PerfusionsModel
 from aind_slims_service_async_client.models import (
     SlimsHistologyData,
     SlimsWaterRestrictionData,
@@ -29,6 +40,7 @@ from aind_metadata_service_server.mappers.las2020 import (
 from aind_metadata_service_server.mappers.nsb2019 import (
     MappedNSBList as MappedNSB2019,
 )
+from aind_metadata_service_server.mappers.perfusion import PerfusionMapper
 
 class LabTracksTaskStatuses(Enum):
     """LabTracks Task Status Options"""
@@ -90,6 +102,7 @@ class ProceduresMapper:
         labtracks_tasks: List[LabTracksTask] = [],
         las_2020: List[Las2020List] = [],
         nsb_2019: List[NSB2019List] = [],
+        smartsheet_perfusion: List[PerfusionsModel] = [],
         slims_water_restriction: List[SlimsWaterRestrictionData] = [],
         slims_histology: List[SlimsHistologyData] = [],
     ):
@@ -102,6 +115,7 @@ class ProceduresMapper:
         self.labtracks_tasks = labtracks_tasks
         self.las_2020 = las_2020
         self.nsb_2019 = nsb_2019
+        self.smartsheet_perfusion = smartsheet_perfusion
         self.slims_water_restriction = slims_water_restriction
         self.slims_histology = slims_histology
 
@@ -299,6 +313,30 @@ class ProceduresMapper:
                 f"Found {len(nsb_2019_surgeries)} surgeries "
                 f"from NSB2019 for {subject_id}"
             )
+        if self.smartsheet_perfusion:
+            perfusion_mappers = [
+                PerfusionMapper(smartsheet_perfusion=smartsheet_perfusion)
+                for smartsheet_perfusion in self.smartsheet_perfusion
+            ]
+            smartsheet_perfusion_procedures = [
+                perfusion_mapper.map_to_aind_surgery()
+                for perfusion_mapper in perfusion_mappers
+            ]
+            subject_procedures.extend(smartsheet_perfusion_procedures)
+            logging.info(
+                f"Found {len(smartsheet_perfusion_procedures)} perfusions "
+                f"from Smartsheet for {subject_id}"
+            )
+
+        if self.slims_water_restriction:
+            slims_water_restrictions = (
+                self._map_slims_response_to_aind_water_restrictions()
+            )
+            subject_procedures.extend(slims_water_restrictions)
+            logging.info(
+                f"Found {len(slims_water_restrictions)} water restrictions "
+                f"from SLIMS for {subject_id}"
+            )
 
         if self.slims_water_restriction:
             slims_water_restrictions = (
@@ -317,3 +355,61 @@ class ProceduresMapper:
             subject_procedures=subject_procedures,
             specimen_procedures=specimen_procedures,
         )
+
+    @staticmethod
+    def _get_protocol_name(procedure):
+        """Gets protocol name based on procedure type"""
+        if isinstance(procedure, BrainInjection):
+            if getattr(procedure, "dynamics", []):
+                if getattr(procedure.dynamics[0], "volume", None):
+                    return ProtocolNames.INJECTION_NANOJECT.value
+                elif getattr(procedure.dynamics[0], "injection_current", None):
+                    return ProtocolNames.INJECTION_IONTOPHORESIS.value
+        elif isinstance(procedure, Perfusion):
+            return ProtocolNames.PERFUSION.value
+        elif isinstance(procedure, Craniotomy):
+            if procedure.protective_material == ProtectiveMaterial.DURAGEL:
+                return ProtocolNames.DURAGEL_APPLICATION.value
+        else:
+            return None
+
+    def get_protocols_list(self, procedures: Procedures) -> list:
+        """Creates a list of protocol names from procedures list"""
+        protocol_list = []
+        for subject_procedure in procedures.subject_procedures:
+            if isinstance(subject_procedure, Surgery):
+                protocol_list.append(ProtocolNames.SURGERY.value)
+            if not hasattr(subject_procedure, "procedures"):
+                continue
+            for procedure in subject_procedure.procedures:
+                protocol_name = self._get_protocol_name(procedure)
+                if protocol_name:
+                    protocol_list.append(protocol_name)
+        return protocol_list
+
+    def integrate_protocols_into_aind_procedures(
+        self, procedures: Procedures, protocols_mapping: dict
+    ) -> Procedures:
+        """
+        Merges protocols responses with procedures response.
+        protocols_mapping: dict of protocol_name -> ProtocolsModel
+        """
+        for subject_procedure in procedures.subject_procedures:
+            if (
+                isinstance(subject_procedure, Surgery)
+                and hasattr(subject_procedure, "experimenters")
+                and getattr(subject_procedure, "experimenters", [])
+                and "NSB" in subject_procedure.experimenters[0]
+            ):
+                protocol_name = ProtocolNames.SURGERY.value
+                protocol_model = protocols_mapping.get(protocol_name)
+                if protocol_model and getattr(protocol_model, "doi", None):
+                    subject_procedure.protocol_id = protocol_model.doi
+            if not hasattr(subject_procedure, "procedures"):
+                continue
+            for procedure in subject_procedure.procedures:
+                protocol_name = self._get_protocol_name(procedure)
+                protocol_model = protocols_mapping.get(protocol_name)
+                if protocol_model and getattr(protocol_model, "doi", None):
+                    procedure.protocol_id = protocol_model.doi
+        return procedures

@@ -15,12 +15,6 @@ from aind_data_schema.components.reagent import (
     ProteinProbe,
 )
 from aind_data_schema_models.specimen_procedure_types import SpecimenProcedureType
-
-from aind_data_schema.core.procedures import (
-    Antibody,
-    ImmunolabelClass,
-    Reagent,
-)
 from aind_data_schema_models.organizations import Organization
 from aind_slims_service_async_client.models import (
     HistologyReagentData,

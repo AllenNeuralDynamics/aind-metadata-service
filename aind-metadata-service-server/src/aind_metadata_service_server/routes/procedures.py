@@ -7,6 +7,7 @@ from aind_metadata_service_server.mappers.responses import map_to_response
 from aind_metadata_service_server.sessions import (
     get_labtracks_api_instance,
     get_sharepoint_api_instance,
+    get_smartsheet_api_instance,
 )
 
 router = APIRouter()
@@ -31,6 +32,7 @@ async def get_procedures(
     ),
     labtracks_api_instance=Depends(get_labtracks_api_instance),
     sharepoint_api_instance=Depends(get_sharepoint_api_instance),
+    smartsheet_api_instance=Depends(get_smartsheet_api_instance),
 ):
     """
     ## Procedures
@@ -45,13 +47,32 @@ async def get_procedures(
     nsb_2019_response = await sharepoint_api_instance.get_nsb2019(
         subject_id, _request_timeout=10
     )
+    smartsheet_perfusion_response = (
+        await smartsheet_api_instance.get_perfusions(
+            subject_id, _request_timeout=10
+        )
+    )
     mapper = ProceduresMapper(
         labtracks_tasks=labtracks_response,
         las_2020=las_2020_response,
         nsb_2019=nsb_2019_response,
+        smartsheet_perfusion=smartsheet_perfusion_response,
     )
     procedures = mapper.map_responses_to_aind_procedures(subject_id)
     if not procedures:
         raise HTTPException(status_code=404, detail="Not found")
     else:
+        # integrate protocols from smartsheet
+        protocol_names = mapper.get_protocols_list(procedures)
+        protocols_mapping = {}
+        for protocol_name in protocol_names:
+            protocol_records = await smartsheet_api_instance.get_protocols(
+                protocol_name=protocol_name
+            )
+            protocols_mapping[protocol_name] = (
+                protocol_records[0] if protocol_records else None
+            )
+        procedures = mapper.integrate_protocols_into_aind_procedures(
+            procedures, protocols_mapping
+        )
         return map_to_response(procedures)
