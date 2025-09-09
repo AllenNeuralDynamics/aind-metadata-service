@@ -1269,12 +1269,8 @@ class MappedNSBList:
             None
             if fiber_type is None
             else {
-                fiber_type.STANDARD_PROVIDED_BY_NSB: (
-                    FiberType.STANDARD
-                ),
-                fiber_type.CUSTOM: (
-                    FiberType.CUSTOM
-                ),
+                fiber_type.STANDARD_PROVIDED_BY_NSB: (FiberType.STANDARD),
+                fiber_type.CUSTOM: (FiberType.CUSTOM),
             }.get(fiber_type, None)
         )
 
@@ -2926,9 +2922,7 @@ class MappedNSBList:
                 BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
                 BurrHoleProcedure.FIBER_IMPLANT,
             }:
-                burr = self.burr_hole_info(
-                    burr_hole_num=burr_hole_num
-                )
+                burr = self.burr_hole_info(burr_hole_num=burr_hole_num)
                 if burr.during == During.INITIAL:
                     initial_measurements.append(
                         IntendedMeasurementandCoords(
