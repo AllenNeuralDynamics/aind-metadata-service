@@ -3,11 +3,15 @@
 from fastapi import APIRouter, Depends, HTTPException, Path
 
 from aind_metadata_service_server.mappers.procedures import ProceduresMapper
+from aind_metadata_service_server.mappers.injection_materials import (
+    InjectionMaterialsMapper,
+)
 from aind_metadata_service_server.mappers.responses import map_to_response
 from aind_metadata_service_server.sessions import (
     get_labtracks_api_instance,
     get_sharepoint_api_instance,
     get_smartsheet_api_instance,
+    get_tars_api_instance,
 )
 
 router = APIRouter()
@@ -33,6 +37,7 @@ async def get_procedures(
     labtracks_api_instance=Depends(get_labtracks_api_instance),
     sharepoint_api_instance=Depends(get_sharepoint_api_instance),
     smartsheet_api_instance=Depends(get_smartsheet_api_instance),
+    tars_api_instance=Depends(get_tars_api_instance),
 ):
     """
     ## Procedures
@@ -75,4 +80,24 @@ async def get_procedures(
         procedures = mapper.integrate_protocols_into_aind_procedures(
             procedures, protocols_mapping
         )
+        viruses = mapper.get_virus_strains(procedures)
+    tars_mapping = {}
+    for virus_strain in viruses:
+        tars_prep_lot_response = await tars_api_instance.get_viral_prep_lots(
+            lot=virus_strain, _request_timeout=10
+        )
+        tars_mappers = [
+            InjectionMaterialsMapper(prep_lot_data=prep_lot_data)
+            for prep_lot_data in tars_prep_lot_response
+        ]
+        for tars_mapper in tars_mappers:
+            virus_id = tars_mapper.virus_id
+            if virus_id:
+                virus_response = await tars_api_instance.get_viruses(
+                    name=virus_id, _request_timeout=10
+                )
+                tars_mapper.virus_data = virus_response
+            tars_mapping[virus_strain] = (
+                tars_mapper.map_to_viral_material_information()
+            )
         return map_to_response(procedures)
