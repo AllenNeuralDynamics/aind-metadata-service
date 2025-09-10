@@ -12,7 +12,9 @@ from aind_data_schema.components.specimen_procedures import (
 from aind_data_schema.components.reagent import (
     Reagent,
 )
-from aind_data_schema_models.specimen_procedure_types import SpecimenProcedureType
+from aind_data_schema_models.specimen_procedure_types import (
+    SpecimenProcedureType,
+)
 from aind_data_schema_models.organizations import Organization
 from aind_slims_service_async_client.models import (
     HistologyReagentData,
@@ -95,7 +97,7 @@ class SpecimenProcedureMapper:
         start_time = data.washes[0].start_time if data.washes else None
         end_time = self._get_last_valid_end_time(data.washes)
         protocol_id = self._parse_html(data.protocol_id)
-        try: 
+        try:
             return SpecimenProcedure(
                 specimen_id=data.subject_id,
                 procedure_type=procedure_type,
@@ -152,4 +154,3 @@ class SpecimenProcedureMapper:
             if wash.wash_type and wash.end_time:
                 return wash.end_time
         return None
-

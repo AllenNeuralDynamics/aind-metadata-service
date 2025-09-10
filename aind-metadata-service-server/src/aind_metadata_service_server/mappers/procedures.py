@@ -7,7 +7,7 @@ from typing import List, Optional, Union
 from aind_data_schema.components.injection_procedures import Injection
 from aind_data_schema.components.subject_procedures import (
     Perfusion,
-    WaterRestriction
+    WaterRestriction,
 )
 from aind_data_schema.components.surgery_procedures import (
     BrainInjection,
@@ -41,6 +41,7 @@ from aind_metadata_service_server.mappers.perfusion import PerfusionMapper
 from aind_metadata_service_server.mappers.specimen_procedures import (
     SpecimenProcedureMapper,
 )
+
 
 class LabTracksTaskStatuses(Enum):
     """LabTracks Task Status Options"""
@@ -197,7 +198,7 @@ class ProceduresMapper:
             )
 
         return None
-    
+
     def _map_slims_response_to_aind_water_restrictions(
         self,
     ) -> List[WaterRestriction]:
@@ -220,10 +221,10 @@ class ProceduresMapper:
                 ),
                 weight_unit=self._parse_mass_unit(data.weight_unit),
                 minimum_water_per_day=float("1.0"),  # default value
-                )
+            )
             water_restrictions.append(wr)
         return water_restrictions
-    
+
     @staticmethod
     def _parse_mass_unit(
         value: Optional[str],
@@ -247,7 +248,6 @@ class ProceduresMapper:
                     f"Mass unit {value} not recognized. Returning it as is."
                 )
                 return value
-
 
     @staticmethod
     def map_sharepoint_response_to_aind_surgeries(
@@ -374,21 +374,14 @@ class ProceduresMapper:
                 f"Found {len(slims_specimen_procedures)} specimen procedures "
                 f"from SLIMS for {subject_id}"
             )
-        
+
         if not subject_procedures and not specimen_procedures:
             return None
-        try:
-            return Procedures(
-                subject_id=subject_id,
-                subject_procedures=subject_procedures,
-                specimen_procedures=specimen_procedures,
-            )
-        except Exception as e:
-            return Procedures.model_construct(
-                subject_id=subject_id,
-                subject_procedures=subject_procedures,
-                specimen_procedures=specimen_procedures,
-            )
+        return Procedures(
+            subject_id=subject_id,
+            subject_procedures=subject_procedures,
+            specimen_procedures=specimen_procedures,
+        )
 
     @staticmethod
     def _get_protocol_name(procedure):

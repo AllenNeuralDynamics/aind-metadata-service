@@ -2,10 +2,11 @@
 
 import unittest
 from datetime import datetime
-from decimal import Decimal
 from unittest.mock import patch
 
-from aind_data_schema.core.procedures import SpecimenProcedureType
+from aind_data_schema_models.specimen_procedure_types import (
+    SpecimenProcedureType,
+)
 from aind_slims_service_async_client.models import (
     HistologyReagentData,
     HistologyWashData,
@@ -205,18 +206,12 @@ class TestSpecimenProcedureMapper(unittest.TestCase):
         ]
         mapper = SpecimenProcedureMapper(slims_hist_data)
         procedures = mapper.map_slims_response_to_aind_specimen_procedures()
-        self.assertEqual(len(procedures), 4)
+        self.assertEqual(len(procedures), 2)
         self.assertEqual(
             procedures[0].procedure_type, SpecimenProcedureType.DELIPIDATION
         )
         self.assertEqual(
-            procedures[1].procedure_type, SpecimenProcedureType.IMMUNOLABELING
-        )
-        self.assertEqual(
-            procedures[2].procedure_type, SpecimenProcedureType.IMMUNOLABELING
-        )
-        self.assertEqual(
-            procedures[3].procedure_type,
+            procedures[1].procedure_type,
             SpecimenProcedureType.REFRACTIVE_INDEX_MATCHING,
         )
 
