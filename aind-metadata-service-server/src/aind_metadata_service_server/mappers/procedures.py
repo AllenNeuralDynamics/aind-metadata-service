@@ -284,21 +284,6 @@ class ProceduresMapper:
                 f"Found {len(nsb_2019_surgeries)} surgeries "
                 f"from NSB2019 for {subject_id}"
             )
-        if self.smartsheet_perfusion:
-            perfusion_mappers = [
-                PerfusionMapper(smartsheet_perfusion=smartsheet_perfusion)
-                for smartsheet_perfusion in self.smartsheet_perfusion
-            ]
-            smartsheet_perfusion_procedures = [
-                perfusion_mapper.map_to_aind_surgery()
-                for perfusion_mapper in perfusion_mappers
-            ]
-            subject_procedures.extend(smartsheet_perfusion_procedures)
-            logging.info(
-                f"Found {len(smartsheet_perfusion_procedures)} perfusions "
-                f"from Smartsheet for {subject_id}"
-            )
-
         if self.nsb_2023:
             nsb_2023_surgeries = (
                 self.map_sharepoint_response_to_aind_surgeries(
@@ -323,6 +308,20 @@ class ProceduresMapper:
             logging.info(
                 f"Found {len(nsb_present_surgeries)} surgeries "
                 f"from NSB Present for {subject_id}"
+            )
+        if self.smartsheet_perfusion:
+            perfusion_mappers = [
+                PerfusionMapper(smartsheet_perfusion=smartsheet_perfusion)
+                for smartsheet_perfusion in self.smartsheet_perfusion
+            ]
+            smartsheet_perfusion_procedures = [
+                perfusion_mapper.map_to_aind_surgery()
+                for perfusion_mapper in perfusion_mappers
+            ]
+            subject_procedures.extend(smartsheet_perfusion_procedures)
+            logging.info(
+                f"Found {len(smartsheet_perfusion_procedures)} perfusions "
+                f"from Smartsheet for {subject_id}"
             )
 
         if not subject_procedures and not specimen_procedures:
