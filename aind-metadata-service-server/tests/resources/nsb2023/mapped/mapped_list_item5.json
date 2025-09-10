@@ -10,8 +10,14 @@
         "animal_weight_prior": 25.2,
         "animal_weight_post": 28.2,
         "weight_unit": "gram",
-        "anaesthesia": null,
-        "workstation_id": null,
+        "anaesthesia": {
+         "object_type": "Anaesthetic",
+         "anaesthetic_type": "isoflurane",
+         "duration": 90.0,
+         "duration_unit": "minute",
+         "level": 2.0
+      },
+      "workstation_id": "SWS 3",
         "coordinate_system": {
             "object_type": "Coordinate system",
             "name": "BREGMA_ARID",

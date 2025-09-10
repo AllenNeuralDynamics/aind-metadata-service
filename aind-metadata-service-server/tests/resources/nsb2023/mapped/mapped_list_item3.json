@@ -162,7 +162,13 @@
         "animal_weight_prior": 28.2,
         "animal_weight_post": null,
         "weight_unit": "gram",
-        "anaesthesia": null,
+        "anaesthesia": {
+            "object_type": "Anaesthetic",
+            "anaesthetic_type": "isoflurane",
+            "duration": 120.0,
+            "duration_unit": "minute",
+            "level": 2.5
+        },
         "workstation_id": null,
         "coordinate_system": {
             "object_type": "Coordinate system",

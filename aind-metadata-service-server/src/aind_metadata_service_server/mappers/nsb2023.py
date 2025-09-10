@@ -141,13 +141,13 @@ class SurgeryDuringInfo:
     """Container for information related to surgeries during initial or
     follow-up sessions"""
 
-    anaesthetic_duration_in_minutes: Optional[Decimal] = None
-    anaesthetic_level: Optional[Decimal] = None
+    anaesthetic_duration_in_minutes: Optional[float] = None
+    anaesthetic_level: Optional[float] = None
     start_date: Optional[datetime] = None
     workstation_id: Optional[str] = None
-    recovery_time: Optional[Decimal] = None
-    weight_prior: Optional[Decimal] = None
-    weight_post: Optional[Decimal] = None
+    recovery_time: Optional[float] = None
+    weight_prior: Optional[float] = None
+    weight_post: Optional[float] = None
 
 
 @dataclass
@@ -1721,12 +1721,14 @@ class MappedNSBList:
         return self._map_float_to_decimal(self._nsb.first_inj_recovery)
 
     @property
-    def aind_first_injection_iso_durat(self) -> Optional[Decimal]:
+    def aind_first_injection_iso_durat(self) -> Optional[float]:
         """Maps first_injection_iso_durat to aind model"""
         optional_decimal = self._map_float_to_decimal(
             self._nsb.first_injection_iso_duration
         )
-        return None if optional_decimal is None else optional_decimal * 60
+        return (
+            None if optional_decimal is None else float(optional_decimal * 60)
+        )
 
     @property
     def aind_first_injection_weight_af(self) -> Optional[Decimal]:
@@ -2406,9 +2408,7 @@ class MappedNSBList:
             NSB2023Procedure.DHC,
         }
 
-    def surgery_during_info(
-        self, during: During, inj_type: Optional[InjectionType] = None
-    ) -> SurgeryDuringInfo:
+    def surgery_during_info(self, during: During) -> SurgeryDuringInfo:
         """
         Compiles burr hole information from NSB data
         Parameters
@@ -3107,6 +3107,24 @@ class MappedNSBList:
                 transforms.append([translation, rotation])
         return transforms
 
+    @staticmethod
+    def _map_anaesthetic(
+        duration: Optional[Decimal], level: Optional[Decimal]
+    ) -> Anaesthetic:
+        """Maps anaesthetic information."""
+        try:
+            return Anaesthetic(
+                anaesthetic_type="isoflurane",
+                duration=duration,
+                level=level,
+            )
+        except ValidationError:
+            return Anaesthetic.model_construct(
+                anaesthetic_type="isoflurane",
+                duration=duration,
+                level=level,
+            )
+
     def get_surgeries(self) -> List[Surgery]:
         """Get a List of Surgeries."""
 
@@ -3174,22 +3192,10 @@ class MappedNSBList:
                     well_type=headpost_info.well_type,
                     well_part_number=headpost_info.well_part_number,
                 )
-            try:
-                anaesthesia = Anaesthetic(
-                    anaesthetic_type="isoflurane",
-                    duration=(
-                        hf_surgery_during_info.anaesthetic_duration_in_minutes
-                    ),
-                    level=hf_surgery_during_info.anaesthetic_level,
-                )
-            except ValidationError:
-                anaesthesia = Anaesthetic.model_construct(
-                    anaesthetic_type="isoflurane",
-                    duration=(
-                        hf_surgery_during_info.anaesthetic_duration_in_minutes
-                    ),
-                    level=hf_surgery_during_info.anaesthetic_level,
-                )
+            anaesthesia = self._map_anaesthetic(
+                hf_surgery_during_info.anaesthetic_duration_in_minutes,
+                hf_surgery_during_info.anaesthetic_level,
+            )
 
             if hp_during == During.INITIAL:
                 initial_anaesthesia = anaesthesia
@@ -3204,6 +3210,7 @@ class MappedNSBList:
 
         if self.has_cran_procedure():
             cran_during = self.aind_craniotomy_perform_d
+            cran_surgery_during_info = self.surgery_during_info(cran_during)
             implant_part_number = self.aind_implant_id_coverslip_type
             headpost_info = HeadPostInfo.from_hp_and_hp_type(
                 hp=self.aind_headpost, hp_type=self.aind_headpost_type
@@ -3254,10 +3261,18 @@ class MappedNSBList:
                     well_type=headpost_info.well_type,
                     well_part_number=headpost_info.well_part_number,
                 )
+            anaesthesia = self._map_anaesthetic(
+                cran_surgery_during_info.anaesthetic_duration_in_minutes,
+                cran_surgery_during_info.anaesthetic_level,
+            )
             if cran_during == During.INITIAL:
+                initial_anaesthesia = anaesthesia
+                initial_workstation_id = self.aind_hp_work_station
                 initial_procedures.append(cran_procedure)
                 initial_procedures.append(headframe_procedure)
             elif cran_during == During.FOLLOW_UP:
+                followup_anaesthesia = anaesthesia
+                followup_workstation_id = self.aind_hp_work_station
                 followup_procedures.append(cran_procedure)
                 followup_procedures.append(headframe_procedure)
             else:
@@ -3268,6 +3283,9 @@ class MappedNSBList:
         for burr_hole_num in range(1, 7):
             burr_hole_type = getattr(self, f"aind_burr_hole_{burr_hole_num}")
             burr_hole_info = self.burr_hole_info(burr_hole_num)
+            burr_during_info = self.surgery_during_info(
+                during=burr_hole_info.during,
+            )
             # Use correct coordinate system for transforms
             if burr_hole_info.during == During.INITIAL:
                 surgery_coord_system = initial_coord_system
@@ -3297,6 +3315,10 @@ class MappedNSBList:
                     burr_hole_info.inj_materials
                 )
                 dynamics = []
+                anaesthesia = self._map_anaesthetic(
+                    burr_during_info.anaesthetic_duration_in_minutes,
+                    burr_during_info.anaesthetic_level,
+                )
                 if burr_hole_info.inj_type == InjectionType.IONTOPHORESIS:
                     try:
                         dynamics_obj = InjectionDynamics(
@@ -3378,8 +3400,12 @@ class MappedNSBList:
                         coordinates=transforms,
                     )
                 if burr_hole_info.during == During.INITIAL:
+                    initial_anaesthesia = anaesthesia
+                    initial_workstation_id = burr_during_info.workstation_id
                     initial_procedures.append(injection_proc)
                 elif burr_hole_info.during == During.FOLLOW_UP:
+                    followup_anaesthesia = anaesthesia
+                    followup_workstation_id = burr_during_info.workstation_id
                     followup_procedures.append(injection_proc)
                 else:
                     other_procedures.append(injection_proc)
@@ -3418,8 +3444,12 @@ class MappedNSBList:
                     ),
                 )
                 if burr_hole_info.during == During.INITIAL:
+                    initial_anaesthesia = anaesthesia
+                    initial_workstation_id = burr_during_info.workstation_id
                     initial_procedures.append(probe_implant_proc)
                 elif burr_hole_info.during == During.FOLLOW_UP:
+                    followup_anaesthesia = anaesthesia
+                    followup_workstation_id = burr_during_info.workstation_id
                     followup_procedures.append(probe_implant_proc)
                 else:
                     other_procedures.append(probe_implant_proc)
@@ -3444,7 +3474,7 @@ class MappedNSBList:
                     measured_coordinates=measured_coordinates,
                     coordinate_system=initial_coord_system,
                 )
-            except ValidationError:
+            except (ValidationError, TypeError):
                 initial_surgery = Surgery.model_construct(
                     start_date=initial_start_date,
                     experimenters=[initial_surgeon],
