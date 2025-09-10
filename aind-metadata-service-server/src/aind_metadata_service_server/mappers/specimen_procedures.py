@@ -1,4 +1,4 @@
-"""Maps information to aind-data-schema Procedures model."""
+"""Maps information to aind-data-schema SpecimenProcedure model."""
 
 import logging
 import xml.etree.ElementTree as ET
