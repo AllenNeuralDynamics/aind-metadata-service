@@ -87,7 +87,7 @@ async def get_procedures(
             lot=virus_strain, _request_timeout=10
         )
         tars_mappers = [
-            InjectionMaterialsMapper(prep_lot_data=prep_lot_data)
+            InjectionMaterialsMapper(tars_prep_lot_data=prep_lot_data)
             for prep_lot_data in tars_prep_lot_response
         ]
         for tars_mapper in tars_mappers:
@@ -96,7 +96,7 @@ async def get_procedures(
                 virus_response = await tars_api_instance.get_viruses(
                     name=virus_id, _request_timeout=10
                 )
-                tars_mapper.virus_data = virus_response
+                tars_mapper.tars_virus_data = virus_response
             tars_mapping[virus_strain] = (
                 tars_mapper.map_to_viral_material_information()
             )
