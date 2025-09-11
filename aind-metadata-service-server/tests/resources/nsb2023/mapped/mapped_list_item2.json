@@ -42,10 +42,10 @@
          "axis_unit": "millimeter"
       },
       "measured_coordinates": {
-         "Bregma": {
+         "Lambda": {
             "object_type": "Translation",
             "translation": [
-               6.1,
+               -6.1,
                0.0,
                0.0
             ]

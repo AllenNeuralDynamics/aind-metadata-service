@@ -2991,12 +2991,12 @@ class MappedNSBList:
 
         name = surgery_coordinate_system.name
         if name.startswith("LAMBDA"):
-            origin = Origin.LAMBDA
-            dist = -abs(b2l_dist)
-            return {origin: Translation(translation=[dist, 0, 0])}
-        elif name.startswith("BREGMA"):
             origin = Origin.BREGMA
             dist = b2l_dist
+            return {origin: Translation(translation=[dist, 0, 0])}
+        elif name.startswith("BREGMA"):
+            origin = Origin.LAMBDA
+            dist = -(abs(b2l_dist))
             return {origin: Translation(translation=[dist, 0, 0])}
         else:
             return None

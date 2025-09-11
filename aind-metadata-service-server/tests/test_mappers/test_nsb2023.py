@@ -402,7 +402,7 @@ class TestNSB2023Parsers(TestCase):
             b2l_dist=4.1, surgery_coordinate_system=lambda_ari
         )
         expected_measured_coordinates = {
-            Origin.LAMBDA: Translation(translation=[-4.1, 0.0, 0.0])
+            Origin.BREGMA: Translation(translation=[4.1, 0.0, 0.0])
         }
         self.assertEqual(lambda_case, expected_measured_coordinates)
         self.assertIsNone(
