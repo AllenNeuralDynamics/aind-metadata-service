@@ -4,6 +4,7 @@ import json
 import unittest
 from datetime import date, datetime
 from pathlib import Path
+from unittest.mock import patch
 
 from aind_data_schema.components.injection_procedures import (
     Injection,
@@ -21,15 +22,15 @@ from aind_data_schema.core.procedures import (
     Procedures,
     Surgery,
 )
+from aind_data_schema.utils.validators import CoordinateSystemException
 from aind_data_schema_models.mouse_anatomy import InjectionTargets
 from aind_labtracks_service_async_client.models.task import (
     Task as LabTracksTask,
 )
-from aind_sharepoint_service_async_client.models.las2020_list import (
+from aind_sharepoint_service_async_client.models import (
     Las2020List,
-)
-from aind_sharepoint_service_async_client.models.nsb2019_list import (
     NSB2019List,
+    NSB2023List,
 )
 from aind_smartsheet_service_async_client.models import PerfusionsModel
 
@@ -47,6 +48,9 @@ EXAMPLE_LAS2020_JSON = (
 )
 EXAMPLE_NSB2019_JSON = (
     TEST_DIR / "resources" / "nsb2019" / "raw" / "list_item1.json"
+)
+EXAMPLE_NSB2023_JSON = (
+    TEST_DIR / "resources" / "nsb2023" / "raw" / "list_item1.json"
 )
 
 
@@ -108,6 +112,9 @@ class TestProcedures(unittest.TestCase):
         with open(EXAMPLE_NSB2019_JSON) as f:
             nsb2019_contents = json.load(f)
         self.nsb2019 = [NSB2019List.model_validate(nsb2019_contents)]
+        with open(EXAMPLE_NSB2023_JSON) as f:
+            nsb2023_contents = json.load(f)
+        self.nsb_2023 = [NSB2023List.model_validate(nsb2023_contents)]
 
     def test_map_labtracks_unknown_task_to_none(self):
         """Test mapping LabTracksTask to None"""
@@ -165,12 +172,14 @@ class TestProcedures(unittest.TestCase):
             las_2020=self.las2020,
             nsb_2019=self.nsb2019,
             smartsheet_perfusion=self.perfusions_sheet,
+            nsb_2023=self.nsb_2023,
+            nsb_present=self.nsb_2023,
         )
         procedures = mapper.map_responses_to_aind_procedures("115977")
 
         self.assertIsInstance(procedures, Procedures)
         self.assertEqual(procedures.subject_id, "115977")
-        self.assertEqual(len(procedures.subject_procedures), 7)
+        self.assertEqual(len(procedures.subject_procedures), 9)
         self.assertEqual(len(procedures.specimen_procedures), 0)
 
     def test_map_responses_no_data(self):
@@ -286,6 +295,29 @@ class TestProcedures(unittest.TestCase):
             ProtocolNames.SURGERY.value,
         ]
         self.assertEqual(expected_list, protocols_list)
+
+    def test_map_responses_to_aind_procedures_coordinate_exception(self):
+        """Test mapping when CoordinateSystemException raised"""
+        mapper = ProceduresMapper(
+            labtracks_tasks=[],
+            las_2020=[],
+            nsb_2019=self.nsb2019,
+            nsb_2023=[],
+            nsb_present=[],
+        )
+
+        with patch(
+            "aind_metadata_service_server.mappers.procedures.Procedures",
+            side_effect=CoordinateSystemException,
+        ):
+            with patch(
+                "aind_metadata_service_server.mappers.procedures.Procedures."
+                "model_construct"
+            ) as mock_model_construct:
+                mock_model_construct.return_value = "fallback"
+                procedures = mapper.map_responses_to_aind_procedures("115977")
+                self.assertEqual(procedures, "fallback")
+                mock_model_construct.assert_called_once()
 
 
 if __name__ == "__main__":
