@@ -19,14 +19,17 @@ from aind_data_schema.core.procedures import (
     Procedures,
     Surgery,
 )
+from aind_data_schema.utils.validators import CoordinateSystemException
 from aind_data_schema_models.mouse_anatomy import InjectionTargets
 from aind_data_schema_models.units import MassUnit
 from aind_labtracks_service_async_client.models import Task as LabTracksTask
 from aind_sharepoint_service_async_client.models import (
     Las2020List,
     NSB2019List,
+    NSB2023List,
 )
 from aind_smartsheet_service_async_client.models import PerfusionsModel
+from pydantic import ValidationError
 from aind_slims_service_async_client.models import (
     SlimsHistologyData,
     SlimsWaterRestrictionData,
@@ -36,6 +39,9 @@ from aind_metadata_service_server.mappers.las2020 import (
 )
 from aind_metadata_service_server.mappers.nsb2019 import (
     MappedNSBList as MappedNSB2019,
+)
+from aind_metadata_service_server.mappers.nsb2023 import (
+    MappedNSBList as MappedNSB2023,
 )
 from aind_metadata_service_server.mappers.perfusion import PerfusionMapper
 from aind_metadata_service_server.mappers.specimen_procedures import (
@@ -103,6 +109,8 @@ class ProceduresMapper:
         labtracks_tasks: List[LabTracksTask] = [],
         las_2020: List[Las2020List] = [],
         nsb_2019: List[NSB2019List] = [],
+        nsb_2023: List[NSB2023List] = [],
+        nsb_present: List[NSB2023List] = [],
         smartsheet_perfusion: List[PerfusionsModel] = [],
         slims_water_restriction: List[SlimsWaterRestrictionData] = [],
         slims_histology: List[SlimsHistologyData] = [],
@@ -116,6 +124,8 @@ class ProceduresMapper:
         self.labtracks_tasks = labtracks_tasks
         self.las_2020 = las_2020
         self.nsb_2019 = nsb_2019
+        self.nsb_2023 = nsb_2023
+        self.nsb_present = nsb_present
         self.smartsheet_perfusion = smartsheet_perfusion
         self.slims_water_restriction = slims_water_restriction
         self.slims_histology = slims_histology
@@ -337,6 +347,31 @@ class ProceduresMapper:
                 f"Found {len(nsb_2019_surgeries)} surgeries "
                 f"from NSB2019 for {subject_id}"
             )
+        if self.nsb_2023:
+            nsb_2023_surgeries = (
+                self.map_sharepoint_response_to_aind_surgeries(
+                    response=self.nsb_2023,
+                    mapper_cls=MappedNSB2023,
+                )
+            )
+            subject_procedures.extend(nsb_2023_surgeries)
+            logging.info(
+                f"Found {len(nsb_2023_surgeries)} surgeries "
+                f"from NSB2023 for {subject_id}"
+            )
+
+        if self.nsb_present:
+            nsb_present_surgeries = (
+                self.map_sharepoint_response_to_aind_surgeries(
+                    response=self.nsb_present,
+                    mapper_cls=MappedNSB2023,
+                )
+            )
+            subject_procedures.extend(nsb_present_surgeries)
+            logging.info(
+                f"Found {len(nsb_present_surgeries)} surgeries "
+                f"from NSB Present for {subject_id}"
+            )
         if self.smartsheet_perfusion:
             perfusion_mappers = [
                 PerfusionMapper(smartsheet_perfusion=smartsheet_perfusion)
@@ -377,11 +412,18 @@ class ProceduresMapper:
 
         if not subject_procedures and not specimen_procedures:
             return None
-        return Procedures(
-            subject_id=subject_id,
-            subject_procedures=subject_procedures,
-            specimen_procedures=specimen_procedures,
-        )
+        try:
+            return Procedures(
+                subject_id=subject_id,
+                subject_procedures=subject_procedures,
+                specimen_procedures=specimen_procedures,
+            )
+        except (ValidationError, CoordinateSystemException):
+            return Procedures.model_construct(
+                subject_id=subject_id,
+                subject_procedures=subject_procedures,
+                specimen_procedures=specimen_procedures,
+            )
 
     @staticmethod
     def _get_protocol_name(procedure):

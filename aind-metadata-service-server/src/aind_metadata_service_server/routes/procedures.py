@@ -29,6 +29,11 @@ async def get_procedures(
                 "description": "Example subject ID for Procedures",
                 "value": "632269",
             },
+            "example3": {
+                "summary": "Subject ID Example 3",
+                "description": "Example subject ID for Procedures",
+                "value": "656374",
+            },
         },
     ),
     labtracks_api_instance=Depends(get_labtracks_api_instance),
@@ -49,6 +54,12 @@ async def get_procedures(
     nsb_2019_response = await sharepoint_api_instance.get_nsb2019(
         subject_id, _request_timeout=10
     )
+    nsb_2023_response = await sharepoint_api_instance.get_nsb2023(
+        subject_id, _request_timeout=10
+    )
+    nsb_present_response = await sharepoint_api_instance.get_nsb_present(
+        subject_id, _request_timeout=10
+    )
     slims_wr_response = await slims_api_instance.get_water_restriction_data(
         subject_id, _request_timeout=30
     )
@@ -64,6 +75,8 @@ async def get_procedures(
         labtracks_tasks=labtracks_response,
         las_2020=las_2020_response,
         nsb_2019=nsb_2019_response,
+        nsb_2023=nsb_2023_response,
+        nsb_present=nsb_present_response,
         slims_water_restriction=slims_wr_response,
         slims_histology=slims_histology_response,
         smartsheet_perfusion=smartsheet_perfusion_response,
