@@ -16,8 +16,8 @@ from aind_tars_service_async_client import Titers
 from aind_tars_service_async_client.models import PrepLotData, VirusData
 
 from aind_metadata_service_server.mappers.injection_materials import (
-    PrepProtocols,
     InjectionMaterialsMapper,
+    PrepProtocols,
     TarsVirusInformation,
 )
 from aind_metadata_service_server.models import ViralMaterialInformation

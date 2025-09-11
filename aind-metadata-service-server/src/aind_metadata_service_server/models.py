@@ -2,8 +2,8 @@
 
 from typing import Literal, Optional
 
-from pydantic import BaseModel, Field, field_validator
 from aind_data_schema.components.injection_procedures import ViralMaterial
+from pydantic import BaseModel, Field, field_validator
 
 from aind_metadata_service_server import __version__
 
@@ -41,3 +41,14 @@ class ViralMaterialInformation(ViralMaterial):
     """Viral Material with Stock Titer."""
 
     stock_titer: Optional[int] = Field(default=None)
+
+
+class IntendedMeasurementInformation(BaseModel):
+    """Intended Measurement information that will be returned to the user that
+    requests information from the NSB2023 Sharepoint."""
+
+    fiber_name: Optional[str] = None
+    intended_measurement_R: Optional[str] = None
+    intended_measurement_G: Optional[str] = None
+    intended_measurement_B: Optional[str] = None
+    intended_measurement_Iso: Optional[str] = None

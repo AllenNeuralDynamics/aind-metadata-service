@@ -2,10 +2,10 @@
 
 from fastapi import APIRouter, Depends, HTTPException, Path
 
-from aind_metadata_service_server.mappers.procedures import ProceduresMapper
 from aind_metadata_service_server.mappers.injection_materials import (
     InjectionMaterialsMapper,
 )
+from aind_metadata_service_server.mappers.procedures import ProceduresMapper
 from aind_metadata_service_server.mappers.responses import map_to_response
 from aind_metadata_service_server.sessions import (
     get_labtracks_api_instance,
@@ -32,6 +32,16 @@ async def get_procedures(
                 "description": "Example subject ID for Procedures",
                 "value": "632269",
             },
+            "example3": {
+                "summary": "Subject ID Example 3",
+                "description": "Example subject ID for Procedures",
+                "value": "656374",
+            },
+            "example4": {
+                "summary": "Subject ID Example 4",
+                "description": "Example subject ID for Procedures",
+                "value": "821484",
+            },
         },
     ),
     labtracks_api_instance=Depends(get_labtracks_api_instance),
@@ -52,6 +62,12 @@ async def get_procedures(
     nsb_2019_response = await sharepoint_api_instance.get_nsb2019(
         subject_id, _request_timeout=10
     )
+    nsb_2023_response = await sharepoint_api_instance.get_nsb2023(
+        subject_id, _request_timeout=10
+    )
+    nsb_present_response = await sharepoint_api_instance.get_nsb_present(
+        subject_id, _request_timeout=10
+    )
     smartsheet_perfusion_response = (
         await smartsheet_api_instance.get_perfusions(
             subject_id, _request_timeout=10
@@ -61,6 +77,8 @@ async def get_procedures(
         labtracks_tasks=labtracks_response,
         las_2020=las_2020_response,
         nsb_2019=nsb_2019_response,
+        nsb_2023=nsb_2023_response,
+        nsb_present=nsb_present_response,
         smartsheet_perfusion=smartsheet_perfusion_response,
     )
     procedures = mapper.map_responses_to_aind_procedures(subject_id)
@@ -100,4 +118,7 @@ async def get_procedures(
             tars_mapping[virus_strain] = (
                 tars_mapper.map_to_viral_material_information()
             )
-        return map_to_response(procedures)
+    procedures = mapper.integrate_injection_materials_into_aind_procedures(
+        procedures, tars_mapping
+    )
+    return map_to_response(procedures)
