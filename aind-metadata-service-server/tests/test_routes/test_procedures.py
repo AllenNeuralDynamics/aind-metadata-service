@@ -149,7 +149,7 @@ class TestRoute:
         mock_get_perfusions: AsyncMock,
         mock_get_histology: AsyncMock,
         mock_get_water_restriction: AsyncMock,
-         mock_nsb_present: AsyncMock,
+        mock_nsb_present: AsyncMock,
         mock_nsb2023: AsyncMock,
         mock_nsb2019: AsyncMock,
         mock_las: AsyncMock,

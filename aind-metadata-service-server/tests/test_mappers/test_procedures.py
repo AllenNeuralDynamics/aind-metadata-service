@@ -2,7 +2,6 @@
 
 import json
 import unittest
-from unittest.mock import patch
 from datetime import date, datetime
 from pathlib import Path
 from unittest.mock import patch
@@ -26,6 +25,7 @@ from aind_data_schema.core.procedures import (
 )
 from aind_data_schema.utils.validators import CoordinateSystemException
 from aind_data_schema_models.mouse_anatomy import InjectionTargets
+from aind_data_schema_models.units import MassUnit, UnitlessUnit, VolumeUnit
 from aind_labtracks_service_async_client.models.task import (
     Task as LabTracksTask,
 )
@@ -48,7 +48,6 @@ from aind_metadata_service_server.mappers.procedures import (
 from aind_metadata_service_server.models import (
     ProtocolInformation,
 )
-from aind_data_schema_models.units import MassUnit, UnitlessUnit, VolumeUnit
 
 TEST_DIR = Path(__file__).parent / ".."
 EXAMPLE_LAS2020_JSON = (

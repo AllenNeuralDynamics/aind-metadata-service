@@ -14,7 +14,6 @@ from aind_data_schema.components.surgery_procedures import (
     Craniotomy,
     ProtectiveMaterial,
 )
-
 from aind_data_schema.core.procedures import (
     Procedures,
     Surgery,
@@ -28,12 +27,13 @@ from aind_sharepoint_service_async_client.models import (
     NSB2019List,
     NSB2023List,
 )
-from aind_smartsheet_service_async_client.models import PerfusionsModel
-from pydantic import ValidationError
 from aind_slims_service_async_client.models import (
     SlimsHistologyData,
     SlimsWaterRestrictionData,
 )
+from aind_smartsheet_service_async_client.models import PerfusionsModel
+from pydantic import ValidationError
+
 from aind_metadata_service_server.mappers.las2020 import (
     MappedLASList as MappedLAS2020,
 )

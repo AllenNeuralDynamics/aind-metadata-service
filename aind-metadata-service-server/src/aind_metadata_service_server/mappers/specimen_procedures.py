@@ -3,24 +3,24 @@
 import logging
 import xml.etree.ElementTree as ET
 from datetime import datetime
-from pydantic import ValidationError
 from typing import List, Optional, Union
 
-from aind_data_schema.components.specimen_procedures import (
-    SpecimenProcedure,
-)
 from aind_data_schema.components.reagent import (
     Reagent,
 )
+from aind_data_schema.components.specimen_procedures import (
+    SpecimenProcedure,
+)
+from aind_data_schema_models.organizations import Organization
 from aind_data_schema_models.specimen_procedure_types import (
     SpecimenProcedureType,
 )
-from aind_data_schema_models.organizations import Organization
 from aind_slims_service_async_client.models import (
     HistologyReagentData,
     HistologyWashData,
     SlimsHistologyData,
 )
+from pydantic import ValidationError
 
 
 class SpecimenProcedureMapper:

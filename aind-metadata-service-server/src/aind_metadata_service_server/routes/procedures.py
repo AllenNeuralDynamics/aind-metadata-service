@@ -7,8 +7,8 @@ from aind_metadata_service_server.mappers.responses import map_to_response
 from aind_metadata_service_server.sessions import (
     get_labtracks_api_instance,
     get_sharepoint_api_instance,
-    get_smartsheet_api_instance,
     get_slims_api_instance,
+    get_smartsheet_api_instance,
 )
 
 router = APIRouter()
