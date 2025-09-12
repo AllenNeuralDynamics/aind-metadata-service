@@ -66,7 +66,7 @@ class InjectionMaterialsMapper:
     def __init__(
         self,
         tars_prep_lot_data: PrepLotData,
-        tars_virus_data: Optional[List[VirusData]]=None,
+        tars_virus_data: Optional[List[VirusData]] = None,
     ):
         """
         Class constructor.
