@@ -11,6 +11,12 @@ from aind_sharepoint_service_async_client.models import (
     NSB2019List,
     NSB2023List,
 )
+from aind_tars_service_async_client import (
+    Alias,
+    PrepLotData,
+    ViralPrep,
+    VirusData,
+)
 from fastapi.testclient import TestClient
 
 TEST_DIR = Path(__file__).parent / ".."
@@ -36,8 +42,12 @@ class TestRoute:
     @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
-    def test_get_procedures_valid_data(
+    @patch("aind_tars_service_async_client.DefaultApi.get_viral_prep_lots")
+    @patch("aind_tars_service_async_client.DefaultApi.get_viruses")
+    def test_get_procedures_valid_data_only_labtracks(
         self,
+        mock_get_viruses: AsyncMock,
+        mock_get_viral_prep_lots: AsyncMock,
         mock_get_protocols: AsyncMock,
         mock_get_perfusions: AsyncMock,
         mock_get_histology: AsyncMock,
@@ -70,6 +80,8 @@ class TestRoute:
         mock_nsb_present.return_value = []
         mock_get_water_restriction.return_value = []
         mock_get_histology.return_value = []
+        mock_get_viral_prep_lots.return_value = []
+        mock_get_viruses.return_value = []
 
         response = client.get("api/v2/procedures/000000")
         assert response.status_code == 200
@@ -85,8 +97,12 @@ class TestRoute:
     @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
+    @patch("aind_tars_service_async_client.DefaultApi.get_viral_prep_lots")
+    @patch("aind_tars_service_async_client.DefaultApi.get_viruses")
     def test_get_procedures_invalid_data(
         self,
+        mock_get_viruses: AsyncMock,
+        mock_get_viral_prep_lots: AsyncMock,
         mock_get_protocols: AsyncMock,
         mock_get_perfusions: AsyncMock,
         mock_get_histology: AsyncMock,
@@ -116,6 +132,17 @@ class TestRoute:
         mock_get_perfusions.return_value = []
         mock_get_water_restriction.return_value = []
         mock_get_histology.return_value = []
+        mock_get_viral_prep_lots.return_value = [
+            PrepLotData(
+                lot="230929-12",
+                viral_prep=ViralPrep(
+                    virus=VirusData(
+                        aliases=[Alias(is_preferred=True, name="v_123")]
+                    )
+                ),
+            )
+        ]
+        mock_get_viruses.return_value = []
 
         with open(EXAMPLE_NSB2019_JSON) as f:
             contents_nsb2019 = json.load(f)
@@ -143,8 +170,12 @@ class TestRoute:
     @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
+    @patch("aind_tars_service_async_client.DefaultApi.get_viral_prep_lots")
+    @patch("aind_tars_service_async_client.DefaultApi.get_viruses")
     def test_get_procedures_no_data(
         self,
+        mock_get_viruses: AsyncMock,
+        mock_get_viral_prep_lots: AsyncMock,
         mock_get_protocols: AsyncMock,
         mock_get_perfusions: AsyncMock,
         mock_get_histology: AsyncMock,
@@ -166,6 +197,8 @@ class TestRoute:
         mock_nsb_present.return_value = []
         mock_get_water_restriction.return_value = []
         mock_get_histology.return_value = []
+        mock_get_viral_prep_lots.return_value = []
+        mock_get_viruses.return_value = []
 
         response = client.get("api/v2/procedures/nonexistent_subject")
         assert response.status_code == 404

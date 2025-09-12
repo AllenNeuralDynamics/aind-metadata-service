@@ -9,6 +9,9 @@ from unittest.mock import patch
 from aind_data_schema.components.injection_procedures import (
     Injection,
     InjectionDynamics,
+    TarsVirusIdentifiers,
+    ViralMaterial,
+    VirusPrepType,
 )
 from aind_data_schema.components.subject_procedures import (
     Perfusion,
@@ -47,6 +50,7 @@ from aind_metadata_service_server.mappers.procedures import (
 )
 from aind_metadata_service_server.models import (
     ProtocolInformation,
+    ViralMaterialInformation,
 )
 
 TEST_DIR = Path(__file__).parent / ".."
@@ -241,6 +245,144 @@ class TestProcedures(unittest.TestCase):
 
         procedures = mapper.map_responses_to_aind_procedures("0")
         self.assertIsNone(procedures)
+
+    def test_get_virus_strains(self):
+        """Tests that virus strains are retrieved as expected"""
+        procedures1 = Procedures(
+            subject_id="000000",
+            subject_procedures=[
+                Surgery.model_construct(
+                    procedures=[
+                        BrainInjection.model_construct(
+                            injection_materials=[
+                                ViralMaterial.model_construct(name="\n12345 ")
+                            ]
+                        ),
+                        BrainInjection.model_construct(
+                            injection_materials=[
+                                ViralMaterial.model_construct(name=" 67890\t")
+                            ]
+                        ),
+                    ]
+                )
+            ],
+        )
+        procedures2 = Procedures(
+            subject_id="12345",
+            subject_procedures=[
+                Surgery.model_construct(
+                    procedures=[BrainInjection.model_construct()]
+                )
+            ],
+        )
+        procedures3 = Procedures(
+            subject_id="54321",
+            subject_procedures=[
+                Surgery.model_construct(
+                    procedures=[
+                        BrainInjection.model_construct(injection_materials=[])
+                    ]
+                )
+            ],
+        )
+        procedures4 = Procedures(
+            subject_id="000000", subject_procedures=[Surgery.model_construct()]
+        )
+        self.assertEqual(
+            ProceduresMapper.get_virus_strains(procedures1), ["12345", "67890"]
+        )
+        self.assertEqual(ProceduresMapper.get_virus_strains(procedures2), [])
+        self.assertEqual(ProceduresMapper.get_virus_strains(procedures3), [])
+        self.assertEqual(ProceduresMapper.get_virus_strains(procedures4), [])
+
+    def test_integrate_injection_materials(self):
+        """Tests injection materials are integrated into procedures"""
+        tars_material = ViralMaterialInformation(
+            name="rAAV-MGT_789",
+            tars_identifiers=TarsVirusIdentifiers(
+                virus_tars_id="AiV456",
+                plasmid_tars_alias=["AiP123"],
+                prep_lot_number="12345",
+                prep_date=date(2023, 12, 15),
+                prep_type=VirusPrepType.CRUDE,
+                prep_protocol="SOP#VC002",
+            ),
+            stock_titer=413000000000,
+        )
+        tars_material2 = ViralMaterialInformation(
+            name="rAAV-MGT_678",
+            tars_identifiers=TarsVirusIdentifiers(
+                virus_tars_id="AiV789",
+                plasmid_tars_alias=["AiP456"],
+                prep_lot_number="67890",
+                prep_date=date(2023, 12, 16),
+                prep_type=VirusPrepType.CRUDE,
+                prep_protocol="SOP#VC003",
+            ),
+            stock_titer=123000000000,
+        )
+        tars_mapping = {
+            "12345": tars_material,
+            "67890": tars_material2,
+        }
+
+        procedures = Procedures(
+            subject_id="12345",
+            subject_procedures=[
+                Surgery.model_construct(
+                    procedures=[
+                        BrainInjection.model_construct(
+                            injection_materials=[
+                                ViralMaterial.model_construct(
+                                    name="12345", titer=413000000000
+                                ),
+                                ViralMaterial.model_construct(name="67890"),
+                            ]
+                        )
+                    ]
+                )
+            ],
+        )
+        mapper = ProceduresMapper()
+        merged = mapper.integrate_injection_materials_into_aind_procedures(
+            procedures, tars_mapping
+        )
+        inj = merged.subject_procedures[0].procedures[0]
+        self.assertEqual(inj.injection_materials[0].titer, 413000000000)
+        self.assertEqual(
+            inj.injection_materials[0].tars_identifiers,
+            tars_material.tars_identifiers.model_dump(),
+        )
+        self.assertIsNone(inj.injection_materials[1].titer)
+
+    def test_integrate_injection_materials_no_procedures(self):
+        """Tests that nothing breaks if there are no procedures"""
+        tars_material = ViralMaterialInformation(
+            name="rAAV-MGT_789",
+            tars_identifiers=TarsVirusIdentifiers(
+                virus_tars_id="AiV456",
+                plasmid_tars_alias=["AiP123"],
+                prep_lot_number="12345",
+                prep_date=date(2023, 12, 15),
+                prep_type=VirusPrepType.CRUDE,
+                prep_protocol="SOP#VC002",
+            ),
+            stock_titer=413000000000,
+        )
+        tars_mapping = {"12345": tars_material}
+        procedures = Procedures(
+            subject_id="12345",
+            subject_procedures=[
+                Surgery.model_construct(experimenter_full_name="NSB-123")
+            ],
+        )
+        mapper = ProceduresMapper()
+        merged = mapper.integrate_injection_materials_into_aind_procedures(
+            procedures, tars_mapping
+        )
+        self.assertEqual(
+            merged.subject_procedures, procedures.subject_procedures
+        )
 
     def test_integrate_protocols(self):
         """Tests that protocols are integrated into procedures as expected"""

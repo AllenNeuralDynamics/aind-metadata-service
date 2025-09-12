@@ -7,6 +7,7 @@ import aind_mgi_service_async_client
 import aind_sharepoint_service_async_client
 import aind_slims_service_async_client
 import aind_smartsheet_service_async_client
+import aind_tars_service_async_client
 from httpx import AsyncClient
 
 from aind_metadata_service_server.configs import get_settings
@@ -26,6 +27,9 @@ smartsheet_config = aind_smartsheet_service_async_client.Configuration(
 )
 slims_config = aind_slims_service_async_client.Configuration(
     host=settings.slims_host.unicode_string().strip("/")
+)
+tars_config = aind_tars_service_async_client.Configuration(
+    host=settings.tars_host.unicode_string().strip("/")
 )
 
 
@@ -84,6 +88,19 @@ async def get_smartsheet_api_instance() -> (
         api_instance = aind_smartsheet_service_async_client.DefaultApi(
             api_client
         )
+        yield api_instance
+
+
+async def get_tars_api_instance() -> (
+    AsyncGenerator[aind_tars_service_async_client.DefaultApi, None]
+):
+    """
+    Yield an aind_tars_service_async_client.DefaultApi object.
+    """
+    async with aind_tars_service_async_client.ApiClient(
+        tars_config
+    ) as api_client:
+        api_instance = aind_tars_service_async_client.DefaultApi(api_client)
         yield api_instance
 
 

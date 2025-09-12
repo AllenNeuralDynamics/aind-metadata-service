@@ -2,6 +2,7 @@
 
 from typing import Literal, Optional
 
+from aind_data_schema.components.injection_procedures import ViralMaterial
 from pydantic import BaseModel, Field, field_validator
 
 from aind_metadata_service_server import __version__
@@ -34,6 +35,12 @@ class ProtocolInformation(BaseModel):
             return None
         else:
             return str(value)
+
+
+class ViralMaterialInformation(ViralMaterial):
+    """Viral Material with Stock Titer."""
+
+    stock_titer: Optional[int] = Field(default=None)
 
 
 class IntendedMeasurementInformation(BaseModel):

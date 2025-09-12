@@ -4,7 +4,10 @@ import logging
 from enum import Enum
 from typing import List, Optional, Union
 
-from aind_data_schema.components.injection_procedures import Injection
+from aind_data_schema.components.injection_procedures import (
+    Injection,
+    ViralMaterial,
+)
 from aind_data_schema.components.subject_procedures import (
     Perfusion,
     WaterRestriction,
@@ -481,4 +484,73 @@ class ProceduresMapper:
                 protocol_model = protocols_mapping.get(protocol_name)
                 if protocol_model and getattr(protocol_model, "doi", None):
                     procedure.protocol_id = protocol_model.doi
+        return procedures
+
+    @staticmethod
+    def get_virus_strains(procedures: Procedures) -> List:
+        """
+        Iterates through procedures response and creates list of
+        virus strains.
+        Parameters
+        ---------
+        response : ModelResponse
+        """
+        viruses = []
+        for subject_procedure in procedures.subject_procedures:
+            if not hasattr(subject_procedure, "procedures"):
+                continue
+            for procedure in subject_procedure.procedures:
+                if (
+                    isinstance(procedure, Injection)
+                    and hasattr(procedure, "injection_materials")
+                    and isinstance(procedure.injection_materials, list)
+                    and procedure.injection_materials
+                ):
+                    virus_strains = [
+                        getattr(material, "name").strip()
+                        for material in procedure.injection_materials
+                        if getattr(material, "name", None)
+                    ]
+                    viruses.extend(virus_strains)
+        return viruses
+
+    @staticmethod
+    def integrate_injection_materials_into_aind_procedures(
+        procedures: Procedures, tars_mapping: dict
+    ) -> Procedures:
+        """
+        Updates Procedures with ViralMaterialInformation from tars_mapping.
+        tars_mapping: dict of virus_strain -> ViralMaterialInformation
+        """
+        for subject_procedure in procedures.subject_procedures:
+            if not hasattr(subject_procedure, "procedures"):
+                continue
+            for procedure in subject_procedure.procedures:
+                if (
+                    isinstance(procedure, Injection)
+                    and hasattr(procedure, "injection_materials")
+                    and isinstance(procedure.injection_materials, list)
+                ):
+                    for idx, injection_material in enumerate(
+                        procedure.injection_materials
+                    ):
+                        if isinstance(
+                            injection_material, ViralMaterial
+                        ) and getattr(injection_material, "name", None):
+                            virus_strain = injection_material.name.strip()
+                            viral_info = tars_mapping.get(virus_strain)
+                            if viral_info:
+                                info_dict = viral_info.model_dump()
+                                info_dict.pop("stock_titer", None)
+                                titer = getattr(
+                                    injection_material, "titer", None
+                                )
+                                if titer is not None:
+                                    info_dict["titer"] = titer
+                                new_material = ViralMaterial.model_construct(
+                                    **info_dict
+                                )
+                                procedure.injection_materials[idx] = (
+                                    new_material
+                                )
         return procedures
