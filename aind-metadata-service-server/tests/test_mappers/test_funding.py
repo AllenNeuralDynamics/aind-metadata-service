@@ -94,7 +94,7 @@ class TestFundingMapper(unittest.TestCase):
             FundingMapper.split_name(project_b),
         )
         self.assertEqual(
-            ("Ophys Platform - FIP, HSFP and indicator testing", None),
+            ("Ophys Platform", "FIP, HSFP and indicator testing"),
             FundingMapper.split_name(project_c),
         )
 

@@ -27,7 +27,7 @@ class FundingMapper:
     @staticmethod
     def split_name(input_name: str) -> Tuple[str, Optional[str]]:
         """Splits name into project name and subproject name"""
-        name_pattern = r"(.*) - ([Project|Subproject].*)"
+        name_pattern = r"(.*) - (.*)"
         if not re.match(name_pattern, input_name):
             return input_name, None
         else:
