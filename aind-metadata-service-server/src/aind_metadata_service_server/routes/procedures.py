@@ -40,7 +40,7 @@ async def get_procedures(
             "example4": {
                 "summary": "Subject ID Example 4",
                 "description": "Example subject ID for Procedures",
-                "value": "821484",
+                "value": "762287",
             },
         },
     ),
@@ -84,21 +84,21 @@ async def get_procedures(
     procedures = mapper.map_responses_to_aind_procedures(subject_id)
     if not procedures:
         raise HTTPException(status_code=404, detail="Not found")
-    else:
-        # integrate protocols from smartsheet
-        protocol_names = mapper.get_protocols_list(procedures)
-        protocols_mapping = {}
-        for protocol_name in protocol_names:
-            protocol_records = await smartsheet_api_instance.get_protocols(
-                protocol_name=protocol_name
-            )
-            protocols_mapping[protocol_name] = (
-                protocol_records[0] if protocol_records else None
-            )
-        procedures = mapper.integrate_protocols_into_aind_procedures(
-            procedures, protocols_mapping
+    # integrate protocols from smartsheet
+    protocol_names = mapper.get_protocols_list(procedures)
+    protocols_mapping = {}
+    for protocol_name in protocol_names:
+        protocol_records = await smartsheet_api_instance.get_protocols(
+            protocol_name=protocol_name
         )
-        viruses = mapper.get_virus_strains(procedures)
+        protocols_mapping[protocol_name] = (
+            protocol_records[0] if protocol_records else None
+        )
+    procedures = mapper.integrate_protocols_into_aind_procedures(
+        procedures, protocols_mapping
+    )
+    viruses = mapper.get_virus_strains(procedures)
+    # integrate injection materials from smartsheet
     tars_mapping = {}
     for virus_strain in viruses:
         tars_prep_lot_response = await tars_api_instance.get_viral_prep_lots(

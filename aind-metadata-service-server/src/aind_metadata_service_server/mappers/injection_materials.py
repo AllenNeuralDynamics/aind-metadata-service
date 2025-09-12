@@ -66,7 +66,7 @@ class InjectionMaterialsMapper:
     def __init__(
         self,
         tars_prep_lot_data: PrepLotData,
-        tars_virus_data: List[VirusData] = (),
+        tars_virus_data: Optional[List[VirusData]]=None,
     ):
         """
         Class constructor.
@@ -79,7 +79,7 @@ class InjectionMaterialsMapper:
             List of VirusData from TARS
         """
         self.prep_lot_data = tars_prep_lot_data
-        self.virus_data = list(tars_virus_data)
+        self.virus_data = list(tars_virus_data) if tars_virus_data else []
 
     @property
     def virus_id(self) -> Optional[str]:
