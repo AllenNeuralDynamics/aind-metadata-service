@@ -27,7 +27,7 @@
   "custpresent": false,
   "doseduration": "30",
   "doseRoute": "Intraperitoneal (IP)",
-  "doseSub": null,
+  "doseSub": "Heparin1000U/mL",
   "dosevolume": "70.4",
   "doseWhere": null,
   "Doxycycline": false,

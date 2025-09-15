@@ -1,18 +1,24 @@
 {
-    "procedure_type": "Surgery",
+    "object_type": "Surgery",
+    "protocol_id": null,
     "start_date": "2024-06-21",
-    "experimenter_full_name": "LAS-5358",
-    "iacuc_protocol": "2212",
+    "experimenters": [
+        "LAS-5358"
+    ],
+    "ethics_review_id": "2212",
     "animal_weight_prior": null,
     "animal_weight_post": null,
     "weight_unit": "gram",
     "anaesthesia": null,
     "workstation_id": null,
+    "coordinate_system": null,
+    "measured_coordinates": null,
     "procedures": [
         {
+            "object_type": "Injection",
             "injection_materials": [
                 {
-                    "material_type": "Virus",
+                    "object_type": "Viral material",
                     "name": "GT340C",
                     "tars_identifiers": null,
                     "addgene_id": null,
@@ -20,7 +26,7 @@
                     "titer_unit": "gc/mL"
                 },
                 {
-                    "material_type": "Virus",
+                    "object_type": "Viral material",
                     "name": null,
                     "tars_identifiers": null,
                     "addgene_id": null,
@@ -28,7 +34,7 @@
                     "titer_unit": "gc/mL"
                 },
                 {
-                    "material_type": "Virus",
+                    "object_type": "Viral material",
                     "name": null,
                     "tars_identifiers": null,
                     "addgene_id": null,
@@ -36,7 +42,7 @@
                     "titer_unit": "gc/mL"
                 },
                 {
-                    "material_type": "Virus",
+                    "object_type": "Viral material",
                     "name": null,
                     "tars_identifiers": null,
                     "addgene_id": null,
@@ -44,20 +50,32 @@
                     "titer_unit": "gc/mL"
                 }
             ],
-            "recovery_time": null,
-            "recovery_time_unit": "minute",
-            "injection_duration": null,
-            "injection_duration_unit": "minute",
-            "instrument_id": null,
-            "procedure_type": "Retro-orbital injection",
-            "injection_volume": "90",
-            "injection_volume_unit": "microliter",
-            "injection_eye": null
+            "targeted_structure": {
+                "name": "venous sinus",
+                "registry": "Edinburgh Mouse Atlas Project (EMAPA)",
+                "registry_identifier": "37025"
+            },
+            "relative_position": ["Left"],
+            "dynamics": [{
+                "object_type": "Injection dynamics",
+                "profile": "Bolus",
+                "volume": 90.0,
+                "volume_unit": "microliter",
+                "rate": null,
+                "rate_unit": null,
+                "duration": null,
+                "duration_unit": null,
+                "injection_current": null,
+                "injection_current_unit": null,
+                "alternating_current": null
+            }],
+            "protocol_id": null
         },
         {
+            "object_type": "Injection",
             "injection_materials": [
                 {
-                    "material_type": "Virus",
+                    "object_type": "Viral material",
                     "name": null,
                     "tars_identifiers": null,
                     "addgene_id": null,
@@ -65,20 +83,32 @@
                     "titer_unit": "gc/mL"
                 }
             ],
-            "recovery_time": null,
-            "recovery_time_unit": "minute",
-            "injection_duration": null,
-            "injection_duration_unit": "minute",
-            "instrument_id": null,
-            "procedure_type": "Retro-orbital injection",
-            "injection_volume": null,
-            "injection_volume_unit": "microliter",
-            "injection_eye": null
+            "targeted_structure": {
+                "name": "venous sinus",
+                "registry": "Edinburgh Mouse Atlas Project (EMAPA)",
+                "registry_identifier": "37025"
+            },
+            "relative_position": ["Right"],
+            "dynamics": [{
+                "object_type": "Injection dynamics",
+                "profile": "Bolus",
+                "volume": null,
+                "volume_unit": "microliter",
+                "rate": null,
+                "rate_unit": null,
+                "duration": null,
+                "duration_unit": null,
+                "injection_current": null,
+                "injection_current_unit": null,
+                "alternating_current": null
+            }],
+            "protocol_id": null
         },
         {
+            "object_type": "Injection",
             "injection_materials": [
                 {
-                    "material_type": "Virus",
+                    "object_type": "Viral material",
                     "name": null,
                     "tars_identifiers": null,
                     "addgene_id": null,
@@ -86,20 +116,32 @@
                     "titer_unit": "gc/mL"
                 }
             ],
-            "recovery_time": null,
-            "recovery_time_unit": "minute",
-            "injection_duration": null,
-            "injection_duration_unit": "minute",
-            "instrument_id": null,
-            "procedure_type": "Retro-orbital injection",
-            "injection_volume": "89.9",
-            "injection_volume_unit": "microliter",
-            "injection_eye": null
+            "targeted_structure": {
+                "name": "venous sinus",
+                "registry": "Edinburgh Mouse Atlas Project (EMAPA)",
+                "registry_identifier": "37025"
+            },
+            "relative_position": null,
+            "dynamics": [{
+                "object_type": "Injection dynamics",
+                "profile": "Bolus",
+                "volume": 89.9,
+                "volume_unit": "microliter",
+                "rate": null,
+                "rate_unit": null,
+                "duration": null,
+                "duration_unit": null,
+                "injection_current": null,
+                "injection_current_unit": null,
+                "alternating_current": null
+            }],
+            "protocol_id": null
         },
         {
+            "object_type": "Injection",
             "injection_materials": [
                 {
-                    "material_type": "Virus",
+                    "object_type": "Viral material",
                     "name": null,
                     "tars_identifiers": null,
                     "addgene_id": null,
@@ -107,20 +149,32 @@
                     "titer_unit": "gc/mL"
                 }
             ],
-            "recovery_time": null,
-            "recovery_time_unit": "minute",
-            "injection_duration": null,
-            "injection_duration_unit": "minute",
-            "instrument_id": null,
-            "procedure_type": "Retro-orbital injection",
-            "injection_volume": "90",
-            "injection_volume_unit": "microliter",
-            "injection_eye": null
+            "targeted_structure": {
+                "name": "venous sinus",
+                "registry": "Edinburgh Mouse Atlas Project (EMAPA)",
+                "registry_identifier": "37025"
+            },
+            "relative_position": null,
+            "dynamics": [{
+                "object_type": "Injection dynamics",
+                "profile": "Bolus",
+                "volume": 90.0,
+                "volume_unit": "microliter",
+                "rate": null,
+                "rate_unit": null,
+                "duration": null,
+                "duration_unit": null,
+                "injection_current": null,
+                "injection_current_unit": null,
+                "alternating_current": null
+            }],
+            "protocol_id": null
         },
         {
+            "object_type": "Injection",
             "injection_materials": [
                 {
-                    "material_type": "Virus",
+                    "object_type": "Viral material",
                     "name": null,
                     "tars_identifiers": null,
                     "addgene_id": null,
@@ -128,15 +182,26 @@
                     "titer_unit": "gc/mL"
                 }
             ],
-            "recovery_time": null,
-            "recovery_time_unit": "minute",
-            "injection_duration": null,
-            "injection_duration_unit": "minute",
-            "instrument_id": null,
-            "procedure_type": "Retro-orbital injection",
-            "injection_volume": "90",
-            "injection_volume_unit": "microliter",
-            "injection_eye": null
+            "targeted_structure": {
+                "name": "venous sinus",
+                "registry": "Edinburgh Mouse Atlas Project (EMAPA)",
+                "registry_identifier": "37025"
+            },
+            "relative_position": null,
+            "dynamics": [{
+                "object_type": "Injection dynamics",
+                "profile": "Bolus",
+                "volume": 90.0,
+                "volume_unit": "microliter",
+                "rate": null,
+                "rate_unit": null,
+                "duration": null,
+                "duration_unit": null,
+                "injection_current": null,
+                "injection_current_unit": null,
+                "alternating_current": null
+            }],
+            "protocol_id": null
         }
     ],
     "notes": null
