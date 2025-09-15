@@ -1665,7 +1665,6 @@ class MappedLASList:
     @property
     def aind_ro_lot1(self) -> Optional[str]:
         """Maps ro_lot1 to aind model"""
-        print("ro_lot1:", self._las.ro_lot1)
         return self._las.ro_lot1
 
     @property
@@ -2268,8 +2267,6 @@ class MappedLASList:
 
     def has_ro_injection(self) -> bool:
         """Is there a retro-orbital injection?"""
-        print("Checking for RO injection...")
-        print(self.aind_req_pro1)
         return LASProcedure.RETRO_ORBITAL_INJECTION in [
             self.aind_req_pro1,
             self.aind_req_pro2,
@@ -2413,9 +2410,7 @@ class MappedLASList:
             # Check if there are ro injections in 1 thorugh 5
             for ro_num in range(1, 6):
                 ro_info = self.map_ro_injection_info(ro_num=ro_num)
-                print(f"RO info for injection {ro_num}: {ro_info}")
                 if ro_info.animal_id == subject_id:
-                    print(f"Mapping RO injection for subject {subject_id}")
                     injection_materials = self.map_viral_materials(
                         injectable_materials=ro_info.injectable_materials
                     )
