@@ -112,6 +112,7 @@ class InjectionType(Enum):
 
     NANOJECT = "Nanoject"
     IONTOPHORESIS = "Iontophoresis"
+    SPINAL = "Spinal"
 
 
 class FiberType(Enum):
@@ -655,6 +656,19 @@ class MappedNSBList:
             None
             if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
+        )
+    
+    # TODO: pausing here - need to finish this mapping
+    @property
+    def aind_burr_1_spinal_location(self) -> Optional[List[MouseAnatomyModel]]:
+        """Maps burr_1_spinal_location to aind model."""
+        spinal_location = self._nsb.burr_x0020_1_x0020_spinal_x0020_location
+        return (
+            None
+            if spinal_location is None
+            else {
+                spinal_location.BETWEEN_C1_C2: MouseAnatomyModel.
+            }
         )
 
     @property
@@ -2511,6 +2525,7 @@ class MappedNSBList:
                 intended_measurement_iso=self.aind_burr_1_intended_x0023,
                 targeted_structure=self.aind_burr_1_intended,
                 coordinate_system=coordinate_system,
+                spinal_location=None,
             )
         elif burr_hole_num == 2:
             coordinate_depth = self._map_burr_hole_dv(
@@ -2560,6 +2575,7 @@ class MappedNSBList:
                 intended_measurement_iso=self.aind_burr_2_intended_x0023,
                 targeted_structure=self.aind_burr_2_intended,
                 coordinate_system=coordinate_system,
+                spinal_location=None,
             )
         elif burr_hole_num == 3:
             coordinate_depth = self._map_burr_hole_dv(
@@ -3298,6 +3314,7 @@ class MappedNSBList:
             if burr_hole_type in {
                 BurrHoleProcedure.INJECTION,
                 BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
+                BurrHoleProcedure.SPINAL_INJECTION
             }:
                 transforms = (
                     self._map_burr_hole_transforms(
