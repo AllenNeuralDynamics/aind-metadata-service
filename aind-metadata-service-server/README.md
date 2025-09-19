@@ -13,7 +13,7 @@ REST service to retrieve data from backends and create aind-data-schema models.
 
 Requires docker and docker compose to build and run package locally.
 
-- From the main aind-metadata-service directory:
+- From the root aind-metadata-service directory:
   - Create a folder called env if it doesn't exist.
   - Create a file called env/webapp.env with appropriate env variables.
   - Create a file called env/labtracks.env with appropriate env variables for labtracks service.
