@@ -2,7 +2,6 @@
 
 import logging
 
-from aind_data_schema.utils.validators import CoordinateSystemException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ValidationError
 
@@ -19,7 +18,7 @@ def map_to_response(model: BaseModel) -> JSONResponse:
         validate = model.model_validate(model.model_dump())
         content = validate.model_dump(mode="json")
         return JSONResponse(content=content)
-    except (ValidationError, CoordinateSystemException) as e:
+    except ValidationError as e:
         content = model.model_dump(mode="json")
         errors = e.json()
         logging.warning(errors)

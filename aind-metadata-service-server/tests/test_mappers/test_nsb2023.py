@@ -95,6 +95,10 @@ class TestNSB2023Parsers(TestCase):
             mapped_procedure_json_parsed = [
                 json.loads(json_str) for json_str in mapped_procedure_json
             ]
+            raw_file_name = list_item[2]
+            if raw_file_name == "list_item6.json":
+                with open(f"mapped_{raw_file_name}", "w") as f:
+                    json.dump(mapped_procedure_json_parsed, f, indent=3)
             self.assertEqual(
                 expected_mapped_data, mapped_procedure_json_parsed
             )

@@ -38,8 +38,6 @@
                 "profile": "Bolus",
                 "volume": 70.4,
                 "volume_unit": "microliter",
-                "rate": null,
-                "rate_unit": null,
                 "duration": 30.0,
                 "duration_unit": null,
                 "injection_current": null,

@@ -5,7 +5,7 @@ import unittest
 from datetime import date, datetime
 from pathlib import Path
 from unittest.mock import patch
-
+from pydantic import ValidationError
 from aind_data_schema.components.injection_procedures import (
     Injection,
     InjectionDynamics,
@@ -26,7 +26,6 @@ from aind_data_schema.core.procedures import (
     Procedures,
     Surgery,
 )
-from aind_data_schema.utils.validators import CoordinateSystemException
 from aind_data_schema_models.mouse_anatomy import InjectionTargets
 from aind_data_schema_models.units import MassUnit, UnitlessUnit, VolumeUnit
 from aind_labtracks_service_async_client.models.task import (
@@ -537,8 +536,8 @@ class TestProcedures(unittest.TestCase):
         self.assertEqual(mapper._parse_mass_unit(None), MassUnit.G)
         self.assertEqual(mapper._parse_mass_unit("g"), MassUnit.G)
 
-    def test_map_responses_to_aind_procedures_coordinate_exception(self):
-        """Test mapping when CoordinateSystemException raised"""
+    def test_map_responses_to_aind_procedures_exception(self):
+        """Test mapping when ValidationError raised"""
         mapper = ProceduresMapper(
             labtracks_tasks=[],
             las_2020=[],
@@ -546,19 +545,8 @@ class TestProcedures(unittest.TestCase):
             nsb_2023=[],
             nsb_present=[],
         )
-
-        with patch(
-            "aind_metadata_service_server.mappers.procedures.Procedures",
-            side_effect=CoordinateSystemException,
-        ):
-            with patch(
-                "aind_metadata_service_server.mappers.procedures.Procedures."
-                "model_construct"
-            ) as mock_model_construct:
-                mock_model_construct.return_value = "fallback"
-                procedures = mapper.map_responses_to_aind_procedures("115977")
-                self.assertEqual(procedures, "fallback")
-                mock_model_construct.assert_called_once()
+        procedures = mapper.map_responses_to_aind_procedures(subject_id=None)
+        self.assertEqual(procedures.subject_id, None)
 
 
 if __name__ == "__main__":

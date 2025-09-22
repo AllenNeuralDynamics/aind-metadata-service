@@ -83,8 +83,6 @@
                   "profile": "Bolus",
                   "volume": null,
                   "volume_unit": null,
-                  "rate": null,
-                  "rate_unit": null,
                   "duration": null,
                   "duration_unit": null,
                   "injection_current": 5.0,

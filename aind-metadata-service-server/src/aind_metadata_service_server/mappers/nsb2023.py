@@ -8,6 +8,7 @@ from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 
 from aind_data_schema.components.configs import ProbeConfig
+from aind_data_schema_models.mouse_anatomy import MouseAnatomyModel
 from aind_data_schema.components.coordinates import (
     Axis,
     AxisName,
@@ -187,6 +188,7 @@ class BurrHoleInfo:
     transforms: Optional[List[Union[Translation, Rotation]]] = None
     targeted_structure: Optional[BrainStructureModel] = None
     coordinate_system: Optional[CoordinateSystem] = None
+    spinal_location: Optional[Origin] = None
 
 
 @dataclass
@@ -658,16 +660,42 @@ class MappedNSBList:
             else intended.value
         )
     
-    # TODO: pausing here - need to finish this mapping
     @property
-    def aind_burr_1_spinal_location(self) -> Optional[List[MouseAnatomyModel]]:
+    def aind_burr_1_spinal_location(self) -> Optional[Origin]:
         """Maps burr_1_spinal_location to aind model."""
-        spinal_location = self._nsb.burr_x0020_1_x0020_spinal_x0020_location
+        spinal_location = self._nsb.burr_x0020_1_x0020_spinal_x0020_
         return (
             None
             if spinal_location is None
             else {
-                spinal_location.BETWEEN_C1_C2: MouseAnatomyModel.
+                spinal_location.SELECT: None,
+                spinal_location.BETWEEN_C1_C2: Origin.BETWEEN_C1_C2,
+                spinal_location.BETWEEN_C2_C3: Origin.BETWEEN_C2_C3,
+                spinal_location.BETWEEN_C3_C4: Origin.BETWEEN_C3_C4,
+                spinal_location.BETWEEN_C4_C5: Origin.BETWEEN_C4_C5,
+                spinal_location.BETWEEN_C6_C7: Origin.BETWEEN_C6_C7,
+                spinal_location.BETWEEN_C7_C8: Origin.BETWEEN_C7_C8,
+                spinal_location.BETWEEN_C8_T1: Origin.BETWEEN_C8_T1,
+                spinal_location.BETWEEN_T1_T2: Origin.BETWEEN_T1_T2
+            }
+        )
+    
+    def aind_burr_2_spinal_location(self) -> Optional[Origin]:
+        """Maps burr_2_spinal_location to aind model"""
+        spinal_location = self._nsb.burr_x0020_2_x0020_spinal_x0020_
+        return (
+            None
+            if spinal_location is None
+            else {
+                spinal_location.SELECT: None,
+                spinal_location.BETWEEN_C1_C2: Origin.BETWEEN_C1_C2,
+                spinal_location.BETWEEN_C2_C3: Origin.BETWEEN_C2_C3,
+                spinal_location.BETWEEN_C3_C4: Origin.BETWEEN_C3_C4,
+                spinal_location.BETWEEN_C4_C5: Origin.BETWEEN_C4_C5,
+                spinal_location.BETWEEN_C6_C7: Origin.BETWEEN_C6_C7,
+                spinal_location.BETWEEN_C7_C8: Origin.BETWEEN_C7_C8,
+                spinal_location.BETWEEN_C8_T1: Origin.BETWEEN_C8_T1,
+                spinal_location.BETWEEN_T1_T2: Origin.BETWEEN_T1_T2
             }
         )
 
@@ -2525,7 +2553,7 @@ class MappedNSBList:
                 intended_measurement_iso=self.aind_burr_1_intended_x0023,
                 targeted_structure=self.aind_burr_1_intended,
                 coordinate_system=coordinate_system,
-                spinal_location=None,
+                spinal_location=self.aind_burr_1_spinal_location,
             )
         elif burr_hole_num == 2:
             coordinate_depth = self._map_burr_hole_dv(
@@ -2575,7 +2603,7 @@ class MappedNSBList:
                 intended_measurement_iso=self.aind_burr_2_intended_x0023,
                 targeted_structure=self.aind_burr_2_intended,
                 coordinate_system=coordinate_system,
-                spinal_location=None,
+                spinal_location=self.aind_burr_2_spinal_location,
             )
         elif burr_hole_num == 3:
             coordinate_depth = self._map_burr_hole_dv(
@@ -2989,6 +3017,7 @@ class MappedNSBList:
     def map_measured_coordinates(
         b2l_dist: Optional[Decimal],
         surgery_coordinate_system: Optional[CoordinateSystem],
+        spinal_origin: Optional[Origin] = None,
     ) -> Optional[Dict[Origin, Translation]]:
         """
         Maps measured coordinates using the surgery's coordinate system.
@@ -3002,6 +3031,8 @@ class MappedNSBList:
         -------
             Optional[Dict[Origin, Translation]]
         """
+        if spinal_origin: 
+            return {spinal_origin: Translation(translation=[b2l_dist, 0, 0])}
         if b2l_dist is None or surgery_coordinate_system is None:
             return None
 
@@ -3172,6 +3203,8 @@ class MappedNSBList:
         followup_anaesthesia = None
         initial_workstation_id = None
         followup_workstation_id = None
+        initial_spinal_origin = None
+        followup_spinal_origin = None
 
         initial_procedures = []
         followup_procedures = []
@@ -3419,10 +3452,12 @@ class MappedNSBList:
                 if burr_hole_info.during == During.INITIAL:
                     initial_anaesthesia = anaesthesia
                     initial_workstation_id = burr_during_info.workstation_id
+                    initial_spinal_origin = burr_hole_info.spinal_location
                     initial_procedures.append(injection_proc)
                 elif burr_hole_info.during == During.FOLLOW_UP:
                     followup_anaesthesia = anaesthesia
                     followup_workstation_id = burr_during_info.workstation_id
+                    followup_spinal_origin = burr_hole_info.spinal_location
                     followup_procedures.append(injection_proc)
                 else:
                     other_procedures.append(injection_proc)
@@ -3475,7 +3510,7 @@ class MappedNSBList:
         if initial_procedures:
             self.assign_fiber_probe_names(initial_procedures)
             measured_coordinates = self.map_measured_coordinates(
-                self.aind_breg2_lamb, initial_coord_system
+                self.aind_breg2_lamb, initial_coord_system, initial_spinal_origin
             )
             try:
                 initial_surgery = Surgery(
@@ -3510,7 +3545,7 @@ class MappedNSBList:
         if followup_procedures:
             self.assign_fiber_probe_names(followup_procedures)
             measured_coordinates = self.map_measured_coordinates(
-                self.aind_breg2_lamb, followup_coord_system
+                self.aind_breg2_lamb, followup_coord_system, followup_spinal_origin
             )
             try:
                 followup_surgery = Surgery(
