@@ -105,8 +105,7 @@ async def get_v1_funding(
     aind_data_schema_v1_session=Depends(get_aind_data_schema_v1_session),
 ):
     """
-    ## Procedures V1
-    Return Procedure metadata.
+    Return funding metadata for a given project.
     """
     return await proxy(
         request, f"/funding/{project_name}", aind_data_schema_v1_session

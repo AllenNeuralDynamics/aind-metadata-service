@@ -278,27 +278,27 @@ class MappedLASList:
     @property
     def aind_n_roid1(self) -> Optional[str]:
         """Maps n_roid1 to aind model"""
-        return self._las.n_roid1
+        return self._las.n_roid1.strip() if self._las.n_roid1 else None
 
     @property
     def aind_n_roid2(self) -> Optional[str]:
         """Maps n_roid2 to aind model"""
-        return self._las.n_roid2
+        return self._las.n_roid2.strip() if self._las.n_roid2 else None
 
     @property
     def aind_n_roid3(self) -> Optional[str]:
         """Maps n_roid3 to aind model"""
-        return self._las.n_roid3
+        return self._las.n_roid3.strip() if self._las.n_roid3 else None
 
     @property
     def aind_n_roid4(self) -> Optional[str]:
         """Maps n_roid4 to aind model"""
-        return self._las.n_roid4
+        return self._las.n_roid4.strip() if self._las.n_roid4 else None
 
     @property
     def aind_n_roid5(self) -> Optional[str]:
         """Maps n_roid5 to aind model"""
-        return self._las.n_roid5
+        return self._las.n_roid5.strip() if self._las.n_roid5 else None
 
     @property
     def aind_n_start_date(self) -> Optional[date]:

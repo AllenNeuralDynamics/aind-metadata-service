@@ -21,7 +21,7 @@ dependencies = [
     'aind-mgi-service-async-client>=0.1.2',
     'aind-slims-service-async-client>=0.3.2',
     'aind-tars-service-async-client>=0.1.3',
-    'aind-smartsheet-service-async-client>=0.2.1',
+    'aind-smartsheet-service-async-client>=0.3.0',
     'aind-sharepoint-service-async-client>=0.1.3',
     'aind-session-json-service-async-client>=0.1.3',
     'aind-data-schema==2.0.2',
