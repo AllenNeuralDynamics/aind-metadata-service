@@ -20,8 +20,8 @@
       "workstation_id": "SWS 3",
       "coordinate_system": {
          "object_type": "Coordinate system",
-         "name": "BREGMA_ARID",
-         "origin": "Bregma",
+         "name": "C4C5_ARID",
+         "origin": "Between_C4-C5",
          "axes": [
             {
                "object_type": "Axis",
@@ -37,11 +37,6 @@
                "object_type": "Axis",
                "name": "SI",
                "direction": "Superior_to_inferior"
-            },
-            {
-               "object_type": "Axis",
-               "name": "Depth",
-               "direction": "Up_to_down"
             }
          ],
          "axis_unit": "millimeter"
@@ -78,7 +73,7 @@
                }
             ],
             "protocol_id": null,
-            "coordinate_system_name": "BREGMA_ARID",
+            "coordinate_system_name": "C4C5_ARID",
             "coordinates": [
                [
                   {
@@ -133,7 +128,7 @@
                }
             ],
             "protocol_id": null,
-            "coordinate_system_name": "BREGMA_ARID",
+            "coordinate_system_name": "C4C5_ARID",
             "coordinates": [
                [
                   {

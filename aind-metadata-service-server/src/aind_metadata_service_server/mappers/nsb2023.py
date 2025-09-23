@@ -8,7 +8,6 @@ from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 
 from aind_data_schema.components.configs import ProbeConfig
-from aind_data_schema_models.mouse_anatomy import MouseAnatomyModel
 from aind_data_schema.components.coordinates import (
     Axis,
     AxisName,
@@ -281,6 +280,9 @@ class MappedNSBList:
     )
     CONCENTRATION_REGEX = re.compile(r"^\d+(\.\d+)?\s*mg[/]m[lL]$")
     LENGTH_MM_REGEX = re.compile(r"^([1-9]\.\d) mm$")
+    SPINAL_LOCATION_REGEX = re.compile(
+        r"Between_([A-Z]\d+)-([A-Z]\d+)", re.IGNORECASE
+    )
 
     def __init__(self, nsb: NSB2023List):
         """Class constructor"""
@@ -659,7 +661,7 @@ class MappedNSBList:
             if intended is None or intended == getattr(intended, "N_A", None)
             else intended.value
         )
-    
+
     @property
     def aind_burr_1_spinal_location(self) -> Optional[Origin]:
         """Maps burr_1_spinal_location to aind model."""
@@ -676,10 +678,11 @@ class MappedNSBList:
                 spinal_location.BETWEEN_C6_C7: Origin.BETWEEN_C6_C7,
                 spinal_location.BETWEEN_C7_C8: Origin.BETWEEN_C7_C8,
                 spinal_location.BETWEEN_C8_T1: Origin.BETWEEN_C8_T1,
-                spinal_location.BETWEEN_T1_T2: Origin.BETWEEN_T1_T2
-            }
+                spinal_location.BETWEEN_T1_T2: Origin.BETWEEN_T1_T2,
+            }.get(spinal_location, None)
         )
-    
+
+    @property
     def aind_burr_2_spinal_location(self) -> Optional[Origin]:
         """Maps burr_2_spinal_location to aind model"""
         spinal_location = self._nsb.burr_x0020_2_x0020_spinal_x0020_
@@ -695,9 +698,35 @@ class MappedNSBList:
                 spinal_location.BETWEEN_C6_C7: Origin.BETWEEN_C6_C7,
                 spinal_location.BETWEEN_C7_C8: Origin.BETWEEN_C7_C8,
                 spinal_location.BETWEEN_C8_T1: Origin.BETWEEN_C8_T1,
-                spinal_location.BETWEEN_T1_T2: Origin.BETWEEN_T1_T2
-            }
+                spinal_location.BETWEEN_T1_T2: Origin.BETWEEN_T1_T2,
+            }.get(spinal_location, None)
         )
+
+    @staticmethod
+    def _get_spinal_coordinate_system_name(spinal_origin: Origin) -> str:
+        """
+        Helper method to generate coordinate system name from spinal location.
+
+        Parameters
+        ----------
+        spinal_origin: Origin
+            The spinal origin location (e.g., Origin.BETWEEN_C1_C2)
+
+        Returns
+        -------
+        str
+            The coordinate system name (e.g., "C1C2_ARID")
+        """
+        if spinal_origin is None:
+            return "Spinal_ARID"
+        origin_name = spinal_origin.value
+        match = re.search(MappedNSBList.SPINAL_LOCATION_REGEX, origin_name)
+        if match:
+            first_vertebra = match.group(1)
+            second_vertebra = match.group(2)
+            return f"{first_vertebra}{second_vertebra}_ARID"
+
+        return "Spinal_ARID"
 
     @property
     def aind_burr_2_d_v_x00(self) -> Optional[Decimal]:
@@ -3017,7 +3046,6 @@ class MappedNSBList:
     def map_measured_coordinates(
         b2l_dist: Optional[Decimal],
         surgery_coordinate_system: Optional[CoordinateSystem],
-        spinal_origin: Optional[Origin] = None,
     ) -> Optional[Dict[Origin, Translation]]:
         """
         Maps measured coordinates using the surgery's coordinate system.
@@ -3031,8 +3059,6 @@ class MappedNSBList:
         -------
             Optional[Dict[Origin, Translation]]
         """
-        if spinal_origin: 
-            return {spinal_origin: Translation(translation=[b2l_dist, 0, 0])}
         if b2l_dist is None or surgery_coordinate_system is None:
             return None
 
@@ -3063,6 +3089,7 @@ class MappedNSBList:
             Optional[CoordinateSystem]
         """
         systems = []
+        spinal_origins = []
 
         # Craniotomy
         if (
@@ -3076,8 +3103,29 @@ class MappedNSBList:
         # Burr holes
         for i in range(1, 7):
             burr_info = self.burr_hole_info(i)
-            if burr_info.during == during and burr_info.coordinate_system:
-                systems.append(burr_info.coordinate_system)
+            if burr_info.during == during:
+                burr_hole_type = getattr(self, f"aind_burr_hole_{i}")
+                if (
+                    burr_hole_type == BurrHoleProcedure.SPINAL_INJECTION
+                    and burr_info.spinal_location
+                ):
+                    spinal_origins.append(burr_info.spinal_location)
+                elif burr_info.coordinate_system:
+                    systems.append(burr_info.coordinate_system)
+
+        # If we have spinal injections, create spinal coordinate system
+        if spinal_origins:
+            spinal_origin = spinal_origins[0]
+            return CoordinateSystem(
+                name=self._get_spinal_coordinate_system_name(spinal_origin),
+                origin=spinal_origin,
+                axis_unit=SizeUnit.MM,
+                axes=[
+                    Axis(name=AxisName.AP, direction=Direction.PA),
+                    Axis(name=AxisName.ML, direction=Direction.LR),
+                    Axis(name=AxisName.SI, direction=Direction.SI),
+                ],
+            )
 
         # Prioritize ARID over ARI, and LAMBDA over BREGMA if all are lambda
         names = [s.name for s in systems if s]
@@ -3096,6 +3144,7 @@ class MappedNSBList:
                     ],
                 )
             return CoordinateSystemLibrary.BREGMA_ARI
+
         return None
 
     @staticmethod
@@ -3203,8 +3252,6 @@ class MappedNSBList:
         followup_anaesthesia = None
         initial_workstation_id = None
         followup_workstation_id = None
-        initial_spinal_origin = None
-        followup_spinal_origin = None
 
         initial_procedures = []
         followup_procedures = []
@@ -3347,7 +3394,7 @@ class MappedNSBList:
             if burr_hole_type in {
                 BurrHoleProcedure.INJECTION,
                 BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
-                BurrHoleProcedure.SPINAL_INJECTION
+                BurrHoleProcedure.SPINAL_INJECTION,
             }:
                 transforms = (
                     self._map_burr_hole_transforms(
@@ -3452,12 +3499,10 @@ class MappedNSBList:
                 if burr_hole_info.during == During.INITIAL:
                     initial_anaesthesia = anaesthesia
                     initial_workstation_id = burr_during_info.workstation_id
-                    initial_spinal_origin = burr_hole_info.spinal_location
                     initial_procedures.append(injection_proc)
                 elif burr_hole_info.during == During.FOLLOW_UP:
                     followup_anaesthesia = anaesthesia
                     followup_workstation_id = burr_during_info.workstation_id
-                    followup_spinal_origin = burr_hole_info.spinal_location
                     followup_procedures.append(injection_proc)
                 else:
                     other_procedures.append(injection_proc)
@@ -3510,7 +3555,7 @@ class MappedNSBList:
         if initial_procedures:
             self.assign_fiber_probe_names(initial_procedures)
             measured_coordinates = self.map_measured_coordinates(
-                self.aind_breg2_lamb, initial_coord_system, initial_spinal_origin
+                self.aind_breg2_lamb, initial_coord_system
             )
             try:
                 initial_surgery = Surgery(
@@ -3545,7 +3590,7 @@ class MappedNSBList:
         if followup_procedures:
             self.assign_fiber_probe_names(followup_procedures)
             measured_coordinates = self.map_measured_coordinates(
-                self.aind_breg2_lamb, followup_coord_system, followup_spinal_origin
+                self.aind_breg2_lamb, followup_coord_system
             )
             try:
                 followup_surgery = Surgery(

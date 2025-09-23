@@ -540,6 +540,7 @@ class ProceduresMapper:
                             viral_info = tars_mapping.get(virus_strain)
                             if viral_info:
                                 info_dict = viral_info.model_dump()
+                                info_dict["object_type"] = "Viral material"
                                 info_dict.pop("stock_titer", None)
                                 titer = getattr(
                                     injection_material, "titer", None
