@@ -234,8 +234,7 @@ No authorization required
 
 Get V1 Funding
 
-## Procedures V1
-Return Procedure metadata.
+Return funding metadata for a given project.
 
 ### Example
 
