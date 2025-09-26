@@ -426,6 +426,23 @@ class TestNSB2023Parsers(TestCase):
         self.assertEqual(translation.translation, [0, 0, 0, 0])
         self.assertEqual(rotation.angles, [0, 0, 0, 0])
 
+    def test_spinal_coordinate_system_name_edge_case(self):
+        """Tests edge case when spinal coordinate system name is parsed"""
+        self.assertEqual(
+            MappedNSBList._get_spinal_coordinate_system_name(
+                Origin.BETWEEN_C4_C5
+            ),
+            "C4C5_ARID",
+        )
+        self.assertEqual(
+            MappedNSBList._get_spinal_coordinate_system_name(None),
+            "Spinal_ARID",
+        )
+        self.assertEqual(
+            MappedNSBList._get_spinal_coordinate_system_name(Origin.BREGMA),
+            "Spinal_ARID",
+        )
+
 
 class TestNSB2023StringParsers(TestCase):
     """Tests text field parsers in NSB2023Mapping class. Certain fields, such

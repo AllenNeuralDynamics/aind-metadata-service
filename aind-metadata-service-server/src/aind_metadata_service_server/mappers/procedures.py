@@ -21,7 +21,6 @@ from aind_data_schema.core.procedures import (
     Procedures,
     Surgery,
 )
-from aind_data_schema.utils.validators import CoordinateSystemException
 from aind_data_schema_models.mouse_anatomy import InjectionTargets
 from aind_data_schema_models.units import MassUnit
 from aind_labtracks_service_async_client.models import Task as LabTracksTask
@@ -421,7 +420,7 @@ class ProceduresMapper:
                 subject_procedures=subject_procedures,
                 specimen_procedures=specimen_procedures,
             )
-        except (ValidationError, CoordinateSystemException):
+        except ValidationError:
             return Procedures.model_construct(
                 subject_id=subject_id,
                 subject_procedures=subject_procedures,
@@ -541,6 +540,7 @@ class ProceduresMapper:
                             viral_info = tars_mapping.get(virus_strain)
                             if viral_info:
                                 info_dict = viral_info.model_dump()
+                                info_dict["object_type"] = "Viral material"
                                 info_dict.pop("stock_titer", None)
                                 titer = getattr(
                                     injection_material, "titer", None
