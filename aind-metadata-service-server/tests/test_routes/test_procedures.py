@@ -84,7 +84,6 @@ class TestRoute:
         mock_get_viruses.return_value = []
 
         response = client.get("api/v2/procedures/000000")
-        print(response)
         assert response.status_code == 200
 
     @patch("aind_labtracks_service_async_client.DefaultApi.get_tasks")
