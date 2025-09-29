@@ -285,8 +285,6 @@
             "profile": "Bolus",
             "volume": null,
             "volume_unit": "nanoliter",
-            "rate": null,
-            "rate_unit": null,
             "duration": 5.0,
             "duration_unit": "minute",
             "injection_current": null,
