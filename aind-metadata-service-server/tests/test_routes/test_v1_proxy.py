@@ -1,6 +1,6 @@
 """Test subject routes"""
 
-from unittest.mock import AsyncMock, call
+from unittest.mock import AsyncMock
 
 import pytest
 from fastapi.testclient import TestClient
