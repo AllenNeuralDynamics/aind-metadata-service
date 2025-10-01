@@ -1,6 +1,6 @@
 """Test subject routes"""
 
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, call
 
 import pytest
 from fastapi.testclient import TestClient
@@ -126,8 +126,13 @@ class TestV1ProxyRoute:
     ):
         """Tests a get request"""
         response = client.get("/slims/histology?subject_id=abc")
+        call_args = mock_proxy.call_args
+        query_params = dict(call_args[0][3])
+
         mock_proxy.assert_called_once()
         assert 200 == response.status_code
+        assert query_params == {"subject_id": "abc"}
+        assert "None" not in query_params.values()
 
     def test_get_v1_slims_ecephys_workflow(
         self,
