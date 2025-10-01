@@ -15,6 +15,7 @@ from aind_metadata_service_server.routes import (
     procedures,
     subject,
     v1_proxy,
+    funding,
 )
 
 warnings.filterwarnings(
@@ -52,6 +53,7 @@ app.include_router(v1_proxy.router)
 app.include_router(healthcheck.router)
 app.include_router(subject.router)
 app.include_router(procedures.router)
+app.include_router(funding.router)
 app.include_router(index.router)
 
 # Clean up the methods names that is generated in the client code
