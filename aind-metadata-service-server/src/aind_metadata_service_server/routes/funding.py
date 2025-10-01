@@ -55,6 +55,8 @@ async def get_project_names(
     )
     mapper = FundingMapper(smartsheet_funding=funding_response)
     project_names_list = mapper.get_project_names()
+    if len(project_names_list) == 0:
+        raise HTTPException(status_code=404, detail="Not found")
     response = JSONResponse(
         status_code=200,
         content=({"message": "Success", "data": project_names_list}),
