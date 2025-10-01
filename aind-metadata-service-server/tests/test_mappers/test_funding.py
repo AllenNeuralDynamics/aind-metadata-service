@@ -2,9 +2,10 @@
 
 import unittest
 
-from aind_data_schema_models.organizations import Organization
 from aind_data_schema.components.identifiers import Person
+from aind_data_schema_models.organizations import Organization
 from aind_smartsheet_service_async_client.models import FundingModel
+
 from aind_metadata_service_server.mappers.funding import FundingMapper
 from aind_metadata_service_server.models import FundingInformation
 
@@ -113,7 +114,6 @@ class TestFundingMapper(unittest.TestCase):
                     Person(name="Person Six"),
                     Person(name="Person Seven"),
                     Person(name="Person Eight"),
-                        
                 ],
                 investigators=None,
             ),
@@ -177,7 +177,10 @@ class TestFundingMapper(unittest.TestCase):
 
         self.assertEqual(1, len(funding_information))
         self.assertEqual(expected_model.funder, funding_information[0].funder)
-        self.assertEqual(expected_model.fundee[0].name, funding_information[0].fundee[0].name)
+        self.assertEqual(
+            expected_model.fundee[0].name,
+            funding_information[0].fundee[0].name,
+        )
 
     def test_get_project_names_success(self):
         """Tests successful retrieval of project names"""

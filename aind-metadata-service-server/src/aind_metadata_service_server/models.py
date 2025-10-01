@@ -1,10 +1,10 @@
 """Models and schema definitions for backend data structures"""
 
-from typing import Literal, Optional, List
+from typing import List, Literal, Optional
 
+from aind_data_schema.components.identifiers import Person
 from aind_data_schema.components.injection_procedures import ViralMaterial
 from aind_data_schema.core.data_description import Funding
-from aind_data_schema.components.identifiers import Person
 from pydantic import BaseModel, Field, field_validator
 
 from aind_metadata_service_server import __version__
@@ -54,6 +54,7 @@ class IntendedMeasurementInformation(BaseModel):
     intended_measurement_G: Optional[str] = None
     intended_measurement_B: Optional[str] = None
     intended_measurement_Iso: Optional[str] = None
+
 
 class FundingInformation(Funding):
     """Funding information that will be returned to the user that requests

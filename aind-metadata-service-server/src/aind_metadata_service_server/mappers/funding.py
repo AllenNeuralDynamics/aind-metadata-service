@@ -3,7 +3,7 @@ aind-data-schema Funding model."""
 
 import logging
 import re
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple
 
 from aind_data_schema.components.identifiers import Person
 from aind_data_schema_models.organizations import Organization
@@ -59,7 +59,7 @@ class FundingMapper:
             return Organization().abbreviation_map.get(input_name)
         else:
             return input_name
-        
+
     @staticmethod
     def _parse_person_names(
         input_names: Optional[str],
@@ -83,7 +83,7 @@ class FundingMapper:
         names = [name.strip() for name in input_names.split(",")]
         persons = [Person(name=name) for name in names if name]
         return persons
-        
+
     def _map_funding_to_funding_information(
         self,
         smartsheet_funding: FundingModel,

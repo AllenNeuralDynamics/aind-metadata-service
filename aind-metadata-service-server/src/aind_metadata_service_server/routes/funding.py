@@ -1,11 +1,12 @@
 """Module to handle funding endpoints"""
 
-from fastapi import APIRouter, Depends, Path, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Path
 from starlette.responses import JSONResponse
 
 from aind_metadata_service_server.mappers.funding import FundingMapper
-from aind_metadata_service_server.sessions import get_smartsheet_api_instance
 from aind_metadata_service_server.mappers.responses import map_to_response
+from aind_metadata_service_server.sessions import get_smartsheet_api_instance
+
 router = APIRouter()
 
 
@@ -40,6 +41,7 @@ async def get_funding(
     if len(funding_information) == 0:
         raise HTTPException(status_code=404, detail="Not found")
     return map_to_response(funding_information)
+
 
 @router.get("/api/v2/project_names")
 async def get_project_names(
