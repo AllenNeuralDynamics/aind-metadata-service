@@ -81,7 +81,7 @@ class FundingMapper:
         institution_value = smartsheet_funding.funding_institution
         funder = self._parse_institution(institution_value)
         investigators = smartsheet_funding.investigators
-        fundees = smartsheet_funding.fundees
+        fundees = smartsheet_funding.fundees__pi
 
         if (
             funder is None
