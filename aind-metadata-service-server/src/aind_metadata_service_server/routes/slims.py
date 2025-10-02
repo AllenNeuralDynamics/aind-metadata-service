@@ -142,7 +142,7 @@ async def get_slims_workflow(
         "subject_id": subject_id,
         "start_date_gte": start_date_gte,
         "end_date_lte": end_date_lte,
-        "_request_timeout": 30,
+        "_request_timeout": 240,
     }
     if workflow == SlimsWorkflow.ECEPHYS_SESSIONS:
         kwargs["session_name"] = session_name
