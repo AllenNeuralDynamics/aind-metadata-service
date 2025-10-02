@@ -55,9 +55,9 @@ async def get_procedures(
     ## Procedures
     Return Procedure metadata.
     """
-    # labtracks_response = await labtracks_api_instance.get_tasks(
-    #     subject_id, _request_timeout=20
-    # )
+    labtracks_response = await labtracks_api_instance.get_tasks(
+        subject_id, _request_timeout=20
+    )
     las_2020_response = await sharepoint_api_instance.get_las2020(
         subject_id, _request_timeout=30
     )
@@ -82,7 +82,7 @@ async def get_procedures(
         )
     )
     mapper = ProceduresMapper(
-        # labtracks_tasks=labtracks_response,
+        labtracks_tasks=labtracks_response,
         las_2020=las_2020_response,
         nsb_2019=nsb_2019_response,
         nsb_2023=nsb_2023_response,
