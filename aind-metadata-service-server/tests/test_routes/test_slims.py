@@ -35,7 +35,7 @@ class TestRoute:
             subject_id="12345",
             start_date_gte=None,
             end_date_lte=None,
-            _request_timeout=30,
+            _request_timeout=240,
             session_name=None,
         )
         assert 200 == response.status_code
@@ -64,7 +64,7 @@ class TestRoute:
             subject_id="12345",
             start_date_gte=None,
             end_date_lte=None,
-            _request_timeout=30,
+            _request_timeout=240,
         )
         assert 200 == response.status_code
         data = response.json()["data"][0]
@@ -87,7 +87,7 @@ class TestRoute:
             subject_id="12345",
             start_date_gte=None,
             end_date_lte=None,
-            _request_timeout=30,
+            _request_timeout=240,
         )
         assert 200 == response.status_code
 
@@ -110,7 +110,7 @@ class TestRoute:
             subject_id="12345",
             start_date_gte=None,
             end_date_lte=None,
-            _request_timeout=30,
+            _request_timeout=240,
         )
         assert 200 == response.status_code
 
@@ -132,7 +132,7 @@ class TestRoute:
             subject_id="12345",
             start_date_gte=None,
             end_date_lte=None,
-            _request_timeout=30,
+            _request_timeout=240,
         )
         assert 200 == response.status_code
         data = response.json()["data"][0]
@@ -151,7 +151,7 @@ class TestRoute:
             subject_id="12345",
             start_date_gte=None,
             end_date_lte=None,
-            _request_timeout=30,
+            _request_timeout=240,
         )
         assert 200 == response.status_code
         assert "No Data Found" in response.json()["message"]
