@@ -71,10 +71,10 @@ async def get_procedures(
         subject_id, _request_timeout=20
     )
     slims_wr_response = await slims_api_instance.get_water_restriction_data(
-        subject_id, _request_timeout=120
+        subject_id, _request_timeout=240
     )
     slims_histology_response = await slims_api_instance.get_histology_data(
-        subject_id, _request_timeout=120
+        subject_id, _request_timeout=240
     )
     smartsheet_perfusion_response = (
         await smartsheet_api_instance.get_perfusions(
