@@ -56,29 +56,29 @@ async def get_procedures(
     Return Procedure metadata.
     """
     labtracks_response = await labtracks_api_instance.get_tasks(
-        subject_id, _request_timeout=10
-    )
-    las_2020_response = await sharepoint_api_instance.get_las2020(
         subject_id, _request_timeout=20
     )
+    las_2020_response = await sharepoint_api_instance.get_las2020(
+        subject_id, _request_timeout=30
+    )
     nsb_2019_response = await sharepoint_api_instance.get_nsb2019(
-        subject_id, _request_timeout=10
+        subject_id, _request_timeout=20
     )
     nsb_2023_response = await sharepoint_api_instance.get_nsb2023(
-        subject_id, _request_timeout=10
+        subject_id, _request_timeout=20
     )
     nsb_present_response = await sharepoint_api_instance.get_nsb_present(
-        subject_id, _request_timeout=10
+        subject_id, _request_timeout=20
     )
     slims_wr_response = await slims_api_instance.get_water_restriction_data(
-        subject_id, _request_timeout=30
+        subject_id, _request_timeout=240
     )
     slims_histology_response = await slims_api_instance.get_histology_data(
-        subject_id, _request_timeout=30
+        subject_id, _request_timeout=240
     )
     smartsheet_perfusion_response = (
         await smartsheet_api_instance.get_perfusions(
-            subject_id, _request_timeout=10
+            subject_id, _request_timeout=20
         )
     )
     mapper = ProceduresMapper(
