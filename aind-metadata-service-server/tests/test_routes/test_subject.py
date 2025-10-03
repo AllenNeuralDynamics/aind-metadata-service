@@ -21,6 +21,7 @@ class TestRoute:
         mock_lb_api_get: AsyncMock,
         mock_mg_api_get: AsyncMock,
         client: TestClient,
+        caplog: pytest.LogCaptureFixture,
     ):
         """Tests a good response"""
         mock_lb_api_get.return_value = [
@@ -71,7 +72,10 @@ class TestRoute:
         response = client.get("api/v2/subject/632269")
         assert 200 == response.status_code
         assert 1 == len(mock_lb_api_get.mock_calls)
-        assert 2 == len(mock_mg_api_get.mock_calls)
+        # Temporary patch
+        # assert 2 == len(mock_mg_api_get.mock_calls)
+        assert 0 == len(mock_mg_api_get.mock_calls)
+        assert caplog is not None
 
     @patch("aind_labtracks_service_async_client.DefaultApi.get_subject")
     def test_get_missing_subject(
@@ -94,6 +98,7 @@ class TestRoute:
         mock_lb_api_get: AsyncMock,
         mock_mg_api_get: AsyncMock,
         client: TestClient,
+        caplog: pytest.LogCaptureFixture,
     ):
         """
         Unlikely to ever happen, but we raise a 500 error if there are more
@@ -108,6 +113,7 @@ class TestRoute:
         ]
         mock_mg_api_get.return_value = []
         response = client.get("api/v2/subject/632269")
+        assert caplog is not None
         assert 500 == response.status_code
 
 

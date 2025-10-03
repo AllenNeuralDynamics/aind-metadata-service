@@ -69,7 +69,7 @@ async def proxy(
             url=path,
             headers=headers,
             params=query_params,
-            timeout=120,  # Adjust timeout as needed
+            timeout=240,  # Adjust timeout as needed
         )
         # Create a FastAPI Response from the backend's response
         response_headers = {
