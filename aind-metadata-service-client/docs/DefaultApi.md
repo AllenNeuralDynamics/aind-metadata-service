@@ -4,7 +4,9 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**get_funding**](DefaultApi.md#get_funding) | **GET** /api/v2/funding/{project_name} | Get Funding
 [**get_procedures**](DefaultApi.md#get_procedures) | **GET** /api/v2/procedures/{subject_id} | Get Procedures
+[**get_project_names**](DefaultApi.md#get_project_names) | **GET** /api/v2/project_names | Get Project Names
 [**get_subject**](DefaultApi.md#get_subject) | **GET** /api/v2/subject/{subject_id} | Get Subject
 [**get_v1_bergamo_session**](DefaultApi.md#get_v1_bergamo_session) | **POST** /bergamo_session | Get V1 Bergamo Session
 [**get_v1_funding**](DefaultApi.md#get_v1_funding) | **GET** /funding/{project_name} | Get V1 Funding
@@ -21,6 +23,75 @@ Method | HTTP request | Description
 [**get_v1_subject**](DefaultApi.md#get_v1_subject) | **GET** /subject/{subject_id} | Get V1 Subject
 [**index**](DefaultApi.md#index) | **GET** / | Index
 
+
+# **get_funding**
+> object get_funding(project_name)
+
+Get Funding
+
+## Funding
+Return Funding metadata.
+
+### Example
+
+
+```python
+import aind_metadata_service_client
+from aind_metadata_service_client.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to http://localhost
+# See configuration.py for a list of all supported configuration parameters.
+configuration = aind_metadata_service_client.Configuration(
+    host = "http://localhost"
+)
+
+
+# Enter a context with an instance of the API client
+with aind_metadata_service_client.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = aind_metadata_service_client.DefaultApi(api_client)
+    project_name = 'Discovery-Neuromodulator circuit dynamics during foraging' # str | 
+
+    try:
+        # Get Funding
+        api_response = api_instance.get_funding(project_name)
+        print("The response of DefaultApi->get_funding:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling DefaultApi->get_funding: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **project_name** | **str**|  | 
+
+### Return type
+
+**object**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Successful Response |  -  |
+**422** | Validation Error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_procedures**
 > object get_procedures(subject_id)
@@ -88,6 +159,69 @@ No authorization required
 |-------------|-------------|------------------|
 **200** | Successful Response |  -  |
 **422** | Validation Error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **get_project_names**
+> object get_project_names()
+
+Get Project Names
+
+Get a list of project names from the Smartsheet API.
+
+### Example
+
+
+```python
+import aind_metadata_service_client
+from aind_metadata_service_client.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to http://localhost
+# See configuration.py for a list of all supported configuration parameters.
+configuration = aind_metadata_service_client.Configuration(
+    host = "http://localhost"
+)
+
+
+# Enter a context with an instance of the API client
+with aind_metadata_service_client.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = aind_metadata_service_client.DefaultApi(api_client)
+
+    try:
+        # Get Project Names
+        api_response = api_instance.get_project_names()
+        print("The response of DefaultApi->get_project_names:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling DefaultApi->get_project_names: %s\n" % e)
+```
+
+
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+**object**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Successful Response |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
