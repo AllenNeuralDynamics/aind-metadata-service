@@ -48,6 +48,27 @@ class TestResponses(unittest.TestCase):
         self.assertEqual(expected_error_message, response_header_msg)
         self.assertEqual(1, len(captured.output))
 
+    def test_map_multiple_to_200_response(self):
+        """Tests valid list of models is mapped to a 200 response."""
+
+        models = [
+            ExampleModel(name="abc", id=123),
+            ExampleModel(name="def", id=456, val="custom_value"),
+            ExampleModel(name="ghi", id=789),
+        ]
+        response = map_to_response(model=models)
+        self.assertEqual(200, response.status_code)
+
+        expected_content = [
+            {"name": "abc", "id": 123, "val": "default_value"},
+            {"name": "def", "id": 456, "val": "custom_value"},
+            {"name": "ghi", "id": 789, "val": "default_value"},
+        ]
+        self.assertEqual(
+            expected_content,
+            json.loads(response.body.decode("utf-8")),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

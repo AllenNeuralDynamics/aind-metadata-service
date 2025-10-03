@@ -1,12 +1,13 @@
 """Validates aind models and maps to a JSONResponse."""
 
 import logging
+from typing import List, Union
 
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ValidationError
 
 
-def map_to_response(model: BaseModel) -> JSONResponse:
+def map_to_response(model: Union[BaseModel, List[BaseModel]]) -> JSONResponse:
     """
     Maps a pydantic model to a JSONResponse message. If the model is valid,
     then it will return a 200 status code. If the model is not valid, then it
@@ -15,8 +16,13 @@ def map_to_response(model: BaseModel) -> JSONResponse:
     """
 
     try:
-        validate = model.model_validate(model.model_dump())
-        content = validate.model_dump(mode="json")
+        if isinstance(model, list):
+            for item in model:
+                item.model_validate(item.model_dump())
+            content = [item.model_dump(mode="json") for item in model]
+        else:
+            validate = model.model_validate(model.model_dump())
+            content = validate.model_dump(mode="json")
         return JSONResponse(content=content)
     except ValidationError as e:
         content = model.model_dump(mode="json")

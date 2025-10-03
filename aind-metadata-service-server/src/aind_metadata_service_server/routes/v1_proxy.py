@@ -69,7 +69,7 @@ async def proxy(
             url=path,
             headers=headers,
             params=query_params,
-            timeout=120,  # Adjust timeout as needed
+            timeout=240,  # Adjust timeout as needed
         )
         # Create a FastAPI Response from the backend's response
         response_headers = {
@@ -478,7 +478,10 @@ async def get_v1_slims_workflow(
     if workflow == SlimsWorkflow.ECEPHYS_SESSIONS:
         kwargs["session_name"] = session_name
 
-    query_params = QueryParams(kwargs)
+    # Filter out None values to prevent them from being stringified
+    filtered_kwargs = {k: v for k, v in kwargs.items() if v is not None}
+    query_params = QueryParams(filtered_kwargs)
+
     return await proxy(
         request,
         f"/slims/{workflow}",
