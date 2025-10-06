@@ -386,8 +386,8 @@ async def get_v1_slims_workflow(
                 "value": "762287",
             },
             "viral_injections_example": {
-                "summary": "Viral injections example subject ID",
-                "value": "614178",
+                "summary": "Viral injections subject ID (None)",
+                "value": None,
             },
             "ecephys_session_example": {
                 "summary": "Ecephys example subject ID",
@@ -429,7 +429,7 @@ async def get_v1_slims_workflow(
             },
             "viral_injections_example": {
                 "summary": "Viral injections example start date",
-                "value": "2025-04-23",
+                "value": "2025-04-22",
             },
             "ecephys_session_example": {
                 "summary": "Ecephys example start date",
@@ -456,7 +456,7 @@ async def get_v1_slims_workflow(
             },
             "viral_injections_example": {
                 "summary": "Viral injections example end date",
-                "value": "2025-04-24",
+                "value": "2025-04-25",
             },
             "ecephys_session_example": {
                 "summary": "Ecephys example end date",
