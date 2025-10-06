@@ -21,7 +21,6 @@ class TestRoute:
         mock_lb_api_get: AsyncMock,
         mock_mg_api_get: AsyncMock,
         client: TestClient,
-        caplog: pytest.LogCaptureFixture,
     ):
         """Tests a good response"""
         mock_lb_api_get.return_value = [
@@ -72,10 +71,7 @@ class TestRoute:
         response = client.get("api/v2/subject/632269")
         assert 200 == response.status_code
         assert 1 == len(mock_lb_api_get.mock_calls)
-        # Temporary patch
-        # assert 2 == len(mock_mg_api_get.mock_calls)
-        assert 0 == len(mock_mg_api_get.mock_calls)
-        assert caplog is not None
+        assert 2 == len(mock_mg_api_get.mock_calls)
 
     @patch("aind_labtracks_service_async_client.DefaultApi.get_subject")
     def test_get_missing_subject(
