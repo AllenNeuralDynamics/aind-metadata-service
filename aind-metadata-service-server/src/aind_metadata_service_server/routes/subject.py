@@ -1,6 +1,5 @@
 """Module to handle subject endpoints"""
 
-import logging
 from fastapi import APIRouter, Depends, Path
 
 from aind_metadata_service_server.mappers.subject import SubjectMapper
