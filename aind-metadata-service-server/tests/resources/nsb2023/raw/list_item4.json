@@ -269,5 +269,11 @@
   "Burr_x0020_6_x0020_Injectable_x04": null,
   "Burr_x0020_6_x0020_Injectable_x05": null,
   "Burr_x0020_6_x0020_Injectable_x06": null,
-  "Non_x002d_NSB_x0020_Surgeon": false
+  "Non_x002d_NSB_x0020_Surgeon": false,
+  "Burr_x0020_1_x0020_Intended_x002": ["ACB - Nucleus accumbens", "PL - Prelimbic area"],
+  "Burr_x0020_2_x0020_Intended_x002": ["CP - Caudoputamen"],
+  "Burr_x0020_3_x0020_Intended_x002": ["PL - Prelimbic area"],
+  "Burr_x0020_4_x0020_Intended_x002": ["PL - Prelimbic area"],
+  "Burr_x0020_5_x0020_Intended_x002": ["PL - Prelimbic area"],
+  "Burr_x0020_6_x0020_Intended_x002": ["PL - Prelimbic area"]
 }

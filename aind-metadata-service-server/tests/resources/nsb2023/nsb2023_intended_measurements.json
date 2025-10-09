@@ -133,8 +133,8 @@
     "Burr_x0020_2_x0020_Injectable_x03": "2.5e12",
     "Burr_x0020_2_x0020_Injectable_x04": "2.5e12",
     "Non_x002d_NSB_x0020_Surgeon": false,
-    "Burr_x0020_1_x0020_Intended_x002": "ACB - Nucleus accumbens",
-    "Burr_x0020_2_x0020_Intended_x002": "CP - Caudoputamen",
+    "Burr_x0020_1_x0020_Intended_x002": ["ACB - Nucleus accumbens"],
+    "Burr_x0020_2_x0020_Intended_x002": ["CP - Caudoputamen"],
     "Burr_x0020_1_x0020_intended_x0020": "acetylcholine",
     "Burr_x0020_2_x0020_intended_x0020": "acetylcholine",
     "Burr_x0020_3_x0020_intended_x0020": "norepinephrine",
@@ -180,5 +180,7 @@
     "ItemChildCount": "0",
     "FolderChildCount": "0",
     "AppAuthorLookupId": "83",
-    "AppEditorLookupId": "83"
+    "AppEditorLookupId": "83",
+    "Burr_x0020_5_x0020_Intended_x002": ["PL - Prelimbic area"],
+    "Burr_x0020_6_x0020_Intended_x002": ["PL - Prelimbic area"]
 }

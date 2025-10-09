@@ -1,439 +1,505 @@
 [
-  {
-    "procedure_type": "Surgery",
-    "start_date": "2022-01-03",
-    "experimenter_full_name": "NSB-2846",
-    "iacuc_protocol": "2103",
-    "animal_weight_prior": "25.2",
-    "animal_weight_post": "28.2",
-    "weight_unit": "gram",
-    "anaesthesia": {
-      "type": "isoflurane",
-      "duration": "90.0",
-      "duration_unit": "minute",
-      "level": "2.0"
-    },
-    "workstation_id": "SWS 3",
-    "procedures": [
-      {
-        "procedure_type": "Craniotomy",
-        "craniotomy_type": "3 mm",
-        "craniotomy_hemisphere": null,
-        "bregma_to_lambda_distance": null,
-        "bregma_to_lambda_unit": "millimeter",
-        "implant_part_number": "3mm stacked coverslip",
-        "dura_removed": null,
-        "protective_material": null,
-        "recovery_time": "25.0",
-        "recovery_time_unit": "minute"
+   {
+      "procedure_type": "Surgery",
+      "start_date": "2022-01-03",
+      "experimenter_full_name": "NSB-2846",
+      "iacuc_protocol": "2103",
+      "animal_weight_prior": "25.2",
+      "animal_weight_post": "28.2",
+      "weight_unit": "gram",
+      "anaesthesia": {
+         "type": "isoflurane",
+         "duration": "90.0",
+         "duration_unit": "minute",
+         "level": "2.0"
       },
-      {
-        "procedure_type": "Headframe",
-        "headframe_type": "Motor Ctx",
-        "headframe_part_number": "0160-100-51",
-        "headframe_material": null,
-        "well_part_number": "Rev A",
-        "well_type": "Scientifica (CAM)"
-      },
-      {
-        "injection_materials": [],
-        "recovery_time": "25.0",
-        "recovery_time_unit": "minute",
-        "injection_duration": null,
-        "injection_duration_unit": "minute",
-        "instrument_id": null,
-        "injection_coordinate_ml": "-5.2",
-        "injection_coordinate_ap": "-0.85",
-        "injection_coordinate_depth": [
-          "-3.1"
-        ],
-        "injection_coordinate_unit": "millimeter",
-        "injection_coordinate_reference": "Bregma",
-        "bregma_to_lambda_distance": null,
-        "bregma_to_lambda_unit": "millimeter",
-        "injection_angle": "0.0",
-        "injection_angle_unit": "degrees",
-        "targeted_structure": null,
-        "injection_hemisphere": "Left",
-        "procedure_type": "Nanoject injection",
-        "injection_volume": [
-          "600.0"
-        ],
-        "injection_volume_unit": "nanoliter"
-      },
-      {
-        "procedure_type": "Fiber implant",
-        "probes": [
-          {
-            "ophys_probe": {
-              "device_type": "Fiber optic probe",
-              "serial_number": null,
-              "manufacturer": {
-                "name": "Neurophotometrics",
-                "abbreviation": null,
-                "registry": null,
-                "registry_identifier": null
-              },
-              "model": null,
-              "path_to_cad": null,
-              "port_index": null,
-              "additional_settings": {},
-              "notes": null,
-              "core_diameter": 200,
-              "core_diameter_unit": "micrometer",
-              "numerical_aperture": 0.37,
-              "ferrule_material": "Ceramic",
-              "active_length": null,
-              "total_length": null,
-              "length_unit": "millimeter",
-              "name": "Fiber_2"
-            },
-            "targeted_structure": null,
-            "stereotactic_coordinate_ap": "-0.85",
-            "stereotactic_coordinate_ml": "-5.2",
-            "stereotactic_coordinate_dv": "-2.95",
-            "stereotactic_coordinate_unit": "millimeter",
-            "stereotactic_coordinate_reference": "Bregma",
+      "workstation_id": "SWS 3",
+      "procedures": [
+         {
+            "procedure_type": "Craniotomy",
+            "craniotomy_type": "3 mm",
+            "craniotomy_hemisphere": null,
             "bregma_to_lambda_distance": null,
             "bregma_to_lambda_unit": "millimeter",
-            "angle": "0.0",
-            "angle_unit": "degrees",
-            "notes": null
-          }
-        ]
-      },
-      {
-        "injection_materials": [],
-        "recovery_time": "25.0",
-        "recovery_time_unit": "minute",
-        "injection_duration": null,
-        "injection_duration_unit": "minute",
-        "instrument_id": null,
-        "injection_coordinate_ml": "-0.5",
-        "injection_coordinate_ap": "2.0",
-        "injection_coordinate_depth": [
-          "5.0"
-        ],
-        "injection_coordinate_unit": "millimeter",
-        "injection_coordinate_reference": "Bregma",
-        "bregma_to_lambda_distance": null,
-        "bregma_to_lambda_unit": "millimeter",
-        "injection_angle": "0.0",
-        "injection_angle_unit": "degrees",
-        "targeted_structure": null,
-        "injection_hemisphere": "Left",
-        "procedure_type": "Iontophoresis injection",
-        "injection_current": null,
-        "injection_current_unit": "microamps",
-        "alternating_current": "7/7"
-      },
-      {
-        "procedure_type": "Fiber implant",
-        "probes": [
-          {
-            "ophys_probe": {
-              "device_type": "Fiber optic probe",
-              "serial_number": null,
-              "manufacturer": {
-                "name": "Neurophotometrics",
-                "abbreviation": null,
-                "registry": null,
-                "registry_identifier": null
-              },
-              "model": null,
-              "path_to_cad": null,
-              "port_index": null,
-              "additional_settings": {},
-              "notes": null,
-              "core_diameter": 200,
-              "core_diameter_unit": "micrometer",
-              "numerical_aperture": 0.37,
-              "ferrule_material": "Ceramic",
-              "active_length": null,
-              "total_length": "2.5",
-              "length_unit": "millimeter",
-              "name": "Fiber_0"
-            },
-            "targeted_structure": null,
-            "stereotactic_coordinate_ap": "2.0",
-            "stereotactic_coordinate_ml": "-0.5",
-            "stereotactic_coordinate_dv": "-1.05",
-            "stereotactic_coordinate_unit": "millimeter",
-            "stereotactic_coordinate_reference": "Bregma",
+            "implant_part_number": "3mm stacked coverslip",
+            "dura_removed": null,
+            "protective_material": null,
+            "recovery_time": "25.0",
+            "recovery_time_unit": "minute"
+         },
+         {
+            "procedure_type": "Headframe",
+            "headframe_type": "Motor Ctx",
+            "headframe_part_number": "0160-100-51",
+            "headframe_material": null,
+            "well_part_number": "Rev A",
+            "well_type": "Scientifica (CAM)"
+         },
+         {
+            "injection_materials": [],
+            "recovery_time": "25.0",
+            "recovery_time_unit": "minute",
+            "injection_duration": null,
+            "injection_duration_unit": "minute",
+            "instrument_id": null,
+            "injection_coordinate_ml": "-5.2",
+            "injection_coordinate_ap": "-0.85",
+            "injection_coordinate_depth": [
+               "-3.1"
+            ],
+            "injection_coordinate_unit": "millimeter",
+            "injection_coordinate_reference": "Bregma",
             "bregma_to_lambda_distance": null,
             "bregma_to_lambda_unit": "millimeter",
-            "angle": "0.0",
-            "angle_unit": "degrees",
-            "notes": null
-          }
-        ]
-      },
-      {
-        "injection_materials": [],
-        "recovery_time": "25.0",
-        "recovery_time_unit": "minute",
-        "injection_duration": null,
-        "injection_duration_unit": "minute",
-        "instrument_id": null,
-        "injection_coordinate_ml": "-2.2",
-        "injection_coordinate_ap": "-6.1",
-        "injection_coordinate_depth": [
-          "3.1"
-        ],
-        "injection_coordinate_unit": "millimeter",
-        "injection_coordinate_reference": "Bregma",
-        "bregma_to_lambda_distance": null,
-        "bregma_to_lambda_unit": "millimeter",
-        "injection_angle": "0.0",
-        "injection_angle_unit": "degrees",
-        "targeted_structure": null,
-        "injection_hemisphere": "Left",
-        "procedure_type": "Iontophoresis injection",
-        "injection_current": "5",
-        "injection_current_unit": "microamps",
-        "alternating_current": "7/7"
-      },
-      {
-        "procedure_type": "Fiber implant",
-        "probes": [
-          {
-            "ophys_probe": {
-              "device_type": "Fiber optic probe",
-              "serial_number": null,
-              "manufacturer": {
-                "name": "Neurophotometrics",
-                "abbreviation": null,
-                "registry": null,
-                "registry_identifier": null
-              },
-              "model": null,
-              "path_to_cad": null,
-              "port_index": null,
-              "additional_settings": {},
-              "notes": null,
-              "core_diameter": 200,
-              "core_diameter_unit": "micrometer",
-              "numerical_aperture": 0.37,
-              "ferrule_material": "Ceramic",
-              "active_length": null,
-              "total_length": null,
-              "length_unit": "millimeter",
-              "name": "Fiber_3"
-            },
-            "targeted_structure": null,
-            "stereotactic_coordinate_ap": "-6.1",
-            "stereotactic_coordinate_ml": "-2.2",
-            "stereotactic_coordinate_dv": "-1.85",
-            "stereotactic_coordinate_unit": "millimeter",
-            "stereotactic_coordinate_reference": "Bregma",
+            "injection_angle": "0.0",
+            "injection_angle_unit": "degrees",
+            "targeted_structure": [
+               {
+                  "atlas": "CCFv3",
+                  "name": "Nucleus accumbens",
+                  "acronym": "ACB",
+                  "id": "56"
+               },
+               {
+                  "atlas": "CCFv3",
+                  "name": "Prelimbic area",
+                  "acronym": "PL",
+                  "id": "972"
+               }
+            ],
+            "injection_hemisphere": "Left",
+            "procedure_type": "Nanoject injection",
+            "injection_volume": [
+               "600.0"
+            ],
+            "injection_volume_unit": "nanoliter"
+         },
+         {
+            "procedure_type": "Fiber implant",
+            "probes": [
+               {
+                  "ophys_probe": {
+                     "device_type": "Fiber optic probe",
+                     "serial_number": null,
+                     "manufacturer": {
+                        "name": "Neurophotometrics",
+                        "abbreviation": null,
+                        "registry": null,
+                        "registry_identifier": null
+                     },
+                     "model": null,
+                     "path_to_cad": null,
+                     "port_index": null,
+                     "additional_settings": {},
+                     "notes": null,
+                     "core_diameter": 200,
+                     "core_diameter_unit": "micrometer",
+                     "numerical_aperture": 0.37,
+                     "ferrule_material": "Ceramic",
+                     "active_length": null,
+                     "total_length": null,
+                     "length_unit": "millimeter",
+                     "name": "Fiber_2"
+                  },
+                  "targeted_structure": [
+                     {
+                        "atlas": "CCFv3",
+                        "name": "Nucleus accumbens",
+                        "acronym": "ACB",
+                        "id": "56"
+                     },
+                     {
+                        "atlas": "CCFv3",
+                        "name": "Prelimbic area",
+                        "acronym": "PL",
+                        "id": "972"
+                     }
+                  ],
+                  "stereotactic_coordinate_ap": "-0.85",
+                  "stereotactic_coordinate_ml": "-5.2",
+                  "stereotactic_coordinate_dv": "-2.95",
+                  "stereotactic_coordinate_unit": "millimeter",
+                  "stereotactic_coordinate_reference": "Bregma",
+                  "bregma_to_lambda_distance": null,
+                  "bregma_to_lambda_unit": "millimeter",
+                  "angle": "0.0",
+                  "angle_unit": "degrees",
+                  "notes": null
+               }
+            ]
+         },
+         {
+            "injection_materials": [],
+            "recovery_time": "25.0",
+            "recovery_time_unit": "minute",
+            "injection_duration": null,
+            "injection_duration_unit": "minute",
+            "instrument_id": null,
+            "injection_coordinate_ml": "-0.5",
+            "injection_coordinate_ap": "2.0",
+            "injection_coordinate_depth": [
+               "5.0"
+            ],
+            "injection_coordinate_unit": "millimeter",
+            "injection_coordinate_reference": "Bregma",
             "bregma_to_lambda_distance": null,
             "bregma_to_lambda_unit": "millimeter",
-            "angle": "0.0",
-            "angle_unit": "degrees",
-            "notes": null
-          }
-        ]
-      },
-      {
-        "injection_materials": [],
-        "recovery_time": "25.0",
-        "recovery_time_unit": "minute",
-        "injection_duration": null,
-        "injection_duration_unit": "minute",
-        "instrument_id": null,
-        "injection_coordinate_ml": "-2.5",
-        "injection_coordinate_ap": "1.0",
-        "injection_coordinate_depth": [
-          "3.0"
-        ],
-        "injection_coordinate_unit": "millimeter",
-        "injection_coordinate_reference": "Bregma",
-        "bregma_to_lambda_distance": null,
-        "bregma_to_lambda_unit": "millimeter",
-        "injection_angle": "0.0",
-        "injection_angle_unit": "degrees",
-        "targeted_structure": null,
-        "injection_hemisphere": "Right",
-        "procedure_type": "Iontophoresis injection",
-        "injection_current": "5",
-        "injection_current_unit": "microamps",
-        "alternating_current": "7/7"
-      },
-      {
-        "procedure_type": "Fiber implant",
-        "probes": [
-          {
-            "ophys_probe": {
-              "device_type": "Fiber optic probe",
-              "serial_number": null,
-              "manufacturer": {
-                "name": "Neurophotometrics",
-                "abbreviation": null,
-                "registry": null,
-                "registry_identifier": null
-              },
-              "model": null,
-              "path_to_cad": null,
-              "port_index": null,
-              "additional_settings": {},
-              "notes": null,
-              "core_diameter": 200,
-              "core_diameter_unit": "micrometer",
-              "numerical_aperture": 0.37,
-              "ferrule_material": "Ceramic",
-              "active_length": null,
-              "total_length": null,
-              "length_unit": "millimeter",
-              "name": "Fiber_1"
+            "injection_angle": "0.0",
+            "injection_angle_unit": "degrees",
+            "targeted_structure": {
+               "atlas": "CCFv3",
+               "name": "Caudoputamen",
+               "acronym": "CP",
+               "id": "672"
             },
-            "targeted_structure": null,
-            "stereotactic_coordinate_ap": "1.0",
-            "stereotactic_coordinate_ml": "-2.5",
-            "stereotactic_coordinate_dv": "-1.8",
-            "stereotactic_coordinate_unit": "millimeter",
-            "stereotactic_coordinate_reference": "Bregma",
+            "injection_hemisphere": "Left",
+            "procedure_type": "Iontophoresis injection",
+            "injection_current": null,
+            "injection_current_unit": "microamps",
+            "alternating_current": "7/7"
+         },
+         {
+            "procedure_type": "Fiber implant",
+            "probes": [
+               {
+                  "ophys_probe": {
+                     "device_type": "Fiber optic probe",
+                     "serial_number": null,
+                     "manufacturer": {
+                        "name": "Neurophotometrics",
+                        "abbreviation": null,
+                        "registry": null,
+                        "registry_identifier": null
+                     },
+                     "model": null,
+                     "path_to_cad": null,
+                     "port_index": null,
+                     "additional_settings": {},
+                     "notes": null,
+                     "core_diameter": 200,
+                     "core_diameter_unit": "micrometer",
+                     "numerical_aperture": 0.37,
+                     "ferrule_material": "Ceramic",
+                     "active_length": null,
+                     "total_length": "2.5",
+                     "length_unit": "millimeter",
+                     "name": "Fiber_0"
+                  },
+                  "targeted_structure": {
+                     "atlas": "CCFv3",
+                     "name": "Caudoputamen",
+                     "acronym": "CP",
+                     "id": "672"
+                  },
+                  "stereotactic_coordinate_ap": "2.0",
+                  "stereotactic_coordinate_ml": "-0.5",
+                  "stereotactic_coordinate_dv": "-1.05",
+                  "stereotactic_coordinate_unit": "millimeter",
+                  "stereotactic_coordinate_reference": "Bregma",
+                  "bregma_to_lambda_distance": null,
+                  "bregma_to_lambda_unit": "millimeter",
+                  "angle": "0.0",
+                  "angle_unit": "degrees",
+                  "notes": null
+               }
+            ]
+         },
+         {
+            "injection_materials": [],
+            "recovery_time": "25.0",
+            "recovery_time_unit": "minute",
+            "injection_duration": null,
+            "injection_duration_unit": "minute",
+            "instrument_id": null,
+            "injection_coordinate_ml": "-2.2",
+            "injection_coordinate_ap": "-6.1",
+            "injection_coordinate_depth": [
+               "3.1"
+            ],
+            "injection_coordinate_unit": "millimeter",
+            "injection_coordinate_reference": "Bregma",
             "bregma_to_lambda_distance": null,
             "bregma_to_lambda_unit": "millimeter",
-            "angle": "0.0",
-            "angle_unit": "degrees",
-            "notes": null
-          }
-        ]
-      }
-    ],
-    "notes": null
-  },
-  {
-    "procedure_type": "Surgery",
-    "start_date": null,
-    "experimenter_full_name": "NSB",
-    "iacuc_protocol": "2103",
-    "animal_weight_prior": null,
-    "animal_weight_post": null,
-    "weight_unit": "gram",
-    "anaesthesia": null,
-    "workstation_id": null,
-    "procedures": [
-      {
-        "injection_materials": [],
-        "recovery_time": null,
-        "recovery_time_unit": "minute",
-        "injection_duration": null,
-        "injection_duration_unit": "minute",
-        "instrument_id": null,
-        "injection_coordinate_ml": "2.5",
-        "injection_coordinate_ap": "-3.0",
-        "injection_coordinate_depth": [
-          "-1.5"
-        ],
-        "injection_coordinate_unit": "millimeter",
-        "injection_coordinate_reference": "Bregma",
-        "bregma_to_lambda_distance": null,
-        "bregma_to_lambda_unit": "millimeter",
-        "injection_angle": null,
-        "injection_angle_unit": "degrees",
-        "targeted_structure": null,
-        "injection_hemisphere": "Right",
-        "procedure_type": "Nanoject injection",
-        "injection_volume": [
-          "500.0"
-        ],
-        "injection_volume_unit": "nanoliter"
-      },
-      {
-        "procedure_type": "Fiber implant",
-        "probes": [
-          {
-            "ophys_probe": {
-              "device_type": "Fiber optic probe",
-              "serial_number": null,
-              "manufacturer": null,
-              "model": null,
-              "path_to_cad": null,
-              "port_index": null,
-              "additional_settings": {},
-              "notes": null,
-              "core_diameter_unit": "micrometer",
-              "ferrule_material": null,
-              "active_length": null,
-              "total_length": "4.0",
-              "length_unit": "millimeter",
-              "name": "Fiber_1"
+            "injection_angle": "0.0",
+            "injection_angle_unit": "degrees",
+            "targeted_structure": {
+               "atlas": "CCFv3",
+               "name": "Prelimbic area",
+               "acronym": "PL",
+               "id": "972"
             },
-            "targeted_structure": null,
-            "stereotactic_coordinate_ap": "-3.0",
-            "stereotactic_coordinate_ml": "2.5",
-            "stereotactic_coordinate_dv": "-1.2",
-            "stereotactic_coordinate_unit": "millimeter",
-            "stereotactic_coordinate_reference": "Bregma",
+            "injection_hemisphere": "Left",
+            "procedure_type": "Iontophoresis injection",
+            "injection_current": "5",
+            "injection_current_unit": "microamps",
+            "alternating_current": "7/7"
+         },
+         {
+            "procedure_type": "Fiber implant",
+            "probes": [
+               {
+                  "ophys_probe": {
+                     "device_type": "Fiber optic probe",
+                     "serial_number": null,
+                     "manufacturer": {
+                        "name": "Neurophotometrics",
+                        "abbreviation": null,
+                        "registry": null,
+                        "registry_identifier": null
+                     },
+                     "model": null,
+                     "path_to_cad": null,
+                     "port_index": null,
+                     "additional_settings": {},
+                     "notes": null,
+                     "core_diameter": 200,
+                     "core_diameter_unit": "micrometer",
+                     "numerical_aperture": 0.37,
+                     "ferrule_material": "Ceramic",
+                     "active_length": null,
+                     "total_length": null,
+                     "length_unit": "millimeter",
+                     "name": "Fiber_3"
+                  },
+                  "targeted_structure": {
+                     "atlas": "CCFv3",
+                     "name": "Prelimbic area",
+                     "acronym": "PL",
+                     "id": "972"
+                  },
+                  "stereotactic_coordinate_ap": "-6.1",
+                  "stereotactic_coordinate_ml": "-2.2",
+                  "stereotactic_coordinate_dv": "-1.85",
+                  "stereotactic_coordinate_unit": "millimeter",
+                  "stereotactic_coordinate_reference": "Bregma",
+                  "bregma_to_lambda_distance": null,
+                  "bregma_to_lambda_unit": "millimeter",
+                  "angle": "0.0",
+                  "angle_unit": "degrees",
+                  "notes": null
+               }
+            ]
+         },
+         {
+            "injection_materials": [],
+            "recovery_time": "25.0",
+            "recovery_time_unit": "minute",
+            "injection_duration": null,
+            "injection_duration_unit": "minute",
+            "instrument_id": null,
+            "injection_coordinate_ml": "-2.5",
+            "injection_coordinate_ap": "1.0",
+            "injection_coordinate_depth": [
+               "3.0"
+            ],
+            "injection_coordinate_unit": "millimeter",
+            "injection_coordinate_reference": "Bregma",
             "bregma_to_lambda_distance": null,
             "bregma_to_lambda_unit": "millimeter",
-            "angle": null,
-            "angle_unit": "degrees",
-            "notes": null
-          }
-        ]
-      },
-      {
-        "injection_materials": [],
-        "recovery_time": null,
-        "recovery_time_unit": "minute",
-        "injection_duration": null,
-        "injection_duration_unit": "minute",
-        "instrument_id": null,
-        "injection_coordinate_ml": "1.8",
-        "injection_coordinate_ap": "-2.1",
-        "injection_coordinate_depth": [
-          "-2.0"
-        ],
-        "injection_coordinate_unit": "millimeter",
-        "injection_coordinate_reference": "Bregma",
-        "bregma_to_lambda_distance": null,
-        "bregma_to_lambda_unit": "millimeter",
-        "injection_angle": null,
-        "injection_angle_unit": "degrees",
-        "targeted_structure": null,
-        "injection_hemisphere": "Left",
-        "procedure_type": "Iontophoresis injection",
-        "injection_current": "10",
-        "injection_current_unit": "microamps",
-        "alternating_current": "5/5"
-      },
-      {
-        "procedure_type": "Fiber implant",
-        "probes": [
-          {
-            "ophys_probe": {
-              "device_type": "Fiber optic probe",
-              "serial_number": null,
-              "manufacturer": null,
-              "model": null,
-              "path_to_cad": null,
-              "port_index": null,
-              "additional_settings": {},
-              "notes": null,
-              "core_diameter_unit": "micrometer",
-              "ferrule_material": null,
-              "active_length": null,
-              "total_length": "3.5",
-              "length_unit": "millimeter",
-              "name": "Fiber_0"
-            },
-            "targeted_structure": null,
-            "stereotactic_coordinate_ap": "-2.1",
-            "stereotactic_coordinate_ml": "1.8",
-            "stereotactic_coordinate_dv": "-2.3",
-            "stereotactic_coordinate_unit": "millimeter",
-            "stereotactic_coordinate_reference": "Bregma",
+            "injection_angle": "0.0",
+            "injection_angle_unit": "degrees",
+            "targeted_structure": [],
+            "injection_hemisphere": "Right",
+            "procedure_type": "Iontophoresis injection",
+            "injection_current": "5",
+            "injection_current_unit": "microamps",
+            "alternating_current": "7/7"
+         },
+         {
+            "procedure_type": "Fiber implant",
+            "probes": [
+               {
+                  "ophys_probe": {
+                     "device_type": "Fiber optic probe",
+                     "serial_number": null,
+                     "manufacturer": {
+                        "name": "Neurophotometrics",
+                        "abbreviation": null,
+                        "registry": null,
+                        "registry_identifier": null
+                     },
+                     "model": null,
+                     "path_to_cad": null,
+                     "port_index": null,
+                     "additional_settings": {},
+                     "notes": null,
+                     "core_diameter": 200,
+                     "core_diameter_unit": "micrometer",
+                     "numerical_aperture": 0.37,
+                     "ferrule_material": "Ceramic",
+                     "active_length": null,
+                     "total_length": null,
+                     "length_unit": "millimeter",
+                     "name": "Fiber_1"
+                  },
+                  "targeted_structure": [],
+                  "stereotactic_coordinate_ap": "1.0",
+                  "stereotactic_coordinate_ml": "-2.5",
+                  "stereotactic_coordinate_dv": "-1.8",
+                  "stereotactic_coordinate_unit": "millimeter",
+                  "stereotactic_coordinate_reference": "Bregma",
+                  "bregma_to_lambda_distance": null,
+                  "bregma_to_lambda_unit": "millimeter",
+                  "angle": "0.0",
+                  "angle_unit": "degrees",
+                  "notes": null
+               }
+            ]
+         }
+      ],
+      "notes": null
+   },
+   {
+      "procedure_type": "Surgery",
+      "start_date": null,
+      "experimenter_full_name": "NSB",
+      "iacuc_protocol": "2103",
+      "animal_weight_prior": null,
+      "animal_weight_post": null,
+      "weight_unit": "gram",
+      "anaesthesia": null,
+      "workstation_id": null,
+      "procedures": [
+         {
+            "injection_materials": [],
+            "recovery_time": null,
+            "recovery_time_unit": "minute",
+            "injection_duration": null,
+            "injection_duration_unit": "minute",
+            "instrument_id": null,
+            "injection_coordinate_ml": "2.5",
+            "injection_coordinate_ap": "-3.0",
+            "injection_coordinate_depth": [
+               "-1.5"
+            ],
+            "injection_coordinate_unit": "millimeter",
+            "injection_coordinate_reference": "Bregma",
             "bregma_to_lambda_distance": null,
             "bregma_to_lambda_unit": "millimeter",
-            "angle": null,
-            "angle_unit": "degrees",
-            "notes": null
-          }
-        ]
-      }
-    ],
-    "notes": null
-  }
+            "injection_angle": null,
+            "injection_angle_unit": "degrees",
+            "targeted_structure": {
+               "atlas": "CCFv3",
+               "name": "Prelimbic area",
+               "acronym": "PL",
+               "id": "972"
+            },
+            "injection_hemisphere": "Right",
+            "procedure_type": "Nanoject injection",
+            "injection_volume": [
+               "500.0"
+            ],
+            "injection_volume_unit": "nanoliter"
+         },
+         {
+            "procedure_type": "Fiber implant",
+            "probes": [
+               {
+                  "ophys_probe": {
+                     "device_type": "Fiber optic probe",
+                     "serial_number": null,
+                     "manufacturer": null,
+                     "model": null,
+                     "path_to_cad": null,
+                     "port_index": null,
+                     "additional_settings": {},
+                     "notes": null,
+                     "core_diameter_unit": "micrometer",
+                     "ferrule_material": null,
+                     "active_length": null,
+                     "total_length": "4.0",
+                     "length_unit": "millimeter",
+                     "name": "Fiber_1"
+                  },
+                  "targeted_structure": {
+                     "atlas": "CCFv3",
+                     "name": "Prelimbic area",
+                     "acronym": "PL",
+                     "id": "972"
+                  },
+                  "stereotactic_coordinate_ap": "-3.0",
+                  "stereotactic_coordinate_ml": "2.5",
+                  "stereotactic_coordinate_dv": "-1.2",
+                  "stereotactic_coordinate_unit": "millimeter",
+                  "stereotactic_coordinate_reference": "Bregma",
+                  "bregma_to_lambda_distance": null,
+                  "bregma_to_lambda_unit": "millimeter",
+                  "angle": null,
+                  "angle_unit": "degrees",
+                  "notes": null
+               }
+            ]
+         },
+         {
+            "injection_materials": [],
+            "recovery_time": null,
+            "recovery_time_unit": "minute",
+            "injection_duration": null,
+            "injection_duration_unit": "minute",
+            "instrument_id": null,
+            "injection_coordinate_ml": "1.8",
+            "injection_coordinate_ap": "-2.1",
+            "injection_coordinate_depth": [
+               "-2.0"
+            ],
+            "injection_coordinate_unit": "millimeter",
+            "injection_coordinate_reference": "Bregma",
+            "bregma_to_lambda_distance": null,
+            "bregma_to_lambda_unit": "millimeter",
+            "injection_angle": null,
+            "injection_angle_unit": "degrees",
+            "targeted_structure": {
+               "atlas": "CCFv3",
+               "name": "Prelimbic area",
+               "acronym": "PL",
+               "id": "972"
+            },
+            "injection_hemisphere": "Left",
+            "procedure_type": "Iontophoresis injection",
+            "injection_current": "10",
+            "injection_current_unit": "microamps",
+            "alternating_current": "5/5"
+         },
+         {
+            "procedure_type": "Fiber implant",
+            "probes": [
+               {
+                  "ophys_probe": {
+                     "device_type": "Fiber optic probe",
+                     "serial_number": null,
+                     "manufacturer": null,
+                     "model": null,
+                     "path_to_cad": null,
+                     "port_index": null,
+                     "additional_settings": {},
+                     "notes": null,
+                     "core_diameter_unit": "micrometer",
+                     "ferrule_material": null,
+                     "active_length": null,
+                     "total_length": "3.5",
+                     "length_unit": "millimeter",
+                     "name": "Fiber_0"
+                  },
+                  "targeted_structure": {
+                     "atlas": "CCFv3",
+                     "name": "Prelimbic area",
+                     "acronym": "PL",
+                     "id": "972"
+                  },
+                  "stereotactic_coordinate_ap": "-2.1",
+                  "stereotactic_coordinate_ml": "1.8",
+                  "stereotactic_coordinate_dv": "-2.3",
+                  "stereotactic_coordinate_unit": "millimeter",
+                  "stereotactic_coordinate_reference": "Bregma",
+                  "bregma_to_lambda_distance": null,
+                  "bregma_to_lambda_unit": "millimeter",
+                  "angle": null,
+                  "angle_unit": "degrees",
+                  "notes": null
+               }
+            ]
+         }
+      ],
+      "notes": null
+   }
 ]
