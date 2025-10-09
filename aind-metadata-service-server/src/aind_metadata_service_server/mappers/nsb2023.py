@@ -382,13 +382,11 @@ class MappedNSBList:
 
     @staticmethod
     def _map_targeted_structure(
-        structure_str: Optional[str],
+        structure_str: str,
     ) -> Optional[BrainStructureModel]:
         """
         Maps targeted structure from string to BrainStructureModel.
         """
-        if not structure_str:
-            return None
         try:
             acronym = structure_str.split(" - ")[0].strip()
             return CCFv3.by_acronym(acronym)
@@ -608,10 +606,17 @@ class MappedNSBList:
         return self._nsb.burr_x0020_1_x0020_injectable_x06
 
     @property
-    def aind_burr_1_intended(self) -> Optional[BrainStructureModel]:
+    def aind_burr_1_intended(self) -> Optional[List[BrainStructureModel]]:
         """Maps burr_1_intended to aind model."""
         burr_1_intended = self._nsb.burr_x0020_1_x0020_intended_x002
-        return self._map_targeted_structure(burr_1_intended)
+        if burr_1_intended is None:
+            return None
+        else:
+            return [
+                self._map_targeted_structure(target)
+                for target in burr_1_intended
+                if self._map_targeted_structure(target) is not None
+            ]
 
     @property
     def aind_burr_1_intended_x0020(self) -> Optional[str]:
@@ -796,10 +801,17 @@ class MappedNSBList:
         return self._nsb.burr_x0020_2_x0020_injectable_x06
 
     @property
-    def aind_burr_2_intended(self) -> Optional[BrainStructureModel]:
+    def aind_burr_2_intended(self) -> Optional[List[BrainStructureModel]]:
         """Maps burr_2_intended to aind model."""
         burr_2_intended = self._nsb.burr_x0020_2_x0020_intended_x002
-        return self._map_targeted_structure(burr_2_intended)
+        if burr_2_intended is None:
+            return None
+        else:
+            return [
+                self._map_targeted_structure(target)
+                for target in burr_2_intended
+                if self._map_targeted_structure(target) is not None
+            ]
 
     @property
     def aind_burr_2_intended_x0020(self) -> Optional[str]:
@@ -939,10 +951,17 @@ class MappedNSBList:
         return self._nsb.burr_x0020_3_x0020_injectable_x06
 
     @property
-    def aind_burr_3_intended(self) -> Optional[BrainStructureModel]:
+    def aind_burr_3_intended(self) -> Optional[List[BrainStructureModel]]:
         """Maps burr_3_intended to aind model."""
         burr_3_intended = self._nsb.burr_x0020_3_x0020_intended_x002
-        return self._map_targeted_structure(burr_3_intended)
+        if burr_3_intended is None:
+            return None
+        else:
+            return [
+                self._map_targeted_structure(target)
+                for target in burr_3_intended
+                if self._map_targeted_structure(target) is not None
+            ]
 
     @property
     def aind_burr_3_intended_x0020(self) -> Optional[str]:
@@ -1082,10 +1101,17 @@ class MappedNSBList:
         return self._nsb.burr_x0020_4_x0020_injectable_x06
 
     @property
-    def aind_burr_4_intended(self) -> Optional[BrainStructureModel]:
+    def aind_burr_4_intended(self) -> Optional[List[BrainStructureModel]]:
         """Maps burr_4_intended to aind model."""
         burr_4_intended = self._nsb.burr_x0020_4_x0020_intended_x002
-        return self._map_targeted_structure(burr_4_intended)
+        if burr_4_intended is None:
+            return None
+        else:
+            return [
+                self._map_targeted_structure(target)
+                for target in burr_4_intended
+                if self._map_targeted_structure(target) is not None
+            ]
 
     @property
     def aind_burr_4_intended_x0020(self) -> Optional[str]:
@@ -1239,10 +1265,17 @@ class MappedNSBList:
         return self._nsb.burr_x0020_5_x0020_injectable_x06
 
     @property
-    def aind_burr_5_intended(self) -> Optional[BrainStructureModel]:
+    def aind_burr_5_intended(self) -> Optional[List[BrainStructureModel]]:
         """Maps burr_5_intended to aind model."""
         burr_5_intended = self._nsb.burr_x0020_5_x0020_intended_x002
-        return self._map_targeted_structure(burr_5_intended)
+        if burr_5_intended is None:
+            return None
+        else:
+            return [
+                self._map_targeted_structure(target)
+                for target in burr_5_intended
+                if self._map_targeted_structure(target) is not None
+            ]
 
     @property
     def aind_burr_5_intended_x0020(self) -> Optional[str]:
@@ -1403,10 +1436,17 @@ class MappedNSBList:
         return self._nsb.burr_x0020_6_x0020_injectable_x06
 
     @property
-    def aind_burr_6_intended(self) -> Optional[BrainStructureModel]:
+    def aind_burr_6_intended(self) -> Optional[List[BrainStructureModel]]:
         """Maps burr_6_intended to aind model."""
         burr_6_intended = self._nsb.burr_x0020_6_x0020_intended_x002
-        return self._map_targeted_structure(burr_6_intended)
+        if burr_6_intended is None:
+            return None
+        else:
+            return [
+                self._map_targeted_structure(target)
+                for target in burr_6_intended
+                if self._map_targeted_structure(target) is not None
+            ]
 
     @property
     def aind_burr_6_intended_x0020(self) -> Optional[str]:
@@ -3473,7 +3513,11 @@ class MappedNSBList:
                 try:
                     injection_proc = BrainInjection(
                         injection_materials=injection_materials,
-                        targeted_structure=burr_hole_info.targeted_structure,
+                        targeted_structure=(
+                            burr_hole_info.targeted_structure[0]
+                            if burr_hole_info.targeted_structure
+                            else None
+                        ),
                         relative_position=[burr_hole_info.hemisphere],
                         dynamics=dynamics,
                         coordinate_system_name=(
@@ -3486,7 +3530,11 @@ class MappedNSBList:
                 except ValidationError:
                     injection_proc = BrainInjection.model_construct(
                         injection_materials=injection_materials,
-                        targeted_structure=burr_hole_info.targeted_structure,
+                        targeted_structure=(
+                            burr_hole_info.targeted_structure[0]
+                            if burr_hole_info.targeted_structure
+                            else None
+                        ),
                         relative_position=[burr_hole_info.hemisphere],
                         dynamics=dynamics,
                         coordinate_system_name=(
@@ -3512,6 +3560,17 @@ class MappedNSBList:
                 BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
             }:
                 fiber_probe = self._map_burr_fiber_probe(burr_hole_info)
+                primary_target = None
+                other_targets = []
+
+                if (
+                    burr_hole_info.targeted_structure
+                    and len(burr_hole_info.targeted_structure) > 0
+                ):
+                    primary_target = burr_hole_info.targeted_structure[0]
+                    if len(burr_hole_info.targeted_structure) > 1:
+                        other_targets = burr_hole_info.targeted_structure[1:]
+
                 coordinate_system = CoordinateSystem(
                     name="FIBER_PROBE_RSAB",
                     origin=Origin.TIP,
@@ -3532,9 +3591,8 @@ class MappedNSBList:
                 probe_implant_proc = ProbeImplant.model_construct(
                     implanted_device=fiber_probe,
                     device_config=ProbeConfig.model_construct(
-                        primary_targeted_structure=(
-                            burr_hole_info.targeted_structure
-                        ),
+                        primary_targeted_structure=primary_target,
+                        other_targeted_structures=other_targets,
                         device_name=None,
                         coordinate_system=coordinate_system,
                         transform=transforms[0],
