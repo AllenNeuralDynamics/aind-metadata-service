@@ -51,7 +51,12 @@
          {
             "object_type": "Brain injection",
             "injection_materials": [],
-            "targeted_structure": null,
+            "targeted_structure": {
+               "atlas": "CCFv3",
+               "name": "Nucleus accumbens",
+               "acronym": "ACB",
+               "id": "56"
+            },
             "relative_position": [
                "Left"
             ],
@@ -121,7 +126,12 @@
             "device_config": {
                "object_type": "Probe config",
                "device_name": "Fiber_1",
-               "primary_targeted_structure": null,
+               "primary_targeted_structure": {
+                  "atlas": "CCFv3",
+                  "name": "Nucleus accumbens",
+                  "acronym": "ACB",
+                  "id": "56"
+               },
                "other_targeted_structure": null,
                "atlas_coordinate": null,
                "coordinate_system": {
@@ -153,23 +163,23 @@
                   "axis_unit": "millimeter"
                },
                "transform": [
-                     {
-                        "object_type": "Translation",
-                        "translation": [
-                           -0.85,
-                           -5.2,
-                           0.0
-                        ]
-                     },
-                     {
-                        "object_type": "Rotation",
-                        "angles": [
-                           0.0,
-                           0.0,
-                           0.0
-                        ],
-                        "angles_unit": "degrees"
-                     }
+                  {
+                     "object_type": "Translation",
+                     "translation": [
+                        -0.85,
+                        -5.2,
+                        0.0
+                     ]
+                  },
+                  {
+                     "object_type": "Rotation",
+                     "angles": [
+                        0.0,
+                        0.0,
+                        0.0
+                     ],
+                     "angles_unit": "degrees"
+                  }
                ],
                "dye": null,
                "notes": null
@@ -178,7 +188,12 @@
          {
             "object_type": "Brain injection",
             "injection_materials": [],
-            "targeted_structure": null,
+            "targeted_structure": {
+               "atlas": "CCFv3",
+               "name": "Caudoputamen",
+               "acronym": "CP",
+               "id": "672"
+            },
             "relative_position": [
                "Left"
             ],
@@ -248,7 +263,12 @@
             "device_config": {
                "object_type": "Probe config",
                "device_name": "Fiber_0",
-               "primary_targeted_structure": null,
+               "primary_targeted_structure": {
+                  "atlas": "CCFv3",
+                  "name": "Caudoputamen",
+                  "acronym": "CP",
+                  "id": "672"
+               },
                "other_targeted_structure": null,
                "atlas_coordinate": null,
                "coordinate_system": {
@@ -280,23 +300,23 @@
                   "axis_unit": "millimeter"
                },
                "transform": [
-                     {
-                        "object_type": "Translation",
-                        "translation": [
-                           2.0,
-                           -0.5,
-                           0.0
-                        ]
-                     },
-                     {
-                        "object_type": "Rotation",
-                        "angles": [
-                           0.0,
-                           0.0,
-                           0.0
-                        ],
-                        "angles_unit": "degrees"
-                     }
+                  {
+                     "object_type": "Translation",
+                     "translation": [
+                        2.0,
+                        -0.5,
+                        0.0
+                     ]
+                  },
+                  {
+                     "object_type": "Rotation",
+                     "angles": [
+                        0.0,
+                        0.0,
+                        0.0
+                     ],
+                     "angles_unit": "degrees"
+                  }
                ],
                "dye": null,
                "notes": null
@@ -366,7 +386,12 @@
          {
             "object_type": "Brain injection",
             "injection_materials": [],
-            "targeted_structure": null,
+            "targeted_structure": {
+               "atlas": "CCFv3",
+               "name": "Nucleus accumbens",
+               "acronym": "ACB",
+               "id": "56"
+            },
             "relative_position": [
                "Left"
             ],
@@ -436,7 +461,12 @@
             "device_config": {
                "object_type": "Probe config",
                "device_name": "Fiber_1",
-               "primary_targeted_structure": null,
+               "primary_targeted_structure": {
+                  "atlas": "CCFv3",
+                  "name": "Nucleus accumbens",
+                  "acronym": "ACB",
+                  "id": "56"
+               },
                "other_targeted_structure": null,
                "atlas_coordinate": null,
                "coordinate_system": {
@@ -468,23 +498,23 @@
                   "axis_unit": "millimeter"
                },
                "transform": [
-                     {
-                        "object_type": "Translation",
-                        "translation": [
-                           -6.1,
-                           -2.2,
-                           0.0
-                        ]
-                     },
-                     {
-                        "object_type": "Rotation",
-                        "angles": [
-                           0.0,
-                           0.0,
-                           0.0
-                        ],
-                        "angles_unit": "degrees"
-                     }
+                  {
+                     "object_type": "Translation",
+                     "translation": [
+                        -6.1,
+                        -2.2,
+                        0.0
+                     ]
+                  },
+                  {
+                     "object_type": "Rotation",
+                     "angles": [
+                        0.0,
+                        0.0,
+                        0.0
+                     ],
+                     "angles_unit": "degrees"
+                  }
                ],
                "dye": null,
                "notes": null
@@ -493,7 +523,12 @@
          {
             "object_type": "Brain injection",
             "injection_materials": [],
-            "targeted_structure": null,
+            "targeted_structure": {
+               "atlas": "CCFv3",
+               "name": "Prelimbic area",
+               "acronym": "PL",
+               "id": "972"
+            },
             "relative_position": [
                "Right"
             ],
@@ -563,7 +598,12 @@
             "device_config": {
                "object_type": "Probe config",
                "device_name": "Fiber_0",
-               "primary_targeted_structure": null,
+               "primary_targeted_structure": {
+                  "atlas": "CCFv3",
+                  "name": "Prelimbic area",
+                  "acronym": "PL",
+                  "id": "972"
+               },
                "other_targeted_structure": null,
                "atlas_coordinate": null,
                "coordinate_system": {
@@ -595,24 +635,24 @@
                   "axis_unit": "millimeter"
                },
                "transform": [
-                     {
-                        "object_type": "Translation",
-                        "translation": [
-                           1.0,
-                           -2.5,
-                           0.0
-                        ]
-                     },
-                     {
-                        "object_type": "Rotation",
-                        "angles": [
-                           0.0,
-                           0.0,
-                           0.0
-                        ],
-                        "angles_unit": "degrees"
-                     }
-                  ],
+                  {
+                     "object_type": "Translation",
+                     "translation": [
+                        1.0,
+                        -2.5,
+                        0.0
+                     ]
+                  },
+                  {
+                     "object_type": "Rotation",
+                     "angles": [
+                        0.0,
+                        0.0,
+                        0.0
+                     ],
+                     "angles_unit": "degrees"
+                  }
+               ],
                "dye": null,
                "notes": null
             }
