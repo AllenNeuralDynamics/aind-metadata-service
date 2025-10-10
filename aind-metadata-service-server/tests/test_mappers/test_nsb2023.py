@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Callable, List, Tuple
 from unittest import TestCase
 from unittest import main as unittest_main
-
+from aind_data_schema_models.brain_atlas import _BrainStructureModel
 from aind_data_schema.core.procedures import (
     BrainInjection,
     CraniotomyType,
@@ -373,6 +373,29 @@ class TestNSB2023Parsers(TestCase):
         mapper = MappedNSBList(nsb=nsb_model)
         procedures = mapper.get_surgeries()
         self.assertEqual(len(procedures), 1)
+
+    def test_map_targeted_structure_edge_case(self):
+        """Tests case when intended CCF target is malformed"""
+        data = {
+            "Burr_x0020_1_x0020_Intended_x002": [
+                "ACB - Nucleus accumbens",
+                "PL - Prelimbic area",
+            ],
+            "Burr_x0020_2_x0020_Intended_x002": ["Other"],
+        }
+        nsb_model = NSB2023List.model_construct(**data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        self.assertIsInstance(
+            mapper._map_targeted_structure(
+                data["Burr_x0020_1_x0020_Intended_x002"][0]
+            ),
+            _BrainStructureModel,
+        )
+        self.assertIsNone(
+            mapper._map_targeted_structure(
+                data["Burr_x0020_2_x0020_Intended_x002"][0]
+            )
+        )
 
 
 class TestNSB2023StringParsers(TestCase):
