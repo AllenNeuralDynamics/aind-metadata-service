@@ -73,7 +73,12 @@
                   "concentration_unit": null
                }
             ],
-            "targeted_structure": null,
+            "targeted_structure": {
+               "atlas": "CCFv3",
+               "name": "Nucleus accumbens",
+               "acronym": "ACB",
+               "id": "56"
+            },
             "relative_position": [
                "Right"
             ],
