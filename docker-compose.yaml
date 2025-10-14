@@ -28,7 +28,7 @@ services:
     image: "ghcr.io/allenneuraldynamics/aind-slims-service-server:0.3.2"
     env_file: "env/slims.env"
   sharepoint:
-    image: "ghcr.io/allenneuraldynamics/aind-sharepoint-service-server:0.1.4"
+    image: "ghcr.io/allenneuraldynamics/aind-sharepoint-service-server:0.1.5"
     env_file: "env/sharepoint.env"
   tars:
     image: "ghcr.io/allenneuraldynamics/aind-tars-service-server:0.1.3"
