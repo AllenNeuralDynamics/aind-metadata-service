@@ -14,6 +14,8 @@ from aind_metadata_service_server.routes import (
     healthcheck,
     index,
     procedures,
+    rig_and_instrument,
+    slims,
     subject,
     v1_proxy,
 )
@@ -54,6 +56,8 @@ app.include_router(healthcheck.router)
 app.include_router(subject.router)
 app.include_router(procedures.router)
 app.include_router(funding.router)
+app.include_router(slims.router)
+app.include_router(rig_and_instrument.router)
 app.include_router(index.router)
 
 # Clean up the methods names that is generated in the client code
