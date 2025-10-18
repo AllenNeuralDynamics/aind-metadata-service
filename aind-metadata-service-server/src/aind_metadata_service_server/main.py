@@ -18,6 +18,7 @@ from aind_metadata_service_server.routes import (
     protocol,
     rig_and_instrument,
     session_json,
+    rig_and_instrument,
     slims,
     subject,
     v1_proxy,
@@ -64,6 +65,8 @@ app.include_router(rig_and_instrument.router)
 app.include_router(session_json.router)
 app.include_router(slims.router)
 app.include_router(subject.router)
+app.include_router(slims.router)
+app.include_router(rig_and_instrument.router)
 app.include_router(index.router)
 
 # Clean up the methods names that is generated in the client code
