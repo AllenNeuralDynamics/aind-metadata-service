@@ -18,7 +18,6 @@ from aind_metadata_service_server.routes import (
     protocol,
     rig_and_instrument,
     session_json,
-    rig_and_instrument,
     slims,
     subject,
     v1_proxy,
