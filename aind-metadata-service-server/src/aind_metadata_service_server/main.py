@@ -13,11 +13,13 @@ from aind_metadata_service_server.routes import (
     funding,
     healthcheck,
     index,
+    injection_materials,
+    mgi_allele,
+    perfusion,
     intended_measurements,
     procedures,
     protocol,
     rig_and_instrument,
-    session_json,
     slims,
     subject,
     v1_proxy,
@@ -61,11 +63,13 @@ app.include_router(intended_measurements.router)
 app.include_router(procedures.router)
 app.include_router(protocol.router)
 app.include_router(rig_and_instrument.router)
-app.include_router(session_json.router)
 app.include_router(slims.router)
 app.include_router(subject.router)
 app.include_router(slims.router)
 app.include_router(rig_and_instrument.router)
+app.include_router(perfusion.router)
+app.include_router(mgi_allele.router)
+app.include_router(injection_materials.router)
 app.include_router(index.router)
 
 # Clean up the methods names that is generated in the client code
