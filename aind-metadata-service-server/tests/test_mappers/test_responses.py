@@ -69,6 +69,27 @@ class TestResponses(unittest.TestCase):
             json.loads(response.body.decode("utf-8")),
         )
 
+    def test_map_multiple_to_400_response(self):
+        """Tests invalid list of models is mapped to a 400 response."""
+
+        models = [
+            ExampleModel.model_construct(name=None, id=123),
+            ExampleModel.model_construct(name="def", id=None, val=None),
+            ExampleModel.model_construct(name="ghi", id=None),
+        ]
+        response = map_to_response(model=models)
+        self.assertEqual(400, response.status_code)
+
+        expected_content = [
+            {"name": None, "id": 123, "val": "default_value"},
+            {"name": "def", "id": None, "val": None},
+            {"name": "ghi", "id": None, "val": "default_value"},
+        ]
+        self.assertEqual(
+            expected_content,
+            json.loads(response.body.decode("utf-8")),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

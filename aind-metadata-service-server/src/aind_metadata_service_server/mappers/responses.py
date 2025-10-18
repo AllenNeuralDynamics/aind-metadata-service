@@ -25,7 +25,10 @@ def map_to_response(model: Union[BaseModel, List[BaseModel]]) -> JSONResponse:
             content = validate.model_dump(mode="json")
         return JSONResponse(content=content)
     except ValidationError as e:
-        content = model.model_dump(mode="json")
+        if isinstance(model, list):
+            content = [item.model_dump(mode="json") for item in model]
+        else:
+            content = model.model_dump(mode="json")
         errors = e.json()
         logging.warning(errors)
         return JSONResponse(
