@@ -14,9 +14,11 @@ from aind_metadata_service_server.routes import (
     healthcheck,
     index,
     injection_materials,
+    intended_measurements,
     mgi_allele,
     perfusion,
     procedures,
+    protocol,
     rig_and_instrument,
     slims,
     subject,
@@ -56,11 +58,13 @@ app.add_middleware(
 
 app.include_router(v1_proxy.router)
 app.include_router(healthcheck.router)
-app.include_router(subject.router)
-app.include_router(procedures.router)
 app.include_router(funding.router)
-app.include_router(slims.router)
+app.include_router(intended_measurements.router)
+app.include_router(procedures.router)
+app.include_router(protocol.router)
 app.include_router(rig_and_instrument.router)
+app.include_router(slims.router)
+app.include_router(subject.router)
 app.include_router(perfusion.router)
 app.include_router(mgi_allele.router)
 app.include_router(injection_materials.router)
