@@ -50,7 +50,7 @@ class IntendedMeasurementMapper:
                 measurements = mapper.get_intended_measurements()
                 all_measurements.extend(measurements)
             logging.info(
-                f"Found {len([m for m in all_measurements])} "
+                f"Found {len(all_measurements)} "
                 f"measurements from NSB2023 for {subject_id}"
             )
         if self.nsb_present:
