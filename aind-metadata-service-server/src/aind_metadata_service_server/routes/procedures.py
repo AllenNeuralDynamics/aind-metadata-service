@@ -14,6 +14,7 @@ from aind_metadata_service_server.sessions import (
     get_smartsheet_api_instance,
     get_tars_api_instance,
 )
+from asyncio import gather
 
 router = APIRouter()
 
@@ -55,32 +56,46 @@ async def get_procedures(
     ## Procedures
     Return Procedure metadata.
     """
-    labtracks_response = await labtracks_api_instance.get_tasks(
-        subject_id, _request_timeout=20
+    tasks = list()
+    tasks.append(
+        labtracks_api_instance.get_tasks(subject_id, _request_timeout=20)
     )
-    las_2020_response = await sharepoint_api_instance.get_las2020(
-        subject_id, _request_timeout=30
+    tasks.append(
+        sharepoint_api_instance.get_las2020(subject_id, _request_timeout=30)
     )
-    nsb_2019_response = await sharepoint_api_instance.get_nsb2019(
-        subject_id, _request_timeout=20
+    tasks.append(
+        sharepoint_api_instance.get_nsb2019(subject_id, _request_timeout=20)
     )
-    nsb_2023_response = await sharepoint_api_instance.get_nsb2023(
-        subject_id, _request_timeout=20
+    tasks.append(
+        sharepoint_api_instance.get_nsb2023(subject_id, _request_timeout=20)
     )
-    nsb_present_response = await sharepoint_api_instance.get_nsb_present(
-        subject_id, _request_timeout=20
-    )
-    slims_wr_response = await slims_api_instance.get_water_restriction_data(
-        subject_id, _request_timeout=240
-    )
-    slims_histology_response = await slims_api_instance.get_histology_data(
-        subject_id, _request_timeout=240
-    )
-    smartsheet_perfusion_response = (
-        await smartsheet_api_instance.get_perfusions(
+    tasks.append(
+        sharepoint_api_instance.get_nsb_present(
             subject_id, _request_timeout=20
         )
     )
+    tasks.append(
+        slims_api_instance.get_water_restriction_data(
+            subject_id, _request_timeout=240
+        )
+    )
+    tasks.append(
+        slims_api_instance.get_histology_data(subject_id, _request_timeout=240)
+    )
+    tasks.append(
+        smartsheet_api_instance.get_perfusions(subject_id, _request_timeout=20)
+    )
+    (
+        labtracks_response,
+        las_2020_response,
+        nsb_2019_response,
+        nsb_2023_response,
+        nsb_present_response,
+        slims_wr_response,
+        slims_histology_response,
+        smartsheet_perfusion_response,
+    ) = await gather(*tasks)
+
     mapper = ProceduresMapper(
         labtracks_tasks=labtracks_response,
         las_2020=las_2020_response,
