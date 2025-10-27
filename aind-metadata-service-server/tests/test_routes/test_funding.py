@@ -150,7 +150,7 @@ class TestRoute:
         ]
         response = client.get("/api/v2/project_names")
 
-        project_names = response.json()["data"]
+        project_names = response.json()
         expected_names = [
             "Discovery-Neuromodulator circuit dynamics during foraging - "
             "Subproject 1 Electrophysiological Recordings from NM Neurons "
