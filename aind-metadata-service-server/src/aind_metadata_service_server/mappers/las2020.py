@@ -268,12 +268,19 @@ class MappedLASList:
     @property
     def aind_doseduration(self) -> Optional[Decimal]:
         """Maps doseduration to aind model"""
+        if self._is_value_with_unit(self._las.doseduration):
+            match = re.match(self.VALUE_WITH_UNIT_REGEX, self._las.doseduration)
+            return self._parse_basic_decimal_str(match.group(1))
         return self._parse_basic_decimal_str(self._las.doseduration)
 
     @property
     def aind_dosevolume(self) -> Optional[Decimal]:
         """Maps dosevolume to aind model"""
-        return self._parse_basic_decimal_str(self._las.dosevolume)
+        if self._is_value_with_unit(self._las.dosevolume):
+            match = re.match(self.VALUE_WITH_UNIT_REGEX, self._las.dosevolume)
+            return self._parse_basic_decimal_str(match.group(1))
+        else:
+            return self._parse_basic_decimal_str(self._las.dosevolume)
 
     @property
     def aind_n_roid1(self) -> Optional[str]:
