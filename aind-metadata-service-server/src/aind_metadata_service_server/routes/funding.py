@@ -59,6 +59,6 @@ async def get_project_names(
         raise HTTPException(status_code=404, detail="Not found")
     response = JSONResponse(
         status_code=200,
-        content=({"message": "Success", "data": project_names_list}),
+        content=project_names_list,
     )
     return response
