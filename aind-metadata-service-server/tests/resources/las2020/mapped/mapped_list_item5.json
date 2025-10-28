@@ -39,7 +39,7 @@
                 "volume": 70.4,
                 "volume_unit": "microliter",
                 "duration": 30.0,
-                "duration_unit": "second",
+                "duration_unit": null,
                 "injection_current": null,
                 "injection_current_unit": null,
                 "alternating_current": null
