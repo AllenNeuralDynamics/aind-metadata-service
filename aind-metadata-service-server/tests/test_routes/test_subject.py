@@ -77,7 +77,6 @@ class TestRoute:
         assert 0 == len(mock_mg_api_get.mock_calls)
         assert caplog is not None
 
-
     @patch("aind_labtracks_service_async_client.DefaultApi.get_subject")
     def test_get_missing_subject(
         self,
