@@ -79,12 +79,6 @@ class TestLASParsers(TestCase):
                 if mapped_procedure_json
                 else None
             )
-            with open(f"mapped_{raw_file_name}", "w", encoding="utf-8") as f:
-                json.dump(
-                    mapped_procedure_json_parsed,
-                    f,
-                    indent=3,
-                )
             self.assertEqual(
                 expected_mapped_data, mapped_procedure_json_parsed
             )
