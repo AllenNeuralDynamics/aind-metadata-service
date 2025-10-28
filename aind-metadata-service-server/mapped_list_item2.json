@@ -16,7 +16,7 @@
                "name": "GT340C",
                "tars_identifiers": null,
                "addgene_id": null,
-               "titer": 700000000000,
+               "titer": 50,
                "titer_unit": "gc/mL"
             },
             {
@@ -74,6 +74,69 @@
          "injection_volume": null,
          "injection_volume_unit": "microliter",
          "injection_eye": "Right"
+      },
+      {
+         "injection_materials": [
+            {
+               "material_type": "Virus",
+               "name": null,
+               "tars_identifiers": null,
+               "addgene_id": null,
+               "titer": null,
+               "titer_unit": "gc/mL"
+            }
+         ],
+         "recovery_time": null,
+         "recovery_time_unit": "minute",
+         "injection_duration": null,
+         "injection_duration_unit": "minute",
+         "instrument_id": null,
+         "procedure_type": "Retro-orbital injection",
+         "injection_volume": "89.9",
+         "injection_volume_unit": "microliter",
+         "injection_eye": null
+      },
+      {
+         "injection_materials": [
+            {
+               "material_type": "Virus",
+               "name": null,
+               "tars_identifiers": null,
+               "addgene_id": null,
+               "titer": null,
+               "titer_unit": "gc/mL"
+            }
+         ],
+         "recovery_time": null,
+         "recovery_time_unit": "minute",
+         "injection_duration": null,
+         "injection_duration_unit": "minute",
+         "instrument_id": null,
+         "procedure_type": "Retro-orbital injection",
+         "injection_volume": "90",
+         "injection_volume_unit": "microliter",
+         "injection_eye": null
+      },
+      {
+         "injection_materials": [
+            {
+               "material_type": "Virus",
+               "name": null,
+               "tars_identifiers": null,
+               "addgene_id": null,
+               "titer": null,
+               "titer_unit": "gc/mL"
+            }
+         ],
+         "recovery_time": null,
+         "recovery_time_unit": "minute",
+         "injection_duration": null,
+         "injection_duration_unit": "minute",
+         "instrument_id": null,
+         "procedure_type": "Retro-orbital injection",
+         "injection_volume": "90",
+         "injection_volume_unit": "microliter",
+         "injection_eye": null
       }
    ],
    "notes": null
