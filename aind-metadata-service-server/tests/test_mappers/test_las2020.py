@@ -165,8 +165,20 @@ class TestLASParsers(TestCase):
         raw_data["dosevolume"] = None
         las_model = Las2020List.model_validate(raw_data)
         mapped = MappedLASList(las=las_model)
+
+        self.assertIsNone(mapped.aind_doseduration)
         self.assertIsNone(mapped.aind_doseduration_unit)
         self.assertIsNone(mapped.aind_dosevolume)
+
+        raw_data["doseduration"] = ""
+        raw_data["dosevolume"] = ""
+        las_model = Las2020List.model_validate(raw_data)
+        mapped = MappedLASList(las=las_model)
+
+        self.assertIsNone(mapped.aind_doseduration)
+        self.assertIsNone(mapped.aind_doseduration_unit)
+        self.assertIsNone(mapped.aind_dosevolume)
+
 
 if __name__ == "__main__":
     unittest_main()

@@ -277,19 +277,21 @@ class MappedLASList:
             )
             return self._parse_basic_decimal_str(match.group(1))
         return self._parse_basic_decimal_str(self._las.doseduration)
-    
-    @property 
+
+    @property
     def aind_doseduration_unit(self) -> Optional[TimeUnit]:
         """Maps doseduration unit to aind model"""
         if not self._las.doseduration:
             return None
-        
+
         if self._is_value_with_unit(self._las.doseduration):
-            match = re.match(self.VALUE_WITH_UNIT_REGEX, self._las.doseduration)
+            match = re.match(
+                self.VALUE_WITH_UNIT_REGEX, self._las.doseduration
+            )
             if match:
                 unit_str = match.group(2).lower()
                 return self._map_time_unit(unit_str)
-        
+
         return None
 
     def _map_time_unit(self, unit_str: str) -> Optional[TimeUnit]:
@@ -297,44 +299,39 @@ class MappedLASList:
         unit_mapping = {
             # Hours
             "hr": TimeUnit.HR,
-            "hour": TimeUnit.HR, 
+            "hour": TimeUnit.HR,
             "hours": TimeUnit.HR,
             "h": TimeUnit.HR,
-
             # Minutes
             "m": TimeUnit.M,
             "min": TimeUnit.M,
             "minute": TimeUnit.M,
             "minutes": TimeUnit.M,
             "mins": TimeUnit.M,
-            
             # Seconds
             "s": TimeUnit.S,
             "sec": TimeUnit.S,
             "second": TimeUnit.S,
             "seconds": TimeUnit.S,
             "secs": TimeUnit.S,
-            
             # Milliseconds
             "ms": TimeUnit.MS,
             "millisecond": TimeUnit.MS,
             "milliseconds": TimeUnit.MS,
             "msec": TimeUnit.MS,
-            
             # Microseconds
             "us": TimeUnit.US,
             "μs": TimeUnit.US,
             "microsecond": TimeUnit.US,
             "microseconds": TimeUnit.US,
             "usec": TimeUnit.US,
-            
             # Nanoseconds
             "ns": TimeUnit.NS,
             "nanosecond": TimeUnit.NS,
             "nanoseconds": TimeUnit.NS,
             "nsec": TimeUnit.NS,
         }
-        
+
         return unit_mapping.get(unit_str.lower())
 
     @property
@@ -342,13 +339,13 @@ class MappedLASList:
         """Maps dosevolume to aind model"""
         if not self._las.dosevolume:
             return None
-            
+
         if self._is_value_with_unit(self._las.dosevolume):
             match = re.match(self.VALUE_WITH_UNIT_REGEX, self._las.dosevolume)
             return self._parse_basic_decimal_str(match.group(1))
         else:
             return self._parse_basic_decimal_str(self._las.dosevolume)
-    
+
     @property
     def aind_n_roid1(self) -> Optional[str]:
         """Maps n_roid1 to aind model"""
