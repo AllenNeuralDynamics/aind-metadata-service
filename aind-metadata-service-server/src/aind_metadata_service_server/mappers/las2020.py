@@ -17,7 +17,7 @@ from aind_data_schema.components.injection_procedures import (
 from aind_data_schema.components.subject_procedures import Surgery
 from aind_data_schema_models.coordinates import AnatomicalRelative
 from aind_data_schema_models.mouse_anatomy import InjectionTargets
-from aind_data_schema_models.units import VolumeUnit
+from aind_data_schema_models.units import VolumeUnit, TimeUnit
 from aind_sharepoint_service_async_client.models import (
     Las2020List,
     LASDoseroute,
@@ -119,7 +119,7 @@ class MappedLASList:
     )
     DOSE_PAREN_REGEX = re.compile(r"\((\d+(\.\d+)?)\s*([a-zA-Z%\/]+)\)")
     SCIENTIFIC_NOTATION_REGEX = re.compile(r"^[-+]?\d+(?:\.\d+)?[eE][-+]?\d+$")
-    VALUE_WITH_UNIT_REGEX = re.compile(r"^([\d\.eE+-]+)\s*(\S+)$")
+    VALUE_WITH_UNIT_REGEX = re.compile(r"^([\d\.eE+-]+)\s*([a-zA-Z%/]+)$")
     INTEGER_REGEX = re.compile(r"^[+-]?\d+$")
 
     def __init__(self, las: Las2020List):
@@ -268,12 +268,83 @@ class MappedLASList:
     @property
     def aind_doseduration(self) -> Optional[Decimal]:
         """Maps doseduration to aind model"""
+        if not self._las.doseduration:
+            return None
+
+        if self._is_value_with_unit(self._las.doseduration):
+            match = re.match(
+                self.VALUE_WITH_UNIT_REGEX, self._las.doseduration
+            )
+            return self._parse_basic_decimal_str(match.group(1))
         return self._parse_basic_decimal_str(self._las.doseduration)
+
+    @property
+    def aind_doseduration_unit(self) -> Optional[TimeUnit]:
+        """Maps doseduration unit to aind model"""
+        if not self._las.doseduration:
+            return None
+
+        if self._is_value_with_unit(self._las.doseduration):
+            match = re.match(
+                self.VALUE_WITH_UNIT_REGEX, self._las.doseduration
+            )
+            if match:
+                unit_str = match.group(2).lower()
+                return self._map_time_unit(unit_str)
+
+        return None
+
+    def _map_time_unit(self, unit_str: str) -> Optional[TimeUnit]:
+        """Map string unit to TimeUnit enum"""
+        unit_mapping = {
+            # Hours
+            "hr": TimeUnit.HR,
+            "hour": TimeUnit.HR,
+            "hours": TimeUnit.HR,
+            "h": TimeUnit.HR,
+            # Minutes
+            "m": TimeUnit.M,
+            "min": TimeUnit.M,
+            "minute": TimeUnit.M,
+            "minutes": TimeUnit.M,
+            "mins": TimeUnit.M,
+            # Seconds
+            "s": TimeUnit.S,
+            "sec": TimeUnit.S,
+            "second": TimeUnit.S,
+            "seconds": TimeUnit.S,
+            "secs": TimeUnit.S,
+            # Milliseconds
+            "ms": TimeUnit.MS,
+            "millisecond": TimeUnit.MS,
+            "milliseconds": TimeUnit.MS,
+            "msec": TimeUnit.MS,
+            # Microseconds
+            "us": TimeUnit.US,
+            "μs": TimeUnit.US,
+            "microsecond": TimeUnit.US,
+            "microseconds": TimeUnit.US,
+            "usec": TimeUnit.US,
+            # Nanoseconds
+            "ns": TimeUnit.NS,
+            "nanosecond": TimeUnit.NS,
+            "nanoseconds": TimeUnit.NS,
+            "nsec": TimeUnit.NS,
+        }
+
+        return unit_mapping.get(unit_str.lower())
 
     @property
     def aind_dosevolume(self) -> Optional[Decimal]:
         """Maps dosevolume to aind model"""
-        return self._parse_basic_decimal_str(self._las.dosevolume)
+        if not self._las.dosevolume:
+            return None
+
+        if self._is_value_with_unit(self._las.dosevolume):
+            match = re.match(self.VALUE_WITH_UNIT_REGEX, self._las.dosevolume)
+            return self._parse_basic_decimal_str(match.group(1))
+        else:
+            return self._parse_basic_decimal_str(self._las.dosevolume)
 
     @property
     def aind_n_roid1(self) -> Optional[str]:
@@ -1220,6 +1291,7 @@ class MappedLASList:
                     volume=self.aind_dosevolume,
                     volume_unit=VolumeUnit.UL,
                     duration=self.aind_doseduration,
+                    duration_unit=self.aind_doseduration_unit,
                 )
             except ValidationError:
                 dynamics = InjectionDynamics.model_construct(
@@ -1227,6 +1299,7 @@ class MappedLASList:
                     volume=self.aind_dosevolume,
                     volume_unit=VolumeUnit.UL,
                     duration=self.aind_doseduration,
+                    duration_unit=self.aind_doseduration_unit,
                 )
             # Source is missing for injection materials
             ip_injection = Injection.model_construct(
