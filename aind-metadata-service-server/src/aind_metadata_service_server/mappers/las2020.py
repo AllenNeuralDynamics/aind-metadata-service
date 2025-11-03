@@ -1488,8 +1488,8 @@ class MappedLASList:
             if self._las.ro_eye1 is None
             else {
                 self._las.ro_eye1.BEHIND_EITHER: None,
-                self._las.ro_eye1.BEHIND_RIGHT: None,
-                self._las.ro_eye1.BEHIND_LEFT: None,
+                self._las.ro_eye1.BEHIND_RIGHT: Side.RIGHT,
+                self._las.ro_eye1.BEHIND_LEFT: Side.LEFT,
             }.get(self._las.ro_eye1, None)
         )
 
@@ -1501,8 +1501,8 @@ class MappedLASList:
             if self._las.ro_eye2 is None
             else {
                 self._las.ro_eye2.BEHIND_EITHER: None,
-                self._las.ro_eye2.BEHIND_RIGHT: None,
-                self._las.ro_eye2.BEHIND_LEFT: None,
+                self._las.ro_eye2.BEHIND_RIGHT: Side.RIGHT,
+                self._las.ro_eye2.BEHIND_LEFT: Side.LEFT,
             }.get(self._las.ro_eye2, None)
         )
 
@@ -1514,8 +1514,8 @@ class MappedLASList:
             if self._las.ro_eye3 is None
             else {
                 self._las.ro_eye3.BEHIND_EITHER: None,
-                self._las.ro_eye3.BEHIND_RIGHT: None,
-                self._las.ro_eye3.BEHIND_LEFT: None,
+                self._las.ro_eye3.BEHIND_RIGHT: Side.RIGHT,
+                self._las.ro_eye3.BEHIND_LEFT: Side.LEFT,
             }.get(self._las.ro_eye3, None)
         )
 
@@ -1527,8 +1527,8 @@ class MappedLASList:
             if self._las.ro_eye4 is None
             else {
                 self._las.ro_eye4.BEHIND_EITHER: None,
-                self._las.ro_eye4.BEHIND_RIGHT: None,
-                self._las.ro_eye4.BEHIND_LEFT: None,
+                self._las.ro_eye4.BEHIND_RIGHT: Side.RIGHT,
+                self._las.ro_eye4.BEHIND_LEFT: Side.LEFT,
             }.get(self._las.ro_eye4, None)
         )
 
@@ -1540,8 +1540,8 @@ class MappedLASList:
             if self._las.ro_eye5 is None
             else {
                 self._las.ro_eye5.BEHIND_EITHER: None,
-                self._las.ro_eye5.BEHIND_RIGHT: None,
-                self._las.ro_eye5.BEHIND_LEFT: None,
+                self._las.ro_eye5.BEHIND_RIGHT: Side.RIGHT,
+                self._las.ro_eye5.BEHIND_LEFT: Side.LEFT,
             }.get(self._las.ro_eye5, None)
         )
 

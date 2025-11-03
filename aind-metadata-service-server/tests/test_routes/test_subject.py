@@ -21,7 +21,7 @@ class TestRoute:
         mock_lb_api_get: AsyncMock,
         mock_mg_api_get: AsyncMock,
         client: TestClient,
-        caplog: pytest.LogCaptureFixture
+        caplog: pytest.LogCaptureFixture,
     ):
         """Tests a good response"""
         mock_lb_api_get.return_value = [

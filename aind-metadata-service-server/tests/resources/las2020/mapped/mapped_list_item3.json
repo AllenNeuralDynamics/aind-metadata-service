@@ -52,7 +52,7 @@
             "procedure_type": "Retro-orbital injection",
             "injection_volume": "90",
             "injection_volume_unit": "microliter",
-            "injection_eye": null
+            "injection_eye": "Left"
         },
         {
             "injection_materials": [
@@ -73,7 +73,7 @@
             "procedure_type": "Retro-orbital injection",
             "injection_volume": null,
             "injection_volume_unit": "microliter",
-            "injection_eye": null
+            "injection_eye": "Right"
         }
     ],
     "notes": null
