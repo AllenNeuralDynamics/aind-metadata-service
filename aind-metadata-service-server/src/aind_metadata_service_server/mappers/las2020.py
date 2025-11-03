@@ -1488,8 +1488,8 @@ class MappedLASList:
             if self._las.ro_eye1 is None
             else {
                 self._las.ro_eye1.BEHIND_EITHER: None,
-                self._las.ro_eye1.BEHIND_RIGHT: Side.LEFT,
-                self._las.ro_eye1.BEHIND_LEFT: Side.RIGHT,
+                self._las.ro_eye1.BEHIND_RIGHT: Side.RIGHT,
+                self._las.ro_eye1.BEHIND_LEFT: Side.LEFT,
             }.get(self._las.ro_eye1, None)
         )
 
