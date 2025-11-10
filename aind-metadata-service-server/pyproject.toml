@@ -25,7 +25,7 @@ dependencies = [
     'aind-sharepoint-service-async-client>=0.1.5',
     'aind-session-json-service-async-client>=0.1.3',
     'aind-data-schema==2.0.4',
-    'aind-data-schema-models==4.2.11',
+    'aind-data-schema-models==4.5.0',
     'pydantic>=2.0',
     'pydantic-settings>=2.0',
     'fastapi[standard]>=0.114.0',
