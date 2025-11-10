@@ -181,5 +181,6 @@ class TestRoute:
         response = client.get("api/v2/labtracks/subject/632269")
         assert 404 == response.status_code
 
+
 if __name__ == "__main__":
     pytest.main([__file__])
