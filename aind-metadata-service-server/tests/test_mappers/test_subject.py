@@ -232,7 +232,7 @@ class TestSubjectMapper(unittest.TestCase):
         expected_subject = Subject.model_construct(
             subject_id="123",
             subject_details=MouseSubject.model_construct(
-                source=Organization.UNKNOWN,
+                source=Organization.OTHER,
                 species=None,
                 sex=None,
                 date_of_birth=None,

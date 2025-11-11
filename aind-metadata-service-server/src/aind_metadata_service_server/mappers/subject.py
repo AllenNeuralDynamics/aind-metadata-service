@@ -241,7 +241,7 @@ class SubjectMapper:
         if breeding_info:
             source = Organization.AI
         else:
-            source = Organization.UNKNOWN
+            source = Organization.OTHER
         alleles = []
         for mgi_summary_row in self.mgi_info:
             mgi_mapper = MgiMapper(mgi_summary_row=mgi_summary_row)
