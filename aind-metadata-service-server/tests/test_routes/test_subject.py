@@ -163,7 +163,7 @@ class TestRoute:
                 group_description="BALB/c",
             )
         ]
-        response = client.get("api/v2/labtracks/subject/632269")
+        response = client.get("api/v2/labtracks/subject?subject_id=632269")
         assert 200 == response.status_code
 
     @patch("aind_labtracks_service_async_client.DefaultApi.get_subject")
@@ -174,7 +174,7 @@ class TestRoute:
     ):
         """Tests handling of LabTracks API errors"""
         mock_lb_api_get.return_value = []
-        response = client.get("api/v2/labtracks/subject/632269")
+        response = client.get("api/v2/labtracks/subject?subject_id=632269")
         assert 404 == response.status_code
 
 

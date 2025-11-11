@@ -2,7 +2,7 @@
 
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, Path
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
 from aind_metadata_service_server.mappers.responses import map_to_response
 from aind_metadata_service_server.mappers.subject import SubjectMapper
@@ -36,7 +36,6 @@ async def get_subject(
     labtracks_response = await labtracks_api_instance.get_subject(
         subject_id, _request_timeout=10
     )
-
     mappers = [
         SubjectMapper(labtracks_subject=labtracks_subject)
         for labtracks_subject in labtracks_response
@@ -65,9 +64,9 @@ async def get_subject(
         return map_to_response(subjects[0])
 
 
-@router.get("/api/v2/labtracks/subject/{subject_id}")
+@router.get("/api/v2/labtracks/subject")
 async def get_labtracks_subject(
-    subject_id: str = Path(
+    subject_id: str = Query(
         ...,
         openapi_examples={
             "default": {
