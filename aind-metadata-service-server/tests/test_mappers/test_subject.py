@@ -86,8 +86,8 @@ class TestSubjectMapper(unittest.TestCase):
             id="123",
         )
         self.assertEqual(
-            BreedingInfo.model_construct(
-                breeding_group=None,
+            BreedingInfo(
+                breeding_group="",
                 paternal_id="B",
                 paternal_genotype="C",
                 maternal_id="D",
@@ -97,7 +97,7 @@ class TestSubjectMapper(unittest.TestCase):
         )
         self.assertEqual(
             BreedingInfo.model_construct(
-                breeding_group=None,
+                breeding_group="",
                 maternal_id="D",
                 maternal_genotype=None,
                 paternal_id=None,
@@ -207,9 +207,9 @@ class TestSubjectMapper(unittest.TestCase):
                 species=Species.HOUSE_MOUSE,
                 alleles=[],
                 genotype="Pvalb-IRES-Cre/wt;RCL-somBiPoles_mCerulean-WPRE/wt",
-                breeding_info=BreedingInfo.model_construct(
+                breeding_info=BreedingInfo(
                     object_type="Breeding info",
-                    breeding_group=None,
+                    breeding_group="",
                     maternal_id="615310",
                     maternal_genotype="Pvalb-IRES-Cre/wt",
                     paternal_id="623236",

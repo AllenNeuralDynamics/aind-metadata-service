@@ -147,8 +147,6 @@ class SubjectMapper:
         BreedingInfo | None
         """
         labtracks_subject = self.labtracks_subject
-        # labtracks_subject.group_name functionality changed
-        breeding_group = None
         paternal_id = labtracks_subject.paternal_id
         if labtracks_subject.paternal_class_values:
             paternal_genotype = (
@@ -164,15 +162,23 @@ class SubjectMapper:
         else:
             maternal_genotype = None
         breeding_values = [
-            breeding_group,
             paternal_id,
             paternal_genotype,
             maternal_id,
             maternal_genotype,
         ]
-        if any(value is not None for value in breeding_values):
+        # breeding_group will be deprecated in schema, so setting to empty
+        if None not in breeding_values:
+            return BreedingInfo(
+                breeding_group="",
+                paternal_id=paternal_id,
+                paternal_genotype=paternal_genotype,
+                maternal_id=maternal_id,
+                maternal_genotype=maternal_genotype,
+            )
+        elif any(value is not None for value in breeding_values):
             return BreedingInfo.model_construct(
-                breeding_group=breeding_group,
+                breeding_group="",
                 paternal_id=paternal_id,
                 paternal_genotype=paternal_genotype,
                 maternal_id=maternal_id,

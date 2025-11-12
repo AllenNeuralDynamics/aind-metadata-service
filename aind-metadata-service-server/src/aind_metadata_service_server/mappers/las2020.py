@@ -17,7 +17,7 @@ from aind_data_schema.components.injection_procedures import (
 from aind_data_schema.components.subject_procedures import Surgery
 from aind_data_schema_models.coordinates import AnatomicalRelative
 from aind_data_schema_models.mouse_anatomy import InjectionTargets
-from aind_data_schema_models.units import VolumeUnit, TimeUnit
+from aind_data_schema_models.units import TimeUnit, VolumeUnit
 from aind_sharepoint_service_async_client.models import (
     Las2020List,
     LASDoseroute,
