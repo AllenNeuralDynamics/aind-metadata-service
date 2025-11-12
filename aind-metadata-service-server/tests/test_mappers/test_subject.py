@@ -80,13 +80,14 @@ class TestSubjectMapper(unittest.TestCase):
         subject_incomplete_info = LabtrackSubject(
             id="123",
             group_name="A",
+            maternal_id="D",
         )
         subject_no_info = LabtrackSubject(
             id="123",
         )
         self.assertEqual(
-            BreedingInfo(
-                breeding_group="A",
+            BreedingInfo.model_construct(
+                breeding_group=None,
                 paternal_id="B",
                 paternal_genotype="C",
                 maternal_id="D",
@@ -96,8 +97,8 @@ class TestSubjectMapper(unittest.TestCase):
         )
         self.assertEqual(
             BreedingInfo.model_construct(
-                breeding_group="A",
-                maternal_id=None,
+                breeding_group=None,
+                maternal_id="D",
                 maternal_genotype=None,
                 paternal_id=None,
                 paternal_genotype=None,
@@ -206,9 +207,9 @@ class TestSubjectMapper(unittest.TestCase):
                 species=Species.HOUSE_MOUSE,
                 alleles=[],
                 genotype="Pvalb-IRES-Cre/wt;RCL-somBiPoles_mCerulean-WPRE/wt",
-                breeding_info=BreedingInfo(
+                breeding_info=BreedingInfo.model_construct(
                     object_type="Breeding info",
-                    breeding_group="Exp-ND-01-001-2109",
+                    breeding_group=None,
                     maternal_id="615310",
                     maternal_genotype="Pvalb-IRES-Cre/wt",
                     paternal_id="623236",
@@ -232,7 +233,7 @@ class TestSubjectMapper(unittest.TestCase):
         expected_subject = Subject.model_construct(
             subject_id="123",
             subject_details=MouseSubject.model_construct(
-                source=Organization.OTHER,
+                source=Organization.UNKNOWN,
                 species=None,
                 sex=None,
                 date_of_birth=None,

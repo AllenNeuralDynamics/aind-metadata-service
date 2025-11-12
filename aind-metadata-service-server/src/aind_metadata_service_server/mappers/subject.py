@@ -147,7 +147,8 @@ class SubjectMapper:
         BreedingInfo | None
         """
         labtracks_subject = self.labtracks_subject
-        breeding_group = labtracks_subject.group_name
+        # labtracks_subject.group_name functionality changed
+        breeding_group = None
         paternal_id = labtracks_subject.paternal_id
         if labtracks_subject.paternal_class_values:
             paternal_genotype = (
@@ -169,15 +170,7 @@ class SubjectMapper:
             maternal_id,
             maternal_genotype,
         ]
-        if None not in breeding_values:
-            return BreedingInfo(
-                breeding_group=breeding_group,
-                paternal_id=paternal_id,
-                paternal_genotype=paternal_genotype,
-                maternal_id=maternal_id,
-                maternal_genotype=maternal_genotype,
-            )
-        elif any(value is not None for value in breeding_values):
+        if any(value is not None for value in breeding_values):
             return BreedingInfo.model_construct(
                 breeding_group=breeding_group,
                 paternal_id=paternal_id,
@@ -241,7 +234,7 @@ class SubjectMapper:
         if breeding_info:
             source = Organization.AI
         else:
-            source = Organization.OTHER
+            source = Organization.UNKNOWN
         alleles = []
         for mgi_summary_row in self.mgi_info:
             mgi_mapper = MgiMapper(mgi_summary_row=mgi_summary_row)
