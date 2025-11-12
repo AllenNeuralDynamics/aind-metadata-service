@@ -69,7 +69,7 @@ class TestRoute:
         ]
         mock_mg_api_get.return_value = []
         response = client.get("api/v2/subject/632269")
-        assert 200 == response.status_code
+        assert 400 == response.status_code
         assert 1 == len(mock_lb_api_get.mock_calls)
         assert 2 == len(mock_mg_api_get.mock_calls)
 
