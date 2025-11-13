@@ -2,7 +2,7 @@
 
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, Path
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
 from aind_metadata_service_server.mappers.responses import map_to_response
 from aind_metadata_service_server.mappers.subject import SubjectMapper
@@ -36,7 +36,6 @@ async def get_subject(
     labtracks_response = await labtracks_api_instance.get_subject(
         subject_id, _request_timeout=10
     )
-
     mappers = [
         SubjectMapper(labtracks_subject=labtracks_subject)
         for labtracks_subject in labtracks_response
@@ -63,3 +62,31 @@ async def get_subject(
         raise HTTPException(status_code=500)
     else:
         return map_to_response(subjects[0])
+
+
+@router.get("/api/v2/labtracks/subject")
+async def get_labtracks_subject(
+    subject_id: str = Query(
+        ...,
+        openapi_examples={
+            "default": {
+                "summary": "A sample subject ID",
+                "description": "Example subject ID for LabTracks",
+                "value": "632269",
+            }
+        },
+    ),
+    labtracks_api_instance=Depends(get_labtracks_api_instance),
+):
+    """
+    ## LabTracks Subject
+    Return LabTracks Subject metadata.
+    """
+    labtracks_response = await labtracks_api_instance.get_subject(
+        subject_id, _request_timeout=10
+    )
+
+    if not labtracks_response:
+        raise HTTPException(status_code=404, detail="Not found")
+
+    return map_to_response(labtracks_response)
