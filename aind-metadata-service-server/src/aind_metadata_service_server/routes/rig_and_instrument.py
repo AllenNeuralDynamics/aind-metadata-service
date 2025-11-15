@@ -70,7 +70,7 @@ async def get_instrument(
     Return an Instrument.
     """
 
-    if not partial_match:
+    if partial_match:
         filter_query = {"instrument_id": {"$regex": instrument_id}}
     else:
         filter_query = {"instrument_id": instrument_id}
