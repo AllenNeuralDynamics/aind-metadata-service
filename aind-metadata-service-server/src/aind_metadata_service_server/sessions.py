@@ -8,6 +8,7 @@ import aind_sharepoint_service_async_client
 import aind_slims_service_async_client
 import aind_smartsheet_service_async_client
 import aind_tars_service_async_client
+from aind_data_access_api.document_db import Client as DocDBClient
 from httpx import AsyncClient
 
 from aind_metadata_service_server.configs import get_settings
@@ -128,3 +129,14 @@ async def get_slims_api_instance() -> (
     ) as api_client:
         api_instance = aind_slims_service_async_client.DefaultApi(api_client)
         yield api_instance
+
+
+def get_instruments_client() -> DocDBClient:
+    """
+    Returns a client to read/write instruments.
+    """
+    return DocDBClient(
+        host=settings.docdb_api_host,
+        database="metadata_files",
+        collection="instruments",
+    )

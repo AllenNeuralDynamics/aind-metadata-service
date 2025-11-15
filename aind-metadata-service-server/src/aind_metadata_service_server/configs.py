@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     aind_data_schema_v1_host: HttpUrl = Field(
         ..., description="Host address for v1 service"
     )
+    docdb_api_host: str = Field(
+        ..., description="Host address for data access api"
+    )
 
 
 def get_settings():

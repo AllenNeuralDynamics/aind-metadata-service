@@ -29,6 +29,7 @@ dependencies = [
     'pydantic>=2.0',
     'pydantic-settings>=2.0',
     'fastapi[standard]>=0.114.0',
+    'aind-data-access-api==1.9.0'
 ]
 
 [project.optional-dependencies]
@@ -107,4 +108,5 @@ env = [
     "AIND_METADATA_SERVICE_SESSION_JSON_HOST=http://example.com/session_json",
     "AIND_METADATA_SERVICE_SHAREPOINT_HOST=http://example.com/sharepoint",
     "AIND_METADATA_SERVICE_AIND_DATA_SCHEMA_V1_HOST=http://example.com/v1",
+    "AIND_METADATA_SERVICE_DOCDB_API_HOST=http://example.com/docdb",
 ]
