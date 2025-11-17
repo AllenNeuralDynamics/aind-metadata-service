@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
-from requests import Response
+from requests import HTTPError, Response
 
 TEST_DIR = Path(__file__).parent / ".."
 TEST_RIG_JSON = TEST_DIR / "resources" / "slims" / "rig_example.json"
@@ -133,12 +133,13 @@ class TestRoute:
             "utf-8"
         )
         mock_docdb_client_insert.return_value = mock_response
-        body = {"instrument_id": "abc"}
+        body = {"instrument_id": "abc", "modification_date": "2025-10-10"}
         response = client.post("/api/v2/instrument", json=body)
         mock_docdb_client_insert.assert_called_once_with(
             {
                 "instrument_id": "abc",
-                "_id": "90015098-3cd2-4fb0-d696-3f7d28e17f72",
+                "modification_date": "2025-10-10",
+                "_id": "e9851dd4-297a-4fc6-91ec-5665823326a5",
             },
         )
         assert 200 == response.status_code
@@ -153,12 +154,76 @@ class TestRoute:
         mock_docdb_client_insert: MagicMock,
         client: TestClient,
     ):
-        """Tests success post response for an instrument"""
+        """Tests failed post response for an instrument missing id"""
         body = {"field1": "abc"}
         response = client.post("/api/v2/instrument", json=body)
         mock_docdb_client_insert.assert_not_called()
         assert 406 == response.status_code
         assert response.json() == {"message": "Missing instrument_id."}
+
+    @patch(
+        "aind_metadata_service_server.routes.rig_and_instrument.DocDBClient"
+        ".insert_one_docdb_record"
+    )
+    def test_post_instrument_failure_missing_date(
+        self,
+        mock_docdb_client_insert: MagicMock,
+        client: TestClient,
+    ):
+        """Tests failed post response for an instrument missing date"""
+        body = {"instrument_id": "abc"}
+        response = client.post("/api/v2/instrument", json=body)
+        mock_docdb_client_insert.assert_not_called()
+        assert 406 == response.status_code
+        assert response.json() == {"message": "Missing modification_date."}
+
+    @patch(
+        "aind_metadata_service_server.routes.rig_and_instrument.DocDBClient"
+        ".insert_one_docdb_record"
+    )
+    def test_post_instrument_failure_id_exists(
+        self,
+        mock_docdb_client_insert: MagicMock,
+        client: TestClient,
+    ):
+        """Tests failed post response for an instrument same id"""
+        mock_response = HTTPError(response=Response())
+        mock_response.response._content = "duplicate key error".encode()
+        mock_docdb_client_insert.side_effect = mock_response
+        body = {"instrument_id": "abc", "modification_date": "2025-10-10"}
+        response = client.post("/api/v2/instrument", json=body)
+        mock_docdb_client_insert.assert_called_once_with(
+            {
+                "instrument_id": "abc",
+                "modification_date": "2025-10-10",
+                "_id": "e9851dd4-297a-4fc6-91ec-5665823326a5",
+            },
+        )
+        assert 400 == response.status_code
+
+    @patch(
+        "aind_metadata_service_server.routes.rig_and_instrument.DocDBClient"
+        ".insert_one_docdb_record"
+    )
+    def test_post_instrument_failure_server_error(
+        self,
+        mock_docdb_client_insert: MagicMock,
+        client: TestClient,
+    ):
+        """Tests failed post response with server error"""
+        mock_response = HTTPError(response=Response())
+        mock_response.response._content = "Error".encode()
+        mock_docdb_client_insert.side_effect = mock_response
+        body = {"instrument_id": "abc", "modification_date": "2025-10-10"}
+        response = client.post("/api/v2/instrument", json=body)
+        mock_docdb_client_insert.assert_called_once_with(
+            {
+                "instrument_id": "abc",
+                "modification_date": "2025-10-10",
+                "_id": "e9851dd4-297a-4fc6-91ec-5665823326a5",
+            },
+        )
+        assert 500 == response.status_code
 
 
 if __name__ == "__main__":
