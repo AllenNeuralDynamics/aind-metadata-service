@@ -8,6 +8,7 @@ from aind_data_access_api.document_db import Client as DocDBClient
 from aind_slims_service_async_client import DefaultApi
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query
 from fastapi.responses import JSONResponse
+from requests import HTTPError
 
 from aind_metadata_service_server.sessions import (
     get_instruments_client,
@@ -119,9 +120,39 @@ def post_instrument(
         return JSONResponse(
             status_code=406, content={"message": "Missing instrument_id."}
         )
+    elif (
+        data.get("modification_date") is None
+        or not isinstance(data["modification_date"], str)
+        or data["modification_date"].strip() == ""
+    ):
+        return JSONResponse(
+            status_code=406, content={"message": "Missing modification_date."}
+        )
     else:
-        encoded_string = data["instrument_id"].encode("utf-8")
+        instrument_id = data["instrument_id"]
+        modification_date = data["modification_date"]
+        concat_fields = instrument_id + modification_date
+        encoded_string = concat_fields.encode("utf-8")
         md5_hash = hashlib.md5(encoded_string).hexdigest()
         data["_id"] = str(UUID(md5_hash))
-        response = docdb_client.insert_one_docdb_record(data)
-        return response.json()
+        try:
+            response = docdb_client.insert_one_docdb_record(data)
+            return response.json()
+        except HTTPError as e:
+            if "duplicate key error" in e.response.text:
+                return JSONResponse(
+                    status_code=400,
+                    content=(
+                        {
+                            "message": (
+                                "Record for instrument_id and "
+                                "modification_date already exists!"
+                            )
+                        }
+                    ),
+                )
+            else:
+                return JSONResponse(
+                    status_code=500,
+                    content={"message": "Internal Server Error"},
+                )
