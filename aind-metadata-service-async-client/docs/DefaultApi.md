@@ -31,6 +31,7 @@ Method | HTTP request | Description
 [**get_v1_slims_workflow**](DefaultApi.md#get_v1_slims_workflow) | **GET** /slims/{workflow} | Get V1 Slims Workflow
 [**get_v1_subject**](DefaultApi.md#get_v1_subject) | **GET** /subject/{subject_id} | Get V1 Subject
 [**index**](DefaultApi.md#index) | **GET** / | Index
+[**post_instrument**](DefaultApi.md#post_instrument) | **POST** /api/v2/instrument | Post Instrument
 
 
 # **get_funding**
@@ -1900,6 +1901,75 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | Successful Response |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **post_instrument**
+> object post_instrument(request_body)
+
+Post Instrument
+
+## Instrument
+Save an instrument to a database.
+
+### Example
+
+
+```python
+import aind_metadata_service_async_client
+from aind_metadata_service_async_client.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to http://localhost
+# See configuration.py for a list of all supported configuration parameters.
+configuration = aind_metadata_service_async_client.Configuration(
+    host = "http://localhost"
+)
+
+
+# Enter a context with an instance of the API client
+async with aind_metadata_service_async_client.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = aind_metadata_service_async_client.DefaultApi(api_client)
+    request_body = None # Dict[str, object] | 
+
+    try:
+        # Post Instrument
+        api_response = await api_instance.post_instrument(request_body)
+        print("The response of DefaultApi->post_instrument:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling DefaultApi->post_instrument: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **request_body** | [**Dict[str, object]**](object.md)|  | 
+
+### Return type
+
+**object**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Successful Response |  -  |
+**422** | Validation Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
