@@ -105,7 +105,7 @@ class TestRoute:
             "foraging"
         )
 
-        assert 500 == response.status_code
+        assert 406 == response.status_code
         assert 1 == len(mock_get_funding.mock_calls)
 
     @patch(
