@@ -57,7 +57,7 @@ async def get_instrument(
         openapi_examples={
             "default": {
                 "summary": "A sample instrument ID",
-                "description": "Example instrument ID for SLIMS",
+                "description": "Example instrument ID",
                 "value": "440_SmartSPIM1_20240327",
             }
         },

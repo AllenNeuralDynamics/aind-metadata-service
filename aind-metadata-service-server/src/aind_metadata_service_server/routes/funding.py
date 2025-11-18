@@ -19,7 +19,8 @@ async def get_funding(
                 "summary": "A sample project name",
                 "description": "Example project name for smartsheet",
                 "value": (
-                    "Discovery-Neuromodulator circuit dynamics during foraging"
+                    "Thalamus in the middle - Project 1 Mesoscale thalamic"
+                    " circuits"
                 ),
             }
         },
@@ -36,10 +37,23 @@ async def get_funding(
         subproject=subproject,
         _request_timeout=10,
     )
+    if funding_response:
+        has_subprojects = any(row.subproject for row in funding_response)
+        if subproject is None and has_subprojects:
+            raise HTTPException(
+                status_code=500,
+                detail=(
+                    f"Project '{main_project_name}' has subprojects. "
+                    f"Please specify a subproject in the format: "
+                    f"'{main_project_name} - Subproject Name'"
+                ),
+            )
     mapper = FundingMapper(smartsheet_funding=funding_response)
     funding_information = mapper.get_funding_list()
+
     if len(funding_information) == 0:
         raise HTTPException(status_code=404, detail="Not found")
+
     return map_to_response(funding_information)
 
 
@@ -62,3 +76,16 @@ async def get_project_names(
         content=project_names_list,
     )
     return response
+
+
+@router.get("/api/v2/smartsheet/funding")
+async def get_smartsheet_funding(
+    smartsheet_api_instance=Depends(get_smartsheet_api_instance),
+) -> JSONResponse:
+    """
+    Get raw funding data from Smartsheet.
+    """
+    funding_response = await smartsheet_api_instance.get_funding(
+        _request_timeout=10
+    )
+    return funding_response
