@@ -37,17 +37,16 @@ async def get_funding(
         subproject=subproject,
         _request_timeout=10,
     )
-    if funding_response:
-        has_subprojects = any(row.subproject for row in funding_response)
-        if subproject is None and has_subprojects:
-            raise HTTPException(
-                status_code=500,
-                detail=(
-                    f"Project '{main_project_name}' has subprojects. "
-                    f"Please specify a subproject in the format: "
-                    f"'{main_project_name} - Subproject Name'"
-                ),
-            )
+    has_subprojects = any(row.subproject for row in funding_response)
+    if subproject is None and has_subprojects:
+        raise HTTPException(
+            status_code=406,
+            detail=(
+                f"Project '{main_project_name}' has subprojects. "
+                f"Please specify a subproject in the format: "
+                f"'{main_project_name} - Subproject Name'"
+            ),
+        )
     mapper = FundingMapper(smartsheet_funding=funding_response)
     funding_information = mapper.get_funding_list()
 
