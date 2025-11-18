@@ -85,8 +85,6 @@ async def get_labtracks_subject(
     labtracks_response = await labtracks_api_instance.get_subject(
         subject_id, _request_timeout=10
     )
-
     if not labtracks_response:
         raise HTTPException(status_code=404, detail="Not found")
-
-    return map_to_response(labtracks_response)
+    return labtracks_response
