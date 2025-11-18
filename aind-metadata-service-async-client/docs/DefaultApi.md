@@ -8,6 +8,7 @@ Method | HTTP request | Description
 [**get_injection_materials**](DefaultApi.md#get_injection_materials) | **GET** /api/v2/tars_injection_materials/{prep_lot_number} | Get Injection Materials
 [**get_instrument**](DefaultApi.md#get_instrument) | **GET** /api/v2/instrument/{instrument_id} | Get Instrument
 [**get_intended_measurements**](DefaultApi.md#get_intended_measurements) | **GET** /api/v2/intended_measurements/{subject_id} | Get Intended Measurements
+[**get_labtracks_subject**](DefaultApi.md#get_labtracks_subject) | **GET** /api/v2/labtracks/subject | Get Labtracks Subject
 [**get_mgi_allele**](DefaultApi.md#get_mgi_allele) | **GET** /api/v2/mgi_allele/{allele_name} | Get Mgi Allele
 [**get_perfusions**](DefaultApi.md#get_perfusions) | **GET** /api/v2/perfusions/{subject_id} | Get Perfusions
 [**get_procedures**](DefaultApi.md#get_procedures) | **GET** /api/v2/procedures/{subject_id} | Get Procedures
@@ -30,6 +31,7 @@ Method | HTTP request | Description
 [**get_v1_slims_workflow**](DefaultApi.md#get_v1_slims_workflow) | **GET** /slims/{workflow} | Get V1 Slims Workflow
 [**get_v1_subject**](DefaultApi.md#get_v1_subject) | **GET** /subject/{subject_id} | Get V1 Subject
 [**index**](DefaultApi.md#index) | **GET** / | Index
+[**post_instrument**](DefaultApi.md#post_instrument) | **POST** /api/v2/instrument | Post Instrument
 
 
 # **get_funding**
@@ -277,6 +279,75 @@ async with aind_metadata_service_async_client.ApiClient(configuration) as api_cl
         pprint(api_response)
     except Exception as e:
         print("Exception when calling DefaultApi->get_intended_measurements: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **subject_id** | **str**|  | 
+
+### Return type
+
+**object**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Successful Response |  -  |
+**422** | Validation Error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **get_labtracks_subject**
+> object get_labtracks_subject(subject_id)
+
+Get Labtracks Subject
+
+## LabTracks Subject
+Return LabTracks Subject metadata.
+
+### Example
+
+
+```python
+import aind_metadata_service_async_client
+from aind_metadata_service_async_client.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to http://localhost
+# See configuration.py for a list of all supported configuration parameters.
+configuration = aind_metadata_service_async_client.Configuration(
+    host = "http://localhost"
+)
+
+
+# Enter a context with an instance of the API client
+async with aind_metadata_service_async_client.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = aind_metadata_service_async_client.DefaultApi(api_client)
+    subject_id = '632269' # str | 
+
+    try:
+        # Get Labtracks Subject
+        api_response = await api_instance.get_labtracks_subject(subject_id)
+        print("The response of DefaultApi->get_labtracks_subject:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling DefaultApi->get_labtracks_subject: %s\n" % e)
 ```
 
 
@@ -1830,6 +1901,75 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | Successful Response |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **post_instrument**
+> object post_instrument(request_body)
+
+Post Instrument
+
+## Instrument
+Save an instrument to a database.
+
+### Example
+
+
+```python
+import aind_metadata_service_async_client
+from aind_metadata_service_async_client.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to http://localhost
+# See configuration.py for a list of all supported configuration parameters.
+configuration = aind_metadata_service_async_client.Configuration(
+    host = "http://localhost"
+)
+
+
+# Enter a context with an instance of the API client
+async with aind_metadata_service_async_client.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = aind_metadata_service_async_client.DefaultApi(api_client)
+    request_body = None # Dict[str, object] | 
+
+    try:
+        # Post Instrument
+        api_response = await api_instance.post_instrument(request_body)
+        print("The response of DefaultApi->post_instrument:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling DefaultApi->post_instrument: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **request_body** | [**Dict[str, object]**](object.md)|  | 
+
+### Return type
+
+**object**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Successful Response |  -  |
+**422** | Validation Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
