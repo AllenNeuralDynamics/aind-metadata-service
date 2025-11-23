@@ -147,6 +147,36 @@ class TestRoute:
 
     @patch(
         "aind_metadata_service_server.routes.rig_and_instrument.DocDBClient"
+        ".upsert_one_docdb_record"
+    )
+    def test_post_upsert_instrument_success(
+        self,
+        mock_docdb_client_upsert: MagicMock,
+        client: TestClient,
+    ):
+        """Tests success post response for an instrument with upsert True"""
+        mock_response = Response()
+        mock_response.status_code = 200
+        mock_response._content = json.dumps({"message": "success"}).encode(
+            "utf-8"
+        )
+        mock_docdb_client_upsert.return_value = mock_response
+        body = {"instrument_id": "abc", "modification_date": "2025-10-10"}
+        response = client.post(
+            "/api/v2/instrument", json=body, params={"upsert": True}
+        )
+        mock_docdb_client_upsert.assert_called_once_with(
+            {
+                "instrument_id": "abc",
+                "modification_date": "2025-10-10",
+                "_id": "e9851dd4-297a-4fc6-91ec-5665823326a5",
+            },
+        )
+        assert 200 == response.status_code
+        assert response.json() == {"message": "success"}
+
+    @patch(
+        "aind_metadata_service_server.routes.rig_and_instrument.DocDBClient"
         ".insert_one_docdb_record"
     )
     def test_post_instrument_failure(

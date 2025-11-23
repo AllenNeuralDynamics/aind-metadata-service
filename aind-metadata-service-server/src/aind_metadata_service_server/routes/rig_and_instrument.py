@@ -105,6 +105,7 @@ async def get_instrument(
 
 @router.post("/api/v2/instrument")
 def post_instrument(
+    upsert: bool = Query(default=False),
     data: dict = Body(...),
     docdb_client: DocDBClient = Depends(get_instruments_client),
 ):
@@ -136,7 +137,10 @@ def post_instrument(
         md5_hash = hashlib.md5(encoded_string).hexdigest()
         data["_id"] = str(UUID(md5_hash))
         try:
-            response = docdb_client.insert_one_docdb_record(data)
+            if not upsert:
+                response = docdb_client.insert_one_docdb_record(data)
+            else:
+                response = docdb_client.upsert_one_docdb_record(data)
             return response.json()
         except HTTPError as e:
             if "duplicate key error" in e.response.text:
