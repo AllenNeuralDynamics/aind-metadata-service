@@ -2,7 +2,6 @@
 
 import json
 import os
-from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
 from typing import Callable, List
@@ -36,18 +35,15 @@ class TestNSB2019BasicMapping(TestCase):
 
     def test_map_experimenter_full_name(self):
         """Test experimenter full name mapping"""
-        # Test with author_id present
-        with open(DIR_RAW / "list_item1.json") as f:
-            raw_data = json.load(f)
-        
-        nsb_model = NSB2019List.model_validate(raw_data)
+        nsb_model_author = NSB2019List.model_validate(
+            {"FileSystemObjectType": 0, "Id": 1, "AuthorId": 187}
+        )
+        nsb_model = NSB2019List.model_validate(nsb_model_author)
         mapper = MappedNSBList(nsb=nsb_model)
         
         experimenter = mapper.aind_experimenter_full_name
-        self.assertIsNotNone(experimenter)
-        self.assertTrue(experimenter.startswith("NSB"))
+        self.assertEqual(experimenter, "NSB-187")
         
-        # Test with author_id None
         nsb_model_no_author = NSB2019List.model_validate(
             {"FileSystemObjectType": 0, "Id": 1}
         )
@@ -64,8 +60,7 @@ class TestNSB2019BasicMapping(TestCase):
 
     def test_map_iacuc_protocol(self):
         """Test IACUC protocol mapping"""
-        with open(DIR_RAW / "list_item1.json") as f:
-            raw_data = json.load(f)
+        raw_data = {"IACUC_x0020_Protocol_x0020__x002": "2115"}
         
         nsb_model = NSB2019List.model_validate(raw_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -625,22 +620,6 @@ class TestNSB2019SurgeryIntegration(TestCase):
             if injection_surgery.measured_coordinates:
                 self.assertIsInstance(injection_surgery.measured_coordinates, dict)
 
-    # def test_get_surgeries_all_files(self):
-    #     """Test that all raw files produce valid surgeries"""
-    #     for filename in os.listdir(DIR_RAW):
-    #         with self.subTest(file=filename):
-    #             with open(DIR_RAW / filename) as f:
-    #                 raw_data = json.load(f)
-                
-    #             nsb_model = NSB2019List.model_validate(raw_data)
-    #             mapper = MappedNSBList(nsb=nsb_model)
-    #             surgeries = mapper.get_surgeries()
-                
-    #             self.assertIsInstance(surgeries, list)
-    #             for surgery in surgeries:
-    #                 self.assertIsInstance(surgery, Surgery)
-    #                 self.assertIsInstance(surgery.procedures, list)
-
     def test_get_surgeries_unknown_procedure(self):
         """Test handling of unknown procedures"""
         nsb_data = {
@@ -694,15 +673,13 @@ class TestNSB2019CoordinateMapping(TestCase):
         nsb_data = {
             "FileSystemObjectType": 0,
             "Id": 1,
-            "Breg2Lamb": "4.5",
+            "Breg2Lamb": "-4.5",
         }
         nsb_model = NSB2019List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
         
         b2l = mapper.aind_breg2_lamb
-        if b2l:
-            self.assertIsInstance(b2l, Decimal)
-            self.assertGreaterEqual(b2l, 0)  # Should be absolute value
+        self.assertEqual(b2l, Decimal("4.5"))
 
 
 class TestNSB2019StringParsers(TestCase):
