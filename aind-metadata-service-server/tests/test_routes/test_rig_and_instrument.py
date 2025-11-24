@@ -147,25 +147,34 @@ class TestRoute:
 
     @patch(
         "aind_metadata_service_server.routes.rig_and_instrument.DocDBClient"
-        ".upsert_one_docdb_record"
+        ".delete_one_record"
     )
-    def test_post_upsert_instrument_success(
+    @patch(
+        "aind_metadata_service_server.routes.rig_and_instrument.DocDBClient"
+        ".insert_one_docdb_record"
+    )
+    def test_post_replace_instrument_success(
         self,
-        mock_docdb_client_upsert: MagicMock,
+        mock_docdb_client_insert_one: MagicMock,
+        mock_docdb_client_delete_one: MagicMock,
         client: TestClient,
     ):
-        """Tests success post response for an instrument with upsert True"""
+        """Tests success post response for an instrument with replace True"""
         mock_response = Response()
         mock_response.status_code = 200
         mock_response._content = json.dumps({"message": "success"}).encode(
             "utf-8"
         )
-        mock_docdb_client_upsert.return_value = mock_response
+        mock_docdb_client_delete_one.return_value = mock_response
+        mock_docdb_client_insert_one.return_value = mock_response
         body = {"instrument_id": "abc", "modification_date": "2025-10-10"}
         response = client.post(
-            "/api/v2/instrument", json=body, params={"upsert": True}
+            "/api/v2/instrument", json=body, params={"replace": True}
         )
-        mock_docdb_client_upsert.assert_called_once_with(
+        mock_docdb_client_delete_one.assert_called_once_with(
+            "e9851dd4-297a-4fc6-91ec-5665823326a5"
+        )
+        mock_docdb_client_insert_one.assert_called_once_with(
             {
                 "instrument_id": "abc",
                 "modification_date": "2025-10-10",
