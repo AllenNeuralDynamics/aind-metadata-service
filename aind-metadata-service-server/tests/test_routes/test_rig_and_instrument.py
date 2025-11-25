@@ -147,6 +147,45 @@ class TestRoute:
 
     @patch(
         "aind_metadata_service_server.routes.rig_and_instrument.DocDBClient"
+        ".delete_one_record"
+    )
+    @patch(
+        "aind_metadata_service_server.routes.rig_and_instrument.DocDBClient"
+        ".insert_one_docdb_record"
+    )
+    def test_post_replace_instrument_success(
+        self,
+        mock_docdb_client_insert_one: MagicMock,
+        mock_docdb_client_delete_one: MagicMock,
+        client: TestClient,
+    ):
+        """Tests success post response for an instrument with replace True"""
+        mock_response = Response()
+        mock_response.status_code = 200
+        mock_response._content = json.dumps({"message": "success"}).encode(
+            "utf-8"
+        )
+        mock_docdb_client_delete_one.return_value = mock_response
+        mock_docdb_client_insert_one.return_value = mock_response
+        body = {"instrument_id": "abc", "modification_date": "2025-10-10"}
+        response = client.post(
+            "/api/v2/instrument", json=body, params={"replace": True}
+        )
+        mock_docdb_client_delete_one.assert_called_once_with(
+            "e9851dd4-297a-4fc6-91ec-5665823326a5"
+        )
+        mock_docdb_client_insert_one.assert_called_once_with(
+            {
+                "instrument_id": "abc",
+                "modification_date": "2025-10-10",
+                "_id": "e9851dd4-297a-4fc6-91ec-5665823326a5",
+            },
+        )
+        assert 200 == response.status_code
+        assert response.json() == {"message": "success"}
+
+    @patch(
+        "aind_metadata_service_server.routes.rig_and_instrument.DocDBClient"
         ".insert_one_docdb_record"
     )
     def test_post_instrument_failure(

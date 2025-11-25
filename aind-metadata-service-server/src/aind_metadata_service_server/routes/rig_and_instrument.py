@@ -1,6 +1,7 @@
 """Module to handle rig and instrument endpoints"""
 
 import hashlib
+import logging
 from asyncio import gather, to_thread
 from uuid import UUID
 
@@ -57,7 +58,7 @@ async def get_instrument(
         openapi_examples={
             "default": {
                 "summary": "A sample instrument ID",
-                "description": "Example instrument ID for SLIMS",
+                "description": "Example instrument ID",
                 "value": "440_SmartSPIM1_20240327",
             }
         },
@@ -105,6 +106,7 @@ async def get_instrument(
 
 @router.post("/api/v2/instrument")
 def post_instrument(
+    replace: bool = Query(default=False),
     data: dict = Body(...),
     docdb_client: DocDBClient = Depends(get_instruments_client),
 ):
@@ -136,7 +138,12 @@ def post_instrument(
         md5_hash = hashlib.md5(encoded_string).hexdigest()
         data["_id"] = str(UUID(md5_hash))
         try:
-            response = docdb_client.insert_one_docdb_record(data)
+            if not replace:
+                response = docdb_client.insert_one_docdb_record(data)
+            else:
+                response1 = docdb_client.delete_one_record(data["_id"])
+                logging.info(response1.json())
+                response = docdb_client.insert_one_docdb_record(data)
             return response.json()
         except HTTPError as e:
             if "duplicate key error" in e.response.text:

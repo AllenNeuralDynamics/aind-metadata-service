@@ -19,7 +19,7 @@ class TestRoute:
         mock_get_funding: AsyncMock,
         client: TestClient,
     ):
-        """Tests successful funding retrieval"""
+        """Tests successful funding retrieval with subproject specified"""
         discovery_project = (
             "Discovery-Neuromodulator circuit dynamics during foraging"
         )
@@ -27,7 +27,6 @@ class TestRoute:
             "Subproject 1 Electrophysiological Recordings from NM Neurons"
             " During Behavior"
         )
-
         mock_get_funding.return_value = [
             FundingModel(
                 project_name=discovery_project,
@@ -51,7 +50,9 @@ class TestRoute:
         ]
         response = client.get(
             "/api/v2/funding/"
-            "Discovery-Neuromodulator circuit dynamics during foraging"
+            "Discovery-Neuromodulator circuit dynamics during foraging -"
+            " Subproject 1 Electrophysiological Recordings from NM Neurons"
+            " During Behavior"
         )
         assert 200 == response.status_code
         assert 1 == len(mock_get_funding.mock_calls)
@@ -60,7 +61,7 @@ class TestRoute:
         "aind_smartsheet_service_async_client.DefaultApi.get_funding",
         new_callable=AsyncMock,
     )
-    def test_get_funding_with_subproject(
+    def test_get_funding_without_subproject(
         self,
         mock_get_funding: AsyncMock,
         client: TestClient,
@@ -69,9 +70,23 @@ class TestRoute:
         discovery_project = (
             "Discovery-Neuromodulator circuit dynamics during foraging"
         )
+        sub1 = (
+            "Subproject 1 Electrophysiological Recordings from NM Neurons"
+            " During Behavior"
+        )
         sub2 = "Subproject 2 Molecular Anatomy Cell Types"
 
         mock_get_funding.return_value = [
+            FundingModel(
+                project_name=discovery_project,
+                subproject=sub1,
+                project_code="122-01-001-10",
+                funding_institution="Allen Institute",
+                fundees__pi=(
+                    "Person Four, Person Five, Person Six, Person Seven,"
+                    " Person Eight"
+                ),
+            ),
             FundingModel(
                 project_name=discovery_project,
                 subproject=sub2,
@@ -87,10 +102,10 @@ class TestRoute:
         ]
         response = client.get(
             "/api/v2/funding/Discovery-Neuromodulator circuit dynamics during "
-            "foraging?subproject=Subproject 2 Molecular Anatomy Cell Types"
+            "foraging"
         )
 
-        assert 200 == response.status_code
+        assert 406 == response.status_code
         assert 1 == len(mock_get_funding.mock_calls)
 
     @patch(
@@ -212,6 +227,49 @@ class TestRoute:
         ]
         response = client.get("/api/v2/funding/Test Project")
         assert 404 == response.status_code
+        assert 1 == len(mock_get_funding.mock_calls)
+
+    @patch(
+        "aind_smartsheet_service_async_client.DefaultApi.get_funding",
+        new_callable=AsyncMock,
+    )
+    def test_get_smartsheet_funding(
+        self,
+        mock_get_funding: AsyncMock,
+        client: TestClient,
+    ):
+        """Tests successful funding retrieval"""
+        discovery_project = (
+            "Discovery-Neuromodulator circuit dynamics during foraging"
+        )
+        sub1 = (
+            "Subproject 1 Electrophysiological Recordings from NM Neurons"
+            " During Behavior"
+        )
+
+        mock_get_funding.return_value = [
+            FundingModel(
+                project_name=discovery_project,
+                subproject=sub1,
+                project_code="122-01-001-10",
+                funding_institution="Allen Institute",
+                fundees__pi=(
+                    "Person Four, Person Five, Person Six, Person Seven,"
+                    " Person Eight"
+                ),
+            ),
+            FundingModel(
+                project_name=discovery_project,
+                subproject=sub1,
+                project_code="122-01-012-20",
+                funding_institution="NINDS",
+                grant_number="1RF1NS131984",
+                fundees__pi="Person Five, Person Six, Person Eight",
+                investigators="Person Six, Person Eight",
+            ),
+        ]
+        response = client.get("/api/v2/smartsheet/funding/")
+        assert 200 == response.status_code
         assert 1 == len(mock_get_funding.mock_calls)
 
 
