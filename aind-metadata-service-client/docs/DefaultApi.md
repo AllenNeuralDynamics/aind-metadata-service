@@ -16,6 +16,7 @@ Method | HTTP request | Description
 [**get_protocols**](DefaultApi.md#get_protocols) | **GET** /api/v2/protocols/{protocol_name} | Get Protocols
 [**get_rig**](DefaultApi.md#get_rig) | **GET** /api/v2/rig/{rig_id} | Get Rig
 [**get_slims_workflow**](DefaultApi.md#get_slims_workflow) | **GET** /api/v2/slims/{workflow} | Get Slims Workflow
+[**get_smartsheet_funding**](DefaultApi.md#get_smartsheet_funding) | **GET** /api/v2/smartsheet/funding | Get Smartsheet Funding
 [**get_subject**](DefaultApi.md#get_subject) | **GET** /api/v2/subject/{subject_id} | Get Subject
 [**get_v1_bergamo_session**](DefaultApi.md#get_v1_bergamo_session) | **POST** /bergamo_session | Get V1 Bergamo Session
 [**get_v1_funding**](DefaultApi.md#get_v1_funding) | **GET** /funding/{project_name} | Get V1 Funding
@@ -61,7 +62,7 @@ configuration = aind_metadata_service_client.Configuration(
 with aind_metadata_service_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = aind_metadata_service_client.DefaultApi(api_client)
-    project_name = 'Discovery-Neuromodulator circuit dynamics during foraging' # str | 
+    project_name = 'Thalamus in the middle - Project 1 Mesoscale thalamic circuits' # str | 
 
     try:
         # Get Funding
@@ -866,6 +867,69 @@ No authorization required
 |-------------|-------------|------------------|
 **200** | Successful Response |  -  |
 **422** | Validation Error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **get_smartsheet_funding**
+> object get_smartsheet_funding()
+
+Get Smartsheet Funding
+
+Get raw funding data from Smartsheet.
+
+### Example
+
+
+```python
+import aind_metadata_service_client
+from aind_metadata_service_client.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to http://localhost
+# See configuration.py for a list of all supported configuration parameters.
+configuration = aind_metadata_service_client.Configuration(
+    host = "http://localhost"
+)
+
+
+# Enter a context with an instance of the API client
+with aind_metadata_service_client.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = aind_metadata_service_client.DefaultApi(api_client)
+
+    try:
+        # Get Smartsheet Funding
+        api_response = api_instance.get_smartsheet_funding()
+        print("The response of DefaultApi->get_smartsheet_funding:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling DefaultApi->get_smartsheet_funding: %s\n" % e)
+```
+
+
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+**object**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Successful Response |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -1905,7 +1969,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **post_instrument**
-> object post_instrument(request_body)
+> object post_instrument(request_body, replace=replace)
 
 Post Instrument
 
@@ -1932,10 +1996,11 @@ with aind_metadata_service_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = aind_metadata_service_client.DefaultApi(api_client)
     request_body = None # Dict[str, object] | 
+    replace = False # bool |  (optional) (default to False)
 
     try:
         # Post Instrument
-        api_response = api_instance.post_instrument(request_body)
+        api_response = api_instance.post_instrument(request_body, replace=replace)
         print("The response of DefaultApi->post_instrument:\n")
         pprint(api_response)
     except Exception as e:
@@ -1950,6 +2015,7 @@ with aind_metadata_service_client.ApiClient(configuration) as api_client:
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **request_body** | [**Dict[str, object]**](object.md)|  | 
+ **replace** | **bool**|  | [optional] [default to False]
 
 ### Return type
 
