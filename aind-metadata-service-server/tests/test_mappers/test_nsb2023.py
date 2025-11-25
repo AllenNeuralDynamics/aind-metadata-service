@@ -5,7 +5,13 @@ from decimal import Decimal
 from unittest import TestCase
 from unittest import main as unittest_main
 
-from aind_data_schema.components.coordinates import CoordinateSystemLibrary
+from aind_data_schema.components.coordinates import (
+    Axis,
+    AxisName,
+    CoordinateSystem,
+    CoordinateSystemLibrary,
+    Direction,
+)
 from aind_data_schema.components.subject_procedures import Surgery
 from aind_data_schema.components.surgery_procedures import (
     BrainInjection,
@@ -27,7 +33,7 @@ from aind_metadata_service_server.mappers.nsb2023 import (
     FiberType,
     MappedNSBList,
 )
-
+from aind_data_schema_models.units import SizeUnit
 
 class TestNSB2023BasicMapping(TestCase):
     """Tests basic NSB2023 mapping functionality"""
@@ -88,9 +94,9 @@ class TestNSB2023HeadframeMapping(TestCase):
             "FileSystemObjectType": 0,
             "Id": 2,
             "Headpost": "Visual Ctx",
-            "Headpost_Type": "Mesoscope",
-            "Headpost_x0020_perform_x0020_dur": "Initial Surgery",
-            "Procedure": "SX 1: Visual  Ctx 2P",
+            "HeadpostType": "Mesoscope",
+            "Headpost_x0020_Perform_x0020_Dur": "Initial Surgery",
+            "Procedure": "Stereotaxic Injection (with Headpost)",
             "Date_x0020_of_x0020_Surgery": "2022-01-03",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
         }
@@ -224,17 +230,6 @@ class TestNSB2023CraniotomyMapping(TestCase):
         self.assertEqual(craniotomy.craniotomy_type, CraniotomyType.CIRCLE)
         self.assertEqual(craniotomy.size, 5.0)
 
-    # def test_map_3mm_craniotomy(self):
-    #     """test 3mm craniotomy mapping"""
-    #     test_data = deepcopy(self.craniotomy_data)
-    #     test_data["craniotomy_type"] = "3mm"
-    #
-    #     nsb_model = nsb2023list.model_validate(test_data)
-    #     mapper = mappednsblist(nsb=nsb_model)
-    #
-    #     self.assertequal(mapper.aind_craniotomy_type, craniotomytype.circle)
-    #     self.assertequal(mapper.aind_craniotomy_size, 3.0)
-
 
 class TestNSB2023InjectionMapping(TestCase):
     """Tests brain injection procedure mapping"""
@@ -250,10 +245,10 @@ class TestNSB2023InjectionMapping(TestCase):
             "AP2ndInj": -2.45,
             "DV2ndInj": 3.1,
             "Hemisphere2ndInj": "Right",
-            "Inj2_Type": "Nanoject (Pressure)",
-            "Inj2volperdepth": 500.2,
-            "Burr2_x0020_perform_x0020_during": "Initial Surgery",
-            "Inj2_Angle_v2": 10.0,
+            "Inj2Type": "Nanoject (Pressure)",
+            "inj2volperdepth": 500.2,
+            "Burr2_x0020_Perform_x0020_During": "Initial Surgery",
+            "Inj2Angle_v2": 10.0,
             "Date_x0020_of_x0020_Surgery": "2022-01-03",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
         }
@@ -299,9 +294,9 @@ class TestNSB2023InjectionMapping(TestCase):
     def test_map_iontophoresis_injection(self):
         """Test iontophoresis injection type"""
         test_data = deepcopy(self.injection_data)
-        test_data["Inj2_Type"] = "Iontophoresis"
-        test_data["Inj2_Current"] = "5 uA"
-        test_data["Inj2_Ionto_Time"] = "10 min"
+        test_data["Inj2Type"] = "Iontophoresis"
+        test_data["Inj2Current"] = "5 uA"
+        test_data["Inj2IontoTime"] = "10 min"
         
         nsb_model = NSB2023List.model_validate(test_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -322,9 +317,9 @@ class TestNSB2023FiberImplantMapping(TestCase):
             "Id": 5,
             "Burr_x0020_hole_x0020_1": "Fiber Implant",
             "FiberImplant2DV": -2.0,
-            "Fiber_x0020_Implant2_x0020_Lengt": "6.5 mm",
-            "Burr_x0020_2_x0020_fiber_x0020_t": "Standard (provided by NSB)",
-            "Burr1_x0020_perform_x0020_during": "Initial Surgery",
+            "Fiber_x0020_Implant2_x0020_Lengt": "4.5 mm",
+            "Burr_x0020_2_x0020_Fiber_x0020_T": "Standard (Provided by NSB)",
+            "Burr1_x0020_Perform_x0020_During": "Initial Surgery",
             "Date_x0020_of_x0020_Surgery": "2022-01-03",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
         }
@@ -344,7 +339,7 @@ class TestNSB2023FiberImplantMapping(TestCase):
 
     def test_map_fiber_implant_length(self):
         """Test fiber implant length mapping"""
-        self.assertEqual(self.mapper.aind_fiber_implant2_lengt, Decimal("6.5"))
+        self.assertEqual(self.mapper.aind_fiber_implant2_lengt, Decimal("4.5"))
 
     def test_map_fiber_type_standard(self):
         """Test standard fiber type mapping"""
@@ -353,7 +348,7 @@ class TestNSB2023FiberImplantMapping(TestCase):
     def test_map_fiber_type_custom(self):
         """Test custom fiber type mapping"""
         test_data = deepcopy(self.fiber_data)
-        test_data["Burr_x0020_2_x0020_fiber_x0020_t"] = "Custom (specs in comment)."
+        test_data["Burr_x0020_2_x0020_Fiber_x0020_T"] = "Custom"
         
         nsb_model = NSB2023List.model_validate(test_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -423,18 +418,18 @@ class TestNSB2023SurgeryIntegration(TestCase):
             "Date_x0020_of_x0020_Surgery": "2022-01-03",
             "Weight_x0020_before_x0020_Surger": 25.2,
             "Weight_x0020_after_x0020_Surgery": 28.2,
-            "HP_Work_Station": "SWS 4",
+            "HpWorkStation": "SWS 4",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
             "Headpost": "Visual Ctx",
-            "Headpost_Type": "Mesoscope",
-            "Headpost_x0020_perform_x0020_dur": "Initial Surgery",
-            "Craniotomy_Type": "5mm",
-            "Craniotomy_x0020_perform_x0020_d": "Initial Surgery",
-            "Procedure": "SX 1: Visual  Ctx 2P",
-            "Test1_Lookup_ID": 2846,
+            "HeadpostType": "Mesoscope",
+            "Headpost_x0020_Perform_x0020_Dur": "Initial Surgery",
+            "CraniotomyType": "5mm",
+            "Craniotomy_x0020_Perform_x0020_D": "Initial Surgery",
+            "Procedure": "Sx-01 Visual Ctx 2P",
+            "Test1LookupId": 2846,
             "Breg2Lamb": 4.5,
             "ISO_x0020_on": 1.5,
-            "HP_ISO_Level": 2.0,
+            "HPIsoLevel": 2.0,
         }
         cls.nsb_model = NSB2023List.model_validate(cls.full_surgery_data)
         cls.mapper = MappedNSBList(nsb=cls.nsb_model)
@@ -458,6 +453,7 @@ class TestNSB2023SurgeryIntegration(TestCase):
              and any(isinstance(p, Craniotomy) for p in s.procedures)),
             None
         )
+        print(combined_surgery)
         
         self.assertIsNotNone(combined_surgery)
         self.assertIsNotNone(combined_surgery.anaesthesia)
@@ -481,7 +477,16 @@ class TestNSB2023SurgeryIntegration(TestCase):
 
     def test_map_measured_coordinates(self):
         """Test measured coordinates mapping"""
-        coord_sys = CoordinateSystemLibrary.LAMBDA_ARI
+        coord_sys = CoordinateSystem(
+                name="LAMBDA_ARI",
+                origin=Origin.LAMBDA,
+                axis_unit=SizeUnit.MM,
+                axes=[
+                    Axis(name=AxisName.AP, direction=Direction.PA),
+                    Axis(name=AxisName.ML, direction=Direction.LR),
+                    Axis(name=AxisName.SI, direction=Direction.SI),
+                ],
+            )
         measured = MappedNSBList.map_measured_coordinates(
             Decimal("4.5"), coord_sys
         )
@@ -498,7 +503,7 @@ class TestNSB2023CoordinateMapping(TestCase):
             angle=Decimal("10"),
             ml=Decimal("2.0"),
             ap=Decimal("1.5"),
-            depth=Decimal("3.0"),
+            depth=[Decimal("3.0")],
             surgery_coordinate_system=CoordinateSystemLibrary.BREGMA_ARID,
         )
         self.assertIsInstance(transforms, list)
