@@ -1,13 +1,15 @@
 """Tests NSB 2019 data model is parsed correctly"""
 
 import json
-import os
+from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
 from typing import Callable, List
 from unittest import TestCase
 from unittest import main as unittest_main
-
+from aind_data_schema.components.devices import FiberProbe
+from aind_data_schema.components.configs import ProbeConfig
+from aind_metadata_service_server.mappers.nsb2019 import InjectionType
 from aind_data_schema.components.coordinates import CoordinateSystemLibrary
 from aind_data_schema.components.subject_procedures import Surgery
 from aind_data_schema.components.surgery_procedures import (
@@ -17,6 +19,18 @@ from aind_data_schema.components.surgery_procedures import (
     Headframe,
     ProbeImplant,
 )
+from aind_data_schema.components.injection_procedures import (
+    InjectionDynamics,
+    InjectionProfile,
+)
+from aind_data_schema_models.units import (
+    AngleUnit,
+    CurrentUnit,
+    SizeUnit,
+    TimeUnit,
+    VolumeUnit,
+)
+from aind_data_schema_models.coordinates import AnatomicalRelative
 from aind_sharepoint_service_async_client.models.nsb2019_list import (
     NSB2019List,
 )
@@ -24,7 +38,6 @@ from aind_sharepoint_service_async_client.models.nsb2019_list import (
 from aind_metadata_service_server.mappers.nsb2019 import MappedNSBList
 
 TEST_DIR = Path(__file__).parent / ".."
-DIR_RAW = TEST_DIR / "resources" / "nsb2019" / "raw"
 TEST_EXAMPLES = (
     TEST_DIR / "resources" / "nsb2019" / "nsb2019_string_entries.json"
 )
@@ -33,17 +46,26 @@ TEST_EXAMPLES = (
 class TestNSB2019BasicMapping(TestCase):
     """Tests basic NSB2019 mapping functionality"""
 
+    @classmethod
+    def setUpClass(cls):
+        """Create test data once for all tests"""
+        cls.basic_nsb_data = {
+            "FileSystemObjectType": 0,
+            "Id": 5554,
+            "Date_x0020_of_x0020_Surgery": "2022-12-06T08:00:00Z",
+            "Weight_x0020_before_x0020_Surger": "19.1",
+            "Weight_x0020_after_x0020_Surgery": "19.2",
+            "HpWorkStation": "SWS 3",
+            "IACUC_x0020_Protocol_x0020__x002": "2115",
+            "Breg2Lamb": "4",
+            "AuthorId": 187,
+        }
+        cls.nsb_model = NSB2019List.model_validate(cls.basic_nsb_data)
+        cls.mapper = MappedNSBList(nsb=cls.nsb_model)
+
     def test_map_experimenter_full_name(self):
         """Test experimenter full name mapping"""
-        nsb_model_author = NSB2019List.model_validate(
-            {"FileSystemObjectType": 0, "Id": 1, "AuthorId": 187}
-        )
-        nsb_model = NSB2019List.model_validate(nsb_model_author)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        experimenter = mapper.aind_experimenter_full_name
-        self.assertEqual(experimenter, "NSB-187")
-        
+        self.assertEqual(self.mapper.aind_experimenter_full_name, "NSB-187")
         nsb_model_no_author = NSB2019List.model_validate(
             {"FileSystemObjectType": 0, "Id": 1}
         )
@@ -52,634 +74,522 @@ class TestNSB2019BasicMapping(TestCase):
 
     def test_map_anaesthetic_type(self):
         """Test anaesthetic type is always isoflurane"""
-        nsb_model = NSB2019List.model_validate(
-            {"FileSystemObjectType": 0, "Id": 1}
-        )
-        mapper = MappedNSBList(nsb=nsb_model)
-        self.assertEqual(mapper.aind_anaesthetic_type, "isoflurane")
+        self.assertEqual(self.mapper.aind_anaesthetic_type, "isoflurane")
 
     def test_map_iacuc_protocol(self):
         """Test IACUC protocol mapping"""
-        raw_data = {"IACUC_x0020_Protocol_x0020__x002": "2115"}
-        
-        nsb_model = NSB2019List.model_validate(raw_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        if mapper.aind_iacuc_protocol:
-            self.assertIsInstance(mapper.aind_iacuc_protocol, str)
-            self.assertRegex(mapper.aind_iacuc_protocol, r"^\d{4}$")
+        self.assertEqual(self.mapper.aind_iacuc_protocol, "2115")
 
-    def test_map_surgery_dates(self):
-        """Test surgery date mappings"""
-        with open(DIR_RAW / "list_item1.json") as f:
-            raw_data = json.load(f)
-        
-        nsb_model = NSB2019List.model_validate(raw_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        # Test date of surgery
-        if mapper.aind_date_of_surgery:
-            self.assertIsNotNone(mapper.aind_date_of_surgery)
-        
-        # Test date of first injection
-        if mapper.aind_date1st_injection:
-            self.assertIsNotNone(mapper.aind_date1st_injection)
-        
-        # Test date of second injection
-        if mapper.aind_date2nd_injection:
-            self.assertIsNotNone(mapper.aind_date2nd_injection)
+    def test_map_surgery_date(self):
+        """Test surgery date mapping"""
+        self.assertIsNotNone(self.mapper.aind_date_of_surgery)
+        self.assertEqual(str(self.mapper.aind_date_of_surgery), "2022-12-06")
 
     def test_map_animal_weights(self):
         """Test animal weight mappings"""
-        with open(DIR_RAW / "list_item1.json") as f:
-            raw_data = json.load(f)
-        
-        nsb_model = NSB2019List.model_validate(raw_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        # Test surgery weights
-        if mapper.aind_weight_before_surger:
-            self.assertIsInstance(mapper.aind_weight_before_surger, Decimal)
-            self.assertGreater(mapper.aind_weight_before_surger, 0)
-        
-        if mapper.aind_weight_after_surgery:
-            self.assertIsInstance(mapper.aind_weight_after_surgery, Decimal)
-            self.assertGreater(mapper.aind_weight_after_surgery, 0)
-        
-        # Test first injection weights
-        if mapper.aind_first_injection_weight_be:
-            self.assertIsInstance(mapper.aind_first_injection_weight_be, Decimal)
-        
-        if mapper.aind_first_injection_weight_af:
-            self.assertIsInstance(mapper.aind_first_injection_weight_af, Decimal)
+        self.assertEqual(self.mapper.aind_weight_before_surger, Decimal("19.1"))
+        self.assertEqual(self.mapper.aind_weight_after_surgery, Decimal("19.2"))
 
-    def test_map_workstation_ids(self):
-        """Test workstation ID mappings"""
-        with open(DIR_RAW / "list_item1.json") as f:
-            raw_data = json.load(f)
+    def test_map_workstation_id(self):
+        """Test workstation ID mapping"""
+        self.assertEqual(self.mapper.aind_hp_work_station, "SWS 3")
+
+    def test_map_bregma_lambda_distance(self):
+        """Test bregma-lambda distance returns absolute value"""
+        self.assertEqual(self.mapper.aind_breg2_lamb, Decimal("4"))
         
-        nsb_model = NSB2019List.model_validate(raw_data)
+        # Test with negative value
+        test_data = deepcopy(self.basic_nsb_data)
+        test_data["Breg2Lamb"] = "-4.5"
+        nsb_model = NSB2019List.model_validate(test_data)
         mapper = MappedNSBList(nsb=nsb_model)
-        
-        if mapper.aind_hp_work_station:
-            self.assertIn("SWS", mapper.aind_hp_work_station)
-        
-        if mapper.aind_work_station1st_injection:
-            self.assertIn("SWS", mapper.aind_work_station1st_injection)
-        
-        if mapper.aind_work_station2nd_injection:
-            self.assertIn("SWS", mapper.aind_work_station2nd_injection)
+        self.assertEqual(mapper.aind_breg2_lamb, Decimal("4.5"))
 
 
 class TestNSB2019HeadframeMapping(TestCase):
     """Tests headframe procedure mapping"""
 
+    @classmethod
+    def setUpClass(cls):
+        """Create test data once for all tests"""
+        cls.headframe_data = {
+            "FileSystemObjectType": 0,
+            "Id": 5554,
+            "HeadpostType": "AI Straight Headbar",
+            "Procedure": "HP+Injection+Optic Fiber Implant",
+            "Date_x0020_of_x0020_Surgery": "2022-12-06T08:00:00Z",
+            "IACUC_x0020_Protocol_x0020__x002": "2115",
+        }
+        cls.nsb_model = NSB2019List.model_validate(cls.headframe_data)
+        cls.mapper = MappedNSBList(nsb=cls.nsb_model)
+
     def test_map_headframe_type(self):
-        """Test headframe type mapping"""
-        with open(DIR_RAW / "list_item1.json") as f:
-            raw_data = json.load(f)
-        
-        nsb_model = NSB2019List.model_validate(raw_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        head_post_info = mapper.aind_headpost_type
+        """Test AI Straight Headbar type mapping"""
+        head_post_info = self.mapper.aind_headpost_type
         self.assertIsNotNone(head_post_info)
-        
-        if head_post_info.headframe_type:
-            self.assertIsInstance(head_post_info.headframe_type, str)
+        self.assertEqual(head_post_info.headframe_type, "AI Straight Headbar")
+
+    def test_has_head_frame_procedure(self):
+        """Test detection of headframe procedure"""
+        self.assertTrue(self.mapper.has_head_frame_procedure)
 
     def test_map_headframe_procedure(self):
         """Test creation of Headframe procedure"""
-        with open(DIR_RAW / "list_item1.json") as f:
-            raw_data = json.load(f)
-        
-        nsb_model = NSB2019List.model_validate(raw_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        if mapper.has_head_frame_procedure:
-            headframe = mapper.get_head_frame_procedure()
-            self.assertIsInstance(headframe, Headframe)
-            self.assertEqual(headframe.object_type, "Headframe")
-            
-            if headframe.headframe_type:
-                self.assertIsInstance(headframe.headframe_type, str)
+        headframe = self.mapper.get_head_frame_procedure()
+        self.assertIsInstance(headframe, Headframe)
+        self.assertEqual(headframe.object_type, "Headframe")
+        self.assertEqual(headframe.headframe_type, "AI Straight Headbar")
 
-    def test_headframe_all_types(self):
-        """Test all headframe type variations"""
+    def test_map_different_headframe_types(self):
+        """Test various headframe type mappings"""
         test_cases = [
-            ("CAMstyle headframe (0160-100-10 Rev A)", "CAM-style"),
-            ("Neuropixelstyle headframe", "Neuropixel-style"),
-            ("Mesoscopestyle well with NGC headframe", "NGC-style"),
-            ("NGCstyle headframe (no well)", "NGC-style"),
+            ("CAM-style headframe (0160-100-10 Rev A)", "CAM-style", "0160-100-10 Rev A"),
+            ("Neuropixel-style headframe (0160-100-10/0160-200-36)", "Neuropixel-style", "0160-100-10"),
+            ("Mesoscope-style well with NGC-style headframe (0160-200-20/0160-100-10)", "NGC-style", "0160-100-10"),
+            ("NGC-style headframe, no well (0160-100-10)", "NGC-style", "0160-100-10"),
+            ("WHC #42 with Neuropixel well and well cap", "WHC #42", "42"),
         ]
         
-        for procedure_value, expected_type in test_cases:
-            with self.subTest(procedure=procedure_value):
-                nsb_data = {
-                    "FileSystemObjectType": 0,
-                    "Id": 1,
-                    "Headpost_x0020_Type": procedure_value,
-                }
-                nsb_model = NSB2019List.model_validate(nsb_data)
+        for headpost_str, expected_type, expected_part in test_cases:
+            with self.subTest(headpost=headpost_str):
+                test_data = deepcopy(self.headframe_data)
+                test_data["HeadpostType"] = headpost_str
+                
+                nsb_model = NSB2019List.model_validate(test_data)
                 mapper = MappedNSBList(nsb=nsb_model)
                 
                 head_post = mapper.aind_headpost_type
-                if head_post.headframe_type:
-                    self.assertEqual(head_post.headframe_type, expected_type)
+                self.assertEqual(head_post.headframe_type, expected_type)
+                if expected_part:
+                    self.assertEqual(head_post.headframe_part_number, expected_part)
 
 
 class TestNSB2019CraniotomyMapping(TestCase):
     """Tests craniotomy procedure mapping"""
 
-    def test_map_craniotomy_type(self):
-        """Test craniotomy type mapping"""
-        with open(DIR_RAW / "list_item2.json") as f:
-            raw_data = json.load(f)
-        
-        nsb_model = NSB2019List.model_validate(raw_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        craniotomy_type = mapper.aind_craniotomy_type
-        if craniotomy_type:
-            self.assertIsInstance(craniotomy_type, CraniotomyType)
+    @classmethod
+    def setUpClass(cls):
+        """Create test data once for all tests"""
+        cls.craniotomy_data = {
+            "FileSystemObjectType": 0,
+            "Id": 5554,
+            "CraniotomyType": "Visual Cortex 5mm",
+            "Procedure": "HP+C Neuropixel style",
+            "HpLoc": "Right",
+            "HPDurotomy": "Yes",
+            "Date_x0020_of_x0020_Surgery": "2022-12-06T08:00:00Z",
+            "IACUC_x0020_Protocol_x0020__x002": "2115",
+        }
+        cls.nsb_model = NSB2019List.model_validate(cls.craniotomy_data)
+        cls.mapper = MappedNSBList(nsb=cls.nsb_model)
+
+    def test_map_craniotomy_type_5mm(self):
+        """Test 5mm craniotomy type mapping"""
+        self.assertEqual(self.mapper.aind_craniotomy_type, CraniotomyType.CIRCLE)
 
     def test_map_craniotomy_size(self):
         """Test craniotomy size mapping"""
-        nsb_data = {
-            "FileSystemObjectType": 0,
-            "Id": 1,
-            "CraniotomyType": "Visual Cortex 5mm",
-        }
-        nsb_model = NSB2019List.model_validate(nsb_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        size = mapper.aind_craniotomy_size
-        if size:
-            self.assertEqual(size, Decimal(5))
+        self.assertEqual(self.mapper.aind_craniotomy_size, Decimal(5))
 
     def test_map_craniotomy_coordinates(self):
         """Test craniotomy coordinate system mapping"""
-        nsb_data = {
-            "FileSystemObjectType": 0,
-            "Id": 1,
-            "Craniotomy_x0020_Type": "Visual cortex (5mm)",
-        }
-        nsb_model = NSB2019List.model_validate(nsb_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        coord_sys = mapper.aind_craniotomy_coordinates_reference
-        if coord_sys:
-            self.assertEqual(coord_sys.name, "LAMBDA_ARI")
+        coord_sys = self.mapper.aind_craniotomy_coordinates_reference
+        self.assertIsNotNone(coord_sys)
+        self.assertEqual(coord_sys.name, "LAMBDA_ARI")
 
-    def test_map_craniotomy_procedure(self):
-        """Test creation of Craniotomy procedure"""
-        with open(DIR_RAW / "list_item2.json") as f:
-            raw_data = json.load(f)
-        
-        nsb_model = NSB2019List.model_validate(raw_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        if mapper.has_craniotomy_procedure:
-            craniotomy = mapper.get_craniotomy_procedure()
-            self.assertIsInstance(craniotomy, Craniotomy)
-            self.assertIsNotNone(craniotomy.craniotomy_type)
-            self.assertIsNotNone(craniotomy.coordinate_system_name)
+    def test_map_craniotomy_position(self):
+        """Test craniotomy position mapping"""
+        self.assertEqual(self.mapper.aind_hp_loc, AnatomicalRelative.RIGHT)
 
     def test_map_dura_removed(self):
         """Test dura removed flag mapping"""
-        with open(DIR_RAW / "list_item1.json") as f:
-            raw_data = json.load(f)
+        self.assertTrue(self.mapper.aind_hp_durotomy)
+
+    def test_has_craniotomy_procedure(self):
+        """Test detection of craniotomy procedure"""
+        self.assertTrue(self.mapper.has_craniotomy_procedure)
+
+    def test_map_craniotomy_procedure(self):
+        """Test creation of Craniotomy procedure"""
+        craniotomy = self.mapper.get_craniotomy_procedure()
+        self.assertIsInstance(craniotomy, Craniotomy)
+        self.assertEqual(craniotomy.craniotomy_type, CraniotomyType.CIRCLE)
+        self.assertEqual(craniotomy.size, Decimal(5))
+        self.assertTrue(craniotomy.dura_removed)
+
+    def test_map_3mm_craniotomy(self):
+        """Test 3mm frontal craniotomy mapping"""
+        test_data = deepcopy(self.craniotomy_data)
+        test_data["CraniotomyType"] = "Frontal Window 3mm"
         
-        nsb_model = NSB2019List.model_validate(raw_data)
+        nsb_model = NSB2019List.model_validate(test_data)
         mapper = MappedNSBList(nsb=nsb_model)
         
-        dura_removed = mapper.aind_hp_durotomy
-        if dura_removed is not None:
-            self.assertIsInstance(dura_removed, bool)
+        self.assertEqual(mapper.aind_craniotomy_type, CraniotomyType.CIRCLE)
+        self.assertEqual(mapper.aind_craniotomy_size, Decimal(3))
 
 
 class TestNSB2019InjectionMapping(TestCase):
     """Tests brain injection procedure mapping"""
 
+    @classmethod
+    def setUpClass(cls):
+        """Create test data once for all tests"""
+        cls.injection_data = {
+            "FileSystemObjectType": 0,
+            "Id": 5554,
+            "Procedure": "Stereotaxic Injection",
+            "Virus_x0020_A_x002f_P": "-1.6",
+            "Virus_x0020_M_x002f_L": "-3.3",
+            "Virus_x0020_D_x002f_V": "4.3",
+            "Virus_x0020_Hemisphere": "Left",
+            "Inj1Type": "Nanoject (Pressure)",
+            "Inj1Vol": "400",
+            "Inj1LenghtofTime": "5min",
+            "Inj1Angle_v2": "0",
+            "Date1stInjection": "2022-12-06T08:00:00Z",
+            "FirstInjectionWeightBefor": "19.1",
+            "FirstInjectionWeightAfter": "19.2",
+            "FirstInjectionIsoDuration": "1 hour",
+            "IACUC_x0020_Protocol_x0020__x002": "2115",
+            "Breg2Lamb": "4",
+        }
+        cls.nsb_model = NSB2019List.model_validate(cls.injection_data)
+        cls.mapper = MappedNSBList(nsb=cls.nsb_model)
+
     def test_map_first_injection_coordinates(self):
         """Test first injection coordinate mapping"""
-        with open(DIR_RAW / "list_item1.json") as f:
-            raw_data = json.load(f)
-        
-        nsb_model = NSB2019List.model_validate(raw_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        # Test AP coordinate
-        ap = mapper.aind_virus_a_p
-        if ap:
-            self.assertIsInstance(ap, Decimal)
-        
-        # Test ML coordinate
-        ml = mapper.aind_virus_m_l
-        if ml:
-            self.assertIsInstance(ml, Decimal)
-        
-        # Test DV coordinate
-        dv = mapper.aind_virus_d_v
-        if dv:
-            self.assertIsInstance(dv, Decimal)
+        self.assertEqual(self.mapper.aind_virus_a_p, Decimal("-1.6"))
+        self.assertEqual(self.mapper.aind_virus_m_l, Decimal("-3.3"))
+        self.assertEqual(self.mapper.aind_virus_d_v, Decimal("4.3"))
 
     def test_map_first_injection_hemisphere(self):
         """Test first injection hemisphere mapping"""
-        with open(DIR_RAW / "list_item1.json") as f:
-            raw_data = json.load(f)
-        
-        nsb_model = NSB2019List.model_validate(raw_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        hemisphere = mapper.aind_virus_hemisphere
-        if hemisphere:
-            self.assertIn(hemisphere.value, ["Left", "Right"])
+        self.assertEqual(self.mapper.aind_virus_hemisphere, AnatomicalRelative.LEFT)
 
     def test_map_first_injection_coordinate_system(self):
         """Test first injection coordinate system mapping"""
-        # Test BREGMA_ARI (no DV)
-        nsb_data = {
-            "FileSystemObjectType": 0,
-            "Id": 1,
-            "Virus_x0020_A_x002f_P": "1.5",
-            "Virus_x0020_M_x002f_L": "2.0",
-        }
-        nsb_model = NSB2019List.model_validate(nsb_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        coord_sys = mapper.aind_inj1_coordinates_reference
-        if coord_sys:
-            self.assertEqual(coord_sys, CoordinateSystemLibrary.BREGMA_ARI)
-        
-        # Test BREGMA_ARID (with DV)
-        nsb_data["Virus_x0020_D_x002f_V"] = "3.0"
-        nsb_model = NSB2019List.model_validate(nsb_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        coord_sys = mapper.aind_inj1_coordinates_reference
-        if coord_sys:
-            self.assertEqual(coord_sys, CoordinateSystemLibrary.BREGMA_ARID)
+        coord_sys = self.mapper.aind_inj1_coordinates_reference
+        self.assertEqual(coord_sys, CoordinateSystemLibrary.BREGMA_ARID)
 
-    def test_map_first_injection_type(self):
-        """Test first injection type mapping"""
-        # Test Nanoject
-        nsb_data = {
-            "FileSystemObjectType": 0,
-            "Id": 1,
-            "Inj1Type": "Nanoject (Pressure)",
-        }
-        nsb_model = NSB2019List.model_validate(nsb_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        from aind_metadata_service_server.mappers.nsb2019 import InjectionType
-        
-        inj_type = mapper.aind_inj1_type
-        if inj_type:
-            self.assertEqual(inj_type, InjectionType.NANOJECT)
-        
-        # Test Iontophoresis
-        nsb_data["Inj1Type"] = "Iontophoresis"
-        nsb_model = NSB2019List.model_validate(nsb_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        inj_type = mapper.aind_inj1_type
-        if inj_type:
-            self.assertEqual(inj_type, InjectionType.IONTOPHORESIS)
+    def test_map_first_injection_type_nanoject(self):
+        """Test Nanoject injection type mapping"""
+        self.assertEqual(self.mapper.aind_inj1_type, InjectionType.NANOJECT)
 
     def test_map_first_injection_volume(self):
         """Test first injection volume mapping"""
-        nsb_data = {
-            "FileSystemObjectType": 0,
-            "Id": 1,
-            "Inj1Vol": "50 nL",
-        }
-        nsb_model = NSB2019List.model_validate(nsb_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        volume = mapper.aind_inj1_vol
-        if volume:
-            self.assertIsInstance(volume, list)
-            self.assertEqual(volume[0], Decimal(50))
+        volume = self.mapper.aind_inj1_vol
+        self.assertIsInstance(volume, list)
+        self.assertEqual(volume[0], Decimal(400))
+
+    def test_map_first_injection_duration(self):
+        """Test first injection duration mapping"""
+        self.assertEqual(self.mapper.aind_inj1_lenghtof_time, Decimal("5"))
 
     def test_map_first_injection_angle(self):
         """Test first injection angle mapping"""
-        nsb_data = {
-            "FileSystemObjectType": 0,
-            "Id": 1,
-            "Inj1Angle0": "10 degrees",
-        }
-        nsb_model = NSB2019List.model_validate(nsb_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        angle = mapper.aind_inj1angle0
-        if angle:
-            self.assertEqual(angle, Decimal(10))
+        self.assertEqual(self.mapper.aind_inj1_angle_v2, Decimal("0"))
 
     def test_map_first_injection_dynamics(self):
         """Test first injection dynamics creation"""
-        with open(DIR_RAW / "list_item1.json") as f:
-            raw_data = json.load(f)
-        
-        nsb_model = NSB2019List.model_validate(raw_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        dynamics = mapper.aind_inj1_dynamics
+        dynamics = self.mapper.aind_inj1_dynamics
         self.assertIsNotNone(dynamics)
-        self.assertIsNotNone(dynamics.profile)
+        self.assertEqual(dynamics.profile, InjectionProfile.BOLUS)
+        self.assertEqual(dynamics.volume[0], Decimal(400))
+        self.assertEqual(dynamics.duration, Decimal("5"))
+
+    def test_has_injection_procedure(self):
+        """Test detection of injection procedure"""
+        self.assertTrue(self.mapper.has_injection_procedure)
 
     def test_map_first_injection_procedure(self):
         """Test creation of first BrainInjection procedure"""
-        with open(DIR_RAW / "list_item1.json") as f:
-            raw_data = json.load(f)
+        injection = self.mapper.get_first_injection_procedure()
+        self.assertIsInstance(injection, BrainInjection)
+        self.assertEqual(injection.object_type, "Brain injection")
+        self.assertIsNotNone(injection.dynamics)
+
+    def test_map_iontophoresis_injection(self):
+        """Test iontophoresis injection type"""
+        test_data = deepcopy(self.injection_data)
+        test_data["Inj1Type"] = "Iontophoresis"
+        test_data["Inj1Current"] = "5 uA"
+        test_data["Inj1AlternatingTime"] = "7/7"
         
-        nsb_model = NSB2019List.model_validate(raw_data)
+        nsb_model = NSB2019List.model_validate(test_data)
         mapper = MappedNSBList(nsb=nsb_model)
-        
-        if mapper.has_injection_procedure:
-            injection = mapper.get_first_injection_procedure()
-            self.assertIsInstance(injection, BrainInjection)
-            self.assertEqual(injection.object_type, "Brain injection")
-            
-            if injection.dynamics:
-                self.assertGreater(len(injection.dynamics), 0)
+
+        self.assertEqual(mapper.aind_inj1_type, InjectionType.IONTOPHORESIS)
+        self.assertEqual(mapper.aind_inj1_current, Decimal("5"))
 
     def test_map_second_injection_coordinates(self):
         """Test second injection coordinate mapping"""
-        nsb_data = {
-            "FileSystemObjectType": 0,
-            "Id": 1,
-            "AP2ndInj": "2.5",
-            "ML2ndInj": "1.5",
-            "DV2ndInj": "3.0",
-        }
-        nsb_model = NSB2019List.model_validate(nsb_data)
+        test_data = deepcopy(self.injection_data)
+        test_data["AP2ndInj"] = "-3.05"
+        test_data["ML2ndInj"] = "-0.6"
+        test_data["DV2ndInj"] = "4.3"
+        test_data["Hemisphere2ndInj"] = "Left"
+        
+        nsb_model = NSB2019List.model_validate(test_data)
         mapper = MappedNSBList(nsb=nsb_model)
         
-        self.assertEqual(mapper.aind_ap2nd_inj, Decimal("2.5"))
-        self.assertEqual(mapper.aind_ml2nd_inj, Decimal("1.5"))
-        self.assertEqual(mapper.aind_dv2nd_inj, Decimal("3.0"))
+        self.assertEqual(mapper.aind_ap2nd_inj, Decimal("-3.05"))
+        self.assertEqual(mapper.aind_ml2nd_inj, Decimal("-0.6"))
+        self.assertEqual(mapper.aind_dv2nd_inj, Decimal("4.3"))
 
     def test_map_second_injection_coordinate_system(self):
-        """Test second injection coordinate system mapping"""
-        # Test BREGMA_ARI
-        nsb_data = {
+        """Test second injection coordinate system with various scenarios"""
+        # BREGMA_ARI (no DV)
+        test_data_ari = {
             "FileSystemObjectType": 0,
             "Id": 1,
             "AP2ndInj": "1.0",
             "ML2ndInj": "2.0",
         }
-        nsb_model = NSB2019List.model_validate(nsb_data)
+        nsb_model = NSB2019List.model_validate(test_data_ari)
         mapper = MappedNSBList(nsb=nsb_model)
+        self.assertEqual(mapper.aind_inj2_coordinates_reference, CoordinateSystemLibrary.BREGMA_ARI)
         
-        coord_sys = mapper.aind_inj2_coordinates_reference
-        if coord_sys:
-            self.assertEqual(coord_sys, CoordinateSystemLibrary.BREGMA_ARI)
-        
-        # Test None when no coordinates
-        nsb_data_none = {
-            "FileSystemObjectType": 0,
-            "Id": 2,
-        }
-        nsb_model_none = NSB2019List.model_validate(nsb_data_none)
-        mapper_none = MappedNSBList(nsb=nsb_model_none)
-        
-        self.assertIsNone(mapper_none.aind_inj2_coordinates_reference)
-
-    def test_map_second_injection_hemisphere(self):
-        """Test second injection hemisphere mapping"""
-        nsb_data = {
+        # BREGMA_ARID (with DV)
+        test_data_arid = {
             "FileSystemObjectType": 0,
             "Id": 1,
-            "Hemisphere2ndInj": "Right",
+            "AP2ndInj": "1.0",
+            "ML2ndInj": "2.0",
+            "DV2ndInj": "3.0",
         }
-        nsb_model = NSB2019List.model_validate(nsb_data)
+        nsb_model = NSB2019List.model_validate(test_data_arid)
+        mapper = MappedNSBList(nsb=nsb_model)
+        self.assertEqual(mapper.aind_inj2_coordinates_reference, CoordinateSystemLibrary.BREGMA_ARID)
+
+    def test_has_second_injection_procedure(self):
+        """Test detection of second injection"""
+        test_data = deepcopy(self.injection_data)
+        test_data["Inj2Type"] = "Iontophoresis"
+        
+        nsb_model = NSB2019List.model_validate(test_data)
         mapper = MappedNSBList(nsb=nsb_model)
         
-        hemisphere = mapper.aind_hemisphere2nd_inj
-        if hemisphere:
-            self.assertIn(hemisphere.value, ["Left", "Right"])
+        self.assertTrue(mapper.has_second_injection_procedure)
 
     def test_map_second_injection_procedure(self):
         """Test creation of second BrainInjection procedure"""
-        nsb_data = {
-            "FileSystemObjectType": 0,
-            "Id": 1,
-            "Procedure": "Stereotaxic Injection",
-            "AP2ndInj": "1.0",
-            "ML2ndInj": "2.0",
-            "Inj2Type": "Nanoject (Pressure)",
-            "Inj2Vol": "25 nL",
-        }
-        nsb_model = NSB2019List.model_validate(nsb_data)
+        test_data = deepcopy(self.injection_data)
+        test_data["AP2ndInj"] = "-3.05"
+        test_data["ML2ndInj"] = "-0.6"
+        test_data["Inj2Type"] = "Iontophoresis"
+        test_data["Inj2Vol"] = "500"
+        test_data["Inj2LenghtofTime"] = "4min"
+        test_data["Inj2Current"] = "5 uA"
+        test_data["Inj2AlternatingTime"] = "7/7"
+        
+        nsb_model = NSB2019List.model_validate(test_data)
         mapper = MappedNSBList(nsb=nsb_model)
         
-        if mapper.has_second_injection_procedure:
-            injection = mapper.get_second_injection_procedure()
-            self.assertIsInstance(injection, BrainInjection)
-            self.assertEqual(injection.object_type, "Brain injection")
-
-    def test_injection_with_malformed_types(self):
-        """Test injection creation with malformed/missing types"""
-        nsb_data = {
-            "FileSystemObjectType": 0,
-            "Id": 1,
-            "Procedure": "Stereotaxic Injection",
-            "Inj1Type": "Select...",
-            "Virus_x0020_A_x002f_P": "1.5",
-            "Virus_x0020_M_x002f_L": "2.0",
-        }
-        nsb_model = NSB2019List.model_validate(nsb_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        # Should still create injection even with malformed type
-        if mapper.has_injection_procedure:
-            injection = mapper.get_first_injection_procedure()
-            self.assertIsInstance(injection, BrainInjection)
+        injection = mapper.get_second_injection_procedure()
+        self.assertIsInstance(injection, BrainInjection)
+        self.assertEqual(injection.object_type, "Brain injection")
 
 
 class TestNSB2019FiberImplantMapping(TestCase):
     """Tests fiber implant/probe implant mapping"""
 
+    @classmethod
+    def setUpClass(cls):
+        """Create test data once for all tests"""
+        cls.fiber_data = {
+            "FileSystemObjectType": 0,
+            "Id": 5554,
+            "Procedure": "HP+Injection+Optic Fiber Implant",
+            "FiberImplant1": True,
+            "FiberImplant1DV": "4.2",
+            "FiberImplant2": True,
+            "FiberImplant2DV": "4.2",
+            "Virus_x0020_A_x002f_P": "-1.6",
+            "Virus_x0020_M_x002f_L": "-3.3",
+            "Inj1Angle_v2": "0",
+            "Inj2Angle_v2": "90",
+            "Date_x0020_of_x0020_Surgery": "2022-12-06T08:00:00Z",
+            "IACUC_x0020_Protocol_x0020__x002": "2115",
+        }
+        cls.nsb_model = NSB2019List.model_validate(cls.fiber_data)
+        cls.mapper = MappedNSBList(nsb=cls.nsb_model)
+
     def test_map_fiber_implant_flags(self):
         """Test fiber implant presence flags"""
-        nsb_data = {
-            "FileSystemObjectType": 0,
-            "Id": 1,
-            "FiberImplant1": True,
-            "FiberImplant2": False,
-        }
-        nsb_model = NSB2019List.model_validate(nsb_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        self.assertTrue(mapper.aind_fiber_implant1)
-        self.assertFalse(mapper.aind_fiber_implant2)
+        self.assertTrue(self.mapper.aind_fiber_implant1)
+        self.assertTrue(self.mapper.aind_fiber_implant2)
 
-    def test_map_fiber_implant_depth(self):
+    def test_map_fiber_implant_depths(self):
         """Test fiber implant depth mapping"""
-        nsb_data = {
-            "FileSystemObjectType": 0,
-            "Id": 1,
-            "FiberImplant1DV": "3.5 mm",
-            "FiberImplant2DV": "2.0 mm",
-        }
-        nsb_model = NSB2019List.model_validate(nsb_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        if mapper.aind_fiber_implant1_dv:
-            self.assertEqual(mapper.aind_fiber_implant1_dv, Decimal("3.5"))
-        
-        if mapper.aind_fiber_implant2_dv:
-            self.assertEqual(mapper.aind_fiber_implant2_dv, Decimal("2.0"))
+        self.assertEqual(self.mapper.aind_fiber_implant1_dv, Decimal("4.2"))
+        self.assertEqual(self.mapper.aind_fiber_implant2_dv, Decimal("4.2"))
+
+    def test_has_fiber_implant_procedure(self):
+        """Test detection of fiber implant procedure"""
+        self.assertTrue(self.mapper.has_fiber_implant_procedure)
 
     def test_map_fiber_implant_procedures(self):
         """Test creation of ProbeImplant procedures"""
-        # Find a test file with fiber implants
-        for filename in os.listdir(DIR_RAW):
-            with open(DIR_RAW / filename) as f:
-                raw_data = json.load(f)
-            
-            nsb_model = NSB2019List.model_validate(raw_data)
-            mapper = MappedNSBList(nsb=nsb_model)
-            
-            if mapper.has_fiber_implant_procedure:
-                fiber_implants = mapper.get_fiber_implants()
-                self.assertIsInstance(fiber_implants, list)
-                
-                for implant in fiber_implants:
-                    self.assertIsInstance(implant, ProbeImplant)
-                    self.assertIsNotNone(implant.implanted_device)
-                    self.assertIsNotNone(implant.device_config)
-                break
+        fiber_implants = self.mapper.get_fiber_implants()
+        self.assertIsInstance(fiber_implants, list)
+        self.assertEqual(len(fiber_implants), 2)
+        for implant in fiber_implants:
+            self.assertIsInstance(implant, ProbeImplant)
+            self.assertIsInstance(implant.implanted_device, FiberProbe)
+            self.assertIsInstance(implant.device_config, ProbeConfig)
+            self.assertIsInstance(implant.device_config.transform, list)
+        self.assertEqual(fiber_implants[0].implanted_device.name, "Probe A")
+        self.assertEqual(fiber_implants[1].implanted_device.name, "Probe B")
 
 
 class TestNSB2019SurgeryIntegration(TestCase):
     """Tests complete Surgery object creation"""
 
-    def test_get_surgeries_basic(self):
+    @classmethod
+    def setUpClass(cls):
+        """Create comprehensive test data"""
+        cls.full_surgery_data = {
+            "FileSystemObjectType": 0,
+            "Id": 5554,
+            "Date_x0020_of_x0020_Surgery": "2022-12-06T08:00:00Z",
+            "Weight_x0020_before_x0020_Surger": "19.1",
+            "Weight_x0020_after_x0020_Surgery": "19.2",
+            "HpWorkStation": "SWS 3",
+            "IACUC_x0020_Protocol_x0020__x002": "2115",
+            "HeadpostType": "AI Straight Headbar",
+            "CraniotomyType": "Visual Cortex 5mm",
+            "Procedure": "HP+Injection+Optic Fiber Implant",
+            "Virus_x0020_A_x002f_P": "-1.6",
+            "Virus_x0020_M_x002f_L": "-3.3",
+            "Virus_x0020_D_x002f_V": "4.3",
+            "Virus_x0020_Hemisphere": "Left",
+            "Inj1Type": "Nanoject (Pressure)",
+            "Inj1Vol": "400",
+            "Inj1LenghtofTime": "5min",
+            "Date1stInjection": "2022-12-06T08:00:00Z",
+            "FirstInjectionWeightBefor": "19.1",
+            "FirstInjectionWeightAfter": "19.2",
+            "FirstInjectionIsoDuration": "1 hour",
+            "FiberImplant1": True,
+            "FiberImplant1DV": "4.2",
+            "Breg2Lamb": "4",
+            "HPIsoLevel": "1.5",
+            "AuthorId": 187,
+        }
+        cls.nsb_model = NSB2019List.model_validate(cls.full_surgery_data)
+        cls.mapper = MappedNSBList(nsb=cls.nsb_model)
+        cls.surgeries = cls.mapper.get_surgeries()
+
+    def test_get_surgeries_basic_structure(self):
         """Test basic surgery creation"""
-        with open(DIR_RAW / "list_item1.json") as f:
-            raw_data = json.load(f)
+        self.assertIsInstance(self.surgeries, list)
+        self.assertGreater(len(self.surgeries), 0)
         
-        nsb_model = NSB2019List.model_validate(raw_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        surgeries = mapper.get_surgeries()
-        
-        self.assertIsInstance(surgeries, list)
-        self.assertGreater(len(surgeries), 0)
-        
-        for surgery in surgeries:
+        for surgery in self.surgeries:
             self.assertIsInstance(surgery, Surgery)
             self.assertIsNotNone(surgery.experimenters)
-            self.assertGreater(len(surgery.experimenters), 0)
+            self.assertEqual(surgery.experimenters[0], "NSB-187")
 
-    def test_get_surgeries_with_headframe_and_craniotomy(self):
-        """Test surgery with headframe and craniotomy procedures"""
-        with open(DIR_RAW / "list_item1.json") as f:
-            raw_data = json.load(f)
-        
-        nsb_model = NSB2019List.model_validate(raw_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        surgeries = mapper.get_surgeries()
-        
-        # Find surgery with headframe
-        headframe_surgery = None
-        for surgery in surgeries:
-            if any(isinstance(p, Headframe) for p in surgery.procedures):
-                headframe_surgery = surgery
-                break
-        
-        if headframe_surgery:
-            self.assertIsNotNone(headframe_surgery.anaesthesia)
-            if headframe_surgery.anaesthesia:
-                self.assertEqual(
-                    headframe_surgery.anaesthesia.anaesthetic_type,
-                    "isoflurane"
-                )
+    def test_get_surgeries_with_multiple_procedures(self):
+        """Test surgery with headframe, craniotomy, and fiber implant"""
+        # Should have 2 surgeries: one with HP+Fiber, one with injection
+        combined_surgery = next(
+            (s for s in self.surgeries 
+             if any(isinstance(p, Headframe) for p in s.procedures)
+             and any(isinstance(p, ProbeImplant) for p in s.procedures)),
+            None
+        )
+        self.assertIsNotNone(combined_surgery)
+        self.assertIsNotNone(combined_surgery.anaesthesia)
+        self.assertEqual(combined_surgery.anaesthesia.anaesthetic_type, "isoflurane")
 
-    def test_get_surgeries_with_injections(self):
-        """Test surgery with injection procedures"""
-        with open(DIR_RAW / "list_item1.json") as f:
-            raw_data = json.load(f)
+    def test_get_surgeries_with_injection(self):
+        """Test surgery with injection procedure"""
+        injection_surgery = next(
+            (s for s in self.surgeries 
+             if any(isinstance(p, BrainInjection) for p in s.procedures)),
+            None
+        )
         
-        nsb_model = NSB2019List.model_validate(raw_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        surgeries = mapper.get_surgeries()
-        
-        # Find surgery with injection
-        injection_surgery = None
-        for surgery in surgeries:
-            if any(isinstance(p, BrainInjection) for p in surgery.procedures):
-                injection_surgery = surgery
-                break
-        
-        if injection_surgery:
-            self.assertIsNotNone(injection_surgery.start_date)
-            
-            # Check measured coordinates if present
-            if injection_surgery.measured_coordinates:
-                self.assertIsInstance(injection_surgery.measured_coordinates, dict)
+        self.assertIsNotNone(injection_surgery)
+        self.assertIsNotNone(injection_surgery.start_date)
+        self.assertIsNotNone(injection_surgery.measured_coordinates)
 
-    def test_get_surgeries_unknown_procedure(self):
-        """Test handling of unknown procedures"""
+    def test_procedure_flags(self):
+        """Test procedure presence flags"""
+        self.assertTrue(self.mapper.has_injection_procedure)
+        self.assertFalse(self.mapper.has_craniotomy_procedure)
+        self.assertTrue(self.mapper.has_head_frame_procedure)
+        self.assertTrue(self.mapper.has_fiber_implant_procedure)
+
+    def test_unknown_surgery_handling(self):
+        """Test handling of unknown surgery"""
         nsb_data = {
             "FileSystemObjectType": 0,
             "Id": 1,
-            "Procedure": None,
-            "Date_x0020_of_x0020_Surgery": None,
+            "Date_x0020_of_x0020_Surgery": "2022-12-06T08:00:00Z",
         }
         nsb_model = NSB2019List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
+        
+        self.assertTrue(mapper.has_unknown_surgery)
         surgeries = mapper.get_surgeries()
-        
-        self.assertEqual(len(surgeries), 0)
-
-    def test_has_procedure_flags(self):
-        """Test procedure presence flags"""
-        with open(DIR_RAW / "list_item1.json") as f:
-            raw_data = json.load(f)
-        
-        nsb_model = NSB2019List.model_validate(raw_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        # Test various procedure flags
-        self.assertIsInstance(mapper.has_injection_procedure, bool)
-        self.assertIsInstance(mapper.has_craniotomy_procedure, bool)
-        self.assertIsInstance(mapper.has_head_frame_procedure, bool)
-        self.assertIsInstance(mapper.has_fiber_implant_procedure, bool)
+        self.assertEqual(len(surgeries), 1)
 
 
 class TestNSB2019CoordinateMapping(TestCase):
     """Tests coordinate and transform mapping"""
 
-    def test_map_measured_coordinates(self):
-        """Test measured coordinates mapping"""
-        # Test with bregma-lambda distance
+    def test_map_measured_coordinates_bregma(self):
+        """Test measured coordinates with BREGMA"""
         coords = MappedNSBList.get_measured_coordinates(
             b2l_dist=Decimal("4.5"),
             coordinate_system_name="BREGMA_ARI"
         )
         self.assertIsNotNone(coords)
-        
-        # Test with None
-        coords_none = MappedNSBList.get_measured_coordinates(
+        from aind_data_schema_models.coordinates import Origin
+        self.assertIn(Origin.BREGMA, coords)
+
+    def test_map_measured_coordinates_lambda(self):
+        """Test measured coordinates with LAMBDA"""
+        coords = MappedNSBList.get_measured_coordinates(
+            b2l_dist=Decimal("4.5"),
+            coordinate_system_name="LAMBDA_ARI"
+        )
+        self.assertIsNotNone(coords)
+        from aind_data_schema_models.coordinates import Origin
+        self.assertIn(Origin.LAMBDA, coords)
+
+    def test_map_measured_coordinates_none(self):
+        """Test measured coordinates with None"""
+        coords = MappedNSBList.get_measured_coordinates(
             b2l_dist=None,
             coordinate_system_name=None
         )
-        self.assertIsNone(coords_none)
+        self.assertIsNone(coords)
 
-    def test_map_bregma_lambda_distance(self):
-        """Test bregma-lambda distance mapping"""
-        nsb_data = {
-            "FileSystemObjectType": 0,
-            "Id": 1,
-            "Breg2Lamb": "-4.5",
-        }
-        nsb_model = NSB2019List.model_validate(nsb_data)
-        mapper = MappedNSBList(nsb=nsb_model)
-        
-        b2l = mapper.aind_breg2_lamb
-        self.assertEqual(b2l, Decimal("4.5"))
+    def test_map_transform_without_depth(self):
+        """Test transform creation without depth"""
+        transform = MappedNSBList._get_transform(
+            angle=Decimal("10"),
+            ml=Decimal("2.0"),
+            ap=Decimal("1.5"),
+            depth=None,
+        )
+        self.assertIsInstance(transform, list)
+        self.assertEqual(len(transform), 2)
+
+    def test_map_transform_with_depth(self):
+        """Test transform creation with depth"""
+        transform = MappedNSBList._get_transform(
+            angle=Decimal("10"),
+            ml=Decimal("2.0"),
+            ap=Decimal("1.5"),
+            depth=Decimal("3.0"),
+        )
+        self.assertIsInstance(transform, list)
+        self.assertEqual(len(transform), 2)
 
 
 class TestNSB2019StringParsers(TestCase):
@@ -687,89 +597,90 @@ class TestNSB2019StringParsers(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """Load string entry examples and build a blank mapper"""
-        with open(TEST_EXAMPLES, encoding="utf-8") as f:
-            cls.string_entries = json.load(f)
-        
+        """Create blank mapper for parser testing"""
         cls.blank_model = MappedNSBList(
-            nsb=NSB2019List.model_validate(
-                {"FileSystemObjectType": 0, "Id": 0}
-            )
+            nsb=NSB2019List.model_validate({
+                "FileSystemObjectType": 0, 
+                "Id": 0
+            })
         )
 
-    def _test_parser(self, keys: List[str], parser: Callable) -> None:
-        """Run a list of example keys through one of the _parse_* methods"""
-        for field in keys:
-            entries = self.string_entries[field]["unique_entries"]
-            for raw_input, expected in entries.items():
-                if isinstance(expected, float):
-                    expected = Decimal(str(expected))
-                actual = parser(raw_input)
-                self.assertEqual(expected, actual, f"{field}: {raw_input!r}")
-        self.assertIsNone(parser(None))
-
-    def test_ap_parser(self):
+    def test_parse_ap_str(self):
         """Tests parsing of AP coordinate values"""
-        ap_keys = ["AP2ndInj", "HP_x0020_A_x002f_P", "Virus_x0020_A_x002f_P"]
-        self._test_parser(ap_keys, self.blank_model._parse_ap_str)
+        self.assertEqual(self.blank_model._parse_ap_str("-1.06"), Decimal("-1.06"))
+        self.assertEqual(self.blank_model._parse_ap_str("1"), Decimal("1.0"))
+        self.assertEqual(self.blank_model._parse_ap_str("-3.8mm"), Decimal("-3.8"))
+        self.assertIsNone(self.blank_model._parse_ap_str("calamus -0.44"))
+        self.assertIsNone(self.blank_model._parse_ap_str(None))
 
-    def test_dv_parser(self):
-        """Tests parsing of DV coordinate values"""
-        dv_keys = [
-            "DV2ndInj",
-            "FiberImplant1DV",
-            "FiberImplant2DV",
-            "Virus_x0020_D_x002f_V",
-        ]
-        self._test_parser(dv_keys, self.blank_model._parse_dv_str)
-
-    def test_ml_parser(self):
+    def test_parse_ml_str(self):
         """Tests parsing of ML coordinate values"""
-        ml_keys = ["ML2ndInj", "HP_x0020_M_x002f_L", "Virus_x0020_M_x002f_L"]
-        self._test_parser(ml_keys, self.blank_model._parse_ml_str)
+        self.assertEqual(self.blank_model._parse_ml_str("3.4"), Decimal("3.4"))
+        self.assertEqual(self.blank_model._parse_ml_str("-2.3 mm"), Decimal("-2.3"))
+        self.assertEqual(self.blank_model._parse_ml_str(".35"), Decimal("0.35"))
+        self.assertIsNone(self.blank_model._parse_ml_str("-2.7mm (Left)"))
+        self.assertIsNone(self.blank_model._parse_ml_str(None))
 
-    def test_iso_dur_parser(self):
-        """Tests parsing of isoflurane duration values"""
-        iso_keys = ["FirstInjectionIsoDuration", "SecondInjectionIsoDuration"]
-        self._test_parser(iso_keys, self.blank_model._parse_iso_dur_str)
+    def test_parse_dv_str(self):
+        """Tests parsing of DV coordinate values"""
+        self.assertEqual(self.blank_model._parse_dv_str("3.38"), Decimal("3.38"))
+        self.assertEqual(self.blank_model._parse_dv_str("0.6mm"), Decimal("0.6"))
+        self.assertEqual(self.blank_model._parse_dv_str("+3.6"), Decimal("3.6"))
+        self.assertIsNone(self.blank_model._parse_dv_str("2.2, 2.60"))
+        self.assertIsNone(self.blank_model._parse_dv_str(None))
 
-    def test_weight_parser(self):
+    def test_parse_weight_str(self):
         """Tests parsing of animal weight values"""
-        w_keys = [
-            "FirstInjectionWeightAfter",
-            "FirstInjectionWeightBefor",
-            "Touch_x0020_Up_x0020_Weight_x002",
-            "Weight_x0020_after_x0020_Surgery",
-            "Weight_x0020_before_x0020_Surger",
-            "SecondInjectionWeightAfter",
-            "SecondInjectionWeightBefore",
-        ]
-        self._test_parser(w_keys, self.blank_model._parse_weight_str)
+        self.assertEqual(self.blank_model._parse_weight_str("19.1"), Decimal("19.1"))
+        self.assertEqual(self.blank_model._parse_weight_str("30."), Decimal("30.0"))
+        self.assertIsNone(self.blank_model._parse_weight_str("20/0"))
+        self.assertIsNone(self.blank_model._parse_weight_str(None))
 
-    def test_alt_time_parser(self):
-        """Tests parsing of alternating time values"""
-        at_keys = ["Inj1AlternatingTime", "Inj2AlternatingTime"]
-        self._test_parser(at_keys, self.blank_model._parse_alt_time_str)
+    def test_parse_iso_dur_str(self):
+        """Tests parsing of isoflurane duration values"""
+        self.assertEqual(self.blank_model._parse_iso_dur_str("1"), Decimal("60.0"))
+        self.assertEqual(self.blank_model._parse_iso_dur_str("1:45"), Decimal("105.0"))
+        self.assertEqual(self.blank_model._parse_iso_dur_str("2 hours"), Decimal("120.0"))
+        self.assertIsNone(self.blank_model._parse_iso_dur_str("45"))
+        self.assertIsNone(self.blank_model._parse_iso_dur_str(None))
 
-    def test_angle_parser(self):
+    def test_parse_angle_str(self):
         """Tests parsing of injection angle values"""
-        an_keys = ["Inj1Angle_v2", "Inj2Angle_v2"]
-        self._test_parser(an_keys, self.blank_model._parse_angle_str)
+        self.assertEqual(self.blank_model._parse_angle_str("0"), Decimal("0.0"))
+        self.assertEqual(self.blank_model._parse_angle_str("-10"), Decimal("-10.0"))
+        self.assertEqual(self.blank_model._parse_angle_str("0 degree"), Decimal("0.0"))
+        self.assertIsNone(self.blank_model._parse_angle_str("normal"))
+        self.assertIsNone(self.blank_model._parse_angle_str(None))
 
-    def test_current_parser(self):
+    def test_parse_current_str(self):
         """Tests parsing of injection current values"""
-        c_keys = ["Inj1Current", "Inj2Current"]
-        self._test_parser(c_keys, self.blank_model._parse_current_str)
+        self.assertEqual(self.blank_model._parse_current_str("5uA"), Decimal("5.0"))
+        self.assertEqual(self.blank_model._parse_current_str("3 uA"), Decimal("3.0"))
+        self.assertIsNone(self.blank_model._parse_current_str("5min"))
+        self.assertIsNone(self.blank_model._parse_current_str(None))
 
-    def test_length_of_time_parser(self):
+    def test_parse_alt_time_str(self):
+        """Tests parsing of alternating time values"""
+        self.assertEqual(self.blank_model._parse_alt_time_str("7/7"), Decimal("7.0"))
+        self.assertEqual(self.blank_model._parse_alt_time_str("7 seconds"), Decimal("7.0"))
+        self.assertIsNone(self.blank_model._parse_alt_time_str("30sec"))
+        self.assertIsNone(self.blank_model._parse_alt_time_str(None))
+
+    def test_parse_length_of_time_str(self):
         """Tests parsing of duration/length of time values"""
-        lt_keys = ["Inj1LenghtofTime", "Inj2LenghtofTime"]
-        self._test_parser(lt_keys, self.blank_model._parse_length_of_time_str)
+        self.assertEqual(self.blank_model._parse_length_of_time_str("5min"), Decimal("5.0"))
+        self.assertEqual(self.blank_model._parse_length_of_time_str("10 minutes"), Decimal("10.0"))
+        self.assertEqual(self.blank_model._parse_length_of_time_str("2.5min"), Decimal("2.5"))
+        self.assertIsNone(self.blank_model._parse_length_of_time_str("30 sec"))
+        self.assertIsNone(self.blank_model._parse_length_of_time_str(None))
 
-    def test_volume_parser(self):
+    def test_parse_inj_vol_str(self):
         """Tests parsing of injection volume values"""
-        v_keys = ["Inj1Vol", "Inj2Vol", "inj1volperdepth", "inj2volperdepth"]
-        self._test_parser(v_keys, self.blank_model._parse_inj_vol_str)
+        self.assertEqual(self.blank_model._parse_inj_vol_str("200 nL"), Decimal("200.0"))
+        self.assertEqual(self.blank_model._parse_inj_vol_str("500nl"), Decimal("500.0"))
+        self.assertEqual(self.blank_model._parse_inj_vol_str("400"), Decimal("400.0"))
+        self.assertIsNone(self.blank_model._parse_inj_vol_str("1uL (1000nl)"))
+        self.assertIsNone(self.blank_model._parse_inj_vol_str(None))
 
     def test_basic_float_parser(self):
         """Tests parsing of basic float strings"""
@@ -780,14 +691,8 @@ class TestNSB2019StringParsers(TestCase):
 
     def test_basic_decimal_parser(self):
         """Tests parsing of basic decimal strings"""
-        self.assertEqual(
-            self.blank_model._parse_basic_decimal_str("1.5"),
-            Decimal("1.5")
-        )
-        self.assertEqual(
-            self.blank_model._parse_basic_decimal_str("0"),
-            Decimal("0")
-        )
+        self.assertEqual(self.blank_model._parse_basic_decimal_str("1.5"), Decimal("1.5"))
+        self.assertEqual(self.blank_model._parse_basic_decimal_str("0"), Decimal("0"))
         self.assertIsNone(self.blank_model._parse_basic_decimal_str("invalid"))
         self.assertIsNone(self.blank_model._parse_basic_decimal_str(None))
 

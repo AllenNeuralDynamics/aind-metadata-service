@@ -88,7 +88,7 @@ class MappedNSBList:
     LENGTH_OF_TIME_REGEX = re.compile(
         r"^ *(\d*\.?\d+) *(?:m|min|mins|minute|minutes)+ *$"
     )
-    VOLUME_REGEX = re.compile(r"^ *(\d*\.?\d+) *(?:nl|nL)+ *$")
+    VOLUME_REGEX = re.compile(r"^ *(\d*\.?\d+) *(?:nl|nL)* *$")
 
     def __init__(self, nsb: NSB2019List):
         """Class constructor"""
@@ -946,7 +946,7 @@ class MappedNSBList:
             else {
                 self._nsb.craniotomy_type.VISUAL_CORTEX_5MM: (Decimal(5)),
                 self._nsb.craniotomy_type.FRONTAL_WINDOW_3MM: (Decimal(3)),
-            }.get(self.aind_craniotomy_type, None)
+            }.get(self._nsb.craniotomy_type, None)
         )
 
     @property
