@@ -453,8 +453,6 @@ class TestNSB2023SurgeryIntegration(TestCase):
              and any(isinstance(p, Craniotomy) for p in s.procedures)),
             None
         )
-        print(combined_surgery)
-        
         self.assertIsNotNone(combined_surgery)
         self.assertIsNotNone(combined_surgery.anaesthesia)
         self.assertEqual(

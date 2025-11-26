@@ -99,9 +99,6 @@ fail-under = 100
 [tool.pytest.ini_options]
 asyncio_mode="auto"
 asyncio_default_fixture_loop_scope="function"
-filterwarnings = [
-    "ignore::UserWarning",
-]
 env = [
     "AIND_METADATA_SERVICE_LABTRACKS_HOST=http://example.com/labtracks",
     "AIND_METADATA_SERVICE_MGI_HOST=http://example.com/mgi",
