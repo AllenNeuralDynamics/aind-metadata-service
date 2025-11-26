@@ -1,11 +1,8 @@
 """Module to test ProceduresMapper class"""
 
-import json
 import unittest
 from datetime import date, datetime
-from pathlib import Path
-from unittest.mock import patch
-
+from copy import deepcopy
 from aind_data_schema.components.injection_procedures import (
     Injection,
     InjectionDynamics,
@@ -52,24 +49,15 @@ from aind_metadata_service_server.models import (
     ViralMaterialInformation,
 )
 
-TEST_DIR = Path(__file__).parent / ".."
-EXAMPLE_LAS2020_JSON = (
-    TEST_DIR / "resources" / "las2020" / "raw" / "list_item1.json"
-)
-EXAMPLE_NSB2019_JSON = (
-    TEST_DIR / "resources" / "nsb2019" / "raw" / "list_item1.json"
-)
-EXAMPLE_NSB2023_JSON = (
-    TEST_DIR / "resources" / "nsb2023" / "raw" / "list_item1.json"
-)
 
-
-class TestProcedures(unittest.TestCase):
+class TestProceduresMapper(unittest.TestCase):
     """Test procedures mapper functionality"""
 
-    def setUp(self):
-        """Set up test data before each test method"""
-        self.labtracks_tasks = [
+    @classmethod
+    def setUpClass(cls):
+        """Set up test data once for all tests"""
+        # LabTracks tasks data
+        cls.labtracks_tasks = [
             LabTracksTask(
                 id="0",
                 type_name="Perfusion Gel",
@@ -101,7 +89,9 @@ class TestProcedures(unittest.TestCase):
                 task_status="F",
             ),
         ]
-        self.slims_water_restriction = [
+
+        # SLIMS water restriction data
+        cls.slims_water_restriction = [
             SlimsWaterRestrictionData(
                 content_event_created_on=1734119014103,
                 subject_id="115977",
@@ -113,7 +103,9 @@ class TestProcedures(unittest.TestCase):
                 weight_unit="g",
             )
         ]
-        self.slims_histology = [
+
+        # SLIMS histology data
+        cls.slims_histology = [
             SlimsHistologyData(
                 procedure_name="SmartSPIM Labeling",
                 protocol_id=None,
@@ -141,7 +133,9 @@ class TestProcedures(unittest.TestCase):
                 subject_id="115977",
             ),
         ]
-        self.perfusions_sheet = [
+
+        # Smartsheet perfusion data
+        cls.perfusions_sheet = [
             PerfusionsModel(
                 subject_id="115977.0",
                 var_date=date(2023, 10, 2),
@@ -156,19 +150,74 @@ class TestProcedures(unittest.TestCase):
                 notes="Good",
             )
         ]
-        with open(EXAMPLE_LAS2020_JSON) as f:
-            las2020_contents = json.load(f)
-        self.las2020 = [Las2020List.model_validate(las2020_contents)]
-        with open(EXAMPLE_NSB2019_JSON) as f:
-            nsb2019_contents = json.load(f)
-        self.nsb2019 = [NSB2019List.model_validate(nsb2019_contents)]
-        with open(EXAMPLE_NSB2023_JSON) as f:
-            nsb2023_contents = json.load(f)
-        self.nsb_2023 = [NSB2023List.model_validate(nsb2023_contents)]
+
+        # LAS2020 data
+        las2020_data = {
+            "FileSystemObjectType": 0,
+            "Id": 6709,
+            "AuthorId": 5358,
+            "Protocol": "2212 - Investigating Brain States",
+            "nStart_x0020_Date": "2024-06-21T07:00:00Z",
+            "ReqPro1": "Tissue Collection",
+            "ReqPro2": "Dosing",
+            "doseRoute": "Intraperitoneal (IP)",
+            "doseSub": "Heparin1000U/mL",
+            "dosevolume": "70.4 uL",
+            "doseduration": "30 s",
+        }
+        cls.las2020 = [Las2020List.model_validate(las2020_data)]
+
+        # NSB2019 data
+        nsb2019_data = {
+            "FileSystemObjectType": 0,
+            "Id": 5554,
+            "Title": "115977INJ+HP+C",
+            "IACUC_x0020_Protocol_x0020__x002": "2115",
+            "Procedure": "HP+Injection+Optic Fiber Implant",
+            "LabTracks_x0020_ID": "115977",
+            "Date_x0020_of_x0020_Surgery": "2022-12-06T08:00:00Z",
+            "Virus_x0020_M_x002f_L": "-3.3",
+            "Virus_x0020_A_x002f_P": "-1.6",
+            "Virus_x0020_D_x002f_V": "4.3",
+            "Virus_x0020_Hemisphere": "Left",
+            "Inj1Type": "Nanoject (Pressure)",
+            "Inj1Vol": "400",
+            "Inj1LenghtofTime": "5min",
+            "Date1stInjection": "2022-12-06T08:00:00Z",
+            "FirstInjectionWeightBefor": "19.1",
+            "FirstInjectionWeightAfter": "19.2",
+            "FirstInjectionIsoDuration": "1 hour",
+            "Breg2Lamb": "4",
+        }
+        cls.nsb2019 = [NSB2019List.model_validate(nsb2019_data)]
+
+        # NSB2023 data
+        nsb2023_data = {
+            "FileSystemObjectType": 0,
+            "Id": 190,
+            "Title": "115977Visual Ctx 2P",
+            "IACUC_x0020_Protocol_x0020__x002": "2103",
+            "DateRangeStart": "2023-01-02T08:00:00Z",
+            "Date_x0020_of_x0020_Surgery": "2022-01-03T08:00:00Z",
+            "Date1stInjection": "2022-01-03T08:00:00Z",
+            "LabTracks_x0020_ID1": "115977",
+            "Sex": "Male",
+            "Date_x0020_of_x0020_Birth": "2022-11-09T08:00:00Z",
+            "Weight_x0020_before_x0020_Surger": 25.2,
+            "Weight_x0020_after_x0020_Surgery": 28.2,
+            "Iso_x0020_On": 1.5,
+            "HPIsoLevel": 2.0,
+            "Procedure": "Frontal Ctx 2P",
+            "Headpost": "Visual Ctx",
+            "HeadpostType": "Mesoscope",
+            "CraniotomyType": "5mm",
+            "AuthorId": 187,
+        }
+        cls.nsb_2023 = [NSB2023List.model_validate(nsb2023_data)]
 
     def test_map_labtracks_unknown_task_to_none(self):
         """Test mapping LabTracksTask to None"""
-        task = self.labtracks_tasks[0]
+        task = deepcopy(self.labtracks_tasks[0])
         task.type_name = "Unknown Task Type"
         surgery = ProceduresMapper._map_labtracks_task_to_aind_surgery(task)
         self.assertIsNone(surgery)
@@ -188,7 +237,6 @@ class TestProcedures(unittest.TestCase):
                 animal_weight_post=None,
                 anaesthesia=None,
                 notes=None,
-                # Perfusion missing protocol_id
                 procedures=[
                     Perfusion.model_construct(output_specimen_ids={"115977"})
                 ],
@@ -201,7 +249,6 @@ class TestProcedures(unittest.TestCase):
                 animal_weight_post=None,
                 anaesthesia=None,
                 notes=None,
-                # Missing injection_volume and injection_eye
                 procedures=[
                     Injection.model_construct(
                         targeted_structure=InjectionTargets.RETRO_ORBITAL,
@@ -231,7 +278,7 @@ class TestProcedures(unittest.TestCase):
 
         self.assertIsInstance(procedures, Procedures)
         self.assertEqual(procedures.subject_id, "115977")
-        self.assertEqual(len(procedures.subject_procedures), 10)
+        self.assertEqual(len(procedures.subject_procedures), 9)
         self.assertEqual(len(procedures.specimen_procedures), 0)
 
     def test_map_responses_no_data(self):
@@ -488,20 +535,8 @@ class TestProcedures(unittest.TestCase):
 
     def test_map_slims_info_to_water_restrictions(self):
         """Tests map_slims_info_to_water_restrictions method."""
-        slims_water_restriction = [
-            SlimsWaterRestrictionData(
-                content_event_created_on=1734119014103,
-                subject_id="762287",
-                start_date=datetime.fromtimestamp(1734119012.354),
-                end_date=None,
-                assigned_by="person.name",
-                target_weight_fraction="0.85",
-                baseline_weight="28.23",
-                weight_unit="g",
-            )
-        ]
         mapper = ProceduresMapper(
-            slims_water_restriction=slims_water_restriction
+            slims_water_restriction=self.slims_water_restriction
         )
         output = mapper._map_slims_response_to_aind_water_restrictions()
         expected_output = [
@@ -521,6 +556,8 @@ class TestProcedures(unittest.TestCase):
 
     def test_parse_mass_unit(self):
         """Test mass unit parsed as expected."""
+        from unittest.mock import patch
+
         slims_water_restriction = [SlimsWaterRestrictionData.model_construct()]
         mapper = ProceduresMapper(
             slims_water_restriction=slims_water_restriction

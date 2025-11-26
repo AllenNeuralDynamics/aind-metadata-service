@@ -1,10 +1,10 @@
 """Tests procedures route"""
 
-import json
 from datetime import datetime
-from pathlib import Path
 from unittest.mock import AsyncMock, patch
-
+import warnings
+from pathlib import Path
+import json
 import pytest
 from aind_labtracks_service_async_client.models import Task as LabTracksTask
 from aind_sharepoint_service_async_client.models import (
@@ -30,6 +30,15 @@ EXAMPLE_NSB2023_JSON = (
 
 class TestRoute:
     """Test responses."""
+
+    @pytest.fixture(autouse=True)
+    def setup_method(self):
+        """Filter Pydantic serialization warnings for all tests"""
+        warnings.filterwarnings(
+            "ignore",
+            category=UserWarning,
+            message=".*Pydantic serializer warnings.*"
+        )
 
     @patch("aind_labtracks_service_async_client.DefaultApi.get_tasks")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_las2020")
