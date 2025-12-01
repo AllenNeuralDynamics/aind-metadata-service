@@ -24,6 +24,6 @@ jobs:
       default-branch: dev
       working-directory: aind-metadata-service-server
       image-name: aind-metadata-service-server
-      docker_tag: ${{ needs.compute-docker-tag.outputs.docker_tag }}
+      docker-tag: ${{ needs.compute-docker-tag.outputs.docker_tag }}
     secrets:
       repo-token: ${{ secrets.GITHUB_TOKEN }}
