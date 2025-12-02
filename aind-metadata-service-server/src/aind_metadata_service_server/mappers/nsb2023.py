@@ -305,14 +305,6 @@ class MappedNSBList:
         except (ValueError, DecimalException):
             return None
 
-    @staticmethod
-    def _parse_basic_float_str(float_str: Optional[str]) -> Optional[float]:
-        """Parse string representation of float such as '0.25'."""
-        try:
-            return None if float_str is None else float(float_str)
-        except ValueError:
-            return None
-
     def _parse_current_str(self, cur_str: Optional[str]) -> Optional[Decimal]:
         """Parse current strings"""
         if cur_str is not None:
@@ -392,13 +384,6 @@ class MappedNSBList:
             return CCFv3.by_acronym(acronym)
         except (ValueError, AttributeError, IndexError):
             return None
-
-    @property
-    def aind_age_at_injection(self) -> Optional[Decimal]:
-        """Maps age_at_injection to aind model."""
-        return self._parse_basic_decimal_str(
-            self._nsb.age_x0020_at_x0020_injection
-        )
 
     @property
     def aind_ap2nd_inj(self) -> Optional[Decimal]:
@@ -1706,11 +1691,6 @@ class MappedNSBList:
         return self._parse_datetime_to_date(self._nsb.date1st_injection)
 
     @property
-    def aind_date_of_birth(self) -> Optional[datetime]:
-        """Maps date_of_birth to aind model"""
-        return self._nsb.date_x0020_of_x0020_birth
-
-    @property
     def aind_date_of_surgery(self) -> Optional[date]:
         """Maps date_of_surgery to aind model"""
         return self._parse_datetime_to_date(
@@ -2217,39 +2197,10 @@ class MappedNSBList:
         return self._parse_virus_strain_str(self._nsb.inj_virus_strain_rt)
 
     @property
-    def aind_ionto_number_inj1(self) -> Optional[Any]:
-        """Maps ionto_number_inj1 to aind model."""
-        return (
-            None
-            if self._nsb.ionto_number_inj1 is None
-            or self._nsb.ionto_number_inj1
-            == self._nsb.ionto_number_inj1.SELECT
-            or self._nsb.ionto_number_inj1 == self._nsb.ionto_number_inj1.N_A
-            else self._nsb.ionto_number_inj1.value
-        )
-
-    @property
-    def aind_ionto_number_inj2(self) -> Optional[Any]:
-        """Maps ionto_number_inj2 to aind model."""
-        return (
-            None
-            if self._nsb.ionto_number_inj2 is None
-            or self._nsb.ionto_number_inj2
-            == self._nsb.ionto_number_inj2.SELECT
-            or self._nsb.ionto_number_inj2 == self._nsb.ionto_number_inj2.N_A
-            else self._nsb.ionto_number_inj2.value
-        )
-
-    @property
     def aind_iso_on(self) -> Optional[Decimal]:
         """Maps iso_on to aind model"""
         optional_decimal = self._map_float_to_decimal(self._nsb.iso_x0020_on)
         return None if optional_decimal is None else optional_decimal * 60
-
-    @property
-    def aind_lab_tracks_id1(self) -> Optional[str]:
-        """Maps lab_tracks_id1 to aind model."""
-        return self._nsb.lab_tracks_x0020_id1
 
     @property
     def aind_long_requestor_comments(self) -> Optional[str]:
@@ -2262,45 +2213,9 @@ class MappedNSBList:
         return self._map_float_to_decimal(self._nsb.ml2nd_inj)
 
     @property
-    def aind_nanoject_number_inj10(self) -> Optional[Any]:
-        """Maps nanoject_number_inj10 to aind model."""
-        return (
-            None
-            if self._nsb.nanoject_number_inj10 is None
-            or self._nsb.nanoject_number_inj10
-            == self._nsb.nanoject_number_inj10.SELECT
-            or self._nsb.nanoject_number_inj10
-            == self._nsb.nanoject_number_inj10.N_A
-            else self._nsb.nanoject_number_inj10.value
-        )
-
-    @property
-    def aind_nanoject_number_inj2(self) -> Optional[Any]:
-        """Maps nanoject_number_inj2 to aind model."""
-        return (
-            None
-            if self._nsb.nanoject_number_inj2 is None
-            or self._nsb.nanoject_number_inj2
-            == self._nsb.nanoject_number_inj2.SELECT
-            or self._nsb.nanoject_number_inj2
-            == self._nsb.nanoject_number_inj2.N_A
-            else self._nsb.nanoject_number_inj2.value
-        )
-
-    @property
-    def aind_non_x002d_nsb_surgeon(self) -> Optional[bool]:
-        """Maps non_x002d_nsb_surgeon to aind model."""
-        return self._nsb.non_x002d_nsb_x0020_surgeon
-
-    @property
     def aind_procedure(self) -> Optional[NSB2023Procedure]:
         """Maps procedure to aind model"""
         return self._nsb.procedure
-
-    @property
-    def aind_procedure_family(self) -> Optional[NSB2023ProcedureCategory]:
-        """Maps procedure_family to aind model"""
-        return self._nsb.procedure_x0020_family
 
     @property
     def aind_protocol(self) -> Optional[str]:
@@ -3422,6 +3337,10 @@ class MappedNSBList:
             burr_during_info = self.surgery_during_info(
                 during=burr_hole_info.during,
             )
+            anaesthesia = self._map_anaesthetic(
+                    burr_during_info.anaesthetic_duration_in_minutes,
+                    burr_during_info.anaesthetic_level,
+                )
             # Use correct coordinate system for transforms
             if burr_hole_info.during == During.INITIAL:
                 surgery_coord_system = initial_coord_system
@@ -3452,10 +3371,6 @@ class MappedNSBList:
                     burr_hole_info.inj_materials
                 )
                 dynamics = []
-                anaesthesia = self._map_anaesthetic(
-                    burr_during_info.anaesthetic_duration_in_minutes,
-                    burr_during_info.anaesthetic_level,
-                )
                 if burr_hole_info.inj_type == InjectionType.IONTOPHORESIS:
                     try:
                         dynamics_obj = InjectionDynamics(

@@ -261,11 +261,6 @@ class MappedLASList:
         return self._parse_dose_sub_to_nonviral_material(self._las.dose_sub)
 
     @property
-    def aind_dose_where(self) -> Optional[str]:
-        """Maps dose_where to aind model"""
-        return self._las.dose_where
-
-    @property
     def aind_doseduration(self) -> Optional[Decimal]:
         """Maps doseduration to aind model"""
         if not self._las.doseduration:
