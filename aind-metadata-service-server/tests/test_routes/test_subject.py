@@ -119,7 +119,10 @@ class TestRoute:
         """Tests handling of invalid subject ID"""
         response = client.get("api/v2/subject/abcd")
         expected_response = {
-            "detail": "Subject ID abcd is not a valid subject."
+            "detail": (
+                "Subject ID abcd is not valid."
+                " Please specify a numeric subject ID."
+            )
         }
         assert 406 == response.status_code
         assert expected_response == response.json()
@@ -196,10 +199,14 @@ class TestRoute:
         """Tests handling of invalid subject ID for LabTracks"""
         response = client.get("api/v2/labtracks/subject?subject_id=abcd")
         expected_response = {
-            "detail": "Subject ID abcd is not a valid subject."
+            "detail": (
+                "Subject ID abcd is not valid."
+                " Please specify a numeric subject ID."
+            )
         }
         assert 406 == response.status_code
         assert expected_response == response.json()
+
 
 if __name__ == "__main__":
     pytest.main([__file__])
