@@ -73,6 +73,11 @@ class TestRoute:
         assert 1 == len(mock_lb_api_get.mock_calls)
         assert 2 == len(mock_mg_api_get.mock_calls)
 
+    def test_get_subject_bad_request(self, client: TestClient):
+        """Tests a bad request response"""
+        response = client.get("/subject/abcd")
+        assert 400 == response.status_code
+
 
 if __name__ == "__main__":
     pytest.main([__file__])
