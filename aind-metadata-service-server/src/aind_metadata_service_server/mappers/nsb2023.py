@@ -3507,7 +3507,7 @@ class MappedNSBList:
                     implanted_device=fiber_probe,
                     device_config=ProbeConfig.model_construct(
                         primary_targeted_structure=primary_target,
-                        other_targeted_structures=other_targets,
+                        other_targeted_structure=other_targets,
                         device_name=None,
                         coordinate_system=coordinate_system,
                         transform=transforms[0],
