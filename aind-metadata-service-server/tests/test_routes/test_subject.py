@@ -112,6 +112,21 @@ class TestRoute:
         assert caplog is not None
         assert 500 == response.status_code
 
+    def test_get_subject_invalid_id(
+        self,
+        client: TestClient,
+    ):
+        """Tests handling of invalid subject ID"""
+        response = client.get("api/v2/subject/abcd")
+        expected_response = {
+            "detail": (
+                "Subject ID abcd is not valid."
+                " Please specify a numeric subject ID."
+            )
+        }
+        assert 406 == response.status_code
+        assert expected_response == response.json()
+
     @patch("aind_labtracks_service_async_client.DefaultApi.get_subject")
     def test_get_labtracks_subject(
         self,
@@ -176,6 +191,21 @@ class TestRoute:
         mock_lb_api_get.return_value = []
         response = client.get("api/v2/labtracks/subject?subject_id=632269")
         assert 404 == response.status_code
+
+    def test_get_labtracks_subject_invalid_id(
+        self,
+        client: TestClient,
+    ):
+        """Tests handling of invalid subject ID for LabTracks"""
+        response = client.get("api/v2/labtracks/subject?subject_id=abcd")
+        expected_response = {
+            "detail": (
+                "Subject ID abcd is not valid."
+                " Please specify a numeric subject ID."
+            )
+        }
+        assert 406 == response.status_code
+        assert expected_response == response.json()
 
 
 if __name__ == "__main__":

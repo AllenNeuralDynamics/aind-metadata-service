@@ -33,6 +33,15 @@ async def get_subject(
     ## Subject
     Return Subject metadata.
     """
+    if not subject_id.isdigit():
+        raise HTTPException(
+            status_code=406,
+            detail=(
+                f"Subject ID {subject_id} is not valid."
+                " Please specify a numeric subject ID."
+            ),
+        )
+
     labtracks_response = await labtracks_api_instance.get_subject(
         subject_id, _request_timeout=10
     )
@@ -82,6 +91,15 @@ async def get_labtracks_subject(
     ## LabTracks Subject
     Return LabTracks Subject metadata.
     """
+    if not subject_id.isdigit():
+        raise HTTPException(
+            status_code=406,
+            detail=(
+                f"Subject ID {subject_id} is not valid."
+                " Please specify a numeric subject ID."
+            ),
+        )
+
     labtracks_response = await labtracks_api_instance.get_subject(
         subject_id, _request_timeout=10
     )
