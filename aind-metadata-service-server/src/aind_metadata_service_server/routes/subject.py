@@ -35,31 +35,34 @@ async def get_subject(
     ## Subject
     Return Subject metadata.
     """
-    labtracks_response = await labtracks_api_instance.get_subject(
-        subject_id, _request_timeout=10
-    )
+    if not subject_id.isdigit():
+        response_handler = ModelResponse.bad_request_error_response()
+    else:
+        labtracks_response = await labtracks_api_instance.get_subject(
+            subject_id, _request_timeout=10
+        )
 
-    mappers = [
-        SubjectMapper(labtracks_subject=labtracks_subject)
-        for labtracks_subject in labtracks_response
-    ]
+        mappers = [
+            SubjectMapper(labtracks_subject=labtracks_subject)
+            for labtracks_subject in labtracks_response
+        ]
 
-    for mapper in mappers:
-        mgi_info = []
-        allele_names = mapper.get_allele_names_from_genotype()
-        for allele_name in allele_names:
-            logging.warning(
-                f"Skipping allele {allele_name} search for {subject_id}"
-            )
-            api_response = await mgi_api_instance.get_allele_info(
-                allele_name=allele_name, _request_timeout=10
-            )
-            mgi_info.extend(api_response)
-        mapper.mgi_info = mgi_info
+        for mapper in mappers:
+            mgi_info = []
+            allele_names = mapper.get_allele_names_from_genotype()
+            for allele_name in allele_names:
+                logging.warning(
+                    f"Skipping allele {allele_name} search for {subject_id}"
+                )
+                api_response = await mgi_api_instance.get_allele_info(
+                    allele_name=allele_name, _request_timeout=10
+                )
+                mgi_info.extend(api_response)
+            mapper.mgi_info = mgi_info
 
-    subjects = [mapper.map_to_aind_subject() for mapper in mappers]
-    response_handler = ModelResponse(
-        aind_models=subjects, status_code=StatusCodes.DB_RESPONDED
-    )
+        subjects = [mapper.map_to_aind_subject() for mapper in mappers]
+        response_handler = ModelResponse(
+            aind_models=subjects, status_code=StatusCodes.DB_RESPONDED
+        )
     response = response_handler.map_to_json_response()
     return response
