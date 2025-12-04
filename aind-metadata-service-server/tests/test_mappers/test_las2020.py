@@ -61,7 +61,9 @@ class TestLAS2020BasicMapping(TestCase):
 
     def test_map_requested_procedures(self):
         """Test requested procedure mappings"""
-        self.assertEqual(self.mapper.aind_req_pro1, LASProcedure.TISSUE_COLLECTION)
+        self.assertEqual(
+            self.mapper.aind_req_pro1, LASProcedure.TISSUE_COLLECTION
+        )
         self.assertEqual(self.mapper.aind_req_pro2, LASProcedure.DOSING)
         self.assertIsNone(self.mapper.aind_req_pro3)
 
@@ -89,7 +91,9 @@ class TestLAS2020IPInjectionMapping(TestCase):
 
     def test_map_dose_route(self):
         """Test dose route mapping"""
-        self.assertEqual(self.mapper.aind_dose_route, LASDoseroute.INTRAPERITONEAL_IP)
+        self.assertEqual(
+            self.mapper.aind_dose_route, LASDoseroute.INTRAPERITONEAL_IP
+        )
 
     def test_map_dose_substance(self):
         """Test dose substance mapping"""
@@ -116,15 +120,13 @@ class TestLAS2020IPInjectionMapping(TestCase):
         """Test creation of IP Injection procedure"""
         surgery = self.mapper.get_surgery(subject_id="000000")
         self.assertIsNotNone(surgery)
-        
+
         ip_injection = next(
-            (p for p in surgery.procedures if isinstance(p, Injection)),
-            None
+            (p for p in surgery.procedures if isinstance(p, Injection)), None
         )
         self.assertIsNotNone(ip_injection)
         self.assertEqual(
-            ip_injection.targeted_structure, 
-            InjectionTargets.INTRAPERITONEAL
+            ip_injection.targeted_structure, InjectionTargets.INTRAPERITONEAL
         )
 
 
@@ -206,15 +208,13 @@ class TestLAS2020RetroOrbitalInjectionMapping(TestCase):
         """Test creation of RO Injection procedure"""
         surgery = self.mapper.get_surgery(subject_id="000000")
         self.assertIsNotNone(surgery)
-        
+
         ro_injection = next(
-            (p for p in surgery.procedures if isinstance(p, Injection)),
-            None
+            (p for p in surgery.procedures if isinstance(p, Injection)), None
         )
         self.assertIsNotNone(ro_injection)
         self.assertEqual(
-            ro_injection.targeted_structure,
-            InjectionTargets.RETRO_ORBITAL
+            ro_injection.targeted_structure, InjectionTargets.RETRO_ORBITAL
         )
         self.assertIn(AnatomicalRelative.RIGHT, ro_injection.relative_position)
 
@@ -225,13 +225,15 @@ class TestLAS2020RetroOrbitalInjectionMapping(TestCase):
         test_data["roLot1b"] = "LOT456"
         test_data["roGC1b"] = "2e13"
         test_data["roTite1b"] = "2e12"
-        
+
         las_model = Las2020List.model_validate(test_data)
         mapper = MappedLASList(las=las_model)
-        
+
         ro_info = mapper.map_ro_injection_info(ro_num=1)
         self.assertEqual(len(ro_info.injectable_materials), 2)
-        self.assertEqual(ro_info.injectable_materials[1].substance, "AAV-PHP.S")
+        self.assertEqual(
+            ro_info.injectable_materials[1].substance, "AAV-PHP.S"
+        )
 
 
 class TestLAS2020SurgeryIntegration(TestCase):
@@ -274,11 +276,11 @@ class TestLAS2020SurgeryIntegration(TestCase):
         self.assertEqual(len(surgery.procedures), 2)
         self.assertEqual(
             surgery.procedures[0].targeted_structure,
-            InjectionTargets.INTRAPERITONEAL
+            InjectionTargets.INTRAPERITONEAL,
         )
         self.assertEqual(
             surgery.procedures[1].targeted_structure,
-            InjectionTargets.RETRO_ORBITAL
+            InjectionTargets.RETRO_ORBITAL,
         )
 
     def test_get_surgery_no_procedures(self):
@@ -291,7 +293,7 @@ class TestLAS2020SurgeryIntegration(TestCase):
         }
         las_model = Las2020List.model_validate(test_data)
         mapper = MappedLASList(las=las_model)
-        
+
         surgery = mapper.get_surgery(subject_id="000000")
         self.assertIsNone(surgery)
 
@@ -301,7 +303,7 @@ class TestLAS2020SurgeryIntegration(TestCase):
         self.assertEqual(len(surgery.procedures), 1)
         self.assertEqual(
             surgery.procedures[0].targeted_structure,
-            InjectionTargets.INTRAPERITONEAL
+            InjectionTargets.INTRAPERITONEAL,
         )
 
 
@@ -312,21 +314,18 @@ class TestLAS2020StringParsers(TestCase):
     def setUpClass(cls):
         """Create blank mapper for parser testing"""
         cls.blank_model = MappedLASList(
-            las=Las2020List.model_validate({
-                "FileSystemObjectType": 0,
-                "Id": 0
-            })
+            las=Las2020List.model_validate(
+                {"FileSystemObjectType": 0, "Id": 0}
+            )
         )
 
     def test_parse_basic_decimal_str(self):
         """Test basic decimal string parsing"""
         self.assertEqual(
-            self.blank_model._parse_basic_decimal_str("0.25"), 
-            Decimal("0.25")
+            self.blank_model._parse_basic_decimal_str("0.25"), Decimal("0.25")
         )
         self.assertEqual(
-            self.blank_model._parse_basic_decimal_str("100"), 
-            Decimal("100")
+            self.blank_model._parse_basic_decimal_str("100"), Decimal("100")
         )
         self.assertIsNone(self.blank_model._parse_basic_decimal_str("abc"))
         self.assertIsNone(self.blank_model._parse_basic_decimal_str(None))
@@ -339,17 +338,26 @@ class TestLAS2020StringParsers(TestCase):
             ("Dox diet (200 mg/kg)", "Dox", Decimal("200"), "mg/kg"),
             ("Heparin (1000U/mL)", "Heparin", Decimal("1000"), "u/ml"),
         ]
-        
-        for input_str, expected_name, expected_conc, expected_unit in test_cases:
+
+        for (
+            input_str,
+            expected_name,
+            expected_conc,
+            expected_unit,
+        ) in test_cases:
             with self.subTest(input=input_str):
-                result = self.blank_model._parse_dose_sub_to_nonviral_material(input_str)
+                result = self.blank_model._parse_dose_sub_to_nonviral_material(
+                    input_str
+                )
                 self.assertEqual(result.name, expected_name)
                 self.assertEqual(result.concentration, expected_conc)
                 self.assertEqual(result.concentration_unit, expected_unit)
 
     def test_parse_dose_substance_without_concentration(self):
         """Test dose substance parsing without concentration"""
-        result = self.blank_model._parse_dose_sub_to_nonviral_material("2% Evans blue")
+        result = self.blank_model._parse_dose_sub_to_nonviral_material(
+            "2% Evans blue"
+        )
         self.assertEqual(result.name, "2% Evans blue")
         self.assertIsNone(result.concentration)
         self.assertIsNone(result.concentration_unit)
@@ -358,22 +366,27 @@ class TestLAS2020StringParsers(TestCase):
         """Test dose substance parsing with invalid inputs"""
         # Too long string
         long_string = "heparin  1000U/mL (2 mice only)"
-        result = self.blank_model._parse_dose_sub_to_nonviral_material(long_string)
+        result = self.blank_model._parse_dose_sub_to_nonviral_material(
+            long_string
+        )
         self.assertIsNone(result)
-        
+
         # None
-        result_none = self.blank_model._parse_dose_sub_to_nonviral_material(None)
+        result_none = self.blank_model._parse_dose_sub_to_nonviral_material(
+            None
+        )
         self.assertIsNone(result_none)
 
     def test_parse_iacuc_protocol(self):
         """Test IACUC protocol parsing"""
         self.assertEqual(
-            self.blank_model._parse_iacuc_protocol("2212 - Investigating Brain States"),
-            "2212"
+            self.blank_model._parse_iacuc_protocol(
+                "2212 - Investigating Brain States"
+            ),
+            "2212",
         )
         self.assertEqual(
-            self.blank_model._parse_iacuc_protocol("2115"),
-            "2115"
+            self.blank_model._parse_iacuc_protocol("2115"), "2115"
         )
         self.assertIsNone(
             self.blank_model._parse_iacuc_protocol("Invalid Protocol")
@@ -386,7 +399,7 @@ class TestLAS2020StringParsers(TestCase):
             ("1.5e13", 15000000000000, "gc/mL"),
             ("2E10", 20000000000, "gc/mL"),
         ]
-        
+
         for input_str, expected_value, expected_unit in test_cases:
             with self.subTest(input=input_str):
                 value, unit = self.blank_model._parse_titer(input_str)
@@ -399,7 +412,7 @@ class TestLAS2020StringParsers(TestCase):
             ("1000000 gc/mL", 1000000, "gc/mL"),
             ("500000 vg/mL", 500000, "vg/mL"),
         ]
-        
+
         for input_str, expected_value, expected_unit in test_cases:
             with self.subTest(input=input_str):
                 value, unit = self.blank_model._parse_titer(input_str)
@@ -423,7 +436,7 @@ class TestLAS2020StringParsers(TestCase):
             ("hr", TimeUnit.HR),
             ("hour", TimeUnit.HR),
         ]
-        
+
         for input_str, expected_unit in test_cases:
             with self.subTest(input=input_str):
                 result = self.blank_model._map_time_unit(input_str)

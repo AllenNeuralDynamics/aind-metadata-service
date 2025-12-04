@@ -3338,9 +3338,9 @@ class MappedNSBList:
                 during=burr_hole_info.during,
             )
             anaesthesia = self._map_anaesthetic(
-                    burr_during_info.anaesthetic_duration_in_minutes,
-                    burr_during_info.anaesthetic_level,
-                )
+                burr_during_info.anaesthetic_duration_in_minutes,
+                burr_during_info.anaesthetic_level,
+            )
             # Use correct coordinate system for transforms
             if burr_hole_info.during == During.INITIAL:
                 surgery_coord_system = initial_coord_system

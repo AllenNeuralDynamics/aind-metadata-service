@@ -787,7 +787,7 @@ class MappedNSBList:
                 self._nsb.round2_inj_isolevel.N_300: None,
             }.get(self._nsb.round2_inj_isolevel, None)
         )
-    
+
     @property
     def aind_second_injection_iso_dura(self) -> Optional[Decimal]:
         """Maps second_injection_iso_dura to aind model"""

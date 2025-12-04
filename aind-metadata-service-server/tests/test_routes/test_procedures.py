@@ -37,7 +37,7 @@ class TestRoute:
         warnings.filterwarnings(
             "ignore",
             category=UserWarning,
-            message=".*Pydantic serializer warnings.*"
+            message=".*Pydantic serializer warnings.*",
         )
 
     @patch("aind_labtracks_service_async_client.DefaultApi.get_tasks")
