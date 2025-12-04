@@ -56,6 +56,52 @@ async def get_funding(
     return map_to_response(funding_information)
 
 
+@router.get("/api/v2/investigators/{project_name}")
+async def get_investigators(
+    project_name: str = Path(
+        ...,
+        openapi_examples={
+            "default": {
+                "summary": "A sample project name",
+                "description": "Example project name for smartsheet",
+                "value": (
+                    "Thalamus in the middle - Project 1 Mesoscale thalamic"
+                    " circuits"
+                ),
+            }
+        },
+    ),
+    smartsheet_api_instance=Depends(get_smartsheet_api_instance),
+):
+    """
+    ## Funding
+    Return Funding metadata.
+    """
+    main_project_name, subproject = FundingMapper.split_name(project_name)
+    funding_response = await smartsheet_api_instance.get_funding(
+        project_name=main_project_name,
+        subproject=subproject,
+        _request_timeout=10,
+    )
+    has_subprojects = any(row.subproject for row in funding_response)
+    if subproject is None and has_subprojects:
+        raise HTTPException(
+            status_code=406,
+            detail=(
+                f"Project '{main_project_name}' has subprojects. "
+                f"Please specify a subproject in the format: "
+                f"'{main_project_name} - Subproject Name'"
+            ),
+        )
+    mapper = FundingMapper(smartsheet_funding=funding_response)
+    investigators = mapper.get_investigators_list()
+
+    if len(investigators) == 0:
+        raise HTTPException(status_code=404, detail="Not found")
+
+    return map_to_response(investigators)
+
+
 @router.get("/api/v2/project_names")
 async def get_project_names(
     smartsheet_api_instance=Depends(get_smartsheet_api_instance),

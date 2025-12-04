@@ -6,9 +6,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 from typing import Any, List, Literal, Optional
 
-from aind_data_schema.components.identifiers import Person
 from aind_data_schema.components.injection_procedures import ViralMaterial
-from aind_data_schema.core.data_description import Funding
 from aind_slims_service_async_client import (
     EcephysStreamModule,
     SlimsEcephysData,
@@ -64,13 +62,6 @@ class IntendedMeasurementInformation(BaseModel):
     intended_measurement_G: Optional[str] = None
     intended_measurement_B: Optional[str] = None
     intended_measurement_Iso: Optional[str] = None
-
-
-class FundingInformation(Funding):
-    """Funding information that will be returned to the user that requests
-    information from the Funding SmartSheet"""
-
-    investigators: Optional[List[Person]] = Field(default=None)
 
 
 class SpimData(SlimsSpimData):
