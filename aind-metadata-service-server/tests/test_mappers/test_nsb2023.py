@@ -13,6 +13,9 @@ from aind_data_schema.components.coordinates import (
     CoordinateSystemLibrary,
     Direction,
 )
+from aind_data_schema.components.injection_procedures import (
+    NonViralMaterial,
+)
 from aind_data_schema.components.subject_procedures import Surgery
 from aind_data_schema.components.surgery_procedures import (
     BrainInjection,
@@ -25,11 +28,9 @@ from aind_data_schema_models.coordinates import Origin
 from aind_sharepoint_service_async_client.models.nsb2023_list import (
     NSB2023List,
 )
-from aind_data_schema.components.configs import ProbeConfig
 from aind_data_schema.components.devices import FiberProbe
 from aind_data_schema.components.surgery_procedures import ProbeImplant
 from aind_data_schema.components.coordinates import Translation, Rotation
-
 from aind_metadata_service_server.mappers.nsb2023 import (
     BurrHoleProcedure,
     During,
@@ -40,6 +41,7 @@ from aind_metadata_service_server.mappers.nsb2023 import (
     MappedNSBList,
     HeadPostInfo,
     HeadframeMaterial,
+    InjectableMaterial,
 )
 from aind_data_schema_models.units import SizeUnit
 
@@ -371,7 +373,7 @@ class TestNSB2023CraniotomyMapping(TestCase):
         """Test None craniotomy type for missing or invalid values"""
         # Test with missing field
         test_data_missing = deepcopy(self.craniotomy_data_5mm)
-        del test_data_missing["CraniotomyType"]
+        test_data_missing["CraniotomyType"] = None
         nsb_model_missing = NSB2023List.model_validate(test_data_missing)
         mapper_missing = MappedNSBList(nsb=nsb_model_missing)
         self.assertIsNone(mapper_missing.aind_craniotomy_type)
@@ -396,7 +398,7 @@ class TestNSB2023CraniotomyMapping(TestCase):
             with self.subTest(craniotomy_type=cran_type):
                 test_data = deepcopy(self.craniotomy_data_5mm)
                 if cran_type is None:
-                    del test_data["CraniotomyType"]
+                    test_data["CraniotomyType"] = None
                 else:
                     test_data["CraniotomyType"] = cran_type
 
@@ -850,14 +852,33 @@ class TestNSB2023InjectionMapping(TestCase):
         nsb_model = NSB2023List.model_validate(minimal_data)
         mapper = MappedNSBList(nsb=nsb_model)
 
-        # Test all valid burr hole numbers
         for i in range(1, 7):
             burr_info = mapper.burr_hole_info(i)
-            from aind_metadata_service_server.mappers.nsb2023 import (
-                BurrHoleInfo,
-            )
-
             self.assertIsInstance(burr_info, BurrHoleInfo)
+
+    def test_map_burr_hole_injection_materials_nonviral(self):
+        """Test mapping of non-viral materials with concentration"""
+        nonviral_materials = [
+            InjectableMaterial(material="Muscimol", titer_str="0.5 mg/ml"),
+            InjectableMaterial(material="Saline", titer_str="2.5 mg/mL"),
+        ]
+
+        nsb_data = {"FileSystemObjectType": 0, "Id": 1}
+        nsb_model = NSB2023List.model_validate(nsb_data)
+        mapper = MappedNSBList(nsb=nsb_model)
+
+        injection_materials = mapper.map_burr_hole_injection_materials(
+            nonviral_materials
+        )
+
+        self.assertEqual(len(injection_materials), 2)
+        self.assertIsInstance(injection_materials[0], NonViralMaterial)
+        self.assertEqual(injection_materials[0].name, "Muscimol")
+        self.assertEqual(injection_materials[0].concentration, Decimal("0.5"))
+
+        self.assertIsInstance(injection_materials[1], NonViralMaterial)
+        self.assertEqual(injection_materials[1].name, "Saline")
+        self.assertEqual(injection_materials[1].concentration, Decimal("2.5"))
 
     def test_map_burr_hole_info_with_partial_coordinates(self):
         """Test burr_hole_info when some coordinates are missing"""
@@ -865,7 +886,6 @@ class TestNSB2023InjectionMapping(TestCase):
             "FileSystemObjectType": 0,
             "Id": 1,
             "ML2ndInj": 2.0,
-            # AP2ndInj missing
             "DV2ndInj": 1.5,
         }
         nsb_model = NSB2023List.model_validate(test_data)
@@ -1060,7 +1080,6 @@ class TestNSB2023FiberImplantMapping(TestCase):
             "Virus_x0020_M_x002f_L": 2.0,
             "Virus_x0020_A_x002f_P": 3.0,
             "Virus_x0020_D_x002f_V": 4.0,
-            # No "during" field
             "Burr_x0020_1_x0020_Fiber_x0020_T": "Standard (Provided by NSB)",
             "Fiber_x0020_Implant1_x0020_Lengt": "2.0 mm",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
@@ -1784,6 +1803,30 @@ class TestNSB2023CoordinateMapping(TestCase):
         # All None
         dv_list_none = MappedNSBList._map_burr_hole_dv(None, None, None)
         self.assertIsNone(dv_list_none)
+
+    def test_determine_surgery_coordinate_system_bregma_ari(self):
+        """Test BREGMA_ARI is returned when systems have ARI but not LAMBDA"""
+        nsb_data = {
+            "FileSystemObjectType": 0,
+            "Id": 40,
+            "Date_x0020_of_x0020_Surgery": "2022-01-03T08:00:00Z",
+            "Burr_x0020_hole_x0020_1": "Injection",
+            "Virus_x0020_M_x002f_L": 2.0,
+            "Virus_x0020_A_x002f_P": 3.0,
+            "Burr1_x0020_Perform_x0020_During": "Initial Surgery",
+            "Burr_x0020_hole_x0020_2": "Injection",
+            "ML2ndInj": 1.5,
+            "AP2ndInj": 2.5,
+            "Burr2_x0020_Perform_x0020_During": "Initial Surgery",
+            "IACUC_x0020_Protocol_x0020__x002": "2103",
+            "Test1LookupId": 2846,
+        }
+        nsb_model = NSB2023List.model_validate(nsb_data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        coord_sys = mapper.determine_surgery_coordinate_system(During.INITIAL)
+
+        self.assertIsNotNone(coord_sys)
+        self.assertEqual(coord_sys, CoordinateSystemLibrary.BREGMA_ARI)
 
 
 class TestNSB2023StringParsers(TestCase):

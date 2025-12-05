@@ -12,7 +12,7 @@ from aind_data_schema.components.injection_procedures import (
 from aind_data_schema.components.subject_procedures import Surgery
 from aind_data_schema_models.coordinates import AnatomicalRelative
 from aind_data_schema_models.mouse_anatomy import InjectionTargets
-from aind_data_schema_models.units import TimeUnit, VolumeUnit
+from aind_data_schema_models.units import TimeUnit
 from aind_sharepoint_service_async_client.models.las2020_list import (
     Las2020List,
     LASDoseroute,
@@ -118,7 +118,6 @@ class TestLAS2020IPInjectionMapping(TestCase):
 
         self.assertEqual(self.mapper.aind_dosevolume, Decimal("70.4"))
 
-
     def test_map_dose_duration(self):
         """Test dose duration mapping"""
         none_test_data = deepcopy(self.ip_injection_data)
@@ -161,14 +160,15 @@ class TestLAS2020IPInjectionMapping(TestCase):
             ip_injection.targeted_structure, InjectionTargets.INTRAPERITONEAL
         )
 
+
 class TestLAS2020InjectableMaterialsMapping(TestCase):
     """Tests _map_injectable_materials method with systematic field coverage"""
 
     def test_map_injectable_materials_all_fields_all_suffixes(self):
         """Test all material numbers (1-5) with all suffixes ('', 'b', 'c', 'd') systematically"""
-        field_types = ['Sub', 'Lot', 'GC', 'Tite', 'VolV']
-        suffixes = ['', 'b', 'c', 'd']
-        
+        field_types = ["Sub", "Lot", "GC", "Tite", "VolV"]
+        suffixes = ["", "b", "c", "d"]
+
         for material_num in range(1, 6):
             with self.subTest(material_num=material_num):
                 # Build test data with all fields for this material number and all suffixes
@@ -176,39 +176,64 @@ class TestLAS2020InjectableMaterialsMapping(TestCase):
                     "FileSystemObjectType": 0,
                     "Id": material_num,
                 }
-                
+
                 # Add all field combinations for all suffixes
                 for suffix in suffixes:
                     suffix_label = suffix if suffix else "no_suffix"
-                    test_data[f"roSub{material_num}{suffix}"] = f"AAV-{material_num}{suffix_label}"
-                    test_data[f"roLot{material_num}{suffix}"] = f"LOT-{material_num}{suffix_label}"
-                    test_data[f"roGC{material_num}{suffix}"] = f"{material_num}e13"
-                    test_data[f"roTite{material_num}{suffix}"] = f"{material_num}e12"
-                    test_data[f"roVolV{material_num}{suffix}"] = f"{material_num * 100}"
-                
+                    test_data[f"roSub{material_num}{suffix}"] = (
+                        f"AAV-{material_num}{suffix_label}"
+                    )
+                    test_data[f"roLot{material_num}{suffix}"] = (
+                        f"LOT-{material_num}{suffix_label}"
+                    )
+                    test_data[f"roGC{material_num}{suffix}"] = (
+                        f"{material_num}e13"
+                    )
+                    test_data[f"roTite{material_num}{suffix}"] = (
+                        f"{material_num}e12"
+                    )
+                    test_data[f"roVolV{material_num}{suffix}"] = (
+                        f"{material_num * 100}"
+                    )
+
                 las_model = Las2020List.model_validate(test_data)
                 mapper = MappedLASList(las=las_model)
-                
-                materials = mapper._map_injectable_materials(material_num=material_num)
-                
+
+                materials = mapper._map_injectable_materials(
+                    material_num=material_num
+                )
+
                 # Should have 4 materials (one for each suffix)
                 self.assertEqual(len(materials), 4)
-                
+
                 # Verify each material has correct data
                 for idx, suffix in enumerate(suffixes):
                     suffix_label = suffix if suffix else "no_suffix"
                     with self.subTest(suffix=suffix):
-                        self.assertEqual(materials[idx].substance, f"AAV-{material_num}{suffix_label}")
-                        self.assertEqual(materials[idx].prep_lot_id, f"LOT-{material_num}{suffix_label}")
-                        self.assertEqual(materials[idx].genome_copy, f"{material_num}e13")
-                        self.assertEqual(materials[idx].titer, f"{material_num}e12")
-                        self.assertEqual(materials[idx].virus_volume, Decimal(str(material_num * 100)))
+                        self.assertEqual(
+                            materials[idx].substance,
+                            f"AAV-{material_num}{suffix_label}",
+                        )
+                        self.assertEqual(
+                            materials[idx].prep_lot_id,
+                            f"LOT-{material_num}{suffix_label}",
+                        )
+                        self.assertEqual(
+                            materials[idx].genome_copy, f"{material_num}e13"
+                        )
+                        self.assertEqual(
+                            materials[idx].titer, f"{material_num}e12"
+                        )
+                        self.assertEqual(
+                            materials[idx].virus_volume,
+                            Decimal(str(material_num * 100)),
+                        )
 
     def test_map_injectable_materials_property_mappings(self):
         """Test that all aind_ro_* properties correctly map to _las fields"""
         material_nums = range(1, 6)
-        suffixes = ['', 'b', 'c', 'd']
-        
+        suffixes = ["", "b", "c", "d"]
+
         for material_num in material_nums:
             for suffix in suffixes:
                 with self.subTest(material_num=material_num, suffix=suffix):
@@ -216,75 +241,95 @@ class TestLAS2020InjectableMaterialsMapping(TestCase):
                         "FileSystemObjectType": 0,
                         "Id": 100 + material_num,
                     }
-                    
+
                     # Set raw LAS field values
                     test_values = {
-                        'Sub': f"Test-Sub-{material_num}{suffix}",
-                        'Lot': f"Test-Lot-{material_num}{suffix}",
-                        'GC': f"Test-GC-{material_num}{suffix}",
-                        'Tite': f"Test-Tite-{material_num}{suffix}",
-                        'VolV': f"{material_num}{len(suffix)}",  # unique numeric value
+                        "Sub": f"Test-Sub-{material_num}{suffix}",
+                        "Lot": f"Test-Lot-{material_num}{suffix}",
+                        "GC": f"Test-GC-{material_num}{suffix}",
+                        "Tite": f"Test-Tite-{material_num}{suffix}",
+                        "VolV": f"{material_num}{len(suffix)}",  # unique numeric value
                     }
-                    
+
                     for field_key, field_value in test_values.items():
                         # Construct LAS field name: roSub1, roLot1b, roVol_v1c, etc.
                         las_field = f"ro{field_key}{material_num}{suffix}"
                         test_data[las_field] = field_value
-                    
+
                     las_model = Las2020List.model_validate(test_data)
                     mapper = MappedLASList(las=las_model)
-                    
+
                     # Check property mappings
                     for field_key in test_values.keys():
                         # Property name matches field_key but lowercase
                         aind_property = f"aind_ro_{field_key.lower()}{material_num}{suffix}"
-                        
+
                         if hasattr(mapper, aind_property):
                             actual_value = getattr(mapper, aind_property)
                             expected_value = test_values[field_key]
-                            self.assertEqual(actual_value, expected_value,
-                                f"Property {aind_property} mismatch")
+                            self.assertEqual(
+                                actual_value,
+                                expected_value,
+                                f"Property {aind_property} mismatch",
+                            )
 
     def test_map_injectable_materials_sparse_data(self):
         """Test with sparse data - random combinations of fields present"""
         import random
-        
-        suffixes = ['', 'b', 'c', 'd']
-        
+
+        suffixes = ["", "b", "c", "d"]
+
         for material_num in range(1, 6):
             with self.subTest(material_num=material_num):
                 test_data = {
                     "FileSystemObjectType": 0,
                     "Id": 200 + material_num,
                 }
-                
+
                 # Randomly decide which suffixes to include (at least one)
-                included_suffixes = random.sample(suffixes, k=random.randint(1, 4))
-                
+                included_suffixes = random.sample(
+                    suffixes, k=random.randint(1, 4)
+                )
+
                 expected_material_count = 0
                 for suffix in included_suffixes:
                     # Always include Sub (required for material to be created)
-                    test_data[f"roSub{material_num}{suffix}"] = f"AAV-{material_num}{suffix}"
+                    test_data[f"roSub{material_num}{suffix}"] = (
+                        f"AAV-{material_num}{suffix}"
+                    )
                     expected_material_count += 1
-                    
+
                     # Randomly include other fields
                     if random.choice([True, False]):
-                        test_data[f"roLot{material_num}{suffix}"] = f"LOT-{material_num}{suffix}"
+                        test_data[f"roLot{material_num}{suffix}"] = (
+                            f"LOT-{material_num}{suffix}"
+                        )
                     if random.choice([True, False]):
-                        test_data[f"roGC{material_num}{suffix}"] = f"{material_num}e13"
+                        test_data[f"roGC{material_num}{suffix}"] = (
+                            f"{material_num}e13"
+                        )
                     if random.choice([True, False]):
-                        test_data[f"roTite{material_num}{suffix}"] = f"{material_num}e12"
+                        test_data[f"roTite{material_num}{suffix}"] = (
+                            f"{material_num}e12"
+                        )
                     if random.choice([True, False]):
-                        test_data[f"roVolV{material_num}{suffix}"] = f"{material_num * 50}"
-                
+                        test_data[f"roVolV{material_num}{suffix}"] = (
+                            f"{material_num * 50}"
+                        )
+
                 las_model = Las2020List.model_validate(test_data)
                 mapper = MappedLASList(las=las_model)
-                
-                materials = mapper._map_injectable_materials(material_num=material_num)
-                
-                self.assertEqual(len(materials), expected_material_count,
-                    f"Expected {expected_material_count} materials for included suffixes {included_suffixes}")
-                
+
+                materials = mapper._map_injectable_materials(
+                    material_num=material_num
+                )
+
+                self.assertEqual(
+                    len(materials),
+                    expected_material_count,
+                    f"Expected {expected_material_count} materials for included suffixes {included_suffixes}",
+                )
+
                 # Verify all materials have substance (required field)
                 for material in materials:
                     self.assertIsNotNone(material.substance)
@@ -292,57 +337,82 @@ class TestLAS2020InjectableMaterialsMapping(TestCase):
     def test_map_injectable_materials_complete_coverage_matrix(self):
         """Generate a coverage matrix testing every field exists and maps correctly"""
         material_nums = range(1, 6)
-        suffixes = ['', 'b', 'c', 'd']
-        fields = ['Sub', 'Lot', 'GC', 'Tite', 'Vol_v']  # Changed from 'VolV' to 'Vol_v'
+        suffixes = ["", "b", "c", "d"]
+        fields = [
+            "Sub",
+            "Lot",
+            "GC",
+            "Tite",
+            "Vol_v",
+        ]  # Changed from 'VolV' to 'Vol_v'
 
         # Test that every combination can be accessed
         for material_num in material_nums:
             for suffix in suffixes:
                 for field in fields:
-                    with self.subTest(material_num=material_num, suffix=suffix, field=field):
+                    with self.subTest(
+                        material_num=material_num, suffix=suffix, field=field
+                    ):
                         test_data = {
                             "FileSystemObjectType": 0,
                             "Id": 300,
                         }
 
                         las_field = f"ro{field}{material_num}{suffix}"
-                        test_value = f"test_{field}_{material_num}_{suffix}" if field != 'Vol_v' else "123.45"
+                        test_value = (
+                            f"test_{field}_{material_num}_{suffix}"
+                            if field != "Vol_v"
+                            else "123.45"
+                        )
                         test_data[las_field] = test_value
 
                         # Must have Sub for material to be created
-                        if field != 'Sub':
-                            test_data[f"roSub{material_num}{suffix}"] = "AAV-Test"
+                        if field != "Sub":
+                            test_data[f"roSub{material_num}{suffix}"] = (
+                                "AAV-Test"
+                            )
 
                         las_model = Las2020List.model_validate(test_data)
                         mapper = MappedLASList(las=las_model)
 
                         # Verify property exists and is accessible
-                        aind_property = f"aind_ro_{field.lower()}{material_num}{suffix}"
-                        self.assertTrue(hasattr(mapper, aind_property),
-                            f"Property {aind_property} does not exist")
+                        aind_property = (
+                            f"aind_ro_{field.lower()}{material_num}{suffix}"
+                        )
+                        self.assertTrue(
+                            hasattr(mapper, aind_property),
+                            f"Property {aind_property} does not exist",
+                        )
 
                         # Verify through _map_injectable_materials
-                        materials = mapper._map_injectable_materials(material_num=material_num)
+                        materials = mapper._map_injectable_materials(
+                            material_num=material_num
+                        )
                         self.assertEqual(len(materials), 1)
 
     def test_map_injectable_materials_only_substance_all_combinations(self):
         """Test that material is created with only substance for all combinations"""
         for material_num in range(1, 6):
-            for suffix in ['', 'b', 'c', 'd']:
+            for suffix in ["", "b", "c", "d"]:
                 with self.subTest(material_num=material_num, suffix=suffix):
                     test_data = {
                         "FileSystemObjectType": 0,
                         "Id": 400 + material_num,
                         f"roSub{material_num}{suffix}": f"AAV-Only-{material_num}{suffix}",
                     }
-                    
+
                     las_model = Las2020List.model_validate(test_data)
                     mapper = MappedLASList(las=las_model)
-                    
-                    materials = mapper._map_injectable_materials(material_num=material_num)
-                    
+
+                    materials = mapper._map_injectable_materials(
+                        material_num=material_num
+                    )
+
                     self.assertEqual(len(materials), 1)
-                    self.assertEqual(materials[0].substance, f"AAV-Only-{material_num}{suffix}")
+                    self.assertEqual(
+                        materials[0].substance,
+                        f"AAV-Only-{material_num}{suffix}",
+                    )
                     self.assertIsNone(materials[0].prep_lot_id)
                     self.assertIsNone(materials[0].genome_copy)
                     self.assertIsNone(materials[0].titer)
@@ -359,13 +429,16 @@ class TestLAS2020InjectableMaterialsMapping(TestCase):
                     f"roLot{material_num}": "LOT-NoSub",
                     f"roGC{material_num}": "1e13",
                 }
-                
+
                 las_model = Las2020List.model_validate(test_data)
                 mapper = MappedLASList(las=las_model)
-                
-                materials = mapper._map_injectable_materials(material_num=material_num)
-                
+
+                materials = mapper._map_injectable_materials(
+                    material_num=material_num
+                )
+
                 self.assertEqual(len(materials), 0)
+
 
 class TestLAS2020RetroOrbitalInjectionMapping(TestCase):
     """Tests retro-orbital injection procedure mapping"""
@@ -562,13 +635,15 @@ class TestLAS2020SurgeryIntegration(TestCase):
         test_data["nStart_x0020_Date"] = None
         las_model = Las2020List.model_validate(test_data)
         mapper = MappedLASList(las=las_model)
-        
+
         surgery = mapper.get_surgery(subject_id="000000")
 
         self.assertIsNotNone(surgery)
         self.assertIsNone(surgery.start_date)
 
-    def test_get_surgery_ip_injection_validation_error_no_volume_or_current(self):
+    def test_get_surgery_ip_injection_validation_error_no_volume_or_current(
+        self,
+    ):
         """Test IP injection when InjectionDynamics validation fails (no volume or current)"""
         test_data = {
             "FileSystemObjectType": 0,
@@ -582,7 +657,7 @@ class TestLAS2020SurgeryIntegration(TestCase):
         }
         las_model = Las2020List.model_validate(test_data)
         mapper = MappedLASList(las=las_model)
-        
+
         surgery = mapper.get_surgery(subject_id="000000")
 
         self.assertIsNotNone(surgery)
@@ -590,7 +665,9 @@ class TestLAS2020SurgeryIntegration(TestCase):
         ip_injection = surgery.procedures[0]
         self.assertIsNone(ip_injection.dynamics[0].volume)
 
-    def test_get_surgery_ro_injection_validation_error_no_volume_or_current(self):
+    def test_get_surgery_ro_injection_validation_error_no_volume_or_current(
+        self,
+    ):
         """Test RO injection when InjectionDynamics validation fails"""
         test_data = {
             "FileSystemObjectType": 0,
@@ -606,9 +683,9 @@ class TestLAS2020SurgeryIntegration(TestCase):
         }
         las_model = Las2020List.model_validate(test_data)
         mapper = MappedLASList(las=las_model)
-        
+
         surgery = mapper.get_surgery(subject_id="123456")
-        
+
         # Should still create surgery using model_construct
         self.assertIsNotNone(surgery)
         self.assertEqual(len(surgery.procedures), 1)
@@ -627,108 +704,16 @@ class TestLAS2020SurgeryIntegration(TestCase):
             "nROID1": "123456",
             "roEye1": "Behind Right",
             "roVol1": "100",
-            # roSub1 missing - no materials will be mapped
         }
         las_model = Las2020List.model_validate(test_data)
         mapper = MappedLASList(las=las_model)
-        
+
         surgery = mapper.get_surgery(subject_id="123456")
-        
-        # Should create surgery, but with empty injection_materials list
         self.assertIsNotNone(surgery)
         self.assertEqual(len(surgery.procedures), 1)
         ro_injection = surgery.procedures[0]
         self.assertEqual(len(ro_injection.injection_materials), 0)
 
-    # def test_get_surgery_mixed_valid_and_invalid_procedures(self):
-    #     """Test surgery with one valid and one invalid procedure"""
-    #     test_data = {
-    #         "FileSystemObjectType": 0,
-    #         "Id": 103,
-    #         "AuthorId": 5358,
-    #         "Protocol": "2212 - Test",
-    #         "nStart_x0020_Date": "2024-06-21T07:00:00Z",
-    #         "ReqPro1": "Dosing",
-    #         "ReqPro2": "Retro-Orbital Injection",
-    #         "doseRoute": "Intraperitoneal (IP)",
-    #         "doseSub": "Heparin 1000U/mL",
-    #         "dosevolume": "70.4",
-    #         "doseduration": "30 s",
-    #         # RO injection has issues
-    #         "nROID1": "123456",
-    #         "roEye1": "Behind Right",
-    #         # Missing roVol1 - RO will have validation error
-    #         "roSub1": "AAV-Test",
-    #     }
-    #     las_model = Las2020List.model_validate(test_data)
-    #     mapper = MappedLASList(las=las_model)
-    #
-    #     surgery = mapper.get_surgery(subject_id="123456")
-    #
-    #     # Should create surgery with both procedures
-    #     self.assertIsNotNone(surgery)
-    #     self.assertEqual(len(surgery.procedures), 2)
-    #
-    #     # First procedure (IP) should be valid
-    #     ip_injection = surgery.procedures[0]
-    #     self.assertEqual(ip_injection.targeted_structure, InjectionTargets.INTRAPERITONEAL)
-    #     self.assertIsNotNone(ip_injection.dynamics[0].volume)
-    #
-    #     # Second procedure (RO) should be created with model_construct
-    #     ro_injection = surgery.procedures[1]
-    #     self.assertEqual(ro_injection.targeted_structure, InjectionTargets.RETRO_ORBITAL)
-    #     self.assertIsNone(ro_injection.dynamics[0].volume)
-    #
-    # def test_get_surgery_ro_injection_validation_error_multiple_materials(self):
-    #     """Test RO injection with multiple materials where some cause validation errors"""
-    #     test_data = {
-    #         "FileSystemObjectType": 0,
-    #         "Id": 104,
-    #         "AuthorId": 5358,
-    #         "Protocol": "2212 - Test",
-    #         "nStart_x0020_Date": "2024-06-21T07:00:00Z",
-    #         "ReqPro1": "Retro-Orbital Injection",
-    #         "nROID1": "123456",
-    #         "roEye1": "Behind Right",
-    #         "roVol1": "100",
-    #         "roSub1": "AAV-Valid",
-    #         "roLot1": "LOT123",
-    #         "roSub1b": "AAV-Also-Valid",
-    #         "roLot1b": "LOT456",
-    #     }
-    #     las_model = Las2020List.model_validate(test_data)
-    #     mapper = MappedLASList(las=las_model)
-    #
-    #     surgery = mapper.get_surgery(subject_id="123456")
-    #
-    #     # Should create surgery with 2 viral materials
-    #     self.assertIsNotNone(surgery)
-    #     self.assertEqual(len(surgery.procedures), 1)
-    #     ro_injection = surgery.procedures[0]
-    #     self.assertEqual(len(ro_injection.injection_materials), 2)
-    #
-    # def test_get_surgery_validation_error_all_fields_missing(self):
-    #     """Test surgery creation with minimal data causing multiple validation errors"""
-    #     test_data = {
-    #         "FileSystemObjectType": 0,
-    #         "Id": 105,
-    #         "ReqPro1": "Retro-Orbital Injection",
-    #         "nROID1": "123456",
-    #     }
-    #     las_model = Las2020List.model_validate(test_data)
-    #     mapper = MappedLASList(las=las_model)
-    #
-    #     surgery = mapper.get_surgery(subject_id="123456")
-    #
-    #     # Should create surgery using model_construct with many None fields
-    #     self.assertIsNotNone(surgery)
-    #     self.assertIsNone(surgery.ethics_review_id)
-    #     self.assertIsNone(surgery.start_date)
-    #     self.assertEqual(surgery.experimenters, [None])
-    #
-    #     # Procedure should have empty materials
-    #     self.assertEqual(len(surgery.procedures), 1)
-    #     self.assertEqual(len(surgery.procedures[0].injection_materials), 0)
 
 class TestLAS2020StringParsers(TestCase):
     """Tests text field parsers in LAS2020Mapping class"""
@@ -787,14 +772,11 @@ class TestLAS2020StringParsers(TestCase):
 
     def test_parse_dose_substance_invalid(self):
         """Test dose substance parsing with invalid inputs"""
-        # Too long string
         long_string = "heparin  1000U/mL (2 mice only)"
         result = self.blank_model._parse_dose_sub_to_nonviral_material(
             long_string
         )
         self.assertIsNone(result)
-
-        # None
         result_none = self.blank_model._parse_dose_sub_to_nonviral_material(
             None
         )
@@ -851,13 +833,16 @@ class TestLAS2020StringParsers(TestCase):
     def test_parse_titer_str_all_cases(self):
         """Test _parse_titer_str with all input variations"""
         test_cases = [
-            # (input, expected_output, description)
             ("12345", 12345, "plain integer"),
             ("+678", 678, "integer with positive sign"),
             ("-999", -999, "integer with negative sign"),
             ("0", 0, "zero"),
             ("123.45", None, "decimal (doesn't match INTEGER_REGEX)"),
-            ("1e10", None, "scientific notation (doesn't match INTEGER_REGEX)"),
+            (
+                "1e10",
+                None,
+                "scientific notation (doesn't match INTEGER_REGEX)",
+            ),
             ("abc", None, "text"),
             ("", None, "empty string"),
         ]
@@ -870,41 +855,55 @@ class TestLAS2020StringParsers(TestCase):
     def test_parse_titer_all_cases(self):
         """Test _parse_titer with all input formats and edge cases"""
         test_cases = [
-            # (input, expected_value, expected_unit, description)
-            # None case
             (None, None, "gc/mL", "None input returns None with default unit"),
-            
-            # Plain integer (via _parse_titer_str path)
             ("12345", 12345, "gc/mL", "plain integer"),
             ("  12345  ", 12345, "gc/mL", "integer with whitespace"),
             ("+789", 789, "gc/mL", "integer with positive sign"),
             ("-456", -456, "gc/mL", "integer with negative sign"),
             ("0", 0, "gc/mL", "zero"),
-            
-            # Scientific notation path
-            ("1e12", 1000000000000, "gc/mL", "scientific notation lowercase e"),
-            ("1.5e13", 15000000000000, "gc/mL", "scientific notation with decimal"),
+            (
+                "1e12",
+                1000000000000,
+                "gc/mL",
+                "scientific notation lowercase e",
+            ),
+            (
+                "1.5e13",
+                15000000000000,
+                "gc/mL",
+                "scientific notation with decimal",
+            ),
             ("2E10", 20000000000, "gc/mL", "scientific notation uppercase E"),
             ("1.5e-3", 0, "gc/mL", "scientific notation negative exponent"),
-            
-            # Value with unit path
             ("1000000 gc/mL", 1000000, "gc/mL", "value with gc/mL unit"),
             ("500000 vg/mL", 500000, "vg/mL", "value with vg/mL unit"),
             ("12345gc/mL", 12345, "gc/mL", "value with unit no space"),
-            ("12345   gc/mL", 12345, "gc/mL", "value with unit multiple spaces"),
-            
-            # Unparseable cases (final fallback)
+            (
+                "12345   gc/mL",
+                12345,
+                "gc/mL",
+                "value with unit multiple spaces",
+            ),
             ("unknown", None, "gc/mL", "unparseable text"),
             ("abc123def", None, "gc/mL", "mixed text and numbers"),
             ("", None, "gc/mL", "empty string after strip"),
             ("123.45", None, "gc/mL", "decimal without unit"),
         ]
-        
-        for input_str, expected_value, expected_unit, description in test_cases:
+
+        for (
+            input_str,
+            expected_value,
+            expected_unit,
+            description,
+        ) in test_cases:
             with self.subTest(input=input_str, case=description):
                 value, unit = self.blank_model._parse_titer(input_str)
-                self.assertEqual(value, expected_value, f"Value mismatch for {description}")
-                self.assertEqual(unit, expected_unit, f"Unit mismatch for {description}")
+                self.assertEqual(
+                    value, expected_value, f"Value mismatch for {description}"
+                )
+                self.assertEqual(
+                    unit, expected_unit, f"Unit mismatch for {description}"
+                )
 
 
 if __name__ == "__main__":

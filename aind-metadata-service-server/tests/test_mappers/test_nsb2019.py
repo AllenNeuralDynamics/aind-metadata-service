@@ -1,10 +1,7 @@
 """Tests NSB 2019 data model is parsed correctly"""
 
-import json
 from copy import deepcopy
 from decimal import Decimal
-from pathlib import Path
-from typing import Callable, List
 from unittest import TestCase
 from unittest import main as unittest_main
 from aind_data_schema.components.devices import FiberProbe
@@ -23,13 +20,10 @@ from aind_data_schema.components.surgery_procedures import (
     ProbeImplant,
 )
 from aind_data_schema.components.injection_procedures import (
-    InjectionDynamics,
     InjectionProfile,
 )
 from aind_data_schema_models.units import (
-    AngleUnit,
     CurrentUnit,
-    SizeUnit,
     TimeUnit,
     VolumeUnit,
 )
@@ -39,11 +33,6 @@ from aind_sharepoint_service_async_client.models.nsb2019_list import (
 )
 
 from aind_metadata_service_server.mappers.nsb2019 import MappedNSBList
-
-TEST_DIR = Path(__file__).parent / ".."
-TEST_EXAMPLES = (
-    TEST_DIR / "resources" / "nsb2019" / "nsb2019_string_entries.json"
-)
 
 
 class TestNSB2019BasicMapping(TestCase):
@@ -62,6 +51,7 @@ class TestNSB2019BasicMapping(TestCase):
             "IACUC_x0020_Protocol_x0020__x002": "2115",
             "Breg2Lamb": "4",
             "AuthorId": 187,
+            "Date2ndInjection": None,
         }
         cls.nsb_model = NSB2019List.model_validate(cls.basic_nsb_data)
         cls.mapper = MappedNSBList(nsb=cls.nsb_model)
@@ -87,6 +77,7 @@ class TestNSB2019BasicMapping(TestCase):
         """Test surgery date mapping"""
         self.assertIsNotNone(self.mapper.aind_date_of_surgery)
         self.assertEqual(str(self.mapper.aind_date_of_surgery), "2022-12-06")
+        self.assertIsNone(self.mapper.aind_date2nd_injection)
 
     def test_map_animal_weights(self):
         """Test animal weight mappings"""
@@ -414,6 +405,10 @@ class TestNSB2019InjectionMapping(TestCase):
         test_data["Inj2LenghtofTime"] = "4min"
         test_data["Inj2Current"] = "5 uA"
         test_data["Inj2AlternatingTime"] = "7/7"
+        test_data["SecondInjectionWeightAfter"] = "19.3"
+        test_data["SecondInjectionWeightBefore"] = "19.2"
+        test_data["SecondInjectionIsoDuration"] = "45min"
+        test_data["WorkStation2ndInjection"] = "SWS 4"
 
         nsb_model = NSB2019List.model_validate(test_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -426,8 +421,6 @@ class TestNSB2019InjectionMapping(TestCase):
             CoordinateSystemLibrary.BREGMA_ARID,
         )
         self.assertEqual(mapper.aind_inj2_vol[0], Decimal("500"))
-
-    # ...existing code...
 
     def test_map_second_injection_coordinate_system(self):
         """Test second injection coordinate system mapping for all cases"""
@@ -513,7 +506,7 @@ class TestNSB2019InjectionMapping(TestCase):
         self.assertEqual(mapper.aind_inj2_type, InjectionType.NANOJECT)
         self.assertEqual(mapper.aind_inj2_vol[0], Decimal("500"))
         self.assertEqual(mapper.aind_inj2_lenghtof_time, Decimal("4"))
-        self.assertEqual(dynamics[0].volume, [Decimal("500")])
+        self.assertEqual(dynamics.volume, [Decimal("500")])
 
     def test_map_coordinate_system_without_dv(self):
         """Test coordinate system mapping when DV is missing"""
@@ -617,6 +610,8 @@ class TestNSB2019SurgeryIntegration(TestCase):
             "Breg2Lamb": "4",
             "HPIsoLevel": "1.5",
             "AuthorId": 187,
+            "Round1InjIsolevel": None,
+            "Round2InjIsolevel": None,
         }
         cls.nsb_model = NSB2019List.model_validate(cls.full_surgery_data)
         cls.mapper = MappedNSBList(nsb=cls.nsb_model)
@@ -744,6 +739,115 @@ class TestNSB2019SurgeryIntegration(TestCase):
         self.assertTrue(mapper.has_unknown_surgery)
         surgeries = mapper.get_surgeries()
         self.assertEqual(len(surgeries), 1)
+
+    def test_get_surgeries_with_second_injection_valid(self):
+        """Test surgery creation with valid second injection"""
+        test_data = deepcopy(self.full_surgery_data)
+        # Add second injection data
+        test_data["AP2ndInj"] = "-3.05"
+        test_data["ML2ndInj"] = "-0.6"
+        test_data["DV2ndInj"] = "4.3"
+        test_data["Hemisphere2ndInj"] = "Left"
+        test_data["Inj2Type"] = "Nanoject (Pressure)"
+        test_data["Inj2Vol"] = "500"
+        test_data["Inj2LenghtofTime"] = "4min"
+        test_data["Date2ndInjection"] = "2022-12-07T08:00:00Z"
+        test_data["SecondInjectionWeightBefore"] = "19.2"
+        test_data["SecondInjectionWeightAfter"] = "19.3"
+        test_data["SecondInjectionIsoDuration"] = "1 hour"
+        test_data["WorkStation2ndInjection"] = "SWS 4"
+        test_data["Round2InjIsolevel"] = "1.50"
+
+        nsb_model = NSB2019List.model_validate(test_data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        surgeries = mapper.get_surgeries()
+
+        # Should have 3 surgeries: HP+Craniotomy+Fiber, 1st injection, 2nd injection
+        self.assertEqual(len(surgeries), 3)
+
+        # Find the second injection surgery
+        second_injection_surgery = surgeries[2]
+
+        # Verify it's a valid Surgery object with BrainInjection
+        self.assertIsInstance(second_injection_surgery, Surgery)
+        self.assertEqual(len(second_injection_surgery.procedures), 1)
+        self.assertIsInstance(
+            second_injection_surgery.procedures[0], BrainInjection
+        )
+
+        # Verify second injection specific fields
+        self.assertEqual(
+            str(second_injection_surgery.start_date), "2022-12-07"
+        )
+        self.assertEqual(second_injection_surgery.animal_weight_prior, 19.2)
+        self.assertEqual(second_injection_surgery.animal_weight_post, 19.3)
+        self.assertEqual(second_injection_surgery.workstation_id, "SWS 4")
+
+        # Verify anaesthesia
+        self.assertIsNotNone(second_injection_surgery.anaesthesia)
+        self.assertEqual(
+            second_injection_surgery.anaesthesia.anaesthetic_type, "isoflurane"
+        )
+        self.assertEqual(second_injection_surgery.anaesthesia.duration, 60.0)
+        self.assertEqual(second_injection_surgery.anaesthesia.level, 1.5)
+
+        # Verify measured coordinates
+        self.assertIsNotNone(second_injection_surgery.measured_coordinates)
+        self.assertIn(
+            Origin.BREGMA, second_injection_surgery.measured_coordinates
+        )
+
+        # Verify coordinate system
+        self.assertEqual(
+            second_injection_surgery.coordinate_system,
+            CoordinateSystemLibrary.BREGMA_ARID,
+        )
+
+        # Verify injection dynamics
+        injection = second_injection_surgery.procedures[0]
+        self.assertEqual(len(injection.dynamics), 1)
+        print(injection.dynamics)
+        self.assertEqual(injection.dynamics[0].volume, [Decimal("500")])
+        self.assertEqual(injection.dynamics[0].volume_unit, VolumeUnit.NL)
+        self.assertEqual(injection.dynamics[0].duration, Decimal("4"))
+
+    def test_get_surgeries_with_second_injection_validation_error(self):
+        """Test second injection surgery creation with missing start_date (validation error)"""
+        test_data = deepcopy(self.full_surgery_data)
+        test_data["AP2ndInj"] = "-3.05"
+        test_data["ML2ndInj"] = "-0.6"
+        test_data["DV2ndInj"] = "4.3"
+        test_data["Inj2Type"] = "Iontophoresis"
+        test_data["Inj2Vol"] = "500"
+        test_data["Inj2LenghtofTime"] = "4min"
+        test_data["Inj2Current"] = "5 uA"
+        test_data["Inj2AlternatingTime"] = "7/7"
+        test_data["Date2ndInjection"] = None
+        test_data["SecondInjectionWeightBefore"] = "19.2"
+        test_data["SecondInjectionWeightAfter"] = "19.3"
+        test_data["SecondInjectionIsoDuration"] = "45min"
+        test_data["WorkStation2ndInjection"] = "SWS 4"
+
+        nsb_model = NSB2019List.model_validate(test_data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        surgeries = mapper.get_surgeries()
+
+        self.assertEqual(len(surgeries), 3)
+        second_injection_surgery = surgeries[2]
+
+        self.assertIsInstance(second_injection_surgery, Surgery)
+        self.assertIsNone(second_injection_surgery.start_date)
+        self.assertEqual(len(second_injection_surgery.procedures), 1)
+        self.assertIsInstance(
+            second_injection_surgery.procedures[0], BrainInjection
+        )
+        self.assertEqual(
+            second_injection_surgery.animal_weight_prior, Decimal("19.2")
+        )
+        self.assertEqual(
+            second_injection_surgery.animal_weight_post, Decimal("19.3")
+        )
+        self.assertEqual(second_injection_surgery.workstation_id, "SWS 4")
 
 
 class TestNSB2019CoordinateMapping(TestCase):
@@ -884,8 +988,6 @@ class TestNSB2019StringParsers(TestCase):
         self.assertIsNone(self.blank_model._parse_iso_dur_str("45"))
         self.assertIsNone(self.blank_model._parse_iso_dur_str("1:"))
         self.assertIsNone(self.blank_model._parse_iso_dur_str("abc:def"))
-
-        # Edge case: None input
         self.assertIsNone(self.blank_model._parse_iso_dur_str(None))
 
     def test_parse_angle_str(self):

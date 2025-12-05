@@ -238,7 +238,7 @@ class TestProceduresMapper(unittest.TestCase):
                 anaesthesia=None,
                 notes=None,
                 procedures=[
-                    Perfusion.model_construct(output_specimen_ids={"115977"})
+                    Perfusion.model_construct(output_specimen_ids=["115977"])
                 ],
             ),
             Surgery.model_construct(

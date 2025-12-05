@@ -63,7 +63,7 @@ class TestPerfusionMapper(unittest.TestCase):
             notes="Good",
             procedures=[
                 Perfusion(
-                    output_specimen_ids={"689418"},
+                    output_specimen_ids=["689418"],
                     protocol_id="dx.doi.org/10.17504/protocols.io.bg5vjy66",
                 )
             ],

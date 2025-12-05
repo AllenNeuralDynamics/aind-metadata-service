@@ -49,7 +49,6 @@ from aind_sharepoint_service_async_client.models import (
 from aind_sharepoint_service_async_client.models import (
     NSB2023List,
     NSB2023Procedure,
-    NSB2023ProcedureCategory,
 )
 from pydantic import ValidationError
 
@@ -278,7 +277,7 @@ class MappedNSBList:
     SCIENTIFIC_NOTATION_REGEX = re.compile(
         r"^[-+]?\d*\.?\d+[eE][-+]?\d+(?![\d.])"
     )
-    CONCENTRATION_REGEX = re.compile(r"^\d+(\.\d+)?\s*mg[/]m[lL]$")
+    CONCENTRATION_REGEX = re.compile(r"^(\d+(?:\.\d+)?)\s*mg[/]m[lL]$")
     LENGTH_MM_REGEX = re.compile(r"^([1-9]\.\d) mm$")
     SPINAL_LOCATION_REGEX = re.compile(
         r"Between_([A-Z]\d+)-([A-Z]\d+)", re.IGNORECASE

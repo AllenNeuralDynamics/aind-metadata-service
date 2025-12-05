@@ -41,7 +41,6 @@ from aind_data_schema_models.units import (
 )
 from aind_sharepoint_service_async_client.models import (
     NSB2019List,
-    NSB2019Procedure,
 )
 from pydantic import ValidationError
 
@@ -650,12 +649,6 @@ class MappedNSBList:
             }.get(self._nsb.inj1angle0, None)
         )
 
-    # @property
-    # def aind_inj1volperdepth(self) -> Optional[List[Decimal]]:
-    #     """Maps inj1volperdepth to aind model"""
-    #     volperdepth = self._parse_inj_vol_str(self._nsb.inj1volperdepth)
-    #     return None if volperdepth is None else [volperdepth]
-
     @property
     def aind_inj2_alternating_time(self) -> Optional[str]:
         """Maps inj2_alternating_time to aind model"""
@@ -730,12 +723,6 @@ class MappedNSBList:
                 self._nsb.inj2angle0.N_40_DEGREES: Decimal(40),
             }.get(self._nsb.inj2angle0, None)
         )
-
-    # @property
-    # def aind_inj2volperdepth(self) -> Optional[List[Decimal]]:
-    #     """Maps inj2volperdepth to aind model"""
-    #     volperdepth = self._parse_inj_vol_str(self._nsb.inj2volperdepth)
-    #     return None if volperdepth is None else [volperdepth]
 
     @property
     def aind_ml2nd_inj(self) -> Optional[Decimal]:
@@ -1097,9 +1084,9 @@ class MappedNSBList:
             )
 
         try:
-            return [InjectionDynamics(**dynamics_kwargs)]
+            return InjectionDynamics(**dynamics_kwargs)
         except ValidationError:
-            return [InjectionDynamics.model_construct(**dynamics_kwargs)]
+            return InjectionDynamics.model_construct(**dynamics_kwargs)
 
     @property
     def has_injection_procedure(self) -> bool:
