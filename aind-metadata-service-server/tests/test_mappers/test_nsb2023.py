@@ -1292,9 +1292,7 @@ class TestNSB2023SurgeryIntegration(TestCase):
         cls.fiber_followup_model = NSB2023List.model_validate(
             cls.fiber_followup_surgery_data
         )
-        cls.fiber_followup_mapper = MappedNSBList(
-            nsb=cls.fiber_followup_model
-        )
+        cls.fiber_followup_mapper = MappedNSBList(nsb=cls.fiber_followup_model)
         cls.fiber_followup_surgeries = (
             cls.fiber_followup_mapper.get_surgeries()
         )
