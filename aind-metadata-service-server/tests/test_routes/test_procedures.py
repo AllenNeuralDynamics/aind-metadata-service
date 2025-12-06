@@ -103,8 +103,12 @@ class TestRoute:
         mock_las: AsyncMock,
         mock_labtracks: AsyncMock,
         client: TestClient,
+        recwarn: pytest.WarningsRecorder,
     ):
-        """Tests successful retrieval of procedures."""
+        """
+        Tests a procedures model is built as best as possible even with
+        missing data and verifies serialization warnings are issued.
+        """
         mock_labtracks.return_value = [
             LabTracksTask(
                 id="00000",
@@ -192,9 +196,12 @@ class TestRoute:
             )
         ]
         mock_nsb_present.return_value = []
-
         response = client.get("api/v2/procedures/000000")
         assert response.status_code == 400
+        assert len(recwarn) == 1
+        w = recwarn.pop()
+        assert issubclass(w.category, UserWarning)
+        assert "Pydantic serializer warnings" in str(w.message)
 
     @patch("aind_labtracks_service_async_client.DefaultApi.get_tasks")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_las2020")
