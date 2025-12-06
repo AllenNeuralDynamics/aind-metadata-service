@@ -162,45 +162,32 @@ class TestRoute:
         ]
         mock_nsb2023.return_value = [
             NSB2023List(
-                # Basic surgery info
                 Date_x0020_of_x0020_Surgery="2022-01-03T00:00:00Z",
                 Weight_x0020_before_x0020_Surger=25.2,
                 Weight_x0020_after_x0020_Surgery=28.2,
                 HpWorkStation="SWS 4",
                 IACUC_x0020_Protocol_x0020__x002="2103",
-                # Headpost info
                 Headpost="Visual Ctx",
                 HeadpostType="Mesoscope",
                 Headpost_x0020_Perform_x0020_Dur="Initial Surgery",
-                # Craniotomy
                 CraniotomyType="5mm",
                 Craniotomy_x0020_Perform_x0020_D="Initial Surgery",
-                # Procedure
                 Procedure="Sx-01 Visual Ctx 2P",
                 Test1LookupId=2846,
-                # Bregma to Lambda - REQUIRED
                 Breg2Lamb=4.5,
-                # Anaesthesia - REQUIRED
-                Iso_x0020_On=1.5,  # Duration in hours
-                HPIsoLevel=2.0,  # Level
-                HPRecovery=25,  # Recovery time
-                # Burr hole 1 - Injection with COMPLETE data
+                Iso_x0020_On=1.5,
+                HPIsoLevel=2.0,
+                HPRecovery=25,
                 Burr_x0020_hole_x0020_1="Injection",
                 Burr1_x0020_Perform_x0020_During="Initial Surgery",
-                # Injection coordinates - COMPLETE
                 Virus_x0020_M_x002f_L=2.0,
                 Virus_x0020_A_x002f_P=-1.5,
-                Virus_x0020_D_x002f_V=3.0,  # Depth - REQUIRED
+                Virus_x0020_D_x002f_V=3.0,
                 Virus_x0020_Hemisphere="Right",
-                # Injection details - COMPLETE
                 Inj1Type="Nanoject (Pressure)",
-                inj1volperdepth=500.0,  # Volume
-                # Add injection duration if available in your schema
-                # inj1_ionto_time="4min",  # If this field exists
-                # Injectable materials
+                inj1volperdepth=500.0,
                 Burr_x0020_1_x0020_Injectable_x0="230929-12",
                 Burr_x0020_1_x0020_Injectable_x03="1e12",
-                # Virus strain (optional)
                 Inj1VirusStrain_rt='Premixed "dL+Cre"',
             )
         ]
