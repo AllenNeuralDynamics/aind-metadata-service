@@ -1,8 +1,9 @@
 """Module to test ProceduresMapper class"""
 
 import unittest
-from datetime import date, datetime
 from copy import deepcopy
+from datetime import date, datetime
+
 from aind_data_schema.components.injection_procedures import (
     Injection,
     InjectionDynamics,

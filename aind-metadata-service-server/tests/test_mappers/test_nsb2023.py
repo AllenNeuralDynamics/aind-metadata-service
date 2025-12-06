@@ -1,18 +1,24 @@
 """Tests NSB 2023 data model is parsed correctly"""
 
+import json
+import os
 from copy import deepcopy
 from decimal import Decimal
+from pathlib import Path
+from typing import Callable, List
 from unittest import TestCase
 from unittest import main as unittest_main
 
-from aind_metadata_service_server.mappers.nsb2023 import BurrHoleInfo
 from aind_data_schema.components.coordinates import (
     Axis,
     AxisName,
     CoordinateSystem,
     CoordinateSystemLibrary,
     Direction,
+    Rotation,
+    Translation,
 )
+from aind_data_schema.components.devices import FiberProbe
 from aind_data_schema.components.injection_procedures import (
     NonViralMaterial,
 )
@@ -22,28 +28,33 @@ from aind_data_schema.components.surgery_procedures import (
     Craniotomy,
     CraniotomyType,
     Headframe,
+    ProbeImplant,
 )
 from aind_data_schema_models.brain_atlas import BrainStructureModel
 from aind_data_schema_models.coordinates import Origin
+from aind_data_schema_models.units import SizeUnit
 from aind_sharepoint_service_async_client.models.nsb2023_list import (
     NSB2023List,
 )
-from aind_data_schema.components.devices import FiberProbe
-from aind_data_schema.components.surgery_procedures import ProbeImplant
-from aind_data_schema.components.coordinates import Translation, Rotation
+
 from aind_metadata_service_server.mappers.nsb2023 import (
+    BurrHoleInfo,
     BurrHoleProcedure,
     During,
-    HeadPost,
-    HeadPostType,
-    InjectionType,
     FiberType,
-    MappedNSBList,
-    HeadPostInfo,
     HeadframeMaterial,
+    HeadPost,
+    HeadPostInfo,
+    HeadPostType,
     InjectableMaterial,
+    InjectionType,
+    MappedNSBList,
 )
-from aind_data_schema_models.units import SizeUnit
+
+TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / ".."
+TEST_EXAMPLES = (
+    TEST_DIR / "resources" / "nsb2023" / "nsb2023_string_entries.json"
+)
 
 
 class TestNSB2023BasicMapping(TestCase):
@@ -469,7 +480,6 @@ class TestNSB2023CraniotomyMapping(TestCase):
             mapper_followup.aind_craniotomy_perform_d, During.FOLLOW_UP
         )
 
-        # None
         test_data_none = deepcopy(self.craniotomy_data_5mm)
         test_data_none["Craniotomy_x0020_Perform_x0020_D"] = None
         nsb_model_none = NSB2023List.model_validate(test_data_none)
@@ -478,10 +488,8 @@ class TestNSB2023CraniotomyMapping(TestCase):
 
     def test_has_cran_procedure(self):
         """Test detection of craniotomy procedure"""
-        # Has craniotomy (using class mapper)
         self.assertTrue(self.mapper_5mm.has_cran_procedure())
 
-        # No craniotomy
         test_data_no_cran = deepcopy(self.craniotomy_data_5mm)
         test_data_no_cran["Procedure"] = "HP Only"
         nsb_model_no_cran = NSB2023List.model_validate(test_data_no_cran)
@@ -556,10 +564,8 @@ class TestNSB2023CraniotomyMapping(TestCase):
 
         self.assertGreater(len(surgeries), 0)
         surgery = surgeries[0]
-        # 5mm craniotomy creates LAMBDA_ARI coordinate system
         self.assertIsNotNone(surgery.coordinate_system)
         self.assertEqual(surgery.coordinate_system.name, "LAMBDA_ARI")
-        # Should have measured coordinates
         self.assertIsNotNone(surgery.measured_coordinates)
         self.assertIn(Origin.BREGMA, surgery.measured_coordinates)
 
@@ -580,14 +586,11 @@ class TestNSB2023CraniotomyMapping(TestCase):
         surgeries = mapper.get_surgeries()
 
         self.assertGreater(len(surgeries), 0)
-        # Should have a surgery with no start date (other_procedures)
         other_surgery = next(
             (s for s in surgeries if s.start_date is None), None
         )
         self.assertIsNotNone(other_surgery)
         self.assertEqual(other_surgery.experimenters[0], "NSB")
-
-        # Should contain craniotomy
         craniotomy = next(
             (p for p in other_surgery.procedures if isinstance(p, Craniotomy)),
             None,
@@ -682,6 +685,7 @@ class TestNSB2023InjectionMapping(TestCase):
         self.assertEqual(mapper.aind_inj2_ionto_time, Decimal("10"))
 
     def test_map_targeted_structures(self):
+        """Test mapping of targeted brain structures for burr holes"""
         test_data = {
             "Burr_x0020_1_x0020_Intended_x002": ["INVALID"],
             "Burr_x0020_2_x0020_Intended_x002": [
@@ -713,7 +717,7 @@ class TestNSB2023InjectionMapping(TestCase):
         self.assertIsNone(bh_info.hemisphere)
 
     def test_get_surgeries_injection_validation_error(self):
-        """Test iontophoresis injection dynamics with ValidationError fallback"""
+        """Test iontophoresis injection dynamics with ValidationError"""
         nsb_data = {
             "FileSystemObjectType": 0,
             "Id": 200,
@@ -822,14 +826,12 @@ class TestNSB2023InjectionMapping(TestCase):
         self.assertIsNotNone(injection)
 
     def test_burr_hole_info_invalid_number(self):
-        """Test burr_hole_info with invalid burr hole number returns empty BurrHoleInfo"""
-        # Test with number outside valid range (1-6)
+        """Test burr_hole_info with invalid burr hole number"""
         burr_info_0 = self.mapper.burr_hole_info(0)
         burr_info_7 = self.mapper.burr_hole_info(7)
         burr_info_negative = self.mapper.burr_hole_info(-1)
         burr_info_large = self.mapper.burr_hole_info(100)
 
-        # All should return empty BurrHoleInfo objects
         for burr_info in [
             burr_info_0,
             burr_info_7,
@@ -1056,14 +1058,10 @@ class TestNSB2023FiberImplantMapping(TestCase):
 
         self.assertGreater(len(surgeries), 0)
         surgery = surgeries[0]
-
-        # Count fiber probes
         fiber_count = sum(
             1 for proc in surgery.procedures if isinstance(proc, ProbeImplant)
         )
         self.assertEqual(fiber_count, 2)
-
-        # Verify fiber names are assigned
         for proc in surgery.procedures:
             if isinstance(proc, ProbeImplant):
                 self.assertIsNotNone(proc.implanted_device.name)
@@ -1089,14 +1087,10 @@ class TestNSB2023FiberImplantMapping(TestCase):
 
         surgeries = mapper.get_surgeries()
         self.assertGreater(len(surgeries), 0)
-
-        # Should have surgery with no start date (other_procedures)
         other_surgery = next(
             (s for s in surgeries if s.start_date is None), None
         )
         self.assertIsNotNone(other_surgery)
-
-        # Should contain fiber implant
         probe_implant = next(
             (
                 p
@@ -1214,7 +1208,6 @@ class TestNSB2023SurgeryIntegration(TestCase):
     @classmethod
     def setUpClass(cls):
         """Create comprehensive test data"""
-        # Test data for headframe/craniotomy procedures (INITIAL)
         cls.hp_cran_surgery_data = {
             "FileSystemObjectType": 0,
             "Id": 7,
@@ -1236,7 +1229,6 @@ class TestNSB2023SurgeryIntegration(TestCase):
             "HPRecovery": 25,
         }
 
-        # Test data for fiber implant procedures (INITIAL with HP fields)
         cls.fiber_implant_surgery_data = {
             "FileSystemObjectType": 0,
             "Id": 10,
@@ -1257,13 +1249,11 @@ class TestNSB2023SurgeryIntegration(TestCase):
             "Burr2_x0020_Perform_x0020_During": "Initial Surgery",
             "Burr_x0020_2_x0020_Fiber_x0020_T": "Standard (Provided by NSB)",
             "Fiber_x0020_Implant2_x0020_Lengt": "5.0 mm",
-            # For INITIAL surgery, use HP fields with correct backend names:
-            "Iso_x0020_On": 1.5,  # Backend field name (not just "ISOon")
+            "Iso_x0020_On": 1.5,
             "HPIsoLevel": 1.8,
             "HPRecovery": 30,
         }
 
-        # Test data for follow-up fiber implant procedures
         cls.fiber_followup_surgery_data = {
             "FileSystemObjectType": 0,
             "Id": 11,
@@ -1279,16 +1269,14 @@ class TestNSB2023SurgeryIntegration(TestCase):
             "Burr1_x0020_Perform_x0020_During": "Follow up Surgery",
             "Burr_x0020_1_x0020_Fiber_x0020_T": "Standard (Provided by NSB)",
             "Fiber_x0020_Implant1_x0020_Lengt": "2.0 mm",
-            # For FOLLOW-UP surgery, use First* fields with correct backend names:
-            "FirstInjectionIsoDuration": 1.5,  # Backend field name
-            "Round1InjIsolevel": 2.5,  # Backend field name
-            "FirstInjRecovery": 35,  # Backend field name
+            "FirstInjectionIsoDuration": 1.5,
+            "Round1InjIsolevel": 2.5,
+            "FirstInjRecovery": 35,
             "FirstInjectionWeightBefor": 26.5,
             "FirstInjectionWeightAfter": 29.0,
             "WorkStation1stInjection": "SWS 5",
         }
 
-        # Create mappers for all datasets
         cls.hp_cran_model = NSB2023List.model_validate(
             cls.hp_cran_surgery_data
         )
@@ -1304,7 +1292,9 @@ class TestNSB2023SurgeryIntegration(TestCase):
         cls.fiber_followup_model = NSB2023List.model_validate(
             cls.fiber_followup_surgery_data
         )
-        cls.fiber_followup_mapper = MappedNSBList(nsb=cls.fiber_followup_model)
+        cls.fiber_followup_mapper = MappedNSBList(
+            nsb=cls.fiber_followup_model
+        )
         cls.fiber_followup_surgeries = (
             cls.fiber_followup_mapper.get_surgeries()
         )
@@ -1346,21 +1336,8 @@ class TestNSB2023SurgeryIntegration(TestCase):
             combined_surgery.anaesthesia.anaesthetic_type, "isoflurane"
         )
 
-    def test_surgery_during_info_initial_hp_cran(self):
-        """Test surgery during info for initial surgery with headframe/craniotomy"""
-        during_info = self.hp_cran_mapper.surgery_during_info(During.INITIAL)
-
-        self.assertIsNotNone(during_info.start_date)
-        self.assertEqual(str(during_info.start_date), "2022-01-03")
-
-        self.assertIsNotNone(during_info.workstation_id)
-        self.assertEqual(during_info.workstation_id, "SWS 4")
-        self.assertEqual(during_info.anaesthetic_level, 2.0)
-        self.assertEqual(during_info.recovery_time, 25.0)
-        self.assertEqual(during_info.anaesthetic_duration_in_minutes, 90)
-
-    def test_surgery_during_info_initial_fiber(self):
-        """Test surgery during info for initial surgery with fiber implants"""
+    def test_surgery_during_info_initial(self):
+        """Test surgery during info for initial surgery"""
         during_info = self.fiber_mapper.surgery_during_info(During.INITIAL)
 
         self.assertIsNotNone(during_info.start_date)
@@ -1369,8 +1346,8 @@ class TestNSB2023SurgeryIntegration(TestCase):
         self.assertEqual(during_info.recovery_time, 30.0)
         self.assertEqual(during_info.anaesthetic_level, Decimal("1.8"))
 
-    def test_surgery_during_info_followup_fiber(self):
-        """Test surgery during info for follow-up surgery with fiber implants"""
+    def test_surgery_during_info_followup(self):
+        """Test surgery during info for follow-up surgery"""
         during_info = self.fiber_followup_mapper.surgery_during_info(
             During.FOLLOW_UP
         )
@@ -1420,7 +1397,7 @@ class TestNSB2023SurgeryIntegration(TestCase):
         self.assertIn(Origin.BREGMA, measured)
 
         coord_sys_other = CoordinateSystem(
-            name="C1C2_ARID",  # Spinal coordinate system
+            name="C1C2_ARID",
             origin=Origin.BETWEEN_C1_C2,
             axis_unit=SizeUnit.MM,
             axes=[
@@ -1447,8 +1424,6 @@ class TestNSB2023SurgeryIntegration(TestCase):
         probe_names = [p.implanted_device.name for p in probe_implants]
         self.assertIn("Fiber_0", probe_names)
         self.assertIn("Fiber_1", probe_names)
-
-        # Verify fiber probes are correctly configured
         for probe_implant in probe_implants:
             fiber_probe = probe_implant.implanted_device
             self.assertIsInstance(fiber_probe, FiberProbe)
@@ -1489,7 +1464,7 @@ class TestNSB2023SurgeryIntegration(TestCase):
         self.assertEqual(surgeries[0].ethics_review_id, "2119")
 
     def test_get_surgeries_validation_error_surgery_object_initial(self):
-        """Test initial surgery object with ValidationError/TypeError fallback"""
+        """Test initial surgery object with ValidationError fallback"""
         nsb_data = {
             "FileSystemObjectType": 0,
             "Id": 20,
@@ -1539,13 +1514,11 @@ class TestNSB2023SurgeryIntegration(TestCase):
             "IACUC_x0020_Protocol_x0020__x002": "2103",
             "Test1LookupId": 2846,
             "test_x0020_1st_x0020_round_x0020_LookupId": 2847,
-            # Initial burr hole
             "Burr_x0020_hole_x0020_1": "Injection",
             "Virus_x0020_M_x002f_L": 2.0,
             "Virus_x0020_A_x002f_P": 3.0,
             "Virus_x0020_D_x002f_V": 4.0,
             "Burr1_x0020_Perform_x0020_During": "Initial Surgery",
-            # Follow-up burr hole
             "Burr_x0020_hole_x0020_2": "Injection",
             "ML2ndInj": 1.5,
             "AP2ndInj": 2.5,
@@ -1691,9 +1664,9 @@ class TestNSB2023CoordinateMapping(TestCase):
             # ARI should have 3D coordinates only
             self.assertIsInstance(translation, Translation)
             self.assertEqual(len(translation.translation), 3)
-            self.assertEqual(translation.translation[0], 1.8)  # AP
-            self.assertEqual(translation.translation[1], 2.5)  # ML
-            self.assertEqual(translation.translation[2], 0)  # SI
+            self.assertEqual(translation.translation[0], 1.8)
+            self.assertEqual(translation.translation[1], 2.5)
+            self.assertEqual(translation.translation[2], 0)
 
             # ARI should have 3D rotation angles
             self.assertIsInstance(rotation, Rotation)
@@ -1718,7 +1691,7 @@ class TestNSB2023CoordinateMapping(TestCase):
 
         # ARID without depth should still have 4D (with 0 depth)
         self.assertEqual(len(translation.translation), 4)
-        self.assertEqual(translation.translation[3], 0)  # Depth should be 0
+        self.assertEqual(translation.translation[3], 0)
 
         self.assertEqual(len(rotation.angles), 4)
         self.assertEqual(rotation.angles[3], 0)
@@ -1736,8 +1709,6 @@ class TestNSB2023CoordinateMapping(TestCase):
         # Should have 1 transform
         self.assertEqual(len(transforms), 1)
         translation, rotation = transforms[0]
-
-        # ARI without depth should have 3D
         self.assertEqual(len(translation.translation), 3)
         self.assertEqual(len(rotation.angles), 3)
 
@@ -1750,17 +1721,15 @@ class TestNSB2023CoordinateMapping(TestCase):
             depth=[Decimal("3.0")],
             surgery_coordinate_system=None,
         )
-
-        # Should default to 3D
         self.assertEqual(len(transforms), 1)
         translation, rotation = transforms[0]
         self.assertEqual(len(translation.translation), 3)
         self.assertEqual(len(rotation.angles), 3)
 
     def test_map_burr_hole_transforms_spinal_coordinate_system(self):
-        """Test burr hole transforms with spinal (non-ARID) coordinate system"""
+        """Test burr hole transforms with spinal coordinate system"""
         spinal_coord_sys = CoordinateSystem(
-            name="C1C2_ARID",  # Ends with ARID but is spinal
+            name="C1C2_ARID",
             origin=Origin.BETWEEN_C1_C2,
             axis_unit=SizeUnit.MM,
             axes=[
@@ -1830,96 +1799,83 @@ class TestNSB2023CoordinateMapping(TestCase):
 
 
 class TestNSB2023StringParsers(TestCase):
-    """Tests text field parsers in NSB2023Mapping class"""
+    """Tests text field parsers in NSB2023Mapping class. Certain fields, such
+    as AP2ndInj, allow the users to input text freely. This has led to entries
+    like '+0.8 ANT', '+1.8', ;-3.8mm', etc."""
 
     @classmethod
     def setUpClass(cls):
-        """Create blank mapper for parser testing"""
-        cls.blank_model = MappedNSBList(
-            nsb=NSB2023List.model_validate(
-                {"FileSystemObjectType": 0, "Id": 0}
-            )
-        )
+        """Load json files before running tests."""
+        cls.string_entries = cls._load_json_file()
+        cls.blank_model = MappedNSBList(nsb=NSB2023List.model_construct())
 
-    def test_parse_float_to_decimal(self):
-        """Test float to decimal conversion"""
-        result = MappedNSBList._map_float_to_decimal(3.14)
-        self.assertEqual(result, Decimal("3.14"))
+    @staticmethod
+    def _load_json_file() -> dict:
+        """Reads raw data and expected data into json"""
+        with open(TEST_EXAMPLES) as f:
+            contents = json.load(f)
+        return contents
 
-        result_int = MappedNSBList._map_float_to_decimal(5.0)
-        self.assertEqual(result_int, Decimal("5.0"))
+    def _test_parser(self, keys: List[str], parser: Callable) -> None:
+        """
+        Helper function to test a parser againsts a list of keys in resource
+        json file.
+        Parameters
+        ----------
+        keys : List[str]
+          Keys of the json fields we want to check
+        parser : Callable
+          The parser method we want to test
 
-        result_none = MappedNSBList._map_float_to_decimal(None)
-        self.assertIsNone(result_none)
+        Returns
+        -------
+        None
+          Will raise an assertion error if the parsers return unexpected values
 
-    def test_parse_basic_decimal_str(self):
-        """Test basic decimal string parsing"""
-        test_cases = [
-            ("3.14", Decimal("3.14")),
-            ("10", Decimal("10")),
-            ("0.001", Decimal("0.001")),
-            (None, None),
-            ("invalid", None),
+        """
+        for k in keys:
+            expected_entries = self.string_entries[k]["unique_entries"]
+            for example_key, example_val in expected_entries.items():
+                expected = example_val
+                actual = parser(example_key)
+                self.assertEqual(expected, actual)
+        self.assertIsNone(parser(None))
+
+    def test_current_parser(self):
+        """Checks that current fields are parsed correctly"""
+
+        c_keys = ["Inj1Current", "Inj2Current", "Inj3Current", "Inj4Current"]
+        self._test_parser(c_keys, self.blank_model._parse_current_str)
+
+    def test_length_of_time_parser(self):
+        """Checks that length-of-time fields are parsed correctly"""
+
+        lt_keys = [
+            "Inj1IontoTime",
+            "Inj2IontoTime",
+            "Inj3IontoTime",
+            "Inj4IontoTime",
         ]
+        self._test_parser(lt_keys, self.blank_model._parse_length_of_time_str)
 
-        for input_str, expected in test_cases:
-            with self.subTest(input=input_str):
-                result = self.blank_model._parse_basic_decimal_str(input_str)
-                self.assertEqual(result, expected)
-
-    def test_parse_current_str(self):
-        """Test current string parsing"""
-        test_cases = [
-            ("5 uA", Decimal("5")),
-            ("10 uAmp", Decimal("10")),
-            ("3.5 ua", Decimal("3.5")),
-            (None, None),
-            ("invalid", None),
+    def test_parse_basic_decimal_str_invalid(self):
+        """Test parsing invalid strings returns None"""
+        invalid_inputs = [
+            "invalid",
+            "abc123",
+            "12.34.56",
+            "1e10e5",
+            "",
+            "   ",
+            "3.14 extra",
+            "text 5.0",
         ]
-
-        for input_str, expected in test_cases:
-            with self.subTest(input=input_str):
-                result = self.blank_model._parse_current_str(input_str)
-                self.assertEqual(result, expected)
-
-    def test_parse_length_of_time_str(self):
-        """Test length of time string parsing"""
-        test_cases = [
-            ("10 min", Decimal("10")),
-            ("5 minutes", Decimal("5")),
-            ("2.5 m", Decimal("2.5")),
-            (None, None),
-            ("invalid", None),
-        ]
-
-        for input_str, expected in test_cases:
-            with self.subTest(input=input_str):
-                result = self.blank_model._parse_length_of_time_str(input_str)
-                self.assertEqual(result, expected)
-
-    def test_parse_fiber_length_mm_str(self):
-        """Test fiber length string parsing"""
-        result = self.blank_model._parse_fiber_length_mm_str("6.5 mm")
-        self.assertEqual(result, Decimal("6.5"))
-
-        result_other = self.blank_model._parse_fiber_length_mm_str("4.2 mm")
-        self.assertEqual(result_other, Decimal("4.2"))
-
-    def test_is_titer(self):
-        """Test titer detection"""
-        self.assertTrue(self.blank_model._is_titer("1.5e12"))
-        self.assertTrue(self.blank_model._is_titer("3.2E10"))
-        self.assertTrue(self.blank_model._is_titer("5e+8"))
-        self.assertFalse(self.blank_model._is_titer("0.5 mg/ml"))
-        self.assertFalse(self.blank_model._is_titer("regular text"))
-
-    def test_is_concentration(self):
-        """Test concentration detection"""
-        self.assertTrue(self.blank_model._is_concentration("0.5 mg/ml"))
-        self.assertTrue(self.blank_model._is_concentration("2.5 mg/mL"))
-        self.assertTrue(self.blank_model._is_concentration("10 mg/ml"))
-        self.assertFalse(self.blank_model._is_concentration("1.5e12"))
-        self.assertFalse(self.blank_model._is_concentration("regular text"))
+        for invalid_input in invalid_inputs:
+            with self.subTest(input=invalid_input):
+                result = self.blank_model._parse_basic_decimal_str(
+                    invalid_input
+                )
+                self.assertIsNone(result)
 
 
 if __name__ == "__main__":

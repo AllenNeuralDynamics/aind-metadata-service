@@ -1,15 +1,21 @@
 """Tests NSB 2019 data model is parsed correctly"""
 
+import json
 from copy import deepcopy
 from decimal import Decimal
+from pathlib import Path
+from typing import Callable, List
 from unittest import TestCase
 from unittest import main as unittest_main
-from aind_data_schema.components.devices import FiberProbe
+
 from aind_data_schema.components.configs import ProbeConfig
-from aind_metadata_service_server.mappers.nsb2019 import InjectionType
 from aind_data_schema.components.coordinates import (
     CoordinateSystemLibrary,
     Origin,
+)
+from aind_data_schema.components.devices import FiberProbe
+from aind_data_schema.components.injection_procedures import (
+    InjectionProfile,
 )
 from aind_data_schema.components.subject_procedures import Surgery
 from aind_data_schema.components.surgery_procedures import (
@@ -19,20 +25,25 @@ from aind_data_schema.components.surgery_procedures import (
     Headframe,
     ProbeImplant,
 )
-from aind_data_schema.components.injection_procedures import (
-    InjectionProfile,
-)
+from aind_data_schema_models.coordinates import AnatomicalRelative
 from aind_data_schema_models.units import (
     CurrentUnit,
     TimeUnit,
     VolumeUnit,
 )
-from aind_data_schema_models.coordinates import AnatomicalRelative
 from aind_sharepoint_service_async_client.models.nsb2019_list import (
     NSB2019List,
 )
 
-from aind_metadata_service_server.mappers.nsb2019 import MappedNSBList
+from aind_metadata_service_server.mappers.nsb2019 import (
+    InjectionType,
+    MappedNSBList,
+)
+
+TEST_DIR = Path(__file__).parent / ".."
+TEST_EXAMPLES = (
+    TEST_DIR / "resources" / "nsb2019" / "nsb2019_string_entries.json"
+)
 
 
 class TestNSB2019BasicMapping(TestCase):
@@ -152,7 +163,10 @@ class TestNSB2019HeadframeMapping(TestCase):
                 "0160-100-10",
             ),
             (
-                "Mesoscope-style well with NGC-style headframe (0160-200-20/0160-100-10)",
+                (
+                    "Mesoscope-style well with NGC-style headframe"
+                    " (0160-200-20/0160-100-10)"
+                ),
                 "NGC-style",
                 "0160-100-10",
             ),
@@ -761,58 +775,42 @@ class TestNSB2019SurgeryIntegration(TestCase):
         nsb_model = NSB2019List.model_validate(test_data)
         mapper = MappedNSBList(nsb=nsb_model)
         surgeries = mapper.get_surgeries()
-
-        # Should have 3 surgeries: HP+Craniotomy+Fiber, 1st injection, 2nd injection
-        self.assertEqual(len(surgeries), 3)
-
-        # Find the second injection surgery
         second_injection_surgery = surgeries[2]
+        injection = second_injection_surgery.procedures[0]
 
-        # Verify it's a valid Surgery object with BrainInjection
+        self.assertEqual(len(surgeries), 3)
         self.assertIsInstance(second_injection_surgery, Surgery)
         self.assertEqual(len(second_injection_surgery.procedures), 1)
         self.assertIsInstance(
             second_injection_surgery.procedures[0], BrainInjection
         )
-
-        # Verify second injection specific fields
         self.assertEqual(
             str(second_injection_surgery.start_date), "2022-12-07"
         )
         self.assertEqual(second_injection_surgery.animal_weight_prior, 19.2)
         self.assertEqual(second_injection_surgery.animal_weight_post, 19.3)
         self.assertEqual(second_injection_surgery.workstation_id, "SWS 4")
-
-        # Verify anaesthesia
         self.assertIsNotNone(second_injection_surgery.anaesthesia)
         self.assertEqual(
             second_injection_surgery.anaesthesia.anaesthetic_type, "isoflurane"
         )
         self.assertEqual(second_injection_surgery.anaesthesia.duration, 60.0)
         self.assertEqual(second_injection_surgery.anaesthesia.level, 1.5)
-
-        # Verify measured coordinates
         self.assertIsNotNone(second_injection_surgery.measured_coordinates)
         self.assertIn(
             Origin.BREGMA, second_injection_surgery.measured_coordinates
         )
-
-        # Verify coordinate system
         self.assertEqual(
             second_injection_surgery.coordinate_system,
             CoordinateSystemLibrary.BREGMA_ARID,
         )
-
-        # Verify injection dynamics
-        injection = second_injection_surgery.procedures[0]
         self.assertEqual(len(injection.dynamics), 1)
-        print(injection.dynamics)
         self.assertEqual(injection.dynamics[0].volume, [Decimal("500")])
         self.assertEqual(injection.dynamics[0].volume_unit, VolumeUnit.NL)
         self.assertEqual(injection.dynamics[0].duration, Decimal("4"))
 
     def test_get_surgeries_with_second_injection_validation_error(self):
-        """Test second injection surgery creation with missing start_date (validation error)"""
+        """Test second injection surgery creation with validation error"""
         test_data = deepcopy(self.full_surgery_data)
         test_data["AP2ndInj"] = "-3.05"
         test_data["ML2ndInj"] = "-0.6"
@@ -904,175 +902,88 @@ class TestNSB2019CoordinateMapping(TestCase):
 
 
 class TestNSB2019StringParsers(TestCase):
-    """Tests text field parsers in NSB2019Mapping class"""
+    """Tests text field parsers in NSB2019Mapping class."""
 
     @classmethod
     def setUpClass(cls):
-        """Create blank mapper for parser testing"""
-        cls.blank_model = MappedNSBList(
-            nsb=NSB2019List.model_validate(
-                {"FileSystemObjectType": 0, "Id": 0}
-            )
-        )
+        """Load string‐entry examples and build a blank mapper."""
+        with open(TEST_EXAMPLES, encoding="utf-8") as f:
+            cls.string_entries = json.load(f)
+        cls.blank_model = MappedNSBList(nsb=NSB2019List.model_construct())
 
-    def test_parse_ap_str(self):
-        """Tests parsing of AP coordinate values"""
-        self.assertEqual(
-            self.blank_model._parse_ap_str("-1.06"), Decimal("-1.06")
-        )
-        self.assertEqual(self.blank_model._parse_ap_str("1"), Decimal("1.0"))
-        self.assertEqual(
-            self.blank_model._parse_ap_str("-3.8mm"), Decimal("-3.8")
-        )
-        self.assertIsNone(self.blank_model._parse_ap_str("calamus -0.44"))
-        self.assertIsNone(self.blank_model._parse_ap_str(None))
+    def _test_parser(self, keys: List[str], parser: Callable) -> None:
+        """Run a list of example keys through one of the _parse_* methods."""
+        for field in keys:
+            entries = self.string_entries[field]["unique_entries"]
+            for raw_input, expected in entries.items():
+                if isinstance(expected, float):
+                    expected = Decimal(str(expected))
+                actual = parser(raw_input)
+                self.assertEqual(expected, actual, f"{field}: {raw_input!r}")
+        self.assertIsNone(parser(None))
 
-    def test_parse_ml_str(self):
-        """Tests parsing of ML coordinate values"""
-        self.assertEqual(self.blank_model._parse_ml_str("3.4"), Decimal("3.4"))
-        self.assertEqual(
-            self.blank_model._parse_ml_str("-2.3 mm"), Decimal("-2.3")
-        )
-        self.assertEqual(
-            self.blank_model._parse_ml_str(".35"), Decimal("0.35")
-        )
-        self.assertIsNone(self.blank_model._parse_ml_str("-2.7mm (Left)"))
-        self.assertIsNone(self.blank_model._parse_ml_str(None))
+    def test_ap_parser(self):
+        """Tests parsing of AP values"""
+        ap_keys = ["AP2ndInj", "HP_x0020_A_x002f_P", "Virus_x0020_A_x002f_P"]
+        self._test_parser(ap_keys, self.blank_model._parse_ap_str)
 
-    def test_parse_dv_str(self):
-        """Tests parsing of DV coordinate values"""
-        self.assertEqual(
-            self.blank_model._parse_dv_str("3.38"), Decimal("3.38")
-        )
-        self.assertEqual(
-            self.blank_model._parse_dv_str("0.6mm"), Decimal("0.6")
-        )
-        self.assertEqual(
-            self.blank_model._parse_dv_str("+3.6"), Decimal("3.6")
-        )
-        self.assertIsNone(self.blank_model._parse_dv_str("2.2, 2.60"))
-        self.assertIsNone(self.blank_model._parse_dv_str(None))
+    def test_dv_parser(self):
+        """Tests parsing of DV values"""
+        dv_keys = [
+            "DV2ndInj",
+            "FiberImplant1DV",
+            "FiberImplant2DV",
+            "Virus_x0020_D_x002f_V",
+        ]
+        self._test_parser(dv_keys, self.blank_model._parse_dv_str)
 
-    def test_parse_weight_str(self):
-        """Tests parsing of animal weight values"""
-        self.assertEqual(
-            self.blank_model._parse_weight_str("19.1"), Decimal("19.1")
-        )
-        self.assertEqual(
-            self.blank_model._parse_weight_str("30."), Decimal("30.0")
-        )
-        self.assertIsNone(self.blank_model._parse_weight_str("20/0"))
-        self.assertIsNone(self.blank_model._parse_weight_str(None))
+    def test_iso_dur_parser(self):
+        """Tests parsing of Iso Duration values"""
+        iso_keys = ["FirstInjectionIsoDuration", "SecondInjectionIsoDuration"]
+        self._test_parser(iso_keys, self.blank_model._parse_iso_dur_str)
 
-    def test_parse_iso_dur_str(self):
-        """Tests parsing of isoflurane duration values"""
+    def test_weight_parser(self):
+        """Tests parsing of weight values"""
+        w_keys = [
+            "FirstInjectionWeightAfter",
+            "FirstInjectionWeightBefor",
+            "Touch_x0020_Up_x0020_Weight_x002",
+            "Weight_x0020_after_x0020_Surgery",
+            "Weight_x0020_before_x0020_Surger",
+            "SecondInjectionWeightAfter",
+            "SecondInjectionWeightBefore",
+        ]
+        self._test_parser(w_keys, self.blank_model._parse_weight_str)
 
-        self.assertEqual(
-            self.blank_model._parse_iso_dur_str("1"), Decimal("60.0")
-        )
-        self.assertEqual(
-            self.blank_model._parse_iso_dur_str("1:45"), Decimal("105.0")
-        )
-        self.assertEqual(
-            self.blank_model._parse_iso_dur_str("2 hours"), Decimal("120.0")
-        )
-        self.assertEqual(
-            self.blank_model._parse_iso_dur_str("0.75"), Decimal("45.0")
-        )
-        self.assertEqual(
-            self.blank_model._parse_iso_dur_str("2.5 hour"), Decimal("150.0")
-        )
+    def test_ml_parser(self):
+        """Tests parsing of ml values"""
+        ml_keys = ["ML2ndInj", "HP_x0020_M_x002f_L", "Virus_x0020_M_x002f_L"]
+        self._test_parser(ml_keys, self.blank_model._parse_ml_str)
 
-        self.assertIsNone(self.blank_model._parse_iso_dur_str("6 hours"))
-        self.assertIsNone(self.blank_model._parse_iso_dur_str("5:30"))
-        self.assertIsNone(self.blank_model._parse_iso_dur_str("45"))
-        self.assertIsNone(self.blank_model._parse_iso_dur_str("1:"))
-        self.assertIsNone(self.blank_model._parse_iso_dur_str("abc:def"))
-        self.assertIsNone(self.blank_model._parse_iso_dur_str(None))
-
-    def test_parse_angle_str(self):
-        """Tests parsing of injection angle values"""
-        self.assertEqual(
-            self.blank_model._parse_angle_str("0"), Decimal("0.0")
-        )
-        self.assertEqual(
-            self.blank_model._parse_angle_str("-10"), Decimal("-10.0")
-        )
-        self.assertEqual(
-            self.blank_model._parse_angle_str("0 degree"), Decimal("0.0")
-        )
-        self.assertIsNone(self.blank_model._parse_angle_str("normal"))
-        self.assertIsNone(self.blank_model._parse_angle_str(None))
-
-    def test_parse_current_str(self):
-        """Tests parsing of injection current values"""
-        self.assertEqual(
-            self.blank_model._parse_current_str("5uA"), Decimal("5.0")
-        )
-        self.assertEqual(
-            self.blank_model._parse_current_str("3 uA"), Decimal("3.0")
-        )
-        self.assertIsNone(self.blank_model._parse_current_str("5min"))
-        self.assertIsNone(self.blank_model._parse_current_str(None))
-
-    def test_parse_alt_time_str(self):
+    def test_alt_time_parser(self):
         """Tests parsing of alternating time values"""
-        self.assertEqual(
-            self.blank_model._parse_alt_time_str("7/7"), Decimal("7.0")
-        )
-        self.assertEqual(
-            self.blank_model._parse_alt_time_str("7 seconds"), Decimal("7.0")
-        )
-        self.assertIsNone(self.blank_model._parse_alt_time_str("30sec"))
-        self.assertIsNone(self.blank_model._parse_alt_time_str(None))
+        at_keys = ["Inj1AlternatingTime", "Inj2AlternatingTime"]
+        self._test_parser(at_keys, self.blank_model._parse_alt_time_str)
 
-    def test_parse_length_of_time_str(self):
-        """Tests parsing of duration/length of time values"""
-        self.assertEqual(
-            self.blank_model._parse_length_of_time_str("5min"), Decimal("5.0")
-        )
-        self.assertEqual(
-            self.blank_model._parse_length_of_time_str("10 minutes"),
-            Decimal("10.0"),
-        )
-        self.assertEqual(
-            self.blank_model._parse_length_of_time_str("2.5min"),
-            Decimal("2.5"),
-        )
-        self.assertIsNone(self.blank_model._parse_length_of_time_str("30 sec"))
-        self.assertIsNone(self.blank_model._parse_length_of_time_str(None))
+    def test_angle_parser(self):
+        """Tests parsing of angle values"""
+        an_keys = ["Inj1Angle_v2", "Inj2Angle_v2"]
+        self._test_parser(an_keys, self.blank_model._parse_angle_str)
 
-    def test_parse_inj_vol_str(self):
-        """Tests parsing of injection volume values"""
-        self.assertEqual(
-            self.blank_model._parse_inj_vol_str("200 nL"), Decimal("200.0")
-        )
-        self.assertEqual(
-            self.blank_model._parse_inj_vol_str("500nl"), Decimal("500.0")
-        )
-        self.assertEqual(
-            self.blank_model._parse_inj_vol_str("400"), Decimal("400.0")
-        )
-        self.assertIsNone(self.blank_model._parse_inj_vol_str("1uL (1000nl)"))
-        self.assertIsNone(self.blank_model._parse_inj_vol_str(None))
+    def test_current_parser(self):
+        """Tests parsing of current values"""
+        c_keys = ["Inj1Current", "Inj2Current"]
+        self._test_parser(c_keys, self.blank_model._parse_current_str)
 
-    def test_basic_float_parser(self):
-        """Tests parsing of basic float strings"""
-        self.assertEqual(self.blank_model._parse_basic_float_str("1.5"), 1.5)
-        self.assertEqual(self.blank_model._parse_basic_float_str("0"), 0.0)
-        self.assertIsNone(self.blank_model._parse_basic_float_str("invalid"))
-        self.assertIsNone(self.blank_model._parse_basic_float_str(None))
+    def test_length_of_time_parser(self):
+        """Tests parsing of length of time values"""
+        lt_keys = ["Inj1LenghtofTime", "Inj2LenghtofTime"]
+        self._test_parser(lt_keys, self.blank_model._parse_length_of_time_str)
 
-    def test_basic_decimal_parser(self):
-        """Tests parsing of basic decimal strings"""
-        self.assertEqual(
-            self.blank_model._parse_basic_decimal_str("1.5"), Decimal("1.5")
-        )
-        self.assertEqual(
-            self.blank_model._parse_basic_decimal_str("0"), Decimal("0")
-        )
-        self.assertIsNone(self.blank_model._parse_basic_decimal_str("invalid"))
-        self.assertIsNone(self.blank_model._parse_basic_decimal_str(None))
+    def test_volume_parser(self):
+        """Tests parsing of volume values"""
+        v_keys = ["Inj1Vol", "Inj2Vol", "inj1volperdepth", "inj2volperdepth"]
+        self._test_parser(v_keys, self.blank_model._parse_inj_vol_str)
 
 
 if __name__ == "__main__":

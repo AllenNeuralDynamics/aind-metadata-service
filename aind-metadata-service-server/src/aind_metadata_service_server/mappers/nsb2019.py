@@ -101,14 +101,6 @@ class MappedNSBList:
         except (ValueError, DecimalException):
             return None
 
-    @staticmethod
-    def _parse_basic_float_str(float_str: Optional[str]) -> Optional[float]:
-        """Parse string representation of float such as '0.25'."""
-        try:
-            return None if float_str is None else float(float_str)
-        except ValueError:
-            return None
-
     def _parse_ap_str(self, ap_str: Optional[str]) -> Optional[Decimal]:
         """Parse AP String."""
         if ap_str is not None:
@@ -230,12 +222,6 @@ class MappedNSBList:
                 return None
         else:
             return None
-
-    # @staticmethod
-    # def _parse_virus_strain_str(_: Optional[str]) -> Optional[str]:
-    #     """Parse virus strain strings"""
-    #     # TODO: Figure out how to parse virus strain fields
-    #     return None
 
     def _parse_inj_vol_str(self, vol_str: Optional[str]) -> Optional[Decimal]:
         """Parse injection volume strings"""
@@ -409,16 +395,6 @@ class MappedNSBList:
             }.get(self._nsb.hemisphere2nd_inj, None)
         )
 
-    # @property
-    # def aind_hp_a_p(self) -> Optional[Decimal]:
-    #     """Maps hp_a_p to aind model"""
-    #     return self._parse_ap_str(self._nsb.hp_x0020_a_x002f_p)
-
-    # @property
-    # def aind_hp_diameter(self) -> Optional[str]:
-    #     """Maps hp_diameter to aind model"""
-    #     return self._nsb.hp_x0020_diameter
-
     @property
     def aind_hp_durotomy(self) -> Optional[bool]:
         """Maps hp_durotomy to aind model"""
@@ -464,11 +440,6 @@ class MappedNSBList:
                 self._nsb.hp_loc.RIGHT: AnatomicalRelative.RIGHT,
             }.get(self._nsb.hp_loc, None)
         )
-
-    # @property
-    # def aind_hp_m_l(self) -> Optional[Decimal]:
-    #     """Maps hp_m_l to aind model"""
-    #     return self._parse_ml_str(self._nsb.hp_x0020_m_x002f_l)
 
     @property
     def aind_hp_work_station(self) -> Optional[str]:
@@ -621,11 +592,6 @@ class MappedNSBList:
             }.get(self._nsb.inj1_type, None)
         )
 
-    # @property
-    # def aind_inj1_virus_strain_rt(self) -> Optional[str]:
-    #     """Maps inj1_virus_strain_rt to aind model"""
-    #     return self._parse_virus_strain_str(self._nsb.inj1_virus_strain_rt)
-
     @property
     def aind_inj1_vol(self) -> Optional[List[Decimal]]:
         """Maps inj1_vol to aind model"""
@@ -695,11 +661,6 @@ class MappedNSBList:
                 self._nsb.inj2_type.NANOJECT_PRESSURE: InjectionType.NANOJECT,
             }.get(self._nsb.inj2_type, None)
         )
-
-    # @property
-    # def aind_inj2_virus_strain_rt(self) -> Optional[str]:
-    #     """Maps inj2_virus_strain_rt to aind model"""
-    #     return self._parse_virus_strain_str(self._nsb.inj2_virus_strain_rt)
 
     @property
     def aind_inj2_vol(self) -> Optional[List[Decimal]]:

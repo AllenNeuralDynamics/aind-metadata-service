@@ -72,6 +72,159 @@ class TestLAS2020BasicMapping(TestCase):
         self.assertEqual(self.mapper.aind_req_pro2, LASProcedure.DOSING)
         self.assertIsNone(self.mapper.aind_req_pro3)
 
+    def test_map_injectable_materials_all_fields_all_suffixes(self):
+        """
+        Test all material numbers (1-5) with all suffixes
+        ('', 'b', 'c', 'd') for injectable materials
+        """
+        suffixes = ["", "b", "c", "d"]
+
+        for material_num in range(1, 6):
+            with self.subTest(material_num=material_num):
+                test_data = {
+                    "FileSystemObjectType": 0,
+                    "Id": material_num,
+                }
+
+                for suffix in suffixes:
+                    suffix_label = suffix if suffix else "no_suffix"
+                    test_data[f"roSub{material_num}{suffix}"] = (
+                        f"AAV-{material_num}{suffix_label}"
+                    )
+                    test_data[f"roLot{material_num}{suffix}"] = (
+                        f"LOT-{material_num}{suffix_label}"
+                    )
+                    test_data[f"roGC{material_num}{suffix}"] = (
+                        f"{material_num}e13"
+                    )
+                    test_data[f"roTite{material_num}{suffix}"] = (
+                        f"{material_num}e12"
+                    )
+                    test_data[f"roVolV{material_num}{suffix}"] = (
+                        f"{material_num * 100}"
+                    )
+
+                las_model = Las2020List.model_validate(test_data)
+                mapper = MappedLASList(las=las_model)
+
+                materials = mapper._map_injectable_materials(
+                    material_num=material_num
+                )
+
+                self.assertEqual(len(materials), 4)
+                for idx, suffix in enumerate(suffixes):
+                    suffix_label = suffix if suffix else "no_suffix"
+                    with self.subTest(suffix=suffix):
+                        self.assertEqual(
+                            materials[idx].substance,
+                            f"AAV-{material_num}{suffix_label}",
+                        )
+                        self.assertEqual(
+                            materials[idx].prep_lot_id,
+                            f"LOT-{material_num}{suffix_label}",
+                        )
+                        self.assertEqual(
+                            materials[idx].genome_copy, f"{material_num}e13"
+                        )
+                        self.assertEqual(
+                            materials[idx].titer, f"{material_num}e12"
+                        )
+                        self.assertEqual(
+                            materials[idx].virus_volume,
+                            Decimal(str(material_num * 100)),
+                        )
+
+    def test_map_injectable_materials_property_mappings(self):
+        """Test that all aind_ro_* properties correctly map to _las fields"""
+        material_nums = range(1, 6)
+        suffixes = ["", "b", "c", "d"]
+
+        for material_num in material_nums:
+            for suffix in suffixes:
+                with self.subTest(material_num=material_num, suffix=suffix):
+                    test_data = {
+                        "FileSystemObjectType": 0,
+                        "Id": 100 + material_num,
+                    }
+                    test_values = {
+                        "Sub": f"Test-Sub-{material_num}{suffix}",
+                        "Lot": f"Test-Lot-{material_num}{suffix}",
+                        "GC": f"Test-GC-{material_num}{suffix}",
+                        "Tite": f"Test-Tite-{material_num}{suffix}",
+                        "VolV": f"{material_num}{len(suffix)}",
+                    }
+
+                    for field_key, field_value in test_values.items():
+                        las_field = f"ro{field_key}{material_num}{suffix}"
+                        test_data[las_field] = field_value
+
+                    las_model = Las2020List.model_validate(test_data)
+                    mapper = MappedLASList(las=las_model)
+
+                    for field_key in test_values.keys():
+                        aind_property = (
+                            f"aind_ro_{field_key.lower()}{material_num}"
+                            f"{suffix}"
+                        )
+
+                        if hasattr(mapper, aind_property):
+                            actual_value = getattr(mapper, aind_property)
+                            expected_value = test_values[field_key]
+                            self.assertEqual(
+                                actual_value,
+                                expected_value,
+                                f"Property {aind_property} mismatch",
+                            )
+
+    def test_map_injectable_materials_complete_matrix(self):
+        """Generate a matrix testing every field exists and maps correctly"""
+        material_nums = range(1, 6)
+        suffixes = ["", "b", "c", "d"]
+        fields = [
+            "Sub",
+            "Lot",
+            "GC",
+            "Tite",
+            "Vol_v",
+        ]
+        for material_num in material_nums:
+            for suffix in suffixes:
+                for field in fields:
+                    with self.subTest(
+                        material_num=material_num, suffix=suffix, field=field
+                    ):
+                        test_data = {
+                            "FileSystemObjectType": 0,
+                            "Id": 300,
+                        }
+
+                        las_field = f"ro{field}{material_num}{suffix}"
+                        test_value = (
+                            f"test_{field}_{material_num}_{suffix}"
+                            if field != "Vol_v"
+                            else "123.45"
+                        )
+                        test_data[las_field] = test_value
+                        if field != "Sub":
+                            test_data[f"roSub{material_num}{suffix}"] = (
+                                "AAV-Test"
+                            )
+
+                        las_model = Las2020List.model_validate(test_data)
+                        mapper = MappedLASList(las=las_model)
+
+                        aind_property = (
+                            f"aind_ro_{field.lower()}{material_num}{suffix}"
+                        )
+                        self.assertTrue(
+                            hasattr(mapper, aind_property),
+                            f"Property {aind_property} does not exist",
+                        )
+                        materials = mapper._map_injectable_materials(
+                            material_num=material_num
+                        )
+                        self.assertEqual(len(materials), 1)
+
 
 class TestLAS2020IPInjectionMapping(TestCase):
     """Tests intraperitoneal injection procedure mapping"""
@@ -159,285 +312,6 @@ class TestLAS2020IPInjectionMapping(TestCase):
         self.assertEqual(
             ip_injection.targeted_structure, InjectionTargets.INTRAPERITONEAL
         )
-
-
-class TestLAS2020InjectableMaterialsMapping(TestCase):
-    """Tests _map_injectable_materials method with systematic field coverage"""
-
-    def test_map_injectable_materials_all_fields_all_suffixes(self):
-        """Test all material numbers (1-5) with all suffixes ('', 'b', 'c', 'd') systematically"""
-        field_types = ["Sub", "Lot", "GC", "Tite", "VolV"]
-        suffixes = ["", "b", "c", "d"]
-
-        for material_num in range(1, 6):
-            with self.subTest(material_num=material_num):
-                # Build test data with all fields for this material number and all suffixes
-                test_data = {
-                    "FileSystemObjectType": 0,
-                    "Id": material_num,
-                }
-
-                # Add all field combinations for all suffixes
-                for suffix in suffixes:
-                    suffix_label = suffix if suffix else "no_suffix"
-                    test_data[f"roSub{material_num}{suffix}"] = (
-                        f"AAV-{material_num}{suffix_label}"
-                    )
-                    test_data[f"roLot{material_num}{suffix}"] = (
-                        f"LOT-{material_num}{suffix_label}"
-                    )
-                    test_data[f"roGC{material_num}{suffix}"] = (
-                        f"{material_num}e13"
-                    )
-                    test_data[f"roTite{material_num}{suffix}"] = (
-                        f"{material_num}e12"
-                    )
-                    test_data[f"roVolV{material_num}{suffix}"] = (
-                        f"{material_num * 100}"
-                    )
-
-                las_model = Las2020List.model_validate(test_data)
-                mapper = MappedLASList(las=las_model)
-
-                materials = mapper._map_injectable_materials(
-                    material_num=material_num
-                )
-
-                # Should have 4 materials (one for each suffix)
-                self.assertEqual(len(materials), 4)
-
-                # Verify each material has correct data
-                for idx, suffix in enumerate(suffixes):
-                    suffix_label = suffix if suffix else "no_suffix"
-                    with self.subTest(suffix=suffix):
-                        self.assertEqual(
-                            materials[idx].substance,
-                            f"AAV-{material_num}{suffix_label}",
-                        )
-                        self.assertEqual(
-                            materials[idx].prep_lot_id,
-                            f"LOT-{material_num}{suffix_label}",
-                        )
-                        self.assertEqual(
-                            materials[idx].genome_copy, f"{material_num}e13"
-                        )
-                        self.assertEqual(
-                            materials[idx].titer, f"{material_num}e12"
-                        )
-                        self.assertEqual(
-                            materials[idx].virus_volume,
-                            Decimal(str(material_num * 100)),
-                        )
-
-    def test_map_injectable_materials_property_mappings(self):
-        """Test that all aind_ro_* properties correctly map to _las fields"""
-        material_nums = range(1, 6)
-        suffixes = ["", "b", "c", "d"]
-
-        for material_num in material_nums:
-            for suffix in suffixes:
-                with self.subTest(material_num=material_num, suffix=suffix):
-                    test_data = {
-                        "FileSystemObjectType": 0,
-                        "Id": 100 + material_num,
-                    }
-
-                    # Set raw LAS field values
-                    test_values = {
-                        "Sub": f"Test-Sub-{material_num}{suffix}",
-                        "Lot": f"Test-Lot-{material_num}{suffix}",
-                        "GC": f"Test-GC-{material_num}{suffix}",
-                        "Tite": f"Test-Tite-{material_num}{suffix}",
-                        "VolV": f"{material_num}{len(suffix)}",  # unique numeric value
-                    }
-
-                    for field_key, field_value in test_values.items():
-                        # Construct LAS field name: roSub1, roLot1b, roVol_v1c, etc.
-                        las_field = f"ro{field_key}{material_num}{suffix}"
-                        test_data[las_field] = field_value
-
-                    las_model = Las2020List.model_validate(test_data)
-                    mapper = MappedLASList(las=las_model)
-
-                    # Check property mappings
-                    for field_key in test_values.keys():
-                        # Property name matches field_key but lowercase
-                        aind_property = f"aind_ro_{field_key.lower()}{material_num}{suffix}"
-
-                        if hasattr(mapper, aind_property):
-                            actual_value = getattr(mapper, aind_property)
-                            expected_value = test_values[field_key]
-                            self.assertEqual(
-                                actual_value,
-                                expected_value,
-                                f"Property {aind_property} mismatch",
-                            )
-
-    def test_map_injectable_materials_sparse_data(self):
-        """Test with sparse data - random combinations of fields present"""
-        import random
-
-        suffixes = ["", "b", "c", "d"]
-
-        for material_num in range(1, 6):
-            with self.subTest(material_num=material_num):
-                test_data = {
-                    "FileSystemObjectType": 0,
-                    "Id": 200 + material_num,
-                }
-
-                # Randomly decide which suffixes to include (at least one)
-                included_suffixes = random.sample(
-                    suffixes, k=random.randint(1, 4)
-                )
-
-                expected_material_count = 0
-                for suffix in included_suffixes:
-                    # Always include Sub (required for material to be created)
-                    test_data[f"roSub{material_num}{suffix}"] = (
-                        f"AAV-{material_num}{suffix}"
-                    )
-                    expected_material_count += 1
-
-                    # Randomly include other fields
-                    if random.choice([True, False]):
-                        test_data[f"roLot{material_num}{suffix}"] = (
-                            f"LOT-{material_num}{suffix}"
-                        )
-                    if random.choice([True, False]):
-                        test_data[f"roGC{material_num}{suffix}"] = (
-                            f"{material_num}e13"
-                        )
-                    if random.choice([True, False]):
-                        test_data[f"roTite{material_num}{suffix}"] = (
-                            f"{material_num}e12"
-                        )
-                    if random.choice([True, False]):
-                        test_data[f"roVolV{material_num}{suffix}"] = (
-                            f"{material_num * 50}"
-                        )
-
-                las_model = Las2020List.model_validate(test_data)
-                mapper = MappedLASList(las=las_model)
-
-                materials = mapper._map_injectable_materials(
-                    material_num=material_num
-                )
-
-                self.assertEqual(
-                    len(materials),
-                    expected_material_count,
-                    f"Expected {expected_material_count} materials for included suffixes {included_suffixes}",
-                )
-
-                # Verify all materials have substance (required field)
-                for material in materials:
-                    self.assertIsNotNone(material.substance)
-
-    def test_map_injectable_materials_complete_coverage_matrix(self):
-        """Generate a coverage matrix testing every field exists and maps correctly"""
-        material_nums = range(1, 6)
-        suffixes = ["", "b", "c", "d"]
-        fields = [
-            "Sub",
-            "Lot",
-            "GC",
-            "Tite",
-            "Vol_v",
-        ]  # Changed from 'VolV' to 'Vol_v'
-
-        # Test that every combination can be accessed
-        for material_num in material_nums:
-            for suffix in suffixes:
-                for field in fields:
-                    with self.subTest(
-                        material_num=material_num, suffix=suffix, field=field
-                    ):
-                        test_data = {
-                            "FileSystemObjectType": 0,
-                            "Id": 300,
-                        }
-
-                        las_field = f"ro{field}{material_num}{suffix}"
-                        test_value = (
-                            f"test_{field}_{material_num}_{suffix}"
-                            if field != "Vol_v"
-                            else "123.45"
-                        )
-                        test_data[las_field] = test_value
-
-                        # Must have Sub for material to be created
-                        if field != "Sub":
-                            test_data[f"roSub{material_num}{suffix}"] = (
-                                "AAV-Test"
-                            )
-
-                        las_model = Las2020List.model_validate(test_data)
-                        mapper = MappedLASList(las=las_model)
-
-                        # Verify property exists and is accessible
-                        aind_property = (
-                            f"aind_ro_{field.lower()}{material_num}{suffix}"
-                        )
-                        self.assertTrue(
-                            hasattr(mapper, aind_property),
-                            f"Property {aind_property} does not exist",
-                        )
-
-                        # Verify through _map_injectable_materials
-                        materials = mapper._map_injectable_materials(
-                            material_num=material_num
-                        )
-                        self.assertEqual(len(materials), 1)
-
-    def test_map_injectable_materials_only_substance_all_combinations(self):
-        """Test that material is created with only substance for all combinations"""
-        for material_num in range(1, 6):
-            for suffix in ["", "b", "c", "d"]:
-                with self.subTest(material_num=material_num, suffix=suffix):
-                    test_data = {
-                        "FileSystemObjectType": 0,
-                        "Id": 400 + material_num,
-                        f"roSub{material_num}{suffix}": f"AAV-Only-{material_num}{suffix}",
-                    }
-
-                    las_model = Las2020List.model_validate(test_data)
-                    mapper = MappedLASList(las=las_model)
-
-                    materials = mapper._map_injectable_materials(
-                        material_num=material_num
-                    )
-
-                    self.assertEqual(len(materials), 1)
-                    self.assertEqual(
-                        materials[0].substance,
-                        f"AAV-Only-{material_num}{suffix}",
-                    )
-                    self.assertIsNone(materials[0].prep_lot_id)
-                    self.assertIsNone(materials[0].genome_copy)
-                    self.assertIsNone(materials[0].titer)
-                    self.assertIsNone(materials[0].virus_volume)
-
-    def test_map_injectable_materials_no_materials_all_numbers(self):
-        """Test that no materials are created when substance is missing for all material numbers"""
-        for material_num in range(1, 6):
-            with self.subTest(material_num=material_num):
-                test_data = {
-                    "FileSystemObjectType": 0,
-                    "Id": 500 + material_num,
-                    # No roSub fields - materials shouldn't be created
-                    f"roLot{material_num}": "LOT-NoSub",
-                    f"roGC{material_num}": "1e13",
-                }
-
-                las_model = Las2020List.model_validate(test_data)
-                mapper = MappedLASList(las=las_model)
-
-                materials = mapper._map_injectable_materials(
-                    material_num=material_num
-                )
-
-                self.assertEqual(len(materials), 0)
 
 
 class TestLAS2020RetroOrbitalInjectionMapping(TestCase):
@@ -641,10 +515,10 @@ class TestLAS2020SurgeryIntegration(TestCase):
         self.assertIsNotNone(surgery)
         self.assertIsNone(surgery.start_date)
 
-    def test_get_surgery_ip_injection_validation_error_no_volume_or_current(
+    def test_get_surgery_ip_injection_validation_error(
         self,
     ):
-        """Test IP injection when InjectionDynamics validation fails (no volume or current)"""
+        """Test IP injection when InjectionDynamics validation fails"""
         test_data = {
             "FileSystemObjectType": 0,
             "Id": 100,
@@ -665,7 +539,7 @@ class TestLAS2020SurgeryIntegration(TestCase):
         ip_injection = surgery.procedures[0]
         self.assertIsNone(ip_injection.dynamics[0].volume)
 
-    def test_get_surgery_ro_injection_validation_error_no_volume_or_current(
+    def test_get_surgery_ro_injection_validation_error(
         self,
     ):
         """Test RO injection when InjectionDynamics validation fails"""
@@ -678,22 +552,19 @@ class TestLAS2020SurgeryIntegration(TestCase):
             "ReqPro1": "Retro-Orbital Injection",
             "nROID1": "123456",
             "roEye1": "Behind Right",
-            # Missing roVol1 - will cause validation error
             "roSub1": "AAV-Test",
         }
         las_model = Las2020List.model_validate(test_data)
         mapper = MappedLASList(las=las_model)
 
         surgery = mapper.get_surgery(subject_id="123456")
-
-        # Should still create surgery using model_construct
         self.assertIsNotNone(surgery)
         self.assertEqual(len(surgery.procedures), 1)
         ro_injection = surgery.procedures[0]
         self.assertIsNone(ro_injection.dynamics[0].volume)
 
     def test_get_surgery_injection_validation_error_empty_materials(self):
-        """Test injection with empty injection_materials (min_length=1 requirement)"""
+        """Test injection with empty injection_materials"""
         test_data = {
             "FileSystemObjectType": 0,
             "Id": 102,
