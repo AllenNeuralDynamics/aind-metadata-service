@@ -41,7 +41,6 @@ from aind_data_schema_models.units import (
 )
 from aind_sharepoint_service_async_client.models import (
     NSB2019List,
-    NSB2019Procedure,
 )
 from pydantic import ValidationError
 
@@ -88,7 +87,7 @@ class MappedNSBList:
     LENGTH_OF_TIME_REGEX = re.compile(
         r"^ *(\d*\.?\d+) *(?:m|min|mins|minute|minutes)+ *$"
     )
-    VOLUME_REGEX = re.compile(r"^ *(\d*\.?\d+) *(?:nl|nL)+ *$")
+    VOLUME_REGEX = re.compile(r"^ *(\d*\.?\d+) *(?:nl|nL)* *$")
 
     def __init__(self, nsb: NSB2019List):
         """Class constructor"""
@@ -100,14 +99,6 @@ class MappedNSBList:
         try:
             return None if value is None else Decimal(value)
         except (ValueError, DecimalException):
-            return None
-
-    @staticmethod
-    def _parse_basic_float_str(float_str: Optional[str]) -> Optional[float]:
-        """Parse string representation of float such as '0.25'."""
-        try:
-            return None if float_str is None else float(float_str)
-        except ValueError:
             return None
 
     def _parse_ap_str(self, ap_str: Optional[str]) -> Optional[Decimal]:
@@ -232,12 +223,6 @@ class MappedNSBList:
         else:
             return None
 
-    @staticmethod
-    def _parse_virus_strain_str(_: Optional[str]) -> Optional[str]:
-        """Parse virus strain strings"""
-        # TODO: Figure out how to parse virus strain fields
-        return None
-
     def _parse_inj_vol_str(self, vol_str: Optional[str]) -> Optional[Decimal]:
         """Parse injection volume strings"""
         if vol_str is not None:
@@ -253,11 +238,6 @@ class MappedNSBList:
     def _parse_datetime_to_date(dt: Optional[datetime]) -> Optional[date]:
         """Parse date from datetime"""
         return None if dt is None else dt.date()
-
-    @property
-    def aind_age_at_injection(self) -> Optional[str]:
-        """Maps age_at_injection to aind model"""
-        return self._nsb.age_x0020_at_x0020_injection
 
     @property
     def aind_ap2nd_inj(self) -> Optional[Decimal]:
@@ -335,12 +315,6 @@ class MappedNSBList:
     def aind_fiber_implant2_dv(self) -> Optional[Decimal]:
         """Maps fiber_implant2_dv to aind model"""
         return self._parse_dv_str(self._nsb.fiber_implant2_dv)
-
-    @property
-    def aind_first_inj_recovery(self) -> Optional[Decimal]:
-        """Maps first_inj_recovery to aind model"""
-        opt_float = self._nsb.first_inj_recovery
-        return None if opt_float is None else Decimal(opt_float)
 
     @property
     def aind_first_injection_iso_durat(self) -> Optional[Decimal]:
@@ -422,16 +396,6 @@ class MappedNSBList:
         )
 
     @property
-    def aind_hp_a_p(self) -> Optional[Decimal]:
-        """Maps hp_a_p to aind model"""
-        return self._parse_ap_str(self._nsb.hp_x0020_a_x002f_p)
-
-    @property
-    def aind_hp_diameter(self) -> Optional[str]:
-        """Maps hp_diameter to aind model"""
-        return self._nsb.hp_x0020_diameter
-
-    @property
     def aind_hp_durotomy(self) -> Optional[bool]:
         """Maps hp_durotomy to aind model"""
         return {
@@ -439,16 +403,6 @@ class MappedNSBList:
             self._nsb.hp_durotomy.YES: True,
             self._nsb.hp_durotomy.NO: False,
         }.get(self._nsb.hp_durotomy, None)
-
-    @property
-    def aind_hp_inj(self) -> Optional[bool]:
-        """Maps hp_inj to aind model"""
-        return (
-            True
-            if self._nsb.hp_x0020__x0026__x0020_inj is not None
-            and self._nsb.hp_x0020__x0026__x0020_inj == "Yes"
-            else False
-        )
 
     @property
     def aind_hp_iso_level(self) -> Optional[Decimal]:
@@ -486,17 +440,6 @@ class MappedNSBList:
                 self._nsb.hp_loc.RIGHT: AnatomicalRelative.RIGHT,
             }.get(self._nsb.hp_loc, None)
         )
-
-    @property
-    def aind_hp_m_l(self) -> Optional[Decimal]:
-        """Maps hp_m_l to aind model"""
-        return self._parse_ml_str(self._nsb.hp_x0020_m_x002f_l)
-
-    @property
-    def aind_hp_recovery(self) -> Optional[float]:
-        """Maps hp_recovery to aind model"""
-        opt_float = self._nsb.hp_recovery
-        return None if opt_float is None else Decimal(self._nsb.hp_recovery)
 
     @property
     def aind_hp_work_station(self) -> Optional[str]:
@@ -650,11 +593,6 @@ class MappedNSBList:
         )
 
     @property
-    def aind_inj1_virus_strain_rt(self) -> Optional[str]:
-        """Maps inj1_virus_strain_rt to aind model"""
-        return self._parse_virus_strain_str(self._nsb.inj1_virus_strain_rt)
-
-    @property
     def aind_inj1_vol(self) -> Optional[List[Decimal]]:
         """Maps inj1_vol to aind model"""
         vol = self._parse_inj_vol_str(self._nsb.inj1_vol)
@@ -676,12 +614,6 @@ class MappedNSBList:
                 self._nsb.inj1angle0.N_40_DEGREES: Decimal(40),
             }.get(self._nsb.inj1angle0, None)
         )
-
-    @property
-    def aind_inj1volperdepth(self) -> Optional[List[Decimal]]:
-        """Maps inj1volperdepth to aind model"""
-        volperdepth = self._parse_inj_vol_str(self._nsb.inj1volperdepth)
-        return None if volperdepth is None else [volperdepth]
 
     @property
     def aind_inj2_alternating_time(self) -> Optional[str]:
@@ -718,11 +650,6 @@ class MappedNSBList:
         )
 
     @property
-    def aind_inj2_storage_location(self) -> Optional[str]:
-        """Maps inj2_storage_location to aind model"""
-        return self._nsb.inj2_storage_location
-
-    @property
     def aind_inj2_type(self) -> Optional[InjectionType]:
         """Maps inj2_type to aind model"""
         return (
@@ -734,11 +661,6 @@ class MappedNSBList:
                 self._nsb.inj2_type.NANOJECT_PRESSURE: InjectionType.NANOJECT,
             }.get(self._nsb.inj2_type, None)
         )
-
-    @property
-    def aind_inj2_virus_strain_rt(self) -> Optional[str]:
-        """Maps inj2_virus_strain_rt to aind model"""
-        return self._parse_virus_strain_str(self._nsb.inj2_virus_strain_rt)
 
     @property
     def aind_inj2_vol(self) -> Optional[List[Decimal]]:
@@ -764,218 +686,9 @@ class MappedNSBList:
         )
 
     @property
-    def aind_inj2volperdepth(self) -> Optional[List[Decimal]]:
-        """Maps inj2volperdepth to aind model"""
-        volperdepth = self._parse_inj_vol_str(self._nsb.inj2volperdepth)
-        return None if volperdepth is None else [volperdepth]
-
-    @property
-    def aind_ionto_number_hpinj(self) -> Optional[str]:
-        """Maps ionto_number_hpinj to aind model"""
-        return (
-            None
-            if self._nsb.ionto_number_hpinj is None
-            else {
-                self._nsb.ionto_number_hpinj.IONTO_1: (
-                    self._nsb.ionto_number_hpinj.IONTO_1.value
-                ),
-                self._nsb.ionto_number_hpinj.IONTO_2: (
-                    self._nsb.ionto_number_hpinj.IONTO_2.value
-                ),
-                self._nsb.ionto_number_hpinj.IONTO_3: (
-                    self._nsb.ionto_number_hpinj.IONTO_3.value
-                ),
-                self._nsb.ionto_number_hpinj.IONTO_4: (
-                    self._nsb.ionto_number_hpinj.IONTO_4.value
-                ),
-                self._nsb.ionto_number_hpinj.IONTO_5: (
-                    self._nsb.ionto_number_hpinj.IONTO_5.value
-                ),
-                self._nsb.ionto_number_hpinj.IONTO_6: (
-                    self._nsb.ionto_number_hpinj.IONTO_6.value
-                ),
-                self._nsb.ionto_number_hpinj.IONTO_7: (
-                    self._nsb.ionto_number_hpinj.IONTO_7.value
-                ),
-                self._nsb.ionto_number_hpinj.IONTO_8: (
-                    self._nsb.ionto_number_hpinj.IONTO_8.value
-                ),
-                self._nsb.ionto_number_hpinj.IONTO_9: (
-                    self._nsb.ionto_number_hpinj.IONTO_9.value
-                ),
-            }.get(self._nsb.ionto_number_hpinj, None)
-        )
-
-    @property
-    def aind_ionto_number_inj1(self) -> Optional[str]:
-        """Maps ionto_number_inj1 to aind model"""
-        return (
-            None
-            if self._nsb.ionto_number_inj1 is None
-            else {
-                self._nsb.ionto_number_inj1.SELECT: None,
-                self._nsb.ionto_number_inj1.IONTO_1: (
-                    self._nsb.ionto_number_inj1.IONTO_1.value
-                ),
-                self._nsb.ionto_number_inj1.IONTO_2: (
-                    self._nsb.ionto_number_inj1.IONTO_2.value
-                ),
-                self._nsb.ionto_number_inj1.IONTO_3: (
-                    self._nsb.ionto_number_inj1.IONTO_3.value
-                ),
-                self._nsb.ionto_number_inj1.IONTO_4: (
-                    self._nsb.ionto_number_inj1.IONTO_4.value
-                ),
-                self._nsb.ionto_number_inj1.IONTO_5: (
-                    self._nsb.ionto_number_inj1.IONTO_5.value
-                ),
-                self._nsb.ionto_number_inj1.IONTO_6: (
-                    self._nsb.ionto_number_inj1.IONTO_6.value
-                ),
-                self._nsb.ionto_number_inj1.IONTO_7: (
-                    self._nsb.ionto_number_inj1.IONTO_7.value
-                ),
-                self._nsb.ionto_number_inj1.IONTO_8: (
-                    self._nsb.ionto_number_inj1.IONTO_8.value
-                ),
-                self._nsb.ionto_number_inj1.IONTO_9: (
-                    self._nsb.ionto_number_inj1.IONTO_9.value
-                ),
-                self._nsb.ionto_number_inj1.IONTO_10: (
-                    self._nsb.ionto_number_inj1.IONTO_10.value
-                ),
-                self._nsb.ionto_number_inj1.NA: None,
-            }.get(self._nsb.ionto_number_inj1, None)
-        )
-
-    @property
-    def aind_ionto_number_inj2(self) -> Optional[str]:
-        """Maps ionto_number_inj2 to aind model"""
-        return (
-            None
-            if self._nsb.ionto_number_inj2 is None
-            else {
-                self._nsb.ionto_number_inj2.SELECT: None,
-                self._nsb.ionto_number_inj2.IONTO_1: (
-                    self._nsb.ionto_number_inj2.IONTO_1.value
-                ),
-                self._nsb.ionto_number_inj2.IONTO_2: (
-                    self._nsb.ionto_number_inj2.IONTO_2.value
-                ),
-                self._nsb.ionto_number_inj2.IONTO_3: (
-                    self._nsb.ionto_number_inj2.IONTO_3.value
-                ),
-                self._nsb.ionto_number_inj2.IONTO_4: (
-                    self._nsb.ionto_number_inj2.IONTO_4.value
-                ),
-                self._nsb.ionto_number_inj2.IONTO_5: (
-                    self._nsb.ionto_number_inj2.IONTO_5.value
-                ),
-                self._nsb.ionto_number_inj2.IONTO_6: (
-                    self._nsb.ionto_number_inj2.IONTO_6.value
-                ),
-                self._nsb.ionto_number_inj2.IONTO_7: (
-                    self._nsb.ionto_number_inj2.IONTO_7.value
-                ),
-                self._nsb.ionto_number_inj2.IONTO_8: (
-                    self._nsb.ionto_number_inj2.IONTO_8.value
-                ),
-                self._nsb.ionto_number_inj2.IONTO_9: (
-                    self._nsb.ionto_number_inj2.IONTO_9.value
-                ),
-                self._nsb.ionto_number_inj2.IONTO_10: (
-                    self._nsb.ionto_number_inj2.IONTO_10.value
-                ),
-                self._nsb.ionto_number_inj2.NA: None,
-            }.get(self._nsb.ionto_number_inj2, None)
-        )
-
-    @property
-    def aind_lab_tracks_id(self) -> Optional[str]:
-        """Maps lab_tracks_id to aind model"""
-        return self._nsb.lab_tracks_x0020_id
-
-    @property
     def aind_ml2nd_inj(self) -> Optional[Decimal]:
         """Maps ml2nd_inj to aind model"""
         return self._parse_ml_str(self._nsb.ml2nd_inj)
-
-    @property
-    def aind_nanoject_number_inj10(self) -> Optional[str]:
-        """Maps nanoject_number_inj10 to aind model"""
-        return (
-            None
-            if self._nsb.nanoject_number_inj10 is None
-            else {
-                self._nsb.nanoject_number_inj10.SELECT: None,
-                self._nsb.nanoject_number_inj10.NJ1: (
-                    self._nsb.nanoject_number_inj10.NJ1.value
-                ),
-                self._nsb.nanoject_number_inj10.NJ2: (
-                    self._nsb.nanoject_number_inj10.NJ2.value
-                ),
-                self._nsb.nanoject_number_inj10.NJ3: (
-                    self._nsb.nanoject_number_inj10.NJ3.value
-                ),
-                self._nsb.nanoject_number_inj10.NJ4: (
-                    self._nsb.nanoject_number_inj10.NJ4.value
-                ),
-                self._nsb.nanoject_number_inj10.NJ5: (
-                    self._nsb.nanoject_number_inj10.NJ5.value
-                ),
-                self._nsb.nanoject_number_inj10.NJ6: (
-                    self._nsb.nanoject_number_inj10.NJ6.value
-                ),
-                self._nsb.nanoject_number_inj10.NJ7: (
-                    self._nsb.nanoject_number_inj10.NJ7.value
-                ),
-                self._nsb.nanoject_number_inj10.NJ8: (
-                    self._nsb.nanoject_number_inj10.NJ8.value
-                ),
-                self._nsb.nanoject_number_inj10.NA: None,
-            }.get(self._nsb.nanoject_number_inj10, None)
-        )
-
-    @property
-    def aind_nanoject_number_inj2(self) -> Optional[str]:
-        """Maps nanoject_number_inj2 to aind model"""
-        return (
-            None
-            if self._nsb.nanoject_number_inj2 is None
-            else {
-                self._nsb.nanoject_number_inj2.SELECT: None,
-                self._nsb.nanoject_number_inj2.NJ1: (
-                    self._nsb.nanoject_number_inj2.NJ1
-                ),
-                self._nsb.nanoject_number_inj2.NJ2: (
-                    self._nsb.nanoject_number_inj2.NJ2
-                ),
-                self._nsb.nanoject_number_inj2.NJ3: (
-                    self._nsb.nanoject_number_inj2.NJ3
-                ),
-                self._nsb.nanoject_number_inj2.NJ4: (
-                    self._nsb.nanoject_number_inj2.NJ4
-                ),
-                self._nsb.nanoject_number_inj2.NJ5: (
-                    self._nsb.nanoject_number_inj2.NJ5
-                ),
-                self._nsb.nanoject_number_inj2.NJ6: (
-                    self._nsb.nanoject_number_inj2.NJ6
-                ),
-                self._nsb.nanoject_number_inj2.NJ7: (
-                    self._nsb.nanoject_number_inj2.NJ7
-                ),
-                self._nsb.nanoject_number_inj2.NJ8: (
-                    self._nsb.nanoject_number_inj2.NJ8
-                ),
-                self._nsb.nanoject_number_inj2.NA: None,
-            }.get(self._nsb.nanoject_number_inj2, None)
-        )
-
-    @property
-    def aind_procedure(self) -> Optional[NSB2019Procedure]:
-        """Maps procedure to aind model"""
-        return self._nsb.procedure
 
     @property
     def aind_round1_inj_isolevel(self) -> Optional[Decimal]:
@@ -1021,16 +734,6 @@ class MappedNSBList:
                 self._nsb.round2_inj_isolevel.N_275: Decimal(2.75),
                 self._nsb.round2_inj_isolevel.N_300: None,
             }.get(self._nsb.round2_inj_isolevel, None)
-        )
-
-    @property
-    def aind_second_inj_recover(self) -> Optional[Decimal]:
-        """Maps second_inj_recover to aind model"""
-        opt_float = self._nsb.second_inj_recover
-        return (
-            None
-            if opt_float is None
-            else Decimal(self._nsb.second_inj_recover)
         )
 
     @property
@@ -1191,7 +894,7 @@ class MappedNSBList:
             else {
                 self._nsb.craniotomy_type.VISUAL_CORTEX_5MM: (Decimal(5)),
                 self._nsb.craniotomy_type.FRONTAL_WINDOW_3MM: (Decimal(3)),
-            }.get(self.aind_craniotomy_type, None)
+            }.get(self._nsb.craniotomy_type, None)
         )
 
     @property
@@ -1342,9 +1045,9 @@ class MappedNSBList:
             )
 
         try:
-            return [InjectionDynamics(**dynamics_kwargs)]
+            return InjectionDynamics(**dynamics_kwargs)
         except ValidationError:
-            return [InjectionDynamics.model_construct(**dynamics_kwargs)]
+            return InjectionDynamics.model_construct(**dynamics_kwargs)
 
     @property
     def has_injection_procedure(self) -> bool:
