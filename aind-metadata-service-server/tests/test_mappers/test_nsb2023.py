@@ -9,12 +9,13 @@ from pathlib import Path
 from typing import Callable, List, Tuple
 from unittest import TestCase
 from unittest import main as unittest_main
-from aind_data_schema_models.brain_atlas import _BrainStructureModel
+
 from aind_data_schema.core.procedures import (
     BrainInjection,
     CraniotomyType,
     HeadframeMaterial,
 )
+from aind_data_schema_models.brain_atlas import _BrainStructureModel
 from aind_sharepoint_service_async_client.models.nsb2023_list import (
     NSB2023List,
 )

@@ -1,6 +1,7 @@
 """Module to handle subject endpoints"""
 
 import logging
+
 from fastapi import APIRouter, Depends, Path
 
 from aind_metadata_service_server.mappers.subject import SubjectMapper
@@ -55,7 +56,7 @@ async def get_subject(
                     f"Skipping allele {allele_name} search for {subject_id}"
                 )
                 api_response = await mgi_api_instance.get_allele_info(
-                    allele_name=allele_name, _request_timeout=10
+                    allele_name=allele_name, _request_timeout=90
                 )
                 mgi_info.extend(api_response)
             mapper.mgi_info = mgi_info
