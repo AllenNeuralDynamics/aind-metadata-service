@@ -26,8 +26,8 @@ from aind_data_schema.core.procedures import (
     ViralMaterial,
 )
 from aind_data_schema.core.subject import Sex
-from aind_data_schema_models.organizations import Organization
 from aind_data_schema_models.brain_atlas import CCFStructure
+from aind_data_schema_models.organizations import Organization
 from aind_sharepoint_service_async_client.models import (
     NSB2023IacucProtocol as IacucProtocol,
 )
