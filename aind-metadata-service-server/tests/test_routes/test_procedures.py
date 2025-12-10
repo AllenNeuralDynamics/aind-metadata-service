@@ -1,8 +1,6 @@
 """Tests procedures route"""
 
-import json
 from datetime import datetime
-from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -18,14 +16,6 @@ from aind_tars_service_async_client import (
     VirusData,
 )
 from fastapi.testclient import TestClient
-
-TEST_DIR = Path(__file__).parent / ".."
-EXAMPLE_NSB2019_JSON = (
-    TEST_DIR / "resources" / "nsb2019" / "raw" / "list_item1.json"
-)
-EXAMPLE_NSB2023_JSON = (
-    TEST_DIR / "resources" / "nsb2023" / "raw" / "list_item2.json"
-)
 
 
 class TestRoute:
@@ -113,8 +103,12 @@ class TestRoute:
         mock_las: AsyncMock,
         mock_labtracks: AsyncMock,
         client: TestClient,
+        recwarn: pytest.WarningsRecorder,
     ):
-        """Tests successful retrieval of procedures."""
+        """
+        Tests a procedures model is built as best as possible even with
+        missing data and verifies serialization warnings are issued.
+        """
         mock_labtracks.return_value = [
             LabTracksTask(
                 id="00000",
@@ -143,21 +137,71 @@ class TestRoute:
             )
         ]
         mock_get_viruses.return_value = []
-
-        with open(EXAMPLE_NSB2019_JSON) as f:
-            contents_nsb2019 = json.load(f)
-        with open(EXAMPLE_NSB2023_JSON) as f:
-            contents_nsb2023 = json.load(f)
         mock_nsb2019.return_value = [
-            NSB2019List.model_validate(contents_nsb2019)
+            NSB2019List(
+                # Basic surgery info
+                Date_x0020_of_x0020_Surgery="2022-12-06T08:00:00Z",
+                Weight_x0020_before_x0020_Surger="19.1",
+                Weight_x0020_after_x0020_Surgery="19.2",
+                HpWorkStation="SWS 3",
+                IACUC_x0020_Protocol_x0020__x002="2115",
+                HeadpostType="AI Straight Headbar",
+                CraniotomyType="Visual Cortex 5mm",
+                Procedure="HP+Injection+Optic Fiber Implant",
+                Virus_x0020_A_x002f_P="-1.6",
+                Virus_x0020_M_x002f_L="-3.3",
+                Virus_x0020_D_x002f_V="4.3",
+                Virus_x0020_Hemisphere="Left",
+                Inj1Type="Nanoject (Pressure)",
+                Inj1Vol="400",
+                Inj1LenghtofTime="5min",
+                Breg2Lamb="4.5",
+                Iso_x0020_On=1.5,
+                HPIsoLevel="2.00",
+                HPRecovery=25,
+                Date1stInjection="2022-12-06T08:00:00Z",
+                Burr_x0020_1_x0020_Injectable_x0="AAV-PHP.eB",
+                Burr_x0020_1_x0020_Injectable_x03="1.5e12",
+            )
         ]
         mock_nsb2023.return_value = [
-            NSB2023List.model_validate(contents_nsb2023)
+            NSB2023List(
+                Date_x0020_of_x0020_Surgery="2022-01-03T00:00:00Z",
+                Weight_x0020_before_x0020_Surger=25.2,
+                Weight_x0020_after_x0020_Surgery=28.2,
+                HpWorkStation="SWS 4",
+                IACUC_x0020_Protocol_x0020__x002="2103",
+                Headpost="Visual Ctx",
+                HeadpostType="Mesoscope",
+                Headpost_x0020_Perform_x0020_Dur="Initial Surgery",
+                CraniotomyType="5mm",
+                Craniotomy_x0020_Perform_x0020_D="Initial Surgery",
+                Procedure="Sx-01 Visual Ctx 2P",
+                Test1LookupId=2846,
+                Breg2Lamb=4.5,
+                Iso_x0020_On=1.5,
+                HPIsoLevel=2.0,
+                HPRecovery=25,
+                Burr_x0020_hole_x0020_1="Injection",
+                Burr1_x0020_Perform_x0020_During="Initial Surgery",
+                Virus_x0020_M_x002f_L=2.0,
+                Virus_x0020_A_x002f_P=-1.5,
+                Virus_x0020_D_x002f_V=3.0,
+                Virus_x0020_Hemisphere="Right",
+                Inj1Type="Nanoject (Pressure)",
+                inj1volperdepth=500.0,
+                Burr_x0020_1_x0020_Injectable_x0="230929-12",
+                Burr_x0020_1_x0020_Injectable_x03="1e12",
+                Inj1VirusStrain_rt='Premixed "dL+Cre"',
+            )
         ]
         mock_nsb_present.return_value = []
-
         response = client.get("api/v2/procedures/000000")
         assert response.status_code == 400
+        assert len(recwarn) == 1
+        w = recwarn.pop()
+        assert issubclass(w.category, UserWarning)
+        assert "Pydantic serializer warnings" in str(w.message)
 
     @patch("aind_labtracks_service_async_client.DefaultApi.get_tasks")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_las2020")
