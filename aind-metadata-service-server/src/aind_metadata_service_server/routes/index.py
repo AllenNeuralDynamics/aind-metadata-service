@@ -30,7 +30,7 @@ async def index(request: Request):
                     "REST service to retrieve metadata from AIND databases."
                 ),
                 "service_version": service_version,
-                "tools": [
+                "endpoints": [
                     {
                         "id": "subject",
                         "title": "Subject",

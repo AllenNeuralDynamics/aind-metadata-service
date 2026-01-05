@@ -95,9 +95,8 @@
   </div>
 
   <div class="main">
-    {# Preferred: grouped tools w/ version dropdown #}
-    {% if tools %}
-      {% for t in tools %}
+    {% if endpoints %}
+      {% for t in endpoints %}
         <div class="container">
           <div class="heading">{{ t.title or t.id|title }}</div>
           <p>{{ t.description }}</p>
