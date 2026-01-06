@@ -32,21 +32,33 @@ async def index(request: Request):
                 "service_version": service_version,
                 "endpoints": [
                     {
-                        "endpoint": "subject",
+                        "id": "subject",
+                        "title": "Subject",
                         "description": (
-                            "Retrieve subject metadata from Labtracks server"
+                            "Retrieve subject metadata from Labtracks server."
                         ),
                         "parameter": "subject_id",
                         "parameter_label": "Subject ID",
+                        "versions": [
+                            {"label": "V2", "endpoint": "api/v2/subject"},
+                            {"label": "V1", "endpoint": "subject"},
+                        ],
+                        "default_endpoint": "api/v2/subject",
                     },
                     {
-                        "endpoint": "procedures",
+                        "id": "procedures",
+                        "title": "Procedures",
                         "description": (
-                            "Retrieve procedures metadata from Labtracks and "
-                            "SharePoint servers"
+                            "Retrieve procedures metadata from Sharepoint, "
+                            "Labtracks, and other servers."
                         ),
                         "parameter": "subject_id",
                         "parameter_label": "Subject ID",
+                        "versions": [
+                            {"label": "V2", "endpoint": "api/v2/procedures"},
+                            {"label": "V1", "endpoint": "procedures"},
+                        ],
+                        "default_endpoint": "api/v2/procedures",
                     },
                 ],
             }

@@ -26,14 +26,10 @@
         div, input, button, label { border-radius: 6px; }
       }
     }
-    input {
+    input, select {
       padding: 8px 20px;
       border: 1px solid #5065df;
       background-color: #E8EAF6;
-      &:focus {
-        outline: none;
-        border-width: 2px;
-      }
     }
     button {
       margin: 20px 0px;
@@ -97,17 +93,38 @@
       {% if service_version %} Version {{ service_version }}{% endif %}
     </span>
   </div>
+
   <div class="main">
-    {% for e in endpoints if e.endpoint and e.parameter %}
+    {# Render tool boxes with V1/V2 dropdowns #}
+    {% for t in endpoints %}
       <div class="container">
-        <div class="heading">{{ e.endpoint|title }}
-        </div>
-        <p>{{ e.description }}</p>
-        <label for="param-id-{{ e.endpoint }}">{{ e.parameter_label or e.parameter }}:</label>
-        <input type="text" id="param-id-{{ e.endpoint }}" size="6" placeholder="{{ e.parameter }}" onkeydown="searchWithEnter('{{ e.endpoint }}')" />
-      <button id="search" type="button" class="primary" onclick="queryEndpoint('{{ e.endpoint }}')">Search</button>
-    </div>
+        <div class="heading">{{ t.title or t.id|title }}</div>
+        <p>{{ t.description }}</p>
+
+        <label for="version-id-{{ t.id }}">AIND Data Schema Version:</label>
+        <select id="version-id-{{ t.id }}">
+          {% for v in t.versions %}
+            <option
+              value="{{ v.endpoint }}"
+              {% if t.default_endpoint and v.endpoint == t.default_endpoint %}selected{% endif %}
+            >
+              {{ v.label }}
+            </option>
+          {% endfor %}
+        </select>
+
+        <label for="param-id-{{ t.id }}">{{ t.parameter_label or t.parameter }}:</label>
+        <input
+          type="text"
+          id="param-id-{{ t.id }}"
+          size="12"
+          placeholder="{{ t.parameter }}"
+          onkeydown="searchWithEnterTool('{{ t.id }}')"
+        />
+        <button type="button" class="primary" onclick="queryTool('{{ t.id }}')">Search</button>
+      </div>
     {% endfor %}
+
     <div>
       <div id="user-message"></div>
       <div id="response" class="container" hidden>
@@ -121,11 +138,49 @@
   </div>
 
   <script>
-    searchWithEnter = function (endpoint) {
-      if(event.key === 'Enter') {
-        queryEndpoint(endpoint);
+    endpointToId = function(endpoint) {
+      return (endpoint ?? "").replaceAll("/", "-").replaceAll(":", "-");
+    };
+
+    // v1 returns {message, data}; v2 returns the object directly.
+    normalizeResponse = function (response) {
+      if (response && typeof response === "object" && (("data" in response) || ("message" in response))) {
+        return {
+          message: response?.message ?? "",
+          data: ("data" in response) ? response.data : response
+        };
+      }
+      return { message: "", data: response };
+    };
+
+    safeStringify = function (value) {
+      try {
+        return JSON.stringify(value, null, 2);
+      } catch (e) {
+        return String(value);
       }
     };
+
+    getV2HeaderMessage = function (endpoint, xhr) {
+      if (!(endpoint ?? "").includes("api/v2/")) return "";
+      if (!xhr || typeof xhr.getResponseHeader !== "function") return "";
+
+      const raw = xhr.getResponseHeader("x-error-message") || "";
+      if (!raw) return "";
+
+      try {
+        return safeStringify(JSON.parse(raw));
+      } catch (e) {
+        return String(raw);
+      }
+    };
+
+    searchWithEnterTool = function (toolId) {
+      if (event.key === 'Enter') {
+        queryTool(toolId);
+      }
+    };
+
     displayPendingUI = function () {
       $("#user-message").removeClass("success error partialError").addClass("pending");
       $("#user-message").html("Searching.... Please do not refresh or re-submit.");
@@ -134,46 +189,62 @@
       }
       $("#response").hide();
     };
-    displayResponseUI = function (isError, response, statusCode, statusText) {
+    displayResponseUI = function (isError, response, statusCode, statusText, endpoint, xhr) {
+      const normalized = normalizeResponse(response);
+
+      const v2HeaderMessage = getV2HeaderMessage(endpoint, xhr);
+      const message = v2HeaderMessage || normalized.message || "";
+
       const responseText = {
         "user-message"    : `Search returned ${statusText} (Status ${statusCode}).`,
-        "response-message": response?.message,
-        "response-data"   : JSON.stringify(response?.data, null, 2),
-        "response-raw"    : JSON.stringify(response, null, 2)
-      }
-      if (statusCode === 406 || statusCode === 300){
-        $("#user-message").removeClass("pending error success").addClass("partialError")
+        "response-message": message,
+        "response-data"   : safeStringify(normalized.data),
+        "response-raw"    : safeStringify(response)
+      };
+
+      if (statusCode === 406 || statusCode === 300 || statusCode === 400){
+        $("#user-message").removeClass("pending error success").addClass("partialError");
       } else{
         $("#user-message").removeClass("pending").addClass(isError ? "error" : "success");
       }
+
       Object.keys(responseText).forEach((id) => {
-        $(`#${id}`).html(responseText[id]);
+        $(`#${id}`).html(responseText[id] ?? "");
       });
+
       $("#response").show();
     };
+
     toggleViewRawResponse = function () {
       $("#response-raw-div").toggle();
       const viewOrHide = $("#response-raw-div").is(":visible") ? "Hide" : "View";
       $("#toggle-raw").text(`${viewOrHide} raw response`);
     };
-    queryEndpoint = function (endpoint) {
-        let parameter = $(`#param-id-${endpoint}`).val();
-        $.ajax({
-        url: `/${endpoint}/${parameter}`,
+
+    queryTool = function(toolId) {
+      const endpoint = $(`#version-id-${toolId}`).val();
+      queryEndpoint(endpoint, toolId);
+    };
+
+    queryEndpoint = function (endpoint, endpointId) {
+      const safeId = endpointId ?? endpointToId(endpoint);
+      const parameter = $(`#param-id-${safeId}`).val();
+
+      const ep = (endpoint ?? "").replace(/^\/+/, "");
+      const url = `/${ep}/${encodeURIComponent(parameter ?? "")}`;
+
+      $.ajax({
+        url,
         type: "GET",
         beforeSend: function () {
           displayPendingUI();
         },
         success: function (data, status, xhr) {
-          displayResponseUI(false, data, xhr.status, xhr.statusText);
+          displayResponseUI(false, data, xhr.status, xhr.statusText, endpoint, xhr);
         },
-        error: function (data) {
-          displayResponseUI(
-            true,
-            data.responseJSON ?? data.responseText ?? data,
-            data.status,
-            data.statusText
-          );
+        error: function (xhr, textStatus, errorThrown) {
+          const body = xhr?.responseJSON ?? xhr?.responseText ?? { error: errorThrown ?? textStatus };
+          displayResponseUI(true, body, xhr?.status ?? 0, xhr?.statusText ?? textStatus, endpoint, xhr);
         }
       });
     };
