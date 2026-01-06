@@ -202,7 +202,7 @@
         "response-raw"    : safeStringify(response)
       };
 
-      if (statusCode === 406 || statusCode === 300){
+      if (statusCode === 406 || statusCode === 300 || statusCode === 400){
         $("#user-message").removeClass("pending error success").addClass("partialError");
       } else{
         $("#user-message").removeClass("pending").addClass(isError ? "error" : "success");
