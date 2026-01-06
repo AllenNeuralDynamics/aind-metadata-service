@@ -14,25 +14,20 @@
 
 import unittest
 
-from aind_metadata_service_client.api.healthcheck_api import HealthcheckApi
+from aind_metadata_service_client.models.slims_workflow import SlimsWorkflow
 
+class TestSlimsWorkflow(unittest.TestCase):
+    """SlimsWorkflow unit test stubs"""
 
-class TestHealthcheckApi(unittest.TestCase):
-    """HealthcheckApi unit test stubs"""
-
-    def setUp(self) -> None:
-        self.api = HealthcheckApi()
-
-    def tearDown(self) -> None:
+    def setUp(self):
         pass
 
-    def test_get_health(self) -> None:
-        """Test case for get_health
-
-        Perform a Health Check
-        """
+    def tearDown(self):
         pass
 
+    def testSlimsWorkflow(self):
+        """Test SlimsWorkflow"""
+        # inst = SlimsWorkflow()
 
 if __name__ == '__main__':
     unittest.main()
