@@ -24,6 +24,7 @@ class TestIntendedMeasurementMapper(unittest.TestCase):
 
     def setUp(self):
         """Set up test data for test methods"""
+
         with open(EXAMPLE_NSB2023_INTENDED_MEASUREMENTS) as f:
             nsb2023_raw = json.load(f)
         self.nsb2023_intended = NSB2023List.model_validate(nsb2023_raw)

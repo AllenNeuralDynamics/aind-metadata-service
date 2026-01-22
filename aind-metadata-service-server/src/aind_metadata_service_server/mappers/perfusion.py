@@ -91,7 +91,7 @@ class PerfusionMapper:
                 notes=notes,
                 procedures=[
                     Perfusion(
-                        output_specimen_ids=output_specimen_ids,
+                        output_specimen_ids=list(output_specimen_ids),
                         protocol_id=protocol_id,
                     )
                 ],
@@ -108,7 +108,7 @@ class PerfusionMapper:
                 notes=notes,
                 procedures=[
                     Perfusion.model_construct(
-                        output_specimen_ids=output_specimen_ids,
+                        output_specimen_ids=list(output_specimen_ids),
                         protocol_id=protocol_id,
                     )
                 ],

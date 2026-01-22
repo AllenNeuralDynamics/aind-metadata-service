@@ -112,6 +112,101 @@ class TestRoute:
         assert caplog is not None
         assert 500 == response.status_code
 
+    def test_get_subject_invalid_id(
+        self,
+        client: TestClient,
+    ):
+        """Tests handling of invalid subject ID"""
+        response = client.get("api/v2/subject/abcd")
+        expected_response = {
+            "detail": (
+                "Subject ID abcd is not valid."
+                " Please specify a numeric subject ID."
+            )
+        }
+        assert 406 == response.status_code
+        assert expected_response == response.json()
+
+    @patch("aind_labtracks_service_async_client.DefaultApi.get_subject")
+    def test_get_labtracks_subject(
+        self,
+        mock_lb_api_get: AsyncMock,
+        client: TestClient,
+    ):
+        """Tests good response labtracks subject"""
+        mock_lb_api_get.return_value = [
+            LabtrackSubject(
+                id="632269",
+                class_values=MouseCustomClass(
+                    reserved_by="Person A",
+                    reserved_date="2022-07-14T00:00:00-07:00",
+                    reason=None,
+                    solution="1xPBS",
+                    full_genotype=(
+                        "Pvalb-IRES-Cre/wt;RCL-somBiPoles_mCerulean-WPRE/wt"
+                    ),
+                    phenotype=(
+                        "P19: TSTW. Small body, large head, slightly "
+                        "dehydrated. 3.78g. P22: 5.59g. P26: 8.18g. "
+                        "Normal body proportions. "
+                    ),
+                ),
+                sex="F",
+                birth_date=datetime(2022, 5, 1, 0, 0),
+                species_name="mouse",
+                cage_id="-99999999999999",
+                room_id="-99999999999999.0000000000",
+                paternal_id="623236",
+                paternal_class_values=MouseCustomClass(
+                    reserved_by="Person One ",
+                    reserved_date="2022-11-01T00:00:00",
+                    reason="eu-retire",
+                    solution=None,
+                    full_genotype="RCL-somBiPoles_mCerulean-WPRE/wt",
+                    phenotype="P87: F.G. P133: Barberer. ",
+                ),
+                maternal_id="615310",
+                maternal_class_values=MouseCustomClass(
+                    reserved_by="Person One ",
+                    reserved_date="2022-08-03T00:00:00",
+                    reason="Eu-retire",
+                    solution=None,
+                    full_genotype="Pvalb-IRES-Cre/wt",
+                    phenotype="P100: F.G.",
+                ),
+                group_name="Exp-ND-01-001-2109",
+                group_description="BALB/c",
+            )
+        ]
+        response = client.get("api/v2/labtracks/subject?subject_id=632269")
+        assert 200 == response.status_code
+
+    @patch("aind_labtracks_service_async_client.DefaultApi.get_subject")
+    def test_get_missing_labtracks_subject(
+        self,
+        mock_lb_api_get: AsyncMock,
+        client: TestClient,
+    ):
+        """Tests handling of LabTracks API errors"""
+        mock_lb_api_get.return_value = []
+        response = client.get("api/v2/labtracks/subject?subject_id=632269")
+        assert 404 == response.status_code
+
+    def test_get_labtracks_subject_invalid_id(
+        self,
+        client: TestClient,
+    ):
+        """Tests handling of invalid subject ID for LabTracks"""
+        response = client.get("api/v2/labtracks/subject?subject_id=abcd")
+        expected_response = {
+            "detail": (
+                "Subject ID abcd is not valid."
+                " Please specify a numeric subject ID."
+            )
+        }
+        assert 406 == response.status_code
+        assert expected_response == response.json()
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

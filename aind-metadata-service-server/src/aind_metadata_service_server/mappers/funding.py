@@ -10,7 +10,7 @@ from aind_data_schema_models.organizations import Organization
 from aind_smartsheet_service_async_client.models import FundingModel
 from pydantic import ValidationError
 
-from aind_metadata_service_server.models import FundingInformation
+from aind_data_schema.core.data_description import Funding
 
 
 class FundingMapper:
@@ -87,9 +87,9 @@ class FundingMapper:
     def _map_funding_to_funding_information(
         self,
         smartsheet_funding: FundingModel,
-    ) -> Optional[FundingInformation]:
+    ) -> Optional[Funding]:
         """
-        Map a FundingModel to an optional FundingInformation model.
+        Map a FundingModel to an optional Funding model.
 
         Parameters
         ----------
@@ -98,54 +98,42 @@ class FundingMapper:
 
         Returns
         -------
-        FundingInformation | None
+        Funding | None
             If no relevant funding information is found, then None.
-            Otherwise, a FundingInformation model with parsed data.
+            Otherwise, a Funding model with parsed data.
         """
         grant_number = smartsheet_funding.grant_number
         institution_value = smartsheet_funding.funding_institution
         funder = self._parse_institution(institution_value)
-        investigators = self._parse_person_names(
-            smartsheet_funding.investigators
-        )
         fundees = self._parse_person_names(smartsheet_funding.fundees__pi)
 
-        if (
-            funder is None
-            and grant_number is None
-            and investigators is None
-            and fundees is None
-        ):
+        if funder is None and grant_number is None and fundees is None:
             return None
 
         try:
-            return FundingInformation(
+            return Funding(
                 funder=funder,
                 grant_number=grant_number,
                 fundee=fundees,
-                investigators=investigators,
             )
         except ValidationError as e:
-            logging.warning(
-                f"Validation error creating FundingInformation model: {e}"
-            )
-            return FundingInformation.model_construct(
+            logging.warning(f"Validation error creating Funding model: {e}")
+            return Funding.model_construct(
                 funder=funder,
                 grant_number=grant_number,
                 fundee=fundees,
-                investigators=investigators,
             )
 
-    def get_funding_list(self) -> List[FundingInformation]:
+    def get_funding_list(self) -> List[Funding]:
         """
-        Return a list of FundingInformation models for a given project name.
+        Return a list of Funding models for a given project name.
 
         Returns
         -------
-        List[FundingInformation]
-            A list of FundingInformation models.
+        List[Funding]
+            A list of Funding models.
         """
-        funding_list: List[FundingInformation] = []
+        funding_list: List[Funding] = []
 
         for smartsheet_funding in self.smartsheet_funding:
             funding_info = self._map_funding_to_funding_information(
@@ -155,6 +143,24 @@ class FundingMapper:
                 funding_list.append(funding_info)
 
         return funding_list
+
+    def get_investigators_list(self) -> List[Person]:
+        """
+        Get list of investigators from funding data
+
+        Returns
+        -------
+        List[Person]
+            List of unique investigators
+        """
+        investigators_list: List[Person] = []
+        for smartsheet_funding in self.smartsheet_funding:
+            investigators = self._parse_person_names(
+                smartsheet_funding.investigators
+            )
+            if investigators:
+                investigators_list.extend(investigators)
+        return investigators_list
 
     def get_project_names(self) -> List[str]:
         """

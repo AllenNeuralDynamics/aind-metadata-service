@@ -31,6 +31,7 @@ class TestSettings(unittest.TestCase):
             "AIND_METADATA_SERVICE_AIND_DATA_SCHEMA_V1_HOST": (
                 "http://example.com/v1"
             ),
+            "AIND_METADATA_SERVICE_DOCDB_API_HOST": ("example.com/docdb"),
         },
         clear=True,
     )
@@ -45,6 +46,7 @@ class TestSettings(unittest.TestCase):
             tars_host="http://example.com/tars",
             sharepoint_host="http://example.com/sharepoint",
             session_json_host="http://example.com/session_json",
+            docdb_api_host="example.com/docdb",
         )
         self.assertEqual(expected_settings, settings)
 

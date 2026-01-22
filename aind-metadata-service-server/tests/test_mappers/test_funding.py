@@ -7,7 +7,7 @@ from aind_data_schema_models.organizations import Organization
 from aind_smartsheet_service_async_client.models import FundingModel
 
 from aind_metadata_service_server.mappers.funding import FundingMapper
-from aind_metadata_service_server.models import FundingInformation
+from aind_data_schema.core.data_description import Funding
 
 
 class TestFundingMapper(unittest.TestCase):
@@ -99,13 +99,13 @@ class TestFundingMapper(unittest.TestCase):
             FundingMapper.split_name(project_c),
         )
 
-    def test_mapping_success(self):
+    def test_mapping_funding_success(self):
         """Tests successful mapping of funding data"""
         discovery_funding_rows = self.funding_sheet[3:5]
         mapper = FundingMapper(smartsheet_funding=discovery_funding_rows)
         funding_information = mapper.get_funding_list()
         expected_funding = [
-            FundingInformation(
+            Funding(
                 funder=Organization.AI,
                 grant_number=None,
                 fundee=[
@@ -115,9 +115,8 @@ class TestFundingMapper(unittest.TestCase):
                     Person(name="Person Seven"),
                     Person(name="Person Eight"),
                 ],
-                investigators=None,
             ),
-            FundingInformation(
+            Funding(
                 funder=Organization.NINDS,
                 grant_number="1RF1NS131984",
                 fundee=[
@@ -125,14 +124,24 @@ class TestFundingMapper(unittest.TestCase):
                     Person(name="Person Six"),
                     Person(name="Person Eight"),
                 ],
-                investigators=[
-                    Person(name="Person Six"),
-                    Person(name="Person Eight"),
-                ],
             ),
         ]
         self.assertEqual(len(funding_information), 2)
         self.assertEqual(funding_information, expected_funding)
+
+    def test_mapping_investigators_success(self):
+        """Tests successful mapping of investigators from funding data"""
+        discovery_funding_rows = self.funding_sheet[3:5]
+        mapper = FundingMapper(smartsheet_funding=discovery_funding_rows)
+        investigators_information = mapper.get_investigators_list()
+        expected_investigators = [
+            Person(name="Person Six"),
+            Person(name="Person Eight"),
+        ]
+        self.assertEqual(
+            sorted(investigators_information, key=lambda x: x.name),
+            sorted(expected_investigators, key=lambda x: x.name),
+        )
 
     def test_mapping_empty_list(self):
         """Tests mapping with empty funding data list"""
@@ -164,7 +173,7 @@ class TestFundingMapper(unittest.TestCase):
         mapper = FundingMapper(smartsheet_funding=smartsheet_funding)
         funding_information = mapper.get_funding_list()
 
-        expected_model = FundingInformation.model_construct(
+        expected_model = Funding.model_construct(
             funder="Some Institute",
             grant_number=None,
             fundee=[
@@ -172,7 +181,6 @@ class TestFundingMapper(unittest.TestCase):
                 Person(name="Person Two"),
                 Person(name="Person Three"),
             ],
-            investigators=None,
         )
 
         self.assertEqual(1, len(funding_information))

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aind_metadata_service_client"
-version = "2.2.3"
+version = "2.6.0"
 description = "aind-metadata-service"
 authors = ["OpenAPI Generator Community <team@openapitools.org>"]
 license = "NoLicense"
