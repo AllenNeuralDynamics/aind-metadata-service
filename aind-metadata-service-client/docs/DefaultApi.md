@@ -875,7 +875,7 @@ Return information from SLIMS.
 
 ```python
 import aind_metadata_service_client
-from aind_metadata_service_client.models.aind_metadata_service_server_routes_slims_slims_workflow import AindMetadataServiceServerRoutesSlimsSlimsWorkflow
+from aind_metadata_service_client.models.slims_workflow import SlimsWorkflow
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
@@ -890,7 +890,7 @@ configuration = aind_metadata_service_client.Configuration(
 with aind_metadata_service_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = aind_metadata_service_client.DefaultApi(api_client)
-    workflow = aind_metadata_service_client.AindMetadataServiceServerRoutesSlimsSlimsWorkflow() # AindMetadataServiceServerRoutesSlimsSlimsWorkflow | The SLIMS workflow to query.
+    workflow = aind_metadata_service_client.SlimsWorkflow() # SlimsWorkflow | The SLIMS workflow to query.
     subject_id = '744742' # str | Subject ID to filter the data. (optional)
     session_name = 'session_name_example' # str | Name of the session (only for ecephys sessions). (optional)
     start_date_gte = '2025-02-12' # str | Experiment run created on or after. (ISO format) (optional)
@@ -912,7 +912,7 @@ with aind_metadata_service_client.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **workflow** | [**AindMetadataServiceServerRoutesSlimsSlimsWorkflow**](.md)| The SLIMS workflow to query. | 
+ **workflow** | [**SlimsWorkflow**](.md)| The SLIMS workflow to query. | 
  **subject_id** | **str**| Subject ID to filter the data. | [optional] 
  **session_name** | **str**| Name of the session (only for ecephys sessions). | [optional] 
  **start_date_gte** | **str**| Experiment run created on or after. (ISO format) | [optional] 
@@ -1841,7 +1841,7 @@ Return information from SLIMS.
 
 ```python
 import aind_metadata_service_client
-from aind_metadata_service_client.models.aind_metadata_service_server_routes_slims_slims_workflow import AindMetadataServiceServerRoutesSlimsSlimsWorkflow
+from aind_metadata_service_client.models.slims_workflow import SlimsWorkflow
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
@@ -1856,7 +1856,7 @@ configuration = aind_metadata_service_client.Configuration(
 with aind_metadata_service_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = aind_metadata_service_client.DefaultApi(api_client)
-    workflow = aind_metadata_service_client.AindMetadataServiceServerRoutesSlimsSlimsWorkflow() # AindMetadataServiceServerRoutesSlimsSlimsWorkflow | The SLIMS workflow to query.
+    workflow = aind_metadata_service_client.SlimsWorkflow() # SlimsWorkflow | The SLIMS workflow to query.
     subject_id = '744742' # str | Subject ID to filter the data. (optional)
     session_name = 'session_name_example' # str | Name of the session (only for ecephys sessions). (optional)
     start_date_gte = '2025-02-12' # str | Experiment run created on or after. (ISO format) (optional)
@@ -1878,7 +1878,7 @@ with aind_metadata_service_client.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **workflow** | [**AindMetadataServiceServerRoutesSlimsSlimsWorkflow**](.md)| The SLIMS workflow to query. | 
+ **workflow** | [**SlimsWorkflow**](.md)| The SLIMS workflow to query. | 
  **subject_id** | **str**| Subject ID to filter the data. | [optional] 
  **session_name** | **str**| Name of the session (only for ecephys sessions). | [optional] 
  **start_date_gte** | **str**| Experiment run created on or after. (ISO format) | [optional] 

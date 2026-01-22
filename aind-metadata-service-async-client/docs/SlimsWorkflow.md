@@ -1,4 +1,4 @@
-# AindMetadataServiceServerRoutesSlimsSlimsWorkflow
+# SlimsWorkflow
 
 Available workflows that can be queried.
 
