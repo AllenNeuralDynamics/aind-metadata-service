@@ -110,7 +110,7 @@ async def get_procedures(
     if not procedures:
         raise HTTPException(status_code=404, detail="Not found")
 
-    # integrate protocols from smartsheet - FETCH CONCURRENTLY
+    # integrate protocols from smartsheet
     protocol_names = mapper.get_protocols_list(procedures)
     protocol_tasks = [
         smartsheet_api_instance.get_protocols(protocol_name=protocol_name)
@@ -126,6 +126,7 @@ async def get_procedures(
         procedures, protocols_mapping
     )
 
+    # integrate injection materials from tars
     viruses = mapper.get_virus_strains(procedures)
     viral_prep_tasks = [
         tars_api_instance.get_viral_prep_lots(
@@ -137,8 +138,10 @@ async def get_procedures(
         await gather(*viral_prep_tasks) if viral_prep_tasks else []
     )
     virus_mappers_by_strain = {}
-    all_virus_tasks = []
-    virus_task_indices = []
+    virus_ids_to_fetch = []
+    virus_id_to_strain_mapper = (
+        []
+    )
 
     for virus_strain, tars_prep_lot_response in zip(
         viruses, viral_prep_results
@@ -151,17 +154,17 @@ async def get_procedures(
 
         for tars_mapper in tars_mappers:
             if tars_mapper.virus_id:
-                all_virus_tasks.append(
-                    tars_api_instance.get_viruses(
-                        name=tars_mapper.virus_id, _request_timeout=10
-                    )
-                )
-                virus_task_indices.append((virus_strain, tars_mapper))
+                virus_ids_to_fetch.append(tars_mapper.virus_id)
+                virus_id_to_strain_mapper.append((virus_strain, tars_mapper))
 
-    if all_virus_tasks:
-        virus_responses = await gather(*all_virus_tasks)
+    if virus_ids_to_fetch:
+        virus_tasks = [
+            tars_api_instance.get_viruses(name=virus_id, _request_timeout=10)
+            for virus_id in virus_ids_to_fetch
+        ]
+        virus_responses = await gather(*virus_tasks)
         for (virus_strain, tars_mapper), virus_response in zip(
-            virus_task_indices, virus_responses
+            virus_id_to_strain_mapper, virus_responses
         ):
             tars_mapper.tars_virus_data = virus_response
 
