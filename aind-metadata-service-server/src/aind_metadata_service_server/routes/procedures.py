@@ -109,40 +109,71 @@ async def get_procedures(
     procedures = mapper.map_responses_to_aind_procedures(subject_id)
     if not procedures:
         raise HTTPException(status_code=404, detail="Not found")
-    # integrate protocols from smartsheet
+
+    # integrate protocols from smartsheet - FETCH CONCURRENTLY
     protocol_names = mapper.get_protocols_list(procedures)
-    protocols_mapping = {}
-    for protocol_name in protocol_names:
-        protocol_records = await smartsheet_api_instance.get_protocols(
-            protocol_name=protocol_name
-        )
-        protocols_mapping[protocol_name] = (
-            protocol_records[0] if protocol_records else None
-        )
+    protocol_tasks = [
+        smartsheet_api_instance.get_protocols(protocol_name=protocol_name)
+        for protocol_name in protocol_names
+    ]
+    protocol_results = await gather(*protocol_tasks) if protocol_tasks else []
+    protocols_mapping = {
+        name: (records[0] if records else None)
+        for name, records in zip(protocol_names, protocol_results)
+    }
+
     procedures = mapper.integrate_protocols_into_aind_procedures(
         procedures, protocols_mapping
     )
+
     viruses = mapper.get_virus_strains(procedures)
-    # integrate injection materials from smartsheet
-    tars_mapping = {}
-    for virus_strain in viruses:
-        tars_prep_lot_response = await tars_api_instance.get_viral_prep_lots(
+    viral_prep_tasks = [
+        tars_api_instance.get_viral_prep_lots(
             lot=virus_strain, _request_timeout=10
         )
+        for virus_strain in viruses
+    ]
+    viral_prep_results = (
+        await gather(*viral_prep_tasks) if viral_prep_tasks else []
+    )
+    virus_mappers_by_strain = {}
+    all_virus_tasks = []
+    virus_task_indices = []
+
+    for virus_strain, tars_prep_lot_response in zip(
+        viruses, viral_prep_results
+    ):
         tars_mappers = [
             InjectionMaterialsMapper(tars_prep_lot_data=prep_lot_data)
             for prep_lot_data in tars_prep_lot_response
         ]
+        virus_mappers_by_strain[virus_strain] = tars_mappers
+
         for tars_mapper in tars_mappers:
-            virus_id = tars_mapper.virus_id
-            if virus_id:
-                virus_response = await tars_api_instance.get_viruses(
-                    name=virus_id, _request_timeout=10
+            if tars_mapper.virus_id:
+                all_virus_tasks.append(
+                    tars_api_instance.get_viruses(
+                        name=tars_mapper.virus_id, _request_timeout=10
+                    )
                 )
-                tars_mapper.tars_virus_data = virus_response
-            tars_mapping[virus_strain] = (
-                tars_mapper.map_to_viral_material_information()
-            )
+                virus_task_indices.append((virus_strain, tars_mapper))
+
+    if all_virus_tasks:
+        virus_responses = await gather(*all_virus_tasks)
+        for (virus_strain, tars_mapper), virus_response in zip(
+            virus_task_indices, virus_responses
+        ):
+            tars_mapper.tars_virus_data = virus_response
+
+    tars_mapping = {}
+    for virus_strain, mappers in virus_mappers_by_strain.items():
+        if mappers:
+            tars_mapping[virus_strain] = mappers[
+                0
+            ].map_to_viral_material_information()
+        else:
+            tars_mapping[virus_strain] = None
+
     procedures = mapper.integrate_injection_materials_into_aind_procedures(
         procedures, tars_mapping
     )
