@@ -493,8 +493,9 @@ class TestRoute:
         ]
         mock_nsb_present.return_value = []
 
-        # Mock TARS responses for multiple virus strains
+        # TODO: should this be moved to conftest
         def viral_prep_side_effect(lot, **kwargs):
+            """Mock side effect for multiple virus strains"""
             if lot == "AAV-PHP.eB":
                 return [
                     PrepLotData(
@@ -526,6 +527,7 @@ class TestRoute:
         mock_get_viral_prep_lots.side_effect = viral_prep_side_effect
 
         def virus_side_effect(name, **kwargs):
+            """Mock side effect for get_viruses based on virus name"""
             return [VirusData(aliases=[Alias(is_preferred=True, name=name)])]
 
         mock_get_viruses.side_effect = virus_side_effect
