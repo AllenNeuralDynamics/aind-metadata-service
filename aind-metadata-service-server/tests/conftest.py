@@ -7,7 +7,12 @@ import pytest
 from fastapi.testclient import TestClient
 from pytest_mock import MockFixture
 from starlette.responses import JSONResponse
-
+from aind_tars_service_async_client import (
+        Alias,
+        PrepLotData,
+        ViralPrep,
+        VirusData,
+    )
 from aind_metadata_service_server.main import app
 from aind_metadata_service_server.sessions import (
     get_aind_data_schema_v1_session,
@@ -42,3 +47,20 @@ def client() -> Generator[TestClient, Any, None]:
         yield c
 
     app.dependency_overrides.clear()
+
+
+@pytest.fixture()
+def mock_tars_prep_lot_230929():
+    """Fixture for TARS prep lot 230929-12."""
+    return PrepLotData(
+        lot="230929-12",
+        viral_prep=ViralPrep(
+            virus=VirusData(aliases=[Alias(is_preferred=True, name="v_123")])
+        ),
+    )
+
+
+@pytest.fixture()
+def mock_tars_virus_v123():
+    """Fixture for TARS virus v_123."""
+    return VirusData(aliases=[Alias(is_preferred=True, name="v_123")])
