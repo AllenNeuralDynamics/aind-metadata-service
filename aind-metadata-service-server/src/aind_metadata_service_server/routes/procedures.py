@@ -14,6 +14,7 @@ from aind_metadata_service_server.sessions import (
     get_smartsheet_api_instance,
     get_tars_api_instance,
 )
+from asyncio import gather
 
 router = APIRouter()
 
@@ -55,32 +56,46 @@ async def get_procedures(
     ## Procedures
     Return Procedure metadata.
     """
-    labtracks_response = await labtracks_api_instance.get_tasks(
-        subject_id, _request_timeout=20
+    tasks = list()
+    tasks.append(
+        labtracks_api_instance.get_tasks(subject_id, _request_timeout=20)
     )
-    las_2020_response = await sharepoint_api_instance.get_las2020(
-        subject_id, _request_timeout=30
+    tasks.append(
+        sharepoint_api_instance.get_las2020(subject_id, _request_timeout=30)
     )
-    nsb_2019_response = await sharepoint_api_instance.get_nsb2019(
-        subject_id, _request_timeout=20
+    tasks.append(
+        sharepoint_api_instance.get_nsb2019(subject_id, _request_timeout=20)
     )
-    nsb_2023_response = await sharepoint_api_instance.get_nsb2023(
-        subject_id, _request_timeout=20
+    tasks.append(
+        sharepoint_api_instance.get_nsb2023(subject_id, _request_timeout=20)
     )
-    nsb_present_response = await sharepoint_api_instance.get_nsb_present(
-        subject_id, _request_timeout=20
-    )
-    slims_wr_response = await slims_api_instance.get_water_restriction_data(
-        subject_id, _request_timeout=240
-    )
-    slims_histology_response = await slims_api_instance.get_histology_data(
-        subject_id, _request_timeout=240
-    )
-    smartsheet_perfusion_response = (
-        await smartsheet_api_instance.get_perfusions(
+    tasks.append(
+        sharepoint_api_instance.get_nsb_present(
             subject_id, _request_timeout=20
         )
     )
+    tasks.append(
+        slims_api_instance.get_water_restriction_data(
+            subject_id, _request_timeout=240
+        )
+    )
+    tasks.append(
+        slims_api_instance.get_histology_data(subject_id, _request_timeout=240)
+    )
+    tasks.append(
+        smartsheet_api_instance.get_perfusions(subject_id, _request_timeout=20)
+    )
+    (
+        labtracks_response,
+        las_2020_response,
+        nsb_2019_response,
+        nsb_2023_response,
+        nsb_present_response,
+        slims_wr_response,
+        slims_histology_response,
+        smartsheet_perfusion_response,
+    ) = await gather(*tasks)
+
     mapper = ProceduresMapper(
         labtracks_tasks=labtracks_response,
         las_2020=las_2020_response,
@@ -94,40 +109,74 @@ async def get_procedures(
     procedures = mapper.map_responses_to_aind_procedures(subject_id)
     if not procedures:
         raise HTTPException(status_code=404, detail="Not found")
+
     # integrate protocols from smartsheet
     protocol_names = mapper.get_protocols_list(procedures)
-    protocols_mapping = {}
-    for protocol_name in protocol_names:
-        protocol_records = await smartsheet_api_instance.get_protocols(
-            protocol_name=protocol_name
-        )
-        protocols_mapping[protocol_name] = (
-            protocol_records[0] if protocol_records else None
-        )
+    protocol_tasks = [
+        smartsheet_api_instance.get_protocols(protocol_name=protocol_name)
+        for protocol_name in protocol_names
+    ]
+    protocol_results = await gather(*protocol_tasks) if protocol_tasks else []
+    protocols_mapping = {
+        name: (records[0] if records else None)
+        for name, records in zip(protocol_names, protocol_results)
+    }
+
     procedures = mapper.integrate_protocols_into_aind_procedures(
         procedures, protocols_mapping
     )
+
+    # integrate injection materials from tars
     viruses = mapper.get_virus_strains(procedures)
-    # integrate injection materials from smartsheet
-    tars_mapping = {}
-    for virus_strain in viruses:
-        tars_prep_lot_response = await tars_api_instance.get_viral_prep_lots(
+    viral_prep_tasks = [
+        tars_api_instance.get_viral_prep_lots(
             lot=virus_strain, _request_timeout=10
         )
+        for virus_strain in viruses
+    ]
+    viral_prep_results = (
+        await gather(*viral_prep_tasks) if viral_prep_tasks else []
+    )
+    virus_mappers_by_strain = {}
+    virus_ids_to_fetch = []
+    virus_id_to_strain_mapper = (
+        []
+    )
+
+    for virus_strain, tars_prep_lot_response in zip(
+        viruses, viral_prep_results
+    ):
         tars_mappers = [
             InjectionMaterialsMapper(tars_prep_lot_data=prep_lot_data)
             for prep_lot_data in tars_prep_lot_response
         ]
+        virus_mappers_by_strain[virus_strain] = tars_mappers
+
         for tars_mapper in tars_mappers:
-            virus_id = tars_mapper.virus_id
-            if virus_id:
-                virus_response = await tars_api_instance.get_viruses(
-                    name=virus_id, _request_timeout=10
-                )
-                tars_mapper.tars_virus_data = virus_response
-            tars_mapping[virus_strain] = (
-                tars_mapper.map_to_viral_material_information()
-            )
+            if tars_mapper.virus_id:
+                virus_ids_to_fetch.append(tars_mapper.virus_id)
+                virus_id_to_strain_mapper.append((virus_strain, tars_mapper))
+
+    if virus_ids_to_fetch:
+        virus_tasks = [
+            tars_api_instance.get_viruses(name=virus_id, _request_timeout=10)
+            for virus_id in virus_ids_to_fetch
+        ]
+        virus_responses = await gather(*virus_tasks)
+        for (virus_strain, tars_mapper), virus_response in zip(
+            virus_id_to_strain_mapper, virus_responses
+        ):
+            tars_mapper.tars_virus_data = virus_response
+
+    tars_mapping = {}
+    for virus_strain, mappers in virus_mappers_by_strain.items():
+        if mappers:
+            tars_mapping[virus_strain] = mappers[
+                0
+            ].map_to_viral_material_information()
+        else:
+            tars_mapping[virus_strain] = None
+
     procedures = mapper.integrate_injection_materials_into_aind_procedures(
         procedures, tars_mapping
     )
