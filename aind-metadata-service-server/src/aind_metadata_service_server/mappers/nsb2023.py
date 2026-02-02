@@ -3485,22 +3485,12 @@ class MappedNSBList:
                     if len(burr_hole_info.targeted_structure) > 1:
                         other_targets = burr_hole_info.targeted_structure[1:]
 
-                coordinate_system = CoordinateSystem(
-                    name="FIBER_PROBE_RSAB",
-                    origin=Origin.TIP,
-                    axis_unit=SizeUnit.MM,
-                    axes=[
-                        Axis(name=AxisName.X, direction=Direction.LR),
-                        Axis(name=AxisName.Y, direction=Direction.IS),
-                        Axis(name=AxisName.Z, direction=Direction.PA),
-                        Axis(name=AxisName.DEPTH, direction=Direction.UD),
-                    ],
-                )
                 transforms = self._map_burr_hole_transforms(
                     angle=burr_hole_info.angle,
                     ml=burr_hole_info.coordinate_ml,
                     ap=burr_hole_info.coordinate_ap,
-                    depth=burr_hole_info.coordinate_depth,
+                    depth=[burr_hole_info.fiber_implant_depth] if burr_hole_info.fiber_implant_depth else None,
+                    surgery_coordinate_system=surgery_coord_system,
                 )
                 probe_implant_proc = ProbeImplant.model_construct(
                     implanted_device=fiber_probe,
@@ -3508,7 +3498,7 @@ class MappedNSBList:
                         primary_targeted_structure=primary_target,
                         other_targeted_structure=other_targets,
                         device_name=None,
-                        coordinate_system=coordinate_system,
+                        coordinate_system=surgery_coord_system,
                         transform=transforms[0],
                     ),
                 )
