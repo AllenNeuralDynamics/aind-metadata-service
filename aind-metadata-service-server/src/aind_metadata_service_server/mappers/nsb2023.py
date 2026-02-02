@@ -3489,7 +3489,11 @@ class MappedNSBList:
                     angle=burr_hole_info.angle,
                     ml=burr_hole_info.coordinate_ml,
                     ap=burr_hole_info.coordinate_ap,
-                    depth=[burr_hole_info.fiber_implant_depth] if burr_hole_info.fiber_implant_depth else None,
+                    depth=(
+                        [burr_hole_info.fiber_implant_depth]
+                        if burr_hole_info.fiber_implant_depth
+                        else None
+                    ),
                     surgery_coordinate_system=surgery_coord_system,
                 )
                 probe_implant_proc = ProbeImplant.model_construct(
