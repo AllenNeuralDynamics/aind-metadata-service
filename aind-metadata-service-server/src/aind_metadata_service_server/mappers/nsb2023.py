@@ -972,7 +972,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_3_intended_x0022(self) -> Optional[Any]:
+    def aind_burr_3_intended_x0022(self) -> Optional[str]:
         """Maps burr_3_intended_x0022 to aind model."""
         intended = getattr(
             self._nsb, "burr_x0020_3_x0020_intended_x0022", None
@@ -1036,7 +1036,7 @@ class MappedNSBList:
             else {
                 self._nsb.burr_x0020_4_x0020_hemisphere.SELECT: None,
                 self._nsb.burr_x0020_4_x0020_hemisphere.LEFT: (
-                    AnatomicalRelative.LEFT,
+                    AnatomicalRelative.LEFT
                 ),
                 self._nsb.burr_x0020_4_x0020_hemisphere.RIGHT: (
                     AnatomicalRelative.RIGHT
@@ -3017,14 +3017,18 @@ class MappedNSBList:
             return None
 
         name = surgery_coordinate_system.name
+        num_axes = len(surgery_coordinate_system.axes)
+
         if name.startswith("LAMBDA"):
             origin = Origin.BREGMA
             dist = b2l_dist
-            return {origin: Translation(translation=[dist, 0, 0])}
+            translation_values = [dist] + [0] * (num_axes - 1)
+            return {origin: Translation(translation=translation_values)}
         elif name.startswith("BREGMA"):
             origin = Origin.LAMBDA
             dist = -(abs(b2l_dist))
-            return {origin: Translation(translation=[dist, 0, 0])}
+            translation_values = [dist] + [0] * (num_axes - 1)
+            return {origin: Translation(translation=translation_values)}
         else:
             return None
 

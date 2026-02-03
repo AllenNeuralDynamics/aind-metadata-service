@@ -1378,7 +1378,7 @@ class TestNSB2023SurgeryIntegration(TestCase):
 
     def test_map_measured_coordinates(self):
         """Test measured coordinates mapping"""
-        coord_sys = CoordinateSystem(
+        coord_sys_3d = CoordinateSystem(
             name="LAMBDA_ARI",
             origin=Origin.LAMBDA,
             axis_unit=SizeUnit.MM,
@@ -1389,10 +1389,22 @@ class TestNSB2023SurgeryIntegration(TestCase):
             ],
         )
         measured = MappedNSBList.map_measured_coordinates(
-            Decimal("4.5"), coord_sys
+            Decimal("4.5"), coord_sys_3d
         )
         self.assertIsNotNone(measured)
         self.assertIn(Origin.BREGMA, measured)
+        self.assertEqual(len(measured[Origin.BREGMA].translation), 3)
+
+        coord_sys_4d = CoordinateSystemLibrary.BREGMA_ARID
+        measured_4d = MappedNSBList.map_measured_coordinates(
+            Decimal("4.5"), coord_sys_4d
+        )
+        self.assertIsNotNone(measured_4d)
+        self.assertIn(Origin.LAMBDA, measured_4d)
+        self.assertEqual(len(measured_4d[Origin.LAMBDA].translation), 4)
+        self.assertEqual(
+            measured_4d[Origin.LAMBDA].translation, [Decimal("-4.5"), 0, 0, 0]
+        )
 
         coord_sys_other = CoordinateSystem(
             name="C1C2_ARID",
