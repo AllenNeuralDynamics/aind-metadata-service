@@ -134,6 +134,7 @@ async def get_slims_api_instance() -> (
         api_instance = aind_slims_service_async_client.DefaultApi(api_client)
         yield api_instance
 
+
 async def get_dataverse_api_instance() -> (
     AsyncGenerator[aind_dataverse_service_async_client.DefaultApi, None]
 ):
@@ -147,7 +148,8 @@ async def get_dataverse_api_instance() -> (
             api_client
         )
         yield api_instance
-        
+
+
 def get_instruments_client() -> DocDBClient:
     """
     Returns a client to read/write instruments.
