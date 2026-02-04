@@ -8,6 +8,7 @@ import aind_sharepoint_service_async_client
 import aind_slims_service_async_client
 import aind_smartsheet_service_async_client
 import aind_tars_service_async_client
+import aind_dataverse_service_async_client
 from aind_data_access_api.document_db import Client as DocDBClient
 from httpx import AsyncClient
 
@@ -31,6 +32,9 @@ slims_config = aind_slims_service_async_client.Configuration(
 )
 tars_config = aind_tars_service_async_client.Configuration(
     host=settings.tars_host.unicode_string().strip("/")
+)
+dataverse_config = aind_dataverse_service_async_client.Configuration(
+    host=settings.dataverse_host.unicode_string().strip("/")
 )
 
 
@@ -130,7 +134,20 @@ async def get_slims_api_instance() -> (
         api_instance = aind_slims_service_async_client.DefaultApi(api_client)
         yield api_instance
 
-
+async def get_dataverse_api_instance() -> (
+    AsyncGenerator[aind_dataverse_service_async_client.DefaultApi, None]
+):
+    """
+    Yield an aind_dataverse_service_async_client.DefaultApi object.
+    """
+    async with aind_dataverse_service_async_client.ApiClient(
+        dataverse_config
+    ) as api_client:
+        api_instance = aind_dataverse_service_async_client.DefaultApi(
+            api_client
+        )
+        yield api_instance
+        
 def get_instruments_client() -> DocDBClient:
     """
     Returns a client to read/write instruments.
