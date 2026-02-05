@@ -139,9 +139,7 @@ async def get_procedures(
     )
     virus_mappers_by_strain = {}
     virus_ids_to_fetch = []
-    virus_id_to_strain_mapper = (
-        []
-    )
+    virus_id_to_strain_mapper = []
 
     for virus_strain, tars_prep_lot_response in zip(
         viruses, viral_prep_results

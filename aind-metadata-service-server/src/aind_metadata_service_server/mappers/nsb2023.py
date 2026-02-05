@@ -3488,8 +3488,8 @@ class MappedNSBList:
                     primary_target = burr_hole_info.targeted_structure[0]
                     if len(burr_hole_info.targeted_structure) > 1:
                         other_targets = burr_hole_info.targeted_structure[1:]
-                
-                # 
+
+                #
                 coordinate_system = CoordinateSystem(
                     name="TIP_D",
                     origin=Origin.TIP,
@@ -3513,7 +3513,7 @@ class MappedNSBList:
                     device_config=ProbeConfig.model_construct(
                         primary_targeted_structure=primary_target,
                         other_targeted_structure=other_targets,
-                        device_name=None, # Will be assigned
+                        device_name=None,  # Will be assigned
                         coordinate_system=coordinate_system,
                         transform=transforms[0],
                     ),

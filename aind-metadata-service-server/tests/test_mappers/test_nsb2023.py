@@ -1141,7 +1141,7 @@ class TestNSB2023FiberImplantMapping(TestCase):
         self.assertIsNotNone(probe_implant.device_config.transform)
         transform = probe_implant.device_config.transform
         self.assertEqual(len(transform), 2)
-        
+
         translation, rotation = transform
         self.assertIsInstance(translation, Translation)
         self.assertEqual(len(translation.translation), 4)
@@ -1149,6 +1149,7 @@ class TestNSB2023FiberImplantMapping(TestCase):
         self.assertEqual(len(rotation.angles), 4)
         self.assertIsNotNone(surgery.coordinate_system)
         self.assertEqual(surgery.coordinate_system.name, "BREGMA_ARID")
+
 
 class TestNSB2023SpinalInjectionMapping(TestCase):
     """Tests spinal injection procedure mapping"""
