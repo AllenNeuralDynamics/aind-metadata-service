@@ -2,6 +2,7 @@
 
 from typing import AsyncGenerator
 
+import aind_dataverse_service_async_client
 import aind_labtracks_service_async_client
 import aind_mgi_service_async_client
 import aind_sharepoint_service_async_client
@@ -31,6 +32,9 @@ slims_config = aind_slims_service_async_client.Configuration(
 )
 tars_config = aind_tars_service_async_client.Configuration(
     host=settings.tars_host.unicode_string().strip("/")
+)
+dataverse_config = aind_dataverse_service_async_client.Configuration(
+    host=settings.dataverse_host.unicode_string().strip("/")
 )
 
 
@@ -128,6 +132,21 @@ async def get_slims_api_instance() -> (
         slims_config
     ) as api_client:
         api_instance = aind_slims_service_async_client.DefaultApi(api_client)
+        yield api_instance
+
+
+async def get_dataverse_api_instance() -> (
+    AsyncGenerator[aind_dataverse_service_async_client.DefaultApi, None]
+):
+    """
+    Yield an aind_dataverse_service_async_client.DefaultApi object.
+    """
+    async with aind_dataverse_service_async_client.ApiClient(
+        dataverse_config
+    ) as api_client:
+        api_instance = aind_dataverse_service_async_client.DefaultApi(
+            api_client
+        )
         yield api_instance
 
 

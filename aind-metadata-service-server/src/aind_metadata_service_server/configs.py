@@ -37,6 +37,9 @@ class Settings(BaseSettings):
     docdb_api_host: str = Field(
         ..., description="Host address for data access api"
     )
+    dataverse_host: HttpUrl = Field(
+        ..., description="Host address for dataverse endpoint"
+    )
 
 
 def get_settings():

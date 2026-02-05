@@ -25,6 +25,9 @@ class TestSettings(unittest.TestCase):
             "AIND_METADATA_SERVICE_SHAREPOINT_HOST": (
                 "http://example.com/sharepoint"
             ),
+            "AIND_METADATA_SERVICE_DATAVERSE_HOST": (
+                "http://example.com/dataverse"
+            ),
             "AIND_METADATA_SERVICE_SESSION_JSON_HOST": (
                 "http://example.com/session_json"
             ),
@@ -45,6 +48,7 @@ class TestSettings(unittest.TestCase):
             slims_host="http://example.com/slims",
             tars_host="http://example.com/tars",
             sharepoint_host="http://example.com/sharepoint",
+            dataverse_host="http://example.com/dataverse",
             session_json_host="http://example.com/session_json",
             docdb_api_host="example.com/docdb",
         )
