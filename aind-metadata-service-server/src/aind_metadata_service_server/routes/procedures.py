@@ -1,5 +1,7 @@
 """Module to handle subject endpoints"""
 
+from asyncio import gather
+
 from fastapi import APIRouter, Depends, HTTPException, Path
 
 from aind_metadata_service_server.mappers.injection_materials import (
@@ -14,7 +16,6 @@ from aind_metadata_service_server.sessions import (
     get_smartsheet_api_instance,
     get_tars_api_instance,
 )
-from asyncio import gather
 
 router = APIRouter()
 

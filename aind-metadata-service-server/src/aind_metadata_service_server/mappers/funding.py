@@ -6,11 +6,10 @@ import re
 from typing import List, Optional, Tuple
 
 from aind_data_schema.components.identifiers import Person
+from aind_data_schema.core.data_description import Funding
 from aind_data_schema_models.organizations import Organization
 from aind_smartsheet_service_async_client.models import FundingModel
 from pydantic import ValidationError
-
-from aind_data_schema.core.data_description import Funding
 
 
 class FundingMapper:

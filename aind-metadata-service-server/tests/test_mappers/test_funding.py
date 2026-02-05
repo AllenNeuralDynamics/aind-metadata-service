@@ -3,11 +3,11 @@
 import unittest
 
 from aind_data_schema.components.identifiers import Person
+from aind_data_schema.core.data_description import Funding
 from aind_data_schema_models.organizations import Organization
 from aind_smartsheet_service_async_client.models import FundingModel
 
 from aind_metadata_service_server.mappers.funding import FundingMapper
-from aind_data_schema.core.data_description import Funding
 
 
 class TestFundingMapper(unittest.TestCase):

@@ -1,8 +1,11 @@
 """Tests for dataverse routes"""
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from aind_dataverse_service_async_client.exceptions import (
+    ApiException,
+)
 from fastapi import status
 from fastapi.testclient import TestClient
 
@@ -81,6 +84,29 @@ class TestDataverseRoutes:
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert response.json() == {"detail": "Not found"}
+        assert len(mock_api_get.mock_calls) == 1
+
+    @patch("aind_dataverse_service_async_client.DefaultApi.get_table")
+    def test_get_dataverse_table_api_exception(
+        self,
+        mock_api_get: AsyncMock,
+        client: TestClient,
+    ):
+        """Test handling of ApiException from dataverse service"""
+        mock_exception = ApiException(
+            http_resp=MagicMock(status=400),
+            body='{"error": "Invalid table name"}',
+            data=None,
+        )
+        mock_exception.status = 400
+        mock_exception.reason = "Bad Request"
+        mock_api_get.side_effect = mock_exception
+
+        response = client.get("/api/v2/dataverse/tables/invalid_table")
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "Error fetching invalid_table" in response.json()["detail"]
+        assert "Bad Request" in response.json()["detail"]
         assert len(mock_api_get.mock_calls) == 1
 
 
