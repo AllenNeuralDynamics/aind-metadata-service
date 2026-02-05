@@ -972,7 +972,7 @@ class MappedNSBList:
         )
 
     @property
-    def aind_burr_3_intended_x0022(self) -> Optional[Any]:
+    def aind_burr_3_intended_x0022(self) -> Optional[str]:
         """Maps burr_3_intended_x0022 to aind model."""
         intended = getattr(
             self._nsb, "burr_x0020_3_x0020_intended_x0022", None
@@ -1036,7 +1036,7 @@ class MappedNSBList:
             else {
                 self._nsb.burr_x0020_4_x0020_hemisphere.SELECT: None,
                 self._nsb.burr_x0020_4_x0020_hemisphere.LEFT: (
-                    AnatomicalRelative.LEFT,
+                    AnatomicalRelative.LEFT
                 ),
                 self._nsb.burr_x0020_4_x0020_hemisphere.RIGHT: (
                     AnatomicalRelative.RIGHT
@@ -3017,14 +3017,18 @@ class MappedNSBList:
             return None
 
         name = surgery_coordinate_system.name
+        num_axes = len(surgery_coordinate_system.axes)
+
         if name.startswith("LAMBDA"):
             origin = Origin.BREGMA
             dist = b2l_dist
-            return {origin: Translation(translation=[dist, 0, 0])}
+            translation_values = [dist] + [0] * (num_axes - 1)
+            return {origin: Translation(translation=translation_values)}
         elif name.startswith("BREGMA"):
             origin = Origin.LAMBDA
             dist = -(abs(b2l_dist))
-            return {origin: Translation(translation=[dist, 0, 0])}
+            translation_values = [dist] + [0] * (num_axes - 1)
+            return {origin: Translation(translation=translation_values)}
         else:
             return None
 
@@ -3485,29 +3489,31 @@ class MappedNSBList:
                     if len(burr_hole_info.targeted_structure) > 1:
                         other_targets = burr_hole_info.targeted_structure[1:]
 
+                #
                 coordinate_system = CoordinateSystem(
-                    name="FIBER_PROBE_RSAB",
+                    name="TIP_D",
                     origin=Origin.TIP,
                     axis_unit=SizeUnit.MM,
-                    axes=[
-                        Axis(name=AxisName.X, direction=Direction.LR),
-                        Axis(name=AxisName.Y, direction=Direction.IS),
-                        Axis(name=AxisName.Z, direction=Direction.PA),
-                        Axis(name=AxisName.DEPTH, direction=Direction.UD),
-                    ],
+                    axes=[Axis(name=AxisName.SI, direction=Direction.UD)],
                 )
+
                 transforms = self._map_burr_hole_transforms(
                     angle=burr_hole_info.angle,
                     ml=burr_hole_info.coordinate_ml,
                     ap=burr_hole_info.coordinate_ap,
-                    depth=burr_hole_info.coordinate_depth,
+                    depth=(
+                        [burr_hole_info.fiber_implant_depth]
+                        if burr_hole_info.fiber_implant_depth
+                        else None
+                    ),
+                    surgery_coordinate_system=surgery_coord_system,
                 )
                 probe_implant_proc = ProbeImplant.model_construct(
                     implanted_device=fiber_probe,
                     device_config=ProbeConfig.model_construct(
                         primary_targeted_structure=primary_target,
                         other_targeted_structure=other_targets,
-                        device_name=None,
+                        device_name=None,  # Will be assigned
                         coordinate_system=coordinate_system,
                         transform=transforms[0],
                     ),
