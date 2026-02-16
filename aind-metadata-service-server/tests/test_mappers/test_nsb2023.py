@@ -1101,6 +1101,55 @@ class TestNSB2023FiberImplantMapping(TestCase):
         )
         self.assertIsNotNone(probe_implant)
 
+    def test_fiber_probe_coordinate_system_properties(self):
+        """Test fiber probe coordinate system has correct properties"""
+        nsb_data = {
+            "FileSystemObjectType": 0,
+            "Id": 106,
+            "Date_x0020_of_x0020_Surgery": "2022-03-15T08:00:00Z",
+            "IACUC_x0020_Protocol_x0020__x002": "2103",
+            "Test1LookupId": 2846,
+            "Burr_x0020_hole_x0020_1": "Fiber Implant",
+            "Virus_x0020_M_x002f_L": 2.0,
+            "Virus_x0020_A_x002f_P": 3.0,
+            "Virus_x0020_D_x002f_V": 4.0,
+            "Burr1_x0020_Perform_x0020_During": "Initial Surgery",
+            "Burr_x0020_1_x0020_Fiber_x0020_T": "Standard (Provided by NSB)",
+            "Fiber_x0020_Implant1_x0020_Lengt": "2.0 mm",
+            "Iso_x0020_On": 1.5,
+            "HPIsoLevel": 1.8,
+        }
+        nsb_model = NSB2023List.model_validate(nsb_data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        surgeries = mapper.get_surgeries()
+
+        self.assertGreater(len(surgeries), 0)
+        surgery = surgeries[0]
+        probe_implant = next(
+            (p for p in surgery.procedures if isinstance(p, ProbeImplant)),
+            None,
+        )
+        self.assertIsNotNone(probe_implant)
+        coord_sys = probe_implant.device_config.coordinate_system
+        self.assertIsNotNone(coord_sys)
+        self.assertEqual(coord_sys.name, "TIP_D")
+        self.assertEqual(coord_sys.origin, Origin.TIP)
+        self.assertEqual(coord_sys.axis_unit, SizeUnit.MM)
+        self.assertEqual(len(coord_sys.axes), 1)
+        self.assertEqual(coord_sys.axes[0].name, AxisName.SI)
+        self.assertEqual(coord_sys.axes[0].direction, Direction.UD)
+        self.assertIsNotNone(probe_implant.device_config.transform)
+        transform = probe_implant.device_config.transform
+        self.assertEqual(len(transform), 2)
+
+        translation, rotation = transform
+        self.assertIsInstance(translation, Translation)
+        self.assertEqual(len(translation.translation), 4)
+        self.assertIsInstance(rotation, Rotation)
+        self.assertEqual(len(rotation.angles), 4)
+        self.assertIsNotNone(surgery.coordinate_system)
+        self.assertEqual(surgery.coordinate_system.name, "BREGMA_ARID")
+
 
 class TestNSB2023SpinalInjectionMapping(TestCase):
     """Tests spinal injection procedure mapping"""
@@ -1378,7 +1427,7 @@ class TestNSB2023SurgeryIntegration(TestCase):
 
     def test_map_measured_coordinates(self):
         """Test measured coordinates mapping"""
-        coord_sys = CoordinateSystem(
+        coord_sys_3d = CoordinateSystem(
             name="LAMBDA_ARI",
             origin=Origin.LAMBDA,
             axis_unit=SizeUnit.MM,
@@ -1389,10 +1438,22 @@ class TestNSB2023SurgeryIntegration(TestCase):
             ],
         )
         measured = MappedNSBList.map_measured_coordinates(
-            Decimal("4.5"), coord_sys
+            Decimal("4.5"), coord_sys_3d
         )
         self.assertIsNotNone(measured)
         self.assertIn(Origin.BREGMA, measured)
+        self.assertEqual(len(measured[Origin.BREGMA].translation), 3)
+
+        coord_sys_4d = CoordinateSystemLibrary.BREGMA_ARID
+        measured_4d = MappedNSBList.map_measured_coordinates(
+            Decimal("4.5"), coord_sys_4d
+        )
+        self.assertIsNotNone(measured_4d)
+        self.assertIn(Origin.LAMBDA, measured_4d)
+        self.assertEqual(len(measured_4d[Origin.LAMBDA].translation), 4)
+        self.assertEqual(
+            measured_4d[Origin.LAMBDA].translation, [Decimal("-4.5"), 0, 0, 0]
+        )
 
         coord_sys_other = CoordinateSystem(
             name="C1C2_ARID",

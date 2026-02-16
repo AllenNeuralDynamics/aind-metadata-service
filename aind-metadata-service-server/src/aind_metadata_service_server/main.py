@@ -10,6 +10,7 @@ from fastapi.routing import APIRoute
 
 from aind_metadata_service_server import __version__ as service_version
 from aind_metadata_service_server.routes import (
+    dataverse,
     funding,
     healthcheck,
     index,
@@ -68,6 +69,7 @@ app.include_router(subject.router)
 app.include_router(perfusion.router)
 app.include_router(mgi_allele.router)
 app.include_router(injection_materials.router)
+app.include_router(dataverse.router)
 app.include_router(index.router)
 
 # Clean up the methods names that is generated in the client code

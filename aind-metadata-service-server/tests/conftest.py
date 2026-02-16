@@ -4,15 +4,16 @@ from typing import Any, Generator
 from unittest.mock import AsyncMock
 
 import pytest
+from aind_tars_service_async_client import (
+    Alias,
+    PrepLotData,
+    ViralPrep,
+    VirusData,
+)
 from fastapi.testclient import TestClient
 from pytest_mock import MockFixture
 from starlette.responses import JSONResponse
-from aind_tars_service_async_client import (
-        Alias,
-        PrepLotData,
-        ViralPrep,
-        VirusData,
-    )
+
 from aind_metadata_service_server.main import app
 from aind_metadata_service_server.sessions import (
     get_aind_data_schema_v1_session,
