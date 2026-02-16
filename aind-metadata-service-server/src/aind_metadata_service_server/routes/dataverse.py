@@ -3,6 +3,9 @@
 from aind_dataverse_service_async_client.exceptions import ApiException
 from fastapi import APIRouter, Depends, HTTPException, Path
 
+from aind_metadata_service_server.mappers.dataverse import (
+    _filter_dataverse_metadata,
+)
 from aind_metadata_service_server.sessions import get_dataverse_api_instance
 
 router = APIRouter()
@@ -42,6 +45,7 @@ async def get_dataverse_table(
     """
     ## Table Data
     Retrieves data for a specific entity table in Dataverse.
+    Metadata fields (starting with '@' or '_', or containing '@') are filtered out.
     """
     try:
         dataverse_response = await dataverse_api_instance.get_table(
@@ -54,4 +58,4 @@ async def get_dataverse_table(
         )
     if not dataverse_response:
         raise HTTPException(status_code=404, detail="Not found")
-    return dataverse_response
+    return _filter_dataverse_metadata(dataverse_response)
