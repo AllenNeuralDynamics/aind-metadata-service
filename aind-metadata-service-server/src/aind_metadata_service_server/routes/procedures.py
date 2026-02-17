@@ -20,7 +20,20 @@ from aind_metadata_service_server.sessions import (
 router = APIRouter()
 
 
-@router.get("/api/v2/procedures/{subject_id}")
+@router.get(
+    "/api/v2/procedures/{subject_id}",
+    responses={
+        400: {
+            "description": "Validation error in response model.",
+            "content": {
+                "application/json": {
+                    "example": {"detail": "Validation error in response model."}
+                }
+            },
+        },
+        404: {"description": "Not found"},
+    },
+)
 async def get_procedures(
     subject_id: str = Path(
         ...,

@@ -14,7 +14,22 @@ from aind_metadata_service_server.sessions import (
 router = APIRouter()
 
 
-@router.get("/api/v2/subject/{subject_id}")
+@router.get(
+    "/api/v2/subject/{subject_id}",
+    responses={
+        400: {
+            "description": "Validation error in response model.",
+            "content": {
+                "application/json": {
+                    "example": {"detail": "Validation error in response model."}
+                }
+            },
+        },
+        404: {"description": "Not found"},
+        406: {"description": "Invalid subject ID"},
+        500: {"description": "Too many responses"},
+    },
+)
 async def get_subject(
     subject_id: str = Path(
         ...,

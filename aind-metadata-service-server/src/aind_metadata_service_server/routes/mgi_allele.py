@@ -9,7 +9,20 @@ from aind_metadata_service_server.sessions import get_mgi_api_instance
 router = APIRouter()
 
 
-@router.get("/api/v2/mgi_allele/{allele_name}")
+@router.get(
+    "/api/v2/mgi_allele/{allele_name}",
+    responses={
+        400: {
+            "description": "Validation error in response model.",
+            "content": {
+                "application/json": {
+                    "example": {"detail": "Validation error in response model."}
+                }
+            },
+        },
+        404: {"description": "Not found"},
+    },
+)
 async def get_mgi_allele(
     allele_name: str = Path(
         ...,

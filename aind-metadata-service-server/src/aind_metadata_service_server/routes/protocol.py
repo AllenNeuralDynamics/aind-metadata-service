@@ -9,7 +9,21 @@ from aind_metadata_service_server.sessions import get_smartsheet_api_instance
 router = APIRouter()
 
 
-@router.get("/api/v2/protocols/{protocol_name}")
+@router.get(
+    "/api/v2/protocols/{protocol_name}",
+    responses={
+        400: {
+            "description": "Validation error in response model.",
+            "content": {
+                "application/json": {
+                    "example": {"detail": "Validation error in response model."}
+                }
+            },
+        },
+        404: {"description": "Not found"},
+        500: {"description": "Too many responses"},
+    },
+)
 async def get_protocols(
     protocol_name: str = Path(
         ...,

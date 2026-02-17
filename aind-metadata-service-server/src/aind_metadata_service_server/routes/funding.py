@@ -10,7 +10,21 @@ from aind_metadata_service_server.sessions import get_smartsheet_api_instance
 router = APIRouter()
 
 
-@router.get("/api/v2/funding/{project_name}")
+@router.get(
+    "/api/v2/funding/{project_name}",
+    responses={
+        400: {
+            "description": "Validation error in response model.",
+            "content": {
+                "application/json": {
+                    "example": {"detail": "Validation error in response model."}
+                }
+            },
+        },
+        404: {"description": "Not found"},
+        406: {"description": "Project has subprojects, specify subproject"},
+    },
+)
 async def get_funding(
     project_name: str = Path(
         ...,
@@ -56,7 +70,21 @@ async def get_funding(
     return map_to_response(funding_information)
 
 
-@router.get("/api/v2/investigators/{project_name}")
+@router.get(
+    "/api/v2/investigators/{project_name}",
+    responses={
+        400: {
+            "description": "Validation error in response model.",
+            "content": {
+                "application/json": {
+                    "example": {"detail": "Validation error in response model."}
+                }
+            },
+        },
+        404: {"description": "Not found"},
+        406: {"description": "Project has subprojects, specify subproject"},
+    },
+)
 async def get_investigators(
     project_name: str = Path(
         ...,
