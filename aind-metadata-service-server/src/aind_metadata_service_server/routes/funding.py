@@ -17,7 +17,9 @@ router = APIRouter()
             "description": "Validation error in response model.",
             "content": {
                 "application/json": {
-                    "example": {"detail": "Validation error in response model."}
+                    "example": {
+                        "detail": "Validation error in response model."
+                    }
                 }
             },
         },
@@ -77,7 +79,9 @@ async def get_funding(
             "description": "Validation error in response model.",
             "content": {
                 "application/json": {
-                    "example": {"detail": "Validation error in response model."}
+                    "example": {
+                        "detail": "Validation error in response model."
+                    }
                 }
             },
         },
