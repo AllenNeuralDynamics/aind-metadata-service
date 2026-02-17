@@ -9,7 +9,7 @@ def _filter_dataverse_metadata(data: Dict) -> Dict:
     Parameters
     ----------
     data : Dict
-        The dataverse response data (can be dict, list, or other)
+        The dataverse response data
 
     Returns
     -------
@@ -20,7 +20,12 @@ def _filter_dataverse_metadata(data: Dict) -> Dict:
         return {
             key: _filter_dataverse_metadata(value)
             for key, value in data.items()
-            if not (key.startswith("@") or "@" in key or key.startswith("_"))
+            if (
+                key.endswith("@OData.Community.Display.V1.FormattedValue")
+                or not (
+                    key.startswith("@") or "@" in key or key.startswith("_")
+                )
+            )
         }
     elif isinstance(data, list):
         return [_filter_dataverse_metadata(item) for item in data]
