@@ -21,12 +21,12 @@ router = APIRouter()
             "description": "Validation error in response model.",
             "headers": {
                 "X-Error-Message": {
-                    "description": "A JSON-encoded list of Pydantic validation errors.",
-                    "schema": {
-                        "type": "string"
-                    }
+                    "description": (
+                        "A JSON-encoded list of Pydantic validation errors."
+                    ),
+                    "schema": {"type": "string"},
                 }
-            }
+            },
         },
         404: {"description": "Not found"},
         406: {"description": "Invalid subject ID"},
@@ -91,7 +91,13 @@ async def get_subject(
         return map_to_response(subjects[0])
 
 
-@router.get("/api/v2/labtracks/subject")
+@router.get(
+        "/api/v2/labtracks/subject",
+        responses={
+            404: {"description": "Not found"},
+            406: {"description": "Invalid subject ID"},
+        },
+    )
 async def get_labtracks_subject(
     subject_id: str = Query(
         ...,

@@ -26,10 +26,12 @@ router = APIRouter()
             "description": "Validation error in response model.",
             "headers": {
                 "X-Error-Message": {
-                    "description": "A JSON-encoded list of Pydantic validation errors or a string describing the error.",
-                    "schema": {"type": "string"}
+                    "description": (
+                        "A JSON-encoded list of Pydantic validation errors."
+                    ),
+                    "schema": {"type": "string"},
                 }
-            }
+            },
         },
         404: {"description": "Not found"},
     },
@@ -72,10 +74,12 @@ async def get_rig(
             "description": "Validation error in response model.",
             "headers": {
                 "X-Error-Message": {
-                    "description": "A JSON-encoded list of Pydantic validation errors or a string describing the error.",
-                    "schema": {"type": "string"}
+                    "description": (
+                        "A JSON-encoded list of Pydantic validation errors.",
+                    ),
+                    "schema": {"type": "string"},
                 }
-            }
+            },
         },
         404: {"description": "Not found"},
     },
