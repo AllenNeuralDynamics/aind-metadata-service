@@ -3,7 +3,7 @@
 import unittest
 
 from aind_metadata_service_server.mappers.dataverse import (
-    _filter_dataverse_metadata,
+    filter_dataverse_metadata,
 )
 
 
@@ -43,7 +43,7 @@ class TestDataverseMapper(unittest.TestCase):
                 },
             ],
         }
-        filtered = _filter_dataverse_metadata(data)
+        filtered = filter_dataverse_metadata(data)
 
         expected = {
             "data": "some-data",

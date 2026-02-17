@@ -18,7 +18,7 @@ def filter_dataverse_metadata(data: Dict) -> Dict:
     """
     if isinstance(data, dict):
         return {
-            key: _filter_dataverse_metadata(value)
+            key: filter_dataverse_metadata(value)
             for key, value in data.items()
             if (
                 key.endswith("@OData.Community.Display.V1.FormattedValue")
@@ -28,6 +28,6 @@ def filter_dataverse_metadata(data: Dict) -> Dict:
             )
         }
     elif isinstance(data, list):
-        return [_filter_dataverse_metadata(item) for item in data]
+        return [filter_dataverse_metadata(item) for item in data]
     else:
         return data
