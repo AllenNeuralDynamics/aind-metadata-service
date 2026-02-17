@@ -10,7 +10,7 @@ def _filter_dataverse_metadata(data: Dict) -> Dict:
     ----------
     data : Dict
         The dataverse response data (can be dict, list, or other)
-    
+
     Returns
     -------
     Dict

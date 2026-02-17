@@ -45,7 +45,6 @@ async def get_dataverse_table(
     """
     ## Table Data
     Retrieves data for a specific entity table in Dataverse.
-    Metadata fields (starting with '@' or '_', or containing '@') are filtered out.
     """
     try:
         dataverse_response = await dataverse_api_instance.get_table(
