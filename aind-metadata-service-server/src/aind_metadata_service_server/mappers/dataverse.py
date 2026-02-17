@@ -3,7 +3,7 @@
 from typing import Dict
 
 
-def _filter_dataverse_metadata(data: Dict) -> Dict:
+def filter_dataverse_metadata(data: Dict) -> Dict:
     """
     Filter out Dataverse metadata fields from the response.
     Parameters
