@@ -11,7 +11,12 @@ from aind_metadata_service_server.sessions import get_dataverse_api_instance
 router = APIRouter()
 
 
-@router.get("/api/v2/dataverse/tables")
+@router.get(
+    "/api/v2/dataverse/tables",
+    responses={
+        404: {"description": "Not found"},
+    },
+)
 async def get_dataverse_table_info(
     dataverse_api_instance=Depends(get_dataverse_api_instance),
 ):
@@ -27,7 +32,12 @@ async def get_dataverse_table_info(
     return dataverse_response
 
 
-@router.get("/api/v2/dataverse/tables/{entity_set_table_name}")
+@router.get(
+    "/api/v2/dataverse/tables/{entity_set_table_name}",
+    responses={
+        404: {"description": "Not found"},
+    },
+)
 async def get_dataverse_table(
     entity_set_table_name: str = Path(
         ...,

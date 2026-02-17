@@ -19,13 +19,14 @@ router = APIRouter()
     responses={
         400: {
             "description": "Validation error in response model.",
-            "content": {
-                "application/json": {
-                    "example": {
-                        "detail": "Validation error in response model."
+            "headers": {
+                "X-Error-Message": {
+                    "description": "A JSON-encoded list of Pydantic validation errors.",
+                    "schema": {
+                        "type": "string"
                     }
                 }
-            },
+            }
         },
         404: {"description": "Not found"},
         406: {"description": "Invalid subject ID"},
