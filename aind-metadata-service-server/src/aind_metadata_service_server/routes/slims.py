@@ -26,7 +26,23 @@ class SlimsWorkflow(str, Enum):
     ECEPHYS_SESSIONS = "ecephys_sessions"
 
 
-@router.get("/api/v2/slims/{workflow}")
+@router.get(
+    "/api/v2/slims/{workflow}",
+    responses={
+        400: {
+            "description": "Validation error in response model.",
+            "headers": {
+                "X-Error-Message": {
+                    "description": (
+                        "A JSON-encoded list of Pydantic validation errors."
+                    ),
+                    "schema": {"type": "string"},
+                }
+            },
+        },
+        404: {"description": "Not found"},
+    },
+)
 async def get_slims_workflow(
     workflow: SlimsWorkflow = Path(
         ...,
