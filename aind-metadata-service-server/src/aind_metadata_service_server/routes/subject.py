@@ -30,7 +30,6 @@ router = APIRouter()
         },
         404: {"description": "Not found"},
         406: {"description": "Invalid subject ID"},
-        500: {"description": "Too many responses"},
     },
 )
 async def get_subject(

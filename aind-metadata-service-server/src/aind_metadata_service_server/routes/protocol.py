@@ -24,7 +24,6 @@ router = APIRouter()
             },
         },
         404: {"description": "Not found"},
-        500: {"description": "Too many responses"},
     },
 )
 async def get_protocols(
