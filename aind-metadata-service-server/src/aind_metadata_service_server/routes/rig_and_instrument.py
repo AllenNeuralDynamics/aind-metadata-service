@@ -19,7 +19,23 @@ from aind_metadata_service_server.sessions import (
 router = APIRouter()
 
 
-@router.get("/api/v2/rig/{rig_id}")
+@router.get(
+    "/api/v2/rig/{rig_id}",
+    responses={
+        400: {
+            "description": "Validation error in response model.",
+            "headers": {
+                "X-Error-Message": {
+                    "description": (
+                        "A JSON-encoded list of Pydantic validation errors."
+                    ),
+                    "schema": {"type": "string"},
+                }
+            },
+        },
+        404: {"description": "Not found"},
+    },
+)
 async def get_rig(
     rig_id: str = Path(
         ...,
@@ -51,7 +67,23 @@ async def get_rig(
         )
 
 
-@router.get("/api/v2/instrument/{instrument_id}")
+@router.get(
+    "/api/v2/instrument/{instrument_id}",
+    responses={
+        400: {
+            "description": "Validation error in response model.",
+            "headers": {
+                "X-Error-Message": {
+                    "description": (
+                        "A JSON-encoded list of Pydantic validation errors.",
+                    ),
+                    "schema": {"type": "string"},
+                }
+            },
+        },
+        404: {"description": "Not found"},
+    },
+)
 async def get_instrument(
     instrument_id: str = Path(
         ...,
