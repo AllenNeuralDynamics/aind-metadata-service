@@ -75,7 +75,7 @@ async def get_rig(
             "headers": {
                 "X-Error-Message": {
                     "description": (
-                        "A JSON-encoded list of Pydantic validation errors.",
+                        "A JSON-encoded list of Pydantic validation errors."
                     ),
                     "schema": {"type": "string"},
                 }
