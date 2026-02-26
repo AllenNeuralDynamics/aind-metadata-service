@@ -71,7 +71,7 @@ class TestRoute:
         response = client.get("/subject/632269")
         assert 200 == response.status_code
         assert 1 == len(mock_lb_api_get.mock_calls)
-        assert 2 == len(mock_mg_api_get.mock_calls)
+        assert 0 == len(mock_mg_api_get.mock_calls) # 2
 
     def test_get_subject_bad_request(self, client: TestClient):
         """Tests a bad request response"""

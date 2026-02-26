@@ -55,10 +55,10 @@ async def get_subject(
                 logging.warning(
                     f"Skipping allele {allele_name} search for {subject_id}"
                 )
-                api_response = await mgi_api_instance.get_allele_info(
-                    allele_name=allele_name, _request_timeout=30
-                )
-                mgi_info.extend(api_response)
+                # api_response = await mgi_api_instance.get_allele_info(
+                #     allele_name=allele_name, _request_timeout=30
+                # )
+                # mgi_info.extend(api_response)
             mapper.mgi_info = mgi_info
 
         subjects = [mapper.map_to_aind_subject() for mapper in mappers]
