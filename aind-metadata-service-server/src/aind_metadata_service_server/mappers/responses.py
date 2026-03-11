@@ -11,8 +11,8 @@ from pydantic import BaseModel, ValidationError
 def clean_error_messages(error_json: str) -> str:
     """Remove function-after patterns from pydantic error messages."""
     pattern = r'"function-after\[[^\]]*(?:\[[^\]]*\][^\]]*)*\]",?'
-    cleaned = re.sub(pattern, '', error_json)
-    
+    cleaned = re.sub(pattern, "", error_json)
+
     return cleaned
 
 
@@ -41,7 +41,7 @@ def map_to_response(model: Union[BaseModel, List[BaseModel]]) -> JSONResponse:
 
         errors = e.json()
         errors = clean_error_messages(errors)
-        
+
         logging.warning(errors)
         return JSONResponse(
             status_code=400,
