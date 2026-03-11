@@ -30,10 +30,10 @@ def map_to_response(model: Union[BaseModel, List[BaseModel]]) -> JSONResponse:
         else:
             content = model.model_dump(mode="json")
 
-        errors = e.json(include_context=False, include_input=False)
+        errors = e.json()
         errors_encoded = errors.encode("utf-8")
         bytes_size = len(errors_encoded)
-        if bytes_size > (4*1024):
+        if bytes_size >= (3800):
             errors = "Too many validation errors. Please check locally."
 
         return JSONResponse(
