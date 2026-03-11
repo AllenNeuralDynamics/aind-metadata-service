@@ -44,10 +44,9 @@ class TestResponses(unittest.TestCase):
             {"name": "abc", "val": "default_value"},
             json.loads(response.body.decode("utf-8")),
         )
-        # expected_error_message = "Field required"
+        expected_error_message = "Field required"
         response_header_msg = json.loads(response.headers["x-error-message"])
-        # With empty dict header, we expect an empty dict
-        self.assertEqual({}, response_header_msg)
+        self.assertEqual(expected_error_message, response_header_msg)
         self.assertEqual(1, len(captured.output))
 
     def test_clean_error_messages(self):
