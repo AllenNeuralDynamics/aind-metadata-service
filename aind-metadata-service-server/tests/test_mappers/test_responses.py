@@ -53,18 +53,22 @@ class TestResponses(unittest.TestCase):
 
     def test_clean_error_messages(self):
         """Tests that function-after removed from error messages."""
-        error_with_patterns = '''[
+        error_with_patterns = (
+            '''[
             {
                 "type": "missing",
-                "loc": ["field1", "function-after[validate_something(),function-after[unit_validator(),SomeModel]]", "subfield"],
+                "loc": ["field1", "function-after[validate_something(),'''
+            '''function-after[unit_validator(),SomeModel]]", "subfield"],
                 "msg": "Field required"
             },
             {
                 "type": "extra_forbidden",
-                "loc": ["field2", "function-after[validate_notes()]", "extra_field"],
+                "loc": ["field2", "function-after[validate_notes()]", '''
+            '''"extra_field"],
                 "msg": "Extra inputs are not permitted"
             }
         ]'''
+        )
 
         expected_cleaned = '''[
             {
