@@ -91,12 +91,12 @@ async def get_subject(
 
 
 @router.get(
-        "/api/v2/labtracks/subject",
-        responses={
-            404: {"description": "Not found"},
-            406: {"description": "Invalid subject ID"},
-        },
-    )
+    "/api/v2/labtracks/subject",
+    responses={
+        404: {"description": "Not found"},
+        406: {"description": "Invalid subject ID"},
+    },
+)
 async def get_labtracks_subject(
     subject_id: str = Query(
         ...,
