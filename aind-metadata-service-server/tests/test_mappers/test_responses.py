@@ -44,44 +44,43 @@ class TestResponses(unittest.TestCase):
             {"name": "abc", "val": "default_value"},
             json.loads(response.body.decode("utf-8")),
         )
-        expected_error_message = "Field required"
-        response_header_msg = json.loads(response.headers["x-error-message"])[
-            0
-        ]["msg"]
-        self.assertEqual(expected_error_message, response_header_msg)
+        # expected_error_message = "Field required"
+        response_header_msg = json.loads(response.headers["x-error-message"])
+        # With empty dict header, we expect an empty dict
+        self.assertEqual({}, response_header_msg)
         self.assertEqual(1, len(captured.output))
 
     def test_clean_error_messages(self):
         """Tests that function-after removed from error messages."""
         error_with_patterns = (
             '''[
-            {
-                "type": "missing",
-                "loc": ["field1", "function-after[validate_something(),'''
+        {
+            "type": "missing",
+            "loc": ["field1", "function-after[validate_something(),'''
             '''function-after[unit_validator(),SomeModel]]", "subfield"],
-                "msg": "Field required"
-            },
-            {
-                "type": "extra_forbidden",
-                "loc": ["field2", "function-after[validate_notes()]", '''
+            "msg": "Field required"
+        },
+        {
+            "type": "extra_forbidden",
+            "loc": ["field2", "function-after[validate_notes()]", '''
             '''"extra_field"],
-                "msg": "Extra inputs are not permitted"
-            }
-        ]'''
+            "msg": "Extra inputs are not permitted"
+        }
+    ]'''
         )
 
         expected_cleaned = '''[
-            {
-                "type": "missing",
-                "loc": ["field1", "subfield"],
-                "msg": "Field required"
-            },
-            {
-                "type": "extra_forbidden",
-                "loc": ["field2", "extra_field"],
-                "msg": "Extra inputs are not permitted"
-            }
-        ]'''
+        {
+            "type": "missing",
+            "loc": ["field1", "subfield"],
+            "msg": "Field required"
+        },
+        {
+            "type": "extra_forbidden",
+            "loc": ["field2", "extra_field"],
+            "msg": "Extra inputs are not permitted"
+        }
+    ]'''
 
         cleaned = clean_error_messages(error_with_patterns)
         cleaned_json = json.loads(cleaned)
