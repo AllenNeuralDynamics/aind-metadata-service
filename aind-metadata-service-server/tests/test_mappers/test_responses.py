@@ -2,13 +2,11 @@
 
 import json
 import unittest
+from unittest.mock import patch, MagicMock
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
-from aind_metadata_service_server.mappers.responses import (
-    map_to_response,
-    clean_error_messages,
-)
+from aind_metadata_service_server.mappers.responses import map_to_response
 
 
 class ExampleModel(BaseModel):
@@ -45,51 +43,11 @@ class TestResponses(unittest.TestCase):
             json.loads(response.body.decode("utf-8")),
         )
         expected_error_message = "Field required"
-        response_header_msg = json.loads(response.headers["x-error-message"])
+        response_header_msg = json.loads(response.headers["x-error-message"])[
+            0
+        ]["msg"]
         self.assertEqual(expected_error_message, response_header_msg)
         self.assertEqual(1, len(captured.output))
-
-    def test_clean_error_messages(self):
-        """Tests that function-after removed from error messages."""
-        error_with_patterns = (
-            '''[
-        {
-            "type": "missing",
-            "loc": ["field1", "function-after[validate_something(),'''
-            '''function-after[unit_validator(),SomeModel]]", "subfield"],
-            "msg": "Field required"
-        },
-        {
-            "type": "extra_forbidden",
-            "loc": ["field2", "function-after[validate_notes()]", '''
-            '''"extra_field"],
-            "msg": "Extra inputs are not permitted"
-        }
-    ]'''
-        )
-
-        expected_cleaned = '''[
-        {
-            "type": "missing",
-            "loc": ["field1", "subfield"],
-            "msg": "Field required"
-        },
-        {
-            "type": "extra_forbidden",
-            "loc": ["field2", "extra_field"],
-            "msg": "Extra inputs are not permitted"
-        }
-    ]'''
-
-        cleaned = clean_error_messages(error_with_patterns)
-        cleaned_json = json.loads(cleaned)
-        expected_json = json.loads(expected_cleaned)
-
-        self.assertEqual(expected_json, cleaned_json)
-        self.assertNotIn("function-after", cleaned)
-        self.assertEqual("missing", cleaned_json[0]["type"])
-        self.assertEqual(["field1", "subfield"], cleaned_json[0]["loc"])
-        self.assertEqual("Field required", cleaned_json[0]["msg"])
 
     def test_map_multiple_to_200_response(self):
         """Tests valid list of models is mapped to a 200 response."""
@@ -131,6 +89,27 @@ class TestResponses(unittest.TestCase):
         self.assertEqual(
             expected_content,
             json.loads(response.body.decode("utf-8")),
+        )
+
+    def test_map_to_400_response_with_long_error_message(self):
+        """Tests that long error message raises expected message."""
+
+        long_error_message = "x" * 4000
+        model = ExampleModel.model_construct(name="abc")
+
+        with patch.object(ExampleModel, "model_validate") as mock_validate:
+            mock_error = ValidationError.from_exception_data(
+                "ExampleModel", []
+            )
+            mock_error.json = MagicMock(return_value=long_error_message)
+            mock_validate.side_effect = mock_error
+
+            response = map_to_response(model=model)
+
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(
+            "Too many validation errors. Please validate locally.",
+            response.headers["x-error-message"],
         )
 
 
