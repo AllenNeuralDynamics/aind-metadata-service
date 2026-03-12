@@ -29,7 +29,16 @@ def map_to_response(model: Union[BaseModel, List[BaseModel]]) -> JSONResponse:
             content = [item.model_dump(mode="json") for item in model]
         else:
             content = model.model_dump(mode="json")
-        errors = e.json()
+
+        errors = e.json(
+            include_url=False,
+            include_context=False,
+            include_input=False
+        )
+        errors_encoded = errors.encode("utf-8")
+        if len(errors_encoded) >= (3800):
+            errors = "Too many validation errors. Please validate locally."
+
         logging.warning(errors)
         return JSONResponse(
             status_code=400,

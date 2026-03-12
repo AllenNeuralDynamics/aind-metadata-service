@@ -2,8 +2,9 @@
 
 import json
 import unittest
+from unittest.mock import patch, MagicMock
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from aind_metadata_service_server.mappers.responses import map_to_response
 
@@ -88,6 +89,27 @@ class TestResponses(unittest.TestCase):
         self.assertEqual(
             expected_content,
             json.loads(response.body.decode("utf-8")),
+        )
+
+    def test_map_to_400_response_with_long_error_message(self):
+        """Tests that long error message raises expected message."""
+
+        long_error_message = "x" * 4000
+        model = ExampleModel.model_construct(name="abc")
+
+        with patch.object(ExampleModel, "model_validate") as mock_validate:
+            mock_error = ValidationError.from_exception_data(
+                "ExampleModel", []
+            )
+            mock_error.json = MagicMock(return_value=long_error_message)
+            mock_validate.side_effect = mock_error
+
+            response = map_to_response(model=model)
+
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(
+            "Too many validation errors. Please validate locally.",
+            response.headers["x-error-message"],
         )
 
 
