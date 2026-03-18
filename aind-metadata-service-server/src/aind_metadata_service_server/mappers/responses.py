@@ -31,9 +31,7 @@ def map_to_response(model: Union[BaseModel, List[BaseModel]]) -> JSONResponse:
             content = model.model_dump(mode="json")
 
         errors = e.json(
-            include_url=False,
-            include_context=False,
-            include_input=False
+            include_url=False, include_context=False, include_input=False
         )
         errors_encoded = errors.encode("utf-8")
         if len(errors_encoded) >= (3800):

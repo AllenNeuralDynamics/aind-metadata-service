@@ -1,10 +1,11 @@
 """Module to handle dataverse endpoints"""
 
 from aind_dataverse_service_async_client.exceptions import ApiException
-from fastapi import APIRouter, Depends, HTTPException, Path
+from fastapi import APIRouter, Depends, HTTPException, Path, Request
 
 from aind_metadata_service_server.mappers.dataverse import (
     filter_dataverse_metadata,
+    apply_query_parameters,
 )
 from aind_metadata_service_server.sessions import get_dataverse_api_instance
 
@@ -36,9 +37,11 @@ async def get_dataverse_table_info(
     "/api/v2/dataverse/tables/{entity_set_table_name}",
     responses={
         404: {"description": "Not found"},
+        400: {"description": "Bad request - invalid filter parameter"},
     },
 )
 async def get_dataverse_table(
+    request: Request,
     entity_set_table_name: str = Path(
         ...,
         description="The entity set name of the table to fetch",
@@ -55,6 +58,9 @@ async def get_dataverse_table(
     """
     ## Table Data
     Retrieves data for a specific entity table in Dataverse.
+
+    The results can be filtered by adding query parameters. For example:
+    - `/api/v2/dataverse/tables/cr138_projects?status=active&owner=jdoe`
     """
     try:
         dataverse_response = await dataverse_api_instance.get_table(
@@ -62,7 +68,18 @@ async def get_dataverse_table(
         )
         if not dataverse_response:
             raise HTTPException(status_code=404, detail="Not found")
-        return filter_dataverse_metadata(dataverse_response)
+
+        query_params = {}
+        if request.query_params:
+            query_params = dict(request.query_params)
+
+        filtered_response = filter_dataverse_metadata(dataverse_response)
+        if query_params:
+            filtered_response = apply_query_parameters(
+                filtered_response, query_params
+            )
+
+        return filtered_response
 
     except ApiException as e:
         raise HTTPException(

@@ -1,9 +1,11 @@
 """Module to test dataverse mapper"""
 
 import unittest
+from fastapi import HTTPException
 
 from aind_metadata_service_server.mappers.dataverse import (
     filter_dataverse_metadata,
+    apply_query_parameters,
 )
 
 
@@ -61,3 +63,78 @@ class TestDataverseMapper(unittest.TestCase):
             ],
         }
         self.assertEqual(filtered, expected)
+
+    def test_apply_query_parameters_no_filters(self):
+        """Test that no filters returns original data."""
+        data = {"value": [{"id": "1", "name": "Test"}]}
+        result = apply_query_parameters(data, {})
+        self.assertEqual(result, data)
+
+    def test_apply_query_parameters_single_filter(self):
+        """Test filtering with single parameter."""
+        data = {
+            "value": [
+                {"id": "1", "status": "active"},
+                {"id": "2", "status": "inactive"},
+            ]
+        }
+        result = apply_query_parameters(data, {"status": "active"})
+        expected = {"value": [{"id": "1", "status": "active"}]}
+        self.assertEqual(result, expected)
+
+    def test_apply_query_parameters_multiple_filters(self):
+        """Test filtering with multiple parameters (AND logic)."""
+        data = {
+            "value": [
+                {"id": "1", "status": "active", "owner": "alice"},
+                {"id": "2", "status": "active", "owner": "bob"},
+            ]
+        }
+        result = apply_query_parameters(
+            data, {"status": "active", "owner": "alice"}
+        )
+        expected = {
+            "value": [{"id": "1", "status": "active", "owner": "alice"}]
+        }
+        self.assertEqual(result, expected)
+
+    def test_apply_query_parameters_case_insensitive(self):
+        """Test that filtering is case-insensitive."""
+        data = {"value": [{"id": "1", "status": "Active"}]}
+        result = apply_query_parameters(data, {"status": "active"})
+        expected = {"value": [{"id": "1", "status": "Active"}]}
+        self.assertEqual(result, expected)
+
+    def test_apply_query_parameters_invalid_column(self):
+        """Test that invalid column raises HTTPException."""
+        data = {"value": [{"id": "1", "name": "Test"}]}
+        with self.assertRaises(HTTPException) as context:
+            apply_query_parameters(data, {"invalid_column": "test"})
+        self.assertEqual(context.exception.status_code, 400)
+        self.assertIn(
+            "Query parameter 'invalid_column' does not match any column",
+            str(context.exception.detail),
+        )
+
+    def test_apply_query_parameters_with_list_input(self):
+        """Test filtering when input is a list instead of dict."""
+        data = [
+            {"id": "1", "status": "active"},
+            {"id": "2", "status": "inactive"},
+        ]
+        result = apply_query_parameters(data, {"status": "active"})
+        expected = [{"id": "1", "status": "active"}]
+        self.assertEqual(result, expected)
+
+    def test_apply_query_parameters_dict_without_value_key(self):
+        """Test that dict without 'value' key returns unchanged."""
+        data = {"some_other_key": "some_value", "metadata": "info"}
+        result = apply_query_parameters(data, {"any": "filter"})
+        self.assertEqual(result, data)
+
+    def test_apply_query_parameters_non_dict_list_input(self):
+        """Test that non-dict/list input returns unchanged (covers else case)."""
+        # Test various non-dict/non-list types
+        for data in ["string", 123, None, True]:
+            result = apply_query_parameters(data, {"any": "filter"})
+            self.assertEqual(result, data)
