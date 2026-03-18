@@ -133,7 +133,7 @@ class TestDataverseMapper(unittest.TestCase):
         self.assertEqual(result, data)
 
     def test_apply_query_parameters_non_dict_list_input(self):
-        """Test that non-dict/list input returns unchanged (covers else case)."""
+        """Test that non-dict/list input returns unchanged."""
         # Test various non-dict/non-list types
         for data in ["string", 123, None, True]:
             result = apply_query_parameters(data, {"any": "filter"})

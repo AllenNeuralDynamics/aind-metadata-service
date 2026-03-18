@@ -41,8 +41,7 @@ def apply_query_parameters(data, query_params: Dict[str, str]):
     Parameters
     ----------
     data : Dict or List
-        The dataverse response data - either a dict with 'value' key containing records,
-        or a direct list of records
+        The dataverse response data
     query_params : Dict[str, str]
         Dictionary of query parameter names and values to filter by
 
@@ -79,7 +78,9 @@ def apply_query_parameters(data, query_params: Dict[str, str]):
             if param_key not in available_columns:
                 raise HTTPException(
                     status_code=400,
-                    detail=f"Query parameter '{param_key}' does not match any column in the table. Available columns: {', '.join(sorted(available_columns))}",
+                    detail=f"Query parameter '{param_key}' does not match any "
+                    f"column in the table. Available columns: "
+                    f"{', '.join(sorted(available_columns))}",
                 )
 
     # Apply query parameter filters

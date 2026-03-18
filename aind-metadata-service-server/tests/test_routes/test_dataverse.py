@@ -189,9 +189,10 @@ class TestDataverseRoutes:
         }
         mock_api_get.return_value = mock_response
 
-        # Test filtering by multiple parameters - should only return rows matching ALL filters
+        # Test filtering by multiple parameters
         response = client.get(
-            "/api/v2/dataverse/tables/cr138_projects?cr138_status=active&cr138_owner=jdoe"
+            "/api/v2/dataverse/tables/cr138_projects?"
+            "cr138_status=active&cr138_owner=jdoe"
         )
 
         assert response.status_code == status.HTTP_200_OK
