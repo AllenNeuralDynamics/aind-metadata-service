@@ -74,10 +74,12 @@ async def get_dataverse_table(
             query_params = dict(request.query_params)
 
         filtered_response = filter_dataverse_metadata(dataverse_response)
-        if query_params:
-            filtered_response = apply_query_parameters(
-                filtered_response, query_params
+        if query_params and "value" in filtered_response:
+            records_list = filtered_response["value"]
+            filtered_records = apply_query_parameters(
+                records_list, query_params
             )
+            filtered_response["value"] = filtered_records
 
         return filtered_response
 

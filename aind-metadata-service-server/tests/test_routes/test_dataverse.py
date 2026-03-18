@@ -232,7 +232,7 @@ class TestDataverseRoutes:
         mock_api_get: AsyncMock,
         client: TestClient,
     ):
-        """Test error when filter parameter doesn't match any column"""
+        """Test that invalid filter parameter returns empty results"""
         mock_response = {
             "value": [
                 {"cr138_projectid": "123", "cr138_name": "Test Project"},
@@ -244,15 +244,10 @@ class TestDataverseRoutes:
             "/api/v2/dataverse/tables/cr138_projects?invalid_column=test"
         )
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert (
-            "Query parameter 'invalid_column' does not match any column"
-            in response.json()["detail"]
-        )
-        assert (
-            "Available columns: cr138_name, cr138_projectid"
-            in response.json()["detail"]
-        )
+        assert response.status_code == status.HTTP_200_OK
+        result = response.json()
+        assert "value" in result
+        assert result["value"] == []  # Should return empty list for invalid column
 
     @patch("aind_dataverse_service_async_client.DefaultApi.get_table")
     def test_get_dataverse_table_no_matching_rows(

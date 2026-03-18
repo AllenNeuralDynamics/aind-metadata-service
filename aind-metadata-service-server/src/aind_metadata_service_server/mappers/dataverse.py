@@ -1,6 +1,6 @@
 """Module to handle dataverse data mapping and filtering"""
 
-from typing import Dict
+from typing import Dict, List
 from fastapi import HTTPException
 
 
@@ -34,61 +34,37 @@ def filter_dataverse_metadata(data: Dict) -> Dict:
         return data
 
 
-def apply_query_parameters(data, query_params: Dict[str, str]):
+def apply_query_parameters(
+    data: List[Dict], query_params: Dict[str, str]
+) -> List[Dict]:
     """
-    Apply query parameter filters to dataverse table data.
+    Apply query parameter filters to a list of records.
 
     Parameters
     ----------
-    data : Dict or List
-        The dataverse response data
+    data : List[Dict]
+        List of records to filter
     query_params : Dict[str, str]
         Dictionary of query parameter names and values to filter by
 
     Returns
     -------
-    Dict or List
-        Filtered data with matching records (same structure as input)
-
-    Raises
-    ------
-    HTTPException
-        If query parameter doesn't match any column in the table
+    List[Dict]
+        Filtered list of records. Returns empty list if query parameters 
+        don't match any columns in the table.
     """
-    if not query_params:
+    if not query_params or not data:
         return data
 
-    # Handle different data structures
-    if isinstance(data, dict):
-        if "value" not in data:
-            return data
-        records = data.get("value", [])
-    elif isinstance(data, list):
-        records = data
-    else:
-        return data
+    available_columns = set(data[0].keys())
+    for param_key in query_params.keys():
+        if param_key not in available_columns:
+            return []
 
-    if not records:
-        return data
-
-    # Check if query parameters exist in the table columns
-    if records:
-        available_columns = set(records[0].keys())
-        for param_key in query_params.keys():
-            if param_key not in available_columns:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Query parameter '{param_key}' does not match any "
-                    f"column in the table. Available columns: "
-                    f"{', '.join(sorted(available_columns))}",
-                )
-
-    # Apply query parameter filters
     filtered_records = []
-    for record in records:
+    for record in data:
         match = True
         for param_key, param_value in query_params.items():
-            # Convert both values to string for comparison (case-insensitive)
             record_value = str(record.get(param_key, "")).lower()
             param_value_lower = str(param_value).lower()
             if record_value != param_value_lower:
@@ -97,10 +73,4 @@ def apply_query_parameters(data, query_params: Dict[str, str]):
         if match:
             filtered_records.append(record)
 
-    # Return the same structure as input
-    if isinstance(data, dict):
-        result = data.copy()
-        result["value"] = filtered_records
-        return result
-    else:
-        return filtered_records
+    return filtered_records
