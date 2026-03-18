@@ -37,7 +37,6 @@ async def get_dataverse_table_info(
     "/api/v2/dataverse/tables/{entity_set_table_name}",
     responses={
         404: {"description": "Not found"},
-        400: {"description": "Bad request - invalid filter parameter"},
     },
 )
 async def get_dataverse_table(
