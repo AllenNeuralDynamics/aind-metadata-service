@@ -247,7 +247,9 @@ class TestDataverseRoutes:
         assert response.status_code == status.HTTP_200_OK
         result = response.json()
         assert "value" in result
-        assert result["value"] == []  # Should return empty list for invalid column
+        assert (
+            result["value"] == []
+        )  # Should return empty list for invalid column
 
     @patch("aind_dataverse_service_async_client.DefaultApi.get_table")
     def test_get_dataverse_table_no_matching_rows(

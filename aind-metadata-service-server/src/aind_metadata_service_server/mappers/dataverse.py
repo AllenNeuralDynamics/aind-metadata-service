@@ -1,7 +1,6 @@
 """Module to handle dataverse data mapping and filtering"""
 
 from typing import Dict, List
-from fastapi import HTTPException
 
 
 def filter_dataverse_metadata(data: Dict) -> Dict:
@@ -50,7 +49,7 @@ def apply_query_parameters(
     Returns
     -------
     List[Dict]
-        Filtered list of records. Returns empty list if query parameters 
+        Filtered list of records. Returns empty list if query parameters
         don't match any columns in the table.
     """
     if not query_params or not data:
