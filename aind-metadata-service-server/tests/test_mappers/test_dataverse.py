@@ -4,7 +4,6 @@ import unittest
 
 from aind_metadata_service_server.mappers.dataverse import (
     filter_dataverse_metadata,
-    apply_query_parameters,
 )
 
 
@@ -62,50 +61,3 @@ class TestDataverseMapper(unittest.TestCase):
             ],
         }
         self.assertEqual(filtered, expected)
-
-    def test_apply_query_parameters_no_filters(self):
-        """Test that no filters returns original data."""
-        data = [{"id": "1", "name": "Test"}]
-        result = apply_query_parameters(data, {})
-        self.assertEqual(result, data)
-
-    def test_apply_query_parameters_single_filter(self):
-        """Test filtering with single parameter."""
-        data = [
-            {"id": "1", "status": "active"},
-            {"id": "2", "status": "inactive"},
-        ]
-        result = apply_query_parameters(data, {"status": "active"})
-        expected = [{"id": "1", "status": "active"}]
-        self.assertEqual(result, expected)
-
-    def test_apply_query_parameters_multiple_filters(self):
-        """Test filtering with multiple parameters (AND logic)."""
-        data = [
-            {"id": "1", "status": "active", "owner": "alice"},
-            {"id": "2", "status": "active", "owner": "bob"},
-        ]
-        result = apply_query_parameters(
-            data, {"status": "active", "owner": "alice"}
-        )
-        expected = [{"id": "1", "status": "active", "owner": "alice"}]
-        self.assertEqual(result, expected)
-
-    def test_apply_query_parameters_case_insensitive(self):
-        """Test that filtering is case-insensitive."""
-        data = [{"id": "1", "status": "Active"}]
-        result = apply_query_parameters(data, {"status": "active"})
-        expected = [{"id": "1", "status": "Active"}]
-        self.assertEqual(result, expected)
-
-    def test_apply_query_parameters_invalid_column(self):
-        """Test that invalid column returns empty list."""
-        data = [{"id": "1", "name": "Test"}]
-        result = apply_query_parameters(data, {"invalid_column": "test"})
-        self.assertEqual(result, [])
-
-    def test_apply_query_parameters_empty_data(self):
-        """Test filtering with empty list returns empty list."""
-        data = []
-        result = apply_query_parameters(data, {"status": "active"})
-        self.assertEqual(result, [])

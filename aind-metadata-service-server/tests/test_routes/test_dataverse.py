@@ -60,19 +60,18 @@ class TestDataverseRoutes:
         client: TestClient,
     ):
         """Test successful retrieval of specific table data"""
-        mock_response = {
-            "value": [{"cr138_projectid": "123", "cr138_name": "Test Project"}]
-        }
+        mock_response = [
+            {"cr138_projectid": "123", "cr138_name": "Test Project"}
+        ]
         mock_api_get.return_value = mock_response
 
         response = client.get("/api/v2/dataverse/tables/cr138_projects")
 
         assert response.status_code == status.HTTP_200_OK
         result = response.json()
-        assert "value" in result
-        assert len(result["value"]) == 1
-        assert result["value"][0]["cr138_projectid"] == "123"
-        assert result["value"][0]["cr138_name"] == "Test Project"
+        assert len(result) == 1
+        assert result[0]["cr138_projectid"] == "123"
+        assert result[0]["cr138_name"] == "Test Project"
         assert len(mock_api_get.mock_calls) == 1
 
     @patch("aind_dataverse_service_async_client.DefaultApi.get_table")
@@ -82,7 +81,7 @@ class TestDataverseRoutes:
         client: TestClient,
     ):
         """Test when table is not found"""
-        mock_api_get.return_value = []
+        mock_api_get.return_value = None
 
         response = client.get("/api/v2/dataverse/tables/nonexistent_table")
 
@@ -114,215 +113,102 @@ class TestDataverseRoutes:
         assert len(mock_api_get.mock_calls) == 1
 
     @patch("aind_dataverse_service_async_client.DefaultApi.get_table")
-    def test_get_dataverse_table_with_filters_success(
+    def test_get_dataverse_table_with_filter_only(
         self,
         mock_api_get: AsyncMock,
         client: TestClient,
     ):
-        """Test successful filtering of table data"""
-        mock_response = {
-            "value": [
-                {
-                    "cr138_projectid": "123",
-                    "cr138_name": "Test Project",
-                    "cr138_status": "active",
-                    "cr138_owner": "jdoe",
-                },
-                {
-                    "cr138_projectid": "124",
-                    "cr138_name": "Another Project",
-                    "cr138_status": "inactive",
-                    "cr138_owner": "jdoe",
-                },
-                {
-                    "cr138_projectid": "125",
-                    "cr138_name": "Third Project",
-                    "cr138_status": "active",
-                    "cr138_owner": "alice",
-                },
-            ]
-        }
-        mock_api_get.return_value = mock_response
-
-        # Test filtering by single parameter
-        response = client.get(
-            "/api/v2/dataverse/tables/cr138_projects?cr138_status=active"
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        result = response.json()
-        assert "value" in result
-        assert len(result["value"]) == 2
-        assert all(
-            record["cr138_status"] == "active" for record in result["value"]
-        )
-        assert len(mock_api_get.mock_calls) == 1
-
-    @patch("aind_dataverse_service_async_client.DefaultApi.get_table")
-    def test_get_dataverse_table_with_multiple_filters(
-        self,
-        mock_api_get: AsyncMock,
-        client: TestClient,
-    ):
-        """Test filtering with multiple parameters (AND logic)"""
-        mock_response = {
-            "value": [
-                {
-                    "cr138_projectid": "123",
-                    "cr138_name": "Test Project",
-                    "cr138_status": "active",
-                    "cr138_owner": "jdoe",
-                },
-                {
-                    "cr138_projectid": "124",
-                    "cr138_name": "Another Project",
-                    "cr138_status": "inactive",
-                    "cr138_owner": "jdoe",
-                },
-                {
-                    "cr138_projectid": "125",
-                    "cr138_name": "Third Project",
-                    "cr138_status": "active",
-                    "cr138_owner": "alice",
-                },
-            ]
-        }
-        mock_api_get.return_value = mock_response
-
-        # Test filtering by multiple parameters
-        response = client.get(
-            "/api/v2/dataverse/tables/cr138_projects?"
-            "cr138_status=active&cr138_owner=jdoe"
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        result = response.json()
-        assert "value" in result
-        assert len(result["value"]) == 1
-        assert result["value"][0]["cr138_projectid"] == "123"
-        assert result["value"][0]["cr138_status"] == "active"
-        assert result["value"][0]["cr138_owner"] == "jdoe"
-
-    @patch("aind_dataverse_service_async_client.DefaultApi.get_table")
-    def test_get_dataverse_table_no_filters(
-        self,
-        mock_api_get: AsyncMock,
-        client: TestClient,
-    ):
-        """Test that no filters returns full table"""
-        mock_response = {
-            "value": [
-                {"cr138_projectid": "123", "cr138_name": "Test Project"},
-                {"cr138_projectid": "124", "cr138_name": "Another Project"},
-            ]
-        }
-        mock_api_get.return_value = mock_response
-
-        response = client.get("/api/v2/dataverse/tables/cr138_projects")
-
-        assert response.status_code == status.HTTP_200_OK
-        result = response.json()
-        assert "value" in result
-        assert len(result["value"]) == 2  # Should return all records
-        assert len(mock_api_get.mock_calls) == 1
-
-    @patch("aind_dataverse_service_async_client.DefaultApi.get_table")
-    def test_get_dataverse_table_invalid_filter_parameter(
-        self,
-        mock_api_get: AsyncMock,
-        client: TestClient,
-    ):
-        """Test that invalid filter parameter returns empty results"""
-        mock_response = {
-            "value": [
-                {"cr138_projectid": "123", "cr138_name": "Test Project"},
-            ]
-        }
+        """Test filtering with OData expression"""
+        mock_response = [
+            {
+                "cr138_projectid": "123",
+                "cr138_projectname": "Barseq_GeneticTools",
+            }
+        ]
         mock_api_get.return_value = mock_response
 
         response = client.get(
-            "/api/v2/dataverse/tables/cr138_projects?invalid_column=test"
+            "/api/v2/dataverse/tables/cr138_projects",
+            params={"filter": "cr138_projectname eq 'Barseq_GeneticTools'"},
         )
 
         assert response.status_code == status.HTTP_200_OK
         result = response.json()
-        assert "value" in result
-        assert (
-            result["value"] == []
-        )  # Should return empty list for invalid column
+        assert len(result) == 1
+        assert result[0]["cr138_projectname"] == "Barseq_GeneticTools"
+
+        # Verify the OData filter was passed directly to the API
+        mock_api_get.assert_called_once_with(
+            "cr138_projects",
+            columns=None,
+            filter="cr138_projectname eq 'Barseq_GeneticTools'",
+            _request_timeout=10,
+        )
 
     @patch("aind_dataverse_service_async_client.DefaultApi.get_table")
-    def test_get_dataverse_table_no_matching_rows(
+    def test_get_dataverse_table_with_columns_only(
         self,
         mock_api_get: AsyncMock,
         client: TestClient,
     ):
-        """Test that no matching rows returns empty list"""
-        mock_response = {
-            "value": [
-                {"cr138_projectid": "123", "cr138_status": "active"},
-                {"cr138_projectid": "124", "cr138_status": "active"},
-            ]
-        }
+        """Test column selection only"""
+        mock_response = [
+            {"cr138_projectid": "123", "cr138_name": "Test Project"}
+        ]
         mock_api_get.return_value = mock_response
 
         response = client.get(
-            "/api/v2/dataverse/tables/cr138_projects?cr138_status=inactive"
+            "/api/v2/dataverse/tables/cr138_projects",
+            params={"columns": "cr138_projectid,cr138_name"},
         )
 
         assert response.status_code == status.HTTP_200_OK
         result = response.json()
-        assert "value" in result
-        assert result["value"] == []  # Should return empty list
+        assert len(result) == 1
+        assert "cr138_projectid" in result[0]
+        assert "cr138_name" in result[0]
+
+        # Verify columns was passed to the API
+        mock_api_get.assert_called_once_with(
+            "cr138_projects",
+            columns="cr138_projectid,cr138_name",
+            filter=None,
+            _request_timeout=10,
+        )
 
     @patch("aind_dataverse_service_async_client.DefaultApi.get_table")
-    def test_get_dataverse_table_case_insensitive_filtering(
+    def test_get_dataverse_table_with_columns_and_filter(
         self,
         mock_api_get: AsyncMock,
         client: TestClient,
     ):
-        """Test that filtering is case-insensitive"""
-        mock_response = {
-            "value": [
-                {"cr138_projectid": "123", "cr138_status": "Active"},
-                {"cr138_projectid": "124", "cr138_status": "ACTIVE"},
-                {"cr138_projectid": "125", "cr138_status": "inactive"},
-            ]
-        }
+        """Test using both columns and filter parameters together"""
+        mock_response = [
+            {"cr138_projectid": "123", "cr138_name": "Test Project"}
+        ]
         mock_api_get.return_value = mock_response
 
-        # Test case-insensitive filtering
         response = client.get(
-            "/api/v2/dataverse/tables/cr138_projects?cr138_status=active"
+            "/api/v2/dataverse/tables/cr138_projects",
+            params={
+                "columns": "cr138_projectid,cr138_name",
+                "filter": "cr138_status eq 'active'",
+            },
         )
 
         assert response.status_code == status.HTTP_200_OK
         result = response.json()
-        assert "value" in result
-        assert (
-            len(result["value"]) == 2
-        )  # Should match both "Active" and "ACTIVE"
-        assert result["value"][0]["cr138_projectid"] == "123"
-        assert result["value"][1]["cr138_projectid"] == "124"
+        assert len(result) == 1
+        assert result[0]["cr138_projectid"] == "123"
+        assert result[0]["cr138_name"] == "Test Project"
 
-    @patch("aind_dataverse_service_async_client.DefaultApi.get_table")
-    def test_get_dataverse_table_empty_table_with_filters(
-        self,
-        mock_api_get: AsyncMock,
-        client: TestClient,
-    ):
-        """Test filtering on empty table"""
-        mock_response = {"value": []}
-        mock_api_get.return_value = mock_response
-
-        response = client.get(
-            "/api/v2/dataverse/tables/cr138_projects?cr138_status=active"
+        # Verify both columns and filter were passed to the API
+        mock_api_get.assert_called_once_with(
+            "cr138_projects",
+            columns="cr138_projectid,cr138_name",
+            filter="cr138_status eq 'active'",
+            _request_timeout=10,
         )
-
-        assert response.status_code == status.HTTP_200_OK
-        result = response.json()
-        assert "value" in result
-        assert result["value"] == []
 
 
 if __name__ == "__main__":

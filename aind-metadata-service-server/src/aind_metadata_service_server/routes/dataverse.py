@@ -1,11 +1,10 @@
 """Module to handle dataverse endpoints"""
 
 from aind_dataverse_service_async_client.exceptions import ApiException
-from fastapi import APIRouter, Depends, HTTPException, Path, Request
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
 from aind_metadata_service_server.mappers.dataverse import (
     filter_dataverse_metadata,
-    apply_query_parameters,
 )
 from aind_metadata_service_server.sessions import get_dataverse_api_instance
 
@@ -40,7 +39,6 @@ async def get_dataverse_table_info(
     },
 )
 async def get_dataverse_table(
-    request: Request,
     entity_set_table_name: str = Path(
         ...,
         description="The entity set name of the table to fetch",
@@ -52,34 +50,34 @@ async def get_dataverse_table(
             }
         },
     ),
+    columns: str | None = Query(
+        default=None,
+        description="Comma-separated column names to select from the table",
+        example="modifiedon,statecode,cr138_projectname",
+    ),
+    filter: str = Query(
+        default=None,
+        description="OData-style filter expression",
+        example="cr138_projectname eq 'Barseq_GeneticTools'",
+    ),
     dataverse_api_instance=Depends(get_dataverse_api_instance),
 ):
     """
     ## Table Data
     Retrieves data for a specific entity table in Dataverse.
-
-    The results can be filtered by adding query parameters. For example:
-    - `/api/v2/dataverse/tables/cr138_projects?status=active&owner=jdoe`
     """
     try:
+
         dataverse_response = await dataverse_api_instance.get_table(
-            entity_set_table_name, _request_timeout=10
+            entity_set_table_name,
+            columns=columns,
+            filter=filter,
+            _request_timeout=10,
         )
-        if not dataverse_response:
+        if dataverse_response is None:
             raise HTTPException(status_code=404, detail="Not found")
 
-        query_params = {}
-        if request.query_params:
-            query_params = dict(request.query_params)
-
         filtered_response = filter_dataverse_metadata(dataverse_response)
-        if query_params and "value" in filtered_response:
-            records_list = filtered_response["value"]
-            filtered_records = apply_query_parameters(
-                records_list, query_params
-            )
-            filtered_response["value"] = filtered_records
-
         return filtered_response
 
     except ApiException as e:
