@@ -55,7 +55,7 @@ async def get_dataverse_table(
         description="Comma-separated column names to select from the table",
         example="modifiedon,statecode,cr138_projectname",
     ),
-    filter: str = Query(
+    filter: str | None = Query(
         default=None,
         description="OData-style filter expression",
         example="cr138_projectname eq 'Barseq_GeneticTools'",
@@ -74,11 +74,10 @@ async def get_dataverse_table(
             filter=filter,
             _request_timeout=10,
         )
-        if dataverse_response is None:
+        if not dataverse_response:
             raise HTTPException(status_code=404, detail="Not found")
 
-        filtered_response = filter_dataverse_metadata(dataverse_response)
-        return filtered_response
+        return filter_dataverse_metadata(dataverse_response)
 
     except ApiException as e:
         raise HTTPException(

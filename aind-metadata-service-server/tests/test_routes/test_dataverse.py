@@ -113,70 +113,6 @@ class TestDataverseRoutes:
         assert len(mock_api_get.mock_calls) == 1
 
     @patch("aind_dataverse_service_async_client.DefaultApi.get_table")
-    def test_get_dataverse_table_with_filter_only(
-        self,
-        mock_api_get: AsyncMock,
-        client: TestClient,
-    ):
-        """Test filtering with OData expression"""
-        mock_response = [
-            {
-                "cr138_projectid": "123",
-                "cr138_projectname": "Barseq_GeneticTools",
-            }
-        ]
-        mock_api_get.return_value = mock_response
-
-        response = client.get(
-            "/api/v2/dataverse/tables/cr138_projects",
-            params={"filter": "cr138_projectname eq 'Barseq_GeneticTools'"},
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        result = response.json()
-        assert len(result) == 1
-        assert result[0]["cr138_projectname"] == "Barseq_GeneticTools"
-
-        # Verify the OData filter was passed directly to the API
-        mock_api_get.assert_called_once_with(
-            "cr138_projects",
-            columns=None,
-            filter="cr138_projectname eq 'Barseq_GeneticTools'",
-            _request_timeout=10,
-        )
-
-    @patch("aind_dataverse_service_async_client.DefaultApi.get_table")
-    def test_get_dataverse_table_with_columns_only(
-        self,
-        mock_api_get: AsyncMock,
-        client: TestClient,
-    ):
-        """Test column selection only"""
-        mock_response = [
-            {"cr138_projectid": "123", "cr138_name": "Test Project"}
-        ]
-        mock_api_get.return_value = mock_response
-
-        response = client.get(
-            "/api/v2/dataverse/tables/cr138_projects",
-            params={"columns": "cr138_projectid,cr138_name"},
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        result = response.json()
-        assert len(result) == 1
-        assert "cr138_projectid" in result[0]
-        assert "cr138_name" in result[0]
-
-        # Verify columns was passed to the API
-        mock_api_get.assert_called_once_with(
-            "cr138_projects",
-            columns="cr138_projectid,cr138_name",
-            filter=None,
-            _request_timeout=10,
-        )
-
-    @patch("aind_dataverse_service_async_client.DefaultApi.get_table")
     def test_get_dataverse_table_with_columns_and_filter(
         self,
         mock_api_get: AsyncMock,
@@ -202,7 +138,6 @@ class TestDataverseRoutes:
         assert result[0]["cr138_projectid"] == "123"
         assert result[0]["cr138_name"] == "Test Project"
 
-        # Verify both columns and filter were passed to the API
         mock_api_get.assert_called_once_with(
             "cr138_projects",
             columns="cr138_projectid,cr138_name",

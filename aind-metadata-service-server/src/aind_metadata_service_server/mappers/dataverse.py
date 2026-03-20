@@ -1,9 +1,9 @@
 """Module to handle dataverse data mapping and filtering"""
 
-from typing import Any
+from typing import Dict
 
 
-def filter_dataverse_metadata(data: Any) -> Any:
+def filter_dataverse_metadata(data: Dict) -> Dict:
     """
     Filter out Dataverse metadata fields from the response.
     Parameters
