@@ -1,7 +1,7 @@
 """Module to handle dataverse endpoints"""
 
 from aind_dataverse_service_async_client.exceptions import ApiException
-from fastapi import APIRouter, Depends, HTTPException, Path
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
 from aind_metadata_service_server.mappers.dataverse import (
     filter_dataverse_metadata,
@@ -50,6 +50,16 @@ async def get_dataverse_table(
             }
         },
     ),
+    columns: str | None = Query(
+        default=None,
+        description="Comma-separated column names to select from the table",
+        example="modifiedon,statecode,cr138_projectname",
+    ),
+    filter: str | None = Query(
+        default=None,
+        description="OData-style filter expression",
+        example="cr138_projectname eq 'Barseq_GeneticTools'",
+    ),
     dataverse_api_instance=Depends(get_dataverse_api_instance),
 ):
     """
@@ -57,11 +67,16 @@ async def get_dataverse_table(
     Retrieves data for a specific entity table in Dataverse.
     """
     try:
+
         dataverse_response = await dataverse_api_instance.get_table(
-            entity_set_table_name, _request_timeout=10
+            entity_set_table_name,
+            columns=columns,
+            filter=filter,
+            _request_timeout=10,
         )
         if not dataverse_response:
             raise HTTPException(status_code=404, detail="Not found")
+
         return filter_dataverse_metadata(dataverse_response)
 
     except ApiException as e:
