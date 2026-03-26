@@ -30,7 +30,9 @@ dependencies = [
     'pydantic>=2.0',
     'pydantic-settings>=2.0',
     'fastapi[standard]>=0.114.0',
-    'aind-data-access-api==1.9.0'
+    'aind-data-access-api==1.9.0',
+    'python-json-logger',
+    'PyYAML'
 ]
 
 [project.optional-dependencies]
@@ -46,7 +48,7 @@ dev = [
     'pytest-env',
     'pytest-mock',
     'pytest_asyncio',
-    'pytest-httpx'
+    'pytest-httpx',
 ]
 
 [tool.setuptools.packages.find]
