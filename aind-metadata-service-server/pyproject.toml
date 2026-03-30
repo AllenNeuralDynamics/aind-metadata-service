@@ -29,6 +29,8 @@ dependencies = [
     'pydantic>=2.0',
     'pydantic-settings>=2.0',
     'fastapi[standard]>=0.114.0',
+    'python-json-logger',
+    'PyYAML'
 ]
 
 [project.optional-dependencies]

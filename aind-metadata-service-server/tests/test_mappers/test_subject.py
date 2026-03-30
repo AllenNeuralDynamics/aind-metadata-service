@@ -115,8 +115,8 @@ class TestSubjectMapper(unittest.TestCase):
         subject_complete_info = LabtrackSubject(
             id="123",
             group_name="A",
-            paternal_id="B",
-            maternal_id="D",
+            paternal_id="623236",
+            maternal_id="615310",
             paternal_class_values=MouseCustomClass(full_genotype="C"),
             maternal_class_values=MouseCustomClass(full_genotype="E"),
         )
@@ -130,9 +130,9 @@ class TestSubjectMapper(unittest.TestCase):
         self.assertEqual(
             BreedingInfo(
                 breeding_group="A",
-                paternal_id="B",
+                paternal_id="623236",
                 paternal_genotype="C",
-                maternal_id="D",
+                maternal_id="615310",
                 maternal_genotype="E",
             ),
             SubjectMapper(subject_complete_info)._map_breeding_info(),
