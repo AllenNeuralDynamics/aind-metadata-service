@@ -38,6 +38,20 @@ if __name__ == "__main__":
         openapi_version=app.openapi_version if app.openapi_version else None,
         description=app.description if app.description else None,
         routes=app.routes if app.routes else None,
+        servers=[
+            {
+                "url": "https://aind-metadata-service",
+                "description": "Production environment",
+            },
+            {
+                "url": "https://aind-metadata-service-dev",
+                "description": "Development environment",
+            },
+            {
+                "url": "http://localhost:5000",
+                "description": "Local development environment",
+            },
+        ],
     )
     with open("openapi.json", "w") as f:
         json.dump(specs, f)
