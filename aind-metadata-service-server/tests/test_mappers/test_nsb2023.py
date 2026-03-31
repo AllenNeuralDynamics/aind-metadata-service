@@ -1748,12 +1748,44 @@ class TestNSB2023CoordinateMapping(TestCase):
         self.assertEqual(len(transforms), 1)
         translation, rotation = transforms[0]
 
-        # ARID without depth should still have 4D (with 0 depth)
+        # ARID without depth should still have 4D, with missing depth preserved
         self.assertEqual(len(translation.translation), 4)
-        self.assertEqual(translation.translation[3], 0)
+        self.assertIsNone(translation.translation[3])
 
         self.assertEqual(len(rotation.angles), 4)
         self.assertEqual(rotation.angles[3], 0)
+
+    def test_map_burr_hole_transforms_all_coords_missing(self):
+        """If AP/ML/DV are all None, translation should be empty."""
+        transforms = MappedNSBList._map_burr_hole_transforms(
+            angle=Decimal("10"),
+            ml=None,
+            ap=None,
+            depth=None,
+            surgery_coordinate_system=CoordinateSystemLibrary.BREGMA_ARID,
+        )
+
+        self.assertEqual(len(transforms), 1)
+        translation, rotation = transforms[0]
+        self.assertEqual(translation.translation, [])
+        self.assertEqual(rotation.angles, [10, 0, 0, 0])
+
+    def test_map_burr_hole_transforms_missing_ap_ml_with_dv(self):
+        """If any coordinate exists, keep missing values as None, not zero."""
+        transforms = MappedNSBList._map_burr_hole_transforms(
+            angle=Decimal("10"),
+            ml=None,
+            ap=None,
+            depth=[Decimal("3.0")],
+            surgery_coordinate_system=CoordinateSystemLibrary.BREGMA_ARID,
+        )
+
+        self.assertEqual(len(transforms), 1)
+        translation, _ = transforms[0]
+        self.assertEqual(
+            translation.translation,
+            [None, None, 0, Decimal("3.0")],
+        )
 
     def test_map_burr_hole_transforms_no_depth_ari(self):
         """Test burr hole transforms without depth for ARI system"""

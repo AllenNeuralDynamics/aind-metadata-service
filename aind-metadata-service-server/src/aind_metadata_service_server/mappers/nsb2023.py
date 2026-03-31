@@ -3131,23 +3131,28 @@ class MappedNSBList:
         -------
         List[List[Union[Translation, Rotation]]]
         """
-        ap = ap if ap is not None else 0
-        ml = ml if ml is not None else 0
         angle = angle if angle is not None else 0
         is_arid = (
             surgery_coordinate_system is not None
             and surgery_coordinate_system.name.endswith("ARID")
         )
 
+        if ap is None and ml is None and depth is None:
+            rotation = Rotation(
+                angles=[angle, 0, 0, 0] if is_arid else [angle, 0, 0],
+                angles_unit=AngleUnit.DEG,
+            )
+            return [[Translation(translation=[]), rotation]]
+
         transforms = []
         if depth is None:
-            translation = Translation(translation=[ap, ml, 0])
-            rotation = Rotation(
-                angles=[angle, 0, 0], angles_unit=AngleUnit.DEG
+            translation = Translation(
+                translation=[ap, ml, 0, None] if is_arid else [ap, ml, 0]
             )
-            if is_arid:
-                translation.translation.append(0)
-                rotation.angles.append(0)
+            rotation = Rotation(
+                angles=[angle, 0, 0, 0] if is_arid else [angle, 0, 0],
+                angles_unit=AngleUnit.DEG,
+            )
             transforms.append([translation, rotation])
         else:
             for d in depth:
