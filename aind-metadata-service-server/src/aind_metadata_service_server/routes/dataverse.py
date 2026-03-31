@@ -53,12 +53,24 @@ async def get_dataverse_table(
     columns: str | None = Query(
         default=None,
         description="Comma-separated column names to select from the table",
-        example="modifiedon,statecode,cr138_projectname",
+        openapi_examples={
+            "default": {
+                "summary": "A sample column selection",
+                "description": "Example columns to select",
+                "value": "modifiedon,statecode,cr138_projectname",
+            }
+        },
     ),
     filter: str | None = Query(
         default=None,
         description="OData-style filter expression",
-        example="cr138_projectname eq 'Barseq_GeneticTools'",
+        openapi_examples={
+            "default": {
+                "summary": "A sample filter expression",
+                "description": "Example OData-style filter expression",
+                "value": "cr138_projectname eq 'Barseq_GeneticTools'",
+            }
+        },
     ),
     dataverse_api_instance=Depends(get_dataverse_api_instance),
 ):

@@ -3131,23 +3131,36 @@ class MappedNSBList:
         -------
         List[List[Union[Translation, Rotation]]]
         """
+        # If all coordinates are None, return empty translation
+        if ap is None and ml is None and depth is None:
+            angle = angle if angle is not None else 0
+            is_arid = (
+                surgery_coordinate_system is not None
+                and surgery_coordinate_system.name.endswith("ARID")
+            )
+            rotation = Rotation(
+                angles=[angle, 0, 0, 0] if is_arid else [angle, 0, 0],
+                angles_unit=AngleUnit.DEG,
+            )
+            return [[Translation.model_construct(translation=[]), rotation]]
+
+        # Convert Decimal to float when not None
+        ap_val = float(ap) if ap is not None else None
+        ml_val = float(ml) if ml is not None else None
         angle = angle if angle is not None else 0
         is_arid = (
             surgery_coordinate_system is not None
             and surgery_coordinate_system.name.endswith("ARID")
         )
 
-        if ap is None and ml is None and depth is None:
-            rotation = Rotation(
-                angles=[angle, 0, 0, 0] if is_arid else [angle, 0, 0],
-                angles_unit=AngleUnit.DEG,
-            )
-            return [[Translation(translation=[]), rotation]]
-
         transforms = []
         if depth is None:
-            translation = Translation(
-                translation=[ap, ml, 0, None] if is_arid else [ap, ml, 0]
+            translation = Translation.model_construct(
+                translation=(
+                    [ap_val, ml_val, 0, None]
+                    if is_arid
+                    else [ap_val, ml_val, 0]
+                )
             )
             rotation = Rotation(
                 angles=[angle, 0, 0, 0] if is_arid else [angle, 0, 0],
@@ -3156,8 +3169,13 @@ class MappedNSBList:
             transforms.append([translation, rotation])
         else:
             for d in depth:
-                translation = Translation(
-                    translation=[ap, ml, 0, d] if is_arid else [ap, ml, 0]
+                d_val = float(d) if d is not None else None
+                translation = Translation.model_construct(
+                    translation=(
+                        [ap_val, ml_val, 0, d_val]
+                        if is_arid
+                        else [ap_val, ml_val, 0]
+                    )
                 )
                 rotation = Rotation(
                     angles=[angle, 0, 0, 0] if is_arid else [angle, 0, 0],
