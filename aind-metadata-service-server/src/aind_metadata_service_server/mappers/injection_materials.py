@@ -82,6 +82,16 @@ class InjectionMaterialsMapper:
         self.virus_data = list(tars_virus_data) if tars_virus_data else []
 
     @property
+    def tars_virus_data(self) -> List[VirusData]:
+        """Get the TARS virus data."""
+        return self.virus_data
+
+    @tars_virus_data.setter
+    def tars_virus_data(self, value: Optional[List[VirusData]]):
+        """Set the TARS virus data."""
+        self.virus_data = list(value) if value else []
+
+    @property
     def virus_id(self) -> Optional[str]:
         """Virus ID associated with prep lot."""
         if (
@@ -314,7 +324,7 @@ class InjectionMaterialsMapper:
         addgene_id_pidname = self._create_addgene_pid_name(virus_info)
         stock_titer = self._map_stock_titer(self.prep_lot_data.titers)
         tars_virus_identifiers = TarsVirusIdentifiers(
-            prep_lot_number=prep_lot_number,  # Only required field
+            prep_lot_number=prep_lot_number,
             virus_tars_id=self.virus_id,
             plasmid_tars_alias=virus_info.plasmid_alias,
             prep_date=prep_date,
