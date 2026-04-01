@@ -275,7 +275,7 @@ class InjectionMaterialsMapper:
         PIDName | None
             PIDName object or None
         """
-        if virus_info.name is None:
+        if virus_info.name is None and virus_info.addgene_id is None:
             return None
         else:
             if virus_info.rrid is None:
