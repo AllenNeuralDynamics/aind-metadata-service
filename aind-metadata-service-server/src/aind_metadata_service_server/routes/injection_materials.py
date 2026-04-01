@@ -63,7 +63,7 @@ async def get_injection_materials(
             virus_response = await tars_api_instance.get_viruses(
                 name=virus_id, _request_timeout=10
             )
-            mapper.tars_virus_data = virus_response
+            mapper.virus_data = virus_response or []
 
     viral_materials = [m.map_to_viral_material_information() for m in mappers]
     if len(viral_materials) == 0:

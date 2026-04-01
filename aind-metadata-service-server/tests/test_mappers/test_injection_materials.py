@@ -54,20 +54,6 @@ class TestInjectionMaterialsMapping(unittest.TestCase):
         """Tests virus_id property"""
         self.assertEqual("VIR300001_PHPeB", self.mapper.virus_id)
 
-    def test_tars_virus_data_property(self):
-        """Tests tars_virus_data property getter and setter"""
-        initial_virus_data = self.mapper.tars_virus_data
-        self.assertEqual(self.mapper.virus_data, initial_virus_data)
-
-        new_virus_data = [VirusData(id="test-id", rr_id="test-rr")]
-        self.mapper.tars_virus_data = new_virus_data
-        self.assertEqual(new_virus_data, self.mapper.virus_data)
-        self.assertEqual(new_virus_data, self.mapper.tars_virus_data)
-
-        self.mapper.tars_virus_data = None
-        self.assertEqual([], self.mapper.virus_data)
-        self.assertEqual([], self.mapper.tars_virus_data)
-
     def test_map_to_prep_type(self):
         """Tests map_to_prep_type"""
         prep_type_crude = self.mapper._map_to_prep_type("Crude-SOP#VC002")
@@ -141,39 +127,6 @@ class TestInjectionMaterialsMapping(unittest.TestCase):
         )
         self.assertEqual(
             TarsVirusInformation(), mapper._map_virus_information()
-        )
-
-    def test_plasmid_alias_with_property_setter(self):
-        """Tests that plasmid_tars_alias is populated with virus data"""
-        mapper = InjectionMaterialsMapper(
-            tars_prep_lot_data=self.mapper.prep_lot_data, tars_virus_data=None
-        )
-        virus_info = mapper._map_virus_information()
-        self.assertIsNone(virus_info.plasmid_alias)
-
-        virus_data = [
-            VirusData(
-                id="test-id",
-                molecules=[
-                    {
-                        "fullName": "Test-Plasmid",
-                        "aliases": [
-                            {"name": "TestAlias123", "isPreferred": True}
-                        ],
-                        "addgeneId": "123456",
-                        "rrId": "test-rr",
-                    }
-                ],
-            )
-        ]
-        mapper.tars_virus_data = virus_data
-        virus_info = mapper._map_virus_information()
-        self.assertIsNotNone(virus_info.plasmid_alias)
-        self.assertEqual(["TestAlias123"], virus_info.plasmid_alias)
-        viral_material = mapper.map_to_viral_material_information()
-        self.assertEqual(
-            ["TestAlias123"],
-            viral_material.tars_identifiers.plasmid_tars_alias,
         )
 
     def test_map_virus_information_first_rrid_edge_case(self):
