@@ -2,6 +2,7 @@
 
 from typing import AsyncGenerator
 
+import aind_active_directory_service_async_client
 import aind_dataverse_service_async_client
 import aind_labtracks_service_async_client
 import aind_mgi_service_async_client
@@ -9,6 +10,7 @@ import aind_sharepoint_service_async_client
 import aind_slims_service_async_client
 import aind_smartsheet_service_async_client
 import aind_tars_service_async_client
+import aind_active_directory_service_async_client
 from aind_data_access_api.document_db import Client as DocDBClient
 from httpx import AsyncClient
 
@@ -35,6 +37,9 @@ tars_config = aind_tars_service_async_client.Configuration(
 )
 dataverse_config = aind_dataverse_service_async_client.Configuration(
     host=settings.dataverse_host.unicode_string().strip("/")
+)
+active_directory_config = aind_active_directory_service_async_client.Configuration(
+    host=settings.active_directory_host.unicode_string().strip("/")
 )
 
 
@@ -149,6 +154,19 @@ async def get_dataverse_api_instance() -> (
         )
         yield api_instance
 
+async def get_active_directory_api_instance() -> (
+    AsyncGenerator[aind_active_directory_service_async_client.DefaultApi, None]
+):
+    """
+    Yield an aind_active_directory_service_async_client.DefaultApi object.
+    """
+    async with aind_active_directory_service_async_client.ApiClient(
+        active_directory_config
+    ) as api_client:
+        api_instance = aind_active_directory_service_async_client.DefaultApi(
+            api_client
+        )
+        yield api_instance
 
 def get_instruments_client() -> DocDBClient:
     """

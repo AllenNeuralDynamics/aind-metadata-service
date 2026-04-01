@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     dataverse_host: HttpUrl = Field(
         ..., description="Host address for dataverse endpoint"
     )
+    active_directory_host: HttpUrl = Field(
+        ..., description="Host address for active directory endpoint"
+    )
 
 
 def get_settings():
