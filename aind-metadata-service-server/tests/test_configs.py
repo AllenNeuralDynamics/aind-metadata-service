@@ -34,7 +34,12 @@ class TestSettings(unittest.TestCase):
             "AIND_METADATA_SERVICE_AIND_DATA_SCHEMA_V1_HOST": (
                 "http://example.com/v1"
             ),
-            "AIND_METADATA_SERVICE_DOCDB_API_HOST": ("example.com/docdb"),
+            "AIND_METADATA_SERVICE_DOCDB_API_HOST": (
+                "http://example.com/docdb"
+            ),
+            "AIND_METADATA_SERVICE_ACTIVE_DIRECTORY_HOST": (
+                "http://example.com/active_directory"
+            ),
         },
         clear=True,
     )
@@ -50,7 +55,8 @@ class TestSettings(unittest.TestCase):
             sharepoint_host="http://example.com/sharepoint",
             dataverse_host="http://example.com/dataverse",
             session_json_host="http://example.com/session_json",
-            docdb_api_host="example.com/docdb",
+            docdb_api_host="http://example.com/docdb",
+            active_directory_host="http://example.com/active_directory",
         )
         self.assertEqual(expected_settings, settings)
 
