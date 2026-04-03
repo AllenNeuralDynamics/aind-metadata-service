@@ -25,7 +25,7 @@ class TestUserEmailRoute:
         mock_user_response = UserInfo(
             username="john.doe",
             full_name="John Doe",
-            email="john.doe@alleninstitute.org",
+            email="john.doe@example.com",
         )
         mock_ad_api_get.return_value = mock_user_response
 
