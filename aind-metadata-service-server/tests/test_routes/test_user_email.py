@@ -2,9 +2,11 @@
 
 from unittest.mock import AsyncMock, patch
 
-from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from aind_active_directory_service_async_client.models import UserInfo
+from aind_active_directory_service_async_client.exceptions import (
+    NotFoundException,
+)
 
 
 class TestUserEmailRoute:
@@ -64,12 +66,10 @@ class TestUserEmailRoute:
         client: TestClient,
     ):
         """Tests an error response from the AD API"""
-        mock_ad_api_get.side_effect = HTTPException(
-            status_code=500, detail="AD API error"
-        )
+        mock_ad_api_get.side_effect = NotFoundException()
 
         response = client.get("/api/v2/active_directory/john.doe")
-        expected_response = {"detail": "AD API error"}
-        assert 500 == response.status_code
+        expected_response = {"detail": "Not found"}
+        assert 404 == response.status_code
         assert expected_response == response.json()
         assert 1 == len(mock_ad_api_get.mock_calls)
