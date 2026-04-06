@@ -314,7 +314,7 @@ class InjectionMaterialsMapper:
         addgene_id_pidname = self._create_addgene_pid_name(virus_info)
         stock_titer = self._map_stock_titer(self.prep_lot_data.titers)
         tars_virus_identifiers = TarsVirusIdentifiers(
-            prep_lot_number=prep_lot_number,  # Only required field
+            prep_lot_number=prep_lot_number,
             virus_tars_id=self.virus_id,
             plasmid_tars_alias=virus_info.plasmid_alias,
             prep_date=prep_date,
