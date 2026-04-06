@@ -24,6 +24,7 @@ from aind_metadata_service_server.routes import (
     slims,
     subject,
     v1_proxy,
+    user_email,
 )
 
 warnings.filterwarnings(
@@ -70,6 +71,7 @@ app.include_router(perfusion.router)
 app.include_router(mgi_allele.router)
 app.include_router(injection_materials.router)
 app.include_router(dataverse.router)
+app.include_router(user_email.router)
 app.include_router(index.router)
 
 # Clean up the methods names that is generated in the client code
