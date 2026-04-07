@@ -1,6 +1,6 @@
 # aind_metadata_service_client.DefaultApi
 
-All URIs are relative to *http://localhost*
+All URIs are relative to *https://aind-metadata-service*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -21,6 +21,7 @@ Method | HTTP request | Description
 [**get_slims_workflow**](DefaultApi.md#get_slims_workflow) | **GET** /api/v2/slims/{workflow} | Get Slims Workflow
 [**get_smartsheet_funding**](DefaultApi.md#get_smartsheet_funding) | **GET** /api/v2/smartsheet/funding | Get Smartsheet Funding
 [**get_subject**](DefaultApi.md#get_subject) | **GET** /api/v2/subject/{subject_id} | Get Subject
+[**get_user_from_active_directory**](DefaultApi.md#get_user_from_active_directory) | **GET** /api/v2/active_directory/{username} | Get User From Active Directory
 [**get_v1_bergamo_session**](DefaultApi.md#get_v1_bergamo_session) | **POST** /bergamo_session | Get V1 Bergamo Session
 [**get_v1_funding**](DefaultApi.md#get_v1_funding) | **GET** /funding/{project_name} | Get V1 Funding
 [**get_v1_injection_materials**](DefaultApi.md#get_v1_injection_materials) | **GET** /tars_injection_materials/{prep_lot_number} | Get V1 Injection Materials
@@ -39,7 +40,7 @@ Method | HTTP request | Description
 
 
 # **get_dataverse_table**
-> object get_dataverse_table(entity_set_table_name)
+> object get_dataverse_table(entity_set_table_name, columns=columns, filter=filter)
 
 Get Dataverse Table
 
@@ -54,10 +55,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -66,10 +67,12 @@ with aind_metadata_service_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = aind_metadata_service_client.DefaultApi(api_client)
     entity_set_table_name = 'cr138_projects' # str | The entity set name of the table to fetch
+    columns = 'modifiedon,statecode,cr138_projectname' # str | Comma-separated column names to select from the table (optional)
+    filter = 'cr138_projectname eq \'Barseq_GeneticTools\'' # str | OData-style filter expression (optional)
 
     try:
         # Get Dataverse Table
-        api_response = api_instance.get_dataverse_table(entity_set_table_name)
+        api_response = api_instance.get_dataverse_table(entity_set_table_name, columns=columns, filter=filter)
         print("The response of DefaultApi->get_dataverse_table:\n")
         pprint(api_response)
     except Exception as e:
@@ -84,6 +87,8 @@ with aind_metadata_service_client.ApiClient(configuration) as api_client:
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **entity_set_table_name** | **str**| The entity set name of the table to fetch | 
+ **columns** | **str**| Comma-separated column names to select from the table | [optional] 
+ **filter** | **str**| OData-style filter expression | [optional] 
 
 ### Return type
 
@@ -124,10 +129,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -189,10 +194,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -261,10 +266,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -332,10 +337,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -405,10 +410,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -476,10 +481,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -548,10 +553,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -619,10 +624,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -690,10 +695,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -761,10 +766,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -831,10 +836,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -895,10 +900,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -966,10 +971,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -1040,10 +1045,10 @@ from aind_metadata_service_client.models.slims_workflow import SlimsWorkflow
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -1118,10 +1123,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -1182,10 +1187,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -1238,6 +1243,74 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **get_user_from_active_directory**
+> object get_user_from_active_directory(username)
+
+Get User From Active Directory
+
+Queries active directory for user information
+
+### Example
+
+
+```python
+import aind_metadata_service_client
+from aind_metadata_service_client.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to https://aind-metadata-service
+# See configuration.py for a list of all supported configuration parameters.
+configuration = aind_metadata_service_client.Configuration(
+    host = "https://aind-metadata-service"
+)
+
+
+# Enter a context with an instance of the API client
+with aind_metadata_service_client.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = aind_metadata_service_client.DefaultApi(api_client)
+    username = 'username_example' # str | 
+
+    try:
+        # Get User From Active Directory
+        api_response = api_instance.get_user_from_active_directory(username)
+        print("The response of DefaultApi->get_user_from_active_directory:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling DefaultApi->get_user_from_active_directory: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **username** | **str**|  | 
+
+### Return type
+
+**object**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Successful Response |  -  |
+**422** | Validation Error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **get_v1_bergamo_session**
 > object get_v1_bergamo_session(request_body)
 
@@ -1254,10 +1327,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -1322,10 +1395,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -1391,10 +1464,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -1460,10 +1533,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -1531,10 +1604,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -1600,10 +1673,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -1669,10 +1742,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -1738,10 +1811,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -1806,10 +1879,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -1870,10 +1943,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -1939,10 +2012,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -2011,10 +2084,10 @@ from aind_metadata_service_client.models.slims_workflow import SlimsWorkflow
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -2088,10 +2161,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -2156,10 +2229,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
@@ -2220,10 +2293,10 @@ import aind_metadata_service_client
 from aind_metadata_service_client.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://localhost
+# Defining the host is optional and defaults to https://aind-metadata-service
 # See configuration.py for a list of all supported configuration parameters.
 configuration = aind_metadata_service_client.Configuration(
-    host = "http://localhost"
+    host = "https://aind-metadata-service"
 )
 
 
