@@ -182,7 +182,7 @@ class TestSpecimenProcedureMapper(unittest.TestCase):
                         end_time=datetime.fromtimestamp(1738781400),
                         modified_by="PersonM",
                         reagents=[],
-                        mass="10.2",
+                        mass=10,
                     ),
                     HistologyWashData(
                         wash_name="Secondary Antibody Wash",
