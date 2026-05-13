@@ -3687,7 +3687,7 @@ class MappedNSBList:
     # TODO: support new Procedures (EMG Array, Grid Injections, Testes, Oviduct)
     def has_hp_procedure(self) -> bool:
         """Is there a headpost procedure?"""
-        return self.aind_procedure in {
+        if self.aind_procedure in {
             NSB2023Procedure.HP_ONLY,
             NSB2023Procedure.HP_TRANSCRANIAL,
             NSB2023Procedure.FIBER_OPTIC_IMPLANT_WITH,
@@ -3702,11 +3702,19 @@ class MappedNSBList:
             NSB2023Procedure.SX_12__STEREOTAXIC__INJEC,
             NSB2023Procedure.SX_21__FIBER__OPTIC__IMPL,
             NSB2023Procedure.INJECTION_FIBER_OPTIC_IMP_,
-        }
+        }:
+            return True
+        if (
+            self.aind_procedure == NSB2023Procedure.CUSTOM
+            or self.aind_procedure == NSB2023Procedure.SX__CUSTOM
+            and self.aind_headpost is not None
+        ):
+            return True
+        return False
 
     def has_cran_procedure(self) -> bool:
         """Is there a craniotomy procedure?"""
-        return self.aind_procedure in {
+        if self.aind_procedure in {
             NSB2023Procedure.FRONTAL_CTX_2_P,
             NSB2023Procedure.INJ_MOTOR_CTX,
             NSB2023Procedure.INJ_VISUAL_CTX_2_P,
@@ -3733,7 +3741,15 @@ class MappedNSBList:
             NSB2023Procedure.GRID_INJ_6_OR_9_MOTOR_C,
             NSB2023Procedure.INJ_WHC_NP,
             NSB2023Procedure.DHC,
-        }
+        }:
+            return True
+        if (
+            self.aind_procedure == NSB2023Procedure.CUSTOM
+            or self.aind_procedure == NSB2023Procedure.SX__CUSTOM
+            and self.aind_craniotomy_type is not None
+        ):
+            return True
+        return False
 
     def surgery_during_info(
         self, during: During, inj_type: Optional[InjectionType] = None
