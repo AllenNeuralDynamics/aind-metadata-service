@@ -397,7 +397,7 @@ class TestNSB2023Parsers(TestCase):
                 data["Burr_x0020_2_x0020_Intended_x002"][0]
             )
         )
-    
+
     def test_ma_custom_hp_and_cran_procedures(self):
         """Tests custom procedure with headpost and cran."""
         data = {
