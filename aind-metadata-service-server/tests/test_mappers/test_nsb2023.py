@@ -321,6 +321,30 @@ class TestNSB2023HeadframeMapping(TestCase):
         self.assertIsNotNone(other_surgery)
         self.assertEqual(other_surgery.experimenters[0], "NSB")
 
+    def test_map_custom_headframe_procedure(self):
+        """Test mapping of custom procedure with headframe info filled"""
+        nsb_data = {
+            "FileSystemObjectType": 0,
+            "Id": 25,
+            "Headpost": "Visual Ctx",
+            "HeadpostType": "Mesoscope",
+            "Procedure": "Custom",
+            "IACUC_x0020_Protocol_x0020__x002": "2103",
+            "Breg2Lamb": 4.5,
+        }
+        nsb_model = NSB2023List.model_validate(nsb_data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        surgeries = mapper.get_surgeries()
+
+        self.assertGreater(len(surgeries), 0)
+        surgery = surgeries[0]
+        headframe = next(
+            (p for p in surgery.procedures if isinstance(p, Headframe)), None
+        )
+        self.assertIsNotNone(headframe)
+        self.assertEqual(headframe.headframe_type, "Visual Ctx")
+        self.assertEqual(headframe.well_type, "Mesoscope")
+
 
 class TestNSB2023CraniotomyMapping(TestCase):
     """Tests craniotomy procedure mapping"""
@@ -596,6 +620,32 @@ class TestNSB2023CraniotomyMapping(TestCase):
             None,
         )
         self.assertIsNotNone(craniotomy)
+
+    def test_map_custom_craniotomy_procedure(self):
+        """Test mapping of custom procedure with craniotomy info filled"""
+        nsb_data = {
+            "FileSystemObjectType": 0,
+            "Id": 32,
+            "CraniotomyType": "5mm",
+            "Procedure": "Custom",
+            "Headpost": "Visual Ctx",
+            "HeadpostType": "Mesoscope",
+            "Date_x0020_of_x0020_Surgery": "2022-01-03",
+            "IACUC_x0020_Protocol_x0020__x002": "2103",
+            "Breg2Lamb": 4.5,
+        }
+        nsb_model = NSB2023List.model_validate(nsb_data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        surgeries = mapper.get_surgeries()
+
+        self.assertGreater(len(surgeries), 0)
+        surgery = surgeries[0]
+        craniotomy = next(
+            (p for p in surgery.procedures if isinstance(p, Craniotomy)), None
+        )
+        self.assertIsNotNone(craniotomy)
+        self.assertEqual(craniotomy.craniotomy_type, CraniotomyType.CIRCLE)
+        self.assertEqual(craniotomy.size, 5.0)
 
 
 class TestNSB2023InjectionMapping(TestCase):
