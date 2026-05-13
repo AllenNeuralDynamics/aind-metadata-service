@@ -397,6 +397,19 @@ class TestNSB2023Parsers(TestCase):
                 data["Burr_x0020_2_x0020_Intended_x002"][0]
             )
         )
+    
+    def test_ma_custom_hp_and_cran_procedures(self):
+        """Tests custom procedure with headpost and cran."""
+        data = {
+            "Procedure": "Custom",
+            "Headpost": "Visual Ctx",
+            "HeadpostType": "Mesoscope",
+            "CraniotomyType": "WHC NP",
+        }
+        nsb_model = NSB2023List.model_construct(**data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        self.assertTrue(mapper.has_hp_procedure())
+        self.assertTrue(mapper.has_cran_procedure())
 
 
 class TestNSB2023StringParsers(TestCase):
