@@ -109,7 +109,7 @@ class TestSpecimenProcedureMapper(unittest.TestCase):
                 end_time=datetime.fromtimestamp(1738781400),
                 modified_by="PersonM",
                 reagents=[],
-                mass="10.2",
+                mass=10,
             ),
             HistologyWashData(
                 wash_name="Secondary Antibody Wash",
@@ -139,7 +139,7 @@ class TestSpecimenProcedureMapper(unittest.TestCase):
         self.assertEqual(
             procedures[0].antibodies.immunolabel_class.name, "PRIMARY"
         )
-        self.assertEqual(procedures[0].antibodies.mass, Decimal("10.2"))
+        self.assertEqual(procedures[0].antibodies.mass, Decimal("10"))
         self.assertEqual(
             procedures[1].antibodies.immunolabel_class.name, "SECONDARY"
         )
@@ -155,7 +155,7 @@ class TestSpecimenProcedureMapper(unittest.TestCase):
             end_time=None,
             modified_by=None,
             reagents=[],
-            mass="5.0",
+            mass=5,
         )
         secondary_wash = HistologyWashData(
             wash_name="Secondary Antibody Wash",
@@ -268,7 +268,7 @@ class TestSpecimenProcedureMapper(unittest.TestCase):
                         end_time=datetime.fromtimestamp(1738781400),
                         modified_by="PersonM",
                         reagents=[],
-                        mass="10.2",
+                        mass=10,
                     ),
                     HistologyWashData(
                         wash_name="Secondary Antibody Wash",

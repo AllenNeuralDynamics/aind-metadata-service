@@ -398,6 +398,19 @@ class TestNSB2023Parsers(TestCase):
             )
         )
 
+    def test_ma_custom_hp_and_cran_procedures(self):
+        """Tests custom procedure with headpost and cran."""
+        data = {
+            "Procedure": "Custom",
+            "Headpost": "Visual Ctx",
+            "HeadpostType": "Mesoscope",
+            "CraniotomyType": "WHC NP",
+        }
+        nsb_model = NSB2023List.model_construct(**data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        self.assertTrue(mapper.has_hp_procedure())
+        self.assertTrue(mapper.has_cran_procedure())
+
 
 class TestNSB2023StringParsers(TestCase):
     """Tests text field parsers in NSB2023Mapping class. Certain fields, such
