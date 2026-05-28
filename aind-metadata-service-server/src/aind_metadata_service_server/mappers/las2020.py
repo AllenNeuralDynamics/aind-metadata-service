@@ -131,7 +131,7 @@ class MappedLASList:
         """Parse string representation of decimal such as '0.25'."""
         try:
             return None if value is None else float(value)
-        except (ValueError, DecimalException):
+        except (ValueError, TypeError):
             return None
 
     @staticmethod

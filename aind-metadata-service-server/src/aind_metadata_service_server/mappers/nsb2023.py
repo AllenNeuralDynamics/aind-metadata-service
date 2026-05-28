@@ -3,7 +3,7 @@
 import re
 from dataclasses import dataclass
 from datetime import date, datetime
-from decimal import Decimal, DecimalException
+from decimal import Decimal
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 
@@ -297,7 +297,7 @@ class MappedNSBList:
         """Parse string representation of a decimal number such as '0.25'."""
         try:
             return None if value is None else float(value)
-        except (ValueError, DecimalException):
+        except (ValueError, TypeError):
             return None
 
     def _parse_current_str(self, cur_str: Optional[str]) -> Optional[float]:
