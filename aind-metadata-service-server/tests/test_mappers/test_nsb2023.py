@@ -51,6 +51,8 @@ from aind_metadata_service_server.mappers.nsb2023 import (
     MappedNSBList,
 )
 
+from tests.conftest import suppress_pydantic_serialization_warnings
+
 TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / ".."
 TEST_EXAMPLES = (
     TEST_DIR / "resources" / "nsb2023" / "nsb2023_string_entries.json"
@@ -96,12 +98,8 @@ class TestNSB2023BasicMapping(TestCase):
 
     def test_map_animal_weights(self):
         """Test animal weight mappings"""
-        self.assertEqual(
-            self.mapper.aind_weight_before_surger, Decimal("25.2")
-        )
-        self.assertEqual(
-            self.mapper.aind_weight_after_surgery, Decimal("28.2")
-        )
+        self.assertEqual(self.mapper.aind_weight_before_surger, 25.2)
+        self.assertEqual(self.mapper.aind_weight_after_surgery, 28.2)
 
     def test_map_workstation_id(self):
         """Test workstation ID mapping"""
@@ -109,7 +107,7 @@ class TestNSB2023BasicMapping(TestCase):
 
     def test_map_bregma_lambda_distance(self):
         """Test bregma-lambda distance returns absolute value"""
-        self.assertEqual(self.mapper.aind_breg2_lamb, Decimal("4.5"))
+        self.assertEqual(self.mapper.aind_breg2_lamb, 4.5)
 
 
 class TestNSB2023HeadframeMapping(TestCase):
@@ -693,7 +691,7 @@ class TestNSB2023InjectionMapping(TestCase):
 
     def test_map_injection_volume(self):
         """Test injection volume mapping"""
-        self.assertEqual(self.mapper.aind_inj2volperdepth, Decimal("500.2"))
+        self.assertEqual(self.mapper.aind_inj2volperdepth, 500.2)
 
     def test_map_injection_hemisphere(self):
         """Test injection hemisphere mapping"""
@@ -731,8 +729,8 @@ class TestNSB2023InjectionMapping(TestCase):
         mapper = MappedNSBList(nsb=nsb_model)
 
         self.assertEqual(mapper.aind_inj2_type, InjectionType.IONTOPHORESIS)
-        self.assertEqual(mapper.aind_inj2_current, Decimal("5"))
-        self.assertEqual(mapper.aind_inj2_ionto_time, Decimal("10"))
+        self.assertEqual(mapper.aind_inj2_current, 5.0)
+        self.assertEqual(mapper.aind_inj2_ionto_time, 10.0)
 
     def test_map_targeted_structures(self):
         """Test mapping of targeted brain structures for burr holes"""
@@ -944,7 +942,7 @@ class TestNSB2023InjectionMapping(TestCase):
         mapper = MappedNSBList(nsb=nsb_model)
 
         burr_info = mapper.burr_hole_info(2)
-        self.assertEqual(burr_info.coordinate_ml, Decimal("2.0"))
+        self.assertEqual(burr_info.coordinate_ml, 2.0)
         self.assertIsNone(burr_info.coordinate_ap)
         self.assertIsNotNone(burr_info.coordinate_depth)
 
@@ -1011,11 +1009,11 @@ class TestNSB2023FiberImplantMapping(TestCase):
 
     def test_map_fiber_implant_depth(self):
         """Test fiber implant depth mapping"""
-        self.assertEqual(self.mapper.aind_fiber_implant2_dv, Decimal("-2.0"))
+        self.assertEqual(self.mapper.aind_fiber_implant2_dv, -2.0)
 
     def test_map_fiber_implant_length(self):
         """Test fiber implant length mapping"""
-        self.assertEqual(self.mapper.aind_fiber_implant2_lengt, Decimal("4.5"))
+        self.assertEqual(self.mapper.aind_fiber_implant2_lengt, 4.5)
 
     def test_map_fiber_type_standard(self):
         """Test standard fiber type mapping"""
@@ -1061,21 +1059,22 @@ class TestNSB2023FiberImplantMapping(TestCase):
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
-        surgeries = mapper.get_surgeries()
+        with suppress_pydantic_serialization_warnings():
+            surgeries = mapper.get_surgeries()
 
-        self.assertGreater(len(surgeries), 0)
-        surgery = surgeries[0]
-        probe_implant = next(
-            (p for p in surgery.procedures if isinstance(p, ProbeImplant)),
-            None,
-        )
-        self.assertIsNotNone(probe_implant)
-        self.assertIsNotNone(
-            probe_implant.device_config.primary_targeted_structure
-        )
-        self.assertEqual(
-            len(probe_implant.device_config.other_targeted_structure), 1
-        )
+            self.assertGreater(len(surgeries), 0)
+            surgery = surgeries[0]
+            probe_implant = next(
+                (p for p in surgery.procedures if isinstance(p, ProbeImplant)),
+                None,
+            )
+            self.assertIsNotNone(probe_implant)
+            self.assertIsNotNone(
+                probe_implant.device_config.primary_targeted_structure
+            )
+            self.assertEqual(
+                len(probe_implant.device_config.other_targeted_structure), 1
+            )
 
     def test_get_surgeries_fiber_probe_name_assignment(self):
         """Test fiber probe name assignment in full surgery workflow"""
@@ -1104,20 +1103,23 @@ class TestNSB2023FiberImplantMapping(TestCase):
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
-        surgeries = mapper.get_surgeries()
+        with suppress_pydantic_serialization_warnings():
+            surgeries = mapper.get_surgeries()
 
-        self.assertGreater(len(surgeries), 0)
-        surgery = surgeries[0]
-        fiber_count = sum(
-            1 for proc in surgery.procedures if isinstance(proc, ProbeImplant)
-        )
-        self.assertEqual(fiber_count, 2)
-        for proc in surgery.procedures:
-            if isinstance(proc, ProbeImplant):
-                self.assertIsNotNone(proc.implanted_device.name)
-                self.assertTrue(
-                    proc.implanted_device.name.startswith("Fiber_")
-                )
+            self.assertGreater(len(surgeries), 0)
+            surgery = surgeries[0]
+            fiber_count = sum(
+                1
+                for proc in surgery.procedures
+                if isinstance(proc, ProbeImplant)
+            )
+            self.assertEqual(fiber_count, 2)
+            for proc in surgery.procedures:
+                if isinstance(proc, ProbeImplant):
+                    self.assertIsNotNone(proc.implanted_device.name)
+                    self.assertTrue(
+                        proc.implanted_device.name.startswith("Fiber_")
+                    )
 
     def test_get_surgeries_fiber_implant_in_other_procedures(self):
         """Test fiber implant without during info goes to other_procedures"""
@@ -1171,34 +1173,35 @@ class TestNSB2023FiberImplantMapping(TestCase):
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
-        surgeries = mapper.get_surgeries()
+        with suppress_pydantic_serialization_warnings():
+            surgeries = mapper.get_surgeries()
 
-        self.assertGreater(len(surgeries), 0)
-        surgery = surgeries[0]
-        probe_implant = next(
-            (p for p in surgery.procedures if isinstance(p, ProbeImplant)),
-            None,
-        )
-        self.assertIsNotNone(probe_implant)
-        coord_sys = probe_implant.device_config.coordinate_system
-        self.assertIsNotNone(coord_sys)
-        self.assertEqual(coord_sys.name, "TIP_D")
-        self.assertEqual(coord_sys.origin, Origin.TIP)
-        self.assertEqual(coord_sys.axis_unit, SizeUnit.MM)
-        self.assertEqual(len(coord_sys.axes), 1)
-        self.assertEqual(coord_sys.axes[0].name, AxisName.SI)
-        self.assertEqual(coord_sys.axes[0].direction, Direction.UD)
-        self.assertIsNotNone(probe_implant.device_config.transform)
-        transform = probe_implant.device_config.transform
-        self.assertEqual(len(transform), 2)
+            self.assertGreater(len(surgeries), 0)
+            surgery = surgeries[0]
+            probe_implant = next(
+                (p for p in surgery.procedures if isinstance(p, ProbeImplant)),
+                None,
+            )
+            self.assertIsNotNone(probe_implant)
+            coord_sys = probe_implant.device_config.coordinate_system
+            self.assertIsNotNone(coord_sys)
+            self.assertEqual(coord_sys.name, "TIP_D")
+            self.assertEqual(coord_sys.origin, Origin.TIP)
+            self.assertEqual(coord_sys.axis_unit, SizeUnit.MM)
+            self.assertEqual(len(coord_sys.axes), 1)
+            self.assertEqual(coord_sys.axes[0].name, AxisName.SI)
+            self.assertEqual(coord_sys.axes[0].direction, Direction.UD)
+            self.assertIsNotNone(probe_implant.device_config.transform)
+            transform = probe_implant.device_config.transform
+            self.assertEqual(len(transform), 2)
 
-        translation, rotation = transform
-        self.assertIsInstance(translation, Translation)
-        self.assertEqual(len(translation.translation), 4)
-        self.assertIsInstance(rotation, Rotation)
-        self.assertEqual(len(rotation.angles), 4)
-        self.assertIsNotNone(surgery.coordinate_system)
-        self.assertEqual(surgery.coordinate_system.name, "BREGMA_ARID")
+            translation, rotation = transform
+            self.assertIsInstance(translation, Translation)
+            self.assertEqual(len(translation.translation), 4)
+            self.assertIsInstance(rotation, Rotation)
+            self.assertEqual(len(rotation.angles), 4)
+            self.assertIsNotNone(surgery.coordinate_system)
+            self.assertEqual(surgery.coordinate_system.name, "BREGMA_ARID")
 
 
 class TestNSB2023SpinalInjectionMapping(TestCase):
@@ -1380,21 +1383,24 @@ class TestNSB2023SurgeryIntegration(TestCase):
             cls.hp_cran_surgery_data
         )
         cls.hp_cran_mapper = MappedNSBList(nsb=cls.hp_cran_model)
-        cls.hp_cran_surgeries = cls.hp_cran_mapper.get_surgeries()
 
         cls.fiber_model = NSB2023List.model_validate(
             cls.fiber_implant_surgery_data
         )
         cls.fiber_mapper = MappedNSBList(nsb=cls.fiber_model)
-        cls.fiber_surgeries = cls.fiber_mapper.get_surgeries()
 
         cls.fiber_followup_model = NSB2023List.model_validate(
             cls.fiber_followup_surgery_data
         )
         cls.fiber_followup_mapper = MappedNSBList(nsb=cls.fiber_followup_model)
-        cls.fiber_followup_surgeries = (
-            cls.fiber_followup_mapper.get_surgeries()
-        )
+
+        # Suppress warnings from setup
+        with suppress_pydantic_serialization_warnings():
+            cls.hp_cran_surgeries = cls.hp_cran_mapper.get_surgeries()
+            cls.fiber_surgeries = cls.fiber_mapper.get_surgeries()
+            cls.fiber_followup_surgeries = (
+                cls.fiber_followup_mapper.get_surgeries()
+            )
 
     def test_get_surgeries_basic_structure_hp_cran(self):
         """Test basic surgery creation for headframe/craniotomy"""
@@ -1441,7 +1447,7 @@ class TestNSB2023SurgeryIntegration(TestCase):
         self.assertEqual(str(during_info.start_date), "2022-03-15")
         self.assertEqual(during_info.anaesthetic_duration_in_minutes, 90)
         self.assertEqual(during_info.recovery_time, 30.0)
-        self.assertEqual(during_info.anaesthetic_level, Decimal("1.8"))
+        self.assertEqual(during_info.anaesthetic_level, 1.8)
 
     def test_surgery_during_info_followup(self):
         """Test surgery during info for follow-up surgery"""
@@ -1455,8 +1461,8 @@ class TestNSB2023SurgeryIntegration(TestCase):
         self.assertEqual(during_info.recovery_time, 35.0)
         self.assertEqual(during_info.anaesthetic_level, 2.5)
         self.assertEqual(during_info.workstation_id, "SWS 5")
-        self.assertEqual(during_info.weight_prior, Decimal("26.5"))
-        self.assertEqual(during_info.weight_post, Decimal("29.0"))
+        self.assertEqual(during_info.weight_prior, 26.5)
+        self.assertEqual(during_info.weight_post, 29.0)
 
     def test_determine_surgery_coordinate_system_hp_cran(self):
         """Test coordinate system determination for headframe/craniotomy"""
@@ -1468,12 +1474,13 @@ class TestNSB2023SurgeryIntegration(TestCase):
 
     def test_determine_surgery_coordinate_system_fiber(self):
         """Test coordinate system determination for fiber implants"""
-        coord_sys = self.fiber_mapper.determine_surgery_coordinate_system(
-            During.INITIAL
-        )
-        self.assertIsNotNone(coord_sys)
-        # Should be BREGMA_ARID since fiber implants have depth coordinates
-        self.assertEqual(coord_sys, CoordinateSystemLibrary.BREGMA_ARID)
+        with suppress_pydantic_serialization_warnings():
+            coord_sys = self.fiber_mapper.determine_surgery_coordinate_system(
+                During.INITIAL
+            )
+            self.assertIsNotNone(coord_sys)
+            # Should be BREGMA_ARID since fiber implants have depth coordinates
+            self.assertEqual(coord_sys, CoordinateSystemLibrary.BREGMA_ARID)
 
     def test_map_measured_coordinates(self):
         """Test measured coordinates mapping"""

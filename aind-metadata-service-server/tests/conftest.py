@@ -1,5 +1,7 @@
 """Set up fixtures to be used across all test modules."""
 
+import warnings
+from contextlib import contextmanager
 from typing import Any, Generator
 from unittest.mock import AsyncMock
 
@@ -65,3 +67,23 @@ def mock_tars_prep_lot_230929():
 def mock_tars_virus_v123():
     """Fixture for TARS virus v_123."""
     return VirusData(aliases=[Alias(is_preferred=True, name="v_123")])
+
+
+@contextmanager
+def suppress_pydantic_serialization_warnings():
+    """
+    Context manager to suppress expected Pydantic serialization warnings.
+
+    These warnings occur during normal operation when:
+    - Pydantic checks union type variants
+    - Objects created with model_construct() have missing optional fields
+    - Discriminated unions check all possible types
+
+    """
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            category=UserWarning,
+            message=".*Pydantic serializer warnings.*",
+        )
+        yield

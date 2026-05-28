@@ -127,10 +127,10 @@ class MappedLASList:
         self._las = las
 
     @staticmethod
-    def _parse_basic_decimal_str(value: Optional[str]) -> Optional[Decimal]:
+    def _parse_basic_decimal_str(value: Optional[str]) -> Optional[float]:
         """Parse string representation of decimal such as '0.25'."""
         try:
-            return None if value is None else Decimal(value)
+            return None if value is None else float(value)
         except (ValueError, DecimalException):
             return None
 
@@ -261,7 +261,7 @@ class MappedLASList:
         return self._parse_dose_sub_to_nonviral_material(self._las.dose_sub)
 
     @property
-    def aind_doseduration(self) -> Optional[Decimal]:
+    def aind_doseduration(self) -> Optional[float]:
         """Maps doseduration to aind model"""
         if not self._las.doseduration:
             return None
@@ -330,7 +330,7 @@ class MappedLASList:
         return unit_mapping.get(unit_str.lower())
 
     @property
-    def aind_dosevolume(self) -> Optional[Decimal]:
+    def aind_dosevolume(self) -> Optional[float]:
         """Maps dosevolume to aind model"""
         if not self._las.dosevolume:
             return None
@@ -1006,127 +1006,127 @@ class MappedLASList:
         return self._las.ro_tube5
 
     @property
-    def aind_ro_vol1(self) -> Optional[Decimal]:
+    def aind_ro_vol1(self) -> Optional[float]:
         """Maps ro_vol1 to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol1)
 
     @property
-    def aind_ro_vol2(self) -> Optional[Decimal]:
+    def aind_ro_vol2(self) -> Optional[float]:
         """Maps ro_vol2 to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol2)
 
     @property
-    def aind_ro_vol3(self) -> Optional[Decimal]:
+    def aind_ro_vol3(self) -> Optional[float]:
         """Maps ro_vol3 to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol3)
 
     @property
-    def aind_ro_vol4(self) -> Optional[Decimal]:
+    def aind_ro_vol4(self) -> Optional[float]:
         """Maps ro_vol4 to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol4)
 
     @property
-    def aind_ro_vol5(self) -> Optional[Decimal]:
+    def aind_ro_vol5(self) -> Optional[float]:
         """Maps ro_vol5 to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol5)
 
     @property
-    def aind_ro_vol_v1(self) -> Optional[Decimal]:
+    def aind_ro_vol_v1(self) -> Optional[float]:
         """Maps ro_vol_v1 to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol_v1)
 
     @property
-    def aind_ro_vol_v1b(self) -> Optional[Decimal]:
+    def aind_ro_vol_v1b(self) -> Optional[float]:
         """Maps ro_vol_v1b to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol_v1b)
 
     @property
-    def aind_ro_vol_v1c(self) -> Optional[Decimal]:
+    def aind_ro_vol_v1c(self) -> Optional[float]:
         """Maps ro_vol_v1c to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol_v1c)
 
     @property
-    def aind_ro_vol_v1d(self) -> Optional[Decimal]:
+    def aind_ro_vol_v1d(self) -> Optional[float]:
         """Maps ro_vol_v1d to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol_v1d)
 
     @property
-    def aind_ro_vol_v2(self) -> Optional[Decimal]:
+    def aind_ro_vol_v2(self) -> Optional[float]:
         """Maps ro_vol_v2 to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol_v2)
 
     @property
-    def aind_ro_vol_v2b(self) -> Optional[Decimal]:
+    def aind_ro_vol_v2b(self) -> Optional[float]:
         """Maps ro_vol_v2b to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol_v2b)
 
     @property
-    def aind_ro_vol_v2c(self) -> Optional[Decimal]:
+    def aind_ro_vol_v2c(self) -> Optional[float]:
         """Maps ro_vol_v2c to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol_v2c)
 
     @property
-    def aind_ro_vol_v2d(self) -> Optional[Decimal]:
+    def aind_ro_vol_v2d(self) -> Optional[float]:
         """Maps ro_vol_v2d to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol_v2d)
 
     @property
-    def aind_ro_vol_v3(self) -> Optional[Decimal]:
+    def aind_ro_vol_v3(self) -> Optional[float]:
         """Maps ro_vol_v3 to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol_v3)
 
     @property
-    def aind_ro_vol_v3b(self) -> Optional[Decimal]:
+    def aind_ro_vol_v3b(self) -> Optional[float]:
         """Maps ro_vol_v3b to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol_v3b)
 
     @property
-    def aind_ro_vol_v3c(self) -> Optional[Decimal]:
+    def aind_ro_vol_v3c(self) -> Optional[float]:
         """Maps ro_vol_v3c to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol_v3c)
 
     @property
-    def aind_ro_vol_v3d(self) -> Optional[Decimal]:
+    def aind_ro_vol_v3d(self) -> Optional[float]:
         """Maps ro_vol_v3d to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol_v3d)
 
     @property
-    def aind_ro_vol_v4(self) -> Optional[Decimal]:
+    def aind_ro_vol_v4(self) -> Optional[float]:
         """Maps ro_vol_v4 to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol_v4)
 
     @property
-    def aind_ro_vol_v4b(self) -> Optional[Decimal]:
+    def aind_ro_vol_v4b(self) -> Optional[float]:
         """Maps ro_vol_v4b to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol_v4b)
 
     @property
-    def aind_ro_vol_v4c(self) -> Optional[Decimal]:
+    def aind_ro_vol_v4c(self) -> Optional[float]:
         """Maps ro_vol_v4c to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol_v4c)
 
     @property
-    def aind_ro_vol_v4d(self) -> Optional[Decimal]:
+    def aind_ro_vol_v4d(self) -> Optional[float]:
         """Maps ro_vol_v4d to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol_v4d)
 
     @property
-    def aind_ro_vol_v5(self) -> Optional[Decimal]:
+    def aind_ro_vol_v5(self) -> Optional[float]:
         """Maps ro_vol_v5 to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol_v5)
 
     @property
-    def aind_ro_vol_v5b(self) -> Optional[Decimal]:
+    def aind_ro_vol_v5b(self) -> Optional[float]:
         """Maps ro_vol_v5b to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol_v5b)
 
     @property
-    def aind_ro_vol_v5c(self) -> Optional[Decimal]:
+    def aind_ro_vol_v5c(self) -> Optional[float]:
         """Maps ro_vol_v5c to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol_v5c)
 
     @property
-    def aind_ro_vol_v5d(self) -> Optional[Decimal]:
+    def aind_ro_vol_v5d(self) -> Optional[float]:
         """Maps ro_vol_v5d to aind model"""
         return self._parse_basic_decimal_str(self._las.ro_vol_v5d)
 
