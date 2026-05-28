@@ -158,7 +158,9 @@ class MappedNSBList:
             else:
                 return None
 
-    def _parse_weight_str(self, weight_str: Optional[str]) -> Optional[float]:
+    def _parse_weight_str(
+        self, weight_str: Optional[str]
+    ) -> Optional[float]:
         """Parse weight strings"""
         # Most entries are recorded as simple floats. There are some outliers.
         # But we can map those to None for the time being.
@@ -181,7 +183,9 @@ class MappedNSBList:
         else:
             return None
 
-    def _parse_angle_str(self, inj_ang_str: Optional[str]) -> Optional[float]:
+    def _parse_angle_str(
+        self, inj_ang_str: Optional[str]
+    ) -> Optional[float]:
         """Parse angle strings"""
         if inj_ang_str is not None:
             parsed_string = re.search(self.INJ_ANGLE_REGEX, inj_ang_str)

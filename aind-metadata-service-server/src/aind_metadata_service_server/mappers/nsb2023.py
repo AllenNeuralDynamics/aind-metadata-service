@@ -2860,16 +2860,19 @@ class MappedNSBList:
                 numerical_aperture=Decimal("0.37"),
                 ferrule_material=FerruleMaterial.CERAMIC,
                 total_length=burr_info.fiber_implant_length,
+                active_length=None,
             )
         elif burr_info.fiber_type == FiberType.CUSTOM:
             # if custom, specs are stored in requestor comments
             return FiberProbe.model_construct(
                 total_length=burr_info.fiber_implant_length,
+                active_length=None,
                 notes=self.aind_long_requestor_comments,
             )
         else:
             return FiberProbe.model_construct(
                 total_length=burr_info.fiber_implant_length,
+                active_length=None,
             )
 
     @staticmethod

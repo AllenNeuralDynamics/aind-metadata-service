@@ -73,12 +73,6 @@ def mock_tars_virus_v123():
 def suppress_pydantic_serialization_warnings():
     """
     Context manager to suppress expected Pydantic serialization warnings.
-
-    These warnings occur during normal operation when:
-    - Pydantic checks union type variants
-    - Objects created with model_construct() have missing optional fields
-    - Discriminated unions check all possible types
-
     """
     with warnings.catch_warnings():
         warnings.filterwarnings(

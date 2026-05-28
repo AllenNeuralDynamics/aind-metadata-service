@@ -51,7 +51,9 @@ from aind_metadata_service_server.mappers.nsb2023 import (
     MappedNSBList,
 )
 
-from tests.conftest import suppress_pydantic_serialization_warnings
+from tests.conftest import (
+    suppress_pydantic_serialization_warnings
+)
 
 TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / ".."
 TEST_EXAMPLES = (
@@ -1474,13 +1476,12 @@ class TestNSB2023SurgeryIntegration(TestCase):
 
     def test_determine_surgery_coordinate_system_fiber(self):
         """Test coordinate system determination for fiber implants"""
-        with suppress_pydantic_serialization_warnings():
-            coord_sys = self.fiber_mapper.determine_surgery_coordinate_system(
+        coord_sys = self.fiber_mapper.determine_surgery_coordinate_system(
                 During.INITIAL
             )
-            self.assertIsNotNone(coord_sys)
+        self.assertIsNotNone(coord_sys)
             # Should be BREGMA_ARID since fiber implants have depth coordinates
-            self.assertEqual(coord_sys, CoordinateSystemLibrary.BREGMA_ARID)
+        self.assertEqual(coord_sys, CoordinateSystemLibrary.BREGMA_ARID)
 
     def test_map_measured_coordinates(self):
         """Test measured coordinates mapping"""
