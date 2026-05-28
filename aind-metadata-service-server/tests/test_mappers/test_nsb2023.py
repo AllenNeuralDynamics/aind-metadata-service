@@ -1480,7 +1480,7 @@ class TestNSB2023SurgeryIntegration(TestCase):
                 During.INITIAL
             )
         self.assertIsNotNone(coord_sys)
-            # Should be BREGMA_ARID since fiber implants have depth coordinates
+        # Should be BREGMA_ARID since fiber implants have depth coordinates
         self.assertEqual(coord_sys, CoordinateSystemLibrary.BREGMA_ARID)
 
     def test_map_measured_coordinates(self):
