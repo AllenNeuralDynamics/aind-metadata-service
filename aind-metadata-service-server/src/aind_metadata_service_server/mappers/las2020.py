@@ -3,7 +3,7 @@
 import re
 from dataclasses import dataclass
 from datetime import date, datetime
-from decimal import Decimal, DecimalException
+from decimal import Decimal
 from enum import Enum
 from typing import Any, List, Optional
 
