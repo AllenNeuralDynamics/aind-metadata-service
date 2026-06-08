@@ -1,7 +1,6 @@
 """Tests LAS 2020 data model is parsed correctly"""
 
 from copy import deepcopy
-from decimal import Decimal
 from unittest import TestCase
 from unittest import main as unittest_main
 
@@ -22,6 +21,8 @@ from aind_metadata_service_server.mappers.las2020 import (
     LASProcedure,
     MappedLASList,
 )
+
+from tests.conftest import suppress_pydantic_serialization_warnings
 
 
 class TestLAS2020BasicMapping(TestCase):
@@ -131,7 +132,7 @@ class TestLAS2020BasicMapping(TestCase):
                         )
                         self.assertEqual(
                             materials[idx].virus_volume,
-                            Decimal(str(material_num * 100)),
+                            float(material_num * 100),
                         )
 
     def test_map_injectable_materials_property_mappings(self):
@@ -258,7 +259,7 @@ class TestLAS2020IPInjectionMapping(TestCase):
         dose_sub = self.mapper.aind_dose_sub
         self.assertIsInstance(dose_sub, NonViralMaterial)
         self.assertEqual(dose_sub.name, "Heparin")
-        self.assertEqual(dose_sub.concentration, Decimal("1000"))
+        self.assertEqual(dose_sub.concentration, 1000.0)
         self.assertEqual(dose_sub.concentration_unit, "u/ml")
 
     def test_map_dose_volume(self):
@@ -269,7 +270,7 @@ class TestLAS2020IPInjectionMapping(TestCase):
         none_mapper = MappedLASList(las=none_las_model)
         self.assertIsNone(none_mapper.aind_dosevolume)
 
-        self.assertEqual(self.mapper.aind_dosevolume, Decimal("70.4"))
+        self.assertEqual(self.mapper.aind_dosevolume, 70.4)
 
     def test_map_dose_duration(self):
         """Test dose duration mapping"""
@@ -302,16 +303,18 @@ class TestLAS2020IPInjectionMapping(TestCase):
 
     def test_map_ip_injection_procedure(self):
         """Test creation of IP Injection procedure"""
-        surgery = self.mapper.get_surgery(subject_id="000000")
-        self.assertIsNotNone(surgery)
-
-        ip_injection = next(
-            (p for p in surgery.procedures if isinstance(p, Injection)), None
-        )
-        self.assertIsNotNone(ip_injection)
-        self.assertEqual(
-            ip_injection.targeted_structure, InjectionTargets.INTRAPERITONEAL
-        )
+        with suppress_pydantic_serialization_warnings():
+            surgery = self.mapper.get_surgery(subject_id="000000")
+            self.assertIsNotNone(surgery)
+            ip_injection = next(
+                (p for p in surgery.procedures if isinstance(p, Injection)),
+                None,
+            )
+            self.assertIsNotNone(ip_injection)
+            self.assertEqual(
+                ip_injection.targeted_structure,
+                InjectionTargets.INTRAPERITONEAL,
+            )
 
 
 class TestLAS2020RetroOrbitalInjectionMapping(TestCase):
@@ -350,7 +353,7 @@ class TestLAS2020RetroOrbitalInjectionMapping(TestCase):
 
     def test_map_ro_volume(self):
         """Test RO injection volume mapping"""
-        self.assertEqual(self.mapper.aind_ro_vol1, Decimal("100"))
+        self.assertEqual(self.mapper.aind_ro_vol1, 100.0)
 
     def test_map_ro_substance(self):
         """Test RO injection substance mapping"""
@@ -383,7 +386,7 @@ class TestLAS2020RetroOrbitalInjectionMapping(TestCase):
         self.assertIsNotNone(ro_info)
         self.assertEqual(ro_info.animal_id, "000000")
         self.assertEqual(ro_info.injection_eye, AnatomicalRelative.RIGHT)
-        self.assertEqual(ro_info.injection_volume, Decimal("100"))
+        self.assertEqual(ro_info.injection_volume, 100.0)
         self.assertEqual(ro_info.tube_label, "Tube-A")
         self.assertEqual(ro_info.box_label, "Box-1")
         self.assertEqual(len(ro_info.injectable_materials), 1)
@@ -448,24 +451,26 @@ class TestLAS2020SurgeryIntegration(TestCase):
 
     def test_get_surgery_basic_structure(self):
         """Test basic surgery creation"""
-        surgery = self.mapper.get_surgery(subject_id="000000")
-        self.assertIsInstance(surgery, Surgery)
-        self.assertIsNotNone(surgery.experimenters)
-        self.assertEqual(surgery.experimenters[0], "LAS-5358")
-        self.assertEqual(surgery.ethics_review_id, "2212")
+        with suppress_pydantic_serialization_warnings():
+            surgery = self.mapper.get_surgery(subject_id="000000")
+            self.assertIsInstance(surgery, Surgery)
+            self.assertIsNotNone(surgery.experimenters)
+            self.assertEqual(surgery.experimenters[0], "LAS-5358")
+            self.assertEqual(surgery.ethics_review_id, "2212")
 
     def test_get_surgery_with_multiple_procedures(self):
         """Test surgery with IP and RO injections"""
-        surgery = self.mapper.get_surgery(subject_id="000000")
-        self.assertEqual(len(surgery.procedures), 2)
-        self.assertEqual(
-            surgery.procedures[0].targeted_structure,
-            InjectionTargets.INTRAPERITONEAL,
-        )
-        self.assertEqual(
-            surgery.procedures[1].targeted_structure,
-            InjectionTargets.RETRO_ORBITAL,
-        )
+        with suppress_pydantic_serialization_warnings():
+            surgery = self.mapper.get_surgery(subject_id="000000")
+            self.assertEqual(len(surgery.procedures), 2)
+            self.assertEqual(
+                surgery.procedures[0].targeted_structure,
+                InjectionTargets.INTRAPERITONEAL,
+            )
+            self.assertEqual(
+                surgery.procedures[1].targeted_structure,
+                InjectionTargets.RETRO_ORBITAL,
+            )
 
     def test_get_surgery_no_procedures(self):
         """Test surgery returns None when no procedures"""
@@ -483,12 +488,13 @@ class TestLAS2020SurgeryIntegration(TestCase):
 
     def test_get_surgery_wrong_subject_id(self):
         """Test surgery with wrong subject ID for RO injection"""
-        surgery = self.mapper.get_surgery(subject_id="999999")
-        self.assertEqual(len(surgery.procedures), 1)
-        self.assertEqual(
-            surgery.procedures[0].targeted_structure,
-            InjectionTargets.INTRAPERITONEAL,
-        )
+        with suppress_pydantic_serialization_warnings():
+            surgery = self.mapper.get_surgery(subject_id="999999")
+            self.assertEqual(len(surgery.procedures), 1)
+            self.assertEqual(
+                surgery.procedures[0].targeted_structure,
+                InjectionTargets.INTRAPERITONEAL,
+            )
 
     def test_get_surgery_author_lookup_id(self):
         """Test basic surgery creation"""
@@ -497,11 +503,12 @@ class TestLAS2020SurgeryIntegration(TestCase):
         test_data["AuthorLookupId"] = 6000
         las_model = Las2020List.model_validate(test_data)
         mapper = MappedLASList(las=las_model)
-        surgery = mapper.get_surgery(subject_id="000000")
-        self.assertIsInstance(surgery, Surgery)
-        self.assertIsNotNone(surgery.experimenters)
-        self.assertEqual(surgery.experimenters[0], "LAS-6000")
-        self.assertEqual(surgery.ethics_review_id, "2212")
+        with suppress_pydantic_serialization_warnings():
+            surgery = mapper.get_surgery(subject_id="000000")
+            self.assertIsInstance(surgery, Surgery)
+            self.assertIsNotNone(surgery.experimenters)
+            self.assertEqual(surgery.experimenters[0], "LAS-6000")
+            self.assertEqual(surgery.ethics_review_id, "2212")
 
     def test_get_surgery_validation_error(self):
         """Test surgery creation with missing start_date (required field)"""
@@ -510,10 +517,11 @@ class TestLAS2020SurgeryIntegration(TestCase):
         las_model = Las2020List.model_validate(test_data)
         mapper = MappedLASList(las=las_model)
 
-        surgery = mapper.get_surgery(subject_id="000000")
+        with suppress_pydantic_serialization_warnings():
+            surgery = mapper.get_surgery(subject_id="000000")
 
-        self.assertIsNotNone(surgery)
-        self.assertIsNone(surgery.start_date)
+            self.assertIsNotNone(surgery)
+            self.assertIsNone(surgery.start_date)
 
     def test_get_surgery_ip_injection_validation_error(
         self,
@@ -532,12 +540,13 @@ class TestLAS2020SurgeryIntegration(TestCase):
         las_model = Las2020List.model_validate(test_data)
         mapper = MappedLASList(las=las_model)
 
-        surgery = mapper.get_surgery(subject_id="000000")
+        with suppress_pydantic_serialization_warnings():
+            surgery = mapper.get_surgery(subject_id="000000")
 
-        self.assertIsNotNone(surgery)
-        self.assertEqual(len(surgery.procedures), 1)
-        ip_injection = surgery.procedures[0]
-        self.assertIsNone(ip_injection.dynamics[0].volume)
+            self.assertIsNotNone(surgery)
+            self.assertEqual(len(surgery.procedures), 1)
+            ip_injection = surgery.procedures[0]
+            self.assertIsNone(ip_injection.dynamics[0].volume)
 
     def test_get_surgery_ro_injection_validation_error(
         self,
@@ -601,10 +610,10 @@ class TestLAS2020StringParsers(TestCase):
     def test_parse_basic_decimal_str(self):
         """Test basic decimal string parsing"""
         self.assertEqual(
-            self.blank_model._parse_basic_decimal_str("0.25"), Decimal("0.25")
+            self.blank_model._parse_basic_decimal_str("0.25"), 0.25
         )
         self.assertEqual(
-            self.blank_model._parse_basic_decimal_str("100"), Decimal("100")
+            self.blank_model._parse_basic_decimal_str("100"), 100.0
         )
         self.assertIsNone(self.blank_model._parse_basic_decimal_str("abc"))
         self.assertIsNone(self.blank_model._parse_basic_decimal_str(None))
@@ -612,10 +621,10 @@ class TestLAS2020StringParsers(TestCase):
     def test_parse_dose_substance_with_concentration(self):
         """Test dose substance parsing with concentration"""
         test_cases = [
-            ("Heparin 1000u/ml", "Heparin", Decimal("1000"), "u/ml"),
-            ("Heparin 1000U/mL", "Heparin", Decimal("1000"), "u/ml"),
-            ("Dox diet (200 mg/kg)", "Dox", Decimal("200"), "mg/kg"),
-            ("Heparin (1000U/mL)", "Heparin", Decimal("1000"), "u/ml"),
+            ("Heparin 1000u/ml", "Heparin", 1000.0, "u/ml"),
+            ("Heparin 1000U/mL", "Heparin", 1000.0, "u/ml"),
+            ("Dox diet (200 mg/kg)", "Dox", 200.0, "mg/kg"),
+            ("Heparin (1000U/mL)", "Heparin", 1000.0, "u/ml"),
         ]
 
         for (

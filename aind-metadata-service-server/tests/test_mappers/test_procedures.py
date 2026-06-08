@@ -50,6 +50,8 @@ from aind_metadata_service_server.models import (
     ViralMaterialInformation,
 )
 
+from tests.conftest import suppress_pydantic_serialization_warnings
+
 
 class TestProceduresMapper(unittest.TestCase):
     """Test procedures mapper functionality"""
@@ -229,39 +231,42 @@ class TestProceduresMapper(unittest.TestCase):
             labtracks_tasks=self.labtracks_tasks,
             las_2020=[],
         )
-        expected_subject_procedures = [
-            Surgery.model_construct(
-                start_date=date(2022, 10, 11),
-                experimenters=["28803"],
-                iacuc_protocol="2002",
-                animal_weight_prior=None,
-                animal_weight_post=None,
-                anaesthesia=None,
-                notes=None,
-                procedures=[
-                    Perfusion.model_construct(output_specimen_ids=["115977"])
-                ],
-            ),
-            Surgery.model_construct(
-                start_date=date(2022, 5, 11),
-                experimenters=["28803"],
-                iacuc_protocol="2002",
-                animal_weight_prior=None,
-                animal_weight_post=None,
-                anaesthesia=None,
-                notes=None,
-                procedures=[
-                    Injection.model_construct(
-                        targeted_structure=InjectionTargets.RETRO_ORBITAL,
-                    )
-                ],
-            ),
-        ]
-        procedures = mapper.map_responses_to_aind_procedures("115977")
-        self.assertIsInstance(procedures, Procedures)
-        self.assertEqual(
-            procedures.subject_procedures, expected_subject_procedures
-        )
+        with suppress_pydantic_serialization_warnings():
+            expected_subject_procedures = [
+                Surgery.model_construct(
+                    start_date=date(2022, 10, 11),
+                    experimenters=["28803"],
+                    iacuc_protocol="2002",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
+                    anaesthesia=None,
+                    notes=None,
+                    procedures=[
+                        Perfusion.model_construct(
+                            output_specimen_ids=["115977"]
+                        )
+                    ],
+                ),
+                Surgery.model_construct(
+                    start_date=date(2022, 5, 11),
+                    experimenters=["28803"],
+                    iacuc_protocol="2002",
+                    animal_weight_prior=None,
+                    animal_weight_post=None,
+                    anaesthesia=None,
+                    notes=None,
+                    procedures=[
+                        Injection.model_construct(
+                            targeted_structure=InjectionTargets.RETRO_ORBITAL,
+                        )
+                    ],
+                ),
+            ]
+            procedures = mapper.map_responses_to_aind_procedures("115977")
+            self.assertIsInstance(procedures, Procedures)
+            self.assertEqual(
+                procedures.subject_procedures, expected_subject_procedures
+            )
 
     def test_map_responses_to_aind_procedures(self):
         """Test mapping with data from all sources"""
@@ -275,12 +280,13 @@ class TestProceduresMapper(unittest.TestCase):
             nsb_2023=self.nsb_2023,
             nsb_present=self.nsb_2023,
         )
-        procedures = mapper.map_responses_to_aind_procedures("115977")
+        with suppress_pydantic_serialization_warnings():
+            procedures = mapper.map_responses_to_aind_procedures("115977")
 
-        self.assertIsInstance(procedures, Procedures)
-        self.assertEqual(procedures.subject_id, "115977")
-        self.assertEqual(len(procedures.subject_procedures), 9)
-        self.assertEqual(len(procedures.specimen_procedures), 0)
+            self.assertIsInstance(procedures, Procedures)
+            self.assertEqual(procedures.subject_id, "115977")
+            self.assertEqual(len(procedures.subject_procedures), 9)
+            self.assertEqual(len(procedures.specimen_procedures), 0)
 
     def test_map_responses_no_data(self):
         """Test mapping when no data sources have content"""
@@ -295,52 +301,69 @@ class TestProceduresMapper(unittest.TestCase):
 
     def test_get_virus_strains(self):
         """Tests that virus strains are retrieved as expected"""
-        procedures1 = Procedures(
-            subject_id="000000",
-            subject_procedures=[
-                Surgery.model_construct(
-                    procedures=[
-                        BrainInjection.model_construct(
-                            injection_materials=[
-                                ViralMaterial.model_construct(name="\n12345 ")
-                            ]
-                        ),
-                        BrainInjection.model_construct(
-                            injection_materials=[
-                                ViralMaterial.model_construct(name=" 67890\t")
-                            ]
-                        ),
-                    ]
-                )
-            ],
-        )
-        procedures2 = Procedures(
-            subject_id="12345",
-            subject_procedures=[
-                Surgery.model_construct(
-                    procedures=[BrainInjection.model_construct()]
-                )
-            ],
-        )
-        procedures3 = Procedures(
-            subject_id="54321",
-            subject_procedures=[
-                Surgery.model_construct(
-                    procedures=[
-                        BrainInjection.model_construct(injection_materials=[])
-                    ]
-                )
-            ],
-        )
-        procedures4 = Procedures(
-            subject_id="000000", subject_procedures=[Surgery.model_construct()]
-        )
-        self.assertEqual(
-            ProceduresMapper.get_virus_strains(procedures1), ["12345", "67890"]
-        )
-        self.assertEqual(ProceduresMapper.get_virus_strains(procedures2), [])
-        self.assertEqual(ProceduresMapper.get_virus_strains(procedures3), [])
-        self.assertEqual(ProceduresMapper.get_virus_strains(procedures4), [])
+        # Suppress expected Pydantic warnings from model_construct
+        with suppress_pydantic_serialization_warnings():
+            procedures1 = Procedures(
+                subject_id="000000",
+                subject_procedures=[
+                    Surgery.model_construct(
+                        procedures=[
+                            BrainInjection.model_construct(
+                                injection_materials=[
+                                    ViralMaterial.model_construct(
+                                        name="\n12345 "
+                                    )
+                                ]
+                            ),
+                            BrainInjection.model_construct(
+                                injection_materials=[
+                                    ViralMaterial.model_construct(
+                                        name=" 67890\t"
+                                    )
+                                ]
+                            ),
+                        ]
+                    )
+                ],
+            )
+            procedures2 = Procedures(
+                subject_id="12345",
+                subject_procedures=[
+                    Surgery.model_construct(
+                        procedures=[BrainInjection.model_construct()]
+                    )
+                ],
+            )
+            procedures3 = Procedures(
+                subject_id="54321",
+                subject_procedures=[
+                    Surgery.model_construct(
+                        procedures=[
+                            BrainInjection.model_construct(
+                                injection_materials=[]
+                            )
+                        ]
+                    )
+                ],
+            )
+            procedures4 = Procedures(
+                subject_id="000000",
+                subject_procedures=[Surgery.model_construct()],
+            )
+
+            self.assertEqual(
+                ProceduresMapper.get_virus_strains(procedures1),
+                ["12345", "67890"],
+            )
+            self.assertEqual(
+                ProceduresMapper.get_virus_strains(procedures2), []
+            )
+            self.assertEqual(
+                ProceduresMapper.get_virus_strains(procedures3), []
+            )
+            self.assertEqual(
+                ProceduresMapper.get_virus_strains(procedures4), []
+            )
 
     def test_integrate_injection_materials(self):
         """Tests injection materials are integrated into procedures"""
@@ -373,34 +396,37 @@ class TestProceduresMapper(unittest.TestCase):
             "67890": tars_material2,
         }
 
-        procedures = Procedures(
-            subject_id="12345",
-            subject_procedures=[
-                Surgery.model_construct(
-                    procedures=[
-                        BrainInjection.model_construct(
-                            injection_materials=[
-                                ViralMaterial.model_construct(
-                                    name="12345", titer=413000000000
-                                ),
-                                ViralMaterial.model_construct(name="67890"),
-                            ]
-                        )
-                    ]
-                )
-            ],
-        )
         mapper = ProceduresMapper()
-        merged = mapper.integrate_injection_materials_into_aind_procedures(
-            procedures, tars_mapping
-        )
-        inj = merged.subject_procedures[0].procedures[0]
-        self.assertEqual(inj.injection_materials[0].titer, 413000000000)
-        self.assertEqual(
-            inj.injection_materials[0].tars_identifiers,
-            tars_material.tars_identifiers.model_dump(),
-        )
-        self.assertIsNone(inj.injection_materials[1].titer)
+        with suppress_pydantic_serialization_warnings():
+            procedures = Procedures(
+                subject_id="12345",
+                subject_procedures=[
+                    Surgery.model_construct(
+                        procedures=[
+                            BrainInjection.model_construct(
+                                injection_materials=[
+                                    ViralMaterial.model_construct(
+                                        name="12345", titer=413000000000
+                                    ),
+                                    ViralMaterial.model_construct(
+                                        name="67890"
+                                    ),
+                                ]
+                            )
+                        ]
+                    )
+                ],
+            )
+            merged = mapper.integrate_injection_materials_into_aind_procedures(
+                procedures, tars_mapping
+            )
+            inj = merged.subject_procedures[0].procedures[0]
+            self.assertEqual(inj.injection_materials[0].titer, 413000000000)
+            self.assertEqual(
+                inj.injection_materials[0].tars_identifiers,
+                tars_material.tars_identifiers.model_dump(),
+            )
+            self.assertIsNone(inj.injection_materials[1].titer)
 
     def test_integrate_injection_materials_no_procedures(self):
         """Tests that nothing breaks if there are no procedures"""
@@ -417,19 +443,20 @@ class TestProceduresMapper(unittest.TestCase):
             stock_titer=413000000000,
         )
         tars_mapping = {"12345": tars_material}
-        procedures = Procedures(
-            subject_id="12345",
-            subject_procedures=[
-                Surgery.model_construct(experimenter_full_name="NSB-123")
-            ],
-        )
         mapper = ProceduresMapper()
-        merged = mapper.integrate_injection_materials_into_aind_procedures(
-            procedures, tars_mapping
-        )
-        self.assertEqual(
-            merged.subject_procedures, procedures.subject_procedures
-        )
+        with suppress_pydantic_serialization_warnings():
+            procedures = Procedures(
+                subject_id="12345",
+                subject_procedures=[
+                    Surgery.model_construct(experimenter_full_name="NSB-123")
+                ],
+            )
+            merged = mapper.integrate_injection_materials_into_aind_procedures(
+                procedures, tars_mapping
+            )
+            self.assertEqual(
+                merged.subject_procedures, procedures.subject_procedures
+            )
 
     def test_integrate_protocols(self):
         """Tests that protocols are integrated into procedures as expected"""
@@ -524,15 +551,16 @@ class TestProceduresMapper(unittest.TestCase):
 
     def test_get_protocols_list_missing_procedures(self):
         """Tests protocols list when Surgery has no procedures attribute"""
-        surgery = Surgery.model_construct()
-        procedures = Procedures(
-            subject_id="000000", subject_procedures=[surgery]
-        )
-        protocols_list = ProceduresMapper().get_protocols_list(procedures)
-        expected_list = [
-            ProtocolNames.SURGERY.value,
-        ]
-        self.assertEqual(expected_list, protocols_list)
+        with suppress_pydantic_serialization_warnings():
+            surgery = Surgery.model_construct()
+            procedures = Procedures(
+                subject_id="000000", subject_procedures=[surgery]
+            )
+            protocols_list = ProceduresMapper().get_protocols_list(procedures)
+            expected_list = [
+                ProtocolNames.SURGERY.value,
+            ]
+            self.assertEqual(expected_list, protocols_list)
 
     def test_map_slims_info_to_water_restrictions(self):
         """Tests map_slims_info_to_water_restrictions method."""
