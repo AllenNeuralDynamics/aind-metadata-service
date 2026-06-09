@@ -2924,20 +2924,31 @@ class MappedNSBList:
 
         intended_measurments = []
 
-        # Filter measurements with valid coordinates
-        # and at least one measurement value
-        measurements_with_coords = [
-            m for m in sp_measurement_data
-            if m.coordinate_ap is not None
-            and m.coordinate_ml is not None
-            and (
+        # Filter to measurements with at least one measurement value
+        measurements_with_values = [
+            m
+            for m in sp_measurement_data
+            if (
                 m.intended_measurement_R is not None
                 or m.intended_measurement_G is not None
                 or m.intended_measurement_B is not None
                 or m.intended_measurement_Iso is not None
             )
         ]
-        # Sort by AP descending, ML ascending
+
+        # Separate measurements with coordinates from those without
+        measurements_with_coords = [
+            m
+            for m in measurements_with_values
+            if m.coordinate_ap is not None and m.coordinate_ml is not None
+        ]
+        measurements_without_coords = [
+            m
+            for m in measurements_with_values
+            if m.coordinate_ap is None or m.coordinate_ml is None
+        ]
+
+        # Sort measurements with coordinates by AP descending, ML ascending
         sorted_data = sorted(
             measurements_with_coords,
             key=lambda measurement: (
@@ -2945,6 +2956,8 @@ class MappedNSBList:
                 float(measurement.coordinate_ml),
             ),
         )
+
+        # Add sorted measurements with fiber names
         for index, data in enumerate(sorted_data):
             intended_measurments.append(
                 IntendedMeasurementInformation(
@@ -2955,6 +2968,19 @@ class MappedNSBList:
                     intended_measurement_Iso=data.intended_measurement_Iso,
                 )
             )
+
+        # Add measurements without coordinates (no fiber name)
+        for data in measurements_without_coords:
+            intended_measurments.append(
+                IntendedMeasurementInformation(
+                    fiber_name=None,
+                    intended_measurement_R=data.intended_measurement_R,
+                    intended_measurement_B=data.intended_measurement_B,
+                    intended_measurement_G=data.intended_measurement_G,
+                    intended_measurement_Iso=data.intended_measurement_Iso,
+                )
+            )
+
         return intended_measurments
 
     def get_intended_measurements(

@@ -78,7 +78,7 @@ class TestIntendedMeasurementMapper(unittest.TestCase):
         self.assertEqual(measurements, [])
 
     def test_measurements_with_none_coordinates_filtered_out(self):
-        """Test that measurements with None coordinates are filtered out."""
+        """Test measurements with None coordinates without fiber names."""
         nsb_data = {
             "FileSystemObjectType": 0,
             "Id": 1,
@@ -96,7 +96,12 @@ class TestIntendedMeasurementMapper(unittest.TestCase):
         measurements = mapper.map_responses_to_intended_measurements(
             subject_id="test_subject"
         )
-        self.assertEqual(measurements, [])
+        self.assertEqual(len(measurements), 1)
+        self.assertIsNone(measurements[0].fiber_name)
+        self.assertEqual(
+            measurements[0].intended_measurement_R, "acetylcholine"
+        )
+        self.assertEqual(measurements[0].intended_measurement_G, "dopamine")
 
     def test_measurements_with_all_none_values_filtered_out(self):
         """Test that measurements with all None values are filtered out."""
@@ -148,6 +153,28 @@ class TestIntendedMeasurementMapper(unittest.TestCase):
             measurements[0].intended_measurement_R, "acetylcholine"
         )
         self.assertIsNone(measurements[0].intended_measurement_G)
+
+    def test_measurements_without_during_info_filtered_if_all_none(self):
+        """Test measurements without during info and None values."""
+        nsb_data = {
+            "FileSystemObjectType": 0,
+            "Id": 4,
+            "Burr_x0020_hole_x0020_1": "Stereotaxic Injection & Fiber Implant",
+            "Virus_x0020_A_x002f_P": 1.0,
+            "Virus_x0020_M_x002f_L": 1.5,
+            "Burr_x0020_1_x0020_intended_x0020": None,
+            "Burr_x0020_1_x0020_intended_x0021": None,
+            "Burr_x0020_1_x0020_intended_x0022": None,
+            "Burr_x0020_1_x0020_intended_x0023": None,
+        }
+        nsb_model = NSB2023List.model_validate(nsb_data)
+        mapper = IntendedMeasurementMapper(
+            nsb_2023=[nsb_model], nsb_present=[]
+        )
+        measurements = mapper.map_responses_to_intended_measurements(
+            subject_id="test_subject"
+        )
+        self.assertEqual(measurements, [])
 
 
 if __name__ == "__main__":
