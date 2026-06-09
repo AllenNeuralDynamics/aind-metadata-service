@@ -260,7 +260,6 @@ class IntendedMeasurementandCoords:
 
 
 # Define BREGMA_ARD coordinate system (3 axes: AP, ML, Depth)
-# NSB doesn't provide SI dimension data, so we use ARD instead of ARID
 BREGMA_ARD = CoordinateSystem(
     name="BREGMA_ARD",
     origin=Origin.BREGMA,
@@ -717,18 +716,18 @@ class MappedNSBList:
         Returns
         -------
         str
-            The coordinate system name (e.g., "C1C2_ARID")
+            The coordinate system name (e.g., "C1C2_ARD")
         """
         if spinal_origin is None:
-            return "Spinal_ARID"
+            return "Spinal_ARD"
         origin_name = spinal_origin.value
         match = re.search(MappedNSBList.SPINAL_LOCATION_REGEX, origin_name)
         if match:
             first_vertebra = match.group(1)
             second_vertebra = match.group(2)
-            return f"{first_vertebra}{second_vertebra}_ARID"
+            return f"{first_vertebra}{second_vertebra}_ARD"
 
-        return "Spinal_ARID"
+        return "Spinal_ARD"
 
     @property
     def aind_burr_2_d_v_x00(self) -> Optional[Decimal]:
@@ -3539,7 +3538,7 @@ class MappedNSBList:
                     name="TIP_D",
                     origin=Origin.TIP,
                     axis_unit=SizeUnit.MM,
-                    axes=[Axis(name=AxisName.SI, direction=Direction.UD)],
+                    axes=[Axis(name=AxisName.DEPTH, direction=Direction.UD)],
                 )
 
                 transforms = self._map_burr_hole_transforms(

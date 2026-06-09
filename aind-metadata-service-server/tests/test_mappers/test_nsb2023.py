@@ -1192,7 +1192,7 @@ class TestNSB2023FiberImplantMapping(TestCase):
             self.assertEqual(coord_sys.origin, Origin.TIP)
             self.assertEqual(coord_sys.axis_unit, SizeUnit.MM)
             self.assertEqual(len(coord_sys.axes), 1)
-            self.assertEqual(coord_sys.axes[0].name, AxisName.SI)
+            self.assertEqual(coord_sys.axes[0].name, AxisName.DEPTH)
             self.assertEqual(coord_sys.axes[0].direction, Direction.UD)
             self.assertIsNotNone(probe_implant.device_config.transform)
             transform = probe_implant.device_config.transform
@@ -1229,20 +1229,20 @@ class TestNSB2023SpinalInjectionMapping(TestCase):
         c1c2_name = MappedNSBList._get_spinal_coordinate_system_name(
             Origin.BETWEEN_C1_C2
         )
-        self.assertEqual(c1c2_name, "C1C2_ARID")
+        self.assertEqual(c1c2_name, "C1C2_ARD")
 
         none_name = MappedNSBList._get_spinal_coordinate_system_name(None)
-        self.assertEqual(none_name, "Spinal_ARID")
+        self.assertEqual(none_name, "Spinal_ARD")
 
         tip_name = MappedNSBList._get_spinal_coordinate_system_name(Origin.TIP)
-        self.assertEqual(tip_name, "Spinal_ARID")
+        self.assertEqual(tip_name, "Spinal_ARD")
 
     def test_map_various_spinal_locations(self):
         """Test different spinal location mappings"""
         test_cases = [
-            ("Between C2-C3", Origin.BETWEEN_C2_C3, "C2C3_ARID"),
-            ("Between C3-C4", Origin.BETWEEN_C3_C4, "C3C4_ARID"),
-            ("Between T1-T2", Origin.BETWEEN_T1_T2, "T1T2_ARID"),
+            ("Between C2-C3", Origin.BETWEEN_C2_C3, "C2C3_ARD"),
+            ("Between C3-C4", Origin.BETWEEN_C3_C4, "C3C4_ARD"),
+            ("Between T1-T2", Origin.BETWEEN_T1_T2, "T1T2_ARD"),
         ]
 
         for location_str, expected_origin, expected_coord_name in test_cases:
@@ -1279,7 +1279,7 @@ class TestNSB2023SpinalInjectionMapping(TestCase):
             During.FOLLOW_UP
         )
         self.assertIsNotNone(coord_sys)
-        self.assertEqual(coord_sys.name, "T1T2_ARID")
+        self.assertEqual(coord_sys.name, "T1T2_ARD")
         self.assertEqual(coord_sys.origin, Origin.BETWEEN_T1_T2)
 
     def test_get_surgeries_spinal_injection(self):
@@ -1516,7 +1516,7 @@ class TestNSB2023SurgeryIntegration(TestCase):
         )
 
         coord_sys_other = CoordinateSystem(
-            name="C1C2_ARID",
+            name="C1C2_ARD",
             origin=Origin.BETWEEN_C1_C2,
             axis_unit=SizeUnit.MM,
             axes=[
@@ -1806,7 +1806,6 @@ class TestNSB2023CoordinateMapping(TestCase):
         self.assertEqual(len(transforms), 1)
         translation, rotation = transforms[0]
 
-        # ARD without depth should have 3D, with missing depth preserved as None
         self.assertEqual(len(translation.translation), 3)
         self.assertIsNone(translation.translation[2])
 
