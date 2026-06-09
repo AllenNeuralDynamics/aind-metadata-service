@@ -2937,36 +2937,13 @@ class MappedNSBList:
         """Assigns fiber name for intended measurement by coordinate info"""
 
         intended_measurments = []
-
-        # Filter to measurements with at least one measurement value
-        measurements_with_values = [
-            m for m in sp_measurement_data
-            if (
-                m.intended_measurement_R is not None
-                or m.intended_measurement_G is not None
-                or m.intended_measurement_B is not None
-                or m.intended_measurement_Iso is not None
-            )
-        ]
-        measurements_with_coords = [
-            m for m in measurements_with_values
-            if m.coordinate_ap is not None and m.coordinate_ml is not None
-        ]
-        measurements_without_coords = [
-            m for m in measurements_with_values
-            if m.coordinate_ap is None or m.coordinate_ml is None
-        ]
-
-        # Sort measurements with coordinates by AP descending, ML ascending
         sorted_data = sorted(
-            measurements_with_coords,
+            sp_measurement_data,
             key=lambda measurement: (
                 -float(measurement.coordinate_ap),
                 float(measurement.coordinate_ml),
             ),
         )
-        
-        # Add sorted measurements with fiber names
         for index, data in enumerate(sorted_data):
             intended_measurments.append(
                 IntendedMeasurementInformation(
@@ -2977,19 +2954,6 @@ class MappedNSBList:
                     intended_measurement_Iso=data.intended_measurement_Iso,
                 )
             )
-        
-        # Add measurements without coordinates (no fiber name)
-        for data in measurements_without_coords:
-            intended_measurments.append(
-                IntendedMeasurementInformation(
-                    fiber_name=None,
-                    intended_measurement_R=data.intended_measurement_R,
-                    intended_measurement_B=data.intended_measurement_B,
-                    intended_measurement_G=data.intended_measurement_G,
-                    intended_measurement_Iso=data.intended_measurement_Iso,
-                )
-            )
-        
         return intended_measurments
 
     def get_intended_measurements(
@@ -3034,29 +2998,16 @@ class MappedNSBList:
                     )
                 else:
                     # skip fiber name assignment if no During info
-                    # only add if at least one measurement value exists
-                    if (
-                        burr.intended_measurement_r is not None
-                        or burr.intended_measurement_g is not None
-                        or burr.intended_measurement_b is not None
-                        or burr.intended_measurement_iso is not None
-                    ):
-                        all_intended_measurements.append(
-                            IntendedMeasurementInformation(
-                                intended_measurement_R=(
-                                    burr.intended_measurement_r
-                                ),
-                                intended_measurement_B=(
-                                    burr.intended_measurement_b
-                                ),
-                                intended_measurement_G=(
-                                    burr.intended_measurement_g
-                                ),
-                                intended_measurement_Iso=(
-                                    burr.intended_measurement_iso
-                                ),
-                            )
+                    all_intended_measurements.append(
+                        IntendedMeasurementInformation(
+                            intended_measurement_R=burr.intended_measurement_r,
+                            intended_measurement_B=burr.intended_measurement_b,
+                            intended_measurement_G=burr.intended_measurement_g,
+                            intended_measurement_Iso=(
+                                burr.intended_measurement_iso
+                            ),
                         )
+                    )
         all_intended_measurements.extend(
             self._get_intended_measurements(initial_measurements)
         )
