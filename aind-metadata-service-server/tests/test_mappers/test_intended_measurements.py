@@ -77,6 +77,78 @@ class TestIntendedMeasurementMapper(unittest.TestCase):
         )
         self.assertEqual(measurements, [])
 
+    def test_measurements_with_none_coordinates_filtered_out(self):
+        """Test that measurements with None coordinates are filtered out."""
+        nsb_data = {
+            "FileSystemObjectType": 0,
+            "Id": 1,
+            "Burr_x0020_hole_x0020_1": "Stereotaxic Injection & Fiber Implant",
+            "Burr1_x0020_Perform_x0020_During": "Initial Surgery",
+            "Burr_x0020_1_x0020_intended_x0020": "acetylcholine",
+            "Burr_x0020_1_x0020_intended_x0021": "dopamine",
+            "Burr_x0020_1_x0020_intended_x0022": "GABA",
+            "Burr_x0020_1_x0020_intended_x0023": "control",
+        }
+        nsb_model = NSB2023List.model_validate(nsb_data)
+        mapper = IntendedMeasurementMapper(
+            nsb_2023=[nsb_model], nsb_present=[]
+        )
+        measurements = mapper.map_responses_to_intended_measurements(
+            subject_id="test_subject"
+        )
+        self.assertEqual(measurements, [])
+
+    def test_measurements_with_all_none_values_filtered_out(self):
+        """Test that measurements with all None values are filtered out."""
+        nsb_data = {
+            "FileSystemObjectType": 0,
+            "Id": 2,
+            "Burr_x0020_hole_x0020_1": "Stereotaxic Injection & Fiber Implant",
+            "Burr1_x0020_Perform_x0020_During": "Initial Surgery",
+            "Virus_x0020_A_x002f_P": 1.0,
+            "Virus_x0020_M_x002f_L": 1.5,
+            "Burr_x0020_1_x0020_intended_x0020": None,
+            "Burr_x0020_1_x0020_intended_x0021": None,
+            "Burr_x0020_1_x0020_intended_x0022": None,
+            "Burr_x0020_1_x0020_intended_x0023": None,
+        }
+        nsb_model = NSB2023List.model_validate(nsb_data)
+        mapper = IntendedMeasurementMapper(
+            nsb_2023=[nsb_model], nsb_present=[]
+        )
+        measurements = mapper.map_responses_to_intended_measurements(
+            subject_id="test_subject"
+        )
+        self.assertEqual(measurements, [])
+
+    def test_measurements_with_partial_values_included(self):
+        """Test that measurements with at least one value are included."""
+        nsb_data = {
+            "FileSystemObjectType": 0,
+            "Id": 3,
+            "Burr_x0020_hole_x0020_1": "Stereotaxic Injection & Fiber Implant",
+            "Burr1_x0020_Perform_x0020_During": "Initial Surgery",
+            "Virus_x0020_A_x002f_P": 1.0,
+            "Virus_x0020_M_x002f_L": 1.5,
+            "Burr_x0020_1_x0020_intended_x0020": "acetylcholine",
+            "Burr_x0020_1_x0020_intended_x0021": None,
+            "Burr_x0020_1_x0020_intended_x0022": None,
+            "Burr_x0020_1_x0020_intended_x0023": None,
+        }
+        nsb_model = NSB2023List.model_validate(nsb_data)
+        mapper = IntendedMeasurementMapper(
+            nsb_2023=[nsb_model], nsb_present=[]
+        )
+        measurements = mapper.map_responses_to_intended_measurements(
+            subject_id="test_subject"
+        )
+        self.assertEqual(len(measurements), 1)
+        self.assertEqual(measurements[0].fiber_name, "Fiber_0")
+        self.assertEqual(
+            measurements[0].intended_measurement_R, "acetylcholine"
+        )
+        self.assertIsNone(measurements[0].intended_measurement_G)
+
 
 if __name__ == "__main__":
     unittest.main()
