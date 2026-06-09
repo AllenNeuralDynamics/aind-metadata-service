@@ -259,6 +259,20 @@ class IntendedMeasurementandCoords:
     intended_measurement_Iso: Optional[str] = None
 
 
+# Define BREGMA_ARD coordinate system (3 axes: AP, ML, Depth)
+# NSB doesn't provide SI dimension data, so we use ARD instead of ARID
+BREGMA_ARD = CoordinateSystem(
+    name="BREGMA_ARD",
+    origin=Origin.BREGMA,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.AP, direction=Direction.PA),
+        Axis(name=AxisName.ML, direction=Direction.LR),
+        Axis(name=AxisName.DEPTH, direction=Direction.UD),
+    ],
+)
+
+
 class MappedNSBList:
     """Mapped Fields in SharePoint list."""
 
@@ -2512,7 +2526,7 @@ class MappedNSBList:
                 ],
             )
             coordinate_system = (
-                CoordinateSystemLibrary.BREGMA_ARID
+                BREGMA_ARD
                 if coordinate_depth
                 else CoordinateSystemLibrary.BREGMA_ARI
             )
@@ -2562,7 +2576,7 @@ class MappedNSBList:
                 ],
             )
             coordinate_system = (
-                CoordinateSystemLibrary.BREGMA_ARID
+                BREGMA_ARD
                 if coordinate_depth
                 else CoordinateSystemLibrary.BREGMA_ARI
             )
@@ -2612,7 +2626,7 @@ class MappedNSBList:
                 ],
             )
             coordinate_system = (
-                CoordinateSystemLibrary.BREGMA_ARID
+                BREGMA_ARD
                 if coordinate_depth
                 else CoordinateSystemLibrary.BREGMA_ARI
             )
@@ -2661,7 +2675,7 @@ class MappedNSBList:
                 ],
             )
             coordinate_system = (
-                CoordinateSystemLibrary.BREGMA_ARID
+                BREGMA_ARD
                 if coordinate_depth
                 else CoordinateSystemLibrary.BREGMA_ARI
             )
@@ -2710,7 +2724,7 @@ class MappedNSBList:
                 ],
             )
             coordinate_system = (
-                CoordinateSystemLibrary.BREGMA_ARID
+                BREGMA_ARD
                 if coordinate_depth
                 else CoordinateSystemLibrary.BREGMA_ARI
             )
@@ -2759,7 +2773,7 @@ class MappedNSBList:
                 ],
             )
             coordinate_system = (
-                CoordinateSystemLibrary.BREGMA_ARID
+                BREGMA_ARD
                 if coordinate_depth
                 else CoordinateSystemLibrary.BREGMA_ARI
             )
@@ -2923,13 +2937,36 @@ class MappedNSBList:
         """Assigns fiber name for intended measurement by coordinate info"""
 
         intended_measurments = []
+
+        # Filter to measurements with at least one measurement value
+        measurements_with_values = [
+            m for m in sp_measurement_data
+            if (
+                m.intended_measurement_R is not None
+                or m.intended_measurement_G is not None
+                or m.intended_measurement_B is not None
+                or m.intended_measurement_Iso is not None
+            )
+        ]
+        measurements_with_coords = [
+            m for m in measurements_with_values
+            if m.coordinate_ap is not None and m.coordinate_ml is not None
+        ]
+        measurements_without_coords = [
+            m for m in measurements_with_values
+            if m.coordinate_ap is None or m.coordinate_ml is None
+        ]
+
+        # Sort measurements with coordinates by AP descending, ML ascending
         sorted_data = sorted(
-            sp_measurement_data,
+            measurements_with_coords,
             key=lambda measurement: (
                 -float(measurement.coordinate_ap),
                 float(measurement.coordinate_ml),
             ),
         )
+        
+        # Add sorted measurements with fiber names
         for index, data in enumerate(sorted_data):
             intended_measurments.append(
                 IntendedMeasurementInformation(
@@ -2940,6 +2977,19 @@ class MappedNSBList:
                     intended_measurement_Iso=data.intended_measurement_Iso,
                 )
             )
+        
+        # Add measurements without coordinates (no fiber name)
+        for data in measurements_without_coords:
+            intended_measurments.append(
+                IntendedMeasurementInformation(
+                    fiber_name=None,
+                    intended_measurement_R=data.intended_measurement_R,
+                    intended_measurement_B=data.intended_measurement_B,
+                    intended_measurement_G=data.intended_measurement_G,
+                    intended_measurement_Iso=data.intended_measurement_Iso,
+                )
+            )
+        
         return intended_measurments
 
     def get_intended_measurements(
@@ -2984,16 +3034,29 @@ class MappedNSBList:
                     )
                 else:
                     # skip fiber name assignment if no During info
-                    all_intended_measurements.append(
-                        IntendedMeasurementInformation(
-                            intended_measurement_R=burr.intended_measurement_r,
-                            intended_measurement_B=burr.intended_measurement_b,
-                            intended_measurement_G=burr.intended_measurement_g,
-                            intended_measurement_Iso=(
-                                burr.intended_measurement_iso
-                            ),
+                    # only add if at least one measurement value exists
+                    if (
+                        burr.intended_measurement_r is not None
+                        or burr.intended_measurement_g is not None
+                        or burr.intended_measurement_b is not None
+                        or burr.intended_measurement_iso is not None
+                    ):
+                        all_intended_measurements.append(
+                            IntendedMeasurementInformation(
+                                intended_measurement_R=(
+                                    burr.intended_measurement_r
+                                ),
+                                intended_measurement_B=(
+                                    burr.intended_measurement_b
+                                ),
+                                intended_measurement_G=(
+                                    burr.intended_measurement_g
+                                ),
+                                intended_measurement_Iso=(
+                                    burr.intended_measurement_iso
+                                ),
+                            )
                         )
-                    )
         all_intended_measurements.extend(
             self._get_intended_measurements(initial_measurements)
         )
@@ -3091,10 +3154,10 @@ class MappedNSBList:
                 ],
             )
 
-        # Prioritize ARID over ARI, and LAMBDA over BREGMA if all are lambda
+        # Prioritize ARD over ARI, and LAMBDA over BREGMA if all are lambda
         names = [s.name for s in systems if s]
-        if any(n.endswith("ARID") for n in names):
-            return CoordinateSystemLibrary.BREGMA_ARID
+        if any(n.endswith("ARD") for n in names):
+            return BREGMA_ARD
         elif any(n.endswith("ARI") for n in names):
             if all(n.startswith("LAMBDA") for n in names):
                 return CoordinateSystem(
@@ -3140,12 +3203,12 @@ class MappedNSBList:
         # If all coordinates are None, return empty translation
         if ap is None and ml is None and depth is None:
             angle_val = float(angle) if angle is not None else 0.0
-            is_arid = (
+            is_ard = (
                 surgery_coordinate_system is not None
-                and surgery_coordinate_system.name.endswith("ARID")
+                and surgery_coordinate_system.name.endswith("ARD")
             )
             rotation = Rotation(
-                angles=[angle_val, 0, 0, 0] if is_arid else [angle_val, 0, 0],
+                angles=[angle_val, 0, 0] if is_ard else [angle_val, 0, 0],
                 angles_unit=AngleUnit.DEG,
             )
             return [[Translation.model_construct(translation=[]), rotation]]
@@ -3154,22 +3217,22 @@ class MappedNSBList:
         ap_val = float(ap) if ap is not None else None
         ml_val = float(ml) if ml is not None else None
         angle_val = float(angle) if angle is not None else 0.0
-        is_arid = (
+        is_ard = (
             surgery_coordinate_system is not None
-            and surgery_coordinate_system.name.endswith("ARID")
+            and surgery_coordinate_system.name.endswith("ARD")
         )
 
         transforms = []
         if depth is None:
             translation = Translation.model_construct(
                 translation=(
-                    [ap_val, ml_val, 0, None]
-                    if is_arid
+                    [ap_val, ml_val, None]
+                    if is_ard
                     else [ap_val, ml_val, 0]
                 )
             )
             rotation = Rotation(
-                angles=[angle_val, 0, 0, 0] if is_arid else [angle_val, 0, 0],
+                angles=[angle_val, 0, 0] if is_ard else [angle_val, 0, 0],
                 angles_unit=AngleUnit.DEG,
             )
             transforms.append([translation, rotation])
@@ -3178,14 +3241,14 @@ class MappedNSBList:
                 d_val = float(d) if d is not None else None
                 translation = Translation.model_construct(
                     translation=(
-                        [ap_val, ml_val, 0, d_val]
-                        if is_arid
+                        [ap_val, ml_val, d_val]
+                        if is_ard
                         else [ap_val, ml_val, 0]
                     )
                 )
                 rotation = Rotation(
                     angles=(
-                        [angle_val, 0, 0, 0] if is_arid else [angle_val, 0, 0]
+                        [angle_val, 0, 0] if is_ard else [angle_val, 0, 0]
                     ),
                     angles_unit=AngleUnit.DEG,
                 )
@@ -3634,7 +3697,7 @@ class MappedNSBList:
         if other_procedures:
             self.assign_fiber_probe_names(other_procedures)
             measured_coordinates = self.map_measured_coordinates(
-                self.aind_breg2_lamb, CoordinateSystemLibrary.BREGMA_ARID
+                self.aind_breg2_lamb, BREGMA_ARD
             )
             other_surgery = Surgery.model_construct(
                 start_date=None,

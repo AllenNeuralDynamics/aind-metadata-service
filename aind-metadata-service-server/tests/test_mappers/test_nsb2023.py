@@ -38,6 +38,7 @@ from aind_sharepoint_service_async_client.models.nsb2023_list import (
 )
 
 from aind_metadata_service_server.mappers.nsb2023 import (
+    BREGMA_ARD,
     BurrHoleInfo,
     BurrHoleProcedure,
     During,
@@ -1199,11 +1200,11 @@ class TestNSB2023FiberImplantMapping(TestCase):
 
             translation, rotation = transform
             self.assertIsInstance(translation, Translation)
-            self.assertEqual(len(translation.translation), 4)
+            self.assertEqual(len(translation.translation), 3)
             self.assertIsInstance(rotation, Rotation)
-            self.assertEqual(len(rotation.angles), 4)
+            self.assertEqual(len(rotation.angles), 3)
             self.assertIsNotNone(surgery.coordinate_system)
-            self.assertEqual(surgery.coordinate_system.name, "BREGMA_ARID")
+            self.assertEqual(surgery.coordinate_system.name, "BREGMA_ARD")
 
 
 class TestNSB2023SpinalInjectionMapping(TestCase):
@@ -1480,8 +1481,8 @@ class TestNSB2023SurgeryIntegration(TestCase):
                 During.INITIAL
             )
         self.assertIsNotNone(coord_sys)
-        # Should be BREGMA_ARID since fiber implants have depth coordinates
-        self.assertEqual(coord_sys, CoordinateSystemLibrary.BREGMA_ARID)
+        # Should be BREGMA_ARD since fiber implants have depth coordinates
+        self.assertEqual(coord_sys, BREGMA_ARD)
 
     def test_map_measured_coordinates(self):
         """Test measured coordinates mapping"""
@@ -1502,15 +1503,16 @@ class TestNSB2023SurgeryIntegration(TestCase):
         self.assertIn(Origin.BREGMA, measured)
         self.assertEqual(len(measured[Origin.BREGMA].translation), 3)
 
-        coord_sys_4d = CoordinateSystemLibrary.BREGMA_ARID
-        measured_4d = MappedNSBList.map_measured_coordinates(
-            Decimal("4.5"), coord_sys_4d
+        # Test with ARD coordinate system (3 axes)
+        coord_sys_ard = BREGMA_ARD
+        measured_ard = MappedNSBList.map_measured_coordinates(
+            Decimal("4.5"), coord_sys_ard
         )
-        self.assertIsNotNone(measured_4d)
-        self.assertIn(Origin.LAMBDA, measured_4d)
-        self.assertEqual(len(measured_4d[Origin.LAMBDA].translation), 4)
+        self.assertIsNotNone(measured_ard)
+        self.assertIn(Origin.LAMBDA, measured_ard)
+        self.assertEqual(len(measured_ard[Origin.LAMBDA].translation), 3)
         self.assertEqual(
-            measured_4d[Origin.LAMBDA].translation, [Decimal("-4.5"), 0, 0, 0]
+            measured_ard[Origin.LAMBDA].translation, [Decimal("-4.5"), 0, 0]
         )
 
         coord_sys_other = CoordinateSystem(
@@ -1707,7 +1709,7 @@ class TestNSB2023CoordinateMapping(TestCase):
             ml=Decimal("2.0"),
             ap=Decimal("1.5"),
             depth=[Decimal("3.0")],
-            surgery_coordinate_system=CoordinateSystemLibrary.BREGMA_ARID,
+            surgery_coordinate_system=BREGMA_ARD,
         )
         self.assertIsInstance(transforms, list)
         self.assertGreater(len(transforms), 0)
@@ -1724,40 +1726,38 @@ class TestNSB2023CoordinateMapping(TestCase):
         self.assertIsInstance(transforms, list)
         self.assertEqual(len(transforms), 1)
 
-    def test_map_burr_hole_transforms_arid_coordinate_system(self):
-        """Test burr hole transforms with ARID coordinate system (4D)"""
-        # Test with BREGMA_ARID (should add 4th dimension)
-        transforms_arid = MappedNSBList._map_burr_hole_transforms(
+    def test_map_burr_hole_transforms_ard_coordinate_system(self):
+        """Test burr hole transforms with ARD coordinate system (3D)"""
+        # Test with BREGMA_ARD (3 axes: AP, ML, Depth)
+        transforms_ard = MappedNSBList._map_burr_hole_transforms(
             angle=Decimal("15"),
             ml=Decimal("2.5"),
             ap=Decimal("1.8"),
             depth=[Decimal("3.5"), Decimal("4.0")],
-            surgery_coordinate_system=CoordinateSystemLibrary.BREGMA_ARID,
+            surgery_coordinate_system=BREGMA_ARD,
         )
 
         # Should have 2 transforms (one per depth)
-        self.assertEqual(len(transforms_arid), 2)
+        self.assertEqual(len(transforms_ard), 2)
 
         # Each transform should have Translation and Rotation
-        for transform in transforms_arid:
+        for transform in transforms_ard:
             self.assertEqual(len(transform), 2)
             translation, rotation = transform
 
-            # ARID should have 4D coordinates
+            # ARD should have 3D coordinates
             self.assertIsInstance(translation, Translation)
-            self.assertEqual(len(translation.translation), 4)
+            self.assertEqual(len(translation.translation), 3)
             self.assertEqual(translation.translation[0], 1.8)
             self.assertEqual(translation.translation[1], 2.5)  # ML
-            self.assertEqual(translation.translation[2], 0)  # SI
-            self.assertIn(translation.translation[3], [3.5, 4.0])  # Depth
+            self.assertIn(translation.translation[2], [3.5, 4.0])  # Depth
 
-            # ARID should have 4D rotation angles
+            # ARD should have 3D rotation angles
             self.assertIsInstance(rotation, Rotation)
-            self.assertEqual(len(rotation.angles), 4)
+            self.assertEqual(len(rotation.angles), 3)
             self.assertEqual(rotation.angles[0], 15)
             self.assertEqual(rotation.angles[1], 0)
             self.assertEqual(rotation.angles[2], 0)
-            self.assertEqual(rotation.angles[3], 0)
 
     def test_map_burr_hole_transforms_ari_coordinate_system(self):
         """Test burr hole transforms with ARI coordinate system (3D)"""
@@ -1792,26 +1792,26 @@ class TestNSB2023CoordinateMapping(TestCase):
             self.assertEqual(rotation.angles[1], 0)
             self.assertEqual(rotation.angles[2], 0)
 
-    def test_map_burr_hole_transforms_no_depth_arid(self):
-        """Test burr hole transforms without depth for ARID system"""
+    def test_map_burr_hole_transforms_no_depth_ard(self):
+        """Test burr hole transforms without depth for ARD system"""
         transforms = MappedNSBList._map_burr_hole_transforms(
             angle=Decimal("10"),
             ml=Decimal("2.0"),
             ap=Decimal("1.5"),
             depth=None,
-            surgery_coordinate_system=CoordinateSystemLibrary.BREGMA_ARID,
+            surgery_coordinate_system=BREGMA_ARD,
         )
 
         # Should have 1 transform
         self.assertEqual(len(transforms), 1)
         translation, rotation = transforms[0]
 
-        # ARID without depth should still have 4D, with missing depth preserved
-        self.assertEqual(len(translation.translation), 4)
-        self.assertIsNone(translation.translation[3])
+        # ARD without depth should have 3D, with missing depth preserved as None
+        self.assertEqual(len(translation.translation), 3)
+        self.assertIsNone(translation.translation[2])
 
-        self.assertEqual(len(rotation.angles), 4)
-        self.assertEqual(rotation.angles[3], 0)
+        self.assertEqual(len(rotation.angles), 3)
+        self.assertEqual(rotation.angles[2], 0)
 
     def test_map_burr_hole_transforms_all_coords_missing(self):
         """If AP/ML/DV are all None, translation should be empty."""
@@ -1820,13 +1820,14 @@ class TestNSB2023CoordinateMapping(TestCase):
             ml=None,
             ap=None,
             depth=None,
-            surgery_coordinate_system=CoordinateSystemLibrary.BREGMA_ARID,
+            surgery_coordinate_system=BREGMA_ARD,
         )
 
         self.assertEqual(len(transforms), 1)
         translation, rotation = transforms[0]
         self.assertEqual(translation.translation, [])
-        self.assertEqual(rotation.angles, [10, 0, 0, 0])
+        # ARD system should have 3 rotation angles
+        self.assertEqual(rotation.angles, [10.0, 0.0, 0.0])
 
     def test_map_burr_hole_transforms_missing_ap_ml_with_dv(self):
         """If any coordinate exists, keep missing values as None, not zero."""
@@ -1835,14 +1836,15 @@ class TestNSB2023CoordinateMapping(TestCase):
             ml=None,
             ap=None,
             depth=[Decimal("3.0")],
-            surgery_coordinate_system=CoordinateSystemLibrary.BREGMA_ARID,
+            surgery_coordinate_system=BREGMA_ARD,
         )
 
         self.assertEqual(len(transforms), 1)
         translation, _ = transforms[0]
+        # ARD system has 3D: [AP, ML, Depth]
         self.assertEqual(
             translation.translation,
-            [None, None, 0, Decimal("3.0")],
+            [None, None, 3.0],
         )
 
     def test_map_burr_hole_transforms_no_depth_ari(self):
@@ -1878,13 +1880,13 @@ class TestNSB2023CoordinateMapping(TestCase):
     def test_map_burr_hole_transforms_spinal_coordinate_system(self):
         """Test burr hole transforms with spinal coordinate system"""
         spinal_coord_sys = CoordinateSystem(
-            name="C1C2_ARID",
+            name="C1C2_ARD",
             origin=Origin.BETWEEN_C1_C2,
             axis_unit=SizeUnit.MM,
             axes=[
                 Axis(name=AxisName.AP, direction=Direction.PA),
                 Axis(name=AxisName.ML, direction=Direction.LR),
-                Axis(name=AxisName.SI, direction=Direction.SI),
+                Axis(name=AxisName.DEPTH, direction=Direction.UD),
             ],
         )
 
@@ -1896,11 +1898,11 @@ class TestNSB2023CoordinateMapping(TestCase):
             surgery_coordinate_system=spinal_coord_sys,
         )
 
-        # Should treat as ARID (4D) since name ends with "ARID"
+        # Should treat as ARD (3D) since name ends with "ARD"
         self.assertEqual(len(transforms), 1)
         translation, rotation = transforms[0]
-        self.assertEqual(len(translation.translation), 4)
-        self.assertEqual(len(rotation.angles), 4)
+        self.assertEqual(len(translation.translation), 3)
+        self.assertEqual(len(rotation.angles), 3)
 
     def test_map_burr_hole_dv_list(self):
         """Test DV coordinate list mapping"""
