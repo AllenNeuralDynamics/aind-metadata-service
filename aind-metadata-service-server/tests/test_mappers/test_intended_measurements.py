@@ -103,8 +103,8 @@ class TestIntendedMeasurementMapper(unittest.TestCase):
         )
         self.assertEqual(measurements[0].intended_measurement_G, "dopamine")
 
-    def test_measurements_with_all_none_values_filtered_out(self):
-        """Test that measurements with all None values are filtered out."""
+    def test_measurements_with_all_none_values(self):
+        """Test that measurements with None values with fiber names."""
         nsb_data = {
             "FileSystemObjectType": 0,
             "Id": 2,
@@ -124,7 +124,13 @@ class TestIntendedMeasurementMapper(unittest.TestCase):
         measurements = mapper.map_responses_to_intended_measurements(
             subject_id="test_subject"
         )
-        self.assertEqual(measurements, [])
+        # Since coordinates exist, should return measurement with fiber name
+        self.assertEqual(len(measurements), 1)
+        self.assertEqual(measurements[0].fiber_name, "Fiber_0")
+        self.assertIsNone(measurements[0].intended_measurement_R)
+        self.assertIsNone(measurements[0].intended_measurement_G)
+        self.assertIsNone(measurements[0].intended_measurement_B)
+        self.assertIsNone(measurements[0].intended_measurement_Iso)
 
     def test_measurements_with_partial_values_included(self):
         """Test that measurements with at least one value are included."""
@@ -154,8 +160,8 @@ class TestIntendedMeasurementMapper(unittest.TestCase):
         )
         self.assertIsNone(measurements[0].intended_measurement_G)
 
-    def test_measurements_without_during_info_filtered_if_all_none(self):
-        """Test measurements without during info and None values."""
+    def test_measurements_without_during_info(self):
+        """Test measurements without during info"""
         nsb_data = {
             "FileSystemObjectType": 0,
             "Id": 4,
@@ -174,7 +180,13 @@ class TestIntendedMeasurementMapper(unittest.TestCase):
         measurements = mapper.map_responses_to_intended_measurements(
             subject_id="test_subject"
         )
-        self.assertEqual(measurements, [])
+        # Even without during info, measurements with coordinates are included
+        self.assertEqual(len(measurements), 1)
+        self.assertEqual(measurements[0].fiber_name, "Fiber_0")
+        self.assertIsNone(measurements[0].intended_measurement_R)
+        self.assertIsNone(measurements[0].intended_measurement_G)
+        self.assertIsNone(measurements[0].intended_measurement_B)
+        self.assertIsNone(measurements[0].intended_measurement_Iso)
 
 
 if __name__ == "__main__":

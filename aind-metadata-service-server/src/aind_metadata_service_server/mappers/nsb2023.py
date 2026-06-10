@@ -2924,27 +2924,15 @@ class MappedNSBList:
 
         intended_measurments = []
 
-        # Filter to measurements with at least one measurement value
-        measurements_with_values = [
-            m
-            for m in sp_measurement_data
-            if (
-                m.intended_measurement_R is not None
-                or m.intended_measurement_G is not None
-                or m.intended_measurement_B is not None
-                or m.intended_measurement_Iso is not None
-            )
-        ]
-
         # Separate measurements with coordinates from those without
         measurements_with_coords = [
             m
-            for m in measurements_with_values
+            for m in sp_measurement_data
             if m.coordinate_ap is not None and m.coordinate_ml is not None
         ]
         measurements_without_coords = [
             m
-            for m in measurements_with_values
+            for m in sp_measurement_data
             if m.coordinate_ap is None or m.coordinate_ml is None
         ]
 
@@ -2991,6 +2979,7 @@ class MappedNSBList:
         all_intended_measurements = []
         initial_measurements = []
         followup_measurements = []
+        other_measurements = []  # For measurements without during info
         for burr_hole_num in range(1, 7):
             if getattr(self, f"aind_burr_hole_{burr_hole_num}") in {
                 BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
@@ -3024,30 +3013,22 @@ class MappedNSBList:
                         )
                     )
                 else:
-                    # skip fiber name assignment if no During info
-                    # only add if at least one measurement value exists
-                    if (
-                        burr.intended_measurement_r is not None
-                        or burr.intended_measurement_g is not None
-                        or burr.intended_measurement_b is not None
-                        or burr.intended_measurement_iso is not None
-                    ):
-                        all_intended_measurements.append(
-                            IntendedMeasurementInformation(
-                                intended_measurement_R=(
-                                    burr.intended_measurement_r
-                                ),
-                                intended_measurement_B=(
-                                    burr.intended_measurement_b
-                                ),
-                                intended_measurement_G=(
-                                    burr.intended_measurement_g
-                                ),
-                                intended_measurement_Iso=(
-                                    burr.intended_measurement_iso
-                                ),
-                            )
+                    # No during info - add to other_measurements
+                    other_measurements.append(
+                        IntendedMeasurementandCoords(
+                            intended_measurement_R=burr.intended_measurement_r,
+                            intended_measurement_B=burr.intended_measurement_b,
+                            intended_measurement_G=burr.intended_measurement_g,
+                            intended_measurement_Iso=(
+                                burr.intended_measurement_iso
+                            ),
+                            coordinate_ap=burr.coordinate_ap,
+                            coordinate_ml=burr.coordinate_ml,
                         )
+                    )
+        all_intended_measurements.extend(
+            self._get_intended_measurements(other_measurements)
+        )
         all_intended_measurements.extend(
             self._get_intended_measurements(initial_measurements)
         )
