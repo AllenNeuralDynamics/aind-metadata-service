@@ -259,6 +259,19 @@ class IntendedMeasurementandCoords:
     intended_measurement_Iso: Optional[str] = None
 
 
+# Define BREGMA_ARD coordinate system (3 axes: AP, ML, Depth)
+BREGMA_ARD = CoordinateSystem(
+    name="BREGMA_ARD",
+    origin=Origin.BREGMA,
+    axis_unit=SizeUnit.MM,
+    axes=[
+        Axis(name=AxisName.AP, direction=Direction.PA),
+        Axis(name=AxisName.ML, direction=Direction.LR),
+        Axis(name=AxisName.DEPTH, direction=Direction.UD),
+    ],
+)
+
+
 class MappedNSBList:
     """Mapped Fields in SharePoint list."""
 
@@ -703,18 +716,18 @@ class MappedNSBList:
         Returns
         -------
         str
-            The coordinate system name (e.g., "C1C2_ARID")
+            The coordinate system name (e.g., "C1C2_ARD")
         """
         if spinal_origin is None:
-            return "Spinal_ARID"
+            return "Spinal_ARD"
         origin_name = spinal_origin.value
         match = re.search(MappedNSBList.SPINAL_LOCATION_REGEX, origin_name)
         if match:
             first_vertebra = match.group(1)
             second_vertebra = match.group(2)
-            return f"{first_vertebra}{second_vertebra}_ARID"
+            return f"{first_vertebra}{second_vertebra}_ARD"
 
-        return "Spinal_ARID"
+        return "Spinal_ARD"
 
     @property
     def aind_burr_2_d_v_x00(self) -> Optional[Decimal]:
@@ -2512,7 +2525,7 @@ class MappedNSBList:
                 ],
             )
             coordinate_system = (
-                CoordinateSystemLibrary.BREGMA_ARID
+                BREGMA_ARD
                 if coordinate_depth
                 else CoordinateSystemLibrary.BREGMA_ARI
             )
@@ -2562,7 +2575,7 @@ class MappedNSBList:
                 ],
             )
             coordinate_system = (
-                CoordinateSystemLibrary.BREGMA_ARID
+                BREGMA_ARD
                 if coordinate_depth
                 else CoordinateSystemLibrary.BREGMA_ARI
             )
@@ -2612,7 +2625,7 @@ class MappedNSBList:
                 ],
             )
             coordinate_system = (
-                CoordinateSystemLibrary.BREGMA_ARID
+                BREGMA_ARD
                 if coordinate_depth
                 else CoordinateSystemLibrary.BREGMA_ARI
             )
@@ -2661,7 +2674,7 @@ class MappedNSBList:
                 ],
             )
             coordinate_system = (
-                CoordinateSystemLibrary.BREGMA_ARID
+                BREGMA_ARD
                 if coordinate_depth
                 else CoordinateSystemLibrary.BREGMA_ARI
             )
@@ -2710,7 +2723,7 @@ class MappedNSBList:
                 ],
             )
             coordinate_system = (
-                CoordinateSystemLibrary.BREGMA_ARID
+                BREGMA_ARD
                 if coordinate_depth
                 else CoordinateSystemLibrary.BREGMA_ARI
             )
@@ -2759,7 +2772,7 @@ class MappedNSBList:
                 ],
             )
             coordinate_system = (
-                CoordinateSystemLibrary.BREGMA_ARID
+                BREGMA_ARD
                 if coordinate_depth
                 else CoordinateSystemLibrary.BREGMA_ARI
             )
@@ -3126,10 +3139,10 @@ class MappedNSBList:
                 ],
             )
 
-        # Prioritize ARID over ARI, and LAMBDA over BREGMA if all are lambda
+        # Prioritize ARD over ARI, and LAMBDA over BREGMA if all are lambda
         names = [s.name for s in systems if s]
-        if any(n.endswith("ARID") for n in names):
-            return CoordinateSystemLibrary.BREGMA_ARID
+        if any(n.endswith("ARD") for n in names):
+            return BREGMA_ARD
         elif any(n.endswith("ARI") for n in names):
             if all(n.startswith("LAMBDA") for n in names):
                 return CoordinateSystem(
@@ -3175,12 +3188,12 @@ class MappedNSBList:
         # If all coordinates are None, return empty translation
         if ap is None and ml is None and depth is None:
             angle_val = float(angle) if angle is not None else 0.0
-            is_arid = (
+            is_ard = (
                 surgery_coordinate_system is not None
-                and surgery_coordinate_system.name.endswith("ARID")
+                and surgery_coordinate_system.name.endswith("ARD")
             )
             rotation = Rotation(
-                angles=[angle_val, 0, 0, 0] if is_arid else [angle_val, 0, 0],
+                angles=[angle_val, 0, 0] if is_ard else [angle_val, 0, 0],
                 angles_unit=AngleUnit.DEG,
             )
             return [[Translation.model_construct(translation=[]), rotation]]
@@ -3189,22 +3202,22 @@ class MappedNSBList:
         ap_val = float(ap) if ap is not None else None
         ml_val = float(ml) if ml is not None else None
         angle_val = float(angle) if angle is not None else 0.0
-        is_arid = (
+        is_ard = (
             surgery_coordinate_system is not None
-            and surgery_coordinate_system.name.endswith("ARID")
+            and surgery_coordinate_system.name.endswith("ARD")
         )
 
         transforms = []
         if depth is None:
             translation = Translation.model_construct(
                 translation=(
-                    [ap_val, ml_val, 0, None]
-                    if is_arid
+                    [ap_val, ml_val, None]
+                    if is_ard
                     else [ap_val, ml_val, 0]
                 )
             )
             rotation = Rotation(
-                angles=[angle_val, 0, 0, 0] if is_arid else [angle_val, 0, 0],
+                angles=[angle_val, 0, 0] if is_ard else [angle_val, 0, 0],
                 angles_unit=AngleUnit.DEG,
             )
             transforms.append([translation, rotation])
@@ -3213,14 +3226,14 @@ class MappedNSBList:
                 d_val = float(d) if d is not None else None
                 translation = Translation.model_construct(
                     translation=(
-                        [ap_val, ml_val, 0, d_val]
-                        if is_arid
+                        [ap_val, ml_val, d_val]
+                        if is_ard
                         else [ap_val, ml_val, 0]
                     )
                 )
                 rotation = Rotation(
                     angles=(
-                        [angle_val, 0, 0, 0] if is_arid else [angle_val, 0, 0]
+                        [angle_val, 0, 0] if is_ard else [angle_val, 0, 0]
                     ),
                     angles_unit=AngleUnit.DEG,
                 )
@@ -3560,7 +3573,7 @@ class MappedNSBList:
                     name="TIP_D",
                     origin=Origin.TIP,
                     axis_unit=SizeUnit.MM,
-                    axes=[Axis(name=AxisName.SI, direction=Direction.UD)],
+                    axes=[Axis(name=AxisName.DEPTH, direction=Direction.UD)],
                 )
 
                 transforms = self._map_burr_hole_transforms(
@@ -3669,7 +3682,7 @@ class MappedNSBList:
         if other_procedures:
             self.assign_fiber_probe_names(other_procedures)
             measured_coordinates = self.map_measured_coordinates(
-                self.aind_breg2_lamb, CoordinateSystemLibrary.BREGMA_ARID
+                self.aind_breg2_lamb, BREGMA_ARD
             )
             other_surgery = Surgery.model_construct(
                 start_date=None,
