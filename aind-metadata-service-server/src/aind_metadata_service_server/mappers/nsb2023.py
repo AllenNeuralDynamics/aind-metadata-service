@@ -43,16 +43,21 @@ from aind_data_schema_models.units import (
     SizeUnit,
     VolumeUnit,
 )
-from aind_sharepoint_service_async_client.models import (
-    NSB2023IacucProtocol as IacucProtocol,
-)
+
 from aind_sharepoint_service_async_client.models import (
     NSB2023List,
     NSB2023Procedure,
+    NSB2023IacucProtocol as IacucProtocol,
 )
 from pydantic import ValidationError
 
 from aind_metadata_service_server.models import IntendedMeasurementInformation
+
+
+class BurrHoleStatus(Enum):
+    """Enum class for BurrHoleStatus"""
+
+    COMPLETE = "Complete"
 
 
 class BurrHoleProcedure(Enum):
@@ -187,6 +192,7 @@ class BurrHoleInfo:
     targeted_structure: Optional[BrainStructureModel] = None
     coordinate_system: Optional[CoordinateSystem] = None
     spinal_location: Optional[Origin] = None
+    status: Optional[BurrHoleStatus] = None
 
 
 @dataclass
@@ -2383,6 +2389,84 @@ class MappedNSBList:
         else:
             return None
 
+    @property
+    def aind_burr_1_status(self) -> Optional[BurrHoleStatus]:
+        """Map burr hole 1 status to aind model"""
+        return (
+            None
+            if self._nsb.burr_x0020_hole_x0020_1_x0020_st is None
+            else {
+                self._nsb.burr_x0020_hole_x0020_1_x0020_st.COMPLETE: (
+                    BurrHoleStatus.COMPLETE
+                ),
+            }.get(self._nsb.burr_x0020_hole_x0020_1_x0020_st, None)
+        )
+
+    @property
+    def aind_burr_2_status(self) -> Optional[BurrHoleStatus]:
+        """Map burr hole 2 status to aind model"""
+        return (
+            None
+            if self._nsb.burr2_x0020_status is None
+            else {
+                self._nsb.burr2_x0020_status.COMPLETE: (
+                    BurrHoleStatus.COMPLETE
+                ),
+            }.get(self._nsb.burr2_x0020_status, None)
+        )
+
+    @property
+    def aind_burr_3_status(self) -> Optional[BurrHoleStatus]:
+        """Map burr hole 3 status to aind model"""
+        return (
+            None
+            if self._nsb.burr3_x0020_status is None
+            else {
+                self._nsb.burr3_x0020_status.COMPLETE: (
+                    BurrHoleStatus.COMPLETE
+                ),
+            }.get(self._nsb.burr3_x0020_status, None)
+        )
+
+    @property
+    def aind_burr_4_status(self) -> Optional[BurrHoleStatus]:
+        """Map burr hole 4 status to aind model"""
+        return (
+            None
+            if self._nsb.burr4_x0020_status is None
+            else {
+                self._nsb.burr4_x0020_status.COMPLETE: (
+                    BurrHoleStatus.COMPLETE
+                ),
+            }.get(self._nsb.burr4_x0020_status, None)
+        )
+
+    @property
+    def aind_burr_5_status(self) -> Optional[BurrHoleStatus]:
+        """Map burr hole 5 status to aind model"""
+        return (
+            None
+            if self._nsb.burr5_x0020_status is None
+            else {
+                self._nsb.burr5_x0020_status.COMPLETE: (
+                    BurrHoleStatus.COMPLETE
+                ),
+            }.get(self._nsb.burr5_x0020_status, None)
+        )
+
+    @property
+    def aind_burr_6_status(self) -> Optional[BurrHoleStatus]:
+        """Map burr hole 6 status to aind model"""
+        return (
+            None
+            if self._nsb.burr6_x0020_status is None
+            else {
+                self._nsb.burr6_x0020_status.COMPLETE: (
+                    BurrHoleStatus.COMPLETE
+                ),
+            }.get(self._nsb.burr6_x0020_status, None)
+        )
+
     # TODO: support new Procedures
     # (EMG Array, Grid Injections, Testes, Oviduct)
     def has_hp_procedure(self) -> bool:
@@ -2553,6 +2637,7 @@ class MappedNSBList:
                 targeted_structure=self.aind_burr_1_intended,
                 coordinate_system=coordinate_system,
                 spinal_location=self.aind_burr_1_spinal_location,
+                status=self.aind_burr_1_status,
             )
         elif burr_hole_num == 2:
             coordinate_depth = self._map_burr_hole_dv(
@@ -2603,6 +2688,7 @@ class MappedNSBList:
                 targeted_structure=self.aind_burr_2_intended,
                 coordinate_system=coordinate_system,
                 spinal_location=self.aind_burr_2_spinal_location,
+                status=self.aind_burr_2_status,
             )
         elif burr_hole_num == 3:
             coordinate_depth = self._map_burr_hole_dv(
@@ -2652,6 +2738,7 @@ class MappedNSBList:
                 intended_measurement_iso=self.aind_burr_3_intended_x0023,
                 targeted_structure=self.aind_burr_3_intended,
                 coordinate_system=coordinate_system,
+                status=self.aind_burr_3_status,
             )
         elif burr_hole_num == 4:
             coordinate_depth = self._map_burr_hole_dv(
@@ -2701,6 +2788,7 @@ class MappedNSBList:
                 intended_measurement_iso=self.aind_burr_4_intended_x0023,
                 targeted_structure=self.aind_burr_4_intended,
                 coordinate_system=coordinate_system,
+                status=self.aind_burr_4_status,
             )
         elif burr_hole_num == 5:
             coordinate_depth = self._map_burr_hole_dv(
@@ -2750,6 +2838,7 @@ class MappedNSBList:
                 intended_measurement_iso=self.aind_burr_5_intended_x0023,
                 targeted_structure=self.aind_burr_5_intended,
                 coordinate_system=coordinate_system,
+                status=self.aind_burr_5_status,
             )
         elif burr_hole_num == 6:
             coordinate_depth = self._map_burr_hole_dv(
@@ -2799,6 +2888,7 @@ class MappedNSBList:
                 intended_measurement_iso=self.aind_burr_6_intended_x0023,
                 targeted_structure=self.aind_burr_6_intended,
                 coordinate_system=coordinate_system,
+                status=self.aind_burr_6_status,
             )
         else:
             return BurrHoleInfo()
@@ -2936,13 +3026,29 @@ class MappedNSBList:
         """Assigns fiber name for intended measurement by coordinate info"""
 
         intended_measurments = []
+
+        # Separate measurements with coordinates from those without
+        measurements_with_coords = [
+            m
+            for m in sp_measurement_data
+            if m.coordinate_ap is not None and m.coordinate_ml is not None
+        ]
+        measurements_without_coords = [
+            m
+            for m in sp_measurement_data
+            if m.coordinate_ap is None or m.coordinate_ml is None
+        ]
+
+        # Sort measurements with coordinates by AP descending, ML ascending
         sorted_data = sorted(
-            sp_measurement_data,
+            measurements_with_coords,
             key=lambda measurement: (
                 -float(measurement.coordinate_ap),
                 float(measurement.coordinate_ml),
             ),
         )
+
+        # Add sorted measurements with fiber names
         for index, data in enumerate(sorted_data):
             intended_measurments.append(
                 IntendedMeasurementInformation(
@@ -2953,6 +3059,19 @@ class MappedNSBList:
                     intended_measurement_Iso=data.intended_measurement_Iso,
                 )
             )
+
+        # Add measurements without coordinates (no fiber name)
+        for data in measurements_without_coords:
+            intended_measurments.append(
+                IntendedMeasurementInformation(
+                    fiber_name=None,
+                    intended_measurement_R=data.intended_measurement_R,
+                    intended_measurement_B=data.intended_measurement_B,
+                    intended_measurement_G=data.intended_measurement_G,
+                    intended_measurement_Iso=data.intended_measurement_Iso,
+                )
+            )
+
         return intended_measurments
 
     def get_intended_measurements(
@@ -2963,13 +3082,18 @@ class MappedNSBList:
         all_intended_measurements = []
         initial_measurements = []
         followup_measurements = []
+        other_measurements = []  # For measurements without during info
         for burr_hole_num in range(1, 7):
             if getattr(self, f"aind_burr_hole_{burr_hole_num}") in {
                 BurrHoleProcedure.INJECTION_FIBER_IMPLANT,
                 BurrHoleProcedure.FIBER_IMPLANT,
             }:
+                # Only map intended measurement for complete burr holes
                 burr = self.burr_hole_info(burr_hole_num=burr_hole_num)
-                if burr.during == During.INITIAL:
+                if (
+                    burr.during == During.INITIAL
+                    and burr.status == BurrHoleStatus.COMPLETE
+                ):
                     initial_measurements.append(
                         IntendedMeasurementandCoords(
                             intended_measurement_R=burr.intended_measurement_r,
@@ -2982,7 +3106,10 @@ class MappedNSBList:
                             coordinate_ml=burr.coordinate_ml,
                         )
                     )
-                elif burr.during == During.FOLLOW_UP:
+                elif (
+                    burr.during == During.FOLLOW_UP
+                    and burr.status == BurrHoleStatus.COMPLETE
+                ):
                     followup_measurements.append(
                         IntendedMeasurementandCoords(
                             intended_measurement_R=burr.intended_measurement_r,
@@ -2995,18 +3122,23 @@ class MappedNSBList:
                             coordinate_ml=burr.coordinate_ml,
                         )
                     )
-                else:
-                    # skip fiber name assignment if no During info
-                    all_intended_measurements.append(
-                        IntendedMeasurementInformation(
+                elif burr.status == BurrHoleStatus.COMPLETE:
+                    # No during info - add to other_measurements
+                    other_measurements.append(
+                        IntendedMeasurementandCoords(
                             intended_measurement_R=burr.intended_measurement_r,
                             intended_measurement_B=burr.intended_measurement_b,
                             intended_measurement_G=burr.intended_measurement_g,
                             intended_measurement_Iso=(
                                 burr.intended_measurement_iso
                             ),
+                            coordinate_ap=burr.coordinate_ap,
+                            coordinate_ml=burr.coordinate_ml,
                         )
                     )
+        all_intended_measurements.extend(
+            self._get_intended_measurements(other_measurements)
+        )
         all_intended_measurements.extend(
             self._get_intended_measurements(initial_measurements)
         )
@@ -3176,9 +3308,7 @@ class MappedNSBList:
         if depth is None:
             translation = Translation.model_construct(
                 translation=(
-                    [ap_val, ml_val, None]
-                    if is_ard
-                    else [ap_val, ml_val, 0]
+                    [ap_val, ml_val, None] if is_ard else [ap_val, ml_val, 0]
                 )
             )
             rotation = Rotation(
