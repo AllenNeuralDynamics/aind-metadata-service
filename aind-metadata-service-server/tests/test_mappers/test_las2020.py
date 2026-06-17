@@ -4,6 +4,7 @@ from copy import deepcopy
 from unittest import TestCase
 from unittest import main as unittest_main
 
+import pytest
 from aind_data_schema.components.injection_procedures import (
     Injection,
     NonViralMaterial,
@@ -227,6 +228,7 @@ class TestLAS2020BasicMapping(TestCase):
                         self.assertEqual(len(materials), 1)
 
 
+@pytest.mark.usefixtures("mock_emapa_api")
 class TestLAS2020IPInjectionMapping(TestCase):
     """Tests intraperitoneal injection procedure mapping"""
 
@@ -317,6 +319,7 @@ class TestLAS2020IPInjectionMapping(TestCase):
             )
 
 
+@pytest.mark.usefixtures("mock_emapa_api")
 class TestLAS2020RetroOrbitalInjectionMapping(TestCase):
     """Tests retro-orbital injection procedure mapping"""
 
@@ -423,6 +426,7 @@ class TestLAS2020RetroOrbitalInjectionMapping(TestCase):
         )
 
 
+@pytest.mark.usefixtures("mock_emapa_api")
 class TestLAS2020SurgeryIntegration(TestCase):
     """Tests complete Surgery object creation"""
 
