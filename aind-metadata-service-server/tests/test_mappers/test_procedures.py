@@ -3,7 +3,9 @@
 import unittest
 from copy import deepcopy
 from datetime import date, datetime
+from unittest.mock import patch
 
+import pytest
 from aind_data_schema.components.injection_procedures import (
     Injection,
     InjectionDynamics,
@@ -53,6 +55,7 @@ from aind_metadata_service_server.models import (
 from tests.conftest import suppress_pydantic_serialization_warnings
 
 
+@pytest.mark.usefixtures("mock_emapa_api")
 class TestProceduresMapper(unittest.TestCase):
     """Test procedures mapper functionality"""
 
@@ -585,8 +588,6 @@ class TestProceduresMapper(unittest.TestCase):
 
     def test_parse_mass_unit(self):
         """Test mass unit parsed as expected."""
-        from unittest.mock import patch
-
         slims_water_restriction = [SlimsWaterRestrictionData.model_construct()]
         mapper = ProceduresMapper(
             slims_water_restriction=slims_water_restriction

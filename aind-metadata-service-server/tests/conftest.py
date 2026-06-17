@@ -3,7 +3,7 @@
 import warnings
 from contextlib import contextmanager
 from typing import Any, Generator
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from aind_tars_service_async_client import (
@@ -81,3 +81,39 @@ def suppress_pydantic_serialization_warnings():
             message=".*Pydantic serializer warnings.*",
         )
         yield
+
+
+@pytest.fixture(autouse=False)
+def mock_emapa_api():
+    """
+    Fixture to mock the EMAPA ontology API calls.
+
+    This prevents tests from making actual HTTP requests to the external
+    EMAPA ontology service, which can fail if the service is down.
+
+    The fixture mocks common anatomical structures used in injection targets.
+    """
+
+    def mock_search(class_name):
+        """Mock responses for common anatomical structures."""
+        emapa_responses = {
+            "peritoneal cavity": [
+                {
+                    "iri": "http://purl.obolibrary.org/obo/EMAPA_16246",
+                    "label": "peritoneal cavity",
+                }
+            ],
+            "venous sinus": [
+                {
+                    "iri": "http://purl.obolibrary.org/obo/EMAPA_17180",
+                    "label": "venous sinus",
+                }
+            ],
+        }
+        return emapa_responses.get(class_name, [])
+
+    with patch(
+        "aind_data_schema_models.mouse_anatomy.search_emapa_exact_match",
+        side_effect=mock_search,
+    ) as mock:
+        yield mock
