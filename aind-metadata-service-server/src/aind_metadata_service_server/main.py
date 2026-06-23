@@ -22,7 +22,7 @@ from aind_metadata_service_server.routes import (
     rig_and_instrument,
     slims,
     subject,
-    session_json
+    session_json,
 )
 
 warnings.filterwarnings(

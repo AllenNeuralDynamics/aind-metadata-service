@@ -39,10 +39,12 @@ from aind_sharepoint_service_async_client.models import (
 
 from aind_metadata_service_server.models import IntendedMeasurementInformation
 
+
 class BurrHoleStatus(Enum):
     """Enum class for BurrHoleStatus"""
 
     COMPLETE = "Complete"
+
 
 class BurrHoleProcedure(Enum):
     """Enum class for BurrHoleProcedure"""
