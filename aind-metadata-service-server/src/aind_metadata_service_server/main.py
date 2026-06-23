@@ -4,7 +4,7 @@ import logging
 import os
 import warnings
 
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRoute
 
@@ -20,9 +20,9 @@ from aind_metadata_service_server.routes import (
     procedures,
     protocol,
     rig_and_instrument,
-    session_json,
     slims,
     subject,
+    session_json,
 )
 
 warnings.filterwarnings(
@@ -40,6 +40,23 @@ Service to pull data from example backend.
 
 """
 
+
+def set_operation_ids(router: APIRouter) -> None:
+    """
+    Set operation_id to route name for all APIRoutes in a router.
+
+    This cleans up the auto-generated operation IDs in OpenAPI spec.
+
+    Parameters
+    ----------
+    router : APIRouter
+        The router whose routes should have operation_ids set
+    """
+    for route in router.routes:
+        if isinstance(route, APIRoute):
+            route.operation_id = route.name
+
+
 # noinspection PyTypeChecker
 app = FastAPI(
     title="aind-metadata-service",
@@ -56,21 +73,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(healthcheck.router)
-app.include_router(subject.router)
-app.include_router(perfusion.router)
-app.include_router(protocol.router)
-app.include_router(funding.router)
-app.include_router(slims.router)
-app.include_router(rig_and_instrument.router)
-app.include_router(mgi_allele.router)
-app.include_router(procedures.router)
-app.include_router(injection_materials.router)
-app.include_router(session_json.router)
-app.include_router(intended_measurements.router)
-app.include_router(index.router)
+# Set operation IDs for each router before including
+routers = [
+    healthcheck.router,
+    funding.router,
+    intended_measurements.router,
+    procedures.router,
+    protocol.router,
+    rig_and_instrument.router,
+    slims.router,
+    subject.router,
+    perfusion.router,
+    mgi_allele.router,
+    injection_materials.router,
+    session_json.router,
+    index.router,
+]
 
-# Clean up the methods names that is generated in the client code
-for route in app.routes:
-    if isinstance(route, APIRoute):
-        route.operation_id = route.name
+for router in routers:
+    set_operation_ids(router)
+    app.include_router(router)
