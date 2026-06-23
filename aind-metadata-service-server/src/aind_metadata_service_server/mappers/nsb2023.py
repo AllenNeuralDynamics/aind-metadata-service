@@ -3730,6 +3730,9 @@ class MappedNSBList:
             NSB2023Procedure.SX_12__STEREOTAXIC__INJEC,
             NSB2023Procedure.SX_21__FIBER__OPTIC__IMPL,
             NSB2023Procedure.INJECTION_FIBER_OPTIC_IMP_,
+            NSB2023Procedure.THERMISTOR__IMPLANT_WITH,
+            NSB2023Procedure.HP_INJ__THERMISTOR__IMPLA,
+            NSB2023Procedure.CHRONOS_HP__SKULL__SCREW,
         }:
             return True
         if (
