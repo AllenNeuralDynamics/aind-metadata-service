@@ -269,7 +269,9 @@ class MappedNSBList:
     )
     CONCENTRATION_REGEX = re.compile(r"^\d+(\.\d+)?\s*mg[/]m[lL]$")
     LENGTH_MM_REGEX = re.compile(r"^([1-9]\.\d) mm$")
-    INTENDED_TARGET_REGEX = re.compile(r"^([A-Z_]+(?:/[A-Z_]+)*)\s*-")
+    INTENDED_TARGET_REGEX = re.compile(
+        r"^([A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*)\s+-"
+    )
 
     # Mapping from CCF structure acronym to CCFStructure object
     SCHEMA_ACRONYM_MAP = {m().acronym: m() for m in CCFStructure.ALL}
@@ -1134,7 +1136,8 @@ class MappedNSBList:
         return (
             None
             if intended is None
-            or intended.value == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1146,7 +1149,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1158,7 +1163,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1170,7 +1177,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1280,7 +1289,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1292,7 +1303,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1304,7 +1317,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1316,7 +1331,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1444,7 +1461,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1456,7 +1475,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1468,7 +1489,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1480,7 +1503,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1589,7 +1614,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1601,7 +1628,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1613,7 +1642,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1625,7 +1656,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1748,7 +1781,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1760,7 +1795,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1772,7 +1809,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1784,7 +1823,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1914,7 +1955,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1926,7 +1969,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1938,7 +1983,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
@@ -1950,7 +1997,9 @@ class MappedNSBList:
         )
         return (
             None
-            if intended is None or intended == getattr(intended, "N_A", None)
+            if intended is None
+            or intended == getattr(intended, "N_A", None)
+            or intended == getattr(intended, "SELECT", None)
             else intended.value
         )
 
