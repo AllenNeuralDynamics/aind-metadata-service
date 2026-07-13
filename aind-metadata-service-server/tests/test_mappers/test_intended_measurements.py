@@ -213,7 +213,6 @@ class TestIntendedMeasurementMapper(unittest.TestCase):
         measurements = mapper.map_responses_to_intended_measurements(
             subject_id="test_subject"
         )
-        print(measurements)
         self.assertEqual(len(measurements), 1)
         self.assertEqual(measurements[0].fiber_name, "Fiber_0")
         self.assertEqual(
