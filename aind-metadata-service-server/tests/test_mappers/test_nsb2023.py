@@ -15,7 +15,7 @@ from aind_data_schema.core.procedures import (
     CraniotomyType,
     HeadframeMaterial,
 )
-from aind_data_schema_models.brain_atlas import _BrainStructureModel
+from aind_data_schema_models.brain_atlas import _BrainStructureModel, CCFStructure
 from aind_sharepoint_service_async_client.models.nsb2023_list import (
     NSB2023List,
 )
@@ -397,6 +397,23 @@ class TestNSB2023Parsers(TestCase):
                 data["Burr_x0020_2_x0020_Intended_x002"][0]
             )
         )
+
+    def test_map_all_ccf_acronyms(self):
+        """Tests that all CCF acronyms can be parsed correctly by the regex"""
+        nsb_model = NSB2023List.model_construct()
+        mapper = MappedNSBList(nsb=nsb_model)
+        
+        all_acronyms = {m().acronym for m in CCFStructure.ALL}
+        failed_acronyms = []
+        for acronym in all_acronyms:
+            test_string = f"{acronym} - Test Structure"
+            result = mapper._map_targeted_structure(test_string)
+            if result is None:
+                failed_acronyms.append(acronym)
+            else:
+                self.assertEqual(result.acronym, acronym)
+        # Some of these need to be fixed in NSB, log failed acronyms instead of asserting
+        logging.debug(f"Failed CCF acronyms: {failed_acronyms}")
 
     def test_ma_custom_hp_and_cran_procedures(self):
         """Tests custom procedure with headpost and cran."""

@@ -191,6 +191,38 @@ class TestIntendedMeasurementMapper(unittest.TestCase):
         self.assertIsNone(measurements[0].intended_measurement_B)
         self.assertIsNone(measurements[0].intended_measurement_Iso)
 
+    def test_measurements_with_none(self):
+        """Test measurements with None values."""
+        nsb_data = {
+            "FileSystemObjectType": 0,
+            "Id": 3,
+            "Burr_x0020_hole_x0020_1": "Stereotaxic Injection & Fiber Implant",
+            "Burr1_x0020_Perform_x0020_During": "Initial Surgery",
+            "Burr_x0020_Hole_x0020_1_x0020_st": "Complete",
+            "Virus_x0020_A_x002f_P": 1.0,
+            "Virus_x0020_M_x002f_L": 1.5,
+            "Burr_x0020_1_x0020_intended_x0020": "acetylcholine",
+            "Burr_x0020_1_x0020_intended_x0021": "None",
+            "Burr_x0020_1_x0020_intended_x0022": "Select...",
+            "Burr_x0020_1_x0020_intended_x0023": "N/A",
+        }
+        nsb_model = NSB2023List.model_validate(nsb_data)
+        mapper = IntendedMeasurementMapper(
+            nsb_2023=[nsb_model], nsb_present=[]
+        )
+        measurements = mapper.map_responses_to_intended_measurements(
+            subject_id="test_subject"
+        )
+        print(measurements)
+        self.assertEqual(len(measurements), 1)
+        self.assertEqual(measurements[0].fiber_name, "Fiber_0")
+        self.assertEqual(
+            measurements[0].intended_measurement_R, "acetylcholine"
+        )
+        self.assertEqual(measurements[0].intended_measurement_G, "None")
+        self.assertIsNone(measurements[0].intended_measurement_B)
+        self.assertIsNone(measurements[0].intended_measurement_Iso)
+
 
 if __name__ == "__main__":
     unittest.main()
