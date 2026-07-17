@@ -27,6 +27,7 @@ from aind_data_schema.core.subject import Sex
 from aind_sharepoint_service_async_client.models import (
     NSB2019List,
     NSB2019Procedure,
+    NSB2019SurgeryStatus,
 )
 
 
@@ -1710,9 +1711,21 @@ class MappedNSBList:
                 or self.has_head_frame_procedure
             )
 
+    def has_surgery(self) -> bool:
+        """Is there a surgery?"""
+        return (
+            False
+            if self._nsb.surgery_status is None
+            or self._nsb.surgery_status == NSB2019SurgeryStatus.NO_SURGERY
+            else True
+        )
+
     def get_surgeries(self) -> List[Surgery]:
         """Return Surgery as best as possible from a record."""
 
+        # Check if item has been explicitly marked as No Surgery
+        if not self.has_surgery():
+            return []
         # Surgery info
         experimenter_full_name = self.aind_experimenter_full_name
         iacuc_protocol = self.aind_iacuc_protocol

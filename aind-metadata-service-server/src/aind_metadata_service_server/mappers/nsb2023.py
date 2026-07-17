@@ -35,6 +35,7 @@ from aind_sharepoint_service_async_client.models import (
     NSB2023List,
     NSB2023Procedure,
     NSB2023ProcedureCategory,
+    NSB2023SurgeryStatus,
 )
 
 from aind_metadata_service_server.models import IntendedMeasurementInformation
@@ -3763,6 +3764,15 @@ class MappedNSBList:
         """Map surgeon to experimenter name"""
         return "NSB" if surgeon_id is None else f"NSB-{surgeon_id}"
 
+    def has_surgery(self) -> bool:
+        """Is there a surgery?"""
+        return (
+            False
+            if self._nsb.surgery_status is None
+            or self._nsb.surgery_status == NSB2023SurgeryStatus.NO_SURGERY
+            else True
+        )
+
     # TODO: support new Procedures (EMG Array, Grid Injections, Testes, Oviduct)
     def has_hp_procedure(self) -> bool:
         """Is there a headpost procedure?"""
@@ -4440,6 +4450,11 @@ class MappedNSBList:
 
     def get_surgeries(self) -> List[Surgery]:
         """Get a List of Surgeries"""
+
+        # Check if item has been explicitly marked as No Surgery
+        if not self.has_surgery():
+            return []
+
         # Surgery info
         # TODO: start_date should be based on During class
         initial_start_date = self.aind_date_of_surgery

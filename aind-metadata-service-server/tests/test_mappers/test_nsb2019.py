@@ -131,6 +131,28 @@ class TestNSB2019Parsers(TestCase):
         mapped_procedure = mapper.get_surgeries()
         self.assertEqual(len(mapped_procedure), 0)
 
+    def test_no_surgery_edge_case(self):
+        """Tests the case where there is no surgery."""
+        list_item = self.list_items[0]
+        raw_data = deepcopy(list_item[0])
+        raw_data["SurgeryStatus"] = "No Surgery"
+        nsb_model = NSB2019List.model_validate(raw_data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        self.assertFalse(mapper.has_surgery())
+        mapped_procedure = mapper.get_surgeries()
+        self.assertEqual(len(mapped_procedure), 0)
+
+    def test_empty_surgery_edge_case(self):
+        """Tests the case where there is an empty surgery."""
+        list_item = self.list_items[0]
+        raw_data = deepcopy(list_item[0])
+        raw_data["SurgeryStatus"] = None
+        nsb_model = NSB2019List.model_validate(raw_data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        self.assertFalse(mapper.has_surgery())
+        mapped_procedure = mapper.get_surgeries()
+        self.assertEqual(len(mapped_procedure), 0)
+
 
 class TestNSB2019StringParsers(TestCase):
     """Tests text field parsers in NSB2019Mapping class."""
