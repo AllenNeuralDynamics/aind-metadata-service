@@ -48,6 +48,7 @@ from aind_sharepoint_service_async_client.models import (
     NSB2023List,
     NSB2023Procedure,
     NSB2023IacucProtocol as IacucProtocol,
+    NSB2023SurgeryStatus,
 )
 from pydantic import ValidationError
 
@@ -2514,6 +2515,15 @@ class MappedNSBList:
             }.get(self._nsb.burr6_x0020_status, None)
         )
 
+    def has_surgery(self) -> bool:
+        """Is there a surgery?"""
+        return (
+            False
+            if self._nsb.surgery_status is None
+            or self._nsb.surgery_status == NSB2023SurgeryStatus.NO_SURGERY
+            else True
+        )
+
     # TODO: support new Procedures
     # (EMG Array, Grid Injections, Testes, Oviduct)
     def has_hp_procedure(self) -> bool:
@@ -3406,8 +3416,11 @@ class MappedNSBList:
     def get_surgeries(self) -> List[Surgery]:
         """Get a List of Surgeries."""
 
-        surgeries = []
+        # Check if item has been explicitly marked as No Surgery
+        if not self.has_surgery():
+            return []
 
+        surgeries = []
         # Surgery info
         initial_start_date = self.aind_date_of_surgery
         initial_animal_weight_prior = self.aind_weight_before_surger
