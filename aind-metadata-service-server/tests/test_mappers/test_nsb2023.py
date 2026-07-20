@@ -76,6 +76,7 @@ class TestNSB2023BasicMapping(TestCase):
             "IACUC_x0020_Protocol_x0020__x002": "2103",
             "Breg2Lamb": -4.5,
             "Protocol": "2119 - Training and qualification of animal users",
+            "SurgeryStatus": "Ready for Feedback",
         }
         cls.nsb_model = NSB2023List.model_validate(cls.basic_nsb_data)
         cls.mapper = MappedNSBList(nsb=cls.nsb_model)
@@ -126,6 +127,7 @@ class TestNSB2023HeadframeMapping(TestCase):
             "Procedure": "Stereotaxic Injection (with Headpost)",
             "Date_x0020_of_x0020_Surgery": "2022-01-03",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
+            "SurgeryStatus": "Ready for Feedback",
         }
         cls.nsb_model = NSB2023List.model_validate(cls.headframe_data)
         cls.mapper = MappedNSBList(nsb=cls.nsb_model)
@@ -285,6 +287,7 @@ class TestNSB2023HeadframeMapping(TestCase):
             "Procedure": "HP Only",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
             "Test1LookupId": 2846,
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -307,6 +310,7 @@ class TestNSB2023HeadframeMapping(TestCase):
             "Procedure": "HP Only",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
             "Breg2Lamb": 4.5,
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -330,6 +334,7 @@ class TestNSB2023HeadframeMapping(TestCase):
             "Procedure": "Custom",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
             "Breg2Lamb": 4.5,
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -361,6 +366,7 @@ class TestNSB2023CraniotomyMapping(TestCase):
             "HeadpostType": "Mesoscope",
             "Date_x0020_of_x0020_Surgery": "2022-01-03",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
+            "SurgeryStatus": "Ready for Feedback",
         }
         cls.craniotomy_data_3mm = {
             "FileSystemObjectType": 0,
@@ -370,6 +376,7 @@ class TestNSB2023CraniotomyMapping(TestCase):
             "Procedure": "Sx-01 Visual Ctx 2P",
             "Date_x0020_of_x0020_Surgery": "2022-01-03",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
+            "SurgeryStatus": "Ready for Feedback",
         }
         cls.nsb_model_5mm = NSB2023List.model_validate(cls.craniotomy_data_5mm)
         cls.mapper_5mm = MappedNSBList(nsb=cls.nsb_model_5mm)
@@ -554,6 +561,7 @@ class TestNSB2023CraniotomyMapping(TestCase):
             "HeadpostType": "Mesoscope",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
             "Test1LookupId": 2846,
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -580,6 +588,7 @@ class TestNSB2023CraniotomyMapping(TestCase):
             "IACUC_x0020_Protocol_x0020__x002": "2103",
             "Test1LookupId": 2846,
             "Breg2Lamb": 4.5,
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -603,6 +612,7 @@ class TestNSB2023CraniotomyMapping(TestCase):
             "HeadpostType": "Mesoscope",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
             "Breg2Lamb": 4.5,
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -632,6 +642,7 @@ class TestNSB2023CraniotomyMapping(TestCase):
             "Date_x0020_of_x0020_Surgery": "2022-01-03",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
             "Breg2Lamb": 4.5,
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -670,6 +681,7 @@ class TestNSB2023InjectionMapping(TestCase):
             "Burr_x0020_2_x0020_Intended_x002": [
                 "FRP - Frontal pole cerebral cortex"
             ],
+            "SurgeryStatus": "Ready for Feedback",
         }
         cls.nsb_model = NSB2023List.model_validate(cls.injection_data)
         cls.mapper = MappedNSBList(nsb=cls.nsb_model)
@@ -780,6 +792,7 @@ class TestNSB2023InjectionMapping(TestCase):
             "Inj1IontoTime": "10 min",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
             "Test1LookupId": 2846,
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -810,6 +823,7 @@ class TestNSB2023InjectionMapping(TestCase):
             "Inj1LenghtofTime": "5 min",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
             "Test1LookupId": 2846,
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -838,6 +852,7 @@ class TestNSB2023InjectionMapping(TestCase):
             "IACUC_x0020_Protocol_x0020__x002": "2103",
             "Test1LookupId": 2846,
             "Inj1Type": "Nanoject (Pressure)",
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -861,6 +876,7 @@ class TestNSB2023InjectionMapping(TestCase):
             "Virus_x0020_A_x002f_P": 3.0,
             "Virus_x0020_D_x002f_V": 4.0,
             "IACUC_x0020_Protocol_x0020__x002": "2103",
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -965,6 +981,7 @@ class TestNSB2023InjectionMapping(TestCase):
             "Inj1IontoTime": "10 min",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
             "Test1LookupId": 2846,
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -998,6 +1015,7 @@ class TestNSB2023FiberImplantMapping(TestCase):
             "Burr1_x0020_Perform_x0020_During": "Initial Surgery",
             "Date_x0020_of_x0020_Surgery": "2022-01-03",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
+            "SurgeryStatus": "Ready for Feedback",
         }
         cls.nsb_model = NSB2023List.model_validate(cls.fiber_data)
         cls.mapper = MappedNSBList(nsb=cls.nsb_model)
@@ -1057,6 +1075,7 @@ class TestNSB2023FiberImplantMapping(TestCase):
             "Fiber_x0020_Implant1_x0020_Lengt": "2.0 mm",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
             "Test1LookupId": 2846,
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -1101,6 +1120,7 @@ class TestNSB2023FiberImplantMapping(TestCase):
             "Fiber_x0020_Implant2_x0020_Lengt": "5.0 mm",
             "Iso_x0020_On": 1.5,
             "HPIsoLevel": 1.8,
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -1134,6 +1154,7 @@ class TestNSB2023FiberImplantMapping(TestCase):
             "Burr_x0020_1_x0020_Fiber_x0020_T": "Standard (Provided by NSB)",
             "Fiber_x0020_Implant1_x0020_Lengt": "2.0 mm",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -1171,6 +1192,7 @@ class TestNSB2023FiberImplantMapping(TestCase):
             "Fiber_x0020_Implant1_x0020_Lengt": "2.0 mm",
             "Iso_x0020_On": 1.5,
             "HPIsoLevel": 1.8,
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -1294,6 +1316,7 @@ class TestNSB2023SpinalInjectionMapping(TestCase):
             "Burr1_x0020_Perform_x0020_During": "Initial Surgery",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
             "Test1LookupId": 2846,
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -1330,6 +1353,7 @@ class TestNSB2023SurgeryIntegration(TestCase):
             "Iso_x0020_On": 1.5,
             "HPIsoLevel": 2.0,
             "HPRecovery": 25,
+            "SurgeryStatus": "Ready for Feedback",
         }
 
         cls.fiber_implant_surgery_data = {
@@ -1355,6 +1379,7 @@ class TestNSB2023SurgeryIntegration(TestCase):
             "Iso_x0020_On": 1.5,
             "HPIsoLevel": 1.8,
             "HPRecovery": 30,
+            "SurgeryStatus": "Ready for Feedback",
         }
 
         cls.fiber_followup_surgery_data = {
@@ -1378,6 +1403,7 @@ class TestNSB2023SurgeryIntegration(TestCase):
             "FirstInjectionWeightBefor": 26.5,
             "FirstInjectionWeightAfter": 29.0,
             "WorkStation1stInjection": "SWS 5",
+            "SurgeryStatus": "Ready for Feedback",
         }
 
         cls.hp_cran_model = NSB2023List.model_validate(
@@ -1553,6 +1579,7 @@ class TestNSB2023SurgeryIntegration(TestCase):
             "FileSystemObjectType": 0,
             "Id": 27,
             "IACUC_x0020_Protocol_x0020__x002": "2103",
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -1572,6 +1599,7 @@ class TestNSB2023SurgeryIntegration(TestCase):
             "Procedure": "HP Only",
             "Protocol": "2119 - Training and qualification of animal users",
             "Test1LookupId": 2846,
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -1592,6 +1620,7 @@ class TestNSB2023SurgeryIntegration(TestCase):
             "Procedure": "HP Only",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
             "Test1LookupId": 2846,
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -1613,6 +1642,7 @@ class TestNSB2023SurgeryIntegration(TestCase):
             "Burr1_x0020_Perform_x0020_During": "Follow up Surgery",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
             "test_x0020_1st_x0020_round_x0020_LookupId": 2847,
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -1641,6 +1671,7 @@ class TestNSB2023SurgeryIntegration(TestCase):
             "AP2ndInj": 2.5,
             "DV2ndInj": 3.5,
             "Burr2_x0020_Perform_x0020_During": "Follow up Surgery",
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -1686,6 +1717,7 @@ class TestNSB2023SurgeryIntegration(TestCase):
             "HPIsoLevel": 2.0,
             "IACUC_x0020_Protocol_x0020__x002": "2103",
             "Test1LookupId": 2846,
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -1695,6 +1727,24 @@ class TestNSB2023SurgeryIntegration(TestCase):
         surgery = surgeries[0]
         self.assertIsNotNone(surgery.anaesthesia)
         self.assertEqual(surgery.anaesthesia.level, Decimal("2.0"))
+
+    def test_get_surgeries_no_surgery_status(self):
+        """Test get_surgeries when surgery status is NO_SURGERY"""
+        nsb_data = deepcopy(self.hp_cran_surgery_data)
+        nsb_data["SurgeryStatus"] = "No Surgery"
+        nsb_model = NSB2023List.model_validate(nsb_data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        surgeries = mapper.get_surgeries()
+        self.assertEqual(len(surgeries), 0)
+
+    def test_get_surgeries_none_surgery_status(self):
+        """Test get_surgeries when surgery status is None"""
+        nsb_data = deepcopy(self.fiber_implant_surgery_data)
+        nsb_data["SurgeryStatus"] = None
+        nsb_model = NSB2023List.model_validate(nsb_data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        surgeries = mapper.get_surgeries()
+        self.assertEqual(len(surgeries), 0)
 
 
 class TestNSB2023CoordinateMapping(TestCase):
@@ -1937,6 +1987,7 @@ class TestNSB2023CoordinateMapping(TestCase):
             "Burr2_x0020_Perform_x0020_During": "Initial Surgery",
             "IACUC_x0020_Protocol_x0020__x002": "2103",
             "Test1LookupId": 2846,
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2023List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)

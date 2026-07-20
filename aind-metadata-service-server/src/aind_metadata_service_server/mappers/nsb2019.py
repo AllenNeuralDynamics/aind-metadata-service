@@ -40,6 +40,7 @@ from aind_data_schema_models.units import (
 )
 from aind_sharepoint_service_async_client.models import (
     NSB2019List,
+    NSB2019SurgeryStatus,
 )
 from pydantic import ValidationError
 
@@ -1355,8 +1356,21 @@ class MappedNSBList:
                 origin = Origin.BREGMA
             return {origin: Translation(translation=[b2l_dist, 0, 0])}
 
+    def has_surgery(self) -> bool:
+        """Is there a surgery?"""
+        return (
+            False
+            if self._nsb.surgery_status is None
+            or self._nsb.surgery_status == NSB2019SurgeryStatus.NO_SURGERY
+            else True
+        )
+
     def get_surgeries(self) -> List[Surgery]:
         """Return Surgery as best as possible from a record."""
+
+        # Check if item has been explicitly marked as No Surgery
+        if not self.has_surgery():
+            return []
 
         experimenters = [self.aind_experimenter_full_name]
         ethics_review_id = self.aind_iacuc_protocol

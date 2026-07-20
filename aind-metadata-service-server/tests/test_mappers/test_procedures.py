@@ -194,6 +194,7 @@ class TestProceduresMapper(unittest.TestCase):
             "FirstInjectionWeightAfter": "19.2",
             "FirstInjectionIsoDuration": "1 hour",
             "Breg2Lamb": "4",
+            "SurgeryStatus": "Ready for Feedback",
         }
         cls.nsb2019 = [NSB2019List.model_validate(nsb2019_data)]
 
@@ -218,6 +219,7 @@ class TestProceduresMapper(unittest.TestCase):
             "HeadpostType": "Mesoscope",
             "CraniotomyType": "5mm",
             "AuthorId": 187,
+            "SurgeryStatus": "Ready for Feedback",
         }
         cls.nsb_2023 = [NSB2023List.model_validate(nsb2023_data)]
 

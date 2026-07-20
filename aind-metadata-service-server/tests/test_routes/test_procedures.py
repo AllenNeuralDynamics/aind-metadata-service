@@ -175,6 +175,7 @@ class TestRoute:
                 Burr_x0020_1_x0020_Injectable_x0="230929-12",
                 Burr_x0020_1_x0020_Injectable_x03="1e12",
                 Inj1VirusStrain_rt='Premixed "dL+Cre"',
+                SurgeryStatus="Ready for Feedback",
             )
         ]
         mock_nsb_present.return_value = []
@@ -314,6 +315,7 @@ class TestRoute:
                 Burr_x0020_1_x0020_Injectable_x0="UNKNOWN-VIRUS-123",
                 Burr_x0020_1_x0020_Injectable_x03="1e12",
                 Inj1VirusStrain_rt="Unknown strain",
+                SurgeryStatus="Ready for Feedback",
             )
         ]
         mock_nsb_present.return_value = []

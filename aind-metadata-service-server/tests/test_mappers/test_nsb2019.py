@@ -64,6 +64,7 @@ class TestNSB2019BasicMapping(TestCase):
             "Breg2Lamb": "4",
             "AuthorId": 187,
             "Date2ndInjection": None,
+            "SurgeryStatus": "Ready for Feedback",
         }
         cls.nsb_model = NSB2019List.model_validate(cls.basic_nsb_data)
         cls.mapper = MappedNSBList(nsb=cls.nsb_model)
@@ -125,6 +126,7 @@ class TestNSB2019HeadframeMapping(TestCase):
             "Procedure": "HP+Injection+Optic Fiber Implant",
             "Date_x0020_of_x0020_Surgery": "2022-12-06T08:00:00Z",
             "IACUC_x0020_Protocol_x0020__x002": "2115",
+            "SurgeryStatus": "Ready for Feedback",
         }
         cls.nsb_model = NSB2019List.model_validate(cls.headframe_data)
         cls.mapper = MappedNSBList(nsb=cls.nsb_model)
@@ -206,6 +208,7 @@ class TestNSB2019CraniotomyMapping(TestCase):
             "HPDurotomy": "Yes",
             "Date_x0020_of_x0020_Surgery": "2022-12-06T08:00:00Z",
             "IACUC_x0020_Protocol_x0020__x002": "2115",
+            "SurgeryStatus": "Ready for Feedback",
         }
         cls.nsb_model = NSB2019List.model_validate(cls.craniotomy_data)
         cls.mapper = MappedNSBList(nsb=cls.nsb_model)
@@ -288,6 +291,7 @@ class TestNSB2019InjectionMapping(TestCase):
             "FirstInjectionIsoDuration": "1 hour",
             "IACUC_x0020_Protocol_x0020__x002": "2115",
             "Breg2Lamb": "4",
+            "SurgeryStatus": "Ready for Feedback",
         }
         cls.nsb_model = NSB2019List.model_validate(cls.injection_data)
         cls.mapper = MappedNSBList(nsb=cls.nsb_model)
@@ -587,6 +591,7 @@ class TestNSB2019FiberImplantMapping(TestCase):
             "Inj2Angle_v2": "90",
             "Date_x0020_of_x0020_Surgery": "2022-12-06T08:00:00Z",
             "IACUC_x0020_Protocol_x0020__x002": "2115",
+            "SurgeryStatus": "Ready for Feedback",
         }
         cls.nsb_model = NSB2019List.model_validate(cls.fiber_data)
         cls.mapper = MappedNSBList(nsb=cls.nsb_model)
@@ -659,6 +664,7 @@ class TestNSB2019SurgeryIntegration(TestCase):
             "AuthorId": 187,
             "Round1InjIsolevel": None,
             "Round2InjIsolevel": None,
+            "SurgeryStatus": "Ready for Feedback",
         }
         cls.nsb_model = NSB2019List.model_validate(cls.full_surgery_data)
         cls.mapper = MappedNSBList(nsb=cls.nsb_model)
@@ -782,6 +788,7 @@ class TestNSB2019SurgeryIntegration(TestCase):
             "FileSystemObjectType": 0,
             "Id": 1,
             "Date_x0020_of_x0020_Surgery": "2022-12-06T08:00:00Z",
+            "SurgeryStatus": "Ready for Feedback",
         }
         nsb_model = NSB2019List.model_validate(nsb_data)
         mapper = MappedNSBList(nsb=nsb_model)
@@ -887,6 +894,24 @@ class TestNSB2019SurgeryIntegration(TestCase):
             )
             self.assertEqual(second_injection_surgery.animal_weight_post, 19.3)
             self.assertEqual(second_injection_surgery.workstation_id, "SWS 4")
+
+    def test_get_surgeries_no_surgery_status(self):
+        """Test get_surgeries when surgery status is NO_SURGERY"""
+        nsb_data = deepcopy(self.full_surgery_data)
+        nsb_data["SurgeryStatus"] = "No Surgery"
+        nsb_model = NSB2019List.model_validate(nsb_data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        surgeries = mapper.get_surgeries()
+        self.assertEqual(len(surgeries), 0)
+
+    def test_get_surgeries_none_surgery_status(self):
+        """Test get_surgeries when surgery status is None"""
+        nsb_data = deepcopy(self.full_surgery_data)
+        nsb_data["SurgeryStatus"] = None
+        nsb_model = NSB2019List.model_validate(nsb_data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        surgeries = mapper.get_surgeries()
+        self.assertEqual(len(surgeries), 0)
 
 
 class TestNSB2019CoordinateMapping(TestCase):
