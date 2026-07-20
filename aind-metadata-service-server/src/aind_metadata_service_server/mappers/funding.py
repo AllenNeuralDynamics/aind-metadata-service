@@ -104,7 +104,7 @@ class FundingMapper:
         grant_number = smartsheet_funding.grant_number
         institution_value = smartsheet_funding.funding_institution
         funder = self._parse_institution(institution_value)
-        fundees = self._parse_person_names(smartsheet_funding.fundees__pi)
+        fundees = self._parse_person_names(smartsheet_funding.fundees)
 
         if funder is None and grant_number is None and fundees is None:
             return None
