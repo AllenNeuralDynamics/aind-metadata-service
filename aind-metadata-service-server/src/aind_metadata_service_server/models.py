@@ -49,13 +49,13 @@ class ProtocolInformation(BaseModel):
     protocol_name: str = Field(..., description="Protocol name")
     doi: str = Field(..., description="DOI")
     version: str = Field(..., description="Version")
-    protocol_collection: Optional[str] = Field(
+    protocol_collection: Optional[bool] = Field(
         None, description="Protocol Collection"
     )
 
-    @field_validator("version", "protocol_collection", mode="before")
+    @field_validator("version", mode="before")
     def transform_version_to_str(cls, value) -> Optional[str]:
-        """Converts floats to strings"""
+        """Converts floats and other types to strings"""
         if value is None:
             return None
         else:

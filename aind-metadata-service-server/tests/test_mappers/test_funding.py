@@ -28,20 +28,20 @@ class TestFundingMapper(unittest.TestCase):
             FundingModel(
                 project_name="Ephys Platform",
                 funding_institution="Allen Institute",
-                fundees__pi="Person One, Person Two, Person Three",
+                fundees="Person One, Person Two, Person Three",
             ),
             FundingModel(
                 project_name="MSMA Platform",
                 project_code="122-01-001-10",
                 funding_institution="Allen Institute",
-                fundees__pi="Person Four",
+                fundees="Person Four",
             ),
             FundingModel(
                 project_name=discovery_project,
                 subproject=sub1,
                 project_code="122-01-001-10",
                 funding_institution="Allen Institute",
-                fundees__pi=(
+                fundees=(
                     "Person Four, Person Five, Person Six, Person Seven,"
                     " Person Eight"
                 ),
@@ -52,7 +52,7 @@ class TestFundingMapper(unittest.TestCase):
                 project_code="122-01-012-20",
                 funding_institution="NINDS",
                 grant_number="1RF1NS131984",
-                fundees__pi="Person Five, Person Six, Person Eight",
+                fundees="Person Five, Person Six, Person Eight",
                 investigators="Person Six, Person Eight",
             ),
             FundingModel(
@@ -61,7 +61,7 @@ class TestFundingMapper(unittest.TestCase):
                 project_code="122-01-001-10",
                 funding_institution="Allen Institute",
                 grant_number=None,
-                fundees__pi=(
+                fundees=(
                     "Person Four, Person Five, Person Six, Person Seven,"
                     " Person Eight"
                 ),
@@ -145,7 +145,7 @@ class TestFundingMapper(unittest.TestCase):
             subproject=None,
             funding_institution="Some Institute",
             grant_number=None,
-            fundees__pi="Person One, Person Two, Person Three",
+            fundees="Person One, Person Two, Person Three",
             investigators=None,
         )
 
@@ -176,7 +176,7 @@ class TestFundingMapper(unittest.TestCase):
                 subproject="Subproject 1 Electrophysiological Recordings",
                 funding_institution="Allen Institute",
                 grant_number=None,
-                fundees__pi=None,
+                fundees=None,
                 investigators=None,
             ),
         ]
