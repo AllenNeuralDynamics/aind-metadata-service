@@ -373,7 +373,9 @@ class TestNSB2023Parsers(TestCase):
 
     def test_other_headframe_edge_case(self):
         """Tests case when headframe has no during info"""
-        nsb_model = NSB2023List.model_construct(Procedure="HP Only")
+        nsb_model = NSB2023List.model_construct(
+            Procedure="HP Only", SurgeryStatus="Ready for Feedback"
+        )
         mapper = MappedNSBList(nsb=nsb_model)
         procedures = mapper.get_surgeries()
         self.assertEqual(len(procedures), 1)
@@ -430,6 +432,28 @@ class TestNSB2023Parsers(TestCase):
         mapper = MappedNSBList(nsb=nsb_model)
         self.assertTrue(mapper.has_hp_procedure())
         self.assertTrue(mapper.has_cran_procedure())
+
+    def test_no_surgery_edge_case(self):
+        """Tests the case where there is no surgery."""
+        list_item = self.list_items[0]
+        raw_data = deepcopy(list_item[0])
+        raw_data["SurgeryStatus"] = "No Surgery"
+        nsb_model = NSB2023List.model_validate(raw_data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        self.assertFalse(mapper.has_surgery())
+        mapped_procedure = mapper.get_surgeries()
+        self.assertEqual(len(mapped_procedure), 0)
+
+    def test_empty_surgery_edge_case(self):
+        """Tests the case where there is an empty surgery."""
+        list_item = self.list_items[0]
+        raw_data = deepcopy(list_item[0])
+        raw_data["SurgeryStatus"] = None
+        nsb_model = NSB2023List.model_validate(raw_data)
+        mapper = MappedNSBList(nsb=nsb_model)
+        self.assertFalse(mapper.has_surgery())
+        mapped_procedure = mapper.get_surgeries()
+        self.assertEqual(len(mapped_procedure), 0)
 
 
 class TestNSB2023StringParsers(TestCase):
