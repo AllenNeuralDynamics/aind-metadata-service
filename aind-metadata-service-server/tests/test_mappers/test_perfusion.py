@@ -25,8 +25,8 @@ class TestPerfusionMapper(unittest.TestCase):
                     "2109 - Analysis of brain - wide neural circuits in the"
                     " mouse"
                 ),
-                animal_weight_prior__g="22.0",
-                output_specimen_id_s="689418.0",
+                animal_weight_prior="22.0",
+                output_specimen_id="689418.0",
                 postfix_solution="1xPBS",
                 notes="Good",
             ),
@@ -35,8 +35,8 @@ class TestPerfusionMapper(unittest.TestCase):
                 var_date=date(2023, 10, 2),
                 experimenter="Person S",
                 iacuc_protocol=None,
-                animal_weight_prior__g="22.0",
-                output_specimen_id_s="689418.0",
+                animal_weight_prior="22.0",
+                output_specimen_id="689418.0",
                 postfix_solution="1xPBS",
                 notes="Good",
             ),
@@ -45,8 +45,8 @@ class TestPerfusionMapper(unittest.TestCase):
                 var_date=date(2023, 10, 2),
                 experimenter="Person S",
                 iacuc_protocol="abc",  # Malformed IACUC
-                animal_weight_prior__g="22.0",
-                output_specimen_id_s="689418.0",
+                animal_weight_prior="22.0",
+                output_specimen_id="689418.0",
                 postfix_solution="1xPBS",
                 notes="Good",
             ),

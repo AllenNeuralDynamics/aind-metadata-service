@@ -74,6 +74,55 @@ class TestProtocolMapper(unittest.TestCase):
         protocol_info = mapper.map_to_protocol_information()
         self.assertIsInstance(protocol_info, ProtocolInformation)
 
+    def test_mapping_with_protocol_collection_true(self):
+        """Tests mapping when protocol_collection is True"""
+        protocol_with_collection = ProtocolsModel(
+            protocol_type="Specimen Procedures",
+            procedure_name="Perfusion",
+            protocol_name=(
+                "Protocol Collection: Perfusing, Sectioning, IHC, "
+                "Mounting and Coverslipping Mouse Brain Specimens"
+            ),
+            doi="dx.doi.org/10.17504/protocols.io.kxygx3yxkg8j/v1",
+            version="1.0",
+            protocol_collection=True,
+        )
+        mapper = ProtocolMapper(smartsheet_protocol=protocol_with_collection)
+        protocol_info = mapper.map_to_protocol_information()
+
+        expected_protocol = ProtocolInformation(
+            protocol_type="Specimen Procedures",
+            procedure_name="Perfusion",
+            protocol_name=(
+                "Protocol Collection: Perfusing, Sectioning, IHC, "
+                "Mounting and Coverslipping Mouse Brain Specimens"
+            ),
+            doi="dx.doi.org/10.17504/protocols.io.kxygx3yxkg8j/v1",
+            version="1.0",
+            protocol_collection=True,
+        )
+
+        self.assertEqual(expected_protocol, protocol_info)
+        self.assertTrue(protocol_info.protocol_collection)
+
+    def test_mapping_with_protocol_collection_false(self):
+        """Tests mapping when protocol_collection is False"""
+        protocol_without_collection = ProtocolsModel(
+            protocol_type="Specimen Procedures",
+            procedure_name="Delipidation",
+            protocol_name="Single Protocol Example",
+            doi="dx.doi.org/10.17504/protocols.io.example",
+            version="2.0",
+            protocol_collection=False,
+        )
+        mapper = ProtocolMapper(
+            smartsheet_protocol=protocol_without_collection
+        )
+        protocol_info = mapper.map_to_protocol_information()
+
+        self.assertIsNotNone(protocol_info)
+        self.assertFalse(protocol_info.protocol_collection)
+
 
 if __name__ == "__main__":
     unittest.main()

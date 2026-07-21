@@ -69,13 +69,13 @@ class PerfusionMapper:
         )
         animal_weight_prior = (
             None
-            if smartsheet_perfusion.animal_weight_prior__g is None
-            else Decimal(smartsheet_perfusion.animal_weight_prior__g)
+            if smartsheet_perfusion.animal_weight_prior is None
+            else Decimal(smartsheet_perfusion.animal_weight_prior)
         )
         output_specimen_ids = (
             set()
-            if smartsheet_perfusion.output_specimen_id_s is None
-            else {str(int(float(smartsheet_perfusion.output_specimen_id_s)))}
+            if smartsheet_perfusion.output_specimen_id is None
+            else {str(int(float(smartsheet_perfusion.output_specimen_id)))}
         )
         notes = smartsheet_perfusion.notes
 

@@ -27,8 +27,8 @@ class TestRoute:
                     "2109 - Analysis of brain - wide neural circuits in the"
                     " mouse"
                 ),
-                animal_weight_prior__g="22.0",
-                output_specimen_id_s="689418.0",
+                animal_weight_prior="22.0",
+                output_specimen_id="689418.0",
                 postfix_solution="1xPBS",
                 notes="Good",
             ),

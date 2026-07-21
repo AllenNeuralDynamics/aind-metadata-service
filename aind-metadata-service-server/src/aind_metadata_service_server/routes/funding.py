@@ -22,7 +22,7 @@ async def get_funding(
                 "summary": "A sample project name",
                 "description": "Example project name for smartsheet",
                 "value": (
-                    "Discovery-Neuromodulator circuit dynamics during foraging"
+                    "Thalamus - Project 1 Mesoscale thalamic circuits"
                 ),
             }
         },
