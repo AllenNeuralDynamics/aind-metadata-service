@@ -7,6 +7,9 @@ from fastapi import APIRouter, Depends, HTTPException, Path
 from aind_metadata_service_server.mappers.injection_materials import (
     InjectionMaterialsMapper,
 )
+from aind_metadata_service_server.mappers.exaspim_procedures import (
+    ExaspimProceduresMapper,
+)
 from aind_metadata_service_server.mappers.procedures import ProceduresMapper
 from aind_metadata_service_server.mappers.responses import map_to_response
 from aind_metadata_service_server.sessions import (
@@ -17,8 +20,8 @@ from aind_metadata_service_server.sessions import (
     get_tars_api_instance,
 )
 
-router = APIRouter()
 
+router = APIRouter()
 
 @router.get(
     "/api/v2/procedures/{subject_id}",
@@ -63,7 +66,7 @@ async def get_procedures(
             },
         },
     ),
-    labtracks_api_instance=Depends(get_labtracks_api_instance),
+    # labtracks_api_instance=Depends(get_labtracks_api_instance),
     sharepoint_api_instance=Depends(get_sharepoint_api_instance),
     slims_api_instance=Depends(get_slims_api_instance),
     smartsheet_api_instance=Depends(get_smartsheet_api_instance),
@@ -74,9 +77,9 @@ async def get_procedures(
     Return Procedure metadata.
     """
     tasks = list()
-    tasks.append(
-        labtracks_api_instance.get_tasks(subject_id, _request_timeout=20)
-    )
+    # tasks.append(
+    #     labtracks_api_instance.get_tasks(subject_id, _request_timeout=20)
+    # )
     tasks.append(
         sharepoint_api_instance.get_las2020(subject_id, _request_timeout=30)
     )
@@ -102,8 +105,11 @@ async def get_procedures(
     tasks.append(
         smartsheet_api_instance.get_perfusions(subject_id, _request_timeout=20)
     )
+    tasks.append(
+        smartsheet_api_instance.get_exaspim_info(subject_id, _request_timeout=100)
+    )
     (
-        labtracks_response,
+        # labtracks_response,
         las_2020_response,
         nsb_2019_response,
         nsb_2023_response,
@@ -111,10 +117,11 @@ async def get_procedures(
         slims_wr_response,
         slims_histology_response,
         smartsheet_perfusion_response,
+        smartsheet_exaspim_response,
     ) = await gather(*tasks)
 
     mapper = ProceduresMapper(
-        labtracks_tasks=labtracks_response,
+        # labtracks_tasks=labtracks_response,
         las_2020=las_2020_response,
         nsb_2019=nsb_2019_response,
         nsb_2023=nsb_2023_response,
@@ -122,6 +129,7 @@ async def get_procedures(
         slims_water_restriction=slims_wr_response,
         slims_histology=slims_histology_response,
         smartsheet_perfusion=smartsheet_perfusion_response,
+        smartsheet_exaspim=smartsheet_exaspim_response,
     )
     procedures = mapper.map_responses_to_aind_procedures(subject_id)
     if not procedures:
@@ -196,3 +204,88 @@ async def get_procedures(
         procedures, tars_mapping
     )
     return map_to_response(procedures)
+
+@router.get(
+    "/api/v2/exaspim_procedures/{subject_id}",
+    responses={
+        400: {
+            "description": "Validation error in response model.",
+            "headers": {
+                "X-Error-Message": {
+                    "description": (
+                        "A JSON-encoded list of Pydantic validation errors."
+                    ),
+                    "schema": {"type": "string"},
+                }
+            },
+        },
+        404: {"description": "Not found"},
+    },
+)
+async def get_exaspim_procedures(
+    subject_id: str = Path(
+        ...,
+        openapi_examples={
+            "example1": {
+                "summary": "Subject ID Example 1",
+                "description": "Example specimen ID for ExaSPIM Procedures",
+                "value": "822178",
+            },
+        },
+    ),
+    smartsheet_api_instance=Depends(get_smartsheet_api_instance),
+):
+    """
+    ## ExaSPIM Procedures
+    Return ExaSPIM procedure metadata from Smartsheet including:
+    - Viral injection surgeries from Mouse Tracker
+    - Delipidation procedures from Sample Tracking
+    - Immunolabeling procedures from Sample Tracking
+    - Gelation procedures from Sample Tracking
+    - Mounting and imaging procedures from Imaging Queue
+    """
+    try:
+        smartsheet_exaspim_response = (
+            await smartsheet_api_instance.get_exaspim_info(
+                subject_id, _request_timeout=120
+            )
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error fetching ExaSPIM data: {str(e)}",
+        )
+
+    return smartsheet_exaspim_response
+
+    # if not smartsheet_exaspim_response:
+    #     raise HTTPException(status_code=404, detail="Not found")
+
+    # exaspim_mapper = ExaspimProceduresMapper(
+    #     mouse_tracker_info=getattr(
+    #         smartsheet_exaspim_response, "mouse_tracker_info", []
+    #     ),
+    #     sample_tracking_info=getattr(
+    #         smartsheet_exaspim_response, "sample_tracking_info", []
+    #     ),
+    #     imaging_queue_info=getattr(
+    #         smartsheet_exaspim_response, "imaging_queue_info", []
+    #     ),
+    #     qc_sheet_info=getattr(
+    #         smartsheet_exaspim_response, "qc_sheet_info", []
+    #     ),
+    # )
+
+    # exaspim_subject_procedures, exaspim_specimen_procedures = (
+    #     exaspim_mapper.map_to_exaspim_procedures(subject_id)
+    # )
+
+    # if not exaspim_subject_procedures and not exaspim_specimen_procedures:
+    #     raise HTTPException(status_code=404, detail="Not found")
+
+    # procedures = exaspim_mapper.map_to_aind_procedures(
+    #     subject_id=subject_id,
+    #     subject_procedures=exaspim_subject_procedures,
+    #     specimen_procedures=exaspim_specimen_procedures,
+    # )
+    # return map_to_response(procedures)

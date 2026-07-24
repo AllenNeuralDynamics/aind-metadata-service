@@ -2,7 +2,7 @@
 
 import logging
 from enum import Enum
-from typing import List, Optional, Union
+from typing import Any, List, Optional, Union
 
 from aind_data_schema.components.injection_procedures import (
     Injection,
@@ -48,6 +48,9 @@ from aind_metadata_service_server.mappers.nsb2023 import (
 from aind_metadata_service_server.mappers.perfusion import PerfusionMapper
 from aind_metadata_service_server.mappers.specimen_procedures import (
     SpecimenProcedureMapper,
+)
+from aind_metadata_service_server.mappers.exaspim_procedures import (
+    ExaspimProceduresMapper,
 )
 
 
@@ -116,12 +119,16 @@ class ProceduresMapper:
         smartsheet_perfusion: List[PerfusionsModel] = [],
         slims_water_restriction: List[SlimsWaterRestrictionData] = [],
         slims_histology: List[SlimsHistologyData] = [],
+        smartsheet_exaspim: Any = None,
     ):
         """
         Class constructor.
         Parameters
         ----------
         labtracks_tasks :  List[LabTracksTask]
+        smartsheet_exaspim : Any
+            ExaSPIM info from Smartsheet (contains mouse_tracker_info,
+            sample_tracking_info, imaging_queue_info, qc_sheet_info)
         """
         self.labtracks_tasks = labtracks_tasks
         self.las_2020 = las_2020
@@ -131,6 +138,7 @@ class ProceduresMapper:
         self.smartsheet_perfusion = smartsheet_perfusion
         self.slims_water_restriction = slims_water_restriction
         self.slims_histology = slims_histology
+        self.smartsheet_exaspim = smartsheet_exaspim
 
     @staticmethod
     def _map_labtracks_task_to_aind_surgery(
@@ -410,6 +418,32 @@ class ProceduresMapper:
             logging.info(
                 f"Found {len(slims_specimen_procedures)} specimen procedures "
                 f"from SLIMS for {subject_id}"
+            )
+
+        if self.smartsheet_exaspim:
+            exaspim_mapper = ExaspimProceduresMapper(
+                mouse_tracker_info=getattr(
+                    self.smartsheet_exaspim, "mouse_tracker_info", []
+                ),
+                sample_tracking_info=getattr(
+                    self.smartsheet_exaspim, "sample_tracking_info", []
+                ),
+                imaging_queue_info=getattr(
+                    self.smartsheet_exaspim, "imaging_queue_info", []
+                ),
+                qc_sheet_info=getattr(
+                    self.smartsheet_exaspim, "qc_sheet_info", []
+                ),
+            )
+            exaspim_subject_procedures, exaspim_specimen_procedures = (
+                exaspim_mapper.map_to_exaspim_procedures(subject_id)
+            )
+            subject_procedures.extend(exaspim_subject_procedures)
+            specimen_procedures.extend(exaspim_specimen_procedures)
+            logging.info(
+                f"Found {len(exaspim_subject_procedures)} subject procedures "
+                f"and {len(exaspim_specimen_procedures)} specimen procedures "
+                f"from ExaSPIM Smartsheet for {subject_id}"
             )
 
         if not subject_procedures and not specimen_procedures:
