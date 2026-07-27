@@ -205,7 +205,7 @@ configuration = aind_metadata_service_async_client.Configuration(
 async with aind_metadata_service_async_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = aind_metadata_service_async_client.DefaultApi(api_client)
-    project_name = 'Thalamus in the middle - Project 1 Mesoscale thalamic circuits' # str | 
+    project_name = 'Thalamus - Project 1 Mesoscale thalamic circuits' # str | 
 
     try:
         # Get Funding
@@ -492,7 +492,7 @@ configuration = aind_metadata_service_async_client.Configuration(
 async with aind_metadata_service_async_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = aind_metadata_service_async_client.DefaultApi(api_client)
-    project_name = 'Thalamus in the middle - Project 1 Mesoscale thalamic circuits' # str | 
+    project_name = 'Thalamus - Project 1 Mesoscale thalamic circuits' # str | 
 
     try:
         # Get Investigators
