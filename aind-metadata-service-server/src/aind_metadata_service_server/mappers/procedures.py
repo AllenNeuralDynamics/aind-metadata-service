@@ -33,7 +33,7 @@ from aind_slims_service_async_client.models import (
     SlimsHistologyData,
     SlimsWaterRestrictionData,
 )
-from aind_smartsheet_service_async_client.models import PerfusionsModel
+from aind_smartsheet_service_async_client.models import PerfusionsModel, ExaSPIMInfo
 from pydantic import ValidationError
 
 from aind_metadata_service_server.mappers.las2020 import (
@@ -119,7 +119,7 @@ class ProceduresMapper:
         smartsheet_perfusion: List[PerfusionsModel] = [],
         slims_water_restriction: List[SlimsWaterRestrictionData] = [],
         slims_histology: List[SlimsHistologyData] = [],
-        smartsheet_exaspim: Any = None,
+        smartsheet_exaspim: List[ExaSPIMInfo] = [],
     ):
         """
         Class constructor.
@@ -302,6 +302,88 @@ class ProceduresMapper:
             surgeries.extend(procedures)
         return surgeries
 
+    @staticmethod
+    def _merge_duplicate_perfusions(
+        subject_procedures: List[Union[Surgery, WaterRestriction]]
+    ) -> List[Union[Surgery, WaterRestriction]]:
+        """
+        Merge duplicate Perfusion surgeries from different data sources.
+        
+        When the same perfusion appears from multiple sources (e.g., LabTracks
+        and Smartsheet), prefer the more complete version if dates match.
+        
+        Parameters
+        ----------
+        subject_procedures : List[Union[Surgery, WaterRestriction]]
+            List of all subject procedures from all sources
+        
+        Returns
+        -------
+        List[Union[Surgery, WaterRestriction]]
+            Deduplicated list with merged perfusions
+        """
+        from collections import defaultdict
+        
+        # Group perfusion surgeries by date
+        perfusions_by_date = defaultdict(list)
+        other_procedures = []
+        
+        for proc in subject_procedures:
+            if isinstance(proc, Surgery):
+                # Check if this is a Perfusion surgery
+                is_perfusion = any(
+                    isinstance(p, Perfusion)
+                    for p in getattr(proc, "procedures", [])
+                )
+                if is_perfusion and proc.start_date:
+                    perfusions_by_date[proc.start_date].append(proc)
+                else:
+                    # Not a perfusion, keep as-is
+                    other_procedures.append(proc)
+            else:
+                # Not a surgery (e.g., WaterRestriction), keep as-is
+                other_procedures.append(proc)
+        
+        # For each date, merge duplicate perfusions
+        merged_perfusions = []
+        for date, perfusions in perfusions_by_date.items():
+            if len(perfusions) == 1:
+                # No duplicates, keep as-is
+                merged_perfusions.append(perfusions[0])
+            else:
+                # Multiple perfusions on same date - keep the more complete one
+                # Prefer the one with more data (usually Smartsheet over LabTracks)
+                best_perfusion = max(
+                    perfusions,
+                    key=lambda s: (
+                        # Prefer if has protocol_id
+                        bool(getattr(s, "protocol_id", None)),
+                        # Prefer if has experimenters
+                        bool(getattr(s, "experimenters", None)),
+                        # Prefer if experimenters is not just a number
+                        not (
+                            getattr(s, "experimenters", None)
+                            and len(s.experimenters) == 1
+                            and s.experimenters[0].isdigit()
+                        ),
+                        # Prefer if has output_specimen_ids in Perfusion
+                        any(
+                            isinstance(p, Perfusion)
+                            and hasattr(p, "output_specimen_ids")
+                            and p.output_specimen_ids
+                            for p in getattr(s, "procedures", [])
+                        ),
+                    ),
+                )
+                merged_perfusions.append(best_perfusion)
+                
+                logging.info(
+                    f"Merged {len(perfusions)} duplicate Perfusion surgeries "
+                    f"on {date}, keeping most complete version"
+                )
+        
+        return merged_perfusions + other_procedures
+
     def map_responses_to_aind_procedures(
         self, subject_id: str
     ) -> Union[Procedures, None]:
@@ -445,6 +527,9 @@ class ProceduresMapper:
                 f"and {len(exaspim_specimen_procedures)} specimen procedures "
                 f"from ExaSPIM Smartsheet for {subject_id}"
             )
+        
+        # Merge duplicate perfusions from different sources
+        subject_procedures = self._merge_duplicate_perfusions(subject_procedures)
 
         if not subject_procedures and not specimen_procedures:
             return None

@@ -1,0 +1,443 @@
+{
+  "object_type": "Procedures",
+  "describedBy": "https://raw.githubusercontent.com/AllenNeuralDynamics/aind-data-schema/main/src/aind_data_schema/core/procedures.py",
+  "schema_version": "2.2.0",
+  "subject_id": "718162",
+  "subject_procedures": [
+    {
+      "object_type": "Surgery",
+      "protocol_id": null,
+      "start_date": "2024-01-31",
+      "experimenters": [
+        "13040"
+      ],
+      "ethics_review_id": null,
+      "animal_weight_prior": null,
+      "animal_weight_post": null,
+      "weight_unit": "gram",
+      "anaesthesia": null,
+      "workstation_id": null,
+      "coordinate_system": null,
+      "measured_coordinates": null,
+      "procedures": [
+        {
+          "object_type": "Injection",
+          "targeted_structure": {
+            "name": "venous sinus",
+            "registry": "Edinburgh Mouse Atlas Project (EMAPA)",
+            "registry_identifier": "37025"
+          },
+          "relative_position": null,
+          "protocol_id": null
+        }
+      ],
+      "notes": null
+    },
+    {
+      "object_type": "Surgery",
+      "protocol_id": null,
+      "start_date": "2024-03-06",
+      "experimenters": [
+        "13040"
+      ],
+      "ethics_review_id": null,
+      "animal_weight_prior": null,
+      "animal_weight_post": null,
+      "weight_unit": "gram",
+      "anaesthesia": null,
+      "workstation_id": null,
+      "coordinate_system": null,
+      "measured_coordinates": null,
+      "procedures": [
+        {
+          "object_type": "Perfusion",
+          "protocol_id": "dx.doi.org/10.17504/protocols.io.8epv51bejl1b/v6",
+          "output_specimen_ids": [
+            "718162"
+          ]
+        }
+      ],
+      "notes": null
+    },
+    {
+      "object_type": "Surgery",
+      "protocol_id": null,
+      "start_date": "2024-01-31",
+      "experimenters": null,
+      "ethics_review_id": null,
+      "animal_weight_prior": null,
+      "animal_weight_post": null,
+      "weight_unit": "gram",
+      "anaesthesia": null,
+      "workstation_id": null,
+      "coordinate_system": null,
+      "measured_coordinates": null,
+      "procedures": [
+        {
+          "object_type": "Injection",
+          "injection_materials": [
+            {
+              "object_type": "Viral material",
+              "name": "AAV-PHP-eB_Syn-Flex-TREx2-tTA",
+              "tars_identifiers": {
+                "object_type": "Tars virus identifiers",
+                "virus_tars_id": "VT4358g",
+                "plasmid_tars_alias": null,
+                "prep_lot_number": "VT4358g",
+                "prep_date": null,
+                "prep_type": null,
+                "prep_protocol": null
+              },
+              "addgene_id": null,
+              "titer": 75700000000000,
+              "titer_unit": "gc/mL"
+            }
+          ],
+          "targeted_structure": null,
+          "relative_position": null,
+          "dynamics": [
+            {
+              "object_type": "Injection dynamics",
+              "profile": "Bolus",
+              "volume": 100000,
+              "volume_unit": "nanoliter",
+              "duration": null,
+              "duration_unit": null,
+              "injection_current": null,
+              "injection_current_unit": null,
+              "alternating_current": null
+            }
+          ],
+          "protocol_id": null
+        },
+        {
+          "object_type": "Injection",
+          "injection_materials": [
+            {
+              "object_type": "Viral material",
+              "name": "AAV-PHP-eB_7x-TRE-3x-eGFP",
+              "tars_identifiers": {
+                "object_type": "Tars virus identifiers",
+                "virus_tars_id": "VT6171g",
+                "plasmid_tars_alias": null,
+                "prep_lot_number": "VT6171g",
+                "prep_date": null,
+                "prep_type": null,
+                "prep_protocol": null
+              },
+              "addgene_id": null,
+              "titer": 40600000000000,
+              "titer_unit": "gc/mL"
+            }
+          ],
+          "targeted_structure": null,
+          "relative_position": null,
+          "dynamics": [
+            {
+              "object_type": "Injection dynamics",
+              "profile": "Bolus",
+              "volume": 100000,
+              "volume_unit": "nanoliter",
+              "duration": null,
+              "duration_unit": null,
+              "injection_current": null,
+              "injection_current_unit": null,
+              "alternating_current": null
+            }
+          ],
+          "protocol_id": null
+        }
+      ],
+      "notes": null
+    }
+  ],
+  "specimen_procedures": [
+    {
+      "object_type": "Specimen procedure",
+      "procedure_type": "Delipidation",
+      "procedure_name": "Delipidation (DCM + SBiP)",
+      "specimen_id": "718162",
+      "start_date": "2024-03-13",
+      "end_date": "2024-04-10",
+      "experimenters": [
+        "Rajvi Javeri"
+      ],
+      "protocol_id": null,
+      "protocol_parameters": null,
+      "procedure_details": [
+        {
+          "object_type": "Reagent",
+          "name": "Dichloromethane (DCM)",
+          "source": {
+            "name": "Other",
+            "abbreviation": null,
+            "registry": null,
+            "registry_identifier": null
+          },
+          "rrid": null,
+          "lot_number": null,
+          "expiration_date": null
+        },
+        {
+          "object_type": "Reagent",
+          "name": "SBiP (Sodium dodecylsulfate, Butanol, isoPropanol)",
+          "source": {
+            "name": "Other",
+            "abbreviation": null,
+            "registry": null,
+            "registry_identifier": null
+          },
+          "rrid": null,
+          "lot_number": null,
+          "expiration_date": null
+        }
+      ],
+      "notes": null
+    },
+    {
+      "object_type": "Specimen procedure",
+      "procedure_type": "Immunolabeling",
+      "procedure_name": "Primary + Secondary Immunolabelling",
+      "specimen_id": "718162",
+      "start_date": "2024-04-11",
+      "end_date": "2024-04-27",
+      "experimenters": [
+        "Rajvi Javeri"
+      ],
+      "protocol_id": null,
+      "protocol_parameters": null,
+      "procedure_details": [
+        {
+          "object_type": "Probe reagent",
+          "name": "Primary Antibody: Rabbit Anti-GFP",
+          "source": {
+            "name": "Other",
+            "abbreviation": null,
+            "registry": null,
+            "registry_identifier": null
+          },
+          "rrid": null,
+          "lot_number": "GR3431263-1",
+          "expiration_date": null,
+          "target": {
+            "object_type": "Protein probe",
+            "protein": {
+              "name": "Rabbit Anti-GFP",
+              "abbreviation": null,
+              "registry": null,
+              "registry_identifier": null
+            },
+            "species": null,
+            "mass": 10,
+            "mass_unit": "microgram",
+            "sequence": null
+          }
+        },
+        {
+          "object_type": "Probe reagent",
+          "name": "Secondary Antibody: Donkey anti-Rabbit IgG (H+L) AF 488",
+          "source": {
+            "name": "Other",
+            "abbreviation": null,
+            "registry": null,
+            "registry_identifier": null
+          },
+          "rrid": null,
+          "lot_number": "2668665",
+          "expiration_date": null,
+          "target": {
+            "object_type": "Protein probe",
+            "protein": {
+              "name": "Donkey anti-Rabbit IgG (H+L) AF 488",
+              "abbreviation": null,
+              "registry": null,
+              "registry_identifier": null
+            },
+            "species": null,
+            "mass": 20,
+            "mass_unit": "microgram",
+            "sequence": null
+          }
+        }
+      ],
+      "notes": null
+    },
+    {
+      "object_type": "Specimen procedure",
+      "procedure_type": "Gelation",
+      "procedure_name": "Gelation (MBS, AcX, StockX+VA-044, ProK digestion)",
+      "specimen_id": "718162",
+      "start_date": "2024-05-23",
+      "end_date": "2024-06-26",
+      "experimenters": [
+        "Rajvi Javeri"
+      ],
+      "protocol_id": null,
+      "protocol_parameters": {
+        "MBS Start": "2024-05-23",
+        "MBS End": "2024-05-28",
+        "AcX Start": "2024-05-28",
+        "AcX End": "2024-06-04",
+        "PBS Wash Start": "2024-06-04",
+        "PBS Wash End": "2024-06-06",
+        "StockX Equilibration Start": "2024-06-06",
+        "StockX Equilibration End": "2024-06-13",
+        "ProK RT Start": "2024-06-13",
+        "ProK RT End": "2024-06-18",
+        "ProK 37C Start": "2024-06-18",
+        "ProK 37C End": "2024-06-24",
+        "PBS Wash Start (post-gel)": "2024-06-24",
+        "PBS Wash End (post-gel)": "2024-06-26",
+        "4C Storage Date": "6/26/24"
+      },
+      "procedure_details": [
+        {
+          "object_type": "Reagent",
+          "name": "MBS (m-Maleimidobenzoyl-N-hydroxysuccinimide ester)",
+          "source": {
+            "name": "Other",
+            "abbreviation": null,
+            "registry": null,
+            "registry_identifier": null
+          },
+          "rrid": null,
+          "lot_number": null,
+          "expiration_date": null
+        },
+        {
+          "object_type": "Reagent",
+          "name": "Acryloyl-X (AcX)",
+          "source": {
+            "name": "Other",
+            "abbreviation": null,
+            "registry": null,
+            "registry_identifier": null
+          },
+          "rrid": null,
+          "lot_number": null,
+          "expiration_date": null
+        },
+        {
+          "object_type": "Reagent",
+          "name": "Stock X + VA-044",
+          "source": {
+            "name": "Other",
+            "abbreviation": null,
+            "registry": null,
+            "registry_identifier": null
+          },
+          "rrid": null,
+          "lot_number": null,
+          "expiration_date": null
+        },
+        {
+          "object_type": "Reagent",
+          "name": "Proteinase K (ProK)",
+          "source": {
+            "name": "Other",
+            "abbreviation": null,
+            "registry": null,
+            "registry_identifier": null
+          },
+          "rrid": null,
+          "lot_number": null,
+          "expiration_date": null
+        },
+        {
+          "object_type": "Reagent",
+          "name": "PBS",
+          "source": {
+            "name": "Other",
+            "abbreviation": null,
+            "registry": null,
+            "registry_identifier": null
+          },
+          "rrid": null,
+          "lot_number": null,
+          "expiration_date": null
+        }
+      ],
+      "notes": null
+    },
+    {
+      "object_type": "Specimen procedure",
+      "procedure_type": "Expansion",
+      "procedure_name": "Expansion",
+      "specimen_id": "718162",
+      "start_date": "2026-01-26",
+      "end_date": "2026-01-29",
+      "experimenters": [
+        "Rajvi Javeri"
+      ],
+      "protocol_id": null,
+      "protocol_parameters": {
+        "ssc_duration": "2 days",
+        "ssc_start": "2026-01-26",
+        "ssc_end": "2026-01-28",
+        "ascorbic_acid_duration": "1 day",
+        "ascorbic_acid_start": "2026-01-28",
+        "ascorbic_acid_end": "2026-01-29"
+      },
+      "procedure_details": [
+        {
+          "object_type": "Reagent",
+          "name": "Saline-Sodium Citrate (SSC)",
+          "source": {
+            "name": "Other",
+            "abbreviation": null,
+            "registry": null,
+            "registry_identifier": null
+          },
+          "rrid": null,
+          "lot_number": null,
+          "expiration_date": null
+        },
+        {
+          "object_type": "Reagent",
+          "name": "Ascorbic Acid",
+          "source": {
+            "name": "Other",
+            "abbreviation": null,
+            "registry": null,
+            "registry_identifier": null
+          },
+          "rrid": null,
+          "lot_number": null,
+          "expiration_date": null
+        }
+      ],
+      "notes": null
+    },
+    {
+      "object_type": "Specimen procedure",
+      "procedure_type": "Mounting",
+      "procedure_name": "Mounting and ExaSPIM Imaging",
+      "specimen_id": "718162",
+      "start_date": "2026-01-29",
+      "end_date": "2026-02-01",
+      "experimenters": [
+        "Rajvi Javeri"
+      ],
+      "protocol_id": null,
+      "protocol_parameters": null,
+      "procedure_details": [
+        {
+          "object_type": "Reagent",
+          "name": "Imaging Buffer: 10 mM Ascorbic Acid",
+          "source": {
+            "name": "Other",
+            "abbreviation": null,
+            "registry": null,
+            "registry_identifier": null
+          },
+          "rrid": null,
+          "lot_number": null,
+          "expiration_date": null
+        }
+      ],
+      "notes": "Microscope: ExA-SPIM Beta 1; Signal channels: 488; Imaging notes: Bright, sparse labeling. Brain seemed somewhat small. Relatively clear with some areas of aberration."
+    }
+  ],
+  "coordinate_system": null,
+  "notes": null
+}

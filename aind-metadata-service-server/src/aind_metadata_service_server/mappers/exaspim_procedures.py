@@ -1,7 +1,6 @@
 """Maps ExaSPIM Smartsheet information to aind-data-schema Procedures models."""
 
-import logging
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Any, Dict, List, Optional, Union
 
 from aind_data_schema.components.injection_procedures import (
@@ -32,7 +31,6 @@ from aind_smartsheet_service_async_client.models import (
     QcSheet,
 
 )
-logger = logging.getLogger(__name__)
 
 
 class ExaspimProceduresMapper:
@@ -84,7 +82,7 @@ class ExaspimProceduresMapper:
         if isinstance(raw, date):
             return raw
         text = str(raw).strip()
-        if not text or text.lower() == "string":
+        if not text:
             return None
         for fmt in (
             "%m/%d/%y",
@@ -97,8 +95,43 @@ class ExaspimProceduresMapper:
                 return datetime.strptime(text, fmt).date()
             except ValueError:
                 continue
-        logger.warning(f"Could not parse date: '{text}'")
         return None
+
+    @staticmethod
+    def _parse_experimenters(sample_tracking_row: SampleTracking) -> List[str]:
+        """
+        Parse the processing_lead field into a list of experimenter names.
+
+        Handles comma- or semicolon-separated lists of experimenter names.
+
+        Parameters
+        ----------
+        sample_tracking_row : SampleTracking
+            Row from Sample Tracking sheet
+
+        Returns
+        -------
+        List[str]
+            List of experimenter name strings (may be empty)
+        """
+        import re
+        
+        raw = sample_tracking_row.processing_lead
+        if not raw:
+            return []
+        
+        raw = raw.strip()
+        if not raw:
+            return []
+        
+        # Split on comma or semicolon
+        names = re.split(r"[;,]", raw)
+        experimenters: List[str] = []
+        for name in names:
+            name = name.strip()
+            if name:
+                experimenters.append(name)
+        return experimenters
 
     def build_injection_surgery(
         self, mouse_tracker_row: MouseTracker
@@ -123,44 +156,36 @@ class ExaspimProceduresMapper:
 
         for virus_num in range(1, 5):
             prefix = f"virus{virus_num}"
-            virus_name = str(
-                getattr(mouse_tracker_row, prefix, "") or ""
-            ).strip()
-            if not virus_name or virus_name.lower() == "string":
+            virus_name = getattr(mouse_tracker_row, prefix)
+            if not virus_name:
                 continue
+            virus_name = virus_name.strip()
 
             injection_date = self._parse_date(
-                getattr(mouse_tracker_row, f"{prefix}_injection_date", None)
+                getattr(mouse_tracker_row, f"{prefix}_injection_date")
             )
             if injection_date:
                 injection_dates.append(injection_date)
 
-            virus_id = str(
-                getattr(mouse_tracker_row, f"{prefix}_id", "") or ""
-            ).strip()
-            if virus_id and virus_id.lower() == "string":
-                virus_id = ""
+            virus_id = getattr(mouse_tracker_row, f"{prefix}_id")
+            if virus_id:
+                virus_id = virus_id.strip()
 
-            titer_raw = getattr(
-                mouse_tracker_row, f"{prefix}_stock_titer_gc_ml", None
-            )
+            titer_raw = getattr(mouse_tracker_row, f"{prefix}_stock_titer_gc_ml")
 
             # Volume — check stereotaxic first
             if virus_num == 4:
-                volume_raw = getattr(
-                    mouse_tracker_row, "stereotaxic_volume_injected_nl", None
-                )
+                volume_raw = mouse_tracker_row.stereotaxic_volume_injected_nl
             else:
                 volume_raw = getattr(
-                    mouse_tracker_row, f"{prefix}_stereotaxic_volume_injected_nl", None
+                    mouse_tracker_row, f"{prefix}_stereotaxic_volume_injected_nl"
                 )
 
             # Fall back to retro-orbital volume (stored in µL)
-            ro_volume_raw = None
-            if not volume_raw or str(volume_raw).strip().lower() == "string":
-                ro_volume_raw = getattr(
-                    mouse_tracker_row, "virus_mix_total_volume_injected_ro_ul", None
-                )
+            if not volume_raw:
+                ro_volume_raw = mouse_tracker_row.virus_mix_total_volume_injected_ro_ul
+            else:
+                ro_volume_raw = None
 
             # Build injection material
             vm_kwargs: Dict[str, Any] = {"name": virus_name}
@@ -169,55 +194,43 @@ class ExaspimProceduresMapper:
                     "virus_tars_id": virus_id,
                     "prep_lot_number": virus_id,
                 }
-            if titer_raw and str(titer_raw).strip().lower() != "string":
-                try:
-                    vm_kwargs["titer"] = int(float(str(titer_raw)))
-                except (ValueError, TypeError):
-                    pass
+            if titer_raw is not None:
+                vm_kwargs["titer"] = int(float(str(titer_raw)))
 
-            viral_material = ViralMaterial.model_construct(**vm_kwargs)
+            viral_material = ViralMaterial(**vm_kwargs)
 
             # Build injection dynamics
             dynamics_list: List[InjectionDynamics] = []
-            if volume_raw and str(volume_raw).strip().lower() != "string":
-                try:
-                    vol = float(str(volume_raw))
-                    if vol > 0:
-                        dynamics_list.append(
-                            InjectionDynamics.model_construct(
-                                profile=InjectionProfile.BOLUS,
-                                volume=vol,
-                                volume_unit=VolumeUnit.NL,
-                            )
+            if volume_raw:
+                vol = float(str(volume_raw))
+                if vol > 0:
+                    dynamics_list.append(
+                        InjectionDynamics(
+                            profile=InjectionProfile.BOLUS,
+                            volume=vol,
+                            volume_unit=VolumeUnit.NL,
                         )
-                except (ValueError, TypeError):
-                    pass
-            elif ro_volume_raw and str(ro_volume_raw).strip().lower() != "string":
+                    )
+            elif ro_volume_raw:
                 # RO volume is in µL — convert to nL
-                try:
-                    vol_ul = float(str(ro_volume_raw))
-                    if vol_ul > 0:
-                        vol_nl = vol_ul * 1000.0
-                        dynamics_list.append(
-                            InjectionDynamics.model_construct(
-                                profile=InjectionProfile.BOLUS,
-                                volume=vol_nl,
-                                volume_unit=VolumeUnit.NL,
-                            )
+                vol_ul = float(str(ro_volume_raw))
+                if vol_ul > 0:
+                    vol_nl = vol_ul * 1000.0
+                    dynamics_list.append(
+                        InjectionDynamics(
+                            profile=InjectionProfile.BOLUS,
+                            volume=vol_nl,
+                            volume_unit=VolumeUnit.NL,
                         )
-                except (ValueError, TypeError):
-                    pass
+                    )
 
             # Skip injection if no volume data
             if not dynamics_list:
-                logger.warning(
-                    f"No volume data found for Virus{virus_num} — skipping injection."
-                )
                 continue
 
             # Build injection object
             injection_objects.append(
-                Injection.model_construct(
+                Injection(
                     injection_materials=[viral_material],
                     dynamics=dynamics_list,
                 )
@@ -229,13 +242,13 @@ class ExaspimProceduresMapper:
         # Use the earliest injection date as the surgery date
         surgery_date = min(injection_dates) if injection_dates else None
 
-        return Surgery.model_construct(
+        return Surgery(
             start_date=surgery_date,
             procedures=injection_objects,
         )
 
     def build_delipidation(
-        self, sample_tracking_row: SampleTracking, specimen_id: str
+        self, sample_tracking_row: SampleTracking, specimen_id: str, experimenters: List[str] = None
     ) -> Optional[SpecimenProcedure]:
         """
         Build a Delipidation SpecimenProcedure.
@@ -262,17 +275,17 @@ class ExaspimProceduresMapper:
         )
 
         if not start_date or not end_date:
-            logger.info(
-                "Delipidation dates not available — skipping delipidation."
-            )
+            # logger.info(
+            #     "Delipidation dates not available — skipping delipidation."
+            # )
             return None
 
         reagents = [
-            Reagent.model_construct(
+            Reagent(
                 name="Dichloromethane (DCM)",
                 source=Organization.OTHER,
             ),
-            Reagent.model_construct(
+            Reagent(
                 name="SBiP (Sodium dodecylsulfate, Butanol, isoPropanol)",
                 source=Organization.OTHER,
             ),
@@ -280,19 +293,19 @@ class ExaspimProceduresMapper:
 
         qc_notes = self._extract_qc_notes("special")
 
-        return SpecimenProcedure.model_construct(
+        return SpecimenProcedure(
             procedure_type=SpecimenProcedureType.DELIPIDATION,
             procedure_name="Delipidation (DCM + SBiP)",
             specimen_id=specimen_id,
             start_date=start_date,
             end_date=end_date,
-            experimenters=[],
+            experimenters=experimenters or [],
             procedure_details=reagents,
             notes=qc_notes,
         )
 
     def build_immunolabeling(
-        self, sample_tracking_row: SampleTracking, specimen_id: str
+        self, sample_tracking_row: SampleTracking, specimen_id: str, experimenters: List[str] = None
     ) -> Optional[SpecimenProcedure]:
         """
         Build an Immunolabeling SpecimenProcedure.
@@ -313,9 +326,6 @@ class ExaspimProceduresMapper:
             sample_tracking_row.immuno_primary_ab_start_date
         )
         if not start_date:
-            logger.info(
-                "Immunolabeling start date not available — skipping immunolabeling."
-            )
             return None
 
         secondary_start = self._parse_date(
@@ -327,45 +337,29 @@ class ExaspimProceduresMapper:
 
         # Build primary antibody reagents (up to 3)
         for i in range(1, 4):
-            ab_name = str(
-                getattr(
-                    sample_tracking_row, f"immuno_primary_antibody{i}", ""
-                )
-                or ""
-            ).strip()
-            if not ab_name or ab_name.lower() == "string":
+            ab_name = getattr(sample_tracking_row, f"immuno_primary_antibody{i}")
+            if not ab_name:
                 continue
+            ab_name = ab_name.strip()
 
-            catalog = str(
-                getattr(
-                    sample_tracking_row, f"primary_antibody{i}_catalog_num", ""
-                )
-                or ""
-            ).strip()
-            lot = str(
-                getattr(
-                    sample_tracking_row, f"primary_antibody{i}_lot_num", ""
-                )
-                or ""
-            ).strip()
+            catalog = getattr(sample_tracking_row, f"primary_antibody{i}_catalog_num")
+            if catalog:
+                catalog = catalog.strip()
+            
+            lot = getattr(sample_tracking_row, f"primary_antibody{i}_lot_num")
+            if lot:
+                lot = lot.strip()
             mass_raw = getattr(
-                sample_tracking_row, f"mass_of_primary_antibody{i}_used_per_brain_ug", None
+                sample_tracking_row, f"mass_of_primary_antibody{i}_used_per_brain_ug"
             )
-            try:
-                mass = (
-                    float(str(mass_raw))
-                    if mass_raw and str(mass_raw).strip().lower() != "string"
-                    else 0.0
-                )
-            except (ValueError, TypeError):
-                mass = 0.0
+            mass = float(str(mass_raw)) if mass_raw is not None else 0.0
 
-            reagent = ProbeReagent.model_construct(
+            reagent = ProbeReagent(
                 name=f"Primary Antibody: {ab_name}",
                 source=Organization.OTHER,
-                lot_number=lot if lot and lot.lower() != "string" else None,
-                target=ProteinProbe.model_construct(
-                    protein=PIDName.model_construct(name=ab_name),
+                lot_number=lot,
+                target=ProteinProbe(
+                    protein=PIDName(name=ab_name),
                     mass=mass,
                 ),
             )
@@ -373,61 +367,46 @@ class ExaspimProceduresMapper:
 
         # Build secondary antibody reagents (up to 3)
         for i in range(1, 4):
-            ab_name = str(
-                getattr(
-                    sample_tracking_row, f"immuno_secondary_antibody{i}", ""
-                )
-                or ""
-            ).strip()
-            if not ab_name or ab_name.lower() == "string":
+            ab_name = getattr(sample_tracking_row, f"immuno_secondary_antibody{i}")
+            if not ab_name:
                 continue
+            ab_name = ab_name.strip()
 
-            catalog = str(
-                getattr(
-                    sample_tracking_row, f"secondary_antibody{i}_catalog_num", ""
-                )
-                or ""
-            ).strip()
-            lot = str(
-                getattr(
-                    sample_tracking_row, f"secondary_antibody{i}_lot_num", ""
-                )
-                or ""
-            ).strip()
+            catalog = getattr(sample_tracking_row, f"secondary_antibody{i}_catalog_num")
+            if catalog:
+                catalog = catalog.strip()
+            
+            lot = getattr(sample_tracking_row, f"secondary_antibody{i}_lot_num")
+            if lot:
+                lot = lot.strip()
             mass_raw = getattr(
-                sample_tracking_row, f"mass_of_secondary_antibody{i}_used_per_brain_ug", None
+                sample_tracking_row, f"mass_of_secondary_antibody{i}_used_per_brain_ug"
             )
-            try:
-                mass = (
-                    float(str(mass_raw))
-                    if mass_raw and str(mass_raw).strip().lower() != "string"
-                    else 0.0
-                )
-            except (ValueError, TypeError):
-                mass = 0.0
+            mass = float(str(mass_raw)) if mass_raw is not None else 0.0
 
-            reagent = ProbeReagent.model_construct(
+            reagent = ProbeReagent(
                 name=f"Secondary Antibody: {ab_name}",
                 source=Organization.OTHER,
-                lot_number=lot if lot and lot.lower() != "string" else None,
-                target=ProteinProbe.model_construct(
-                    protein=PIDName.model_construct(name=ab_name),
+                lot_number=lot,
+                target=ProteinProbe(
+                    protein=PIDName(name=ab_name),
                     mass=mass,
                 ),
             )
             reagents.append(reagent)
 
         # Build notes about RRID if available
-        primary_rrid = str(
-            sample_tracking_row.primary_antibody_rrid or ""
-        ).strip()
-        secondary_rrid = str(
-            sample_tracking_row.secondary_antibody_rrid or ""
-        ).strip()
+        primary_rrid = sample_tracking_row.primary_antibody_rrid
+        if primary_rrid:
+            primary_rrid = primary_rrid.strip()
+        secondary_rrid = sample_tracking_row.secondary_antibody_rrid
+        if secondary_rrid:
+            secondary_rrid = secondary_rrid.strip()
+        
         rrid_notes = []
-        if primary_rrid and primary_rrid.lower() != "string":
+        if primary_rrid:
             rrid_notes.append(f"Primary RRID: {primary_rrid}")
-        if secondary_rrid and secondary_rrid.lower() != "string":
+        if secondary_rrid:
             rrid_notes.append(f"Secondary RRID: {secondary_rrid}")
 
         qc_notes = self._extract_qc_notes("immunolabeling")
@@ -437,19 +416,19 @@ class ExaspimProceduresMapper:
         if qc_notes:
             notes_parts.append(qc_notes)
 
-        return SpecimenProcedure.model_construct(
+        return SpecimenProcedure(
             procedure_type=SpecimenProcedureType.IMMUNOLABELING,
             procedure_name="Primary + Secondary Immunolabelling",
             specimen_id=specimen_id,
             start_date=start_date,
             end_date=end_date,
-            experimenters=[],
+            experimenters=experimenters or [],
             procedure_details=reagents,
             notes="; ".join(notes_parts) if notes_parts else None,
         )
 
     def build_gelation(
-        self, sample_tracking_row: SampleTracking, specimen_id: str
+        self, sample_tracking_row: SampleTracking, specimen_id: str, experimenters: List[str] = None
     ) -> Optional[SpecimenProcedure]:
         """
         Build a Gelation SpecimenProcedure.
@@ -470,9 +449,6 @@ class ExaspimProceduresMapper:
             sample_tracking_row.gelation_mbs_start
         )
         if not start_date:
-            logger.info(
-                "Gelation start date not available — skipping gelation."
-            )
             return None
 
         # End date: storage date or PBS Wash End
@@ -485,20 +461,20 @@ class ExaspimProceduresMapper:
         end_date = storage_date or pbs_wash_end or start_date
 
         reagents = [
-            Reagent.model_construct(
+            Reagent(
                 name="MBS (m-Maleimidobenzoyl-N-hydroxysuccinimide ester)",
                 source=Organization.OTHER,
             ),
-            Reagent.model_construct(
+            Reagent(
                 name="Acryloyl-X (AcX)", source=Organization.OTHER
             ),
-            Reagent.model_construct(
+            Reagent(
                 name="Stock X + VA-044", source=Organization.OTHER
             ),
-            Reagent.model_construct(
+            Reagent(
                 name="Proteinase K (ProK)", source=Organization.OTHER
             ),
-            Reagent.model_construct(
+            Reagent(
                 name="PBS", source=Organization.OTHER
             ),
         ]
@@ -529,19 +505,19 @@ class ExaspimProceduresMapper:
             ("4C Storage Date", "date_of_storage_in_pbs_az_0_05_4c"),
         ]
         for param_key, col_name in substep_mapping:
-            val = getattr(sample_tracking_row, col_name, None)
-            if val is not None and str(val).strip().lower() != "string":
+            val = getattr(sample_tracking_row, col_name)
+            if val is not None:
                 protocol_params[param_key] = str(val)
 
         qc_notes = self._extract_qc_notes("digestion")
 
-        return SpecimenProcedure.model_construct(
+        return SpecimenProcedure(
             procedure_type=SpecimenProcedureType.GELATION,
             procedure_name="Gelation (MBS, AcX, StockX+VA-044, ProK digestion)",
             specimen_id=specimen_id,
             start_date=start_date,
             end_date=end_date,
-            experimenters=[],
+            experimenters=experimenters or [],
             procedure_details=reagents,
             protocol_parameters=(
                 protocol_params if protocol_params else None
@@ -549,8 +525,87 @@ class ExaspimProceduresMapper:
             notes=qc_notes,
         )
 
+    def build_expansion(
+        self, sample_tracking_row: SampleTracking, specimen_id: str, 
+        imaging_start_date: Optional[date], experimenters: List[str] = None
+    ) -> Optional[SpecimenProcedure]:
+        """
+        Build an Expansion SpecimenProcedure.
+
+        Expansion is only performed if the Status column is "Imaged".
+        Dates are inferred by backtracking from the imaging start date:
+        - SSC: 2 days (imaging_start - 3 days to imaging_start - 1 day)
+        - Ascorbic acid: 1 day (imaging_start - 1 day to imaging_start)
+        - Overall: imaging_start - 3 days to imaging_start
+
+        Parameters
+        ----------
+        sample_tracking_row : SampleTracking
+            Row from Sample Tracking sheet
+        specimen_id : str
+            The specimen identifier
+        imaging_start_date : Optional[date]
+            Imaging start date to backtrack from
+        experimenters : List[str]
+            List of experimenters
+
+        Returns
+        -------
+        Optional[SpecimenProcedure]
+            The expansion procedure or None if not applicable
+        """
+        from datetime import timedelta
+        
+        # Check if expansion has occurred (status must be "Imaged")
+        status = sample_tracking_row.status
+        if not status:
+            return None
+        status = status.strip().lower()
+        if status != "imaged":
+            return None
+        
+        # Need imaging start date to calculate expansion dates
+        if not imaging_start_date:
+            return None
+        
+        # Backtrack 3 days from imaging start
+        start_date = imaging_start_date - timedelta(days=3)
+        end_date = imaging_start_date
+        
+        reagents = [
+            Reagent(
+                name="Saline-Sodium Citrate (SSC)",
+                source=Organization.OTHER,
+            ),
+            Reagent(
+                name="Ascorbic Acid",
+                source=Organization.OTHER,
+            ),
+        ]
+        
+        # Protocol parameters with sub-step timing
+        protocol_params = {
+            "ssc_duration": "2 days",
+            "ssc_start": str(imaging_start_date - timedelta(days=3)),
+            "ssc_end": str(imaging_start_date - timedelta(days=1)),
+            "ascorbic_acid_duration": "1 day",
+            "ascorbic_acid_start": str(imaging_start_date - timedelta(days=1)),
+            "ascorbic_acid_end": str(imaging_start_date),
+        }
+
+        return SpecimenProcedure(
+            procedure_type=SpecimenProcedureType.EXPANSION,
+            procedure_name="Expansion",
+            specimen_id=specimen_id,
+            start_date=start_date,
+            end_date=end_date,
+            experimenters=experimenters or [],
+            procedure_details=reagents,
+            protocol_parameters=protocol_params,
+        )
+
     def build_mounting_and_imaging(
-        self, imaging_queue_row: ImagingQueue, specimen_id: str
+        self, imaging_queue_row: ImagingQueue, specimen_id: str, experimenters: List[str] = None
     ) -> Optional[SpecimenProcedure]:
         """
         Build a Mounting SpecimenProcedure for the final imaging step.
@@ -571,50 +626,49 @@ class ExaspimProceduresMapper:
             imaging_queue_row.imaging_start_date
         )
         if not start_date:
-            logger.info(
-                "Imaging start date not available — skipping mounting/imaging."
-            )
             return None
 
         end_date = self._parse_date(
             imaging_queue_row.imaging_end_date
         ) or start_date
 
-        microscope = str(
-            imaging_queue_row.microscope or ""
-        ).strip()
-        imaging_buffer = str(
-            imaging_queue_row.imaging_buffer or ""
-        ).strip()
-        channels = str(
-            imaging_queue_row.signal_channel_s or ""
-        ).strip()
-        notes_col = str(imaging_queue_row.notes or "").strip()
+        microscope = imaging_queue_row.microscope
+        if microscope:
+            microscope = microscope.strip()
+        imaging_buffer = imaging_queue_row.imaging_buffer
+        if imaging_buffer:
+            imaging_buffer = imaging_buffer.strip()
+        channels = imaging_queue_row.signal_channel_s
+        if channels:
+            channels = channels.strip()
+        notes_col = imaging_queue_row.notes
+        if notes_col:
+            notes_col = notes_col.strip()
 
         reagents: List[Reagent] = []
-        if imaging_buffer and imaging_buffer.lower() != "string":
+        if imaging_buffer:
             reagents.append(
-                Reagent.model_construct(
+                Reagent(
                     name=f"Imaging Buffer: {imaging_buffer}",
                     source=Organization.OTHER,
                 )
             )
 
         notes_parts = []
-        if microscope and microscope.lower() != "string":
+        if microscope:
             notes_parts.append(f"Microscope: {microscope}")
-        if channels and channels.lower() != "string":
+        if channels:
             notes_parts.append(f"Signal channels: {channels}")
-        if notes_col and notes_col.lower() != "string":
+        if notes_col:
             notes_parts.append(f"Imaging notes: {notes_col}")
 
-        return SpecimenProcedure.model_construct(
+        return SpecimenProcedure(
             procedure_type=SpecimenProcedureType.MOUNTING,
             procedure_name="Mounting and ExaSPIM Imaging",
             specimen_id=specimen_id,
             start_date=start_date,
             end_date=end_date,
-            experimenters=[],
+            experimenters=experimenters or [],
             procedure_details=reagents if reagents else [],
             notes="; ".join(notes_parts) if notes_parts else None,
         )
@@ -645,9 +699,9 @@ class ExaspimProceduresMapper:
 
         notes_parts = []
         for row in self.qc_sheet_info:
-            value = str(getattr(row, col, "") or "").strip()
-            if value and value.lower() != "string":
-                notes_parts.append(value)
+            value = getattr(row, col)
+            if value:
+                notes_parts.append(value.strip())
 
         return "; ".join(notes_parts) if notes_parts else None
 
@@ -677,48 +731,51 @@ class ExaspimProceduresMapper:
             )
             if injection_surgery:
                 subject_procedures.append(injection_surgery)
-                logger.info(
-                    f"Built injection surgery for specimen {specimen_id}"
-                )
 
+        # Get imaging start date for expansion calculation
+        imaging_start_date = None
+        if self.imaging_queue_info:
+            imaging_start_date = self._parse_date(
+                self.imaging_queue_info[0].imaging_start_date
+            )
+        
         # Build specimen procedures from Sample Tracking
         if self.sample_tracking_info:
             st_row = self.sample_tracking_info[0]
+            experimenters = self._parse_experimenters(st_row)
 
             # Delipidation
-            delipidation = self.build_delipidation(st_row, specimen_id)
+            delipidation = self.build_delipidation(st_row, specimen_id, experimenters)
             if delipidation:
                 specimen_procedures.append(delipidation)
-                logger.info(
-                    f"Built delipidation procedure for specimen {specimen_id}"
-                )
 
             # Immunolabeling
-            immunolabeling = self.build_immunolabeling(st_row, specimen_id)
+            immunolabeling = self.build_immunolabeling(st_row, specimen_id, experimenters)
             if immunolabeling:
                 specimen_procedures.append(immunolabeling)
-                logger.info(
-                    f"Built immunolabeling procedure for specimen {specimen_id}"
-                )
 
             # Gelation
-            gelation = self.build_gelation(st_row, specimen_id)
+            gelation = self.build_gelation(st_row, specimen_id, experimenters)
             if gelation:
                 specimen_procedures.append(gelation)
-                logger.info(
-                    f"Built gelation procedure for specimen {specimen_id}"
-                )
+
+            # Expansion (requires imaging_start_date and status="Imaged")
+            expansion = self.build_expansion(st_row, specimen_id, imaging_start_date, experimenters)
+            if expansion:
+                specimen_procedures.append(expansion)
 
         # Build mounting and imaging from Imaging Queue
         if self.imaging_queue_info:
+            # Try to get experimenters from sample tracking if available
+            experimenters = []
+            if self.sample_tracking_info:
+                experimenters = self._parse_experimenters(self.sample_tracking_info[0])
+            
             mounting = self.build_mounting_and_imaging(
-                self.imaging_queue_info[0], specimen_id
+                self.imaging_queue_info[0], specimen_id, experimenters
             )
             if mounting:
                 specimen_procedures.append(mounting)
-                logger.info(
-                    f"Built mounting/imaging procedure for specimen {specimen_id}"
-                )
 
         # Sort specimen_procedures by start_date
         specimen_procedures.sort(key=lambda p: p.start_date)
@@ -745,7 +802,7 @@ class ExaspimProceduresMapper:
         Dict[str, Any]
             Mapped AIND procedures data
         """
-        procedures = Procedures.model_construct(
+        procedures = Procedures(
                 subject_id=subject_id,
                 subject_procedures=subject_procedures,
                 specimen_procedures=specimen_procedures,
