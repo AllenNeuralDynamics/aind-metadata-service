@@ -1,0 +1,487 @@
+{
+   "object_type": "Procedures",
+   "describedBy": "https://raw.githubusercontent.com/AllenNeuralDynamics/aind-data-schema/main/src/aind_data_schema/core/procedures.py",
+   "schema_version": "2.2.1",
+   "subject_id": "671477",
+   "subject_procedures": [
+      {
+         "object_type": "Surgery",
+         "protocol_id": null,
+         "start_date": "2023-03-31",
+         "experimenters": null,
+         "ethics_review_id": null,
+         "animal_weight_prior": null,
+         "animal_weight_post": null,
+         "weight_unit": "gram",
+         "anaesthesia": null,
+         "workstation_id": null,
+         "coordinate_system": null,
+         "measured_coordinates": null,
+         "procedures": [
+            {
+               "object_type": "Injection",
+               "protocol_id": null,
+               "injection_materials": [
+                  {
+                     "object_type": "Viral material",
+                     "name": "Ef1a-fDOI-eGFP PHP.eB",
+                     "tars_identifiers": {
+                        "object_type": "Tars virus identifiers",
+                        "virus_tars_id": "VT1612g",
+                        "plasmid_tars_alias": null,
+                        "prep_lot_number": "VT1612g",
+                        "prep_date": null,
+                        "prep_type": null,
+                        "prep_protocol": null
+                     },
+                     "addgene_id": null,
+                     "titer": 5000000000000,
+                     "titer_unit": "gc/mL"
+                  }
+               ],
+               "targeted_structure": {
+                  "name": "venous sinus",
+                  "registry": "Edinburgh Mouse Atlas Project (EMAPA)",
+                  "registry_identifier": "37025"
+               },
+               "relative_position": null,
+               "dynamics": [
+                  {
+                     "object_type": "Injection dynamics",
+                     "profile": "Bolus",
+                     "volume": 100000.0,
+                     "volume_unit": "nanoliter",
+                     "duration": null,
+                     "duration_unit": null,
+                     "injection_current": null,
+                     "injection_current_unit": null,
+                     "alternating_current": null
+                  }
+               ]
+            },
+            {
+               "object_type": "Injection",
+               "protocol_id": null,
+               "injection_materials": [
+                  {
+                     "object_type": "Viral material",
+                     "name": "CAG-FLEX-tdTom PHP.eB",
+                     "tars_identifiers": {
+                        "object_type": "Tars virus identifiers",
+                        "virus_tars_id": "v162851",
+                        "plasmid_tars_alias": null,
+                        "prep_lot_number": "v162851",
+                        "prep_date": null,
+                        "prep_type": null,
+                        "prep_protocol": null
+                     },
+                     "addgene_id": null,
+                     "titer": 200000000000,
+                     "titer_unit": "gc/mL"
+                  }
+               ],
+               "targeted_structure": {
+                  "name": "venous sinus",
+                  "registry": "Edinburgh Mouse Atlas Project (EMAPA)",
+                  "registry_identifier": "37025"
+               },
+               "relative_position": null,
+               "dynamics": [
+                  {
+                     "object_type": "Injection dynamics",
+                     "profile": "Bolus",
+                     "volume": 100000.0,
+                     "volume_unit": "nanoliter",
+                     "duration": null,
+                     "duration_unit": null,
+                     "injection_current": null,
+                     "injection_current_unit": null,
+                     "alternating_current": null
+                  }
+               ]
+            }
+         ],
+         "notes": null
+      },
+      {
+         "object_type": "Surgery",
+         "protocol_id": null,
+         "start_date": "2023-05-05",
+         "experimenters": [
+            "30333"
+         ],
+         "ethics_review_id": null,
+         "animal_weight_prior": null,
+         "animal_weight_post": null,
+         "weight_unit": "gram",
+         "anaesthesia": null,
+         "workstation_id": null,
+         "coordinate_system": null,
+         "measured_coordinates": null,
+         "procedures": [
+            {
+               "object_type": "Perfusion",
+               "protocol_id": "dx.doi.org/10.17504/protocols.io.8epv51bejl1b/v6",
+               "output_specimen_ids": [
+                  "671477"
+               ]
+            }
+         ],
+         "notes": null
+      }
+   ],
+   "specimen_procedures": [
+      {
+         "object_type": "Specimen procedure",
+         "protocol_id": [
+            "dx.doi.org/10.17504/protocols.io.36wgqj1kxvk5/v2",
+            "dx.doi.org/10.17504/protocols.io.n2bvj81mwgk5/v2"
+         ],
+         "procedure_type": "Delipidation",
+         "procedure_name": "Delipidation (DCM + SBiP)",
+         "specimen_id": "671477",
+         "start_date": "2023-07-20",
+         "end_date": "2023-08-14",
+         "experimenters": [
+            "Rajvi Javeri"
+         ],
+         "protocol_parameters": null,
+         "procedure_details": [
+            {
+               "object_type": "Solution",
+               "name": "Dichloromethane (DCM)",
+               "lot_number": null
+            },
+            {
+               "object_type": "Solution",
+               "name": "SBiP (Sodium dodecylsulfate, Butanol, isoPropanol)",
+               "lot_number": null
+            }
+         ],
+         "notes": null
+      },
+      {
+         "object_type": "Specimen procedure",
+         "protocol_id": [
+            "dx.doi.org/10.17504/protocols.io.ewov1okwylr2/v2"
+         ],
+         "procedure_type": "Immunolabeling",
+         "procedure_name": "Primary + Secondary Immunolabelling",
+         "specimen_id": "671477",
+         "start_date": "2023-08-15",
+         "end_date": "2023-10-19",
+         "experimenters": [
+            "Rajvi Javeri"
+         ],
+         "protocol_parameters": null,
+         "procedure_details": [
+            {
+               "object_type": "Probe reagent",
+               "name": "Goat Anti-tdT",
+               "source": {
+                  "name": "Other",
+                  "abbreviation": null,
+                  "registry": null,
+                  "registry_identifier": null
+               },
+               "rrid": {
+                  "name": "Goat Anti-tdT",
+                  "abbreviation": null,
+                  "registry": "Research Resource Identifiers (RRID)",
+                  "registry_identifier": "AB_2722750"
+               },
+               "lot_number": "0081030221",
+               "expiration_date": null,
+               "target": {
+                  "object_type": "Protein probe",
+                  "protein": {
+                     "name": "tdTomato",
+                     "abbreviation": null,
+                     "registry": null,
+                     "registry_identifier": null
+                  },
+                  "species": {
+                     "name": "Carpa hircus",
+                     "common_name": "Goat",
+                     "registry": "National Center for Biotechnology Information (NCBI)",
+                     "registry_identifier": "NCBI:txid9925"
+                  },
+                  "mass": 10.0,
+                  "mass_unit": "microgram",
+                  "sequence": null
+               }
+            },
+            {
+               "object_type": "Probe reagent",
+               "name": "Rabbit Anti-GFP",
+               "source": {
+                  "name": "Other",
+                  "abbreviation": null,
+                  "registry": null,
+                  "registry_identifier": null
+               },
+               "rrid": {
+                  "name": "Rabbit Anti-GFP",
+                  "abbreviation": null,
+                  "registry": "Research Resource Identifiers (RRID)",
+                  "registry_identifier": "AB_303395"
+               },
+               "lot_number": "1037873-6",
+               "expiration_date": null,
+               "target": {
+                  "object_type": "Protein probe",
+                  "protein": {
+                     "name": "Green Fluorescent Protein",
+                     "abbreviation": null,
+                     "registry": null,
+                     "registry_identifier": null
+                  },
+                  "species": {
+                     "name": "Oryctolagus cuniculus",
+                     "common_name": "European rabbit",
+                     "registry": "National Center for Biotechnology Information (NCBI)",
+                     "registry_identifier": "NCBI:txid9986"
+                  },
+                  "mass": 10.0,
+                  "mass_unit": "microgram",
+                  "sequence": null
+               }
+            },
+            {
+               "object_type": "Probe reagent",
+               "name": "n/a",
+               "source": {
+                  "name": "Other",
+                  "abbreviation": null,
+                  "registry": null,
+                  "registry_identifier": null
+               },
+               "rrid": null,
+               "lot_number": "n/a",
+               "expiration_date": null,
+               "target": {
+                  "object_type": "Protein probe",
+                  "protein": {
+                     "name": "n/a",
+                     "abbreviation": null,
+                     "registry": null,
+                     "registry_identifier": null
+                  },
+                  "species": null,
+                  "mass": 0.0,
+                  "mass_unit": "microgram",
+                  "sequence": null
+               }
+            },
+            {
+               "object_type": "Probe reagent",
+               "name": "Donkey anti-Goat IgG (H+L) AF 568",
+               "source": {
+                  "name": "Invitrogen",
+                  "abbreviation": null,
+                  "registry": "Research Organization Registry (ROR)",
+                  "registry_identifier": "03x1ewr52"
+               },
+               "rrid": {
+                  "name": "Donkey anti-Goat IgG (H+L) AF 568",
+                  "abbreviation": null,
+                  "registry": "Research Resource Identifiers (RRID)",
+                  "registry_identifier": "AB_2534104"
+               },
+               "lot_number": "2304269",
+               "expiration_date": null,
+               "target": {
+                  "object_type": "Protein probe",
+                  "protein": {
+                     "name": "Goat antibody",
+                     "abbreviation": null,
+                     "registry": null,
+                     "registry_identifier": null
+                  },
+                  "species": {
+                     "name": "Equus asinus",
+                     "common_name": "Donkey",
+                     "registry": "National Center for Biotechnology Information (NCBI)",
+                     "registry_identifier": "NCBI:txid9793"
+                  },
+                  "mass": 20.0,
+                  "mass_unit": "microgram",
+                  "sequence": null
+               }
+            },
+            {
+               "object_type": "Probe reagent",
+               "name": "Donkey anti-Rabbit IgG (H+L) AF 488",
+               "source": {
+                  "name": "Invitrogen",
+                  "abbreviation": null,
+                  "registry": "Research Organization Registry (ROR)",
+                  "registry_identifier": "03x1ewr52"
+               },
+               "rrid": {
+                  "name": "Donkey anti-Rabbit IgG (H+L) AF 488",
+                  "abbreviation": null,
+                  "registry": "Research Resource Identifiers (RRID)",
+                  "registry_identifier": "AB_2535792"
+               },
+               "lot_number": "2541645",
+               "expiration_date": null,
+               "target": {
+                  "object_type": "Protein probe",
+                  "protein": {
+                     "name": "Rabbit antibody",
+                     "abbreviation": null,
+                     "registry": null,
+                     "registry_identifier": null
+                  },
+                  "species": {
+                     "name": "Equus asinus",
+                     "common_name": "Donkey",
+                     "registry": "National Center for Biotechnology Information (NCBI)",
+                     "registry_identifier": "NCBI:txid9793"
+                  },
+                  "mass": 20.0,
+                  "mass_unit": "microgram",
+                  "sequence": null
+               }
+            }
+         ],
+         "notes": "Primary RRID: AB_2722750,; Secondary RRID: AB_2535794, AB_2534105"
+      },
+      {
+         "object_type": "Specimen procedure",
+         "protocol_id": [
+            "dx.doi.org/10.17504/protocols.io.rm7vz6814gx1/v1"
+         ],
+         "procedure_type": "Gelation",
+         "procedure_name": "Gelation (MBS, AcX, StockX+VA-044, ProK digestion)",
+         "specimen_id": "671477",
+         "start_date": "2023-11-09",
+         "end_date": "2023-12-14",
+         "experimenters": [
+            "Rajvi Javeri"
+         ],
+         "protocol_parameters": {
+            "MBS Start": "2023-11-09",
+            "MBS End": "2023-11-13",
+            "AcX Start": "2023-11-13",
+            "AcX End": "2023-11-17",
+            "PBS Wash Start": "2023-11-17",
+            "PBS Wash End": "2023-11-21",
+            "StockX Equilibration Start": "2023-11-21",
+            "StockX Equilibration End": "2023-11-28",
+            "ProK RT Start": "2023-11-28",
+            "ProK RT End": "2023-12-03",
+            "ProK 37C Start": "2023-12-04",
+            "ProK 37C End": "2023-12-10",
+            "PBS Wash Start (post-gel)": "2023-12-11",
+            "PBS Wash End (post-gel)": "2023-12-14",
+            "4C Storage Date": "12/14/23"
+         },
+         "procedure_details": [
+            {
+               "object_type": "Reagent",
+               "name": "MBS (m-Maleimidobenzoyl-N-hydroxysuccinimide ester)",
+               "source": {
+                  "name": "Sigma-Aldrich",
+                  "abbreviation": null,
+                  "registry": null,
+                  "registry_identifier": null
+               },
+               "rrid": null,
+               "lot_number": null,
+               "expiration_date": null
+            },
+            {
+               "object_type": "Reagent",
+               "name": "Acryloyl-X (AcX)",
+               "source": {
+                  "name": "Invitrogen",
+                  "abbreviation": null,
+                  "registry": "Research Organization Registry (ROR)",
+                  "registry_identifier": "03x1ewr52"
+               },
+               "rrid": null,
+               "lot_number": null,
+               "expiration_date": null
+            },
+            {
+               "object_type": "Solution",
+               "name": "Stock X + VA-044",
+               "lot_number": null
+            },
+            {
+               "object_type": "Solution",
+               "name": "Proteinase K (ProK)",
+               "lot_number": null
+            },
+            {
+               "object_type": "Solution",
+               "name": "PBS",
+               "lot_number": null
+            }
+         ],
+         "notes": null
+      },
+      {
+         "object_type": "Specimen procedure",
+         "protocol_id": [
+            "dx.doi.org/10.17504/protocols.io.5jyl8e996l2w/v1"
+         ],
+         "procedure_type": "Expansion",
+         "procedure_name": "Expansion",
+         "specimen_id": "671477",
+         "start_date": "2024-01-05",
+         "end_date": "2024-01-08",
+         "experimenters": [
+            "Rajvi Javeri"
+         ],
+         "protocol_parameters": {
+            "ssc_duration": "2 days",
+            "ssc_start": "2024-01-05",
+            "ssc_end": "2024-01-07",
+            "ascorbic_acid_duration": "1 day",
+            "ascorbic_acid_start": "2024-01-07",
+            "ascorbic_acid_end": "2024-01-08"
+         },
+         "procedure_details": [
+            {
+               "object_type": "Solution",
+               "name": "Saline-Sodium Citrate (SSC)",
+               "lot_number": null
+            },
+            {
+               "object_type": "Solution",
+               "name": "Ascorbic Acid",
+               "lot_number": null
+            }
+         ],
+         "notes": null
+      },
+      {
+         "object_type": "Specimen procedure",
+         "protocol_id": [
+            "dx.doi.org/10.17504/protocols.io.5jyl8e996l2w/v1"
+         ],
+         "procedure_type": "Mounting",
+         "procedure_name": "Mounting and ExaSPIM Imaging",
+         "specimen_id": "671477",
+         "start_date": "2024-01-08",
+         "end_date": "2024-01-08",
+         "experimenters": [
+            "Rajvi Javeri"
+         ],
+         "protocol_parameters": null,
+         "procedure_details": [
+            {
+               "object_type": "Solution",
+               "name": "Imaging Buffer: 0.05X SSC",
+               "lot_number": null
+            }
+         ],
+         "notes": "Imaging notes: First wider light sheet brain"
+      }
+   ],
+   "coordinate_system": null,
+   "notes": "Overview protocol: dx.doi.org/10.17504/protocols.io.n92ldpwjxl5b/v2"
+}

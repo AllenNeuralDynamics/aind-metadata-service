@@ -3,7 +3,7 @@
 import logging
 from enum import Enum
 from typing import Any, List, Optional, Union
-
+from collections import defaultdict
 from aind_data_schema.components.injection_procedures import (
     Injection,
     ViralMaterial,
@@ -12,6 +12,7 @@ from aind_data_schema.components.subject_procedures import (
     Perfusion,
     WaterRestriction,
 )
+from aind_data_schema_models.specimen_procedure_types import SpecimenProcedureType
 from aind_data_schema.components.surgery_procedures import (
     BrainInjection,
     Craniotomy,
@@ -80,7 +81,7 @@ class ProtocolNames(Enum):
         "Tetrahydrofuran and Dichloromethane Delipidation of a"
         " Whole Mouse Brain"
     )
-    SBIP_DELIPADATION = "Aqueous (SBiP) Delipidation of a Whole Mouse Brain"
+    SBIP_DELIPIDATION = "Aqueous (SBiP) Delipidation of a Whole Mouse Brain"
     GELATIN_PREVIOUS = (
         "Whole Mouse Brain Delipidation, Immunolabeling,"
         " and Expansion Microscopy"
@@ -104,7 +105,12 @@ class ProtocolNames(Enum):
     DURAGEL_APPLICATION = (
         "Duragel application for acute electrophysiological recordings"
     )
-
+    GELATION_DIGESTION = "Whole Mouse Brain Gelation and Digestion"
+    EXPANSION_MOUNTING = "Expansion and Mounting of Hydrogel Embedded Brain"
+    DELIPIDATION_V2 = (
+        "Tetrahydrofuran and Dichloromethane Delipidation of a Whole Mouse Brain V.2"
+    )
+    SBIP_DELIPIDATION_V2 = "Aqueous (SBiP) Delipidation of a Whole Mouse Brain V.2"
 
 class ProceduresMapper:
     """Class to handle mapping of procedures data."""
@@ -302,87 +308,63 @@ class ProceduresMapper:
             surgeries.extend(procedures)
         return surgeries
 
-    @staticmethod
-    def _merge_duplicate_perfusions(
-        subject_procedures: List[Union[Surgery, WaterRestriction]]
-    ) -> List[Union[Surgery, WaterRestriction]]:
-        """
-        Merge duplicate Perfusion surgeries from different data sources.
+    # @staticmethod
+    # def _merge_duplicate_perfusions(
+    #     subject_procedures: List[Union[Surgery, WaterRestriction]]
+    # ) -> List[Union[Surgery, WaterRestriction]]:
+    #     """
+    #     Merge duplicate Perfusion surgeries from different data sources.
+    #     Parameters
+    #     ----------
+    #     subject_procedures : List[Union[Surgery, WaterRestriction]]
+    #         List of all subject procedures from all sources
         
-        When the same perfusion appears from multiple sources (e.g., LabTracks
-        and Smartsheet), prefer the more complete version if dates match.
+    #     Returns
+    #     -------
+    #     List[Union[Surgery, WaterRestriction]]
+    #         Deduplicated list with merged perfusions
+    #     """
+    #     perfusions_by_date = defaultdict(list)
+    #     other_procedures = []
         
-        Parameters
-        ----------
-        subject_procedures : List[Union[Surgery, WaterRestriction]]
-            List of all subject procedures from all sources
+    #     for proc in subject_procedures:
+    #         if isinstance(proc, Surgery):
+    #             is_perfusion = any(
+    #                 isinstance(p, Perfusion)
+    #                 for p in getattr(proc, "procedures", [])
+    #             )
+    #             if is_perfusion and proc.start_date:
+    #                 perfusions_by_date[proc.start_date].append(proc)
+    #             else:
+    #                 other_procedures.append(proc)
+    #         else:
+    #             other_procedures.append(proc)
         
-        Returns
-        -------
-        List[Union[Surgery, WaterRestriction]]
-            Deduplicated list with merged perfusions
-        """
-        from collections import defaultdict
-        
-        # Group perfusion surgeries by date
-        perfusions_by_date = defaultdict(list)
-        other_procedures = []
-        
-        for proc in subject_procedures:
-            if isinstance(proc, Surgery):
-                # Check if this is a Perfusion surgery
-                is_perfusion = any(
-                    isinstance(p, Perfusion)
-                    for p in getattr(proc, "procedures", [])
-                )
-                if is_perfusion and proc.start_date:
-                    perfusions_by_date[proc.start_date].append(proc)
-                else:
-                    # Not a perfusion, keep as-is
-                    other_procedures.append(proc)
-            else:
-                # Not a surgery (e.g., WaterRestriction), keep as-is
-                other_procedures.append(proc)
-        
-        # For each date, merge duplicate perfusions
-        merged_perfusions = []
-        for date, perfusions in perfusions_by_date.items():
-            if len(perfusions) == 1:
-                # No duplicates, keep as-is
-                merged_perfusions.append(perfusions[0])
-            else:
-                # Multiple perfusions on same date - keep the more complete one
-                # Prefer the one with more data (usually Smartsheet over LabTracks)
-                best_perfusion = max(
-                    perfusions,
-                    key=lambda s: (
-                        # Prefer if has protocol_id
-                        bool(getattr(s, "protocol_id", None)),
-                        # Prefer if has experimenters
-                        bool(getattr(s, "experimenters", None)),
-                        # Prefer if experimenters is not just a number
-                        not (
-                            getattr(s, "experimenters", None)
-                            and len(s.experimenters) == 1
-                            and s.experimenters[0].isdigit()
-                        ),
-                        # Prefer if has output_specimen_ids in Perfusion
-                        any(
-                            isinstance(p, Perfusion)
-                            and hasattr(p, "output_specimen_ids")
-                            and p.output_specimen_ids
-                            for p in getattr(s, "procedures", [])
-                        ),
-                    ),
-                )
-                merged_perfusions.append(best_perfusion)
+    #     merged_perfusions = []
+    #     for date, perfusions in perfusions_by_date.items():
+    #         if len(perfusions) == 1:
+    #             merged_perfusions.append(perfusions[0])
+    #         else: 
+    #             # Prefer the one with more data (usually Smartsheet over LabTracks)
+    #             best_perfusion = max(
+    #                 perfusions,
+    #                 key=lambda s: (
+    #                     any(
+    #                         isinstance(p, Perfusion)
+    #                         and hasattr(p, "output_specimen_ids")
+    #                         and p.output_specimen_ids
+    #                         for p in getattr(s, "procedures", [])
+    #                     ),
+    #                 ),
+    #             )
+    #             merged_perfusions.append(best_perfusion)
                 
-                logging.info(
-                    f"Merged {len(perfusions)} duplicate Perfusion surgeries "
-                    f"on {date}, keeping most complete version"
-                )
+    #             logging.info(
+    #                 f"Merged {len(perfusions)} duplicate Perfusion surgeries "
+    #                 f"on {date}, keeping most complete version"
+    #             )
         
-        return merged_perfusions + other_procedures
+    #     return merged_perfusions + other_procedures
 
     def map_responses_to_aind_procedures(
         self, subject_id: str
@@ -529,7 +511,7 @@ class ProceduresMapper:
             )
         
         # Merge duplicate perfusions from different sources
-        subject_procedures = self._merge_duplicate_perfusions(subject_procedures)
+        # subject_procedures = self._merge_duplicate_perfusions(subject_procedures)
 
         if not subject_procedures and not specimen_procedures:
             return None
@@ -562,10 +544,35 @@ class ProceduresMapper:
                 return ProtocolNames.DURAGEL_APPLICATION.value
         else:
             return None
+    
+    @staticmethod
+    def _get_specimen_procedure_protocol_names(specimen_procedure):
+        """Gets protocol names for specimen procedures based on procedure type"""
+        
+        procedure_type = getattr(specimen_procedure, "procedure_type", None)
+        
+        if procedure_type == SpecimenProcedureType.DELIPIDATION:
+            # Return both delipidation protocols
+            return [
+                ProtocolNames.DELIPIDATION_V2.value,
+                ProtocolNames.SBIP_DELIPIDATION_V2.value,
+            ]
+        elif procedure_type == SpecimenProcedureType.IMMUNOLABELING:
+            return [ProtocolNames.IMMUNOLABELING.value]
+        elif procedure_type == SpecimenProcedureType.GELATION:
+            return [ProtocolNames.GELATION_DIGESTION.value]
+        elif procedure_type == SpecimenProcedureType.EXPANSION:
+            return [ProtocolNames.EXPANSION_MOUNTING.value]
+        elif procedure_type == SpecimenProcedureType.MOUNTING:
+            return [ProtocolNames.EXPANSION_MOUNTING.value]
+        else:
+            return []
 
     def get_protocols_list(self, procedures: Procedures) -> list:
         """Creates a list of protocol names from procedures list"""
         protocol_list = []
+        
+        # Get protocols for subject procedures
         for subject_procedure in procedures.subject_procedures:
             if isinstance(subject_procedure, Surgery):
                 protocol_list.append(ProtocolNames.SURGERY.value)
@@ -575,6 +582,16 @@ class ProceduresMapper:
                 protocol_name = self._get_protocol_name(procedure)
                 if protocol_name:
                     protocol_list.append(protocol_name)
+        
+        # Get protocols for specimen procedures
+        for specimen_procedure in procedures.specimen_procedures:
+            protocol_names = self._get_specimen_procedure_protocol_names(specimen_procedure)
+            protocol_list.extend(protocol_names)
+        
+        # Add overview protocol if specimen procedures exist
+        if procedures.specimen_procedures:
+            protocol_list.append(ProtocolNames.GELATIN_PREVIOUS.value)
+        
         return protocol_list
 
     def integrate_protocols_into_aind_procedures(
@@ -584,6 +601,7 @@ class ProceduresMapper:
         Merges protocols responses with procedures response.
         protocols_mapping: dict of protocol_name -> ProtocolsModel
         """
+        # Handle subject procedures
         for subject_procedure in procedures.subject_procedures:
             if (
                 isinstance(subject_procedure, Surgery)
@@ -602,6 +620,28 @@ class ProceduresMapper:
                 protocol_model = protocols_mapping.get(protocol_name)
                 if protocol_model and getattr(protocol_model, "doi", None):
                     procedure.protocol_id = protocol_model.doi
+        
+        # Handle specimen procedures
+        for specimen_procedure in procedures.specimen_procedures:
+            protocol_names = self._get_specimen_procedure_protocol_names(specimen_procedure)
+            protocol_ids = []
+            for protocol_name in protocol_names:
+                protocol_model = protocols_mapping.get(protocol_name)
+                if protocol_model and getattr(protocol_model, "doi", None):
+                    protocol_ids.append(protocol_model.doi)
+            if protocol_ids:
+                specimen_procedure.protocol_id = protocol_ids
+        
+        # Add overview protocol notes if specimen procedures exist
+        if procedures.specimen_procedures:
+            overview_protocol = protocols_mapping.get(ProtocolNames.GELATIN_PREVIOUS.value)
+            if overview_protocol and getattr(overview_protocol, "doi", None):
+                overview_note = f"Overview protocol: {overview_protocol.doi}"
+                if procedures.notes:
+                    procedures.notes = f"{procedures.notes}; {overview_note}"
+                else:
+                    procedures.notes = overview_note
+        
         return procedures
 
     @staticmethod

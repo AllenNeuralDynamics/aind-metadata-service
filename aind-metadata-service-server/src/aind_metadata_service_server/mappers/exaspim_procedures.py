@@ -13,12 +13,15 @@ from aind_data_schema.components.reagent import (
     ProbeReagent,
     ProteinProbe,
     Reagent,
+    Solution,
 )
 from aind_data_schema.core.procedures import Procedures
 from aind_data_schema.components.specimen_procedures import SpecimenProcedure
 from aind_data_schema.components.subject_procedures import Surgery
 from aind_data_schema_models.organizations import Organization
 from aind_data_schema_models.pid_names import PIDName
+from aind_data_schema_models.species import Species
+from aind_data_schema_models.registries import Registry
 from aind_data_schema_models.specimen_procedure_types import (
     SpecimenProcedureType,
 )
@@ -31,6 +34,66 @@ from aind_smartsheet_service_async_client.models import (
     QcSheet,
 
 )
+import re
+
+
+# Antibody → Organization lookup
+_ANTIBODY_SOURCE_MAP: Dict[str, Organization] = {
+    "gfp": Organization.ABCAM,
+    "donkey anti-rabbit igg (h+l) af 488": Organization.INVITROGEN,
+    "donkey anti-rabbitt igg (h+l) af 488": Organization.INVITROGEN,
+    "tdtomato": Organization.SICGEN,
+    "donkey anti-goat igg (h+l) af 568": Organization.INVITROGEN,
+    "donkey anti-chicken igy (h+l) af 488": Organization.JAX, # TODO: confirm this, "Jackson Immuno Reserach" doesnt exist in aind-data-schema
+}
+
+_PRIMARY_ANTIBODY_TARGET_CANONICAL_MAP: Dict[str, str] = {
+    "gfp": "GFP",
+    "tdt": "tdTomato",
+    "tdtomato": "tdTomato",
+    "mtfp": "mTFP",
+}
+
+_PROTEIN_FULL_NAME_MAP: Dict[str, str] = {
+    "GFP": "Green Fluorescent Protein",
+    "tdTomato": "tdTomato",
+    "mTFP": "monomeric Teal Fluorescent Protein 1",
+}
+
+_ANTIBODY_HOST_CANONICAL_MAP: Dict[str, str] = {
+    "rabbit": "Rabbit",
+    "mouse": "Mouse",
+    "rat": "Rat",
+    "goat": "Goat",
+    "chicken": "Chicken",
+    "donkey": "Donkey",
+}
+
+_ANTIBODY_SPECIES_MAP: Dict[str, Species.ONE_OF] = {
+    "rabbit": Species.EUROPEAN_RABBIT,
+    "mouse": Species.HOUSE_MOUSE,
+    "rat": Species.NORWAY_RAT,
+    "goat": Species.GOAT,
+    "chicken": Species.CHICKEN,
+    "donkey": Species.DONKEY,
+}
+
+_CATALOG_TO_RRID: Dict[str, str] = {
+    # Primary antibody catalogs
+    "ab290": "AB_303395",
+    "ab8181-200": "AB_2722750",
+    "a-21311": "AB_221477",
+    "155264": "AB_3661847",
+    "gr361051-16": "AB_300798",
+    # Secondary antibody catalogs
+    "a21206": "AB_2535792",
+    "a-21206": "AB_2535792",
+    "a-11057": "AB_2534104",
+    "a11057": "AB_2534104",
+    "a-21247": "AB_141778",
+    "703-545-155": "AB_2340375",
+    "165794": "AB_2340375",
+}
 
 
 class ExaspimProceduresMapper:
@@ -98,6 +161,32 @@ class ExaspimProceduresMapper:
         return None
 
     @staticmethod
+    def _is_numeric(value: Any) -> bool:
+        """
+        Check if a value can be converted to a number.
+
+        Parameters
+        ----------
+        value : Any
+            The value to check
+
+        Returns
+        -------
+        bool
+            True if value is numeric or can be converted to float
+        """
+        if value is None:
+            return False
+        if isinstance(value, (int, float)):
+            return True
+        str_value = str(value).strip().lower()
+        try:
+            float(str_value)
+            return True
+        except (ValueError, TypeError):
+            return False
+
+    @staticmethod
     def _parse_experimenters(sample_tracking_row: SampleTracking) -> List[str]:
         """
         Parse the processing_lead field into a list of experimenter names.
@@ -132,6 +221,76 @@ class ExaspimProceduresMapper:
             if name:
                 experimenters.append(name)
         return experimenters
+    
+    @staticmethod
+    def _resolve_antibody_species(antibody_name: str) -> Optional[Species.ONE_OF]:
+        """Resolve the host Species of an antibody from its name."""
+        cleaned = antibody_name.strip()
+        if not cleaned:
+            return None
+        first_token = cleaned.split()[0].lower()
+        return _ANTIBODY_SPECIES_MAP.get(first_token)
+    
+    @staticmethod
+    def _resolve_antibody_source(antibody_name: str) -> Organization:
+        """Resolve an antibody name to its source Organization."""
+        return _ANTIBODY_SOURCE_MAP.get(antibody_name.strip().lower(), Organization.OTHER)
+    
+    @staticmethod
+    def _resolve_rrid(catalog: str, antibody_name: str) -> Optional[PIDName]:
+        """Resolve a catalog number to a PIDName carrying the corresponding RRID."""
+        if not catalog:
+            return None
+        rrid = _CATALOG_TO_RRID.get(catalog.strip().lower())
+        if not rrid:
+            return None
+        return PIDName(
+            name=antibody_name,
+            registry=Registry.RRID,
+            registry_identifier=rrid,
+        )
+    
+    @staticmethod
+    def _resolve_primary_antibody_target(antibody_name: str) -> str:
+        """Resolve the protein target for a primary antibody name."""
+        cleaned_name = antibody_name.strip()
+        if not cleaned_name:
+            return cleaned_name
+        
+        anti_match = re.search(
+            r"anti[-\s]*([A-Za-z0-9]+)", cleaned_name, flags=re.IGNORECASE
+        )
+        target_token = anti_match.group(1) if anti_match else cleaned_name
+        
+        canonical = _PRIMARY_ANTIBODY_TARGET_CANONICAL_MAP.get(
+            target_token.lower(), target_token
+        )
+        return _PROTEIN_FULL_NAME_MAP.get(canonical, canonical)
+    
+    @staticmethod
+    def _resolve_secondary_antibody_target(
+        secondary_antibody_name: str,
+        primary_antibody_name: str,
+    ) -> str:
+        """Resolve the protein target for a secondary antibody."""
+        primary_name = primary_antibody_name.strip()
+        secondary_name = secondary_antibody_name.strip()
+        
+        for host_key, host_name in _ANTIBODY_HOST_CANONICAL_MAP.items():
+            if re.search(rf"\\b{re.escape(host_key)}\\b", primary_name, flags=re.IGNORECASE):
+                return f"{host_name} antibody"
+        
+        anti_match = re.search(
+            r"anti[-\s]*([A-Za-z0-9]+)",
+            secondary_name,
+            flags=re.IGNORECASE,
+        )
+        if anti_match:
+            secondary_token = anti_match.group(1).lower()
+            if secondary_token in _ANTIBODY_HOST_CANONICAL_MAP:
+                return f"{_ANTIBODY_HOST_CANONICAL_MAP[secondary_token]} antibody"
+        
+        return secondary_name
 
     def build_injection_surgery(
         self, mouse_tracker_row: MouseTracker
@@ -194,14 +353,14 @@ class ExaspimProceduresMapper:
                     "virus_tars_id": virus_id,
                     "prep_lot_number": virus_id,
                 }
-            if titer_raw is not None:
+            if self._is_numeric(titer_raw):
                 vm_kwargs["titer"] = int(float(str(titer_raw)))
 
             viral_material = ViralMaterial(**vm_kwargs)
 
             # Build injection dynamics
             dynamics_list: List[InjectionDynamics] = []
-            if volume_raw:
+            if self._is_numeric(volume_raw):
                 vol = float(str(volume_raw))
                 if vol > 0:
                     dynamics_list.append(
@@ -211,7 +370,7 @@ class ExaspimProceduresMapper:
                             volume_unit=VolumeUnit.NL,
                         )
                     )
-            elif ro_volume_raw:
+            elif self._is_numeric(ro_volume_raw):
                 # RO volume is in µL — convert to nL
                 vol_ul = float(str(ro_volume_raw))
                 if vol_ul > 0:
@@ -281,13 +440,11 @@ class ExaspimProceduresMapper:
             return None
 
         reagents = [
-            Reagent(
+            Solution(
                 name="Dichloromethane (DCM)",
-                source=Organization.OTHER,
             ),
-            Reagent(
+            Solution(
                 name="SBiP (Sodium dodecylsulfate, Butanol, isoPropanol)",
-                source=Organization.OTHER,
             ),
         ]
 
@@ -355,11 +512,13 @@ class ExaspimProceduresMapper:
             mass = float(str(mass_raw)) if mass_raw is not None else 0.0
 
             reagent = ProbeReagent(
-                name=f"Primary Antibody: {ab_name}",
-                source=Organization.OTHER,
-                lot_number=lot,
+                name=ab_name,
+                source=self._resolve_antibody_source(ab_name),
+                lot_number=lot if lot else None,
+                rrid=self._resolve_rrid(catalog, ab_name) if catalog else None,
                 target=ProteinProbe(
-                    protein=PIDName(name=ab_name),
+                    protein=PIDName(name=self._resolve_primary_antibody_target(ab_name)),
+                    species=self._resolve_antibody_species(ab_name),
                     mass=mass,
                 ),
             )
@@ -368,9 +527,14 @@ class ExaspimProceduresMapper:
         # Build secondary antibody reagents (up to 3)
         for i in range(1, 4):
             ab_name = getattr(sample_tracking_row, f"immuno_secondary_antibody{i}")
+            primary_ab_name = getattr(sample_tracking_row, f"immuno_primary_antibody{i}")
             if not ab_name:
                 continue
             ab_name = ab_name.strip()
+            if primary_ab_name:
+                primary_ab_name = primary_ab_name.strip()
+            else:
+                primary_ab_name = ""
 
             catalog = getattr(sample_tracking_row, f"secondary_antibody{i}_catalog_num")
             if catalog:
@@ -385,11 +549,15 @@ class ExaspimProceduresMapper:
             mass = float(str(mass_raw)) if mass_raw is not None else 0.0
 
             reagent = ProbeReagent(
-                name=f"Secondary Antibody: {ab_name}",
-                source=Organization.OTHER,
-                lot_number=lot,
+                name=ab_name,
+                source=self._resolve_antibody_source(ab_name),
+                lot_number=lot if lot else None,
+                rrid=self._resolve_rrid(catalog, ab_name) if catalog else None,
                 target=ProteinProbe(
-                    protein=PIDName(name=ab_name),
+                    protein=PIDName(
+                        name=self._resolve_secondary_antibody_target(ab_name, primary_ab_name)
+                    ),
+                    species=self._resolve_antibody_species(ab_name),
                     mass=mass,
                 ),
             )
@@ -463,19 +631,20 @@ class ExaspimProceduresMapper:
         reagents = [
             Reagent(
                 name="MBS (m-Maleimidobenzoyl-N-hydroxysuccinimide ester)",
-                source=Organization.OTHER,
+                source=Organization.SIGMA_ALDRICH,
             ),
             Reagent(
-                name="Acryloyl-X (AcX)", source=Organization.OTHER
+                name="Acryloyl-X (AcX)",
+                source=Organization.INVITROGEN,
             ),
-            Reagent(
-                name="Stock X + VA-044", source=Organization.OTHER
+            Solution(
+                name="Stock X + VA-044",
             ),
-            Reagent(
-                name="Proteinase K (ProK)", source=Organization.OTHER
+            Solution(
+                name="Proteinase K (ProK)",
             ),
-            Reagent(
-                name="PBS", source=Organization.OTHER
+            Solution(
+                name="PBS",
             ),
         ]
 
@@ -573,13 +742,11 @@ class ExaspimProceduresMapper:
         end_date = imaging_start_date
         
         reagents = [
-            Reagent(
+            Solution(
                 name="Saline-Sodium Citrate (SSC)",
-                source=Organization.OTHER,
             ),
-            Reagent(
+            Solution(
                 name="Ascorbic Acid",
-                source=Organization.OTHER,
             ),
         ]
         
@@ -645,12 +812,11 @@ class ExaspimProceduresMapper:
         if notes_col:
             notes_col = notes_col.strip()
 
-        reagents: List[Reagent] = []
+        reagents: List[Union[Reagent, Solution]] = []
         if imaging_buffer:
             reagents.append(
-                Reagent(
+                Solution(
                     name=f"Imaging Buffer: {imaging_buffer}",
-                    source=Organization.OTHER,
                 )
             )
 
