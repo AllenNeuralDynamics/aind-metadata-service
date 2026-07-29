@@ -308,64 +308,6 @@ class ProceduresMapper:
             surgeries.extend(procedures)
         return surgeries
 
-    # @staticmethod
-    # def _merge_duplicate_perfusions(
-    #     subject_procedures: List[Union[Surgery, WaterRestriction]]
-    # ) -> List[Union[Surgery, WaterRestriction]]:
-    #     """
-    #     Merge duplicate Perfusion surgeries from different data sources.
-    #     Parameters
-    #     ----------
-    #     subject_procedures : List[Union[Surgery, WaterRestriction]]
-    #         List of all subject procedures from all sources
-        
-    #     Returns
-    #     -------
-    #     List[Union[Surgery, WaterRestriction]]
-    #         Deduplicated list with merged perfusions
-    #     """
-    #     perfusions_by_date = defaultdict(list)
-    #     other_procedures = []
-        
-    #     for proc in subject_procedures:
-    #         if isinstance(proc, Surgery):
-    #             is_perfusion = any(
-    #                 isinstance(p, Perfusion)
-    #                 for p in getattr(proc, "procedures", [])
-    #             )
-    #             if is_perfusion and proc.start_date:
-    #                 perfusions_by_date[proc.start_date].append(proc)
-    #             else:
-    #                 other_procedures.append(proc)
-    #         else:
-    #             other_procedures.append(proc)
-        
-    #     merged_perfusions = []
-    #     for date, perfusions in perfusions_by_date.items():
-    #         if len(perfusions) == 1:
-    #             merged_perfusions.append(perfusions[0])
-    #         else: 
-    #             # Prefer the one with more data (usually Smartsheet over LabTracks)
-    #             best_perfusion = max(
-    #                 perfusions,
-    #                 key=lambda s: (
-    #                     any(
-    #                         isinstance(p, Perfusion)
-    #                         and hasattr(p, "output_specimen_ids")
-    #                         and p.output_specimen_ids
-    #                         for p in getattr(s, "procedures", [])
-    #                     ),
-    #                 ),
-    #             )
-    #             merged_perfusions.append(best_perfusion)
-                
-    #             logging.info(
-    #                 f"Merged {len(perfusions)} duplicate Perfusion surgeries "
-    #                 f"on {date}, keeping most complete version"
-    #             )
-        
-    #     return merged_perfusions + other_procedures
-
     def map_responses_to_aind_procedures(
         self, subject_id: str
     ) -> Union[Procedures, None]:
@@ -486,18 +428,7 @@ class ProceduresMapper:
 
         if self.smartsheet_exaspim:
             exaspim_mapper = ExaspimProceduresMapper(
-                mouse_tracker_info=getattr(
-                    self.smartsheet_exaspim, "mouse_tracker_info", []
-                ),
-                sample_tracking_info=getattr(
-                    self.smartsheet_exaspim, "sample_tracking_info", []
-                ),
-                imaging_queue_info=getattr(
-                    self.smartsheet_exaspim, "imaging_queue_info", []
-                ),
-                qc_sheet_info=getattr(
-                    self.smartsheet_exaspim, "qc_sheet_info", []
-                ),
+                exaspim_info=self.smartsheet_exaspim[0]
             )
             exaspim_subject_procedures, exaspim_specimen_procedures = (
                 exaspim_mapper.map_to_exaspim_procedures(subject_id)

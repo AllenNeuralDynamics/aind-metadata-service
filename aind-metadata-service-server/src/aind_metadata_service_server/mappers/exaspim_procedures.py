@@ -32,6 +32,7 @@ from aind_smartsheet_service_async_client.models import (
     SampleTracking,
     ImagingQueue,
     QcSheet,
+    ExaSPIMInfo,
 
 )
 import re
@@ -40,31 +41,33 @@ import re
 class ExaspimProceduresMapper:
     """Class to handle mapping of ExaSPIM procedures data."""
 
+    # Regex patterns
+    EXPERIMENTER_SPLIT_REGEX = re.compile(r"[;,]")
+    ANTIBODY_ANTI_PATTERN_REGEX = re.compile(r"anti[-\s]*([A-Za-z0-9]+)", re.IGNORECASE)
+
     def __init__(
         self,
-        mouse_tracker_info: List[MouseTracker] = None,
-        sample_tracking_info: List[SampleTracking] = None,
-        imaging_queue_info: List[ImagingQueue] = None,
-        qc_sheet_info: List[QcSheet] = None,
+        exaspim_info: Optional[ExaSPIMInfo] = None,
     ):
         """
         Class constructor.
 
         Parameters
         ----------
-        mouse_tracker_info : List[MouseTracker]
-            Mouse tracker data from Smartsheet
-        sample_tracking_info : List[SampleTracking]
-            Sample tracking data from Smartsheet
-        imaging_queue_info : List[ImagingQueue]
-            Imaging queue data from Smartsheet
-        qc_sheet_info : List[QcSheet]
-            QC sheet data from Smartsheet
+        exaspim_info : Optional[ExaSPIMInfo]
+            ExaSPIM info object from Smartsheet containing mouse_tracker_info,
+            sample_tracking_info, imaging_queue_info, and qc_sheet_info
         """
-        self.mouse_tracker_info = mouse_tracker_info or []
-        self.sample_tracking_info = sample_tracking_info or []
-        self.imaging_queue_info = imaging_queue_info or []
-        self.qc_sheet_info = qc_sheet_info or []
+        if exaspim_info is None:
+            self.mouse_tracker_info = []
+            self.sample_tracking_info = []
+            self.imaging_queue_info = []
+            self.qc_sheet_info = []
+        else:
+            self.mouse_tracker_info = getattr(exaspim_info, "mouse_tracker_info", [])
+            self.sample_tracking_info = getattr(exaspim_info, "sample_tracking_info", [])
+            self.imaging_queue_info = getattr(exaspim_info, "imaging_queue_info", [])
+            self.qc_sheet_info = getattr(exaspim_info, "qc_sheet_info", [])
 
     @staticmethod
     def _parse_date(raw: Any) -> Optional[date]:
@@ -88,6 +91,10 @@ class ExaspimProceduresMapper:
         text = str(raw).strip()
         if not text:
             return None
+        # Remove 'Z' suffix if present (UTC indicator)
+        if text.endswith('Z'):
+            text = text[:-1]
+        
         for fmt in (
             "%m/%d/%y",
             "%m/%d/%Y",
@@ -144,8 +151,6 @@ class ExaspimProceduresMapper:
         List[str]
             List of experimenter name strings (may be empty)
         """
-        import re
-        
         raw = sample_tracking_row.processing_lead
         if not raw:
             return []
@@ -155,7 +160,7 @@ class ExaspimProceduresMapper:
             return []
         
         # Split on comma or semicolon
-        names = re.split(r"[;,]", raw)
+        names = ExaspimProceduresMapper.EXPERIMENTER_SPLIT_REGEX.split(raw)
         experimenters: List[str] = []
         for name in names:
             name = name.strip()
@@ -188,6 +193,7 @@ class ExaspimProceduresMapper:
             "donkey anti-rabbit igg (h+l) af 488": Organization.INVITROGEN,
             "donkey anti-rabbitt igg (h+l) af 488": Organization.INVITROGEN,
             "tdtomato": Organization.SICGEN,
+            "goat anti-tdt": Organization.SICGEN,
             "donkey anti-goat igg (h+l) af 568": Organization.INVITROGEN,
         }
         return antibody_source_map.get(antibody_name.strip().lower(), Organization.OTHER)
@@ -229,6 +235,7 @@ class ExaspimProceduresMapper:
             "gfp": "GFP",
             "tdt": "tdTomato",
             "tdtomato": "tdTomato",
+            "tdtomat": "tdTomato",  # Handles "tdT" variations
             "mtfp": "mTFP",
         }
         protein_full_name_map = {
@@ -240,9 +247,7 @@ class ExaspimProceduresMapper:
         if not cleaned_name:
             return cleaned_name
         
-        anti_match = re.search(
-            r"anti[-\s]*([A-Za-z0-9]+)", cleaned_name, flags=re.IGNORECASE
-        )
+        anti_match = ExaspimProceduresMapper.ANTIBODY_ANTI_PATTERN_REGEX.search(cleaned_name)
         target_token = anti_match.group(1) if anti_match else cleaned_name
         
         canonical = target_canonical_map.get(target_token.lower(), target_token)
@@ -266,14 +271,10 @@ class ExaspimProceduresMapper:
         secondary_name = secondary_antibody_name.strip()
         
         for host_key, host_name in antibody_host_canonical_map.items():
-            if re.search(rf"\\b{re.escape(host_key)}\\b", primary_name, flags=re.IGNORECASE):
+            if re.search(rf"\b{re.escape(host_key)}\b", primary_name, flags=re.IGNORECASE):
                 return f"{host_name} antibody"
         
-        anti_match = re.search(
-            r"anti[-\s]*([A-Za-z0-9]+)",
-            secondary_name,
-            flags=re.IGNORECASE,
-        )
+        anti_match = ExaspimProceduresMapper.ANTIBODY_ANTI_PATTERN_REGEX.search(secondary_name)
         if anti_match:
             secondary_token = anti_match.group(1).lower()
             if secondary_token in antibody_host_canonical_map:
@@ -281,63 +282,44 @@ class ExaspimProceduresMapper:
         
         return secondary_name
 
-        
-        return secondary_name
-
     def _get_titer_for_virus(
         self,
         mouse_tracker_row: MouseTracker,
-        prefix: str,
-        volume_raw: Any,
-        ro_volume_raw: Any,
+        virus_num: int,
     ) -> Optional[Any]:
         """
-        Get viral titer using priority system with dose-based calculation fallback.
-        Priority: effective > working > calculated > stock
-
+        Get viral titer using priority system (effective > working > stock).
         Parameters
         ----------
         mouse_tracker_row : MouseTracker
             Row from Mouse Tracker sheet
-        prefix : str
-            Virus prefix (e.g., "virus1")
-        volume_raw : Any
-            Stereotaxic volume in nL (if available)
-        ro_volume_raw : Any
-            Retro-orbital volume in µL (if available)
+        virus_num : int
+            Virus number (1-4)
 
         Returns
         -------
         Optional[Any]
             Titer value or None if unavailable
         """
-        titer_raw = getattr(mouse_tracker_row, f"{prefix}_effective_titer_gc_ml", None)
-        if titer_raw and str(titer_raw).strip():
+        prefix = f"virus{virus_num}"
+        
+        # Effective titer (not available for virus1)
+        if virus_num > 1:
+            titer_raw = getattr(mouse_tracker_row, f"{prefix}_effective_titer_gc_ml", None)
+            if titer_raw is not None and str(titer_raw).strip():
+                return titer_raw
+        
+        # Working titer (virus1 has unprefixed field name)
+        if virus_num == 1:
+            titer_raw = getattr(mouse_tracker_row, "working_titer_gc_ml", None)
+        else:
+            titer_raw = getattr(mouse_tracker_row, f"{prefix}_working_titer_gc_ml", None)
+        if titer_raw is not None and str(titer_raw).strip():
             return titer_raw
         
-        titer_raw = getattr(mouse_tracker_row, f"{prefix}_working_titer_gc_ml", None)
-        if titer_raw and str(titer_raw).strip():
-            return titer_raw
-        
-        dose_gc = getattr(mouse_tracker_row, f"{prefix}_dose_gc", None)
-        if self._is_numeric(dose_gc):
-            dose_val = float(str(dose_gc))
-            volume_ml = None
-            
-            # Convert volume to mL for calculation
-            if self._is_numeric(volume_raw):
-                # Stereotaxic volume in nL
-                volume_ml = float(str(volume_raw)) / 1_000_000
-            elif self._is_numeric(ro_volume_raw):
-                # RO volume in µL
-                volume_ml = float(str(ro_volume_raw)) / 1_000
-            
-            # Calculate titer = dose / volume
-            if volume_ml and volume_ml > 0:
-                return dose_val / volume_ml
-        
+        # Stock titer (all viruses use prefixed field)
         titer_raw = getattr(mouse_tracker_row, f"{prefix}_stock_titer_gc_ml", None)
-        if titer_raw and str(titer_raw).strip():
+        if titer_raw is not None and str(titer_raw).strip():
             return titer_raw
         
         return None
@@ -394,9 +376,9 @@ class ExaspimProceduresMapper:
             else:
                 ro_volume_raw = None
 
-            # Get titer using priority system (effective > working > calculated > stock)
+            # Get titer using priority system (effective > working > stock)
             titer_raw = self._get_titer_for_virus(
-                mouse_tracker_row, prefix, volume_raw, ro_volume_raw
+                mouse_tracker_row, virus_num
             )
 
             # Build injection material
@@ -553,12 +535,10 @@ class ExaspimProceduresMapper:
             ab_name = ab_name.strip()
 
             catalog = getattr(sample_tracking_row, f"primary_antibody{i}_catalog_num")
-            if catalog:
-                catalog = catalog.strip()
+            catalog = catalog.strip() if catalog else None
             
             lot = getattr(sample_tracking_row, f"primary_antibody{i}_lot_num")
-            if lot:
-                lot = lot.strip()
+            lot = lot.strip() if lot else None
             mass_raw = getattr(
                 sample_tracking_row, f"mass_of_primary_antibody{i}_used_per_brain_ug"
             )
@@ -592,12 +572,10 @@ class ExaspimProceduresMapper:
                 primary_ab_name = ""
 
             catalog = getattr(sample_tracking_row, f"secondary_antibody{i}_catalog_num")
-            if catalog:
-                catalog = catalog.strip()
+            catalog = catalog.strip() if catalog else None
             
             lot = getattr(sample_tracking_row, f"secondary_antibody{i}_lot_num")
-            if lot:
-                lot = lot.strip()
+            lot = lot.strip() if lot else None
             mass_raw = getattr(
                 sample_tracking_row, f"mass_of_secondary_antibody{i}_used_per_brain_ug"
             )
@@ -621,12 +599,8 @@ class ExaspimProceduresMapper:
             reagents.append(reagent)
 
         # Build notes about RRID if available
-        primary_rrid = sample_tracking_row.primary_antibody_rrid
-        if primary_rrid:
-            primary_rrid = primary_rrid.strip()
-        secondary_rrid = sample_tracking_row.secondary_antibody_rrid
-        if secondary_rrid:
-            secondary_rrid = secondary_rrid.strip()
+        primary_rrid = sample_tracking_row.primary_antibody_rrid.strip() if sample_tracking_row.primary_antibody_rrid else None
+        secondary_rrid = sample_tracking_row.secondary_antibody_rrid.strip() if sample_tracking_row.secondary_antibody_rrid else None
         
         rrid_notes = []
         if primary_rrid:
@@ -780,14 +754,9 @@ class ExaspimProceduresMapper:
         Optional[SpecimenProcedure]
             The expansion procedure or None if not applicable
         """
-        from datetime import timedelta
-        
         # Check if expansion has occurred (status must be "Imaged")
         status = sample_tracking_row.status
-        if not status:
-            return None
-        status = status.strip().lower()
-        if status != "imaged":
+        if not status or status.strip().lower() != "imaged":
             return None
         
         # Need imaging start date to calculate expansion dates
@@ -856,18 +825,10 @@ class ExaspimProceduresMapper:
             imaging_queue_row.imaging_end_date
         ) or start_date
 
-        microscope = imaging_queue_row.microscope
-        if microscope:
-            microscope = microscope.strip()
-        imaging_buffer = imaging_queue_row.imaging_buffer
-        if imaging_buffer:
-            imaging_buffer = imaging_buffer.strip()
-        channels = imaging_queue_row.signal_channel_s
-        if channels:
-            channels = channels.strip()
-        notes_col = imaging_queue_row.notes
-        if notes_col:
-            notes_col = notes_col.strip()
+        microscope = imaging_queue_row.microscope.strip() if imaging_queue_row.microscope else None
+        imaging_buffer = imaging_queue_row.imaging_buffer.strip() if imaging_queue_row.imaging_buffer else None
+        channels = imaging_queue_row.signal_channel_s.strip() if imaging_queue_row.signal_channel_s else None
+        notes_col = imaging_queue_row.notes.strip() if imaging_queue_row.notes else None
 
         reagents: List[Union[Reagent, Solution]] = []
         if imaging_buffer:

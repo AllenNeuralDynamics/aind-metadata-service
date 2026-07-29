@@ -12,6 +12,7 @@ from aind_tars_service_async_client import (
     ViralPrep,
     VirusData,
 )
+from aind_smartsheet_service_async_client.models import ExaSPIMInfo
 from fastapi.testclient import TestClient
 from pytest_mock import MockFixture
 from starlette.responses import JSONResponse
@@ -67,6 +68,42 @@ def mock_tars_prep_lot_230929():
 def mock_tars_virus_v123():
     """Fixture for TARS virus v_123."""
     return VirusData(aliases=[Alias(is_preferred=True, name="v_123")])
+
+
+@pytest.fixture()
+def mock_smartsheet_exaspim_info():
+    """Fixture for Smartsheet ExaSPIM info."""
+    exaspim_data = {
+        "mouse_tracker_info": [
+            {
+                "num": 1,
+                "sample_name": "Test Sample",
+                "virus_mix_total_volume_injected_ro_ul": "100",
+                "virus1_injection_date": "2023-03-31",
+                "virus1": "Test Virus",
+                "virus1_id": "V123",
+                "virus1_stock_titer_gc_ml": "1.35E+14",
+            }
+        ],
+        "sample_tracking_info": [
+            {
+                "sample": "822178",
+                "processing_lead": "Test Experimenter",
+                "status": "Imaged",
+                "dcm_delipidation_start": "2023-07-20",
+                "sbip_delipidation_end": "2023-08-14",
+            }
+        ],
+        "imaging_queue_info": [
+            {
+                "sample": "822178",
+                "imaging_start_date": "2024-01-08",
+                "microscope": "ExaSPIM",
+            }
+        ],
+        "qc_sheet_info": [],
+    }
+    return ExaSPIMInfo.model_validate(exaspim_data)
 
 
 @contextmanager

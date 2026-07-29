@@ -41,7 +41,10 @@ from aind_slims_service_async_client.models.slims_histology_data import (
     HistologyWashData,
     SlimsHistologyData,
 )
-from aind_smartsheet_service_async_client.models import PerfusionsModel
+from aind_smartsheet_service_async_client.models import (
+    PerfusionsModel,
+    ExaSPIMInfo,
+)
 
 from aind_metadata_service_server.mappers.procedures import (
     ProceduresMapper,
@@ -223,6 +226,37 @@ class TestProceduresMapper(unittest.TestCase):
         }
         cls.nsb_2023 = [NSB2023List.model_validate(nsb2023_data)]
 
+        # ExaSPIM data
+        exaspim_data = {
+            "mouse_tracker_info": [
+                {
+                    "num": 1,
+                    "virus_mix_total_volume_injected_ro_ul": "100",
+                    "virus1_injection_date": "2023-03-31",
+                    "virus1": "Test Virus AAV",
+                    "virus1_id": "VT123",
+                    "virus1_stock_titer_gc_ml": "1.0E+12",
+                }
+            ],
+            "sample_tracking_info": [
+                {
+                    "sample": "115977",
+                    "processing_lead": "Test Person",
+                    "status": "Imaged",
+                    "dcm_delipidation_start": "2023-07-20",
+                    "sbip_delipidation_end": "2023-08-14",
+                }
+            ],
+            "imaging_queue_info": [
+                {
+                    "sample": "115977",
+                    "imaging_start_date": "2024-01-08",
+                }
+            ],
+            "qc_sheet_info": [],
+        }
+        cls.smartsheet_exaspim = [ExaSPIMInfo.model_validate(exaspim_data)]
+
     def test_map_labtracks_unknown_task_to_none(self):
         """Test mapping LabTracksTask to None"""
         task = deepcopy(self.labtracks_tasks[0])
@@ -284,14 +318,17 @@ class TestProceduresMapper(unittest.TestCase):
             smartsheet_perfusion=self.perfusions_sheet,
             nsb_2023=self.nsb_2023,
             nsb_present=self.nsb_2023,
+            smartsheet_exaspim=self.smartsheet_exaspim,
         )
         with suppress_pydantic_serialization_warnings():
             procedures = mapper.map_responses_to_aind_procedures("115977")
 
             self.assertIsInstance(procedures, Procedures)
             self.assertEqual(procedures.subject_id, "115977")
-            self.assertEqual(len(procedures.subject_procedures), 9)
-            self.assertEqual(len(procedures.specimen_procedures), 0)
+            # 9 from previous sources + 1 from ExaSPIM = 10
+            self.assertEqual(len(procedures.subject_procedures), 10)
+            # 0 from slims_histology + 3 from ExaSPIM (delipidation, expansion, mounting) = 3
+            self.assertEqual(len(procedures.specimen_procedures), 3)
 
     def test_map_responses_no_data(self):
         """Test mapping when no data sources have content"""
@@ -303,6 +340,32 @@ class TestProceduresMapper(unittest.TestCase):
 
         procedures = mapper.map_responses_to_aind_procedures("0")
         self.assertIsNone(procedures)
+
+    def test_map_responses_with_exaspim(self):
+        """Test mapping with ExaSPIM data"""
+        mapper = ProceduresMapper(
+            smartsheet_exaspim=self.smartsheet_exaspim,
+        )
+        procedures = mapper.map_responses_to_aind_procedures("115977")
+        
+        self.assertIsInstance(procedures, Procedures)
+        self.assertEqual(procedures.subject_id, "115977")
+        # Should have 1 injection surgery from ExaSPIM
+        self.assertEqual(len(procedures.subject_procedures), 1)
+        # Should have 3 specimen procedures from ExaSPIM (delipidation, expansion, mounting)
+        self.assertEqual(len(procedures.specimen_procedures), 3)
+        
+        # Verify injection surgery
+        surgery = procedures.subject_procedures[0]
+        self.assertIsInstance(surgery, Surgery)
+        self.assertEqual(surgery.start_date, date(2023, 3, 31))
+        self.assertEqual(len(surgery.procedures), 1)
+        
+        # Verify injection has viral material
+        injection = surgery.procedures[0]
+        self.assertIsInstance(injection, Injection)
+        self.assertEqual(len(injection.injection_materials), 1)
+        self.assertEqual(injection.injection_materials[0].name, "Test Virus AAV")
 
     def test_get_virus_strains(self):
         """Tests that virus strains are retrieved as expected"""
@@ -616,6 +679,245 @@ class TestProceduresMapper(unittest.TestCase):
         )
         procedures = mapper.map_responses_to_aind_procedures(subject_id=None)
         self.assertEqual(procedures.subject_id, None)
+
+    def test_get_specimen_procedure_protocol_names_delipidation(self):
+        """Test protocol names for delipidation specimen procedure"""
+        from aind_data_schema.components.specimen_procedures import SpecimenProcedure
+        from aind_data_schema_models.specimen_procedure_types import SpecimenProcedureType
+        
+        specimen_proc = SpecimenProcedure.model_construct(
+            procedure_type=SpecimenProcedureType.DELIPIDATION
+        )
+        protocol_names = ProceduresMapper._get_specimen_procedure_protocol_names(specimen_proc)
+        
+        self.assertEqual(len(protocol_names), 2)
+        self.assertIn(ProtocolNames.DELIPIDATION_V2.value, protocol_names)
+        self.assertIn(ProtocolNames.SBIP_DELIPIDATION_V2.value, protocol_names)
+
+    def test_get_specimen_procedure_protocol_names_immunolabeling(self):
+        """Test protocol names for immunolabeling specimen procedure"""
+        from aind_data_schema.components.specimen_procedures import SpecimenProcedure
+        from aind_data_schema_models.specimen_procedure_types import SpecimenProcedureType
+        
+        specimen_proc = SpecimenProcedure.model_construct(
+            procedure_type=SpecimenProcedureType.IMMUNOLABELING
+        )
+        protocol_names = ProceduresMapper._get_specimen_procedure_protocol_names(specimen_proc)
+        
+        self.assertEqual(len(protocol_names), 1)
+        self.assertEqual(protocol_names[0], ProtocolNames.IMMUNOLABELING.value)
+
+    def test_get_specimen_procedure_protocol_names_gelation(self):
+        """Test protocol names for gelation specimen procedure"""
+        from aind_data_schema.components.specimen_procedures import SpecimenProcedure
+        from aind_data_schema_models.specimen_procedure_types import SpecimenProcedureType
+        
+        specimen_proc = SpecimenProcedure.model_construct(
+            procedure_type=SpecimenProcedureType.GELATION
+        )
+        protocol_names = ProceduresMapper._get_specimen_procedure_protocol_names(specimen_proc)
+        
+        self.assertEqual(len(protocol_names), 1)
+        self.assertEqual(protocol_names[0], ProtocolNames.GELATION_DIGESTION.value)
+
+    def test_get_specimen_procedure_protocol_names_expansion(self):
+        """Test protocol names for expansion specimen procedure"""
+        from aind_data_schema.components.specimen_procedures import SpecimenProcedure
+        from aind_data_schema_models.specimen_procedure_types import SpecimenProcedureType
+        
+        specimen_proc = SpecimenProcedure.model_construct(
+            procedure_type=SpecimenProcedureType.EXPANSION
+        )
+        protocol_names = ProceduresMapper._get_specimen_procedure_protocol_names(specimen_proc)
+        
+        self.assertEqual(len(protocol_names), 1)
+        self.assertEqual(protocol_names[0], ProtocolNames.EXPANSION_MOUNTING.value)
+
+    def test_get_specimen_procedure_protocol_names_mounting(self):
+        """Test protocol names for mounting specimen procedure"""
+        from aind_data_schema.components.specimen_procedures import SpecimenProcedure
+        from aind_data_schema_models.specimen_procedure_types import SpecimenProcedureType
+        
+        specimen_proc = SpecimenProcedure.model_construct(
+            procedure_type=SpecimenProcedureType.MOUNTING
+        )
+        protocol_names = ProceduresMapper._get_specimen_procedure_protocol_names(specimen_proc)
+        
+        self.assertEqual(len(protocol_names), 1)
+        self.assertEqual(protocol_names[0], ProtocolNames.EXPANSION_MOUNTING.value)
+
+    def test_get_specimen_procedure_protocol_names_unknown_type(self):
+        """Test protocol names for unknown specimen procedure type"""
+        from aind_data_schema.components.specimen_procedures import SpecimenProcedure
+        
+        specimen_proc = SpecimenProcedure.model_construct(
+            procedure_type=None  # Unknown type
+        )
+        protocol_names = ProceduresMapper._get_specimen_procedure_protocol_names(specimen_proc)
+        
+        self.assertEqual(len(protocol_names), 0)
+
+    def test_get_protocols_list_with_specimen_procedures(self):
+        """Test get_protocols_list includes specimen procedure protocols"""
+        from aind_data_schema.components.specimen_procedures import SpecimenProcedure
+        from aind_data_schema_models.specimen_procedure_types import SpecimenProcedureType
+        
+        delipidation = SpecimenProcedure.model_construct(
+            procedure_type=SpecimenProcedureType.DELIPIDATION
+        )
+        immunolabeling = SpecimenProcedure.model_construct(
+            procedure_type=SpecimenProcedureType.IMMUNOLABELING
+        )
+        gelation = SpecimenProcedure.model_construct(
+            procedure_type=SpecimenProcedureType.GELATION
+        )
+        
+        procedures = Procedures.model_construct(
+            subject_id="123",
+            subject_procedures=[],
+            specimen_procedures=[delipidation, immunolabeling, gelation]
+        )
+        
+        protocol_list = ProceduresMapper().get_protocols_list(procedures)
+        
+        # Should contain all specimen procedure protocols plus overview
+        self.assertIn(ProtocolNames.DELIPIDATION_V2.value, protocol_list)
+        self.assertIn(ProtocolNames.SBIP_DELIPIDATION_V2.value, protocol_list)
+        self.assertIn(ProtocolNames.IMMUNOLABELING.value, protocol_list)
+        self.assertIn(ProtocolNames.GELATION_DIGESTION.value, protocol_list)
+        self.assertIn(ProtocolNames.GELATIN_PREVIOUS.value, protocol_list)
+
+    def test_get_protocols_list_no_specimen_procedures(self):
+        """Test get_protocols_list excludes overview when no specimen procedures"""
+        procedures = Procedures.model_construct(
+            subject_id="123",
+            subject_procedures=[],
+            specimen_procedures=[]
+        )
+        
+        protocol_list = ProceduresMapper().get_protocols_list(procedures)
+        
+        # Should NOT contain overview protocol when no specimen procedures
+        self.assertNotIn(ProtocolNames.GELATIN_PREVIOUS.value, protocol_list)
+
+    def test_integrate_protocols_with_specimen_procedures(self):
+        """Test protocol integration for specimen procedures"""
+        from aind_data_schema.components.specimen_procedures import SpecimenProcedure
+        from aind_data_schema_models.specimen_procedure_types import SpecimenProcedureType
+        
+        # Create specimen procedures
+        delipidation = SpecimenProcedure.model_construct(
+            procedure_type=SpecimenProcedureType.DELIPIDATION,
+            specimen_id="123"
+        )
+        immunolabeling = SpecimenProcedure.model_construct(
+            procedure_type=SpecimenProcedureType.IMMUNOLABELING,
+            specimen_id="123"
+        )
+        
+        # Create protocols mapping
+        delip_protocol = ProtocolInformation.model_construct(
+            doi="dx.doi.org/delip/v2"
+        )
+        sbip_protocol = ProtocolInformation.model_construct(
+            doi="dx.doi.org/sbip/v2"
+        )
+        immuno_protocol = ProtocolInformation.model_construct(
+            doi="dx.doi.org/immuno"
+        )
+        overview_protocol = ProtocolInformation.model_construct(
+            doi="dx.doi.org/overview"
+        )
+        
+        protocols_mapping = {
+            ProtocolNames.DELIPIDATION_V2.value: delip_protocol,
+            ProtocolNames.SBIP_DELIPIDATION_V2.value: sbip_protocol,
+            ProtocolNames.IMMUNOLABELING.value: immuno_protocol,
+            ProtocolNames.GELATIN_PREVIOUS.value: overview_protocol,
+        }
+        
+        procedures = Procedures.model_construct(
+            subject_id="123",
+            subject_procedures=[],
+            specimen_procedures=[delipidation, immunolabeling]
+        )
+        
+        merged = ProceduresMapper().integrate_protocols_into_aind_procedures(
+            procedures, protocols_mapping
+        )
+        
+        # Check delipidation has both protocol IDs
+        self.assertEqual(len(merged.specimen_procedures[0].protocol_id), 2)
+        self.assertIn("dx.doi.org/delip/v2", merged.specimen_procedures[0].protocol_id)
+        self.assertIn("dx.doi.org/sbip/v2", merged.specimen_procedures[0].protocol_id)
+        
+        # Check immunolabeling has protocol ID
+        self.assertEqual(len(merged.specimen_procedures[1].protocol_id), 1)
+        self.assertEqual(merged.specimen_procedures[1].protocol_id[0], "dx.doi.org/immuno")
+        
+        # Check overview protocol in notes
+        self.assertIn("Overview protocol: dx.doi.org/overview", merged.notes)
+
+    def test_integrate_protocols_specimen_no_matching_protocols(self):
+        """Test protocol integration when specimen protocols not found in mapping"""
+        from aind_data_schema.components.specimen_procedures import SpecimenProcedure
+        from aind_data_schema_models.specimen_procedure_types import SpecimenProcedureType
+        
+        expansion = SpecimenProcedure.model_construct(
+            procedure_type=SpecimenProcedureType.EXPANSION,
+            specimen_id="123"
+        )
+        
+        # Empty protocols mapping
+        protocols_mapping = {}
+        
+        procedures = Procedures.model_construct(
+            subject_id="123",
+            subject_procedures=[],
+            specimen_procedures=[expansion]
+        )
+        
+        merged = ProceduresMapper().integrate_protocols_into_aind_procedures(
+            procedures, protocols_mapping
+        )
+        
+        # protocol_id should not be set or should be None/empty since no matching protocol found
+        protocol_id = getattr(merged.specimen_procedures[0], "protocol_id", None)
+        self.assertTrue(protocol_id is None or protocol_id == [])
+
+    def test_integrate_protocols_overview_appends_to_existing_notes(self):
+        """Test overview protocol appends to existing notes"""
+        from aind_data_schema.components.specimen_procedures import SpecimenProcedure
+        from aind_data_schema_models.specimen_procedure_types import SpecimenProcedureType
+        
+        mounting = SpecimenProcedure.model_construct(
+            procedure_type=SpecimenProcedureType.MOUNTING,
+            specimen_id="123"
+        )
+        
+        overview_protocol = ProtocolInformation.model_construct(
+            doi="dx.doi.org/overview"
+        )
+        
+        protocols_mapping = {
+            ProtocolNames.GELATIN_PREVIOUS.value: overview_protocol,
+        }
+        
+        procedures = Procedures.model_construct(
+            subject_id="123",
+            subject_procedures=[],
+            specimen_procedures=[mounting],
+            notes="Existing note"
+        )
+        
+        merged = ProceduresMapper().integrate_protocols_into_aind_procedures(
+            procedures, protocols_mapping
+        )
+        
+        # Should append to existing notes
+        self.assertIn("Existing note", merged.notes)
+        self.assertIn("Overview protocol: dx.doi.org/overview", merged.notes)
+        self.assertIn(";", merged.notes)  # Separator
 
 
 if __name__ == "__main__":
