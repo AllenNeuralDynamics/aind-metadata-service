@@ -2,15 +2,13 @@
   "object_type": "Procedures",
   "describedBy": "https://raw.githubusercontent.com/AllenNeuralDynamics/aind-data-schema/main/src/aind_data_schema/core/procedures.py",
   "schema_version": "2.2.1",
-  "subject_id": "670339",
+  "subject_id": "3163606",
   "subject_procedures": [
     {
       "object_type": "Surgery",
       "protocol_id": null,
-      "start_date": "2023-07-19",
-      "experimenters": [
-        "21228"
-      ],
+      "start_date": "2023-05-10",
+      "experimenters": null,
       "ethics_review_id": null,
       "animal_weight_prior": null,
       "animal_weight_post": null,
@@ -21,116 +19,25 @@
       "measured_coordinates": null,
       "procedures": [
         {
-          "object_type": "Perfusion",
-          "protocol_id": "dx.doi.org/10.17504/protocols.io.8epv51bejl1b/v6",
-          "output_specimen_ids": [
-            "670339"
-          ]
-        }
-      ],
-      "notes": null
-    },
-    {
-      "object_type": "Surgery",
-      "protocol_id": "dx.doi.org/10.17504/protocols.io.kqdg392o7g25/v2",
-      "start_date": "2023-04-14",
-      "experimenters": [
-        "NSB-1300"
-      ],
-      "ethics_review_id": "2205",
-      "animal_weight_prior": 21.5,
-      "animal_weight_post": 21.3,
-      "weight_unit": "gram",
-      "anaesthesia": {
-        "object_type": "Anaesthetic",
-        "anaesthetic_type": "isoflurane",
-        "duration": 78,
-        "duration_unit": "minute",
-        "level": 1.5
-      },
-      "workstation_id": "SWS 2",
-      "coordinate_system": {
-        "object_type": "Coordinate system",
-        "name": "BREGMA_ARD",
-        "origin": "Bregma",
-        "axes": [
-          {
-            "object_type": "Axis",
-            "name": "AP",
-            "direction": "Posterior_to_anterior"
-          },
-          {
-            "object_type": "Axis",
-            "name": "ML",
-            "direction": "Left_to_right"
-          },
-          {
-            "object_type": "Axis",
-            "name": "Depth",
-            "direction": "Up_to_down"
-          }
-        ],
-        "axis_unit": "millimeter"
-      },
-      "measured_coordinates": null,
-      "procedures": [
-        {
-          "object_type": "Brain injection",
+          "object_type": "Injection",
           "protocol_id": null,
-          "injection_materials": [],
-          "targeted_structure": null,
-          "relative_position": [
-            "Right"
-          ],
-          "dynamics": [
+          "injection_materials": [
             {
-              "object_type": "Injection dynamics",
-              "profile": "Bolus",
-              "volume": 50,
-              "volume_unit": "nanoliter",
-              "duration": 10,
-              "duration_unit": null,
-              "injection_current": null,
-              "injection_current_unit": null,
-              "alternating_current": null
+              "object_type": "Viral material",
+              "name": "AAV1_cag_flex_rev_mKate_T2A_TVA        0.2:1 ratio TVA:G",
+              "tars_identifiers": null,
+              "addgene_id": null,
+              "titer": 7700000000000,
+              "titer_unit": "gc/mL"
             }
           ],
-          "coordinate_system_name": "BREGMA_ARD",
-          "coordinates": [
-            [
-              {
-                "object_type": "Translation",
-                "translation": [
-                  -0.34,
-                  1.7,
-                  3.58
-                ]
-              },
-              {
-                "object_type": "Rotation",
-                "angles": [
-                  0,
-                  0,
-                  0
-                ],
-                "angles_unit": "degrees"
-              }
-            ]
-          ]
-        },
-        {
-          "object_type": "Brain injection",
-          "protocol_id": null,
-          "injection_materials": [],
           "targeted_structure": null,
-          "relative_position": [
-            "Left"
-          ],
+          "relative_position": null,
           "dynamics": [
             {
               "object_type": "Injection dynamics",
               "profile": "Bolus",
-              "volume": 50,
+              "volume": 30,
               "volume_unit": "nanoliter",
               "duration": null,
               "duration_unit": null,
@@ -138,28 +45,64 @@
               "injection_current_unit": null,
               "alternating_current": null
             }
+          ]
+        },
+        {
+          "object_type": "Injection",
+          "protocol_id": null,
+          "injection_materials": [
+            {
+              "object_type": "Viral material",
+              "name": "G = AAV1_syn_flex_mKate_T2A_CVS_N2C-G",
+              "tars_identifiers": null,
+              "addgene_id": null,
+              "titer": 3570000000000,
+              "titer_unit": "gc/mL"
+            }
           ],
-          "coordinate_system_name": "BREGMA_ARD",
-          "coordinates": [
-            [
-              {
-                "object_type": "Translation",
-                "translation": [
-                  -0.34,
-                  -1.7,
-                  3.58
-                ]
-              },
-              {
-                "object_type": "Rotation",
-                "angles": [
-                  0,
-                  0,
-                  0
-                ],
-                "angles_unit": "degrees"
-              }
-            ]
+          "targeted_structure": null,
+          "relative_position": null,
+          "dynamics": [
+            {
+              "object_type": "Injection dynamics",
+              "profile": "Bolus",
+              "volume": 30,
+              "volume_unit": "nanoliter",
+              "duration": null,
+              "duration_unit": null,
+              "injection_current": null,
+              "injection_current_unit": null,
+              "alternating_current": null
+            }
+          ]
+        },
+        {
+          "object_type": "Injection",
+          "protocol_id": null,
+          "injection_materials": [
+            {
+              "object_type": "Viral material",
+              "name": "SADB19_dG_4eGFP_MARCKS-GFP(EnvA)",
+              "tars_identifiers": null,
+              "addgene_id": null,
+              "titer": 3000000000,
+              "titer_unit": "gc/mL"
+            }
+          ],
+          "targeted_structure": null,
+          "relative_position": null,
+          "dynamics": [
+            {
+              "object_type": "Injection dynamics",
+              "profile": "Bolus",
+              "volume": 40,
+              "volume_unit": "nanoliter",
+              "duration": null,
+              "duration_unit": null,
+              "injection_current": null,
+              "injection_current_unit": null,
+              "alternating_current": null
+            }
           ]
         }
       ],
@@ -175,11 +118,11 @@
       ],
       "procedure_type": "Delipidation",
       "procedure_name": "Delipidation (DCM + SBiP)",
-      "specimen_id": "670339",
-      "start_date": "2023-07-20",
-      "end_date": "2023-08-14",
+      "specimen_id": "3163606",
+      "start_date": "2023-07-10",
+      "end_date": "2023-08-04",
       "experimenters": [
-        "Rajvi Javeri"
+        "Naveen Ouellette"
       ],
       "protocol_parameters": null,
       "procedure_details": [
@@ -203,25 +146,30 @@
       ],
       "procedure_type": "Immunolabeling",
       "procedure_name": "Primary + Secondary Immunolabelling",
-      "specimen_id": "670339",
-      "start_date": "2023-08-15",
-      "end_date": "2023-09-07",
+      "specimen_id": "3163606",
+      "start_date": "2023-08-09",
+      "end_date": "2023-09-08",
       "experimenters": [
-        "Rajvi Javeri"
+        "Naveen Ouellette"
       ],
       "protocol_parameters": null,
       "procedure_details": [
         {
           "object_type": "Probe reagent",
-          "name": "Chicken Anti-GFP",
+          "name": "Rabbit Anti-GFP",
           "source": {
             "name": "Other",
             "abbreviation": null,
             "registry": null,
             "registry_identifier": null
           },
-          "rrid": null,
-          "lot_number": "GR361051-16",
+          "rrid": {
+            "name": "Rabbit Anti-GFP",
+            "abbreviation": null,
+            "registry": "Research Resource Identifiers (RRID)",
+            "registry_identifier": "AB_303395"
+          },
+          "lot_number": "1037873-6",
           "expiration_date": null,
           "target": {
             "object_type": "Protein probe",
@@ -232,10 +180,10 @@
               "registry_identifier": null
             },
             "species": {
-              "name": "Gallus gallus",
-              "common_name": "Chicken",
+              "name": "Oryctolagus cuniculus",
+              "common_name": "European rabbit",
               "registry": "National Center for Biotechnology Information (NCBI)",
-              "registry_identifier": "NCBI:txid9031"
+              "registry_identifier": "NCBI:txid9986"
             },
             "mass": 10,
             "mass_unit": "microgram",
@@ -244,25 +192,51 @@
         },
         {
           "object_type": "Probe reagent",
-          "name": "Donkey anti-Chicken IgY (H+L) AF 488",
+          "name": "FluoTag X2 anti-TagFP ATTO 643",
           "source": {
             "name": "Other",
             "abbreviation": null,
             "registry": null,
             "registry_identifier": null
           },
-          "rrid": {
-            "name": "Donkey anti-Chicken IgY (H+L) AF 488",
-            "abbreviation": null,
-            "registry": "Research Resource Identifiers (RRID)",
-            "registry_identifier": "AB_2340375"
-          },
-          "lot_number": "165794",
+          "rrid": null,
+          "lot_number": "012301",
           "expiration_date": null,
           "target": {
             "object_type": "Protein probe",
             "protein": {
-              "name": "Chicken antibody",
+              "name": "TagFP",
+              "abbreviation": null,
+              "registry": null,
+              "registry_identifier": null
+            },
+            "species": null,
+            "mass": 3.75,
+            "mass_unit": "microgram",
+            "sequence": null
+          }
+        },
+        {
+          "object_type": "Probe reagent",
+          "name": "Donkey anti-Rabbit IgG (H+L) AF 488",
+          "source": {
+            "name": "Invitrogen",
+            "abbreviation": null,
+            "registry": "Research Organization Registry (ROR)",
+            "registry_identifier": "03x1ewr52"
+          },
+          "rrid": {
+            "name": "Donkey anti-Rabbit IgG (H+L) AF 488",
+            "abbreviation": null,
+            "registry": "Research Resource Identifiers (RRID)",
+            "registry_identifier": "AB_2535792"
+          },
+          "lot_number": "2541645",
+          "expiration_date": null,
+          "target": {
+            "object_type": "Protein probe",
+            "protein": {
+              "name": "Rabbit antibody",
               "abbreviation": null,
               "registry": null,
               "registry_identifier": null
@@ -273,13 +247,13 @@
               "registry": "National Center for Biotechnology Information (NCBI)",
               "registry_identifier": "NCBI:txid9793"
             },
-            "mass": 40,
+            "mass": 20,
             "mass_unit": "microgram",
             "sequence": null
           }
         }
       ],
-      "notes": "Primary RRID: AB_300798; Secondary RRID: AB_2340375"
+      "notes": "Primary RRID: AB_303395; Secondary RRID: AB_2535792, no RRID for nanotag"
     },
     {
       "object_type": "Specimen procedure",
@@ -288,28 +262,28 @@
       ],
       "procedure_type": "Gelation",
       "procedure_name": "Gelation (MBS, AcX, StockX+VA-044, ProK digestion)",
-      "specimen_id": "670339",
-      "start_date": "2023-09-27",
-      "end_date": "2023-10-26",
+      "specimen_id": "3163606",
+      "start_date": "2023-10-06",
+      "end_date": "2023-11-08",
       "experimenters": [
-        "Rajvi Javeri"
+        "Naveen Ouellette"
       ],
       "protocol_parameters": {
-        "MBS Start": "2023-09-27",
-        "MBS End": "2023-09-28",
-        "AcX Start": "2023-09-28",
-        "AcX End": "2023-10-02",
-        "PBS Wash Start": "2023-10-02",
-        "PBS Wash End": "2023-10-04",
-        "StockX Equilibration Start": "2023-10-04",
-        "StockX Equilibration End": "2023-10-09",
-        "ProK RT Start": "2023-10-09",
-        "ProK RT End": "2023-10-16",
-        "ProK 37C Start": "2023-10-16",
-        "ProK 37C End": "2023-10-23",
-        "PBS Wash Start (post-gel)": "2023-10-23",
-        "PBS Wash End (post-gel)": "2023-10-26",
-        "4C Storage Date": "10/26/2023"
+        "MBS Start": "2023-10-06",
+        "MBS End": "2023-10-09",
+        "AcX Start": "2023-10-09",
+        "AcX End": "2023-10-13",
+        "PBS Wash Start": "2023-10-13",
+        "PBS Wash End": "2023-10-17",
+        "StockX Equilibration Start": "2023-10-17",
+        "StockX Equilibration End": "2023-10-23",
+        "ProK RT Start": "2023-10-23",
+        "ProK RT End": "2023-10-29",
+        "ProK 37C Start": "2023-10-30",
+        "ProK 37C End": "2023-11-05",
+        "PBS Wash Start (post-gel)": "2023-11-06",
+        "PBS Wash End (post-gel)": "2023-11-08",
+        "4C Storage Date": "11/08/2023"
       },
       "procedure_details": [
         {
@@ -363,19 +337,19 @@
       ],
       "procedure_type": "Expansion",
       "procedure_name": "Expansion",
-      "specimen_id": "670339",
-      "start_date": "2024-11-15",
-      "end_date": "2024-11-18",
+      "specimen_id": "3163606",
+      "start_date": "2023-11-14",
+      "end_date": "2023-11-17",
       "experimenters": [
-        "Rajvi Javeri"
+        "Naveen Ouellette"
       ],
       "protocol_parameters": {
         "ssc_duration": "2 days",
-        "ssc_start": "2024-11-15",
-        "ssc_end": "2024-11-17",
+        "ssc_start": "2023-11-14",
+        "ssc_end": "2023-11-16",
         "ascorbic_acid_duration": "1 day",
-        "ascorbic_acid_start": "2024-11-17",
-        "ascorbic_acid_end": "2024-11-18"
+        "ascorbic_acid_start": "2023-11-16",
+        "ascorbic_acid_end": "2023-11-17"
       },
       "procedure_details": [
         {
@@ -398,11 +372,11 @@
       ],
       "procedure_type": "Mounting",
       "procedure_name": "Mounting and ExaSPIM Imaging",
-      "specimen_id": "670339",
-      "start_date": "2024-11-18",
-      "end_date": "2024-11-22",
+      "specimen_id": "3163606",
+      "start_date": "2023-11-17",
+      "end_date": "2023-11-17",
       "experimenters": [
-        "Rajvi Javeri"
+        "Naveen Ouellette"
       ],
       "protocol_parameters": null,
       "procedure_details": [
@@ -412,7 +386,7 @@
           "lot_number": null
         }
       ],
-      "notes": "Microscope: ExaSPIM; Signal channels: 488"
+      "notes": "Microscope: ExaSPIM; Signal channels: 488, 639"
     }
   ],
   "coordinate_system": null,

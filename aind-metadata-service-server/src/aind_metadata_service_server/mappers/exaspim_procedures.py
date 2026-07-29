@@ -37,65 +37,6 @@ from aind_smartsheet_service_async_client.models import (
 import re
 
 
-# Antibody → Organization lookup
-_ANTIBODY_SOURCE_MAP: Dict[str, Organization] = {
-    "gfp": Organization.ABCAM,
-    "donkey anti-rabbit igg (h+l) af 488": Organization.INVITROGEN,
-    "donkey anti-rabbitt igg (h+l) af 488": Organization.INVITROGEN,
-    "tdtomato": Organization.SICGEN,
-    "donkey anti-goat igg (h+l) af 568": Organization.INVITROGEN,
-    "donkey anti-chicken igy (h+l) af 488": Organization.JAX, # TODO: confirm this, "Jackson Immuno Reserach" doesnt exist in aind-data-schema
-}
-
-_PRIMARY_ANTIBODY_TARGET_CANONICAL_MAP: Dict[str, str] = {
-    "gfp": "GFP",
-    "tdt": "tdTomato",
-    "tdtomato": "tdTomato",
-    "mtfp": "mTFP",
-}
-
-_PROTEIN_FULL_NAME_MAP: Dict[str, str] = {
-    "GFP": "Green Fluorescent Protein",
-    "tdTomato": "tdTomato",
-    "mTFP": "monomeric Teal Fluorescent Protein 1",
-}
-
-_ANTIBODY_HOST_CANONICAL_MAP: Dict[str, str] = {
-    "rabbit": "Rabbit",
-    "mouse": "Mouse",
-    "rat": "Rat",
-    "goat": "Goat",
-    "chicken": "Chicken",
-    "donkey": "Donkey",
-}
-
-_ANTIBODY_SPECIES_MAP: Dict[str, Species.ONE_OF] = {
-    "rabbit": Species.EUROPEAN_RABBIT,
-    "mouse": Species.HOUSE_MOUSE,
-    "rat": Species.NORWAY_RAT,
-    "goat": Species.GOAT,
-    "chicken": Species.CHICKEN,
-    "donkey": Species.DONKEY,
-}
-
-_CATALOG_TO_RRID: Dict[str, str] = {
-    # Primary antibody catalogs
-    "ab290": "AB_303395",
-    "ab8181-200": "AB_2722750",
-    "a-21311": "AB_221477",
-    "155264": "AB_3661847",
-    "gr361051-16": "AB_300798",
-    # Secondary antibody catalogs
-    "a21206": "AB_2535792",
-    "a-21206": "AB_2535792",
-    "a-11057": "AB_2534104",
-    "a11057": "AB_2534104",
-    "a-21247": "AB_141778",
-    "703-545-155": "AB_2340375",
-    "165794": "AB_2340375",
-}
-
-
 class ExaspimProceduresMapper:
     """Class to handle mapping of ExaSPIM procedures data."""
 
@@ -223,25 +164,56 @@ class ExaspimProceduresMapper:
         return experimenters
     
     @staticmethod
-    def _resolve_antibody_species(antibody_name: str) -> Optional[Species.ONE_OF]:
-        """Resolve the host Species of an antibody from its name."""
+    def _map_antibody_species(antibody_name: str) -> Optional[Species.ONE_OF]:
+        """Map the host Species of an antibody from its name."""
+        antibody_species_map = {
+            "rabbit": Species.EUROPEAN_RABBIT,
+            "mouse": Species.HOUSE_MOUSE,
+            "rat": Species.NORWAY_RAT,
+            "goat": Species.GOAT,
+            "chicken": Species.CHICKEN,
+            "donkey": Species.DONKEY,
+        }
         cleaned = antibody_name.strip()
         if not cleaned:
             return None
         first_token = cleaned.split()[0].lower()
-        return _ANTIBODY_SPECIES_MAP.get(first_token)
+        return antibody_species_map.get(first_token)
     
     @staticmethod
-    def _resolve_antibody_source(antibody_name: str) -> Organization:
-        """Resolve an antibody name to its source Organization."""
-        return _ANTIBODY_SOURCE_MAP.get(antibody_name.strip().lower(), Organization.OTHER)
+    def _map_antibody_source(antibody_name: str) -> Organization:
+        """Map an antibody name to its source Organization."""
+        antibody_source_map = {
+            "gfp": Organization.ABCAM,
+            "donkey anti-rabbit igg (h+l) af 488": Organization.INVITROGEN,
+            "donkey anti-rabbitt igg (h+l) af 488": Organization.INVITROGEN,
+            "tdtomato": Organization.SICGEN,
+            "donkey anti-goat igg (h+l) af 568": Organization.INVITROGEN,
+        }
+        return antibody_source_map.get(antibody_name.strip().lower(), Organization.OTHER)
     
     @staticmethod
-    def _resolve_rrid(catalog: str, antibody_name: str) -> Optional[PIDName]:
-        """Resolve a catalog number to a PIDName carrying the corresponding RRID."""
+    def _map_rrid(catalog: str, antibody_name: str) -> Optional[PIDName]:
+        """Map a catalog number to a PIDName carrying the corresponding RRID."""
+        catalog_to_rrid = {
+            # Primary antibody catalogs
+            "ab290": "AB_303395",
+            "ab8181-200": "AB_2722750",
+            "a-21311": "AB_221477",
+            "155264": "AB_3661847",
+            "gr361051-16": "AB_300798",
+            # Secondary antibody catalogs
+            "a21206": "AB_2535792",
+            "a-21206": "AB_2535792",
+            "a-11057": "AB_2534104",
+            "a11057": "AB_2534104",
+            "a-21247": "AB_141778",
+            "703-545-155": "AB_2340375",
+            "165794": "AB_2340375",
+        }
         if not catalog:
             return None
-        rrid = _CATALOG_TO_RRID.get(catalog.strip().lower())
+        rrid = catalog_to_rrid.get(catalog.strip().lower())
         if not rrid:
             return None
         return PIDName(
@@ -251,8 +223,19 @@ class ExaspimProceduresMapper:
         )
     
     @staticmethod
-    def _resolve_primary_antibody_target(antibody_name: str) -> str:
-        """Resolve the protein target for a primary antibody name."""
+    def _map_primary_antibody_target(antibody_name: str) -> str:
+        """Map the protein target for a primary antibody name."""
+        target_canonical_map = {
+            "gfp": "GFP",
+            "tdt": "tdTomato",
+            "tdtomato": "tdTomato",
+            "mtfp": "mTFP",
+        }
+        protein_full_name_map = {
+            "GFP": "Green Fluorescent Protein",
+            "tdTomato": "tdTomato",
+            "mTFP": "monomeric Teal Fluorescent Protein 1",
+        }
         cleaned_name = antibody_name.strip()
         if not cleaned_name:
             return cleaned_name
@@ -262,21 +245,27 @@ class ExaspimProceduresMapper:
         )
         target_token = anti_match.group(1) if anti_match else cleaned_name
         
-        canonical = _PRIMARY_ANTIBODY_TARGET_CANONICAL_MAP.get(
-            target_token.lower(), target_token
-        )
-        return _PROTEIN_FULL_NAME_MAP.get(canonical, canonical)
+        canonical = target_canonical_map.get(target_token.lower(), target_token)
+        return protein_full_name_map.get(canonical, canonical)
     
     @staticmethod
-    def _resolve_secondary_antibody_target(
+    def _map_secondary_antibody_target(
         secondary_antibody_name: str,
         primary_antibody_name: str,
     ) -> str:
-        """Resolve the protein target for a secondary antibody."""
+        """Map the protein target for a secondary antibody."""
+        antibody_host_canonical_map = {
+            "rabbit": "Rabbit",
+            "mouse": "Mouse",
+            "rat": "Rat",
+            "goat": "Goat",
+            "chicken": "Chicken",
+            "donkey": "Donkey",
+        }
         primary_name = primary_antibody_name.strip()
         secondary_name = secondary_antibody_name.strip()
         
-        for host_key, host_name in _ANTIBODY_HOST_CANONICAL_MAP.items():
+        for host_key, host_name in antibody_host_canonical_map.items():
             if re.search(rf"\\b{re.escape(host_key)}\\b", primary_name, flags=re.IGNORECASE):
                 return f"{host_name} antibody"
         
@@ -287,10 +276,71 @@ class ExaspimProceduresMapper:
         )
         if anti_match:
             secondary_token = anti_match.group(1).lower()
-            if secondary_token in _ANTIBODY_HOST_CANONICAL_MAP:
-                return f"{_ANTIBODY_HOST_CANONICAL_MAP[secondary_token]} antibody"
+            if secondary_token in antibody_host_canonical_map:
+                return f"{antibody_host_canonical_map[secondary_token]} antibody"
         
         return secondary_name
+
+        
+        return secondary_name
+
+    def _get_titer_for_virus(
+        self,
+        mouse_tracker_row: MouseTracker,
+        prefix: str,
+        volume_raw: Any,
+        ro_volume_raw: Any,
+    ) -> Optional[Any]:
+        """
+        Get viral titer using priority system with dose-based calculation fallback.
+        Priority: effective > working > calculated > stock
+
+        Parameters
+        ----------
+        mouse_tracker_row : MouseTracker
+            Row from Mouse Tracker sheet
+        prefix : str
+            Virus prefix (e.g., "virus1")
+        volume_raw : Any
+            Stereotaxic volume in nL (if available)
+        ro_volume_raw : Any
+            Retro-orbital volume in µL (if available)
+
+        Returns
+        -------
+        Optional[Any]
+            Titer value or None if unavailable
+        """
+        titer_raw = getattr(mouse_tracker_row, f"{prefix}_effective_titer_gc_ml", None)
+        if titer_raw and str(titer_raw).strip():
+            return titer_raw
+        
+        titer_raw = getattr(mouse_tracker_row, f"{prefix}_working_titer_gc_ml", None)
+        if titer_raw and str(titer_raw).strip():
+            return titer_raw
+        
+        dose_gc = getattr(mouse_tracker_row, f"{prefix}_dose_gc", None)
+        if self._is_numeric(dose_gc):
+            dose_val = float(str(dose_gc))
+            volume_ml = None
+            
+            # Convert volume to mL for calculation
+            if self._is_numeric(volume_raw):
+                # Stereotaxic volume in nL
+                volume_ml = float(str(volume_raw)) / 1_000_000
+            elif self._is_numeric(ro_volume_raw):
+                # RO volume in µL
+                volume_ml = float(str(ro_volume_raw)) / 1_000
+            
+            # Calculate titer = dose / volume
+            if volume_ml and volume_ml > 0:
+                return dose_val / volume_ml
+        
+        titer_raw = getattr(mouse_tracker_row, f"{prefix}_stock_titer_gc_ml", None)
+        if titer_raw and str(titer_raw).strip():
+            return titer_raw
+        
+        return None
 
     def build_injection_surgery(
         self, mouse_tracker_row: MouseTracker
@@ -330,8 +380,6 @@ class ExaspimProceduresMapper:
             if virus_id:
                 virus_id = virus_id.strip()
 
-            titer_raw = getattr(mouse_tracker_row, f"{prefix}_stock_titer_gc_ml")
-
             # Volume — check stereotaxic first
             if virus_num == 4:
                 volume_raw = mouse_tracker_row.stereotaxic_volume_injected_nl
@@ -345,6 +393,11 @@ class ExaspimProceduresMapper:
                 ro_volume_raw = mouse_tracker_row.virus_mix_total_volume_injected_ro_ul
             else:
                 ro_volume_raw = None
+
+            # Get titer using priority system (effective > working > calculated > stock)
+            titer_raw = self._get_titer_for_virus(
+                mouse_tracker_row, prefix, volume_raw, ro_volume_raw
+            )
 
             # Build injection material
             vm_kwargs: Dict[str, Any] = {"name": virus_name}
@@ -509,16 +562,18 @@ class ExaspimProceduresMapper:
             mass_raw = getattr(
                 sample_tracking_row, f"mass_of_primary_antibody{i}_used_per_brain_ug"
             )
-            mass = float(str(mass_raw)) if mass_raw is not None else 0.0
+            mass = 0.0
+            if mass_raw is not None and self._is_numeric(mass_raw):
+                mass = float(str(mass_raw))
 
             reagent = ProbeReagent(
                 name=ab_name,
-                source=self._resolve_antibody_source(ab_name),
+                source=self._map_antibody_source(ab_name),
                 lot_number=lot if lot else None,
-                rrid=self._resolve_rrid(catalog, ab_name) if catalog else None,
+                rrid=self._map_rrid(catalog, ab_name) if catalog else None,
                 target=ProteinProbe(
-                    protein=PIDName(name=self._resolve_primary_antibody_target(ab_name)),
-                    species=self._resolve_antibody_species(ab_name),
+                    protein=PIDName(name=self._map_primary_antibody_target(ab_name)),
+                    species=self._map_antibody_species(ab_name),
                     mass=mass,
                 ),
             )
@@ -546,18 +601,20 @@ class ExaspimProceduresMapper:
             mass_raw = getattr(
                 sample_tracking_row, f"mass_of_secondary_antibody{i}_used_per_brain_ug"
             )
-            mass = float(str(mass_raw)) if mass_raw is not None else 0.0
+            mass = 0.0
+            if mass_raw is not None and self._is_numeric(mass_raw):
+                mass = float(str(mass_raw))
 
             reagent = ProbeReagent(
                 name=ab_name,
-                source=self._resolve_antibody_source(ab_name),
+                source=self._map_antibody_source(ab_name),
                 lot_number=lot if lot else None,
-                rrid=self._resolve_rrid(catalog, ab_name) if catalog else None,
+                rrid=self._map_rrid(catalog, ab_name) if catalog else None,
                 target=ProteinProbe(
                     protein=PIDName(
-                        name=self._resolve_secondary_antibody_target(ab_name, primary_ab_name)
+                        name=self._map_secondary_antibody_target(ab_name, primary_ab_name)
                     ),
-                    species=self._resolve_antibody_species(ab_name),
+                    species=self._map_antibody_species(ab_name),
                     mass=mass,
                 ),
             )
