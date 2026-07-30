@@ -765,9 +765,7 @@ class TestProceduresMapper(unittest.TestCase):
     def test_get_specimen_procedure_protocol_names_unknown_type(self):
         """Test protocol names for unknown specimen procedure type"""
 
-        specimen_proc = SpecimenProcedure.model_construct(
-            procedure_type=None
-        )
+        specimen_proc = SpecimenProcedure.model_construct(procedure_type=None)
         protocol_names = (
             ProceduresMapper._get_specimen_procedure_protocol_names(
                 specimen_proc

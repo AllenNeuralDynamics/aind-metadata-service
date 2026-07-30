@@ -304,7 +304,7 @@ class ExaspimProceduresMapper:
         self,
         mouse_tracker_row: MouseTracker,
         virus_num: int,
-    ) -> Optional[Any]:
+    ) -> Optional[Union[str, int, float]]:
         """
         Get viral titer using priority system (effective > working > stock).
         Parameters
@@ -316,7 +316,7 @@ class ExaspimProceduresMapper:
 
         Returns
         -------
-        Optional[Any]
+        Optional[Union[str, int, float]]
             Titer value or None if unavailable
         """
         prefix = f"virus{virus_num}"
@@ -400,7 +400,9 @@ class ExaspimProceduresMapper:
                 ro_volume_raw = None
 
             titer_raw = self._get_titer_for_virus(mouse_tracker_row, virus_num)
-            vm_kwargs: Dict[str, Any] = {"name": virus_name}
+            vm_kwargs: Dict[str, Union[str, int, Dict[str, str]]] = {
+                "name": virus_name
+            }
             if virus_id:
                 vm_kwargs["tars_identifiers"] = {
                     "virus_tars_id": virus_id,
@@ -1039,8 +1041,7 @@ class ExaspimProceduresMapper:
 
         Returns
         -------
-        Dict[str, Any]
-            Mapped AIND procedures data
+        Procedures
         """
         procedures = Procedures(
             subject_id=subject_id,
