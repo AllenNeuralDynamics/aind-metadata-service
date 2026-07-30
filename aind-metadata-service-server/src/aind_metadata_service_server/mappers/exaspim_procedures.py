@@ -34,6 +34,7 @@ from aind_smartsheet_service_async_client.models import (
     ExaSPIMInfo,
 )
 
+
 class ExaspimProceduresMapper:
     """Class to handle mapping of ExaSPIM procedures data."""
 
@@ -94,7 +95,6 @@ class ExaspimProceduresMapper:
         text = str(raw).strip()
         if not text:
             return None
-        # Remove 'Z' suffix if present (UTC indicator)
         if text.endswith("Z"):
             text = text[:-1]
 
@@ -206,13 +206,11 @@ class ExaspimProceduresMapper:
     def _map_rrid(catalog: str, antibody_name: str) -> Optional[PIDName]:
         """Map a catalog number to a PIDName with the corresponding RRID."""
         catalog_to_rrid = {
-            # Primary antibody catalogs
             "ab290": "AB_303395",
             "ab8181-200": "AB_2722750",
             "a-21311": "AB_221477",
             "155264": "AB_3661847",
             "gr361051-16": "AB_300798",
-            # Secondary antibody catalogs
             "a21206": "AB_2535792",
             "a-21206": "AB_2535792",
             "a-11057": "AB_2534104",
@@ -323,7 +321,6 @@ class ExaspimProceduresMapper:
         """
         prefix = f"virus{virus_num}"
 
-        # Effective titer (not available for virus1)
         if virus_num > 1:
             titer_raw = getattr(
                 mouse_tracker_row, f"{prefix}_effective_titer_gc_ml", None
@@ -341,7 +338,6 @@ class ExaspimProceduresMapper:
         if titer_raw is not None and str(titer_raw).strip():
             return titer_raw
 
-        # Stock titer (all viruses use prefixed field)
         titer_raw = getattr(
             mouse_tracker_row, f"{prefix}_stock_titer_gc_ml", None
         )
@@ -388,7 +384,6 @@ class ExaspimProceduresMapper:
             if virus_id:
                 virus_id = virus_id.strip()
 
-            # Volume — check stereotaxic first
             if virus_num == 4:
                 volume_raw = mouse_tracker_row.stereotaxic_volume_injected_nl
             else:
@@ -397,7 +392,6 @@ class ExaspimProceduresMapper:
                     f"{prefix}_stereotaxic_volume_injected_nl",
                 )
 
-            # Fall back to retro-orbital volume (stored in µL)
             if not volume_raw:
                 ro_volume_raw = (
                     mouse_tracker_row.virus_mix_total_volume_injected_ro_ul
@@ -405,10 +399,7 @@ class ExaspimProceduresMapper:
             else:
                 ro_volume_raw = None
 
-            # Get titer using priority system (effective > working > stock)
             titer_raw = self._get_titer_for_virus(mouse_tracker_row, virus_num)
-
-            # Build injection material
             vm_kwargs: Dict[str, Any] = {"name": virus_name}
             if virus_id:
                 vm_kwargs["tars_identifiers"] = {
@@ -420,7 +411,6 @@ class ExaspimProceduresMapper:
 
             viral_material = ViralMaterial(**vm_kwargs)
 
-            # Build injection dynamics
             dynamics_list: List[InjectionDynamics] = []
             if self._is_numeric(volume_raw):
                 vol = float(str(volume_raw))
@@ -445,11 +435,9 @@ class ExaspimProceduresMapper:
                         )
                     )
 
-            # Skip injection if no volume data
             if not dynamics_list:
                 continue
 
-            # Build injection object
             injection_objects.append(
                 Injection(
                     injection_materials=[viral_material],
@@ -643,7 +631,6 @@ class ExaspimProceduresMapper:
             )
             reagents.append(reagent)
 
-        # Build notes about RRID if available
         primary_rrid = (
             sample_tracking_row.primary_antibody_rrid.strip()
             if sample_tracking_row.primary_antibody_rrid
@@ -704,7 +691,6 @@ class ExaspimProceduresMapper:
         if not start_date:
             return None
 
-        # End date: storage date or PBS Wash End
         storage_date = self._parse_date(
             sample_tracking_row.date_of_storage_in_pbs_az_0_05_4c
         )
@@ -731,7 +717,6 @@ class ExaspimProceduresMapper:
             ),
         ]
 
-        # Build protocol parameters with sub-step timing
         protocol_params: Dict[str, str] = {}
         substep_mapping = [
             ("MBS Start", "gelation_mbs_start"),
@@ -809,12 +794,10 @@ class ExaspimProceduresMapper:
         Optional[SpecimenProcedure]
             The expansion procedure or None if not applicable
         """
-        # Check if expansion has occurred (status must be "Imaged")
         status = sample_tracking_row.status
         if not status or status.strip().lower() != "imaged":
             return None
 
-        # Need imaging start date to calculate expansion dates
         if not imaging_start_date:
             return None
 
@@ -980,7 +963,6 @@ class ExaspimProceduresMapper:
         subject_procedures: List[Surgery] = []
         specimen_procedures: List[SpecimenProcedure] = []
 
-        # Build injection surgery from Mouse Tracker
         if self.mouse_tracker_info:
             injection_surgery = self.build_injection_surgery(
                 self.mouse_tracker_info[0]
@@ -988,47 +970,39 @@ class ExaspimProceduresMapper:
             if injection_surgery:
                 subject_procedures.append(injection_surgery)
 
-        # Get imaging start date for expansion calculation
         imaging_start_date = None
         if self.imaging_queue_info:
             imaging_start_date = self._parse_date(
                 self.imaging_queue_info[0].imaging_start_date
             )
 
-        # Build specimen procedures from Sample Tracking
         if self.sample_tracking_info:
             st_row = self.sample_tracking_info[0]
             experimenters = self._parse_experimenters(st_row)
 
-            # Delipidation
             delipidation = self.build_delipidation(
                 st_row, specimen_id, experimenters
             )
             if delipidation:
                 specimen_procedures.append(delipidation)
 
-            # Immunolabeling
             immunolabeling = self.build_immunolabeling(
                 st_row, specimen_id, experimenters
             )
             if immunolabeling:
                 specimen_procedures.append(immunolabeling)
 
-            # Gelation
             gelation = self.build_gelation(st_row, specimen_id, experimenters)
             if gelation:
                 specimen_procedures.append(gelation)
 
-            # Expansion (requires imaging_start_date and status="Imaged")
             expansion = self.build_expansion(
                 st_row, specimen_id, imaging_start_date, experimenters
             )
             if expansion:
                 specimen_procedures.append(expansion)
 
-        # Build mounting and imaging from Imaging Queue
         if self.imaging_queue_info:
-            # Try to get experimenters from sample tracking if available
             experimenters = []
             if self.sample_tracking_info:
                 experimenters = self._parse_experimenters(
@@ -1041,7 +1015,6 @@ class ExaspimProceduresMapper:
             if mounting:
                 specimen_procedures.append(mounting)
 
-        # Sort specimen_procedures by start_date
         specimen_procedures.sort(key=lambda p: p.start_date)
 
         return subject_procedures, specimen_procedures
