@@ -7,9 +7,6 @@ from fastapi import APIRouter, Depends, HTTPException, Path
 from aind_metadata_service_server.mappers.injection_materials import (
     InjectionMaterialsMapper,
 )
-from aind_metadata_service_server.mappers.exaspim_procedures import (
-    ExaspimProceduresMapper,
-)
 from aind_metadata_service_server.mappers.procedures import ProceduresMapper
 from aind_metadata_service_server.mappers.responses import map_to_response
 from aind_metadata_service_server.sessions import (
@@ -20,8 +17,8 @@ from aind_metadata_service_server.sessions import (
     get_tars_api_instance,
 )
 
-
 router = APIRouter()
+
 
 @router.get(
     "/api/v2/procedures/{subject_id}",
@@ -106,7 +103,9 @@ async def get_procedures(
         smartsheet_api_instance.get_perfusions(subject_id, _request_timeout=20)
     )
     tasks.append(
-        smartsheet_api_instance.get_exaspim_info(subject_id, _request_timeout=100)
+        smartsheet_api_instance.get_exaspim_info(
+            subject_id, _request_timeout=100
+        )
     )
     (
         labtracks_response,
@@ -205,6 +204,7 @@ async def get_procedures(
     )
     return map_to_response(procedures)
 
+
 @router.get(
     "/api/v2/smartsheet/exaspim_procedures/{subject_id}",
     responses={
@@ -240,8 +240,8 @@ async def get_exaspim_procedures(
     Return ExaSPIM procedure metadata from Smartsheet
     """
     smartsheet_exaspim_response = (
-            await smartsheet_api_instance.get_exaspim_info(
-                subject_id, _request_timeout=120
+        await smartsheet_api_instance.get_exaspim_info(
+            subject_id, _request_timeout=120
         )
     )
     if not smartsheet_exaspim_response:

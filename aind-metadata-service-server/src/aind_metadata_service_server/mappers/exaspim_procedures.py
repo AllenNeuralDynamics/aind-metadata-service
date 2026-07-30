@@ -1,5 +1,6 @@
-"""Maps ExaSPIM Smartsheet information to aind-data-schema Procedures models."""
+"""Module to map ExaSPIM Smartsheet information to Procedures models."""
 
+import re
 from datetime import date, datetime, timedelta
 from typing import Any, Dict, List, Optional, Union
 
@@ -26,24 +27,20 @@ from aind_data_schema_models.specimen_procedure_types import (
     SpecimenProcedureType,
 )
 from aind_data_schema_models.units import VolumeUnit
-
 from aind_smartsheet_service_async_client.models import (
     MouseTracker,
     SampleTracking,
     ImagingQueue,
-    QcSheet,
     ExaSPIMInfo,
-
 )
-import re
-
 
 class ExaspimProceduresMapper:
     """Class to handle mapping of ExaSPIM procedures data."""
 
-    # Regex patterns
     EXPERIMENTER_SPLIT_REGEX = re.compile(r"[;,]")
-    ANTIBODY_ANTI_PATTERN_REGEX = re.compile(r"anti[-\s]*([A-Za-z0-9]+)", re.IGNORECASE)
+    ANTIBODY_ANTI_PATTERN_REGEX = re.compile(
+        r"anti[-\s]*([A-Za-z0-9]+)", re.IGNORECASE
+    )
 
     def __init__(
         self,
@@ -64,19 +61,25 @@ class ExaspimProceduresMapper:
             self.imaging_queue_info = []
             self.qc_sheet_info = []
         else:
-            self.mouse_tracker_info = getattr(exaspim_info, "mouse_tracker_info", [])
-            self.sample_tracking_info = getattr(exaspim_info, "sample_tracking_info", [])
-            self.imaging_queue_info = getattr(exaspim_info, "imaging_queue_info", [])
+            self.mouse_tracker_info = getattr(
+                exaspim_info, "mouse_tracker_info", []
+            )
+            self.sample_tracking_info = getattr(
+                exaspim_info, "sample_tracking_info", []
+            )
+            self.imaging_queue_info = getattr(
+                exaspim_info, "imaging_queue_info", []
+            )
             self.qc_sheet_info = getattr(exaspim_info, "qc_sheet_info", [])
 
     @staticmethod
-    def _parse_date(raw: Any) -> Optional[date]:
+    def _parse_date(raw: Optional[str]) -> Optional[date]:
         """
         Parse a raw Smartsheet value to a date.
 
         Parameters
         ----------
-        raw : Any
+        raw : Optional[str]
             The cell value
 
         Returns
@@ -92,9 +95,9 @@ class ExaspimProceduresMapper:
         if not text:
             return None
         # Remove 'Z' suffix if present (UTC indicator)
-        if text.endswith('Z'):
+        if text.endswith("Z"):
             text = text[:-1]
-        
+
         for fmt in (
             "%m/%d/%y",
             "%m/%d/%Y",
@@ -154,12 +157,11 @@ class ExaspimProceduresMapper:
         raw = sample_tracking_row.processing_lead
         if not raw:
             return []
-        
+
         raw = raw.strip()
         if not raw:
             return []
-        
-        # Split on comma or semicolon
+
         names = ExaspimProceduresMapper.EXPERIMENTER_SPLIT_REGEX.split(raw)
         experimenters: List[str] = []
         for name in names:
@@ -167,7 +169,7 @@ class ExaspimProceduresMapper:
             if name:
                 experimenters.append(name)
         return experimenters
-    
+
     @staticmethod
     def _map_antibody_species(antibody_name: str) -> Optional[Species.ONE_OF]:
         """Map the host Species of an antibody from its name."""
@@ -184,7 +186,7 @@ class ExaspimProceduresMapper:
             return None
         first_token = cleaned.split()[0].lower()
         return antibody_species_map.get(first_token)
-    
+
     @staticmethod
     def _map_antibody_source(antibody_name: str) -> Organization:
         """Map an antibody name to its source Organization."""
@@ -196,11 +198,13 @@ class ExaspimProceduresMapper:
             "goat anti-tdt": Organization.SICGEN,
             "donkey anti-goat igg (h+l) af 568": Organization.INVITROGEN,
         }
-        return antibody_source_map.get(antibody_name.strip().lower(), Organization.OTHER)
-    
+        return antibody_source_map.get(
+            antibody_name.strip().lower(), Organization.OTHER
+        )
+
     @staticmethod
     def _map_rrid(catalog: str, antibody_name: str) -> Optional[PIDName]:
-        """Map a catalog number to a PIDName carrying the corresponding RRID."""
+        """Map a catalog number to a PIDName with the corresponding RRID."""
         catalog_to_rrid = {
             # Primary antibody catalogs
             "ab290": "AB_303395",
@@ -227,7 +231,7 @@ class ExaspimProceduresMapper:
             registry=Registry.RRID,
             registry_identifier=rrid,
         )
-    
+
     @staticmethod
     def _map_primary_antibody_target(antibody_name: str) -> str:
         """Map the protein target for a primary antibody name."""
@@ -235,7 +239,7 @@ class ExaspimProceduresMapper:
             "gfp": "GFP",
             "tdt": "tdTomato",
             "tdtomato": "tdTomato",
-            "tdtomat": "tdTomato",  # Handles "tdT" variations
+            "tdtomat": "tdTomato",
             "mtfp": "mTFP",
         }
         protein_full_name_map = {
@@ -246,13 +250,19 @@ class ExaspimProceduresMapper:
         cleaned_name = antibody_name.strip()
         if not cleaned_name:
             return cleaned_name
-        
-        anti_match = ExaspimProceduresMapper.ANTIBODY_ANTI_PATTERN_REGEX.search(cleaned_name)
+
+        anti_match = (
+            ExaspimProceduresMapper.ANTIBODY_ANTI_PATTERN_REGEX.search(
+                cleaned_name
+            )
+        )
         target_token = anti_match.group(1) if anti_match else cleaned_name
-        
-        canonical = target_canonical_map.get(target_token.lower(), target_token)
+
+        canonical = target_canonical_map.get(
+            target_token.lower(), target_token
+        )
         return protein_full_name_map.get(canonical, canonical)
-    
+
     @staticmethod
     def _map_secondary_antibody_target(
         secondary_antibody_name: str,
@@ -269,17 +279,27 @@ class ExaspimProceduresMapper:
         }
         primary_name = primary_antibody_name.strip()
         secondary_name = secondary_antibody_name.strip()
-        
+
         for host_key, host_name in antibody_host_canonical_map.items():
-            if re.search(rf"\b{re.escape(host_key)}\b", primary_name, flags=re.IGNORECASE):
+            if re.search(
+                rf"\b{re.escape(host_key)}\b",
+                primary_name,
+                flags=re.IGNORECASE,
+            ):
                 return f"{host_name} antibody"
-        
-        anti_match = ExaspimProceduresMapper.ANTIBODY_ANTI_PATTERN_REGEX.search(secondary_name)
+
+        anti_match = (
+            ExaspimProceduresMapper.ANTIBODY_ANTI_PATTERN_REGEX.search(
+                secondary_name
+            )
+        )
         if anti_match:
             secondary_token = anti_match.group(1).lower()
             if secondary_token in antibody_host_canonical_map:
-                return f"{antibody_host_canonical_map[secondary_token]} antibody"
-        
+                return (
+                    f"{antibody_host_canonical_map[secondary_token]} antibody"
+                )
+
         return secondary_name
 
     def _get_titer_for_virus(
@@ -302,26 +322,32 @@ class ExaspimProceduresMapper:
             Titer value or None if unavailable
         """
         prefix = f"virus{virus_num}"
-        
+
         # Effective titer (not available for virus1)
         if virus_num > 1:
-            titer_raw = getattr(mouse_tracker_row, f"{prefix}_effective_titer_gc_ml", None)
+            titer_raw = getattr(
+                mouse_tracker_row, f"{prefix}_effective_titer_gc_ml", None
+            )
             if titer_raw is not None and str(titer_raw).strip():
                 return titer_raw
-        
+
         # Working titer (virus1 has unprefixed field name)
         if virus_num == 1:
             titer_raw = getattr(mouse_tracker_row, "working_titer_gc_ml", None)
         else:
-            titer_raw = getattr(mouse_tracker_row, f"{prefix}_working_titer_gc_ml", None)
+            titer_raw = getattr(
+                mouse_tracker_row, f"{prefix}_working_titer_gc_ml", None
+            )
         if titer_raw is not None and str(titer_raw).strip():
             return titer_raw
-        
+
         # Stock titer (all viruses use prefixed field)
-        titer_raw = getattr(mouse_tracker_row, f"{prefix}_stock_titer_gc_ml", None)
+        titer_raw = getattr(
+            mouse_tracker_row, f"{prefix}_stock_titer_gc_ml", None
+        )
         if titer_raw is not None and str(titer_raw).strip():
             return titer_raw
-        
+
         return None
 
     def build_injection_surgery(
@@ -367,19 +393,20 @@ class ExaspimProceduresMapper:
                 volume_raw = mouse_tracker_row.stereotaxic_volume_injected_nl
             else:
                 volume_raw = getattr(
-                    mouse_tracker_row, f"{prefix}_stereotaxic_volume_injected_nl"
+                    mouse_tracker_row,
+                    f"{prefix}_stereotaxic_volume_injected_nl",
                 )
 
             # Fall back to retro-orbital volume (stored in µL)
             if not volume_raw:
-                ro_volume_raw = mouse_tracker_row.virus_mix_total_volume_injected_ro_ul
+                ro_volume_raw = (
+                    mouse_tracker_row.virus_mix_total_volume_injected_ro_ul
+                )
             else:
                 ro_volume_raw = None
 
             # Get titer using priority system (effective > working > stock)
-            titer_raw = self._get_titer_for_virus(
-                mouse_tracker_row, virus_num
-            )
+            titer_raw = self._get_titer_for_virus(mouse_tracker_row, virus_num)
 
             # Build injection material
             vm_kwargs: Dict[str, Any] = {"name": virus_name}
@@ -433,7 +460,6 @@ class ExaspimProceduresMapper:
         if not injection_objects:
             return None
 
-        # Use the earliest injection date as the surgery date
         surgery_date = min(injection_dates) if injection_dates else None
 
         return Surgery(
@@ -442,7 +468,10 @@ class ExaspimProceduresMapper:
         )
 
     def build_delipidation(
-        self, sample_tracking_row: SampleTracking, specimen_id: str, experimenters: List[str] = None
+        self,
+        sample_tracking_row: SampleTracking,
+        specimen_id: str,
+        experimenters: List[str] = None,
     ) -> Optional[SpecimenProcedure]:
         """
         Build a Delipidation SpecimenProcedure.
@@ -464,14 +493,9 @@ class ExaspimProceduresMapper:
         start_date = self._parse_date(
             sample_tracking_row.dcm_delipidation_start
         )
-        end_date = self._parse_date(
-            sample_tracking_row.sbip_delipidation_end
-        )
+        end_date = self._parse_date(sample_tracking_row.sbip_delipidation_end)
 
         if not start_date or not end_date:
-            # logger.info(
-            #     "Delipidation dates not available — skipping delipidation."
-            # )
             return None
 
         reagents = [
@@ -497,7 +521,10 @@ class ExaspimProceduresMapper:
         )
 
     def build_immunolabeling(
-        self, sample_tracking_row: SampleTracking, specimen_id: str, experimenters: List[str] = None
+        self,
+        sample_tracking_row: SampleTracking,
+        specimen_id: str,
+        experimenters: List[str] = None,
     ) -> Optional[SpecimenProcedure]:
         """
         Build an Immunolabeling SpecimenProcedure.
@@ -529,55 +556,23 @@ class ExaspimProceduresMapper:
 
         # Build primary antibody reagents (up to 3)
         for i in range(1, 4):
-            ab_name = getattr(sample_tracking_row, f"immuno_primary_antibody{i}")
+            ab_name = getattr(
+                sample_tracking_row, f"immuno_primary_antibody{i}"
+            )
             if not ab_name:
                 continue
             ab_name = ab_name.strip()
 
-            catalog = getattr(sample_tracking_row, f"primary_antibody{i}_catalog_num")
+            catalog = getattr(
+                sample_tracking_row, f"primary_antibody{i}_catalog_num"
+            )
             catalog = catalog.strip() if catalog else None
-            
+
             lot = getattr(sample_tracking_row, f"primary_antibody{i}_lot_num")
             lot = lot.strip() if lot else None
             mass_raw = getattr(
-                sample_tracking_row, f"mass_of_primary_antibody{i}_used_per_brain_ug"
-            )
-            mass = 0.0
-            if mass_raw is not None and self._is_numeric(mass_raw):
-                mass = float(str(mass_raw))
-
-            reagent = ProbeReagent(
-                name=ab_name,
-                source=self._map_antibody_source(ab_name),
-                lot_number=lot if lot else None,
-                rrid=self._map_rrid(catalog, ab_name) if catalog else None,
-                target=ProteinProbe(
-                    protein=PIDName(name=self._map_primary_antibody_target(ab_name)),
-                    species=self._map_antibody_species(ab_name),
-                    mass=mass,
-                ),
-            )
-            reagents.append(reagent)
-
-        # Build secondary antibody reagents (up to 3)
-        for i in range(1, 4):
-            ab_name = getattr(sample_tracking_row, f"immuno_secondary_antibody{i}")
-            primary_ab_name = getattr(sample_tracking_row, f"immuno_primary_antibody{i}")
-            if not ab_name:
-                continue
-            ab_name = ab_name.strip()
-            if primary_ab_name:
-                primary_ab_name = primary_ab_name.strip()
-            else:
-                primary_ab_name = ""
-
-            catalog = getattr(sample_tracking_row, f"secondary_antibody{i}_catalog_num")
-            catalog = catalog.strip() if catalog else None
-            
-            lot = getattr(sample_tracking_row, f"secondary_antibody{i}_lot_num")
-            lot = lot.strip() if lot else None
-            mass_raw = getattr(
-                sample_tracking_row, f"mass_of_secondary_antibody{i}_used_per_brain_ug"
+                sample_tracking_row,
+                f"mass_of_primary_antibody{i}_used_per_brain_ug",
             )
             mass = 0.0
             if mass_raw is not None and self._is_numeric(mass_raw):
@@ -590,7 +585,57 @@ class ExaspimProceduresMapper:
                 rrid=self._map_rrid(catalog, ab_name) if catalog else None,
                 target=ProteinProbe(
                     protein=PIDName(
-                        name=self._map_secondary_antibody_target(ab_name, primary_ab_name)
+                        name=self._map_primary_antibody_target(ab_name)
+                    ),
+                    species=self._map_antibody_species(ab_name),
+                    mass=mass,
+                ),
+            )
+            reagents.append(reagent)
+
+        # Build secondary antibody reagents (up to 3)
+        for i in range(1, 4):
+            ab_name = getattr(
+                sample_tracking_row, f"immuno_secondary_antibody{i}"
+            )
+            primary_ab_name = getattr(
+                sample_tracking_row, f"immuno_primary_antibody{i}"
+            )
+            if not ab_name:
+                continue
+            ab_name = ab_name.strip()
+            if primary_ab_name:
+                primary_ab_name = primary_ab_name.strip()
+            else:
+                primary_ab_name = ""
+
+            catalog = getattr(
+                sample_tracking_row, f"secondary_antibody{i}_catalog_num"
+            )
+            catalog = catalog.strip() if catalog else None
+
+            lot = getattr(
+                sample_tracking_row, f"secondary_antibody{i}_lot_num"
+            )
+            lot = lot.strip() if lot else None
+            mass_raw = getattr(
+                sample_tracking_row,
+                f"mass_of_secondary_antibody{i}_used_per_brain_ug",
+            )
+            mass = 0.0
+            if mass_raw is not None and self._is_numeric(mass_raw):
+                mass = float(str(mass_raw))
+
+            reagent = ProbeReagent(
+                name=ab_name,
+                source=self._map_antibody_source(ab_name),
+                lot_number=lot if lot else None,
+                rrid=self._map_rrid(catalog, ab_name) if catalog else None,
+                target=ProteinProbe(
+                    protein=PIDName(
+                        name=self._map_secondary_antibody_target(
+                            ab_name, primary_ab_name
+                        )
                     ),
                     species=self._map_antibody_species(ab_name),
                     mass=mass,
@@ -599,9 +644,17 @@ class ExaspimProceduresMapper:
             reagents.append(reagent)
 
         # Build notes about RRID if available
-        primary_rrid = sample_tracking_row.primary_antibody_rrid.strip() if sample_tracking_row.primary_antibody_rrid else None
-        secondary_rrid = sample_tracking_row.secondary_antibody_rrid.strip() if sample_tracking_row.secondary_antibody_rrid else None
-        
+        primary_rrid = (
+            sample_tracking_row.primary_antibody_rrid.strip()
+            if sample_tracking_row.primary_antibody_rrid
+            else None
+        )
+        secondary_rrid = (
+            sample_tracking_row.secondary_antibody_rrid.strip()
+            if sample_tracking_row.secondary_antibody_rrid
+            else None
+        )
+
         rrid_notes = []
         if primary_rrid:
             rrid_notes.append(f"Primary RRID: {primary_rrid}")
@@ -627,7 +680,10 @@ class ExaspimProceduresMapper:
         )
 
     def build_gelation(
-        self, sample_tracking_row: SampleTracking, specimen_id: str, experimenters: List[str] = None
+        self,
+        sample_tracking_row: SampleTracking,
+        specimen_id: str,
+        experimenters: List[str] = None,
     ) -> Optional[SpecimenProcedure]:
         """
         Build a Gelation SpecimenProcedure.
@@ -644,9 +700,7 @@ class ExaspimProceduresMapper:
         Optional[SpecimenProcedure]
             The gelation procedure or None if dates missing
         """
-        start_date = self._parse_date(
-            sample_tracking_row.gelation_mbs_start
-        )
+        start_date = self._parse_date(sample_tracking_row.gelation_mbs_start)
         if not start_date:
             return None
 
@@ -654,9 +708,7 @@ class ExaspimProceduresMapper:
         storage_date = self._parse_date(
             sample_tracking_row.date_of_storage_in_pbs_az_0_05_4c
         )
-        pbs_wash_end = self._parse_date(
-            sample_tracking_row.pbs_wash_end
-        )
+        pbs_wash_end = self._parse_date(sample_tracking_row.pbs_wash_end)
         end_date = storage_date or pbs_wash_end or start_date
 
         reagents = [
@@ -713,21 +765,24 @@ class ExaspimProceduresMapper:
 
         return SpecimenProcedure(
             procedure_type=SpecimenProcedureType.GELATION,
-            procedure_name="Gelation (MBS, AcX, StockX+VA-044, ProK digestion)",
+            procedure_name=(
+                "Gelation (MBS, AcX, StockX+VA-044, ProK digestion)"
+            ),
             specimen_id=specimen_id,
             start_date=start_date,
             end_date=end_date,
             experimenters=experimenters or [],
             procedure_details=reagents,
-            protocol_parameters=(
-                protocol_params if protocol_params else None
-            ),
+            protocol_parameters=(protocol_params if protocol_params else None),
             notes=qc_notes,
         )
 
     def build_expansion(
-        self, sample_tracking_row: SampleTracking, specimen_id: str, 
-        imaging_start_date: Optional[date], experimenters: List[str] = None
+        self,
+        sample_tracking_row: SampleTracking,
+        specimen_id: str,
+        imaging_start_date: Optional[date],
+        experimenters: List[str] = None,
     ) -> Optional[SpecimenProcedure]:
         """
         Build an Expansion SpecimenProcedure.
@@ -758,15 +813,15 @@ class ExaspimProceduresMapper:
         status = sample_tracking_row.status
         if not status or status.strip().lower() != "imaged":
             return None
-        
+
         # Need imaging start date to calculate expansion dates
         if not imaging_start_date:
             return None
-        
+
         # Backtrack 3 days from imaging start
         start_date = imaging_start_date - timedelta(days=3)
         end_date = imaging_start_date
-        
+
         reagents = [
             Solution(
                 name="Saline-Sodium Citrate (SSC)",
@@ -775,7 +830,7 @@ class ExaspimProceduresMapper:
                 name="Ascorbic Acid",
             ),
         ]
-        
+
         # Protocol parameters with sub-step timing
         protocol_params = {
             "ssc_duration": "2 days",
@@ -798,7 +853,10 @@ class ExaspimProceduresMapper:
         )
 
     def build_mounting_and_imaging(
-        self, imaging_queue_row: ImagingQueue, specimen_id: str, experimenters: List[str] = None
+        self,
+        imaging_queue_row: ImagingQueue,
+        specimen_id: str,
+        experimenters: List[str] = None,
     ) -> Optional[SpecimenProcedure]:
         """
         Build a Mounting SpecimenProcedure for the final imaging step.
@@ -815,20 +873,34 @@ class ExaspimProceduresMapper:
         Optional[SpecimenProcedure]
             The mounting + imaging procedure or None if dates missing
         """
-        start_date = self._parse_date(
-            imaging_queue_row.imaging_start_date
-        )
+        start_date = self._parse_date(imaging_queue_row.imaging_start_date)
         if not start_date:
             return None
 
-        end_date = self._parse_date(
-            imaging_queue_row.imaging_end_date
-        ) or start_date
+        end_date = (
+            self._parse_date(imaging_queue_row.imaging_end_date) or start_date
+        )
 
-        microscope = imaging_queue_row.microscope.strip() if imaging_queue_row.microscope else None
-        imaging_buffer = imaging_queue_row.imaging_buffer.strip() if imaging_queue_row.imaging_buffer else None
-        channels = imaging_queue_row.signal_channel_s.strip() if imaging_queue_row.signal_channel_s else None
-        notes_col = imaging_queue_row.notes.strip() if imaging_queue_row.notes else None
+        microscope = (
+            imaging_queue_row.microscope.strip()
+            if imaging_queue_row.microscope
+            else None
+        )
+        imaging_buffer = (
+            imaging_queue_row.imaging_buffer.strip()
+            if imaging_queue_row.imaging_buffer
+            else None
+        )
+        channels = (
+            imaging_queue_row.signal_channel_s.strip()
+            if imaging_queue_row.signal_channel_s
+            else None
+        )
+        notes_col = (
+            imaging_queue_row.notes.strip()
+            if imaging_queue_row.notes
+            else None
+        )
 
         reagents: List[Union[Reagent, Solution]] = []
         if imaging_buffer:
@@ -922,19 +994,23 @@ class ExaspimProceduresMapper:
             imaging_start_date = self._parse_date(
                 self.imaging_queue_info[0].imaging_start_date
             )
-        
+
         # Build specimen procedures from Sample Tracking
         if self.sample_tracking_info:
             st_row = self.sample_tracking_info[0]
             experimenters = self._parse_experimenters(st_row)
 
             # Delipidation
-            delipidation = self.build_delipidation(st_row, specimen_id, experimenters)
+            delipidation = self.build_delipidation(
+                st_row, specimen_id, experimenters
+            )
             if delipidation:
                 specimen_procedures.append(delipidation)
 
             # Immunolabeling
-            immunolabeling = self.build_immunolabeling(st_row, specimen_id, experimenters)
+            immunolabeling = self.build_immunolabeling(
+                st_row, specimen_id, experimenters
+            )
             if immunolabeling:
                 specimen_procedures.append(immunolabeling)
 
@@ -944,7 +1020,9 @@ class ExaspimProceduresMapper:
                 specimen_procedures.append(gelation)
 
             # Expansion (requires imaging_start_date and status="Imaged")
-            expansion = self.build_expansion(st_row, specimen_id, imaging_start_date, experimenters)
+            expansion = self.build_expansion(
+                st_row, specimen_id, imaging_start_date, experimenters
+            )
             if expansion:
                 specimen_procedures.append(expansion)
 
@@ -953,8 +1031,10 @@ class ExaspimProceduresMapper:
             # Try to get experimenters from sample tracking if available
             experimenters = []
             if self.sample_tracking_info:
-                experimenters = self._parse_experimenters(self.sample_tracking_info[0])
-            
+                experimenters = self._parse_experimenters(
+                    self.sample_tracking_info[0]
+                )
+
             mounting = self.build_mounting_and_imaging(
                 self.imaging_queue_info[0], specimen_id, experimenters
             )
@@ -967,7 +1047,10 @@ class ExaspimProceduresMapper:
         return subject_procedures, specimen_procedures
 
     def map_to_aind_procedures(
-            self, subject_id: str, specimen_procedures: List[SpecimenProcedure], subject_procedures: List[Surgery]
+        self,
+        subject_id: str,
+        specimen_procedures: List[SpecimenProcedure],
+        subject_procedures: List[Surgery],
     ):
         """
         Map ExaSPIM procedures to AIND procedures.
@@ -987,8 +1070,8 @@ class ExaspimProceduresMapper:
             Mapped AIND procedures data
         """
         procedures = Procedures(
-                subject_id=subject_id,
-                subject_procedures=subject_procedures,
-                specimen_procedures=specimen_procedures,
+            subject_id=subject_id,
+            subject_procedures=subject_procedures,
+            specimen_procedures=specimen_procedures,
         )
         return procedures

@@ -354,13 +354,13 @@ class TestRoute:
 
         response = client.get("api/v2/smartsheet/exaspim_procedures/822178")
         assert response.status_code == 200
-        
+
         response_data = response.json()
         assert "mouse_tracker_info" in response_data
         assert "sample_tracking_info" in response_data
         assert "imaging_queue_info" in response_data
         assert "qc_sheet_info" in response_data
-        
+
         mock_get_exaspim_info.assert_called_once_with(
             "822178", _request_timeout=120
         )
@@ -376,7 +376,7 @@ class TestRoute:
 
         response = client.get("api/v2/smartsheet/exaspim_procedures/999999")
         assert response.status_code == 404
-        
+
         mock_get_exaspim_info.assert_called_once_with(
             "999999", _request_timeout=120
         )
@@ -392,7 +392,7 @@ class TestRoute:
 
         response = client.get("api/v2/smartsheet/exaspim_procedures/000000")
         assert response.status_code == 404
-        
+
         mock_get_exaspim_info.assert_called_once_with(
             "000000", _request_timeout=120
         )

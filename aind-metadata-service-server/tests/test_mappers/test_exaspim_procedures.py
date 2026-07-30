@@ -14,15 +14,12 @@ from aind_data_schema.components.injection_procedures import (
 )
 from aind_data_schema.components.reagent import (
     ProbeReagent,
-    ProteinProbe,
-    Reagent,
     Solution,
 )
 from aind_data_schema.components.specimen_procedures import SpecimenProcedure
 from aind_data_schema.components.subject_procedures import Surgery
 from aind_data_schema.core.procedures import Procedures
 from aind_data_schema_models.organizations import Organization
-from aind_data_schema_models.pid_names import PIDName
 from aind_data_schema_models.registries import Registry
 from aind_data_schema_models.species import Species
 from aind_data_schema_models.specimen_procedure_types import (
@@ -54,23 +51,18 @@ class TestExaspimBasicParsing(TestCase):
 
     def test_parse_date_various_formats(self):
         """Test date parsing with different formats"""
-        # MM/DD/YY format
         result1 = self.mapper._parse_date("07/20/23")
         self.assertEqual(result1, date(2023, 7, 20))
 
-        # MM/DD/YYYY format
         result2 = self.mapper._parse_date("12/14/2023")
         self.assertEqual(result2, date(2023, 12, 14))
 
-        # ISO format
         result3 = self.mapper._parse_date("2023-03-31")
         self.assertEqual(result3, date(2023, 3, 31))
 
-        # With time
         result4 = self.mapper._parse_date("2023-01-08T00:00:00Z")
         self.assertEqual(result4, date(2023, 1, 8))
 
-        # None or empty
         self.assertIsNone(self.mapper._parse_date(None))
         self.assertIsNone(self.mapper._parse_date(""))
         self.assertIsNone(self.mapper._parse_date("  "))
@@ -83,13 +75,11 @@ class TestExaspimBasicParsing(TestCase):
 
     def test_is_numeric(self):
         """Test numeric value detection"""
-        # Valid numeric values
         self.assertTrue(self.mapper._is_numeric(100))
         self.assertTrue(self.mapper._is_numeric(3.14))
         self.assertTrue(self.mapper._is_numeric("500.2"))
         self.assertTrue(self.mapper._is_numeric("1.35E+14"))
 
-        # Invalid values
         self.assertFalse(self.mapper._is_numeric(None))
         self.assertFalse(self.mapper._is_numeric("n/a"))
         self.assertFalse(self.mapper._is_numeric(""))
@@ -124,9 +114,13 @@ class TestExaspimBasicParsing(TestCase):
         sample_tracking_none = SampleTracking.model_construct(
             processing_lead=None
         )
-        self.assertEqual(self.mapper._parse_experimenters(sample_tracking_none), [])
+        self.assertEqual(
+            self.mapper._parse_experimenters(sample_tracking_none), []
+        )
 
-        sample_tracking_empty = SampleTracking.model_construct(processing_lead="")
+        sample_tracking_empty = SampleTracking.model_construct(
+            processing_lead=""
+        )
         self.assertEqual(
             self.mapper._parse_experimenters(sample_tracking_empty), []
         )
@@ -187,7 +181,6 @@ class TestExaspimAntibodyMapping(TestCase):
 
     def test_map_rrid(self):
         """Test RRID mapping from catalog numbers"""
-        # Primary antibodies
         rrid1 = self.mapper._map_rrid("AB290", "Rabbit Anti-GFP")
         self.assertIsNotNone(rrid1)
         self.assertEqual(rrid1.registry, Registry.RRID)
@@ -197,7 +190,6 @@ class TestExaspimAntibodyMapping(TestCase):
         self.assertIsNotNone(rrid2)
         self.assertEqual(rrid2.registry_identifier, "AB_2722750")
 
-        # Secondary antibodies
         rrid3 = self.mapper._map_rrid("A-21206", "Donkey anti-Rabbit")
         self.assertIsNotNone(rrid3)
         self.assertEqual(rrid3.registry_identifier, "AB_2535792")
@@ -232,7 +224,6 @@ class TestExaspimAntibodyMapping(TestCase):
 
     def test_map_secondary_antibody_target(self):
         """Test secondary antibody target mapping"""
-        # Should detect primary host and return "{Host} antibody"
         result1 = self.mapper._map_secondary_antibody_target(
             "Donkey anti-Rabbit IgG", "Rabbit Anti-GFP"
         )
@@ -243,7 +234,6 @@ class TestExaspimAntibodyMapping(TestCase):
         )
         self.assertEqual(result2, "Goat antibody")
 
-        # If can't detect from primary, use secondary
         result3 = self.mapper._map_secondary_antibody_target(
             "Donkey anti-Mouse IgG", "Some Unknown Primary"
         )
@@ -267,72 +257,55 @@ class TestExaspimTiterCalculation(TestCase):
             "virus2_stock_titer_gc_ml": "2.0E+11",
         }
         mouse_tracker = MouseTracker.model_validate(data)
-        result = self.mapper._get_titer_for_virus(
-            mouse_tracker, 2
-        )
+        result = self.mapper._get_titer_for_virus(mouse_tracker, 2)
         self.assertEqual(result, "1.0E+12")
 
     def test_get_titer_working(self):
         """Test titer priority: working titer when no effective (virus1)"""
         data = {
             "num": 1,
-            "working_titer_gc_ml": "5.0E+11",  # virus1 uses unprefixed field
+            "working_titer_gc_ml": "5.0E+11",
             "virus1_stock_titer_gc_ml": "2.0E+11",
         }
         mouse_tracker = MouseTracker.model_validate(data)
-        result = self.mapper._get_titer_for_virus(
-            mouse_tracker, 1
-        )
+        result = self.mapper._get_titer_for_virus(mouse_tracker, 1)
         self.assertEqual(result, "5.0E+11")
 
     def test_get_titer_stock_with_dose_present(self):
         """Test titer uses stock even when dose is present (no calculation)"""
         data = {
             "num": 1,
-            "virus1_dose_gc": "1.0E+09",  # Dose is present but ignored
+            "virus1_dose_gc": "1.0E+09",
             "virus1_stock_titer_gc_ml": "1.0E+11",
         }
         mouse_tracker = MouseTracker.model_validate(data)
-        # Dose is intentionally NOT used to calculate titer
-        result = self.mapper._get_titer_for_virus(
-            mouse_tracker, 1
-        )
+        result = self.mapper._get_titer_for_virus(mouse_tracker, 1)
         self.assertEqual(result, "1.0E+11")
 
     def test_get_titer_priority_skips_dose(self):
         """Test titer priority completely skips dose field (virus2)"""
         data = {
             "num": 1,
-            "virus2_dose_gc": "5.0E+11",  # Dose present
-            "virus2_working_titer_gc_ml": "3.0E+11",  # Should use this
+            "virus2_dose_gc": "5.0E+11",
+            "virus2_working_titer_gc_ml": "3.0E+11",
             "virus2_stock_titer_gc_ml": "1.0E+11",
         }
         mouse_tracker = MouseTracker.model_validate(data)
-        # Should use working titer, not calculate from dose
-        result = self.mapper._get_titer_for_virus(
-            mouse_tracker, 2
-        )
+        result = self.mapper._get_titer_for_virus(mouse_tracker, 2)
         self.assertEqual(result, "3.0E+11")
 
     def test_get_titer_stock(self):
         """Test titer priority: stock titer as last resort"""
-        data = {
-            "num": 1,
-            "virus1_stock_titer_gc_ml": "2.0E+11"
-        }
+        data = {"num": 1, "virus1_stock_titer_gc_ml": "2.0E+11"}
         mouse_tracker = MouseTracker.model_validate(data)
-        result = self.mapper._get_titer_for_virus(
-            mouse_tracker, 1
-        )
+        result = self.mapper._get_titer_for_virus(mouse_tracker, 1)
         self.assertEqual(result, "2.0E+11")
 
     def test_get_titer_none(self):
         """Test titer returns None when no data available"""
         data = {"num": 1}
         mouse_tracker = MouseTracker.model_validate(data)
-        result = self.mapper._get_titer_for_virus(
-            mouse_tracker, 1
-        )
+        result = self.mapper._get_titer_for_virus(mouse_tracker, 1)
         self.assertIsNone(result)
 
 
@@ -381,15 +354,12 @@ class TestExaspimInjectionSurgery(TestCase):
         self.assertIsInstance(material1, ViralMaterial)
         self.assertEqual(material1.name, "Ef1a-fDOI-eGFP PHP.eB")
         self.assertIsNotNone(material1.tars_identifiers)
-        self.assertEqual(
-            material1.tars_identifiers.virus_tars_id, "VT1612g"
-        )
+        self.assertEqual(material1.tars_identifiers.virus_tars_id, "VT1612g")
 
     def test_injection_titer_priority(self):
         """Test titer uses correct priority (effective over stock)"""
         surgery = self.mapper.build_injection_surgery(self.mouse_tracker)
 
-        # Virus2 has effective titer, should use that
         injection2 = surgery.procedures[1]
         material2 = injection2.injection_materials[0]
         self.assertEqual(material2.titer, 200000000000)
@@ -404,7 +374,6 @@ class TestExaspimInjectionSurgery(TestCase):
         dynamics = injection1.dynamics[0]
         self.assertIsInstance(dynamics, InjectionDynamics)
         self.assertEqual(dynamics.profile, InjectionProfile.BOLUS)
-        # 100 µL converted to nL
         self.assertEqual(dynamics.volume, 100000.0)
         self.assertEqual(dynamics.volume_unit, VolumeUnit.NL)
 
@@ -514,7 +483,9 @@ class TestExaspimImmunolabeling(TestCase):
             "mass_of_secondary_antibody1_used_per_brain_ug": "20",
             "secondary_antibody1_catalog_num": "A-11057",
             "secondary_antibody1_lot_num": "2304269",
-            "immuno_secondary_antibody2": "Donkey anti-Rabbit IgG (H+L) AF 488",
+            "immuno_secondary_antibody2": (
+                "Donkey anti-Rabbit IgG (H+L) AF 488"
+            ),
             "mass_of_secondary_antibody2_used_per_brain_ug": "20",
             "secondary_antibody2_catalog_num": "A-21206",
             "secondary_antibody2_lot_num": "2541645",
@@ -547,7 +518,6 @@ class TestExaspimImmunolabeling(TestCase):
             self.sample_tracking, "671477", []
         )
 
-        # 2 primary + 2 secondary = 4 reagents
         self.assertEqual(len(result.procedure_details), 4)
         self.assertTrue(
             all(isinstance(r, ProbeReagent) for r in result.procedure_details)
@@ -578,7 +548,6 @@ class TestExaspimImmunolabeling(TestCase):
         self.assertEqual(secondary1.source, Organization.INVITROGEN)
         self.assertEqual(secondary1.lot_number, "2304269")
         self.assertEqual(secondary1.target.mass, 20.0)
-        # Should target the primary antibody host
         self.assertIn("antibody", secondary1.target.protein.name.lower())
 
     def test_immunolabeling_notes_with_rrid(self):
@@ -707,7 +676,9 @@ class TestExaspimExpansion(TestCase):
 
         self.assertIsNotNone(result)
         self.assertIsInstance(result, SpecimenProcedure)
-        self.assertEqual(result.procedure_type, SpecimenProcedureType.EXPANSION)
+        self.assertEqual(
+            result.procedure_type, SpecimenProcedureType.EXPANSION
+        )
         self.assertEqual(result.specimen_id, "671477")
 
     def test_expansion_dates_backtracked_from_imaging(self):
@@ -716,10 +687,8 @@ class TestExaspimExpansion(TestCase):
             self.sample_tracking, "671477", self.imaging_start_date, []
         )
 
-        # Start: imaging_start - 3 days
         expected_start = self.imaging_start_date - timedelta(days=3)
         self.assertEqual(result.start_date, expected_start)
-        # End: imaging_start
         self.assertEqual(result.end_date, self.imaging_start_date)
 
     def test_expansion_reagents(self):
@@ -915,7 +884,6 @@ class TestExaspimFullIntegration(TestCase):
         """Test correct number of specimen procedures"""
         _, specimen_procs = self.mapper.map_to_exaspim_procedures("671477")
 
-        # Should have: delipidation, immunolabeling, gelation, expansion, mounting
         self.assertEqual(len(specimen_procs), 5)
 
     def test_specimen_procedures_types(self):
@@ -993,9 +961,10 @@ class TestExaspimEdgeCases(TestCase):
         partial_info = ExaSPIMInfo.model_validate(partial_data)
         mapper = ExaspimProceduresMapper(exaspim_info=partial_info)
 
-        subject_procs, specimen_procs = mapper.map_to_exaspim_procedures("test")
+        subject_procs, _ = mapper.map_to_exaspim_procedures(
+            "test"
+        )
 
-        # Should handle missing mouse tracker
         self.assertEqual(len(subject_procs), 0)
 
     def test_qc_notes_extraction_empty(self):
@@ -1023,8 +992,8 @@ class TestExaspimEdgeCases(TestCase):
         sample_tracking = SampleTracking.model_construct(
             immuno_primary_ab_start_date="2023-01-01",
             immuno_primary_antibody1="Rabbit anti-GFP",
-            primary_antibody1_catalog_num="",  # Empty string
-            primary_antibody1_lot_num="",  # Empty string
+            primary_antibody1_catalog_num="",
+            primary_antibody1_lot_num="",
         )
         result = self.mapper.build_immunolabeling(sample_tracking, "123", [])
         self.assertIsNotNone(result)
@@ -1042,7 +1011,6 @@ class TestExaspimEdgeCases(TestCase):
         )
         result = self.mapper.build_immunolabeling(sample_tracking, "123", [])
         self.assertIsNotNone(result)
-        # Whitespace should be stripped to None
         self.assertIsNone(result.procedure_details[0].lot_number)
 
     def test_immunolabeling_secondary_with_empty_primary(self):
@@ -1050,11 +1018,10 @@ class TestExaspimEdgeCases(TestCase):
         sample_tracking = SampleTracking.model_construct(
             immuno_primary_ab_start_date="2023-01-01",
             immuno_secondary_antibody1="Donkey anti-Rabbit IgG",
-            immuno_primary_antibody1="",  # Empty primary
+            immuno_primary_antibody1="",
         )
         result = self.mapper.build_immunolabeling(sample_tracking, "123", [])
         self.assertIsNotNone(result)
-        # Should still map secondary based on anti- token
         self.assertEqual(len(result.procedure_details), 1)
 
     def test_mounting_with_empty_notes_fields(self):
@@ -1066,7 +1033,9 @@ class TestExaspimEdgeCases(TestCase):
             signal_channel_s="",
             notes="",
         )
-        result = self.mapper.build_mounting_and_imaging(imaging_queue, "123", [])
+        result = self.mapper.build_mounting_and_imaging(
+            imaging_queue, "123", []
+        )
         self.assertIsNotNone(result)
         self.assertEqual(result.procedure_details, [])
         self.assertIsNone(result.notes)
@@ -1080,9 +1049,10 @@ class TestExaspimEdgeCases(TestCase):
             signal_channel_s="   ",
             notes="   ",
         )
-        result = self.mapper.build_mounting_and_imaging(imaging_queue, "123", [])
+        result = self.mapper.build_mounting_and_imaging(
+            imaging_queue, "123", []
+        )
         self.assertIsNotNone(result)
-        # Whitespace-only should be treated as None
         self.assertIsNone(result.notes)
 
     def test_immunolabeling_with_rrid_notes(self):
@@ -1163,15 +1133,9 @@ class TestExaspimEdgeCases(TestCase):
 
     def test_qc_notes_with_empty_values(self):
         """Test QC notes with some empty values"""
-        qc1 = QcSheet.model_construct(
-            special_notes="Note 1"
-        )
-        qc2 = QcSheet.model_construct(
-            special_notes=None
-        )
-        qc3 = QcSheet.model_construct(
-            special_notes="Note 2"
-        )
+        qc1 = QcSheet.model_construct(special_notes="Note 1")
+        qc2 = QcSheet.model_construct(special_notes=None)
+        qc3 = QcSheet.model_construct(special_notes="Note 2")
         mapper = ExaspimProceduresMapper(
             exaspim_info=ExaSPIMInfo.model_construct(
                 mouse_tracker_info=[],
@@ -1185,9 +1149,7 @@ class TestExaspimEdgeCases(TestCase):
 
     def test_expansion_with_none_imaging_date(self):
         """Test expansion returns None when imaging_date is explicitly None"""
-        sample_tracking = SampleTracking.model_construct(
-            status="Imaged"
-        )
+        sample_tracking = SampleTracking.model_construct(status="Imaged")
         result = self.mapper.build_expansion(sample_tracking, "123", None, [])
         self.assertIsNone(result)
 
@@ -1215,96 +1177,90 @@ class TestExaspimEdgeCases(TestCase):
 
     def test_parse_date_unparseable(self):
         """Test date parsing with completely unparseable input"""
-        # These should all return None - covers line 105
         self.assertIsNone(self.mapper._parse_date("not a date"))
-        self.assertIsNone(self.mapper._parse_date("13/32/2023"))  # Invalid date
+        self.assertIsNone(
+            self.mapper._parse_date("13/32/2023")
+        )
         self.assertIsNone(self.mapper._parse_date("XYZ-ABC-DEF"))
         self.assertIsNone(self.mapper._parse_date("99/99/99"))
 
     def test_map_primary_antibody_target_empty_name(self):
-        """Test primary antibody target with empty/whitespace name - covers line 246"""
-        # Empty string after strip should return empty string
+        """Test primary antibody target with empty/whitespace name"""
         result1 = self.mapper._map_primary_antibody_target("")
         self.assertEqual(result1, "")
-        
+
         result2 = self.mapper._map_primary_antibody_target("   ")
         self.assertEqual(result2, "")
-        
-        # Also test with no anti- pattern (uses cleaned_name as target_token)
+
         result3 = self.mapper._map_primary_antibody_target("UNKNOWN_PROTEIN")
         self.assertEqual(result3, "UNKNOWN_PROTEIN")
 
     def test_map_secondary_antibody_no_pattern_match(self):
         """Test secondary antibody when no pattern matches - covers line 287"""
-        # Neither primary host nor secondary anti- token matches
         result = self.mapper._map_secondary_antibody_target(
-            "Alexa Fluor 488 Conjugate",  # No anti- pattern
-            "Unknown Primary"  # No recognizable host
+            "Alexa Fluor 488 Conjugate",
+            "Unknown Primary",
         )
-        # Should return secondary_name unchanged
         self.assertEqual(result, "Alexa Fluor 488 Conjugate")
 
     def test_injection_surgery_virus4_stereotaxic_volume(self):
-        """Test injection with virus4 using stereotaxic_volume_injected_nl - covers line 371"""
+        """Test injection with virus4 using stereotaxic_volume_injected_nl"""
         mouse_tracker = MouseTracker.model_construct(
             num=1,
             virus4="AAV-Test",
             virus4_id="V4-123",
             virus4_injection_date="2023-01-15",
-            stereotaxic_volume_injected_nl="500",  # Virus4 uses this field
+            stereotaxic_volume_injected_nl="500",
             virus4_stock_titer_gc_ml="1E+12",
         )
-        
+
         surgery = self.mapper.build_injection_surgery(mouse_tracker)
         self.assertIsNotNone(surgery)
         self.assertEqual(len(surgery.procedures), 1)
-        
+
         injection = surgery.procedures[0]
         self.assertEqual(len(injection.dynamics), 1)
         self.assertEqual(injection.dynamics[0].volume, 500.0)
         self.assertEqual(injection.dynamics[0].volume_unit, VolumeUnit.NL)
 
     def test_injection_surgery_multiple_viruses(self):
-        """Test injection surgery with multiple viruses - comprehensive check"""
+        """Test injection surgery with multiple viruses"""
         mouse_tracker = MouseTracker.model_construct(
             num=1,
             virus1="AAV1-GFP",
             virus1_id="V1-123",
             virus1_injection_date="2023-01-10",
             virus1_stereotaxic_volume_injected_nl="100",
-            working_titer_gc_ml="1E+12",  # virus1 uses unprefixed field
-            
+            working_titer_gc_ml="1E+12",
             virus2="AAV2-tdTomato",
             virus2_id="V2-456",
             virus2_injection_date="2023-01-11",
             virus2_stereotaxic_volume_injected_nl="200",
             virus2_effective_titer_gc_ml="2E+12",
         )
-        
+
         surgery = self.mapper.build_injection_surgery(mouse_tracker)
         self.assertIsNotNone(surgery)
-        
-        # Should have 2 injections
         self.assertEqual(len(surgery.procedures), 2)
-        
-        # Check volumes for each virus
         self.assertEqual(surgery.procedures[0].dynamics[0].volume, 100.0)
         self.assertEqual(surgery.procedures[1].dynamics[0].volume, 200.0)
-        
-        # Check titer values
-        self.assertEqual(surgery.procedures[0].injection_materials[0].titer, int(1E+12))
-        self.assertEqual(surgery.procedures[1].injection_materials[0].titer, int(2E+12))
-        
-        # Check virus IDs are set correctly
-        self.assertEqual(surgery.procedures[0].injection_materials[0].name, "AAV1-GFP")
-        self.assertEqual(surgery.procedures[1].injection_materials[0].name, "AAV2-tdTomato")
-        
-        # Surgery date should be earliest injection date
+
+        self.assertEqual(
+            surgery.procedures[0].injection_materials[0].titer, int(1e12)
+        )
+        self.assertEqual(
+            surgery.procedures[1].injection_materials[0].titer, int(2e12)
+        )
+        self.assertEqual(
+            surgery.procedures[0].injection_materials[0].name, "AAV1-GFP"
+        )
+        self.assertEqual(
+            surgery.procedures[1].injection_materials[0].name, "AAV2-tdTomato"
+        )
         self.assertEqual(surgery.start_date, date(2023, 1, 10))
 
     def test_is_numeric_comprehensive(self):
         """Comprehensive numeric value testing including edge cases"""
-        # Valid numeric values
         self.assertTrue(self.mapper._is_numeric(100))
         self.assertTrue(self.mapper._is_numeric(3.14))
         self.assertTrue(self.mapper._is_numeric(0))
@@ -1312,33 +1268,28 @@ class TestExaspimEdgeCases(TestCase):
         self.assertTrue(self.mapper._is_numeric("500.2"))
         self.assertTrue(self.mapper._is_numeric("1.35E+14"))
         self.assertTrue(self.mapper._is_numeric("  42  "))
-        
-        # Invalid values - covers line 131 exception handler
+
         self.assertFalse(self.mapper._is_numeric(None))
         self.assertFalse(self.mapper._is_numeric("n/a"))
         self.assertFalse(self.mapper._is_numeric(""))
         self.assertFalse(self.mapper._is_numeric("  "))
         self.assertFalse(self.mapper._is_numeric("text"))
-        self.assertFalse(self.mapper._is_numeric("12.34.56"))  # Invalid float format
+        self.assertFalse(
+            self.mapper._is_numeric("12.34.56")
+        )
         self.assertFalse(self.mapper._is_numeric("not-a-number"))
 
     def test_map_antibody_species_comprehensive(self):
         """Comprehensive antibody species mapping including edge cases"""
-        # Valid mappings
         self.assertEqual(
             self.mapper._map_antibody_species("Rabbit Anti-GFP"),
-            Species.EUROPEAN_RABBIT
+            Species.EUROPEAN_RABBIT,
         )
         self.assertEqual(
-            self.mapper._map_antibody_species("Mouse IgG"),
-            Species.HOUSE_MOUSE
+            self.mapper._map_antibody_species("Mouse IgG"), Species.HOUSE_MOUSE
         )
-        
-        # Unknown/unmapped species - returns None
         self.assertIsNone(self.mapper._map_antibody_species("Llama Anti-GFP"))
         self.assertIsNone(self.mapper._map_antibody_species("Unknown"))
-        
-        # Empty string
         self.assertIsNone(self.mapper._map_antibody_species(""))
         self.assertIsNone(self.mapper._map_antibody_species("   "))
 
@@ -1349,34 +1300,31 @@ class TestExaspimEdgeCases(TestCase):
             virus1="AAV1-GFP",
             virus1_id="V1-123",
             virus1_injection_date="2023-01-10",
-            # No volume data provided
             working_titer_gc_ml="1E+12",
-            
             virus2="AAV2-tdTomato",
             virus2_id="V2-456",
             virus2_injection_date="2023-01-11",
-            virus2_stereotaxic_volume_injected_nl="200",  # This one has volume
+            virus2_stereotaxic_volume_injected_nl="200",
             virus2_working_titer_gc_ml="2E+12",
         )
-        
+
         surgery = self.mapper.build_injection_surgery(mouse_tracker)
         self.assertIsNotNone(surgery)
-        
-        # Only virus2 should be included (virus1 skipped due to no volume)
         self.assertEqual(len(surgery.procedures), 1)
-        self.assertEqual(surgery.procedures[0].injection_materials[0].name, "AAV2-tdTomato")
+        self.assertEqual(
+            surgery.procedures[0].injection_materials[0].name, "AAV2-tdTomato"
+        )
 
     def test_injection_surgery_zero_volume_skips(self):
         """Test that zero or negative volumes are skipped"""
         mouse_tracker = MouseTracker.model_construct(
             num=1,
             virus1="AAV1-GFP",
-            virus1_stereotaxic_volume_injected_nl="0",  # Zero volume
+            virus1_stereotaxic_volume_injected_nl="0",
             working_titer_gc_ml="1E+12",
         )
-        
+
         surgery = self.mapper.build_injection_surgery(mouse_tracker)
-        # No valid injections
         self.assertIsNone(surgery)
 
 

@@ -2,8 +2,7 @@
 
 import logging
 from enum import Enum
-from typing import Any, List, Optional, Union
-from collections import defaultdict
+from typing import List, Optional, Union
 from aind_data_schema.components.injection_procedures import (
     Injection,
     ViralMaterial,
@@ -12,7 +11,9 @@ from aind_data_schema.components.subject_procedures import (
     Perfusion,
     WaterRestriction,
 )
-from aind_data_schema_models.specimen_procedure_types import SpecimenProcedureType
+from aind_data_schema_models.specimen_procedure_types import (
+    SpecimenProcedureType,
+)
 from aind_data_schema.components.surgery_procedures import (
     BrainInjection,
     Craniotomy,
@@ -34,7 +35,10 @@ from aind_slims_service_async_client.models import (
     SlimsHistologyData,
     SlimsWaterRestrictionData,
 )
-from aind_smartsheet_service_async_client.models import PerfusionsModel, ExaSPIMInfo
+from aind_smartsheet_service_async_client.models import (
+    PerfusionsModel,
+    ExaSPIMInfo,
+)
 from pydantic import ValidationError
 
 from aind_metadata_service_server.mappers.las2020 import (
@@ -108,9 +112,13 @@ class ProtocolNames(Enum):
     GELATION_DIGESTION = "Whole Mouse Brain Gelation and Digestion"
     EXPANSION_MOUNTING = "Expansion and Mounting of Hydrogel Embedded Brain"
     DELIPIDATION_V2 = (
-        "Tetrahydrofuran and Dichloromethane Delipidation of a Whole Mouse Brain V.2"
+        "Tetrahydrofuran and Dichloromethane Delipidation "
+        "of a Whole Mouse Brain V.2"
     )
-    SBIP_DELIPIDATION_V2 = "Aqueous (SBiP) Delipidation of a Whole Mouse Brain V.2"
+    SBIP_DELIPIDATION_V2 = (
+        "Aqueous (SBiP) Delipidation of a Whole Mouse Brain V.2"
+    )
+
 
 class ProceduresMapper:
     """Class to handle mapping of procedures data."""
@@ -231,7 +239,6 @@ class ProceduresMapper:
         """Maps response from slims into WaterRestriction models"""
         water_restrictions = []
         for data in self.slims_water_restriction:
-            # missing ethics review id
             wr = WaterRestriction.model_construct(
                 start_date=data.start_date.date() if data.start_date else None,
                 end_date=data.end_date.date() if data.end_date else None,
@@ -246,7 +253,7 @@ class ProceduresMapper:
                     else None
                 ),
                 weight_unit=self._parse_mass_unit(data.weight_unit),
-                minimum_water_per_day=float("1.0"),  # default value
+                minimum_water_per_day=float("1.0"),
             )
             water_restrictions.append(wr)
         return water_restrictions
@@ -440,9 +447,6 @@ class ProceduresMapper:
                 f"and {len(exaspim_specimen_procedures)} specimen procedures "
                 f"from ExaSPIM Smartsheet for {subject_id}"
             )
-        
-        # Merge duplicate perfusions from different sources
-        # subject_procedures = self._merge_duplicate_perfusions(subject_procedures)
 
         if not subject_procedures and not specimen_procedures:
             return None
@@ -475,15 +479,14 @@ class ProceduresMapper:
                 return ProtocolNames.DURAGEL_APPLICATION.value
         else:
             return None
-    
+
     @staticmethod
     def _get_specimen_procedure_protocol_names(specimen_procedure):
-        """Gets protocol names for specimen procedures based on procedure type"""
-        
+        """Gets protocol names for specimen procedures"""
+
         procedure_type = getattr(specimen_procedure, "procedure_type", None)
-        
+
         if procedure_type == SpecimenProcedureType.DELIPIDATION:
-            # Return both delipidation protocols
             return [
                 ProtocolNames.DELIPIDATION_V2.value,
                 ProtocolNames.SBIP_DELIPIDATION_V2.value,
@@ -502,8 +505,7 @@ class ProceduresMapper:
     def get_protocols_list(self, procedures: Procedures) -> list:
         """Creates a list of protocol names from procedures list"""
         protocol_list = []
-        
-        # Get protocols for subject procedures
+
         for subject_procedure in procedures.subject_procedures:
             if isinstance(subject_procedure, Surgery):
                 protocol_list.append(ProtocolNames.SURGERY.value)
@@ -513,16 +515,16 @@ class ProceduresMapper:
                 protocol_name = self._get_protocol_name(procedure)
                 if protocol_name:
                     protocol_list.append(protocol_name)
-        
-        # Get protocols for specimen procedures
+
         for specimen_procedure in procedures.specimen_procedures:
-            protocol_names = self._get_specimen_procedure_protocol_names(specimen_procedure)
+            protocol_names = self._get_specimen_procedure_protocol_names(
+                specimen_procedure
+            )
             protocol_list.extend(protocol_names)
-        
-        # Add overview protocol if specimen procedures exist
+
         if procedures.specimen_procedures:
             protocol_list.append(ProtocolNames.GELATIN_PREVIOUS.value)
-        
+
         return protocol_list
 
     def integrate_protocols_into_aind_procedures(
@@ -532,7 +534,6 @@ class ProceduresMapper:
         Merges protocols responses with procedures response.
         protocols_mapping: dict of protocol_name -> ProtocolsModel
         """
-        # Handle subject procedures
         for subject_procedure in procedures.subject_procedures:
             if (
                 isinstance(subject_procedure, Surgery)
@@ -551,10 +552,11 @@ class ProceduresMapper:
                 protocol_model = protocols_mapping.get(protocol_name)
                 if protocol_model and getattr(protocol_model, "doi", None):
                     procedure.protocol_id = protocol_model.doi
-        
-        # Handle specimen procedures
+
         for specimen_procedure in procedures.specimen_procedures:
-            protocol_names = self._get_specimen_procedure_protocol_names(specimen_procedure)
+            protocol_names = self._get_specimen_procedure_protocol_names(
+                specimen_procedure
+            )
             protocol_ids = []
             for protocol_name in protocol_names:
                 protocol_model = protocols_mapping.get(protocol_name)
@@ -562,17 +564,18 @@ class ProceduresMapper:
                     protocol_ids.append(protocol_model.doi)
             if protocol_ids:
                 specimen_procedure.protocol_id = protocol_ids
-        
-        # Add overview protocol notes if specimen procedures exist
+
         if procedures.specimen_procedures:
-            overview_protocol = protocols_mapping.get(ProtocolNames.GELATIN_PREVIOUS.value)
+            overview_protocol = protocols_mapping.get(
+                ProtocolNames.GELATIN_PREVIOUS.value
+            )
             if overview_protocol and getattr(overview_protocol, "doi", None):
                 overview_note = f"Overview protocol: {overview_protocol.doi}"
                 if procedures.notes:
                     procedures.notes = f"{procedures.notes}; {overview_note}"
                 else:
                     procedures.notes = overview_note
-        
+
         return procedures
 
     @staticmethod
