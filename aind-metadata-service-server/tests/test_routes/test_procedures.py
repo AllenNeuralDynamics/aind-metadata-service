@@ -25,6 +25,7 @@ class TestRoute:
     )
     @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_exaspim_info")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
     @patch("aind_tars_service_async_client.DefaultApi.get_viral_prep_lots")
     @patch("aind_tars_service_async_client.DefaultApi.get_viruses")
@@ -33,6 +34,7 @@ class TestRoute:
         mock_get_viruses: AsyncMock,
         mock_get_viral_prep_lots: AsyncMock,
         mock_get_protocols: AsyncMock,
+        mock_get_exaspim_info: AsyncMock,
         mock_get_perfusions: AsyncMock,
         mock_get_histology: AsyncMock,
         mock_get_water_restriction: AsyncMock,
@@ -59,6 +61,7 @@ class TestRoute:
         mock_las.return_value = []
         mock_nsb2019.return_value = []
         mock_get_perfusions.return_value = []
+        mock_get_exaspim_info.return_value = None
         mock_get_protocols.return_value = [
             ProtocolsModel(
                 protocol_type="Specimen Procedures",
@@ -88,6 +91,7 @@ class TestRoute:
         mock_get_water_restriction.assert_called_once()
         mock_get_histology.assert_called_once()
         mock_get_perfusions.assert_called_once()
+        mock_get_exaspim_info.assert_called_once()
         assert mock_get_protocols.call_count >= 1
 
     @patch("aind_labtracks_service_async_client.DefaultApi.get_tasks")
@@ -100,6 +104,7 @@ class TestRoute:
     )
     @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_exaspim_info")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
     @patch("aind_tars_service_async_client.DefaultApi.get_viral_prep_lots")
     @patch("aind_tars_service_async_client.DefaultApi.get_viruses")
@@ -108,6 +113,7 @@ class TestRoute:
         mock_get_viruses: AsyncMock,
         mock_get_viral_prep_lots: AsyncMock,
         mock_get_protocols: AsyncMock,
+        mock_get_exaspim_info: AsyncMock,
         mock_get_perfusions: AsyncMock,
         mock_get_histology: AsyncMock,
         mock_get_water_restriction: AsyncMock,
@@ -141,6 +147,7 @@ class TestRoute:
         mock_las.return_value = []
         mock_get_protocols.return_value = []
         mock_get_perfusions.return_value = []
+        mock_get_exaspim_info.return_value = None
         mock_get_water_restriction.return_value = []
         mock_get_histology.return_value = []
         mock_get_viral_prep_lots.return_value = [mock_tars_prep_lot_230929]
@@ -195,6 +202,7 @@ class TestRoute:
         mock_get_water_restriction.assert_called_once()
         mock_get_histology.assert_called_once()
         mock_get_perfusions.assert_called_once()
+        mock_get_exaspim_info.assert_called_once()
         assert mock_get_protocols.call_count >= 1
         mock_get_viral_prep_lots.assert_called_once_with(
             lot="230929-12", _request_timeout=10
@@ -213,6 +221,7 @@ class TestRoute:
     )
     @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_exaspim_info")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
     @patch("aind_tars_service_async_client.DefaultApi.get_viral_prep_lots")
     @patch("aind_tars_service_async_client.DefaultApi.get_viruses")
@@ -221,6 +230,7 @@ class TestRoute:
         mock_get_viruses: AsyncMock,
         mock_get_viral_prep_lots: AsyncMock,
         mock_get_protocols: AsyncMock,
+        mock_get_exaspim_info: AsyncMock,
         mock_get_perfusions: AsyncMock,
         mock_get_histology: AsyncMock,
         mock_get_water_restriction: AsyncMock,
@@ -236,6 +246,7 @@ class TestRoute:
         mock_las.return_value = []
         mock_nsb2019.return_value = []
         mock_get_perfusions.return_value = []
+        mock_get_exaspim_info.return_value = None
         mock_get_protocols.return_value = []
         mock_nsb2023.return_value = []
         mock_nsb_present.return_value = []
@@ -257,6 +268,7 @@ class TestRoute:
     )
     @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_exaspim_info")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
     @patch("aind_tars_service_async_client.DefaultApi.get_viral_prep_lots")
     @patch("aind_tars_service_async_client.DefaultApi.get_viruses")
@@ -265,6 +277,7 @@ class TestRoute:
         mock_get_viruses: AsyncMock,
         mock_get_viral_prep_lots: AsyncMock,
         mock_get_protocols: AsyncMock,
+        mock_get_exaspim_info: AsyncMock,
         mock_get_perfusions: AsyncMock,
         mock_get_histology: AsyncMock,
         mock_get_water_restriction: AsyncMock,
@@ -279,6 +292,7 @@ class TestRoute:
         mock_labtracks.return_value = []
         mock_las.return_value = []
         mock_get_perfusions.return_value = []
+        mock_get_exaspim_info.return_value = None
         mock_get_protocols.return_value = []
         mock_get_water_restriction.return_value = []
         mock_get_histology.return_value = []
@@ -327,6 +341,61 @@ class TestRoute:
             lot="UNKNOWN-VIRUS-123", _request_timeout=10
         )
         assert mock_get_viruses.call_count == 0
+
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_exaspim_info")
+    def test_get_exaspim_procedures_success(
+        self,
+        mock_get_exaspim_info: AsyncMock,
+        client: TestClient,
+        mock_smartsheet_exaspim_info,
+    ):
+        """Tests successful retrieval of ExaSPIM procedures from Smartsheet."""
+        mock_get_exaspim_info.return_value = mock_smartsheet_exaspim_info
+
+        response = client.get("api/v2/smartsheet/exaspim_procedures/822178")
+        assert response.status_code == 200
+
+        response_data = response.json()
+        assert "mouse_tracker_info" in response_data
+        assert "sample_tracking_info" in response_data
+        assert "imaging_queue_info" in response_data
+        assert "qc_sheet_info" in response_data
+
+        mock_get_exaspim_info.assert_called_once_with(
+            "822178", _request_timeout=120
+        )
+
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_exaspim_info")
+    def test_get_exaspim_procedures_not_found(
+        self,
+        mock_get_exaspim_info: AsyncMock,
+        client: TestClient,
+    ):
+        """Tests 404 response when ExaSPIM data not found."""
+        mock_get_exaspim_info.return_value = None
+
+        response = client.get("api/v2/smartsheet/exaspim_procedures/999999")
+        assert response.status_code == 404
+
+        mock_get_exaspim_info.assert_called_once_with(
+            "999999", _request_timeout=120
+        )
+
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_exaspim_info")
+    def test_get_exaspim_procedures_empty_list(
+        self,
+        mock_get_exaspim_info: AsyncMock,
+        client: TestClient,
+    ):
+        """Tests 404 response when ExaSPIM data is empty."""
+        mock_get_exaspim_info.return_value = []
+
+        response = client.get("api/v2/smartsheet/exaspim_procedures/000000")
+        assert response.status_code == 404
+
+        mock_get_exaspim_info.assert_called_once_with(
+            "000000", _request_timeout=120
+        )
 
 
 if __name__ == "__main__":

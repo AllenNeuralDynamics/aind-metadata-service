@@ -102,6 +102,11 @@ async def get_procedures(
     tasks.append(
         smartsheet_api_instance.get_perfusions(subject_id, _request_timeout=20)
     )
+    tasks.append(
+        smartsheet_api_instance.get_exaspim_info(
+            subject_id, _request_timeout=100
+        )
+    )
     (
         labtracks_response,
         las_2020_response,
@@ -111,6 +116,7 @@ async def get_procedures(
         slims_wr_response,
         slims_histology_response,
         smartsheet_perfusion_response,
+        smartsheet_exaspim_response,
     ) = await gather(*tasks)
 
     mapper = ProceduresMapper(
@@ -122,6 +128,7 @@ async def get_procedures(
         slims_water_restriction=slims_wr_response,
         slims_histology=slims_histology_response,
         smartsheet_perfusion=smartsheet_perfusion_response,
+        smartsheet_exaspim=smartsheet_exaspim_response,
     )
     procedures = mapper.map_responses_to_aind_procedures(subject_id)
     if not procedures:
@@ -196,3 +203,48 @@ async def get_procedures(
         procedures, tars_mapping
     )
     return map_to_response(procedures)
+
+
+@router.get(
+    "/api/v2/smartsheet/exaspim_procedures/{subject_id}",
+    responses={
+        400: {
+            "description": "Validation error in response model.",
+            "headers": {
+                "X-Error-Message": {
+                    "description": (
+                        "A JSON-encoded list of Pydantic validation errors."
+                    ),
+                    "schema": {"type": "string"},
+                }
+            },
+        },
+        404: {"description": "Not found"},
+    },
+)
+async def get_exaspim_procedures(
+    subject_id: str = Path(
+        ...,
+        openapi_examples={
+            "example1": {
+                "summary": "Subject ID Example 1",
+                "description": "Example specimen ID for ExaSPIM Procedures",
+                "value": "822178",
+            },
+        },
+    ),
+    smartsheet_api_instance=Depends(get_smartsheet_api_instance),
+):
+    """
+    ## ExaSPIM Procedures
+    Return ExaSPIM procedure metadata from Smartsheet
+    """
+    smartsheet_exaspim_response = (
+        await smartsheet_api_instance.get_exaspim_info(
+            subject_id, _request_timeout=120
+        )
+    )
+    if not smartsheet_exaspim_response:
+        raise HTTPException(status_code=404, detail="Not found")
+
+    return smartsheet_exaspim_response
