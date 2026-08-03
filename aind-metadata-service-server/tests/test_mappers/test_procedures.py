@@ -323,7 +323,7 @@ class TestProceduresMapper(unittest.TestCase):
             smartsheet_perfusion=self.perfusions_sheet,
             nsb_2023=self.nsb_2023,
             nsb_present=self.nsb_2023,
-            smartsheet_exaspim=self.smartsheet_exaspim,
+            smartsheet_exaspim=self.smartsheet_exaspim[0],
         )
         with suppress_pydantic_serialization_warnings():
             procedures = mapper.map_responses_to_aind_procedures("115977")
@@ -347,7 +347,7 @@ class TestProceduresMapper(unittest.TestCase):
     def test_map_responses_with_exaspim(self):
         """Test mapping with ExaSPIM data"""
         mapper = ProceduresMapper(
-            smartsheet_exaspim=self.smartsheet_exaspim,
+            smartsheet_exaspim=self.smartsheet_exaspim[0],
         )
         procedures = mapper.map_responses_to_aind_procedures("115977")
 

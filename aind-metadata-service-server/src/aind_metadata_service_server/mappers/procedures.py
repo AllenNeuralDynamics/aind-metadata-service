@@ -133,7 +133,7 @@ class ProceduresMapper:
         smartsheet_perfusion: List[PerfusionsModel] = [],
         slims_water_restriction: List[SlimsWaterRestrictionData] = [],
         slims_histology: List[SlimsHistologyData] = [],
-        smartsheet_exaspim: List[ExaSPIMInfo] = [],
+        smartsheet_exaspim: Optional[ExaSPIMInfo] = None,
     ):
         """
         Class constructor.
@@ -435,7 +435,7 @@ class ProceduresMapper:
 
         if self.smartsheet_exaspim:
             exaspim_mapper = ExaspimProceduresMapper(
-                exaspim_info=self.smartsheet_exaspim[0]
+                exaspim_info=self.smartsheet_exaspim
             )
             exaspim_subject_procedures, exaspim_specimen_procedures = (
                 exaspim_mapper.map_to_exaspim_procedures(subject_id)
