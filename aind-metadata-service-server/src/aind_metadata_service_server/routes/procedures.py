@@ -61,6 +61,11 @@ async def get_procedures(
                 "description": "Example subject ID for Procedures",
                 "value": "762287",
             },
+            "example5": {
+                "summary": "Subject ID Example 5",
+                "description": "Example subject ID for Procedures",
+                "value": "3163606",
+            },
         },
     ),
     labtracks_api_instance=Depends(get_labtracks_api_instance),
