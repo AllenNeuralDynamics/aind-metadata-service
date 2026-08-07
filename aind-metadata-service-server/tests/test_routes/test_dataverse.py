@@ -155,16 +155,20 @@ class TestDataverseRoutes:
         mock_response = [
             {
                 "cr138_datetime": "2026-08-07T17:30:14Z",
-                "_aibs_operator_value@OData.Community.Display.V1.FormattedValue": "Jaimie Kenney",
-                "statuscode@OData.Community.Display.V1.FormattedValue": "Active",
+                "_aibs_operator_value@OData.Community.Display.V1"
+                ".FormattedValue": "Jaimie Kenney",
+                "statuscode@OData.Community.Display.V1."
+                "FormattedValue": "Active",
                 "aibs_weight": 22.1,
-                "aibs_fact_mouse_weight_recordsid": "53882aa8-8592-f111-8077-3833c5ef5e4a",
-                "aibs_date_time": "2026-08-07T17:30:14.710665+00:00",
+                "aibs_fact_mouse_weight_recordsid": (
+                    "53882aa8-8592-f111-8077-3833c5ef5e4a"
+                ),
                 "aibs_software_source": "WL",
                 "aibs_is_baseline_weight": False,
                 "aibs_workstation": "FRG.13-D",
                 "aibs_software_version": "4.1.0.dev7",
-                "_aibs_mouse_id_value@OData.Community.Display.V1.FormattedValue": "864846",
+                "_aibs_mouse_id_value@OData.Community.Display.V1."
+                "FormattedValue": "864846",
             }
         ]
         mock_api_get.return_value = mock_response
@@ -191,7 +195,8 @@ class TestDataverseRoutes:
         mock_response = [
             {
                 "cr138_datetime": "2026-08-07T17:30:14Z",
-                "_aibs_mouse_id_value@OData.Community.Display.V1.FormattedValue": "864846",
+                "_aibs_mouse_id_value@OData.Community.Display.V1."
+                "FormattedValue": "864846",
                 "aibs_weight": 22.1,
                 "aibs_fact_mouse_weight_recordsid": "record-1",
             }
@@ -262,13 +267,15 @@ class TestDataverseRoutes:
         mock_response = [
             {
                 "aibs_fact_mouse_weight_recordsid": "record-1",
-                "_aibs_mouse_id_value@OData.Community.Display.V1.FormattedValue": "864846",
+                "_aibs_mouse_id_value@OData.Community.Display.V1."
+                "FormattedValue": "864846",
                 "aibs_weight": 22.1,
                 "cr138_datetime": "2026-08-07T10:00:00Z",
             },
             {
                 "aibs_fact_mouse_weight_recordsid": "record-2",
-                "_aibs_mouse_id_value@OData.Community.Display.V1.FormattedValue": "864846",
+                "_aibs_mouse_id_value@OData.Community.Display.V1."
+                "FormattedValue": "864846",
                 "aibs_weight": 22.3,
                 "cr138_datetime": "2026-08-07T14:00:00Z",
             },

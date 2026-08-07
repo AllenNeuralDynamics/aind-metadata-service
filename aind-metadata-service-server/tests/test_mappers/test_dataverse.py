@@ -71,18 +71,23 @@ class TestDataverseMapper(unittest.TestCase):
         raw_response = [
             {
                 "cr138_datetime": "2026-08-07T17:30:14Z",
-                "_aibs_operator_value@OData.Community.Display.V1.FormattedValue": "Jaimie Kenney",
-                "statuscode@OData.Community.Display.V1.FormattedValue": "Active",
+                "_aibs_operator_value@OData.Community.Display.V1."
+                "FormattedValue": "Jaimie Kenney",
+                "statuscode@OData.Community.Display.V1."
+                "FormattedValue": "Active",
                 "statuscode": 1,
                 "aibs_weight": 22.1,
-                "aibs_fact_mouse_weight_recordsid": "53882aa8-8592-f111-8077-3833c5ef5e4a",
+                "aibs_fact_mouse_weight_recordsid": (
+                    "53882aa8-8592-f111-8077-3833c5ef5e4a"
+                ),
                 "aibs_date_time": "2026-08-07T17:30:14.710665+00:00",
                 "aibs_software_source": "WL",
                 "aibs_is_baseline_weight": False,
                 "aibs_workstation": "FRG.13-D",
                 "aibs_software_version": "4.1.0.dev7",
-                "_aibs_mouse_id_value@OData.Community.Display.V1.FormattedValue": "864846",
-                "aibs_notes": "Test note",
+                "_aibs_mouse_id_value@OData.Community.Display.V1."
+                "FormattedValue": "864846",
+                "aibs_notes": "Test note"
             }
         ]
 
@@ -119,16 +124,18 @@ class TestDataverseMapper(unittest.TestCase):
         raw_response = [
             {
                 "aibs_fact_mouse_weight_recordsid": "record-1",
-                "_aibs_mouse_id_value@OData.Community.Display.V1.FormattedValue": "123456",
+                "_aibs_mouse_id_value@OData.Community.Display.V1."
+                "FormattedValue": "123456",
                 "aibs_weight": 25.5,
                 "cr138_datetime": "2026-08-07T10:00:00Z",
             },
             {
                 "aibs_fact_mouse_weight_recordsid": "record-2",
-                "_aibs_mouse_id_value@OData.Community.Display.V1.FormattedValue": "789012",
+                "_aibs_mouse_id_value@OData.Community.Display.V1."
+                "FormattedValue": "789012",
                 "aibs_weight": 23.2,
                 "cr138_datetime": "2026-08-07T11:00:00Z",
-            },
+            }
         ]
 
         result = map_mouse_weight_records(raw_response)
@@ -192,15 +199,10 @@ class TestDataverseMapper(unittest.TestCase):
 
     def test_parse_datetime(self):
         """Test parsing datetime strings from Dataverse"""
-        # Test with Z suffix (common Dataverse format)
         result = _parse_datetime("2026-08-07T17:30:14Z")
         self.assertIsNotNone(result)
         self.assertEqual(result.year, 2026)
         self.assertEqual(result.month, 8)
         self.assertEqual(result.day, 7)
-
-        # Test with None
         self.assertIsNone(_parse_datetime(None))
-
-        # Test with invalid string
         self.assertIsNone(_parse_datetime("invalid"))

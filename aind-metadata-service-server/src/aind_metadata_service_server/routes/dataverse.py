@@ -147,7 +147,10 @@ async def get_mouse_weight_records(
         end_of_day = start_of_day + timedelta(days=1)
         start_str = start_of_day.strftime("%Y-%m-%dT%H:%M:%SZ")
         end_str = end_of_day.strftime("%Y-%m-%dT%H:%M:%SZ")
-        filter_query += f" and cr138_datetime ge {start_str} and cr138_datetime lt {end_str}"
+        filter_query += (
+            f" and cr138_datetime ge {start_str} "
+            f" and cr138_datetime lt {end_str}"
+        )
     try:
         dataverse_response = await dataverse_api_instance.get_table(
             entity_set_table_name="aibs_fact_mouse_weight_recordses",

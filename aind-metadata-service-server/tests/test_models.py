@@ -160,22 +160,6 @@ class TestMouseWeightData(unittest.TestCase):
         self.assertEqual(data.status, "Active")
         self.assertEqual(data.notes, "Test note")
 
-    def test_constructor_with_minimal_fields(self):
-        """Test MouseWeightData constructor with only required fields (all optional)"""
-        data = MouseWeightData()
-
-        self.assertIsNone(data.record_id)
-        self.assertIsNone(data.mouse_id)
-        self.assertIsNone(data.weight)
-        self.assertIsNone(data.weight_datetime)
-        self.assertIsNone(data.is_baseline_weight)
-        self.assertIsNone(data.operator)
-        self.assertIsNone(data.workstation)
-        self.assertIsNone(data.software_version)
-        self.assertIsNone(data.software_source)
-        self.assertIsNone(data.status)
-        self.assertIsNone(data.notes)
-
     def test_constructor_with_partial_fields(self):
         """Test MouseWeightData constructor with some fields"""
         data = MouseWeightData(

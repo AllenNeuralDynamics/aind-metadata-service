@@ -64,7 +64,8 @@ def map_mouse_weight_records(
         mapped_record = MouseWeightData(
             record_id=record.get("aibs_fact_mouse_weight_recordsid"),
             mouse_id=record.get(
-                "_aibs_mouse_id_value@OData.Community.Display.V1.FormattedValue"
+                "_aibs_mouse_id_value@OData.Community.Display.V1."
+                "FormattedValue"
             ),
             weight=record.get("aibs_weight"),
             weight_datetime=_parse_datetime(
@@ -72,7 +73,8 @@ def map_mouse_weight_records(
             ),
             is_baseline_weight=record.get("aibs_is_baseline_weight"),
             operator=record.get(
-                "_aibs_operator_value@OData.Community.Display.V1.FormattedValue"
+                "_aibs_operator_value@OData.Community.Display.V1."
+                "FormattedValue"
             ),
             workstation=record.get("aibs_workstation"),
             software_version=record.get("aibs_software_version"),
