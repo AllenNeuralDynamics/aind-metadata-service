@@ -135,3 +135,37 @@ class EcephysData(SlimsEcephysData):
                     module.manipulator_unit
                 )
         return v
+
+
+class MouseWeightData(BaseModel):
+    """Class for Mouse Weight Data with proper datetime info"""
+
+    record_id: Optional[str] = Field(
+        default=None, description="Unique record ID"
+    )
+    mouse_id: Optional[str] = Field(
+        default=None, description="Subject/Mouse ID"
+    )
+    weight: Optional[float] = Field(
+        default=None, description="Weight in grams"
+    )
+    weight_datetime: Optional[datetime] = Field(
+        default=None, description="When the weight was measured"
+    )
+    is_baseline_weight: Optional[bool] = Field(
+        default=None, description="Whether this is a baseline weight"
+    )
+    operator: Optional[str] = Field(
+        default=None, description="Person who performed the weighing"
+    )
+    workstation: Optional[str] = Field(
+        default=None, description="Workstation where weight was recorded"
+    )
+    software_version: Optional[str] = Field(
+        default=None, description="Software version used"
+    )
+    software_source: Optional[str] = Field(
+        default=None, description="Source system (e.g., WL)"
+    )
+    status: Optional[str] = Field(default=None, description="Record status")
+    notes: Optional[str] = Field(default=None, description="Additional notes")
