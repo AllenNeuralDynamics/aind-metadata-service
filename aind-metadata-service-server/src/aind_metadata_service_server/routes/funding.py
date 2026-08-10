@@ -35,9 +35,7 @@ async def get_funding(
             "default": {
                 "summary": "A sample project name",
                 "description": "Example project name for smartsheet",
-                "value": (
-                    "Thalamus - Project 1 Mesoscale thalamic circuits"
-                ),
+                "value": ("Thalamus - Project 1 Mesoscale thalamic circuits"),
             }
         },
     ),
@@ -97,9 +95,7 @@ async def get_investigators(
             "default": {
                 "summary": "A sample project name",
                 "description": "Example project name for smartsheet",
-                "value": (
-                    "Thalamus - Project 1 Mesoscale thalamic circuits"
-                ),
+                "value": ("Thalamus - Project 1 Mesoscale thalamic circuits"),
             }
         },
     ),
