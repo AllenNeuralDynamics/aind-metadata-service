@@ -69,7 +69,7 @@ def map_mouse_weight_records(
             ),
             weight=record.get("aibs_weight"),
             weight_datetime=_parse_datetime(
-                record.get("aibs_date_time") or record.get("cr138_datetime")
+                record.get("cr138_datetime")
             ),
             is_baseline_weight=record.get("aibs_is_baseline_weight"),
             operator=record.get(

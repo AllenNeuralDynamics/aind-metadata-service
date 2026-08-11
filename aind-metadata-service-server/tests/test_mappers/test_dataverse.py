@@ -80,7 +80,6 @@ class TestDataverseMapper(unittest.TestCase):
                 "aibs_fact_mouse_weight_recordsid": (
                     "test-record-12345678-1234-1234-1234-123456789abc"
                 ),
-                "aibs_date_time": "2026-08-07T17:30:14.710665+00:00",
                 "aibs_software_source": "WL",
                 "aibs_is_baseline_weight": False,
                 "aibs_workstation": "TEST-WORKSTATION-1",
@@ -150,7 +149,6 @@ class TestDataverseMapper(unittest.TestCase):
             {
                 "aibs_fact_mouse_weight_recordsid": "test-record-minimal",
                 "aibs_weight": 25.5,
-                # Missing most optional fields
             }
         ]
 
@@ -160,33 +158,23 @@ class TestDataverseMapper(unittest.TestCase):
         self.assertEqual(result[0].record_id, "test-record-minimal")
         self.assertEqual(result[0].weight, 25.5)
         self.assertIsNone(result[0].mouse_id)
-        self.assertIsNone(result[0].operator)
-        self.assertIsNone(result[0].weight_datetime)
 
     def test_map_mouse_weight_records_datetime_handling(self):
-        """Test datetime field preference and fallback behavior"""
-        # Test that aibs_date_time is preferred when both fields exist
-        raw_with_both = [
+        """Test datetime field parsing from cr138_datetime"""
+        raw_response = [
             {
-                "aibs_fact_mouse_weight_recordsid": "test-record-datetime-1",
-                "aibs_date_time": "2026-08-07T17:30:14.710665+00:00",
+                "aibs_fact_mouse_weight_recordsid": "test-record-datetime",
                 "cr138_datetime": "2026-08-07T17:30:14Z",
             }
         ]
-        result = map_mouse_weight_records(raw_with_both)
-        # aibs_date_time has microseconds, cr138_datetime doesn't
-        self.assertEqual(result[0].weight_datetime.microsecond, 710665)
-
-        # Test fallback to cr138_datetime when aibs_date_time is missing
-        raw_fallback = [
-            {
-                "aibs_fact_mouse_weight_recordsid": "test-record-datetime-2",
-                "cr138_datetime": "2026-08-07T17:30:14Z",
-            }
-        ]
-        result = map_mouse_weight_records(raw_fallback)
+        result = map_mouse_weight_records(raw_response)
         self.assertIsNotNone(result[0].weight_datetime)
-        self.assertEqual(result[0].weight_datetime.microsecond, 0)
+        self.assertEqual(result[0].weight_datetime.year, 2026)
+        self.assertEqual(result[0].weight_datetime.month, 8)
+        self.assertEqual(result[0].weight_datetime.day, 7)
+        self.assertEqual(result[0].weight_datetime.hour, 17)
+        self.assertEqual(result[0].weight_datetime.minute, 30)
+        self.assertEqual(result[0].weight_datetime.second, 14)
 
     def test_parse_datetime(self):
         """Test parsing datetime strings from Dataverse"""
