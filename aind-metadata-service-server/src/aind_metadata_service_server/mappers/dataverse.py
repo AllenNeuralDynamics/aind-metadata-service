@@ -1,12 +1,9 @@
 """Module to handle dataverse data mapping and filtering"""
 
-import logging
 from datetime import datetime
 from typing import Dict, List, Optional
 
 from aind_metadata_service_server.models import MouseWeightData
-
-logger = logging.getLogger(__name__)
 
 
 def filter_dataverse_metadata(data: Dict) -> Dict:
