@@ -64,7 +64,7 @@ async def get_procedures(
             "example5": {
                 "summary": "Subject ID Example 5",
                 "description": "Example subject ID for Procedures",
-                "value": "3163606",
+                "value": "822178",
             },
         },
     ),
