@@ -6,6 +6,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**get_dataverse_table**](DefaultApi.md#get_dataverse_table) | **GET** /api/v2/dataverse/tables/{entity_set_table_name} | Get Dataverse Table
 [**get_dataverse_table_info**](DefaultApi.md#get_dataverse_table_info) | **GET** /api/v2/dataverse/tables | Get Dataverse Table Info
+[**get_exaspim_procedures**](DefaultApi.md#get_exaspim_procedures) | **GET** /api/v2/smartsheet/exaspim_procedures/{subject_id} | Get Exaspim Procedures
 [**get_funding**](DefaultApi.md#get_funding) | **GET** /api/v2/funding/{project_name} | Get Funding
 [**get_injection_materials**](DefaultApi.md#get_injection_materials) | **GET** /api/v2/tars_injection_materials/{prep_lot_number} | Get Injection Materials
 [**get_instrument**](DefaultApi.md#get_instrument) | **GET** /api/v2/instrument/{instrument_id} | Get Instrument
@@ -175,6 +176,77 @@ No authorization required
 |-------------|-------------|------------------|
 **200** | Successful Response |  -  |
 **404** | Not found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **get_exaspim_procedures**
+> object get_exaspim_procedures(subject_id)
+
+Get Exaspim Procedures
+
+## ExaSPIM Procedures
+Return ExaSPIM procedure metadata from Smartsheet
+
+### Example
+
+
+```python
+import aind_metadata_service_async_client
+from aind_metadata_service_async_client.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to https://aind-metadata-service
+# See configuration.py for a list of all supported configuration parameters.
+configuration = aind_metadata_service_async_client.Configuration(
+    host = "https://aind-metadata-service"
+)
+
+
+# Enter a context with an instance of the API client
+async with aind_metadata_service_async_client.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = aind_metadata_service_async_client.DefaultApi(api_client)
+    subject_id = '822178' # str | 
+
+    try:
+        # Get Exaspim Procedures
+        api_response = await api_instance.get_exaspim_procedures(subject_id)
+        print("The response of DefaultApi->get_exaspim_procedures:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling DefaultApi->get_exaspim_procedures: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **subject_id** | **str**|  | 
+
+### Return type
+
+**object**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Successful Response |  -  |
+**400** | Validation error in response model. |  * X-Error-Message - A JSON-encoded list of Pydantic validation errors. <br>  |
+**404** | Not found |  -  |
+**422** | Validation Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
