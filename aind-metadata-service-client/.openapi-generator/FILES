@@ -15,6 +15,7 @@ aind_metadata_service_client/exceptions.py
 aind_metadata_service_client/models/__init__.py
 aind_metadata_service_client/models/health_check.py
 aind_metadata_service_client/models/http_validation_error.py
+aind_metadata_service_client/models/mouse_weight_data.py
 aind_metadata_service_client/models/slims_workflow.py
 aind_metadata_service_client/models/validation_error.py
 aind_metadata_service_client/models/validation_error_loc_inner.py
@@ -24,6 +25,7 @@ docs/DefaultApi.md
 docs/HTTPValidationError.md
 docs/HealthCheck.md
 docs/HealthcheckApi.md
+docs/MouseWeightData.md
 docs/SlimsWorkflow.md
 docs/ValidationError.md
 docs/ValidationErrorLocInner.md
@@ -38,6 +40,7 @@ test/test_default_api.py
 test/test_health_check.py
 test/test_healthcheck_api.py
 test/test_http_validation_error.py
+test/test_mouse_weight_data.py
 test/test_slims_workflow.py
 test/test_validation_error.py
 test/test_validation_error_loc_inner.py
