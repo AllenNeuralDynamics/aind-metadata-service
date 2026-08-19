@@ -1,4 +1,8 @@
-"""Tests procedures route"""
+"""Tests procedures route
+
+NOTE: SLIMS integration was removed as of 2026-08-19 due to SLIMS shutdown.
+SLIMS-related methods are deprecated and can be removed in future cleanup.
+"""
 
 from datetime import datetime
 from unittest.mock import AsyncMock, patch
@@ -20,10 +24,11 @@ class TestRoute:
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2019")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2023")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb_present")
-    @patch(
-        "aind_slims_service_async_client.DefaultApi.get_water_restriction_data"
-    )
-    @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
+    # SLIMS patches commented out - data provider shut down 2026-08-19
+    # @patch(
+    #     "aind_slims_service_async_client.DefaultApi.get_water_restriction_data"
+    # )
+    # @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_exaspim_info")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
@@ -36,8 +41,9 @@ class TestRoute:
         mock_get_protocols: AsyncMock,
         mock_get_exaspim_info: AsyncMock,
         mock_get_perfusions: AsyncMock,
-        mock_get_histology: AsyncMock,
-        mock_get_water_restriction: AsyncMock,
+        # SLIMS mocks commented out - data provider shut down 2026-08-19
+        # mock_get_histology: AsyncMock,
+        # mock_get_water_restriction: AsyncMock,
         mock_nsb_present: AsyncMock,
         mock_nsb2023: AsyncMock,
         mock_nsb2019: AsyncMock,
@@ -75,8 +81,9 @@ class TestRoute:
         ]
         mock_nsb2023.return_value = []
         mock_nsb_present.return_value = []
-        mock_get_water_restriction.return_value = []
-        mock_get_histology.return_value = []
+        # SLIMS mocks commented out - data provider shut down 2026-08-19
+        # mock_get_water_restriction.return_value = []
+        # mock_get_histology.return_value = []
         mock_get_viral_prep_lots.return_value = []
         mock_get_viruses.return_value = []
 
@@ -88,8 +95,9 @@ class TestRoute:
         mock_nsb2019.assert_called_once()
         mock_nsb2023.assert_called_once()
         mock_nsb_present.assert_called_once()
-        mock_get_water_restriction.assert_called_once()
-        mock_get_histology.assert_called_once()
+        # SLIMS assertions commented out - data provider shut down 2026-08-19
+        # mock_get_water_restriction.assert_called_once()
+        # mock_get_histology.assert_called_once()
         mock_get_perfusions.assert_called_once()
         mock_get_exaspim_info.assert_called_once()
         assert mock_get_protocols.call_count >= 1
@@ -99,10 +107,11 @@ class TestRoute:
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2019")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2023")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb_present")
-    @patch(
-        "aind_slims_service_async_client.DefaultApi.get_water_restriction_data"
-    )
-    @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
+    # SLIMS patches commented out - data provider shut down 2026-08-19
+    # @patch(
+    #     "aind_slims_service_async_client.DefaultApi.get_water_restriction_data"
+    # )
+    # @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_exaspim_info")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
@@ -115,8 +124,9 @@ class TestRoute:
         mock_get_protocols: AsyncMock,
         mock_get_exaspim_info: AsyncMock,
         mock_get_perfusions: AsyncMock,
-        mock_get_histology: AsyncMock,
-        mock_get_water_restriction: AsyncMock,
+        # SLIMS mocks commented out - data provider shut down 2026-08-19
+        # mock_get_histology: AsyncMock,
+        # mock_get_water_restriction: AsyncMock,
         mock_nsb_present: AsyncMock,
         mock_nsb2023: AsyncMock,
         mock_nsb2019: AsyncMock,
@@ -148,8 +158,9 @@ class TestRoute:
         mock_get_protocols.return_value = []
         mock_get_perfusions.return_value = []
         mock_get_exaspim_info.return_value = None
-        mock_get_water_restriction.return_value = []
-        mock_get_histology.return_value = []
+        # SLIMS mocks commented out - data provider shut down 2026-08-19
+        # mock_get_water_restriction.return_value = []
+        # mock_get_histology.return_value = []
         mock_get_viral_prep_lots.return_value = [mock_tars_prep_lot_230929]
         mock_get_viruses.return_value = [mock_tars_virus_v123]
         mock_nsb2019.return_value = []
@@ -199,8 +210,9 @@ class TestRoute:
         mock_nsb2019.assert_called_once()
         mock_nsb2023.assert_called_once()
         mock_nsb_present.assert_called_once()
-        mock_get_water_restriction.assert_called_once()
-        mock_get_histology.assert_called_once()
+        # SLIMS assertions commented out - data provider shut down 2026-08-19
+        # mock_get_water_restriction.assert_called_once()
+        # mock_get_histology.assert_called_once()
         mock_get_perfusions.assert_called_once()
         mock_get_exaspim_info.assert_called_once()
         assert mock_get_protocols.call_count >= 1
@@ -216,10 +228,11 @@ class TestRoute:
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2019")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2023")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb_present")
-    @patch(
-        "aind_slims_service_async_client.DefaultApi.get_water_restriction_data"
-    )
-    @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
+    # SLIMS patches commented out - data provider shut down 2026-08-19
+    # @patch(
+    #     "aind_slims_service_async_client.DefaultApi.get_water_restriction_data"
+    # )
+    # @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_exaspim_info")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
@@ -232,8 +245,9 @@ class TestRoute:
         mock_get_protocols: AsyncMock,
         mock_get_exaspim_info: AsyncMock,
         mock_get_perfusions: AsyncMock,
-        mock_get_histology: AsyncMock,
-        mock_get_water_restriction: AsyncMock,
+        # SLIMS mocks commented out - data provider shut down 2026-08-19
+        # mock_get_histology: AsyncMock,
+        # mock_get_water_restriction: AsyncMock,
         mock_nsb_present: AsyncMock,
         mock_nsb2023: AsyncMock,
         mock_nsb2019: AsyncMock,
@@ -250,8 +264,9 @@ class TestRoute:
         mock_get_protocols.return_value = []
         mock_nsb2023.return_value = []
         mock_nsb_present.return_value = []
-        mock_get_water_restriction.return_value = []
-        mock_get_histology.return_value = []
+        # SLIMS mocks commented out - data provider shut down 2026-08-19
+        # mock_get_water_restriction.return_value = []
+        # mock_get_histology.return_value = []
         mock_get_viral_prep_lots.return_value = []
         mock_get_viruses.return_value = []
 
@@ -263,10 +278,11 @@ class TestRoute:
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2019")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2023")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb_present")
-    @patch(
-        "aind_slims_service_async_client.DefaultApi.get_water_restriction_data"
-    )
-    @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
+    # SLIMS patches commented out - data provider shut down 2026-08-19
+    # @patch(
+    #     "aind_slims_service_async_client.DefaultApi.get_water_restriction_data"
+    # )
+    # @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_exaspim_info")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
@@ -279,8 +295,9 @@ class TestRoute:
         mock_get_protocols: AsyncMock,
         mock_get_exaspim_info: AsyncMock,
         mock_get_perfusions: AsyncMock,
-        mock_get_histology: AsyncMock,
-        mock_get_water_restriction: AsyncMock,
+        # SLIMS mocks commented out - data provider shut down 2026-08-19
+        # mock_get_histology: AsyncMock,
+        # mock_get_water_restriction: AsyncMock,
         mock_nsb_present: AsyncMock,
         mock_nsb2023: AsyncMock,
         mock_nsb2019: AsyncMock,
@@ -294,8 +311,9 @@ class TestRoute:
         mock_get_perfusions.return_value = []
         mock_get_exaspim_info.return_value = None
         mock_get_protocols.return_value = []
-        mock_get_water_restriction.return_value = []
-        mock_get_histology.return_value = []
+        # SLIMS mocks commented out - data provider shut down 2026-08-19
+        # mock_get_water_restriction.return_value = []
+        # mock_get_histology.return_value = []
         mock_get_viral_prep_lots.return_value = []
         mock_get_viruses.return_value = []
 

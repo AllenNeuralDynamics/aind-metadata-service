@@ -1,4 +1,8 @@
-"""Maps information to aind-data-schema SpecimenProcedure model."""
+"""Maps information to aind-data-schema SpecimenProcedure model.
+
+NOTE: SLIMS integration was removed as of 2026-08-19 due to SLIMS shutdown.
+SLIMS-related methods are deprecated and can be removed in future cleanup.
+"""
 
 import logging
 import xml.etree.ElementTree as ET
@@ -15,6 +19,8 @@ from aind_data_schema_models.organizations import Organization
 from aind_data_schema_models.specimen_procedure_types import (
     SpecimenProcedureType,
 )
+
+# DEPRECATED: SLIMS imports - data provider shut down 2026-08-19
 from aind_slims_service_async_client.models import (
     HistologyReagentData,
     HistologyWashData,

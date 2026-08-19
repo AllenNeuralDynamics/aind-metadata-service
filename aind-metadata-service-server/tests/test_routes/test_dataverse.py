@@ -151,9 +151,7 @@ class TestDataverseRoutes:
             }
         ]
         mock_api_get.return_value = mock_single
-        response = client.get(
-            "/api/v2/dataverse/mouse_weight_records/999999"
-        )
+        response = client.get("/api/v2/dataverse/mouse_weight_records/999999")
         assert response.status_code == status.HTTP_200_OK
         result = response.json()
         assert len(result) == 1

@@ -1,4 +1,7 @@
-"""Module to handle subject endpoints"""
+"""Module to handle procedures endpoints
+
+NOTE: SLIMS integration was removed as of 2026-08-19 due to SLIMS shutdown.
+"""
 
 from asyncio import gather
 
@@ -12,7 +15,7 @@ from aind_metadata_service_server.mappers.responses import map_to_response
 from aind_metadata_service_server.sessions import (
     get_labtracks_api_instance,
     get_sharepoint_api_instance,
-    get_slims_api_instance,
+    # get_slims_api_instance,
     get_smartsheet_api_instance,
     get_tars_api_instance,
 )
@@ -70,7 +73,7 @@ async def get_procedures(
     ),
     labtracks_api_instance=Depends(get_labtracks_api_instance),
     sharepoint_api_instance=Depends(get_sharepoint_api_instance),
-    slims_api_instance=Depends(get_slims_api_instance),
+    # slims_api_instance=Depends(get_slims_api_instance),
     smartsheet_api_instance=Depends(get_smartsheet_api_instance),
     tars_api_instance=Depends(get_tars_api_instance),
 ):
@@ -96,14 +99,17 @@ async def get_procedures(
             subject_id, _request_timeout=20
         )
     )
-    tasks.append(
-        slims_api_instance.get_water_restriction_data(
-            subject_id, _request_timeout=240
-        )
-    )
-    tasks.append(
-        slims_api_instance.get_histology_data(subject_id, _request_timeout=240)
-    )
+    # DEPRECATED: SLIMS endpoints removed 2026-08-19 - data provider shut down
+    # tasks.append(
+    #     slims_api_instance.get_water_restriction_data(
+    #         subject_id, _request_timeout=240
+    #     )
+    # )
+    # tasks.append(
+    #     slims_api_instance.get_histology_data(
+    #         subject_id, _request_timeout=240
+    #     )
+    # )
     tasks.append(
         smartsheet_api_instance.get_perfusions(subject_id, _request_timeout=20)
     )
@@ -118,8 +124,8 @@ async def get_procedures(
         nsb_2019_response,
         nsb_2023_response,
         nsb_present_response,
-        slims_wr_response,
-        slims_histology_response,
+        # slims_wr_response,
+        # slims_histology_response,
         smartsheet_perfusion_response,
         smartsheet_exaspim_response,
     ) = await gather(*tasks)
@@ -130,8 +136,8 @@ async def get_procedures(
         nsb_2019=nsb_2019_response,
         nsb_2023=nsb_2023_response,
         nsb_present=nsb_present_response,
-        slims_water_restriction=slims_wr_response,
-        slims_histology=slims_histology_response,
+        # slims_water_restriction=slims_wr_response,
+        # slims_histology=slims_histology_response,
         smartsheet_perfusion=smartsheet_perfusion_response,
         smartsheet_exaspim=smartsheet_exaspim_response,
     )

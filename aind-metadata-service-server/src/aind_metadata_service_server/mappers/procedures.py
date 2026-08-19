@@ -1,4 +1,8 @@
-"""Maps information to aind-data-schema Procedures model."""
+"""Maps information to aind-data-schema Procedures model.
+
+NOTE: SLIMS integration was removed as of 2026-08-19 due to SLIMS shutdown.
+SLIMS-related methods are deprecated and can be removed in future cleanup.
+"""
 
 import logging
 from enum import Enum
@@ -31,6 +35,8 @@ from aind_sharepoint_service_async_client.models import (
     NSB2019List,
     NSB2023List,
 )
+
+# DEPRECATED: SLIMS imports removed 2026-08-19 - data provider shut down
 from aind_slims_service_async_client.models import (
     SlimsHistologyData,
     SlimsWaterRestrictionData,

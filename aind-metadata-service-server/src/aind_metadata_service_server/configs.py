@@ -1,4 +1,8 @@
-"""Module for settings to connect to backend"""
+"""Module for settings to connect to backend
+
+NOTE: SLIMS integration was removed as of 2026-08-19 due to SLIMS shutdown.
+SLIMS-related methods are deprecated and can be removed in future cleanup.
+"""
 
 from pydantic import Field, HttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -16,8 +20,9 @@ class Settings(BaseSettings):
         ..., description="Host address for labtracks endpoint"
     )
     mgi_host: HttpUrl = Field(..., description="Host address for mgi endpoint")
+    # DEPRECATED: SLIMS removed 2026-08-19 - data provider shut down
     slims_host: HttpUrl = Field(
-        ..., description="Host address for slims endpoint"
+        ..., description="Host address for slims endpoint (DEPRECATED)"
     )
     sharepoint_host: HttpUrl = Field(
         ..., description="Host address for sharepoint endpoint"
