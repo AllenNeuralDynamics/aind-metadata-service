@@ -11,7 +11,6 @@ from aind_metadata_service_server.response_handler import (
 from aind_metadata_service_server.sessions import (
     get_labtracks_api_instance,
     get_sharepoint_api_instance,
-    get_slims_api_instance,
     get_smartsheet_api_instance,
     get_tars_api_instance,
 )
@@ -43,7 +42,6 @@ async def get_procedures(
     ),
     labtracks_api_instance=Depends(get_labtracks_api_instance),
     sharepoint_api_instance=Depends(get_sharepoint_api_instance),
-    slims_api_instance=Depends(get_slims_api_instance),
     smartsheet_api_instance=Depends(get_smartsheet_api_instance),
     tars_api_instance=Depends(get_tars_api_instance),
 ):
@@ -66,12 +64,6 @@ async def get_procedures(
     las_2020_response = await sharepoint_api_instance.get_las2020(
         subject_id, _request_timeout=30
     )
-    slims_wr_response = await slims_api_instance.get_water_restriction_data(
-        subject_id, _request_timeout=240
-    )
-    slims_histology_response = await slims_api_instance.get_histology_data(
-        subject_id, _request_timeout=240
-    )
     smartsheet_perfusion_response = (
         await smartsheet_api_instance.get_perfusions(
             subject_id, _request_timeout=20
@@ -83,8 +75,6 @@ async def get_procedures(
         nsb_2023=nsb_2023_response,
         nsb_present=nsb_present_response,
         las_2020=las_2020_response,
-        slims_water_restriction=slims_wr_response,
-        slims_histology=slims_histology_response,
         smartsheet_perfusion=smartsheet_perfusion_response,
     )
     procedures = mapper.map_responses_to_aind_procedures(subject_id)

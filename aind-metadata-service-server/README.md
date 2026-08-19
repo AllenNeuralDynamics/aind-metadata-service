@@ -21,7 +21,6 @@ Requires docker and docker compose to build and run package locally.
     - webapp.env
     - labtracks.env
     - sharepoint.env
-    - slims.env
     - smartsheet.env
     - tars.env
 - Run `docker compose up --build`
