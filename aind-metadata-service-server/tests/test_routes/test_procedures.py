@@ -24,7 +24,6 @@ class TestRoute:
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2019")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2023")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb_present")
-   
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_exaspim_info")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
