@@ -3,7 +3,6 @@
 import unittest
 from copy import deepcopy
 from datetime import date, datetime
-from unittest.mock import patch
 
 import pytest
 from aind_data_schema.components.injection_procedures import (
@@ -15,7 +14,6 @@ from aind_data_schema.components.injection_procedures import (
 )
 from aind_data_schema.components.subject_procedures import (
     Perfusion,
-    WaterRestriction,
 )
 from aind_data_schema.components.surgery_procedures import (
     BrainInjection,
@@ -27,7 +25,6 @@ from aind_data_schema.core.procedures import (
     Surgery,
 )
 from aind_data_schema_models.mouse_anatomy import InjectionTargets
-from aind_data_schema_models.units import MassUnit, UnitlessUnit, VolumeUnit
 from aind_labtracks_service_async_client.models.task import (
     Task as LabTracksTask,
 )
@@ -35,11 +32,6 @@ from aind_sharepoint_service_async_client.models import (
     Las2020List,
     NSB2019List,
     NSB2023List,
-)
-from aind_slims_service_async_client.models import SlimsWaterRestrictionData
-from aind_slims_service_async_client.models.slims_histology_data import (
-    HistologyWashData,
-    SlimsHistologyData,
 )
 from aind_smartsheet_service_async_client.models import (
     PerfusionsModel,
@@ -101,50 +93,6 @@ class TestProceduresMapper(unittest.TestCase):
                 task_object="115977",
                 protocol_number="2002",
                 task_status="F",
-            ),
-        ]
-
-        # SLIMS water restriction data
-        cls.slims_water_restriction = [
-            SlimsWaterRestrictionData(
-                content_event_created_on=1734119014103,
-                subject_id="115977",
-                start_date=datetime.fromtimestamp(1734119012.354),
-                end_date=None,
-                assigned_by="person.name",
-                target_weight_fraction="0.85",
-                baseline_weight="28.23",
-                weight_unit="g",
-            )
-        ]
-
-        # SLIMS histology data
-        cls.slims_histology = [
-            SlimsHistologyData(
-                procedure_name="SmartSPIM Labeling",
-                protocol_id=None,
-                protocol_name=None,
-                washes=[
-                    HistologyWashData(
-                        wash_name="Primary Antibody Wash",
-                        wash_type=None,
-                        start_time=datetime.fromtimestamp(1738688400),
-                        end_time=datetime.fromtimestamp(1738781400),
-                        modified_by="PersonM",
-                        reagents=[],
-                        mass=10,
-                    ),
-                    HistologyWashData(
-                        wash_name="Secondary Antibody Wash",
-                        wash_type=None,
-                        start_time=datetime.fromtimestamp(1738688400),
-                        end_time=datetime.fromtimestamp(1738781400),
-                        modified_by="PersonM",
-                        reagents=[],
-                        mass=None,
-                    ),
-                ],
-                subject_id="115977",
             ),
         ]
 
@@ -318,8 +266,6 @@ class TestProceduresMapper(unittest.TestCase):
             labtracks_tasks=self.labtracks_tasks,
             las_2020=self.las2020,
             nsb_2019=self.nsb2019,
-            slims_water_restriction=self.slims_water_restriction,
-            slims_histology=self.slims_histology,
             smartsheet_perfusion=self.perfusions_sheet,
             nsb_2023=self.nsb_2023,
             nsb_present=self.nsb_2023,
@@ -330,7 +276,7 @@ class TestProceduresMapper(unittest.TestCase):
 
             self.assertIsInstance(procedures, Procedures)
             self.assertEqual(procedures.subject_id, "115977")
-            self.assertEqual(len(procedures.subject_procedures), 10)
+            self.assertEqual(len(procedures.subject_procedures), 9)
             self.assertEqual(len(procedures.specimen_procedures), 3)
 
     def test_map_responses_no_data(self):
@@ -629,44 +575,6 @@ class TestProceduresMapper(unittest.TestCase):
                 ProtocolNames.SURGERY.value,
             ]
             self.assertEqual(expected_list, protocols_list)
-
-    def test_map_slims_info_to_water_restrictions(self):
-        """Tests map_slims_info_to_water_restrictions method."""
-        mapper = ProceduresMapper(
-            slims_water_restriction=self.slims_water_restriction
-        )
-        output = mapper._map_slims_response_to_aind_water_restrictions()
-        expected_output = [
-            WaterRestriction.model_construct(
-                procedure_type="Water restriction",
-                target_fraction_weight=85,
-                target_fraction_weight_unit=UnitlessUnit.PERCENT,
-                minimum_water_per_day_unit=VolumeUnit.ML,
-                baseline_weight=28.23,
-                weight_unit=MassUnit.G,
-                start_date=date.fromtimestamp(1734119012.354),
-                end_date=None,
-                minimum_water_per_day=1.0,
-            )
-        ]
-        self.assertEqual(output, expected_output)
-
-    def test_parse_mass_unit(self):
-        """Test mass unit parsed as expected."""
-        slims_water_restriction = [SlimsWaterRestrictionData.model_construct()]
-        mapper = ProceduresMapper(
-            slims_water_restriction=slims_water_restriction
-        )
-        with patch(
-            "aind_metadata_service_server.mappers.procedures.logging.warning"
-        ) as mock_warn:
-            result = mapper._parse_mass_unit("lbs")
-            self.assertEqual(result, "lbs")
-            mock_warn.assert_called_once_with(
-                "Mass unit lbs not recognized. Returning it as is."
-            )
-        self.assertEqual(mapper._parse_mass_unit(None), MassUnit.G)
-        self.assertEqual(mapper._parse_mass_unit("g"), MassUnit.G)
 
     def test_map_responses_to_aind_procedures_exception(self):
         """Test mapping when ValidationError raised"""

@@ -9,6 +9,15 @@
 
 REST service to retrieve data from backends and create aind-data-schema models.
 
+## Deprecation Notice
+
+**SLIMS Integration Disabled (2026-08-19)**
+
+The SLIMS data provider has been shut down and all SLIMS-related functionality has been disabled. This includes:
+- SLIMS API workflow endpoints (`/api/v2/slims/*`) for ecephys, smartspim imaging, smartspim histology, water restriction, and viral injections
+- Rig and Instruments endpoints; `get_instrument` fetches only from DocDB
+- SLIMS data mapping in procedures and specimen procedures
+
 ## Local Development
 
 Requires docker and docker compose to build and run package locally.
@@ -22,7 +31,7 @@ Requires docker and docker compose to build and run package locally.
   - webapp.env
   - labtracks.env
   - sharepoint.env
-  - slims.env
+  - ~~slims.env~~ (DEPRECATED - no longer needed)
   - smartsheet.env
   - tars.env
 - Run `docker compose up --build`
