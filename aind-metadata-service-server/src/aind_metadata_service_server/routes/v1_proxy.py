@@ -1,7 +1,6 @@
 """Module to proxy requests v1 aind-metadata-service-server"""
 
-from enum import Enum
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from fastapi import APIRouter, Depends, Path, Query, Request, Response
 from httpx import AsyncClient, RequestError

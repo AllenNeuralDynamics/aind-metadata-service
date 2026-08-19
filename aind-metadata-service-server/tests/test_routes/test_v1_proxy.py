@@ -49,6 +49,66 @@ class TestV1ProxyRoute:
         mock_proxy.assert_called_once()
         assert 200 == response.status_code
 
+    def test_get_v1_mgi_allele(
+        self,
+        mock_proxy: AsyncMock,
+        client: TestClient,
+    ):
+        """Tests a get request"""
+        response = client.get("/mgi_allele/abc")
+        mock_proxy.assert_called_once()
+        assert 200 == response.status_code
+
+    def test_get_v1_perfusions(
+        self,
+        mock_proxy: AsyncMock,
+        client: TestClient,
+    ):
+        """Tests a get request"""
+        response = client.get("/perfusions/abc")
+        mock_proxy.assert_called_once()
+        assert 200 == response.status_code
+
+    def test_get_v1_procedures(
+        self,
+        mock_proxy: AsyncMock,
+        client: TestClient,
+    ):
+        """Tests a get request"""
+        response = client.get("/procedures/abc")
+        mock_proxy.assert_called_once()
+        assert 200 == response.status_code
+
+    def test_get_v1_protocols(
+        self,
+        mock_proxy: AsyncMock,
+        client: TestClient,
+    ):
+        """Tests a get request"""
+        response = client.get("/protocols/abc")
+        mock_proxy.assert_called_once()
+        assert 200 == response.status_code
+
+    def test_get_v1_instrument(
+        self,
+        mock_proxy: AsyncMock,
+        client: TestClient,
+    ):
+        """Tests a get request"""
+        response = client.get("/instrument/abc")
+        mock_proxy.assert_called_once()
+        assert 200 == response.status_code
+
+    def test_get_v1_bergamo_session(
+        self,
+        mock_proxy: AsyncMock,
+        client: TestClient,
+    ):
+        """Tests a post request"""
+        response = client.post("/bergamo_session", json={"foo": "bar"})
+        mock_proxy.assert_called_once()
+        assert 200 == response.status_code
+
     def test_get_v1_subject(
         self,
         mock_proxy: AsyncMock,
