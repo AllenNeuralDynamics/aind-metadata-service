@@ -29,9 +29,6 @@ services:
   smartsheet:
     image: "ghcr.io/allenneuraldynamics/aind-smartsheet-service-server:1.1.0"
     env_file: "env/smartsheet.env"
-  slims:
-    image: "ghcr.io/allenneuraldynamics/aind-slims-service-server:0.3.4"
-    env_file: "env/slims.env"
   sharepoint:
     image: "ghcr.io/allenneuraldynamics/aind-sharepoint-service-server:0.3.0"
     env_file: "env/sharepoint.env"
@@ -51,7 +48,6 @@ services:
     depends_on:
       - labtracks
       - mgi
-      - slims
       - smartsheet
       - sharepoint
       - tars

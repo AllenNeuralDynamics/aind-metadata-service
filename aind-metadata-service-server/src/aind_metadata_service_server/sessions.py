@@ -1,9 +1,4 @@
-"""Module to handle sessions to different backends.
-
-NOTE: SLIMS integration was removed as of 2026-08-19 due to SLIMS shutdown.
-SLIMS config and API instance are deprecated and can be removed in future
-cleanup.
-"""
+"""Module to handle sessions to different backends."""
 
 from typing import AsyncGenerator
 
@@ -12,8 +7,6 @@ import aind_dataverse_service_async_client
 import aind_labtracks_service_async_client
 import aind_mgi_service_async_client
 import aind_sharepoint_service_async_client
-
-# import aind_slims_service_async_client
 import aind_smartsheet_service_async_client
 import aind_tars_service_async_client
 from aind_data_access_api.document_db import Client as DocDBClient
@@ -34,9 +27,6 @@ sharepoint_config = aind_sharepoint_service_async_client.Configuration(
 smartsheet_config = aind_smartsheet_service_async_client.Configuration(
     host=settings.smartsheet_host.unicode_string().strip("/")
 )
-# slims_config = aind_slims_service_async_client.Configuration(
-#     host=settings.slims_host.unicode_string().strip("/")
-# )
 tars_config = aind_tars_service_async_client.Configuration(
     host=settings.tars_host.unicode_string().strip("/")
 )
@@ -132,22 +122,6 @@ async def get_aind_data_schema_v1_session() -> (
         base_url=settings.aind_data_schema_v1_host.unicode_string()
     ) as session:
         yield session
-
-
-# async def get_slims_api_instance() -> (
-#     AsyncGenerator[aind_slims_service_async_client.DefaultApi, None]
-# ):
-#     """
-#     DEPRECATED: SLIMS removed 2026-08-19 - data provider shut down.
-#     This function is no longer used and can be removed in future cleanup.
-
-#     Yield an aind_slims_service_async_client.DefaultApi object.
-#     """
-#     async with aind_slims_service_async_client.ApiClient(
-#         slims_config
-#     ) as api_client:
-#         api_instance = aind_slims_service_async_client.DefaultApi(api_client)
-#         yield api_instance
 
 
 async def get_dataverse_api_instance() -> (

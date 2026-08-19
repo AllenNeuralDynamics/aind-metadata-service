@@ -1,8 +1,4 @@
-"""Module to handle rig and instrument endpoints
-
-NOTE: SLIMS integration was removed as of 2026-08-19 due to SLIMS shutdown.
-SLIMS-related methods are deprecated and can be removed in future cleanup.
-"""
+"""Module to handle instrument endpoints"""
 
 import hashlib
 import logging
@@ -10,66 +6,13 @@ from asyncio import to_thread
 from uuid import UUID
 
 from aind_data_access_api.document_db import Client as DocDBClient
-
-# from aind_slims_service_async_client import DefaultApi
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query
 from fastapi.responses import JSONResponse
 from requests import HTTPError
 
-from aind_metadata_service_server.sessions import (
-    get_instruments_client,
-    # get_slims_api_instance,
-)
+from aind_metadata_service_server.sessions import get_instruments_client
 
 router = APIRouter()
-
-
-# @router.get(
-#     "/api/v2/rig/{rig_id}",
-#     responses={
-#         400: {
-#             "description": "Validation error in response model.",
-#             "headers": {
-#                 "X-Error-Message": {
-#                     "description": (
-#                         "A JSON-encoded list of Pydantic validation errors."
-#                     ),
-#                     "schema": {"type": "string"},
-#                 }
-#             },
-#         },
-#         404: {"description": "Not found"},
-#     },
-# )
-# async def get_rig(
-#     rig_id: str = Path(
-#         ...,
-#         openapi_examples={
-#             "default": {
-#                 "summary": "A sample rig ID",
-#                 "description": "Example rig ID for SLIMS",
-#                 "value": "323_EPHYS1_20250205",
-#             }
-#         },
-#     ),
-#     partial_match: bool = Query(False, alias="partial_match"),
-#     slims_api_instance: DefaultApi = Depends(get_slims_api_instance),
-# ):
-#     """
-#     ## Rig
-#     Return a Rig.
-#     """
-#     rigs = await slims_api_instance.get_aind_instrument(
-#         input_id=rig_id, partial_match=partial_match
-#     )
-#     if len(rigs) == 0:
-#         raise HTTPException(status_code=404, detail="Not found")
-#     else:
-#         return JSONResponse(
-#             status_code=400,
-#             content=rigs,
-#             headers={"X-Error-Message": "Models have not been validated."},
-#         )
 
 
 @router.get(

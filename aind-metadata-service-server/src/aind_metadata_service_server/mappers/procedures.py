@@ -1,8 +1,4 @@
-"""Maps information to aind-data-schema Procedures model.
-
-NOTE: SLIMS integration was removed as of 2026-08-19 due to SLIMS shutdown.
-SLIMS-related methods are deprecated and can be removed in future cleanup.
-"""
+"""Maps information to aind-data-schema Procedures model."""
 
 import logging
 from enum import Enum
@@ -13,7 +9,6 @@ from aind_data_schema.components.injection_procedures import (
 )
 from aind_data_schema.components.subject_procedures import (
     Perfusion,
-    WaterRestriction,
 )
 from aind_data_schema_models.specimen_procedure_types import (
     SpecimenProcedureType,
@@ -28,18 +23,11 @@ from aind_data_schema.core.procedures import (
     Surgery,
 )
 from aind_data_schema_models.mouse_anatomy import InjectionTargets
-from aind_data_schema_models.units import MassUnit
 from aind_labtracks_service_async_client.models import Task as LabTracksTask
 from aind_sharepoint_service_async_client.models import (
     Las2020List,
     NSB2019List,
     NSB2023List,
-)
-
-# DEPRECATED: SLIMS imports removed 2026-08-19 - data provider shut down
-from aind_slims_service_async_client.models import (
-    SlimsHistologyData,
-    SlimsWaterRestrictionData,
 )
 from aind_smartsheet_service_async_client.models import (
     PerfusionsModel,
@@ -57,9 +45,6 @@ from aind_metadata_service_server.mappers.nsb2023 import (
     MappedNSBList as MappedNSB2023,
 )
 from aind_metadata_service_server.mappers.perfusion import PerfusionMapper
-from aind_metadata_service_server.mappers.specimen_procedures import (
-    SpecimenProcedureMapper,
-)
 from aind_metadata_service_server.mappers.exaspim_procedures import (
     ExaspimProceduresMapper,
 )
@@ -137,8 +122,6 @@ class ProceduresMapper:
         nsb_2023: List[NSB2023List] = [],
         nsb_present: List[NSB2023List] = [],
         smartsheet_perfusion: List[PerfusionsModel] = [],
-        slims_water_restriction: List[SlimsWaterRestrictionData] = [],
-        slims_histology: List[SlimsHistologyData] = [],
         smartsheet_exaspim: Optional[ExaSPIMInfo] = None,
     ):
         """
@@ -156,8 +139,6 @@ class ProceduresMapper:
         self.nsb_2023 = nsb_2023
         self.nsb_present = nsb_present
         self.smartsheet_perfusion = smartsheet_perfusion
-        self.slims_water_restriction = slims_water_restriction
-        self.slims_histology = slims_histology
         self.smartsheet_exaspim = smartsheet_exaspim
 
     @staticmethod
@@ -238,55 +219,6 @@ class ProceduresMapper:
             )
 
         return None
-
-    def _map_slims_response_to_aind_water_restrictions(
-        self,
-    ) -> List[WaterRestriction]:
-        """Maps response from slims into WaterRestriction models"""
-        water_restrictions = []
-        for data in self.slims_water_restriction:
-            wr = WaterRestriction.model_construct(
-                start_date=data.start_date.date() if data.start_date else None,
-                end_date=data.end_date.date() if data.end_date else None,
-                target_fraction_weight=(
-                    int(float(data.target_weight_fraction) * 100)
-                    if data.target_weight_fraction
-                    else None
-                ),
-                baseline_weight=(
-                    float(data.baseline_weight)
-                    if data.baseline_weight
-                    else None
-                ),
-                weight_unit=self._parse_mass_unit(data.weight_unit),
-                minimum_water_per_day=float("1.0"),
-            )
-            water_restrictions.append(wr)
-        return water_restrictions
-
-    @staticmethod
-    def _parse_mass_unit(
-        value: Optional[str],
-    ) -> Optional[Union[MassUnit, str]]:
-        """Parse mass unit from string to MassUnit enum."""
-        mass_unit_abbreviations = {
-            "kg": MassUnit.KG,
-            "g": MassUnit.G,
-            "mg": MassUnit.MG,
-            "ug": MassUnit.UG,
-            "µg": MassUnit.UG,
-            "ng": MassUnit.NG,
-        }
-        if not value:
-            return MassUnit.G
-        else:
-            try:
-                return mass_unit_abbreviations[value.lower()]
-            except KeyError:
-                logging.warning(
-                    f"Mass unit {value} not recognized. Returning it as is."
-                )
-                return value
 
     @staticmethod
     def map_sharepoint_response_to_aind_surgeries(
@@ -414,29 +346,6 @@ class ProceduresMapper:
             logging.info(
                 f"Found {len(smartsheet_perfusion_procedures)} perfusions "
                 f"from Smartsheet for {subject_id}"
-            )
-
-        if self.slims_water_restriction:
-            slims_water_restrictions = (
-                self._map_slims_response_to_aind_water_restrictions()
-            )
-            subject_procedures.extend(slims_water_restrictions)
-            logging.info(
-                f"Found {len(slims_water_restrictions)} water restrictions "
-                f"from SLIMS for {subject_id}"
-            )
-
-        if self.slims_histology:
-            sp_mapper = SpecimenProcedureMapper(
-                slims_histology=self.slims_histology
-            )
-            slims_specimen_procedures = (
-                sp_mapper.map_slims_response_to_aind_specimen_procedures()
-            )
-            specimen_procedures.extend(slims_specimen_procedures)
-            logging.info(
-                f"Found {len(slims_specimen_procedures)} specimen procedures "
-                f"from SLIMS for {subject_id}"
             )
 
         if self.smartsheet_exaspim:
