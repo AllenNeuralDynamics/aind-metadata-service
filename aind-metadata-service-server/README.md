@@ -14,18 +14,9 @@ REST service to retrieve data from backends and create aind-data-schema models.
 **SLIMS Integration Disabled (2026-08-19)**
 
 The SLIMS data provider has been shut down and all SLIMS-related functionality has been disabled. This includes:
-- SLIMS API endpoints (`/api/v2/slims/*`) - routes commented out in main.py
-- Rig and instrument endpoints that depended on SLIMS data - routes commented out in main.py
-- SLIMS data mapping in procedures and specimen procedures - code commented out
-- Water restriction and histology data from SLIMS - not fetched
-
-Files/code commented out for potential future removal:
-- `src/aind_metadata_service_server/routes/slims.py` (route file)
-- `src/aind_metadata_service_server/routes/rig_and_instrument.py` (route file)
-- `src/aind_metadata_service_server/mappers/specimen_procedures.py` (mapper)
-- `tests/test_routes/test_slims.py` (tests skipped)
-- `tests/test_routes/test_rig_and_instrument.py` (tests skipped)
-- SLIMS-related imports/code in various mapper and route files
+- SLIMS API workflow endpoints (`/api/v2/slims/*`) for ecephys, smartspim imaging, smartspim histology, water restriction, and viral injections
+- Rig and Instruments endpoints; `get_instrument` fetches only from DocDB
+- SLIMS data mapping in procedures and specimen procedures
 
 ## Local Development
 
