@@ -1,7 +1,6 @@
 """Module to proxy requests v1 aind-metadata-service-server"""
 
-from enum import Enum
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from fastapi import APIRouter, Depends, Path, Query, Request, Response
 from httpx import AsyncClient, RequestError
@@ -12,16 +11,6 @@ from aind_metadata_service_server.sessions import (
 )
 
 router = APIRouter()
-
-
-class SlimsWorkflow(str, Enum):
-    """Available workflows that can be queried."""
-
-    SMARTSPIM_IMAGING = "smartspim_imaging"
-    HISTOLOGY = "histology"
-    WATER_RESTRICTION = "water_restriction"
-    VIRAL_INJECTIONS = "viral_injections"
-    ECEPHYS_SESSIONS = "ecephys_sessions"
 
 
 async def proxy(
@@ -289,32 +278,6 @@ async def get_v1_protocols(
     )
 
 
-@router.get("/rig/{rig_id}")
-async def get_v1_rig(
-    request: Request,
-    rig_id: str = Path(
-        ...,
-        openapi_examples={
-            "default": {
-                "summary": "A sample rig ID",
-                "description": "Example rig ID for SLIMS",
-                "value": "323_EPHYS1_20250205",
-            }
-        },
-    ),
-    partial_match: bool = Query(False, alias="partial_match"),
-    aind_data_schema_v1_session=Depends(get_aind_data_schema_v1_session),
-):
-    """
-    ## Rig V1
-    Return a Rig.
-    """
-    query_params = QueryParams({"partial_match": partial_match})
-    return await proxy(
-        request, f"/rig/{rig_id}", aind_data_schema_v1_session, query_params
-    )
-
-
 @router.get("/instrument/{instrument_id}")
 async def get_v1_instrument(
     request: Request,
@@ -323,7 +286,7 @@ async def get_v1_instrument(
         openapi_examples={
             "default": {
                 "summary": "A sample instrument ID",
-                "description": "Example instrument ID for SLIMS",
+                "description": "Example instrument ID",
                 "value": "440_SmartSPIM1_20240327",
             }
         },
@@ -358,135 +321,6 @@ async def get_v1_bergamo_session(
     query_params = QueryParams(job_settings)
     return await proxy(
         request, "/bergamo_session", aind_data_schema_v1_session, query_params
-    )
-
-
-@router.get("/slims/{workflow}")
-async def get_v1_slims_workflow(
-    request: Request,
-    workflow: SlimsWorkflow = Path(
-        ...,
-        description="The SLIMS workflow to query.",
-    ),
-    subject_id: Optional[str] = Query(
-        None,
-        alias="subject_id",
-        description="Subject ID to filter the data.",
-        openapi_examples={
-            "smartspim_imaging_example": {
-                "summary": "SmartSPIM example subject ID",
-                "value": "744742",
-            },
-            "histology_example": {
-                "summary": "Histology example subject ID",
-                "value": "744742",
-            },
-            "water_restriction_example": {
-                "summary": "Water restriction example subject ID",
-                "value": "762287",
-            },
-            "viral_injections_example": {
-                "summary": "Viral injections subject ID (None)",
-                "value": None,
-            },
-            "ecephys_session_example": {
-                "summary": "Ecephys example subject ID",
-                "value": "750108",
-            },
-        },
-    ),
-    session_name: Optional[str] = Query(
-        None,
-        alias="session_name",
-        description="Name of the session (only for ecephys sessions).",
-        openapi_examples={
-            "none_example": {
-                "summary": "No session name (default)",
-                "value": None,
-            },
-            "ecephys_session_example": {
-                "summary": "Ecephys example session name",
-                "value": "ecephys_750108_2024-12-23_14-51-45",
-            },
-        },
-    ),
-    start_date_gte: Optional[str] = Query(
-        None,
-        alias="start_date_gte",
-        description="Experiment run created on or after. (ISO format)",
-        openapi_examples={
-            "smartspim_imaging_example": {
-                "summary": "SmartSPIM example start date",
-                "value": "2025-02-12",
-            },
-            "histology_example": {
-                "summary": "Histology example start date",
-                "value": "2025-02-06",
-            },
-            "water_restriction_example": {
-                "summary": "Water restriction example start date",
-                "value": "2024-12-13",
-            },
-            "viral_injections_example": {
-                "summary": "Viral injections example start date",
-                "value": "2025-04-22",
-            },
-            "ecephys_session_example": {
-                "summary": "Ecephys example start date",
-                "value": "2025-04-10",
-            },
-        },
-    ),
-    end_date_lte: Optional[str] = Query(
-        None,
-        alias="end_date_lte",
-        description="Experiment run created on or before. (ISO format)",
-        openapi_examples={
-            "smartspim_imaging_example": {
-                "summary": "SmartSPIM example end date",
-                "value": "2025-02-13",
-            },
-            "histology_example": {
-                "summary": "Histology example end date",
-                "value": "2025-02-07",
-            },
-            "water_restriction_example": {
-                "summary": "Water restriction example end date",
-                "value": "2024-12-14",
-            },
-            "viral_injections_example": {
-                "summary": "Viral injections example end date",
-                "value": "2025-04-25",
-            },
-            "ecephys_session_example": {
-                "summary": "Ecephys example end date",
-                "value": "2025-04-11",
-            },
-        },
-    ),
-    aind_data_schema_v1_session=Depends(get_aind_data_schema_v1_session),
-):
-    """
-    ## SLIMS V1
-    Return information from SLIMS.
-    """
-    kwargs = {
-        "subject_id": subject_id,
-        "start_date_gte": start_date_gte,
-        "end_date_lte": end_date_lte,
-    }
-    if workflow == SlimsWorkflow.ECEPHYS_SESSIONS:
-        kwargs["session_name"] = session_name
-
-    # Filter out None values to prevent them from being stringified
-    filtered_kwargs = {k: v for k, v in kwargs.items() if v is not None}
-    query_params = QueryParams(filtered_kwargs)
-
-    return await proxy(
-        request,
-        f"/slims/{workflow}",
-        aind_data_schema_v1_session,
-        query_params,
     )
 
 

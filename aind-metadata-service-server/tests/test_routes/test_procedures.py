@@ -1,8 +1,4 @@
-"""Tests procedures route
-
-NOTE: SLIMS integration was removed as of 2026-08-19 due to SLIMS shutdown.
-SLIMS-related methods are deprecated and can be removed in future cleanup.
-"""
+"""Tests procedures route"""
 
 from datetime import datetime
 from unittest.mock import AsyncMock, patch
