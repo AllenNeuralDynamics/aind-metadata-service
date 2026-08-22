@@ -14,6 +14,7 @@ Method | HTTP request | Description
 [**get_investigators**](DefaultApi.md#get_investigators) | **GET** /api/v2/investigators/{project_name} | Get Investigators
 [**get_labtracks_subject**](DefaultApi.md#get_labtracks_subject) | **GET** /api/v2/labtracks/subject | Get Labtracks Subject
 [**get_mgi_allele**](DefaultApi.md#get_mgi_allele) | **GET** /api/v2/mgi_allele/{allele_name} | Get Mgi Allele
+[**get_mouse_weight_records**](DefaultApi.md#get_mouse_weight_records) | **GET** /api/v2/dataverse/mouse_weight_records/{subject_id} | Get Mouse Weight Records
 [**get_perfusions**](DefaultApi.md#get_perfusions) | **GET** /api/v2/perfusions/{subject_id} | Get Perfusions
 [**get_procedures**](DefaultApi.md#get_procedures) | **GET** /api/v2/procedures/{subject_id} | Get Procedures
 [**get_project_names**](DefaultApi.md#get_project_names) | **GET** /api/v2/project_names | Get Project Names
@@ -746,6 +747,79 @@ No authorization required
 |-------------|-------------|------------------|
 **200** | Successful Response |  -  |
 **400** | Validation error in response model. |  * X-Error-Message - A JSON-encoded list of Pydantic validation errors. <br>  |
+**404** | Not found |  -  |
+**422** | Validation Error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **get_mouse_weight_records**
+> List[MouseWeightData] get_mouse_weight_records(subject_id, acquisition_datetime=acquisition_datetime)
+
+Get Mouse Weight Records
+
+## Mouse Weight Records
+Retrieves mouse weight records from Dataverse.
+
+### Example
+
+
+```python
+import aind_metadata_service_client
+from aind_metadata_service_client.models.mouse_weight_data import MouseWeightData
+from aind_metadata_service_client.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to https://aind-metadata-service
+# See configuration.py for a list of all supported configuration parameters.
+configuration = aind_metadata_service_client.Configuration(
+    host = "https://aind-metadata-service"
+)
+
+
+# Enter a context with an instance of the API client
+with aind_metadata_service_client.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = aind_metadata_service_client.DefaultApi(api_client)
+    subject_id = '864846' # str | The subject ID to fetch mouse weight records for
+    acquisition_datetime = '2026-08-07T00:18:00' # datetime | Filter records by acquisition datetime (ISO format) (optional)
+
+    try:
+        # Get Mouse Weight Records
+        api_response = api_instance.get_mouse_weight_records(subject_id, acquisition_datetime=acquisition_datetime)
+        print("The response of DefaultApi->get_mouse_weight_records:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling DefaultApi->get_mouse_weight_records: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **subject_id** | **str**| The subject ID to fetch mouse weight records for | 
+ **acquisition_datetime** | **datetime**| Filter records by acquisition datetime (ISO format) | [optional] 
+
+### Return type
+
+[**List[MouseWeightData]**](MouseWeightData.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Successful Response |  -  |
 **404** | Not found |  -  |
 **422** | Validation Error |  -  |
 
