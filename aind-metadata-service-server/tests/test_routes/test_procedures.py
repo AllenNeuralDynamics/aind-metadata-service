@@ -36,6 +36,10 @@ class TestRoute:
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2023")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb_present")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_las2020")
+    @patch(
+        "aind_slims_service_async_client.DefaultApi.get_water_restriction_data"
+    )
+    @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
     @patch("aind_tars_service_async_client.DefaultApi.get_viral_prep_lots")
@@ -46,6 +50,8 @@ class TestRoute:
         mock_get_viral_prep_lots: AsyncMock,
         mock_get_protocols: AsyncMock,
         mock_get_perfusions: AsyncMock,
+        mock_get_histology_data: AsyncMock,
+        mock_get_water_restriction_data: AsyncMock,
         mock_las: AsyncMock,
         mock_nsb_present: AsyncMock,
         mock_nsb2023: AsyncMock,
@@ -78,6 +84,8 @@ class TestRoute:
         ]
         mock_nsb_present.return_value = []
         mock_las.return_value = []
+        mock_get_water_restriction_data.return_value = []
+        mock_get_histology_data.return_value = []
         mock_get_perfusions.return_value = []
         mock_get_protocols.return_value = []
         mock_get_viral_prep_lots.return_value = [
@@ -104,6 +112,10 @@ class TestRoute:
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2023")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb_present")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_las2020")
+    @patch(
+        "aind_slims_service_async_client.DefaultApi.get_water_restriction_data"
+    )
+    @patch("aind_slims_service_async_client.DefaultApi.get_histology_data")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
     @patch("aind_tars_service_async_client.DefaultApi.get_viral_prep_lots")
@@ -114,6 +126,8 @@ class TestRoute:
         mock_get_viral_prep_lots: AsyncMock,
         mock_get_protocols: AsyncMock,
         mock_get_perfusions: AsyncMock,
+        mock_get_histology_data: AsyncMock,
+        mock_get_water_restriction_data: AsyncMock,
         mock_las: AsyncMock,
         mock_nsb_present: AsyncMock,
         mock_nsb2023: AsyncMock,
@@ -127,6 +141,8 @@ class TestRoute:
         mock_nsb2023.return_value = []
         mock_nsb_present.return_value = []
         mock_las.return_value = []
+        mock_get_water_restriction_data.return_value = []
+        mock_get_histology_data.return_value = []
         mock_get_perfusions.return_value = []
         mock_get_protocols.return_value = []
         mock_get_viral_prep_lots.return_value = []
