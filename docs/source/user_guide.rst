@@ -123,6 +123,7 @@ Example usage:
 
 Available Endpoints
 -------------------
+
 Browse the live Swagger UI at
 ``http://aind-metadata-service/docs`` for interactive exploration with
 example responses.
