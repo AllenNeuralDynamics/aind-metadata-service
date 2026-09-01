@@ -14,7 +14,7 @@ from pathlib import Path
 # A workaround is to import the problematic modules here
 from aind_metadata_service_server import __version__ as package_version
 
-INSTITUTE_NAME = "Allen Institute for Neural Dynamics"
+INSTITUTE_NAME = "Allen Institute, Neural Dynamics"
 
 current_year = date.today().year
 
