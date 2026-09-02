@@ -129,3 +129,35 @@ async def get_labtracks_subject(
     if not labtracks_response:
         raise HTTPException(status_code=404, detail="Not found")
     return labtracks_response
+
+
+@router.get(
+    "/api/v2/labtracks/subject_by_protocol_number",
+    responses={
+        404: {"description": "Not found"},
+    },
+)
+async def get_labtracks_subject_by_protocol_number(
+    protocol_number: str = Query(
+        ...,
+        openapi_examples={
+            "default": {
+                "summary": "A protocol number",
+                "description": "Example protocol number to use.",
+                "value": "0401",
+            }
+        },
+    ),
+    labtracks_api_instance=Depends(get_labtracks_api_instance),
+):
+    """
+    ## LabTracks Subject
+    Return LabTracks Subject metadata for a given protocol number.
+    """
+
+    labtracks_response = (
+        await labtracks_api_instance.get_subject_by_protocol_number(
+            protocol_number=protocol_number, _request_timeout=30
+        )
+    )
+    return labtracks_response

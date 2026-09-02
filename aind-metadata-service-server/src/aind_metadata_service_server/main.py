@@ -22,8 +22,8 @@ from aind_metadata_service_server.routes import (
     protocol,
     rig_and_instrument,
     subject,
-    v1_proxy,
     user_email,
+    v1_proxy,
 )
 
 warnings.filterwarnings(

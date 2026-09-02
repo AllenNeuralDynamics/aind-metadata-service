@@ -22,7 +22,6 @@ from aind_metadata_service_server.mappers.las2020 import (
     LASProcedure,
     MappedLASList,
 )
-
 from tests.conftest import suppress_pydantic_serialization_warnings
 
 
