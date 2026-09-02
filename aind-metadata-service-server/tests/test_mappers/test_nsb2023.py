@@ -51,7 +51,6 @@ from aind_metadata_service_server.mappers.nsb2023 import (
     InjectionType,
     MappedNSBList,
 )
-
 from tests.conftest import suppress_pydantic_serialization_warnings
 
 TEST_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / ".."

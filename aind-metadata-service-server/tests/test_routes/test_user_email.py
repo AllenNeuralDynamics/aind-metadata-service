@@ -2,11 +2,11 @@
 
 from unittest.mock import AsyncMock, patch
 
-from fastapi.testclient import TestClient
-from aind_active_directory_service_async_client.models import UserInfo
 from aind_active_directory_service_async_client.exceptions import (
     NotFoundException,
 )
+from aind_active_directory_service_async_client.models import UserInfo
+from fastapi.testclient import TestClient
 
 
 class TestUserEmailRoute:

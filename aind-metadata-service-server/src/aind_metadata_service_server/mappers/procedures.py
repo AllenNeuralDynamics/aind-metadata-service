@@ -3,15 +3,13 @@
 import logging
 from enum import Enum
 from typing import List, Optional, Union
+
 from aind_data_schema.components.injection_procedures import (
     Injection,
     ViralMaterial,
 )
 from aind_data_schema.components.subject_procedures import (
     Perfusion,
-)
-from aind_data_schema_models.specimen_procedure_types import (
-    SpecimenProcedureType,
 )
 from aind_data_schema.components.surgery_procedures import (
     BrainInjection,
@@ -23,6 +21,9 @@ from aind_data_schema.core.procedures import (
     Surgery,
 )
 from aind_data_schema_models.mouse_anatomy import InjectionTargets
+from aind_data_schema_models.specimen_procedure_types import (
+    SpecimenProcedureType,
+)
 from aind_labtracks_service_async_client.models import Task as LabTracksTask
 from aind_sharepoint_service_async_client.models import (
     Las2020List,
@@ -30,11 +31,14 @@ from aind_sharepoint_service_async_client.models import (
     NSB2023List,
 )
 from aind_smartsheet_service_async_client.models import (
-    PerfusionsModel,
     ExaSPIMInfo,
+    PerfusionsModel,
 )
 from pydantic import ValidationError
 
+from aind_metadata_service_server.mappers.exaspim_procedures import (
+    ExaspimProceduresMapper,
+)
 from aind_metadata_service_server.mappers.las2020 import (
     MappedLASList as MappedLAS2020,
 )
@@ -45,9 +49,6 @@ from aind_metadata_service_server.mappers.nsb2023 import (
     MappedNSBList as MappedNSB2023,
 )
 from aind_metadata_service_server.mappers.perfusion import PerfusionMapper
-from aind_metadata_service_server.mappers.exaspim_procedures import (
-    ExaspimProceduresMapper,
-)
 
 
 class LabTracksTaskStatuses(Enum):

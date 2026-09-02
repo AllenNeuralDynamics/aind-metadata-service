@@ -43,11 +43,12 @@ from aind_data_schema_models.units import (
     SizeUnit,
     VolumeUnit,
 )
-
+from aind_sharepoint_service_async_client.models import (
+    NSB2023IacucProtocol as IacucProtocol,
+)
 from aind_sharepoint_service_async_client.models import (
     NSB2023List,
     NSB2023Procedure,
-    NSB2023IacucProtocol as IacucProtocol,
     NSB2023SurgeryStatus,
 )
 from pydantic import ValidationError
