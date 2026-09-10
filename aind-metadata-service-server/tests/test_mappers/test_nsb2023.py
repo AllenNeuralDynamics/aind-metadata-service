@@ -16,8 +16,8 @@ from aind_data_schema.core.procedures import (
     HeadframeMaterial,
 )
 from aind_data_schema_models.brain_atlas import (
-    _BrainStructureModel,
     CCFStructure,
+    _BrainStructureModel,
 )
 from aind_sharepoint_service_async_client.models.nsb2023_list import (
     NSB2023List,

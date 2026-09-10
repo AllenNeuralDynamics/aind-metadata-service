@@ -3794,6 +3794,7 @@ class MappedNSBList:
             NSB2023Procedure.THERMISTOR__IMPLANT_WITH,
             NSB2023Procedure.HP_INJ__THERMISTOR__IMPLA,
             NSB2023Procedure.CHRONOS_HP__SKULL__SCREW,
+            NSB2023Procedure.WHC_NP__THERMISTOR__IMPLA,
         }:
             return True
         if (
@@ -3833,6 +3834,7 @@ class MappedNSBList:
             NSB2023Procedure.GRID_INJ_6_OR_9_MOTOR_C,
             NSB2023Procedure.INJ_WHC_NP,
             NSB2023Procedure.DHC,
+            NSB2023Procedure.WHC_NP__THERMISTOR__IMPLA,
         }:
             return True
         if (

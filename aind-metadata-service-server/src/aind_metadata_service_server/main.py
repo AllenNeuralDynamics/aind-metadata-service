@@ -20,9 +20,9 @@ from aind_metadata_service_server.routes import (
     procedures,
     protocol,
     rig_and_instrument,
+    session_json,
     slims,
     subject,
-    session_json,
 )
 
 warnings.filterwarnings(
