@@ -65,9 +65,7 @@ def map_mouse_weight_records(
                 "FormattedValue"
             ),
             weight=record.get("aibs_weight"),
-            weight_datetime=_parse_datetime(
-                record.get("cr138_datetime")
-            ),
+            weight_datetime=_parse_datetime(record.get("cr138_datetime")),
             is_baseline_weight=record.get("aibs_is_baseline_weight"),
             operator=record.get(
                 "_aibs_operator_value@OData.Community.Display.V1."

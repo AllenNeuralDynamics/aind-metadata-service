@@ -13,6 +13,9 @@ from aind_data_schema.components.injection_procedures import (
     ViralMaterial,
     VirusPrepType,
 )
+from aind_data_schema.components.specimen_procedures import (
+    SpecimenProcedure,
+)
 from aind_data_schema.components.subject_procedures import (
     Perfusion,
     WaterRestriction,
@@ -27,6 +30,9 @@ from aind_data_schema.core.procedures import (
     Surgery,
 )
 from aind_data_schema_models.mouse_anatomy import InjectionTargets
+from aind_data_schema_models.specimen_procedure_types import (
+    SpecimenProcedureType,
+)
 from aind_data_schema_models.units import MassUnit, UnitlessUnit, VolumeUnit
 from aind_labtracks_service_async_client.models.task import (
     Task as LabTracksTask,
@@ -42,8 +48,8 @@ from aind_slims_service_async_client.models.slims_histology_data import (
     SlimsHistologyData,
 )
 from aind_smartsheet_service_async_client.models import (
-    PerfusionsModel,
     ExaSPIMInfo,
+    PerfusionsModel,
 )
 
 from aind_metadata_service_server.mappers.procedures import (
@@ -53,12 +59,6 @@ from aind_metadata_service_server.mappers.procedures import (
 from aind_metadata_service_server.models import (
     ProtocolInformation,
     ViralMaterialInformation,
-)
-from aind_data_schema.components.specimen_procedures import (
-    SpecimenProcedure,
-)
-from aind_data_schema_models.specimen_procedure_types import (
-    SpecimenProcedureType,
 )
 from tests.conftest import suppress_pydantic_serialization_warnings
 

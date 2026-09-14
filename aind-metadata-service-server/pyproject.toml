@@ -17,7 +17,7 @@ readme = "README.md"
 dynamic = ["version"]
 
 dependencies = [
-    'aind-labtracks-service-async-client>=0.2.4',
+    'aind-labtracks-service-async-client>=0.5.0',
     'aind-mgi-service-async-client>=0.1.2',
     'aind-slims-service-async-client>=0.3.4',
     'aind-tars-service-async-client>=0.1.3',
