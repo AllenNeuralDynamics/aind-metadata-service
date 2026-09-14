@@ -6,13 +6,13 @@ from typing import Any, Generator
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from aind_smartsheet_service_async_client.models import ExaSPIMInfo
 from aind_tars_service_async_client import (
     Alias,
     PrepLotData,
     ViralPrep,
     VirusData,
 )
-from aind_smartsheet_service_async_client.models import ExaSPIMInfo
 from fastapi.testclient import TestClient
 from pytest_mock import MockFixture
 from starlette.responses import JSONResponse

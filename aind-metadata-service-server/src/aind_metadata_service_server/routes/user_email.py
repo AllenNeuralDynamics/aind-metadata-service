@@ -1,9 +1,9 @@
 """Module to handle endpoint responses"""
 
-from fastapi import APIRouter, HTTPException, Depends
 from aind_active_directory_service_async_client.exceptions import (
     NotFoundException,
 )
+from fastapi import APIRouter, Depends, HTTPException
 
 from aind_metadata_service_server.mappers.responses import map_to_response
 from aind_metadata_service_server.sessions import (
