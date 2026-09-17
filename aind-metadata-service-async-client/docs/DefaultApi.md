@@ -13,6 +13,7 @@ Method | HTTP request | Description
 [**get_intended_measurements**](DefaultApi.md#get_intended_measurements) | **GET** /api/v2/intended_measurements/{subject_id} | Get Intended Measurements
 [**get_investigators**](DefaultApi.md#get_investigators) | **GET** /api/v2/investigators/{project_name} | Get Investigators
 [**get_labtracks_subject**](DefaultApi.md#get_labtracks_subject) | **GET** /api/v2/labtracks/subject | Get Labtracks Subject
+[**get_labtracks_subject_by_protocol_number**](DefaultApi.md#get_labtracks_subject_by_protocol_number) | **GET** /api/v2/labtracks/subject_by_protocol_number | Get Labtracks Subject By Protocol Number
 [**get_mgi_allele**](DefaultApi.md#get_mgi_allele) | **GET** /api/v2/mgi_allele/{allele_name} | Get Mgi Allele
 [**get_mouse_weight_records**](DefaultApi.md#get_mouse_weight_records) | **GET** /api/v2/dataverse/mouse_weight_records/{subject_id} | Get Mouse Weight Records
 [**get_perfusions**](DefaultApi.md#get_perfusions) | **GET** /api/v2/perfusions/{subject_id} | Get Perfusions
@@ -677,6 +678,76 @@ No authorization required
 **200** | Successful Response |  -  |
 **404** | Not found |  -  |
 **406** | Invalid subject ID |  -  |
+**422** | Validation Error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **get_labtracks_subject_by_protocol_number**
+> object get_labtracks_subject_by_protocol_number(protocol_number)
+
+Get Labtracks Subject By Protocol Number
+
+## LabTracks Subject
+Return LabTracks Subject metadata for a given protocol number.
+
+### Example
+
+
+```python
+import aind_metadata_service_async_client
+from aind_metadata_service_async_client.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to https://aind-metadata-service
+# See configuration.py for a list of all supported configuration parameters.
+configuration = aind_metadata_service_async_client.Configuration(
+    host = "https://aind-metadata-service"
+)
+
+
+# Enter a context with an instance of the API client
+async with aind_metadata_service_async_client.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = aind_metadata_service_async_client.DefaultApi(api_client)
+    protocol_number = '0401' # str | 
+
+    try:
+        # Get Labtracks Subject By Protocol Number
+        api_response = await api_instance.get_labtracks_subject_by_protocol_number(protocol_number)
+        print("The response of DefaultApi->get_labtracks_subject_by_protocol_number:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling DefaultApi->get_labtracks_subject_by_protocol_number: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **protocol_number** | **str**|  | 
+
+### Return type
+
+**object**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Successful Response |  -  |
+**404** | Not found |  -  |
 **422** | Validation Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
