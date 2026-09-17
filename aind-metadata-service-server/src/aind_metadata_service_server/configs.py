@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     active_directory_host: HttpUrl = Field(
         ..., description="Host address for active directory endpoint"
     )
+    orcid_host: HttpUrl = Field(
+        ..., description="Host address for orcid endpoint"
+    )
 
 
 def get_settings():
