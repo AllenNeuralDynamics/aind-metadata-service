@@ -317,9 +317,10 @@ class TestRoute:
         mock_get_orcid: AsyncMock,
         client: TestClient,
     ):
-        """Tests registry_identifier is filled in for each investigator"""
+        """Tests each investigator gets an iD, looking up a name once"""
         mock_get_funding.return_value = [
-            funding_row(investigators="Person One, Person Two")
+            funding_row(investigators="Person One, Person Two"),
+            funding_row(investigators="Person One"),
         ]
         mock_get_orcid.side_effect = [
             OrcidId(orcid="0000-0000-0000-0001"),
@@ -329,32 +330,12 @@ class TestRoute:
         response = client.get("/api/v2/investigators/Project")
 
         assert 200 == response.status_code
-        assert ["0000-0000-0000-0001", "0000-0000-0000-0002"] == [
-            person["registry_identifier"] for person in response.json()
-        ]
-
-    @patch("orcid_service_async_client.DefaultApi.get_orcid")
-    @patch(
-        "aind_smartsheet_service_async_client.DefaultApi.get_funding",
-        new_callable=AsyncMock,
-    )
-    def test_investigators_look_up_each_name_once(
-        self,
-        mock_get_funding: AsyncMock,
-        mock_get_orcid: AsyncMock,
-        client: TestClient,
-    ):
-        """Tests a repeated name is only looked up once"""
-        mock_get_funding.return_value = [
-            funding_row(investigators="Person One"),
-            funding_row(investigators="Person One"),
-        ]
-        mock_get_orcid.return_value = OrcidId(orcid="0000-0000-0000-0001")
-
-        response = client.get("/api/v2/investigators/Project")
-
-        assert 200 == response.status_code
-        assert 1 == mock_get_orcid.await_count
+        assert [
+            "0000-0000-0000-0001",
+            "0000-0000-0000-0002",
+            "0000-0000-0000-0001",
+        ] == [person["registry_identifier"] for person in response.json()]
+        assert 2 == mock_get_orcid.await_count
 
     @pytest.mark.parametrize(
         "failure", [NotFoundException(), ConnectionError("boom")]
