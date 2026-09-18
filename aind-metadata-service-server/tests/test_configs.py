@@ -39,6 +39,7 @@ class TestSettings(unittest.TestCase):
             "AIND_METADATA_SERVICE_ACTIVE_DIRECTORY_HOST": (
                 "http://example.com/active_directory"
             ),
+            "AIND_METADATA_SERVICE_ORCID_HOST": "http://example.com/orcid",
         },
         clear=True,
     )
@@ -55,6 +56,7 @@ class TestSettings(unittest.TestCase):
             session_json_host="http://example.com/session_json",
             docdb_api_host="http://example.com/docdb",
             active_directory_host="http://example.com/active_directory",
+            orcid_host="http://example.com/orcid",
         )
         self.assertEqual(expected_settings, settings)
 
