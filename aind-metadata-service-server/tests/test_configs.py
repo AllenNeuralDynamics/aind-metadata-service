@@ -20,7 +20,6 @@ class TestSettings(unittest.TestCase):
             "AIND_METADATA_SERVICE_SMARTSHEET_HOST": (
                 "http://example.com/smartsheet"
             ),
-            "AIND_METADATA_SERVICE_SLIMS_HOST": "http://example.com/slims",
             "AIND_METADATA_SERVICE_TARS_HOST": "http://example.com/tars",
             "AIND_METADATA_SERVICE_SHAREPOINT_HOST": (
                 "http://example.com/sharepoint"
@@ -38,7 +37,6 @@ class TestSettings(unittest.TestCase):
             labtracks_host="http://example.com/labtracks",
             mgi_host="http://example.com/mgi",
             smartsheet_host="http://example.com/smartsheet",
-            slims_host="http://example.com/slims",
             tars_host="http://example.com/tars",
             sharepoint_host="http://example.com/sharepoint",
             session_json_host="http://example.com/session_json",

@@ -19,9 +19,7 @@ from aind_metadata_service_server.routes import (
     perfusion,
     procedures,
     protocol,
-    rig_and_instrument,
     session_json,
-    slims,
     subject,
 )
 
@@ -80,8 +78,6 @@ routers = [
     intended_measurements.router,
     procedures.router,
     protocol.router,
-    rig_and_instrument.router,
-    slims.router,
     subject.router,
     perfusion.router,
     mgi_allele.router,
