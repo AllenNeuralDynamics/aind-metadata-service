@@ -12,14 +12,12 @@ from aind_metadata_service_server import __version__ as service_version
 from aind_metadata_service_server.routes import (
     funding,
     healthcheck,
-    index,
     injection_materials,
     intended_measurements,
     mgi_allele,
     perfusion,
     procedures,
     protocol,
-    session_json,
     subject,
 )
 
@@ -82,8 +80,6 @@ routers = [
     perfusion.router,
     mgi_allele.router,
     injection_materials.router,
-    session_json.router,
-    index.router,
 ]
 
 for router in routers:
