@@ -17,10 +17,10 @@ readme = "README.md"
 dynamic = ["version"]
 
 dependencies = [
-    'aind-labtracks-service-async-client>=0.2.4',
+    'aind-labtracks-service-async-client>=0.5.0',
     'aind-mgi-service-async-client>=0.1.2',
-    'aind-tars-service-async-client>=0.1.3',
-    'aind-smartsheet-service-async-client>=1.0.0',
+    'aind-tars-service-async-client>=0.1.5',
+    'aind-smartsheet-service-async-client>=1.1.0',
     'aind-sharepoint-service-async-client>=0.3.0',
     'aind-data-schema==1.4.0',
     'aind-data-schema-models==0.7.5',
