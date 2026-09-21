@@ -10,7 +10,7 @@ from orcid_service_async_client.models import OrcidId
 
 
 def funding_row(**kwargs) -> FundingModel:
-    """Build a smartsheet funding row for the orcid tests."""
+    """Build a funding row so tests only specify the fields they use."""
     return FundingModel(
         project_name="Project",
         funding_institution="Allen Institute",
