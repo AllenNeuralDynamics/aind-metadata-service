@@ -35,7 +35,7 @@ jobs:
         run: |
           init_file="./aind-metadata-service-server/src/aind_metadata_service_server/__init__.py"
           pkg_version=$(grep -Po '[0-9]+\.[0-9]+\.[0-9]+' "$init_file")
-          latest_tag=$(git ls-remote --tags --refs --sort="v:refname" | tail -n1 | sed 's/.*\///')
+          latest_tag=$(git ls-remote --tags --refs --sort="v:refname" | grep v1 | tail -n1 | sed 's/.*\///')
           echo "Checking pkg_version v$pkg_version and latest_tag $latest_tag"
           if [ "$latest_tag" == "v$pkg_version" ]
           then
