@@ -1,6 +1,7 @@
 """Module to handle funding endpoints"""
 
 from fastapi import APIRouter, Depends, Path
+from fastapi.openapi.models import Example
 from starlette.responses import JSONResponse
 
 from aind_metadata_service_server.mappers.funding import FundingMapper
@@ -8,7 +9,7 @@ from aind_metadata_service_server.response_handler import (
     ModelResponse,
     StatusCodes,
 )
-from aind_metadata_service_server.sessions import get_smartsheet_api_instance
+from aind_metadata_service_server.sessions import get_dataverse_api_instance
 
 router = APIRouter()
 
@@ -18,27 +19,22 @@ async def get_funding(
     project_name: str = Path(
         ...,
         openapi_examples={
-            "default": {
-                "summary": "A sample project name",
-                "description": "Example project name for smartsheet",
-                "value": ("Thalamus - Project 1 Mesoscale thalamic circuits"),
-            }
+            "default": Example(
+                summary="A sample project name",
+                description="Example project name for smartsheet",
+                value="Thalamus - Project 1 Mesoscale thalamic circuits",
+            )
         },
     ),
-    smartsheet_api_instance=Depends(get_smartsheet_api_instance),
+    dataverse_api_instance=Depends(get_dataverse_api_instance),
 ):
     """
     ## Funding
     Return Funding metadata.
     """
-    main_project_name, subproject = FundingMapper.split_name(project_name)
-    funding_response = await smartsheet_api_instance.get_funding(
-        project_name=main_project_name,
-        subproject=subproject,
-        _request_timeout=10,
-    )
-    mapper = FundingMapper(smartsheet_funding=funding_response)
-    funding_information = mapper.get_funding_list()
+    funding_response = await dataverse_api_instance.get_funding()
+    mapper = FundingMapper(dataverse_funding=funding_response)
+    funding_information = mapper.get_funding_list(project_name=project_name)
     response_handler = ModelResponse(
         aind_models=funding_information, status_code=StatusCodes.DB_RESPONDED
     )
@@ -48,15 +44,15 @@ async def get_funding(
 
 @router.get("/project_names")
 async def get_project_names(
-    smartsheet_api_instance=Depends(get_smartsheet_api_instance),
+    dataverse_api_instance=Depends(get_dataverse_api_instance),
 ) -> JSONResponse:
     """
     Get a list of project names from the Smartsheet API.
     """
-    funding_response = await smartsheet_api_instance.get_funding(
-        _request_timeout=10
+    funding_response = await dataverse_api_instance.get_funding(
+        _request_timeout=30
     )
-    mapper = FundingMapper(smartsheet_funding=funding_response)
+    mapper = FundingMapper(dataverse_funding=funding_response)
     project_names_list = mapper.get_project_names()
     response = JSONResponse(
         status_code=200,

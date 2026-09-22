@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 class TestRoute:
     """Test responses."""
 
-    @patch("aind_smartsheet_service_async_client.DefaultApi.get_funding")
+    @patch("aind_dataverse_service_async_client.DefaultApi.get_funding")
     def test_get_funding(
         self,
         mock_get_funding: AsyncMock,
@@ -27,7 +27,7 @@ class TestRoute:
 
         mock_get_funding.return_value = [
             FundingModel(
-                project_name=discovery_project,
+                project_name=f"{discovery_project}-{sub1}",
                 subproject=sub1,
                 project_code="122-01-001-10",
                 funding_institution="Allen Institute",
@@ -37,7 +37,7 @@ class TestRoute:
                 ),
             ),
             FundingModel(
-                project_name=discovery_project,
+                project_name=f"{discovery_project}-{sub1}",
                 subproject=sub1,
                 project_code="122-01-012-20",
                 funding_institution="NINDS",
@@ -47,47 +47,12 @@ class TestRoute:
             ),
         ]
         response = client.get(
-            "/funding/"
-            "Discovery-Neuromodulator circuit dynamics during foraging"
+            f"/funding/{discovery_project}-{sub1}",
         )
         assert 300 == response.status_code
         assert 1 == len(mock_get_funding.mock_calls)
 
-    @patch("aind_smartsheet_service_async_client.DefaultApi.get_funding")
-    def test_get_funding_with_subproject(
-        self,
-        mock_get_funding: AsyncMock,
-        client: TestClient,
-    ):
-        """Tests funding retrieval with subproject parameter"""
-        discovery_project = (
-            "Discovery-Neuromodulator circuit dynamics during foraging"
-        )
-        sub2 = "Subproject 2 Molecular Anatomy Cell Types"
-
-        mock_get_funding.return_value = [
-            FundingModel(
-                project_name=discovery_project,
-                subproject=sub2,
-                project_code="122-01-001-10",
-                funding_institution="Allen Institute",
-                grant_number=None,
-                fundees=(
-                    "Person Four, Person Five, Person Six, Person Seven,"
-                    " Person Eight"
-                ),
-                investigators="Person Seven",
-            ),
-        ]
-        response = client.get(
-            "/funding/Discovery-Neuromodulator circuit dynamics during "
-            "foraging?subproject=Subproject 2 Molecular Anatomy Cell Types"
-        )
-
-        assert 200 == response.status_code
-        assert 1 == len(mock_get_funding.mock_calls)
-
-    @patch("aind_smartsheet_service_async_client.DefaultApi.get_funding")
+    @patch("aind_dataverse_service_async_client.DefaultApi.get_funding")
     def test_get_project_names(
         self,
         mock_get_funding: AsyncMock,
@@ -117,7 +82,7 @@ class TestRoute:
                 fundees="Person Four",
             ),
             FundingModel(
-                project_name=discovery_project,
+                project_name=f"{discovery_project}-{sub1}",
                 subproject=sub1,
                 project_code="122-01-001-10",
                 funding_institution="Allen Institute",
@@ -127,7 +92,7 @@ class TestRoute:
                 ),
             ),
             FundingModel(
-                project_name=discovery_project,
+                project_name=f"{discovery_project}-{sub2}",
                 subproject=sub2,
                 project_code="122-01-001-10",
                 funding_institution="Allen Institute",
@@ -143,10 +108,10 @@ class TestRoute:
 
         project_names = response.json()["data"]
         expected_names = [
-            "Discovery-Neuromodulator circuit dynamics during foraging - "
+            "Discovery-Neuromodulator circuit dynamics during foraging-"
             "Subproject 1 Electrophysiological Recordings from NM Neurons "
             "During Behavior",
-            "Discovery-Neuromodulator circuit dynamics during foraging - "
+            "Discovery-Neuromodulator circuit dynamics during foraging-"
             "Subproject 2 Molecular Anatomy Cell Types",
             "Ephys Platform",
             "MSMA Platform",
