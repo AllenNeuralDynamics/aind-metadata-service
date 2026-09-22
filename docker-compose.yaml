@@ -11,6 +11,7 @@ services:
       - smartsheet
       - sharepoint
       - tars
+      - dataverse
       - redis
     env_file: "env/webapp_v1.env"
   labtracks:
@@ -27,5 +28,8 @@ services:
   tars:
     image: "ghcr.io/allenneuraldynamics/aind-tars-service-server:0.1.5"
     env_file: "env/tars.env"
+  dataverse:
+    image: "ghcr.io/allenneuraldynamics/aind-dataverse-service-server:0.4.0"
+    env_file: "env/dataverse.env"
   redis:
     image: "redis:latest"

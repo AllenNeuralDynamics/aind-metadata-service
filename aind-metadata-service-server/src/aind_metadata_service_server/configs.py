@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     smartsheet_host: HttpUrl = Field(
         ..., description="Host address for smartsheet endpoint"
     )
+    dataverse_host: HttpUrl = Field(
+        ..., description="Host address for dataverse endpoint"
+    )
 
 
 def get_settings():

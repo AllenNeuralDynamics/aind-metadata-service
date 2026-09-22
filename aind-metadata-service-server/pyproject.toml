@@ -22,6 +22,7 @@ dependencies = [
     'aind-tars-service-async-client>=0.1.5',
     'aind-smartsheet-service-async-client>=1.1.0',
     'aind-sharepoint-service-async-client>=0.3.0',
+    'aind-dataverse-service-async-client>=0.4.0',
     'aind-data-schema==1.4.0',
     'aind-data-schema-models==0.7.5',
     'pydantic>=2.0',
@@ -104,4 +105,5 @@ env = [
     "AIND_METADATA_SERVICE_SMARTSHEET_HOST=http://example.com/smartsheet",
     "AIND_METADATA_SERVICE_TARS_HOST=http://example.com/tars",
     "AIND_METADATA_SERVICE_SHAREPOINT_HOST=http://example.com/sharepoint",
+    "AIND_METADATA_SERVICE_DATAVERSE_HOST=http://example.com/dataverse",
 ]
