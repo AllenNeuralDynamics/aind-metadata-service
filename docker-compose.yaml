@@ -16,6 +16,7 @@ services:
       - dataverse
       - redis
       - active_directory
+      - orcid
       - aind_metadata_service_v1
     env_file: "env/webapp.env"
     volumes:
@@ -26,6 +27,8 @@ services:
     env_file: "env/labtracks.env"
   mgi:
     image: "ghcr.io/allenneuraldynamics/aind-mgi-service-server:0.2.3"
+  orcid:
+    image: "ghcr.io/allenneuraldynamics/orcid-service-server:0.1.0"
   smartsheet:
     image: "ghcr.io/allenneuraldynamics/aind-smartsheet-service-server:1.1.0"
     env_file: "env/smartsheet.env"

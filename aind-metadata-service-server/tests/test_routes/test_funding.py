@@ -5,6 +5,17 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from aind_smartsheet_service_async_client.models import FundingModel
 from fastapi.testclient import TestClient
+from orcid_service_async_client.exceptions import NotFoundException
+from orcid_service_async_client.models import OrcidId
+
+
+def funding_row(**kwargs) -> FundingModel:
+    """Build a funding row so tests only specify the fields they use."""
+    return FundingModel(
+        project_name="Project",
+        funding_institution="Allen Institute",
+        **kwargs,
+    )
 
 
 class TestRoute:
@@ -294,6 +305,110 @@ class TestRoute:
         response = client.get("/api/v2/funding/Nonexistent Project Name")
         assert 404 == response.status_code
         assert 1 == len(mock_get_funding.mock_calls)
+
+    @patch("orcid_service_async_client.DefaultApi.get_orcid")
+    @patch(
+        "aind_smartsheet_service_async_client.DefaultApi.get_funding",
+        new_callable=AsyncMock,
+    )
+    def test_investigators_get_orcids(
+        self,
+        mock_get_funding: AsyncMock,
+        mock_get_orcid: AsyncMock,
+        client: TestClient,
+    ):
+        """Tests each investigator gets an iD, looking up a name once"""
+        mock_get_funding.return_value = [
+            funding_row(investigators="Person One, Person Two"),
+            funding_row(investigators="Person One"),
+        ]
+        mock_get_orcid.side_effect = [
+            OrcidId(orcid="0000-0000-0000-0001"),
+            OrcidId(orcid="0000-0000-0000-0002"),
+        ]
+
+        response = client.get("/api/v2/investigators/Project")
+
+        assert 200 == response.status_code
+        assert [
+            "0000-0000-0000-0001",
+            "0000-0000-0000-0002",
+            "0000-0000-0000-0001",
+        ] == [person["registry_identifier"] for person in response.json()]
+        assert 2 == mock_get_orcid.await_count
+
+    @pytest.mark.parametrize(
+        "failure", [NotFoundException(), ConnectionError("boom")]
+    )
+    @patch("orcid_service_async_client.DefaultApi.get_orcid")
+    @patch(
+        "aind_smartsheet_service_async_client.DefaultApi.get_funding",
+        new_callable=AsyncMock,
+    )
+    def test_investigators_when_orcid_gives_nothing(
+        self,
+        mock_get_funding: AsyncMock,
+        mock_get_orcid: AsyncMock,
+        failure: Exception,
+        client: TestClient,
+    ):
+        """Tests investigators are still returned when no iD comes back"""
+        mock_get_funding.return_value = [
+            funding_row(investigators="Person One")
+        ]
+        mock_get_orcid.side_effect = failure
+
+        response = client.get("/api/v2/investigators/Project")
+
+        assert 200 == response.status_code
+        assert "Person One" == response.json()[0]["name"]
+        assert response.json()[0]["registry_identifier"] is None
+
+    @patch("aind_metadata_service_server.routes.funding.ORCID_BUDGET", 0)
+    @patch("orcid_service_async_client.DefaultApi.get_orcid")
+    @patch(
+        "aind_smartsheet_service_async_client.DefaultApi.get_funding",
+        new_callable=AsyncMock,
+    )
+    def test_investigators_stop_looking_up_past_the_budget(
+        self,
+        mock_get_funding: AsyncMock,
+        mock_get_orcid: AsyncMock,
+        client: TestClient,
+    ):
+        """Tests a slow ORCID cannot stall a project with many people"""
+        mock_get_funding.return_value = [
+            funding_row(investigators="Person One, Person Two")
+        ]
+
+        response = client.get("/api/v2/investigators/Project")
+
+        assert 200 == response.status_code
+        assert 0 == mock_get_orcid.await_count
+        assert [None, None] == [
+            person["registry_identifier"] for person in response.json()
+        ]
+
+    @patch("orcid_service_async_client.DefaultApi.get_orcid")
+    @patch(
+        "aind_smartsheet_service_async_client.DefaultApi.get_funding",
+        new_callable=AsyncMock,
+    )
+    def test_funding_fundees_get_orcids(
+        self,
+        mock_get_funding: AsyncMock,
+        mock_get_orcid: AsyncMock,
+        client: TestClient,
+    ):
+        """Tests registry_identifier is filled in for each fundee"""
+        mock_get_funding.return_value = [funding_row(fundees="Person One")]
+        mock_get_orcid.return_value = OrcidId(orcid="0000-0000-0000-0001")
+
+        response = client.get("/api/v2/funding/Project")
+
+        assert 200 == response.status_code
+        fundee = response.json()[0]["fundee"][0]
+        assert "0000-0000-0000-0001" == fundee["registry_identifier"]
 
     @patch(
         "aind_smartsheet_service_async_client.DefaultApi.get_funding",

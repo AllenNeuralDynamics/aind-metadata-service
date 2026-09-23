@@ -9,6 +9,7 @@ import aind_mgi_service_async_client
 import aind_sharepoint_service_async_client
 import aind_smartsheet_service_async_client
 import aind_tars_service_async_client
+import orcid_service_async_client
 from aind_data_access_api.document_db import Client as DocDBClient
 from httpx import AsyncClient
 
@@ -37,6 +38,9 @@ active_directory_config = (
     aind_active_directory_service_async_client.Configuration(
         host=settings.active_directory_host.unicode_string().strip("/")
     )
+)
+orcid_config = orcid_service_async_client.Configuration(
+    host=settings.orcid_host.unicode_string().strip("/")
 )
 
 
@@ -151,6 +155,19 @@ async def get_active_directory_api_instance() -> (
         api_instance = aind_active_directory_service_async_client.DefaultApi(
             api_client
         )
+        yield api_instance
+
+
+async def get_orcid_api_instance() -> (
+    AsyncGenerator[orcid_service_async_client.DefaultApi, None]
+):
+    """
+    Yield an orcid_service_async_client.DefaultApi object.
+    """
+    async with orcid_service_async_client.ApiClient(
+        orcid_config
+    ) as api_client:
+        api_instance = orcid_service_async_client.DefaultApi(api_client)
         yield api_instance
 
 

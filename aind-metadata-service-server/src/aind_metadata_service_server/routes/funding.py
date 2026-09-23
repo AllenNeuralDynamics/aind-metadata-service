@@ -1,13 +1,52 @@
 """Module to handle funding endpoints"""
 
+import logging
+from time import monotonic
+from typing import Dict, List, Optional
+
+from aind_data_schema.components.identifiers import Person
 from fastapi import APIRouter, Depends, HTTPException, Path
+from orcid_service_async_client.exceptions import NotFoundException
 from starlette.responses import JSONResponse
 
 from aind_metadata_service_server.mappers.funding import FundingMapper
 from aind_metadata_service_server.mappers.responses import map_to_response
-from aind_metadata_service_server.sessions import get_smartsheet_api_instance
+from aind_metadata_service_server.sessions import (
+    get_orcid_api_instance,
+    get_smartsheet_api_instance,
+)
 
 router = APIRouter()
+
+# An ORCID search is usually well under a second but can take several, so
+# allow room per name while capping the whole enrichment. Neither should
+# ever hold up the investigators or funding these are attached to.
+ORCID_TIMEOUT = 5
+ORCID_BUDGET = 15
+
+
+async def resolve_orcids(orcid_api_instance, people: List[Person]) -> None:
+    """
+    Set registry_identifier in place on each person whose name resolves to
+    a single ORCID iD, looking up each distinct name once and giving up on
+    the rest once ORCID_BUDGET is spent. Anything unresolved is left as
+    None, so a slow or broken ORCID never fails the calling request.
+    """
+    deadline = monotonic() + ORCID_BUDGET
+    resolved: Dict[str, Optional[str]] = dict()
+    for person in people:
+        if person.name not in resolved and monotonic() < deadline:
+            resolved[person.name] = None
+            try:
+                response = await orcid_api_instance.get_orcid(
+                    name=person.name, _request_timeout=ORCID_TIMEOUT
+                )
+                resolved[person.name] = response.orcid
+            except NotFoundException:
+                pass
+            except Exception as error:
+                logging.warning(f"ORCID lookup failed: {error}")
+        person.registry_identifier = resolved.get(person.name)
 
 
 @router.get(
@@ -40,6 +79,7 @@ async def get_funding(
         },
     ),
     smartsheet_api_instance=Depends(get_smartsheet_api_instance),
+    orcid_api_instance=Depends(get_orcid_api_instance),
 ):
     """
     ## Funding
@@ -67,6 +107,10 @@ async def get_funding(
     if len(funding_information) == 0:
         raise HTTPException(status_code=404, detail="Not found")
 
+    await resolve_orcids(
+        orcid_api_instance,
+        [p for f in funding_information for p in f.fundee or []],
+    )
     return map_to_response(funding_information)
 
 
@@ -100,6 +144,7 @@ async def get_investigators(
         },
     ),
     smartsheet_api_instance=Depends(get_smartsheet_api_instance),
+    orcid_api_instance=Depends(get_orcid_api_instance),
 ):
     """
     ## Funding
@@ -127,6 +172,7 @@ async def get_investigators(
     if len(investigators) == 0:
         raise HTTPException(status_code=404, detail="Not found")
 
+    await resolve_orcids(orcid_api_instance, investigators)
     return map_to_response(investigators)
 
 
