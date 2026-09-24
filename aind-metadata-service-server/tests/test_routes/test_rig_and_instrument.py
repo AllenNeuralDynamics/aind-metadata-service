@@ -11,7 +11,7 @@ from requests import HTTPError, Response
 
 TEST_DIR = Path(__file__).parent / ".."
 TEST_INSTRUMENT_JSON = (
-    TEST_DIR / "resources" / "slims" / "instrument_example.json"
+    TEST_DIR / "resources" / "docdb" / "instrument_example.json"
 )
 
 

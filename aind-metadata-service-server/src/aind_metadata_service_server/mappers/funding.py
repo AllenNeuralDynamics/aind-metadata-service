@@ -2,7 +2,7 @@
 aind-data-schema Funding model."""
 
 import logging
-from typing import List, Optional, Union, Set, Dict
+from typing import Dict, List, Optional, Set, Union
 
 from aind_data_schema.components.identifiers import Person
 from aind_data_schema.core.data_description import Funding
@@ -48,13 +48,12 @@ class FundingMapper:
         else:
             return input_name
 
-
     def _map_funding_to_funding_information(
         self,
         institution: Optional[str],
         grant_number: Optional[str],
         people_names: Set[str],
-        people_map: Dict[str, Person]
+        people_map: Dict[str, Person],
     ) -> Optional[Funding]:
         """
         Map a FundingModel to an optional FundingInformation model.
@@ -62,11 +61,7 @@ class FundingMapper:
         funder = self._parse_institution(institution)
         fundees = [people_map.get(p) for p in people_names]
         fundees.sort(key=lambda p: p.name)
-        if (
-            funder is None
-            and grant_number is None
-            and not fundees
-        ):
+        if funder is None and grant_number is None and not fundees:
             return None
         try:
             return Funding(
@@ -83,9 +78,7 @@ class FundingMapper:
             )
 
     def get_funding_list(
-            self,
-            project_name: str,
-            resolved_people: List[Person]
+        self, project_name: str, resolved_people: List[Person]
     ) -> List[Funding]:
         """
         Return a list of Funding models for a given project name.
@@ -109,7 +102,9 @@ class FundingMapper:
                         "people_names": set(),
                     }
                 if dataverse_funding.fundees:
-                    mapped_info[key]["people_names"].add(dataverse_funding.fundees)
+                    mapped_info[key]["people_names"].add(
+                        dataverse_funding.fundees
+                    )
                 if dataverse_funding.investigators:
                     mapped_info[key]["people_names"].add(
                         dataverse_funding.investigators
@@ -120,7 +115,7 @@ class FundingMapper:
                 institution=k[0],
                 grant_number=k[1],
                 people_names=v["people_names"],
-                people_map=people_map
+                people_map=people_map,
             )
             if parsed_info is not None:
                 funding_info.append(parsed_info)
@@ -161,7 +156,10 @@ class FundingMapper:
         investigators_set = set()
         for dataverse_funding in self.dataverse_funding:
             investigators = dataverse_funding.investigators
-            if dataverse_funding.project_name == project_name and dataverse_funding.investigators is not None:
+            if (
+                dataverse_funding.project_name == project_name
+                and dataverse_funding.investigators is not None
+            ):
                 investigators_set.add(investigators)
         investigators_list = [Person(name=p) for p in investigators_set]
         investigators_list.sort(key=lambda p: p.name)

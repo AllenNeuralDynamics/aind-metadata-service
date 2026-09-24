@@ -1,16 +1,16 @@
 """Module to test FundingMapper class"""
 
+import json
+import os
 import unittest
 from pathlib import Path
-import os
-import json
+
 from aind_data_schema.components.identifiers import Person
 from aind_data_schema.core.data_description import Funding
 from aind_data_schema_models.organizations import Organization
 from aind_dataverse_service_async_client.models import FundingModel
 
 from aind_metadata_service_server.mappers.funding import FundingMapper
-
 
 RESOURCES_DIR = (
     Path(os.path.dirname(os.path.realpath(__file__)))
@@ -36,40 +36,40 @@ class TestFundingMapper(unittest.TestCase):
             Person(name="Person T"),
         ]
 
-
     def test_get_funding_list(self):
         """Tests get_funding_list method."""
         actual_funding = self.mapper.get_funding_list(
             project_name="PROJECT1",
-            resolved_people=self.resolved_people_project_1
+            resolved_people=self.resolved_people_project_1,
         )
         expected_funding = [
             Funding(
                 funder=Organization.NINDS,
                 grant_number="A1",
                 fundee=[
-            Person(name="Person A", registry_identifier="1"),
-            Person(name="Person T"),
-            Person(name="Person X", registry_identifier="2"),
-        ],
+                    Person(name="Person A", registry_identifier="1"),
+                    Person(name="Person T"),
+                    Person(name="Person X", registry_identifier="2"),
+                ],
             ),
             Funding(
                 funder=Organization.NINDS,
                 grant_number="B2",
                 fundee=[
-            Person(name="Person A", registry_identifier="1"),
-            Person(name="Person T"),
-            Person(name="Person X", registry_identifier="2"),
-        ],
+                    Person(name="Person A", registry_identifier="1"),
+                    Person(name="Person T"),
+                    Person(name="Person X", registry_identifier="2"),
+                ],
             ),
             Funding(
                 funder=Organization.AI,
                 grant_number=None,
-                fundee=[Person(name="Person T"),]
+                fundee=[
+                    Person(name="Person T"),
+                ],
             ),
         ]
         self.assertEqual(expected_funding, actual_funding)
-
 
     def test_mapping_empty_list(self):
         """Tests mapping with empty funding data list"""
@@ -109,7 +109,7 @@ class TestFundingMapper(unittest.TestCase):
             fundees="Person A",
             investigators="Person B",
         )
-        resolved_people=[
+        resolved_people = [
             Person(name="Person A", registry_identifier="1"),
             Person(name="Person B", registry_identifier="2"),
         ]
@@ -143,7 +143,6 @@ class TestFundingMapper(unittest.TestCase):
         project_names = self.mapper.get_project_names()
         expected_names = ["PROJECT1", "PROJECT2-SUB_G"]
         self.assertEqual(sorted(expected_names), project_names)
-
 
     def test_get_project_names_empty(self):
         """Tests project names with empty data"""

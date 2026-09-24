@@ -2,26 +2,26 @@
 
 import logging
 from asyncio import gather
-from orcid_service_async_client.api.default_api import DefaultApi
 
 from aind_data_schema.components.identifiers import Person
 from fastapi import APIRouter, Depends, HTTPException, Path
 from fastapi.openapi.models import Example
+from orcid_service_async_client.api.default_api import DefaultApi
 from orcid_service_async_client.exceptions import NotFoundException
 from starlette.responses import JSONResponse
 
 from aind_metadata_service_server.mappers.funding import FundingMapper
 from aind_metadata_service_server.mappers.responses import map_to_response
 from aind_metadata_service_server.sessions import (
+    get_dataverse_api_instance,
     get_orcid_api_instance,
-    get_dataverse_api_instance
 )
 
 router = APIRouter()
 
+
 async def resolve_orcid(
-        person: Person,
-        orcid_api_instance: DefaultApi
+    person: Person, orcid_api_instance: DefaultApi
 ) -> None:
     """
     Set registry_identifier in place on each person whose name resolves to
@@ -64,7 +64,7 @@ async def get_funding(
                 summary="A sample project name",
                 description="Example project name for smartsheet",
                 value="Thalamus - Project 1 Mesoscale thalamic circuits",
-)
+            )
         },
     ),
     dataverse_api_instance=Depends(get_dataverse_api_instance),
@@ -77,16 +77,18 @@ async def get_funding(
     funding_response = await dataverse_api_instance.get_funding(
         _request_timeout=30,
     )
-    if len(funding_response) == 0:
-        raise HTTPException(status_code=404, detail="Not found")
     mapper = FundingMapper(dataverse_funding=funding_response)
     people = mapper.get_people_list(project_name=project_name)
-    tasks = [resolve_orcid(person=p, orcid_api_instance=orcid_api_instance) for p in people]
+    tasks = [
+        resolve_orcid(person=p, orcid_api_instance=orcid_api_instance)
+        for p in people
+    ]
     _ = await gather(*tasks)
     funding_information = mapper.get_funding_list(
-        project_name=project_name,
-        resolved_people=people
+        project_name=project_name, resolved_people=people
     )
+    if len(funding_information) == 0:
+        raise HTTPException(status_code=404, detail="Not found")
     return map_to_response(funding_information)
 
 
@@ -104,20 +106,20 @@ async def get_funding(
                 }
             },
         },
-        404: {"description": "Not found"}
+        404: {"description": "Not found"},
     },
 )
 async def get_investigators(
-        project_name: str = Path(
-            ...,
-            openapi_examples={
-                "default": Example(
-                    summary="A sample project name",
-                    description="Example project name for smartsheet",
-                    value="Thalamus - Project 1 Mesoscale thalamic circuits",
-                )
-            },
-        ),
+    project_name: str = Path(
+        ...,
+        openapi_examples={
+            "default": Example(
+                summary="A sample project name",
+                description="Example project name for smartsheet",
+                value="Thalamus - Project 1 Mesoscale thalamic circuits",
+            )
+        },
+    ),
     dataverse_api_instance=Depends(get_dataverse_api_instance),
     orcid_api_instance=Depends(get_orcid_api_instance),
 ):
@@ -131,7 +133,10 @@ async def get_investigators(
 
     if len(investigators) == 0:
         raise HTTPException(status_code=404, detail="Not found")
-    tasks = [resolve_orcid(person=p, orcid_api_instance=orcid_api_instance) for p in investigators]
+    tasks = [
+        resolve_orcid(person=p, orcid_api_instance=orcid_api_instance)
+        for p in investigators
+    ]
     _ = await gather(*tasks)
     return map_to_response(investigators)
 

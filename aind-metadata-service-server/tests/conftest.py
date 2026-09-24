@@ -1,10 +1,14 @@
 """Set up fixtures to be used across all test modules."""
 
+import json
+import os
 import warnings
 from contextlib import contextmanager
+from pathlib import Path
 from typing import Any, Generator
 from unittest.mock import AsyncMock, patch
 
+import orcid_service_async_client.exceptions
 import pytest
 from aind_dataverse_service_async_client import FundingModel
 from aind_smartsheet_service_async_client.models import ExaSPIMInfo
@@ -15,6 +19,7 @@ from aind_tars_service_async_client import (
     VirusData,
 )
 from fastapi.testclient import TestClient
+from orcid_service_async_client import OrcidId
 from pytest_mock import MockFixture
 from starlette.responses import JSONResponse
 
@@ -22,14 +27,8 @@ from aind_metadata_service_server.main import app
 from aind_metadata_service_server.sessions import (
     get_aind_data_schema_v1_session,
 )
-from pathlib import Path
-import os
-import json
 
-RESOURCES_DIR = (
-    Path(os.path.dirname(os.path.realpath(__file__)))
-    / "resources"
-)
+RESOURCES_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / "resources"
 
 
 @pytest.fixture()
@@ -78,35 +77,36 @@ def mock_tars_virus_v123():
     """Fixture for TARS virus v_123."""
     return VirusData(aliases=[Alias(is_preferred=True, name="v_123")])
 
+
 @pytest.fixture()
-def mock_dataverse_funding():
+def mock_dataverse_funding(mocker):
     """Mock response to dataverse_funding request."""
-    with open(RESOURCES_DIR / "dataverse"/ "funding_response.json", "r") as f:
+    with open(RESOURCES_DIR / "dataverse" / "funding_response.json", "r") as f:
         response = json.load(f)
-    return [FundingModel.model_validate(r) for r in response]
+    mocked_func = mocker.patch(
+        "aind_dataverse_service_async_client.DefaultApi.get_funding",
+        return_value=[FundingModel.model_validate(r) for r in response],
+    )
+    return mocked_func
 
 
 @pytest.fixture()
 def mock_orcid(mocker):
-    # Create a dynamic function to intercept and evaluate inputs
-    def _dynamic_response(url, *args, **kwargs):
-        # Create a mock response object structure
-        mock_resp = mocker.MagicMock()
-        if "users/1" in url:
-            mock_resp.status_code = 200
-            mock_resp.json.return_value = {"id": 1, "name": "Alice"}
-        elif "users/2" in url:
-            mock_resp.status_code = 200
-            mock_resp.json.return_value = {"id": 2, "name": "Bob"}
+    """Mock response from orcid server."""
+
+    def _dynamic_response(name, *args, **kwargs):
+        """Create a dynamic response."""
+        if "Person T" in name:
+            return OrcidId(orcid="1")
         else:
-            mock_resp.status_code = 404
-            mock_resp.json.return_value = {"error": "Not Found"}
+            raise orcid_service_async_client.exceptions.NotFoundException
 
-        return mock_resp
+    return mocker.patch(
+        "orcid_service_async_client.DefaultApi.get_orcid",
+        side_effect=_dynamic_response,
+    )
 
-    # Patch the underlying API method with your side_effect function
-    # Note: Replace 'requests.get' with the actual path where it's imported in your app
-    return mocker.patch("requests.get", side_effect=_dynamic_response)
+
 @pytest.fixture()
 def mock_smartsheet_exaspim_info():
     """Fixture for Smartsheet ExaSPIM info."""

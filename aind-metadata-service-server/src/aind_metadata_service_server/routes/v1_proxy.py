@@ -1,7 +1,5 @@
 """Module to proxy requests v1 aind-metadata-service-server"""
 
-from typing import Any, Dict
-
 from fastapi import APIRouter, Depends, Path, Query, Request, Response
 from httpx import AsyncClient, RequestError
 from starlette.datastructures import QueryParams
@@ -306,6 +304,7 @@ async def get_v1_instrument(
         aind_data_schema_v1_session,
         query_params,
     )
+
 
 @router.get("/subject/{subject_id}")
 async def get_v1_subject(
