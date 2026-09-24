@@ -53,7 +53,6 @@ class TestSettings(unittest.TestCase):
             tars_host="http://example.com/tars",
             sharepoint_host="http://example.com/sharepoint",
             dataverse_host="http://example.com/dataverse",
-            session_json_host="http://example.com/session_json",
             docdb_api_host="http://example.com/docdb",
             active_directory_host="http://example.com/active_directory",
             orcid_host="http://example.com/orcid",

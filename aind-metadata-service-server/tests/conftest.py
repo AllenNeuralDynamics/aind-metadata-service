@@ -6,6 +6,7 @@ from typing import Any, Generator
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from aind_dataverse_service_async_client import FundingModel
 from aind_smartsheet_service_async_client.models import ExaSPIMInfo
 from aind_tars_service_async_client import (
     Alias,
@@ -20,6 +21,14 @@ from starlette.responses import JSONResponse
 from aind_metadata_service_server.main import app
 from aind_metadata_service_server.sessions import (
     get_aind_data_schema_v1_session,
+)
+from pathlib import Path
+import os
+import json
+
+RESOURCES_DIR = (
+    Path(os.path.dirname(os.path.realpath(__file__)))
+    / "resources"
 )
 
 
@@ -69,7 +78,35 @@ def mock_tars_virus_v123():
     """Fixture for TARS virus v_123."""
     return VirusData(aliases=[Alias(is_preferred=True, name="v_123")])
 
+@pytest.fixture()
+def mock_dataverse_funding():
+    """Mock response to dataverse_funding request."""
+    with open(RESOURCES_DIR / "dataverse"/ "funding_response.json", "r") as f:
+        response = json.load(f)
+    return [FundingModel.model_validate(r) for r in response]
 
+
+@pytest.fixture()
+def mock_orcid(mocker):
+    # Create a dynamic function to intercept and evaluate inputs
+    def _dynamic_response(url, *args, **kwargs):
+        # Create a mock response object structure
+        mock_resp = mocker.MagicMock()
+        if "users/1" in url:
+            mock_resp.status_code = 200
+            mock_resp.json.return_value = {"id": 1, "name": "Alice"}
+        elif "users/2" in url:
+            mock_resp.status_code = 200
+            mock_resp.json.return_value = {"id": 2, "name": "Bob"}
+        else:
+            mock_resp.status_code = 404
+            mock_resp.json.return_value = {"error": "Not Found"}
+
+        return mock_resp
+
+    # Patch the underlying API method with your side_effect function
+    # Note: Replace 'requests.get' with the actual path where it's imported in your app
+    return mocker.patch("requests.get", side_effect=_dynamic_response)
 @pytest.fixture()
 def mock_smartsheet_exaspim_info():
     """Fixture for Smartsheet ExaSPIM info."""

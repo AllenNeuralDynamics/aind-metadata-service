@@ -65,7 +65,7 @@ class FundingMapper:
         if (
             funder is None
             and grant_number is None
-            and not fundees_list
+            and not fundees
         ):
             return None
         try:
