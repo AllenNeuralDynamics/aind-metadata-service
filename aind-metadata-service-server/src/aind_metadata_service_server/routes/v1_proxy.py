@@ -307,23 +307,6 @@ async def get_v1_instrument(
         query_params,
     )
 
-
-@router.post("/bergamo_session")
-async def get_v1_bergamo_session(
-    request: Request,
-    job_settings: Dict[str, Any],
-    aind_data_schema_v1_session=Depends(get_aind_data_schema_v1_session),
-):
-    """
-    ## Session
-    Return session metadata computed from aind-metadata-mapper.
-    """
-    query_params = QueryParams(job_settings)
-    return await proxy(
-        request, "/bergamo_session", aind_data_schema_v1_session, query_params
-    )
-
-
 @router.get("/subject/{subject_id}")
 async def get_v1_subject(
     request: Request,
