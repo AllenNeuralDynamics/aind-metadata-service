@@ -1,11 +1,16 @@
 """Set up fixtures to be used across all test modules."""
 
+import json
+import os
 import warnings
 from contextlib import contextmanager
+from pathlib import Path
 from typing import Any, Generator
 from unittest.mock import AsyncMock, patch
 
+import orcid_service_async_client.exceptions
 import pytest
+from aind_dataverse_service_async_client import FundingModel
 from aind_smartsheet_service_async_client.models import ExaSPIMInfo
 from aind_tars_service_async_client import (
     Alias,
@@ -14,6 +19,7 @@ from aind_tars_service_async_client import (
     VirusData,
 )
 from fastapi.testclient import TestClient
+from orcid_service_async_client import OrcidId
 from pytest_mock import MockFixture
 from starlette.responses import JSONResponse
 
@@ -21,6 +27,8 @@ from aind_metadata_service_server.main import app
 from aind_metadata_service_server.sessions import (
     get_aind_data_schema_v1_session,
 )
+
+RESOURCES_DIR = Path(os.path.dirname(os.path.realpath(__file__))) / "resources"
 
 
 @pytest.fixture()
@@ -68,6 +76,35 @@ def mock_tars_prep_lot_230929():
 def mock_tars_virus_v123():
     """Fixture for TARS virus v_123."""
     return VirusData(aliases=[Alias(is_preferred=True, name="v_123")])
+
+
+@pytest.fixture()
+def mock_dataverse_funding(mocker):
+    """Mock response to dataverse_funding request."""
+    with open(RESOURCES_DIR / "dataverse" / "funding_response.json", "r") as f:
+        response = json.load(f)
+    mocked_func = mocker.patch(
+        "aind_dataverse_service_async_client.DefaultApi.get_funding",
+        return_value=[FundingModel.model_validate(r) for r in response],
+    )
+    return mocked_func
+
+
+@pytest.fixture()
+def mock_orcid(mocker):
+    """Mock response from orcid server."""
+
+    def _dynamic_response(name, *args, **kwargs):
+        """Create a dynamic response."""
+        if "Person T" in name:
+            return OrcidId(orcid="1")
+        else:
+            raise orcid_service_async_client.exceptions.NotFoundException
+
+    return mocker.patch(
+        "orcid_service_async_client.DefaultApi.get_orcid",
+        side_effect=_dynamic_response,
+    )
 
 
 @pytest.fixture()

@@ -1,0 +1,65 @@
+[
+   {
+      "project_name": "PROJECT1",
+      "subproject": null,
+      "project_code": "1",
+      "funding_institution": "National Institute of Neurological Disorders and Stroke",
+      "grant_number": "A1",
+      "fundees": "Person A",
+      "investigators": "Person T"
+   },
+   {
+      "project_name": "PROJECT1",
+      "subproject": null,
+      "project_code": "1",
+      "funding_institution": "National Institute of Neurological Disorders and Stroke",
+      "grant_number": "A1",
+      "fundees": "Person X",
+      "investigators": "Person T"
+   },
+   {
+      "project_name": "PROJECT1",
+      "subproject": null,
+      "project_code": "1",
+      "funding_institution": "National Institute of Neurological Disorders and Stroke",
+      "grant_number": "B2",
+      "fundees": "Person X",
+      "investigators": "Person T"
+   },
+   {
+      "project_name": "PROJECT1",
+      "subproject": null,
+      "project_code": "1",
+      "funding_institution": "National Institute of Neurological Disorders and Stroke",
+      "grant_number": "B2",
+      "fundees": "Person A",
+      "investigators": "Person T"
+   },
+   {
+      "project_name": "PROJECT1",
+      "subproject": null,
+      "project_code": "1",
+      "funding_institution": "Allen Institute",
+      "grant_number": null,
+      "fundees": null,
+      "investigators": "Person T"
+   },
+   {
+      "project_name": "PROJECT2-SUB_G",
+      "subproject": "SUB_G",
+      "project_code": "1",
+      "funding_institution": "Allen Institute",
+      "grant_number": "Internal",
+      "fundees": null,
+      "investigators": "Person Z"
+   },
+   {
+      "project_name": "PROJECT2-SUB_G",
+      "subproject": "SUB_G",
+      "project_code": "1",
+      "funding_institution": "Allen Institute",
+      "grant_number": "Internal",
+      "fundees": null,
+      "investigators": "Person M"
+   }
+]

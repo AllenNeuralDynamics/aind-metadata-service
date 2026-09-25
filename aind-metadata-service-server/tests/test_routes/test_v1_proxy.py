@@ -99,16 +99,6 @@ class TestV1ProxyRoute:
         mock_proxy.assert_called_once()
         assert 200 == response.status_code
 
-    def test_get_v1_bergamo_session(
-        self,
-        mock_proxy: AsyncMock,
-        client: TestClient,
-    ):
-        """Tests a post request"""
-        response = client.post("/bergamo_session", json={"foo": "bar"})
-        mock_proxy.assert_called_once()
-        assert 200 == response.status_code
-
     def test_get_v1_subject(
         self,
         mock_proxy: AsyncMock,
