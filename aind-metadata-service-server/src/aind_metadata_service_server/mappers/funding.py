@@ -48,7 +48,7 @@ class FundingMapper:
         else:
             return input_name
 
-    def _map_funding_to_funding_information(
+    def _map_source_info_to_funding_model(
         self,
         institution: Optional[str],
         grant_number: Optional[str],
@@ -56,7 +56,7 @@ class FundingMapper:
         people_map: Dict[str, Person],
     ) -> Optional[Funding]:
         """
-        Map a FundingModel to an optional FundingInformation model.
+        Map information from data sources to Funding model.
         """
         funder = self._parse_institution(institution)
         fundees = [people_map.get(p) for p in people_names]
@@ -111,7 +111,7 @@ class FundingMapper:
                     )
         funding_info = []
         for k, v in mapped_info.items():
-            parsed_info = self._map_funding_to_funding_information(
+            parsed_info = self._map_source_info_to_funding_model(
                 institution=k[0],
                 grant_number=k[1],
                 people_names=v["people_names"],
