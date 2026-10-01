@@ -88,8 +88,8 @@ class TestRoute:
         mock_nsb2019.assert_called_once()
         mock_nsb2023.assert_called_once()
         mock_nsb_present.assert_called_once()
-        mock_get_water_restriction.assert_called_once()
-        mock_get_histology.assert_called_once()
+        mock_get_water_restriction.assert_not_called()
+        mock_get_histology.assert_not_called()
         mock_get_perfusions.assert_called_once()
         mock_get_exaspim_info.assert_called_once()
         assert mock_get_protocols.call_count >= 1
@@ -199,8 +199,8 @@ class TestRoute:
         mock_nsb2019.assert_called_once()
         mock_nsb2023.assert_called_once()
         mock_nsb_present.assert_called_once()
-        mock_get_water_restriction.assert_called_once()
-        mock_get_histology.assert_called_once()
+        mock_get_water_restriction.assert_not_called()
+        mock_get_histology.assert_not_called()
         mock_get_perfusions.assert_called_once()
         mock_get_exaspim_info.assert_called_once()
         assert mock_get_protocols.call_count >= 1
