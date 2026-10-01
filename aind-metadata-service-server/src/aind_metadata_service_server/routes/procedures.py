@@ -9,7 +9,7 @@ from aind_metadata_service_server.mappers.injection_materials import (
 )
 from aind_metadata_service_server.mappers.procedures import ProceduresMapper
 from aind_metadata_service_server.mappers.responses import map_to_response
-from aind_metadata_service_server.sessions import (
+from aind_metadata_service_server.sessions import (  # get_slims_api_instance,
     get_labtracks_api_instance,
     get_sharepoint_api_instance,
     get_smartsheet_api_instance,
