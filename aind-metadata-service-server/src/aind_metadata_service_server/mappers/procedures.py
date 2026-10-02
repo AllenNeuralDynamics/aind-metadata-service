@@ -270,7 +270,6 @@ class ProceduresMapper:
             try:
                 wr = WaterRestriction.model_validate(data)
             except ValidationError:
-                print(data)
                 wr = WaterRestriction.model_construct(**data)
             water_restrictions.append(wr)
         return water_restrictions
