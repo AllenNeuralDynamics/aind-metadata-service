@@ -160,16 +160,3 @@ async def get_project_names(
         content=project_names_list,
     )
     return response
-
-
-@router.get("/api/v2/dataverse/funding")
-async def get_dataverse_funding(
-    dataverse_api_instance=Depends(get_dataverse_api_instance),
-) -> JSONResponse:
-    """
-    Get raw funding data from Dataverse.
-    """
-    funding_response = await dataverse_api_instance.get_funding(
-        _request_timeout=30
-    )
-    return funding_response

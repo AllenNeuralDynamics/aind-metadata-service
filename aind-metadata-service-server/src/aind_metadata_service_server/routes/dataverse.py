@@ -5,6 +5,8 @@ from typing import List
 
 from aind_dataverse_service_async_client.exceptions import ApiException
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
+from fastapi.openapi.models import Example
+from starlette.responses import JSONResponse
 
 from aind_metadata_service_server.mappers.dataverse import (
     filter_dataverse_metadata,
@@ -48,33 +50,33 @@ async def get_dataverse_table(
         ...,
         description="The entity set name of the table to fetch",
         openapi_examples={
-            "default": {
-                "summary": "A sample entity set name ID",
-                "description": "Example entity set name",
-                "value": "cr138_projects",
-            }
+            "default": Example(
+                summary="A sample entity set name ID",
+                description="Example entity set name",
+                value="cr138_projects",
+            )
         },
     ),
     columns: str | None = Query(
         default=None,
         description="Comma-separated column names to select from the table",
         openapi_examples={
-            "default": {
-                "summary": "A sample column selection",
-                "description": "Example columns to select",
-                "value": "modifiedon,statecode,cr138_projectname",
-            }
+            "default": Example(
+                summary="A sample column selection",
+                description="Example columns to select",
+                value="modifiedon,statecode,cr138_projectname",
+            )
         },
     ),
     filter: str | None = Query(
         default=None,
         description="OData-style filter expression",
         openapi_examples={
-            "default": {
-                "summary": "A sample filter expression",
-                "description": "Example OData-style filter expression",
-                "value": "cr138_projectname eq 'Barseq_GeneticTools'",
-            }
+            "default": Example(
+                summary="A sample filter expression",
+                description="Example OData-style filter expression",
+                value="cr138_projectname eq 'Barseq_GeneticTools'",
+            )
         },
     ),
     dataverse_api_instance=Depends(get_dataverse_api_instance),
@@ -114,22 +116,22 @@ async def get_mouse_weight_records(
         ...,
         description="The subject ID to fetch mouse weight records for",
         openapi_examples={
-            "default": {
-                "summary": "A sample subject ID",
-                "description": "Example subject ID",
-                "value": "864846",
-            }
+            "default": Example(
+                summary="A sample subject ID",
+                description="Example subject ID",
+                value="864846",
+            )
         },
     ),
     acquisition_datetime: datetime | None = Query(
         default=None,
         description="Filter records by acquisition datetime (ISO format)",
         openapi_examples={
-            "default": {
-                "summary": "A sample acquisition datetime",
-                "description": "Example acquisition datetime",
-                "value": "2026-08-07T00:18:00",
-            }
+            "default": Example(
+                summary="A sample acquisition datetime",
+                description="Example acquisition datetime",
+                value="2026-08-07T00:18:00",
+            )
         },
     ),
     dataverse_api_instance=Depends(get_dataverse_api_instance),
@@ -169,3 +171,40 @@ async def get_mouse_weight_records(
             status_code=e.status,
             detail=f"Error fetching mouse weight records: {e.reason}",
         )
+
+
+@router.get("/api/v2/dataverse/funding")
+async def get_dataverse_funding(
+    dataverse_api_instance=Depends(get_dataverse_api_instance),
+) -> JSONResponse:
+    """
+    Get raw funding data from Dataverse.
+    """
+    funding_response = await dataverse_api_instance.get_funding(
+        _request_timeout=30
+    )
+    return funding_response
+
+
+@router.get("/api/v2/dataverse/water_restriction")
+async def get_dataverse_water_restriction(
+    mouse_id: str = Query(
+        ...,
+        description="Mouse ID to fetch water restriction data for.",
+        openapi_examples={
+            "default": Example(
+                summary="An example mouse id from LabTracks",
+                description="Example Mouse ID",
+                value="858802",
+            )
+        },
+    ),
+    dataverse_api_instance=Depends(get_dataverse_api_instance),
+) -> JSONResponse:
+    """
+    Get raw water restriction data from Dataverse.
+    """
+    water_r_response = await dataverse_api_instance.get_water_restriction(
+        mouse_id=mouse_id, _request_timeout=30
+    )
+    return water_r_response

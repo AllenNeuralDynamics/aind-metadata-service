@@ -247,6 +247,49 @@ class TestDataverseRoutes:
         )
         assert "Internal Server Error" in response.json()["detail"]
 
+    def test_get_dataverse_water_restriction(
+        self,
+        client: TestClient,
+        mock_dataverse_water_restriction: MagicMock,
+    ):
+        """Test response for water restriction data."""
+        response = client.get(
+            "/api/v2/dataverse/water_restriction",
+            params={"mouse_id": "858802"},
+        )
+        expected_response = [
+            {
+                "mouse_id": "858802",
+                "record_name": "858802_20260806T232937Z",
+                "active_record": True,
+                "baseline_weight": "30.67",
+                "last_watered_datetime": "2026-08-13T23:31:52Z",
+                "low_weight_threshold": "22.57",
+                "target_weight": "26.07",
+                "targeted_weight_percentage": "0.85",
+                "water_restriction_status": "252080002",
+                "change_date_time": "2026-08-12T22:08:28Z",
+                "new_value": "active water restriction",
+                "old_value": "adlib: baseline weight establishment",
+            },
+            {
+                "mouse_id": "858802",
+                "record_name": "858802_20260806T232937Z",
+                "active_record": True,
+                "baseline_weight": "30.67",
+                "last_watered_datetime": "2026-08-13T23:31:52Z",
+                "low_weight_threshold": "22.57",
+                "target_weight": "26.07",
+                "targeted_weight_percentage": "0.85",
+                "water_restriction_status": "252080002",
+                "change_date_time": "2026-08-13T23:32:30Z",
+                "new_value": "adlib: paused water restriction",
+                "old_value": "active water restriction",
+            },
+        ]
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == expected_response
+
 
 if __name__ == "__main__":
     pytest.main([__file__])
