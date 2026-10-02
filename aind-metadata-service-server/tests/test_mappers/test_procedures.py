@@ -1,8 +1,11 @@
 """Module to test ProceduresMapper class"""
 
+import json
+import os
 import unittest
 from copy import deepcopy
 from datetime import date, datetime
+from pathlib import Path
 
 import pytest
 from aind_data_schema.components.injection_procedures import (
@@ -31,6 +34,7 @@ from aind_data_schema_models.mouse_anatomy import InjectionTargets
 from aind_data_schema_models.specimen_procedure_types import (
     SpecimenProcedureType,
 )
+from aind_dataverse_service_async_client.models import WaterRestrictionModel
 from aind_labtracks_service_async_client.models.task import (
     Task as LabTracksTask,
 )
@@ -53,6 +57,10 @@ from aind_metadata_service_server.models import (
     ViralMaterialInformation,
 )
 from tests.conftest import suppress_pydantic_serialization_warnings
+
+RESOURCES_DIR = (
+    Path(os.path.dirname(os.path.realpath(__file__))) / ".." / "resources"
+)
 
 
 @pytest.mark.usefixtures("mock_emapa_api")
@@ -210,6 +218,23 @@ class TestProceduresMapper(unittest.TestCase):
         }
         cls.smartsheet_exaspim = [ExaSPIMInfo.model_validate(exaspim_data)]
 
+        with open(
+            RESOURCES_DIR / "dataverse" / "water_restriction_response.json",
+            "r",
+        ) as f:
+            wr_raw = json.load(f)
+        cls.dataverse_water_restriction = [
+            WaterRestrictionModel.model_validate(r) for r in wr_raw
+        ]
+
+    def test_map_dataverse_to_aind_water_restrictions(self):
+        """Tests _map_dataverse_to_aind_water_restrictions method."""
+        mapper = ProceduresMapper(
+            dataverse_water_restriction=self.dataverse_water_restriction
+        )
+        water_restriction = mapper._map_dataverse_to_aind_water_restrictions()
+        self.assertEqual(1, len(water_restriction))
+
     def test_map_labtracks_unknown_task_to_none(self):
         """Test mapping LabTracksTask to None"""
         task = deepcopy(self.labtracks_tasks[0])
@@ -270,13 +295,14 @@ class TestProceduresMapper(unittest.TestCase):
             nsb_2023=self.nsb_2023,
             nsb_present=self.nsb_2023,
             smartsheet_exaspim=self.smartsheet_exaspim[0],
+            dataverse_water_restriction=self.dataverse_water_restriction,
         )
         with suppress_pydantic_serialization_warnings():
             procedures = mapper.map_responses_to_aind_procedures("115977")
 
             self.assertIsInstance(procedures, Procedures)
             self.assertEqual(procedures.subject_id, "115977")
-            self.assertEqual(len(procedures.subject_procedures), 9)
+            self.assertEqual(len(procedures.subject_procedures), 10)
             self.assertEqual(len(procedures.specimen_procedures), 3)
 
     def test_map_responses_no_data(self):

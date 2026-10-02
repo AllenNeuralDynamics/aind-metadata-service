@@ -1,6 +1,7 @@
 """Maps information to aind-data-schema Procedures model."""
 
 import logging
+from decimal import Decimal
 from enum import Enum
 from typing import List, Optional, Union
 
@@ -10,6 +11,7 @@ from aind_data_schema.components.injection_procedures import (
 )
 from aind_data_schema.components.subject_procedures import (
     Perfusion,
+    WaterRestriction,
 )
 from aind_data_schema.components.surgery_procedures import (
     BrainInjection,
@@ -24,6 +26,8 @@ from aind_data_schema_models.mouse_anatomy import InjectionTargets
 from aind_data_schema_models.specimen_procedure_types import (
     SpecimenProcedureType,
 )
+from aind_data_schema_models.units import MassUnit
+from aind_dataverse_service_async_client.models import WaterRestrictionModel
 from aind_labtracks_service_async_client.models import Task as LabTracksTask
 from aind_sharepoint_service_async_client.models import (
     Las2020List,
@@ -123,6 +127,7 @@ class ProceduresMapper:
         nsb_2023: List[NSB2023List] = [],
         nsb_present: List[NSB2023List] = [],
         smartsheet_perfusion: List[PerfusionsModel] = [],
+        dataverse_water_restriction: List[WaterRestrictionModel] = [],
         smartsheet_exaspim: Optional[ExaSPIMInfo] = None,
     ):
         """
@@ -140,6 +145,7 @@ class ProceduresMapper:
         self.nsb_2023 = nsb_2023
         self.nsb_present = nsb_present
         self.smartsheet_perfusion = smartsheet_perfusion
+        self.dataverse_water_restriction = dataverse_water_restriction
         self.smartsheet_exaspim = smartsheet_exaspim
 
     @staticmethod
@@ -220,6 +226,53 @@ class ProceduresMapper:
             )
 
         return None
+
+    def _map_dataverse_to_aind_water_restrictions(
+        self,
+    ) -> List[WaterRestriction]:
+        """Maps response from slims into WaterRestriction models"""
+        water_restriction_groups = dict()
+        for record in self.dataverse_water_restriction:
+            record_key = record.record_name
+            if water_restriction_groups.get(record_key) is None:
+                baseline_weight = (
+                    None
+                    if record.baseline_weight is None
+                    else float(Decimal(record.baseline_weight))
+                )
+                protocol_id = record.protocol_id
+                target_fraction_weight = (
+                    None
+                    if record.targeted_weight_percentage is None
+                    else int(Decimal(record.targeted_weight_percentage) * 100)
+                )
+                weight_unit = MassUnit.G
+                minimum_water_per_day = float(1.0)
+                water_restriction_groups[record_key] = {
+                    "ethics_review_id": protocol_id,
+                    "baseline_weight": baseline_weight,
+                    "target_fraction_weight": target_fraction_weight,
+                    "weight_unit": weight_unit,
+                    "minimum_water_per_day": minimum_water_per_day,
+                }
+            water_restriction_record = water_restriction_groups[record_key]
+            change_date = (
+                None
+                if record.change_date_time is None
+                else record.change_date_time.date()
+            )
+            if record.new_value == "active water restriction":
+                water_restriction_record["start_date"] = change_date
+            elif record.old_value == "active water restriction":
+                water_restriction_record["end_date"] = change_date
+        water_restrictions = []
+        for data in water_restriction_groups.values():
+            try:
+                wr = WaterRestriction.model_validate(data)
+            except ValidationError:
+                wr = WaterRestriction.model_construct(**data)
+            water_restrictions.append(wr)
+        return water_restrictions
 
     @staticmethod
     def map_sharepoint_response_to_aind_surgeries(
@@ -347,6 +400,16 @@ class ProceduresMapper:
             logging.info(
                 f"Found {len(smartsheet_perfusion_procedures)} perfusions "
                 f"from Smartsheet for {subject_id}"
+            )
+
+        if self.dataverse_water_restriction:
+            dv_water_restrictions = (
+                self._map_dataverse_to_aind_water_restrictions()
+            )
+            subject_procedures.extend(dv_water_restrictions)
+            logging.info(
+                f"Found {len(dv_water_restrictions)} water restrictions "
+                f"from Dataverse for {subject_id}"
             )
 
         if self.smartsheet_exaspim:

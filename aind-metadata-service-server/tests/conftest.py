@@ -91,6 +91,25 @@ def mock_dataverse_funding(mocker):
 
 
 @pytest.fixture()
+def mock_dataverse_water_restriction(mocker):
+    """Mock response to dataverse_funding request."""
+    with open(
+        RESOURCES_DIR / "dataverse" / "water_restriction_response.json", "r"
+    ) as f:
+        response = json.load(f)
+
+    def _dynamic_response(mouse_id, *args, **kwargs):
+        """Create a dynamic response."""
+        dv_response = [row for row in response if row["mouse_id"] == mouse_id]
+        return dv_response
+
+    return mocker.patch(
+        "aind_dataverse_service_async_client.DefaultApi.get_water_restriction",
+        side_effect=_dynamic_response,
+    )
+
+
+@pytest.fixture()
 def mock_orcid(mocker):
     """Mock response from orcid server."""
 

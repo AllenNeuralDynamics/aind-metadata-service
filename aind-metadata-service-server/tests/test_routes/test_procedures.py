@@ -25,8 +25,12 @@ class TestRoute:
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
     @patch("aind_tars_service_async_client.DefaultApi.get_viral_prep_lots")
     @patch("aind_tars_service_async_client.DefaultApi.get_viruses")
+    @patch(
+        "aind_dataverse_service_async_client.DefaultApi.get_water_restriction"
+    )
     def test_get_procedures_valid_data_only_labtracks(
         self,
+        mock_get_water_restriction: AsyncMock,
         mock_get_viruses: AsyncMock,
         mock_get_viral_prep_lots: AsyncMock,
         mock_get_protocols: AsyncMock,
@@ -52,6 +56,7 @@ class TestRoute:
                 task_status="F",
             )
         ]
+        mock_get_water_restriction.return_value = []
         mock_las.return_value = []
         mock_nsb2019.return_value = []
         mock_get_perfusions.return_value = []
@@ -82,6 +87,7 @@ class TestRoute:
         mock_nsb_present.assert_called_once()
         mock_get_perfusions.assert_called_once()
         mock_get_exaspim_info.assert_called_once()
+        mock_get_water_restriction.assert_called_once()
         assert mock_get_protocols.call_count >= 1
 
     @patch("aind_labtracks_service_async_client.DefaultApi.get_tasks")
@@ -94,8 +100,12 @@ class TestRoute:
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
     @patch("aind_tars_service_async_client.DefaultApi.get_viral_prep_lots")
     @patch("aind_tars_service_async_client.DefaultApi.get_viruses")
+    @patch(
+        "aind_dataverse_service_async_client.DefaultApi.get_water_restriction"
+    )
     def test_get_procedures_invalid_data(
         self,
+        mock_get_water_restriction: AsyncMock,
         mock_get_viruses: AsyncMock,
         mock_get_viral_prep_lots: AsyncMock,
         mock_get_protocols: AsyncMock,
@@ -128,6 +138,7 @@ class TestRoute:
                 task_status="F",
             )
         ]
+        mock_get_water_restriction.return_value = []
         mock_las.return_value = []
         mock_get_protocols.return_value = []
         mock_get_perfusions.return_value = []
@@ -183,6 +194,7 @@ class TestRoute:
         mock_nsb_present.assert_called_once()
         mock_get_perfusions.assert_called_once()
         mock_get_exaspim_info.assert_called_once()
+        mock_get_water_restriction.assert_called_once()
         assert mock_get_protocols.call_count >= 1
         mock_get_viral_prep_lots.assert_called_once_with(
             lot="230929-12", _request_timeout=10
@@ -201,8 +213,12 @@ class TestRoute:
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
     @patch("aind_tars_service_async_client.DefaultApi.get_viral_prep_lots")
     @patch("aind_tars_service_async_client.DefaultApi.get_viruses")
+    @patch(
+        "aind_dataverse_service_async_client.DefaultApi.get_water_restriction"
+    )
     def test_get_procedures_no_data(
         self,
+        mock_get_water_restriction: AsyncMock,
         mock_get_viruses: AsyncMock,
         mock_get_viral_prep_lots: AsyncMock,
         mock_get_protocols: AsyncMock,
@@ -216,6 +232,7 @@ class TestRoute:
         client: TestClient,
     ):
         """Tests no data found and verifies concurrent API calls."""
+        mock_get_water_restriction.return_value = []
         mock_labtracks.return_value = []
         mock_las.return_value = []
         mock_nsb2019.return_value = []
@@ -240,8 +257,12 @@ class TestRoute:
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
     @patch("aind_tars_service_async_client.DefaultApi.get_viral_prep_lots")
     @patch("aind_tars_service_async_client.DefaultApi.get_viruses")
+    @patch(
+        "aind_dataverse_service_async_client.DefaultApi.get_water_restriction"
+    )
     def test_get_procedures_virus_strain_not_found_in_tars(
         self,
+        mock_get_water_restriction: AsyncMock,
         mock_get_viruses: AsyncMock,
         mock_get_viral_prep_lots: AsyncMock,
         mock_get_protocols: AsyncMock,
@@ -297,6 +318,7 @@ class TestRoute:
             )
         ]
         mock_nsb_present.return_value = []
+        mock_get_water_restriction.return_value = []
 
         response = client.get("api/v2/procedures/000000")
         assert response.status_code == 200
