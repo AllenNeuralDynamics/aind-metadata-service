@@ -17,6 +17,7 @@ from aind_data_schema.core.procedures import (
     ViralMaterial,
     VirusPrepType,
 )
+from aind_dataverse_service_async_client.models import WaterRestrictionModel
 from aind_labtracks_service_async_client.models.task import (
     Task as LabTracksTask,
 )
@@ -49,6 +50,9 @@ EXAMPLE_NSB2023_JSON = (
 )
 EXAMPLE_LAS2020_JSON = (
     TEST_DIR / "resources" / "las2020" / "raw" / "list_item1.json"
+)
+EXAMPLE_DATAVERSE_JSON = (
+    TEST_DIR / "resources" / "dataverse" / "wr_response.json"
 )
 
 
@@ -113,6 +117,19 @@ class TestProcedures(unittest.TestCase):
         with open(EXAMPLE_LAS2020_JSON) as f:
             las2020_contents = json.load(f)
         self.las2020 = [Las2020List.model_validate(las2020_contents)]
+        with open(EXAMPLE_DATAVERSE_JSON, "r") as f:
+            wr_raw = json.load(f)
+        self.dataverse_water_restriction = [
+            WaterRestrictionModel.model_validate(r) for r in wr_raw
+        ]
+
+    def test_map_dataverse_to_aind_water_restrictions(self):
+        """Tests _map_dataverse_to_aind_water_restrictions method."""
+        mapper = ProceduresMapper(
+            dataverse_water_restriction=self.dataverse_water_restriction
+        )
+        water_restriction = mapper._map_dataverse_to_aind_water_restrictions()
+        self.assertEqual(1, len(water_restriction))
 
     def test_map_labtracks_unknown_task_to_none(self):
         """Test mapping LabTracksTask to None"""
@@ -175,12 +192,13 @@ class TestProcedures(unittest.TestCase):
             nsb_present=self.nsb_2023,
             las_2020=self.las2020,
             smartsheet_perfusion=self.perfusions_sheet,
+            dataverse_water_restriction=self.dataverse_water_restriction,
         )
         procedures = mapper.map_responses_to_aind_procedures("115977")
 
         self.assertIsInstance(procedures, Procedures)
         self.assertEqual(procedures.subject_id, "115977")
-        self.assertEqual(len(procedures.subject_procedures), 9)
+        self.assertEqual(len(procedures.subject_procedures), 10)
         self.assertEqual(len(procedures.specimen_procedures), 0)
 
     def test_map_responses_no_data(self):
