@@ -1,6 +1,7 @@
 """Maps information to aind-data-schema Procedures model."""
 
 import logging
+from decimal import Decimal
 from enum import Enum
 from typing import List, Optional, Union
 
@@ -15,7 +16,9 @@ from aind_data_schema.core.procedures import (
     RetroOrbitalInjection,
     Surgery,
     ViralMaterial,
+    WaterRestriction,
 )
+from aind_dataverse_service_async_client.models import WaterRestrictionModel
 from aind_labtracks_service_async_client.models import Task as LabTracksTask
 from aind_sharepoint_service_async_client.models import (
     Las2020List,
@@ -23,6 +26,7 @@ from aind_sharepoint_service_async_client.models import (
     NSB2023List,
 )
 from aind_smartsheet_service_async_client.models import PerfusionsModel
+from pydantic import ValidationError
 
 from aind_metadata_service_server.mappers.las2020 import (
     MappedLASList as MappedLAS2020,
@@ -99,6 +103,7 @@ class ProceduresMapper:
         nsb_present: List[NSB2023List] = [],
         las_2020: List[Las2020List] = [],
         smartsheet_perfusion: List[PerfusionsModel] = [],
+        dataverse_water_restriction: List[WaterRestrictionModel] = [],
     ):
         """
         Class constructor.
@@ -112,6 +117,52 @@ class ProceduresMapper:
         self.nsb_present = nsb_present
         self.las_2020 = las_2020
         self.smartsheet_perfusion = smartsheet_perfusion
+        self.dataverse_water_restriction = dataverse_water_restriction
+
+    def _map_dataverse_to_aind_water_restrictions(
+        self,
+    ) -> List[WaterRestriction]:
+        """Maps response from slims into WaterRestriction models"""
+        water_restriction_groups = dict()
+        for record in self.dataverse_water_restriction:
+            record_key = record.record_name
+            if water_restriction_groups.get(record_key) is None:
+                baseline_weight = (
+                    None
+                    if record.baseline_weight is None
+                    else Decimal(record.baseline_weight)
+                )
+                protocol_id = record.protocol_id
+                target_fraction_weight = (
+                    None
+                    if record.targeted_weight_percentage is None
+                    else int(Decimal(record.targeted_weight_percentage) * 100)
+                )
+                minimum_water_per_day = Decimal("1.0")
+                water_restriction_groups[record_key] = {
+                    "iacuc_protocol": protocol_id,
+                    "baseline_weight": baseline_weight,
+                    "target_fraction_weight": target_fraction_weight,
+                    "minimum_water_per_day": minimum_water_per_day,
+                }
+            water_restriction_record = water_restriction_groups[record_key]
+            change_date = (
+                None
+                if record.change_date_time is None
+                else record.change_date_time.date()
+            )
+            if record.new_value == "active water restriction":
+                water_restriction_record["start_date"] = change_date
+            elif record.old_value == "active water restriction":
+                water_restriction_record["end_date"] = change_date
+        water_restrictions = []
+        for data in water_restriction_groups.values():
+            try:
+                wr = WaterRestriction.model_validate(data)
+            except ValidationError:
+                wr = WaterRestriction.model_construct(**data)
+            water_restrictions.append(wr)
+        return water_restrictions
 
     @staticmethod
     def _map_labtracks_task_to_aind_surgery(
@@ -321,6 +372,16 @@ class ProceduresMapper:
             logging.info(
                 f"Found {len(smartsheet_perfusion_procedures)} perfusions "
                 f"from Smartsheet for {subject_id}"
+            )
+
+        if self.dataverse_water_restriction:
+            dv_water_restrictions = (
+                self._map_dataverse_to_aind_water_restrictions()
+            )
+            subject_procedures.extend(dv_water_restrictions)
+            logging.info(
+                f"Found {len(dv_water_restrictions)} water restrictions "
+                f"from Dataverse for {subject_id}"
             )
 
         if not subject_procedures and not specimen_procedures:

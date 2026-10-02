@@ -40,8 +40,12 @@ class TestRoute:
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
     @patch("aind_tars_service_async_client.DefaultApi.get_viral_prep_lots")
     @patch("aind_tars_service_async_client.DefaultApi.get_viruses")
+    @patch(
+        "aind_dataverse_service_async_client.DefaultApi.get_water_restriction"
+    )
     def test_get_procedures_success(
         self,
+        mock_get_water_restriction: AsyncMock,
         mock_get_viruses: AsyncMock,
         mock_get_viral_prep_lots: AsyncMock,
         mock_get_protocols: AsyncMock,
@@ -91,6 +95,7 @@ class TestRoute:
             )
         ]
         mock_get_viruses.return_value = []
+        mock_get_water_restriction.return_value = []
 
         response = client.get("/procedures/000000")
         assert response.status_code == 406
@@ -108,8 +113,12 @@ class TestRoute:
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
     @patch("aind_tars_service_async_client.DefaultApi.get_viral_prep_lots")
     @patch("aind_tars_service_async_client.DefaultApi.get_viruses")
+    @patch(
+        "aind_dataverse_service_async_client.DefaultApi.get_water_restriction"
+    )
     def test_get_procedures_no_data(
         self,
+        mock_get_water_restriction: AsyncMock,
         mock_get_viruses: AsyncMock,
         mock_get_viral_prep_lots: AsyncMock,
         mock_get_protocols: AsyncMock,
@@ -131,6 +140,7 @@ class TestRoute:
         mock_get_protocols.return_value = []
         mock_get_viral_prep_lots.return_value = []
         mock_get_viruses.return_value = []
+        mock_get_water_restriction.return_value = []
 
         response = client.get("/procedures/nonexistent_subject")
         assert response.status_code == 404

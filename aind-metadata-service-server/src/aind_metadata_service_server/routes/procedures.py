@@ -1,6 +1,9 @@
 """Module to handle subject endpoints"""
 
+from asyncio import gather
+
 from fastapi import APIRouter, Depends, Path
+from fastapi.openapi.models import Example
 
 from aind_metadata_service_server.mappers.injection_materials import TarsMapper
 from aind_metadata_service_server.mappers.procedures import ProceduresMapper
@@ -9,6 +12,7 @@ from aind_metadata_service_server.response_handler import (
     StatusCodes,
 )
 from aind_metadata_service_server.sessions import (
+    get_dataverse_api_instance,
     get_labtracks_api_instance,
     get_sharepoint_api_instance,
     get_smartsheet_api_instance,
@@ -23,52 +27,69 @@ async def get_procedures(
     subject_id: str = Path(
         ...,
         openapi_examples={
-            "example1": {
-                "summary": "Subject ID Example 1",
-                "description": "Example subject ID for Procedures",
-                "value": "632269",
-            },
-            "example2": {
-                "summary": "Subject ID Example 2",
-                "description": "Example subject ID for Procedures",
-                "value": "656374",
-            },
-            "example3": {
-                "summary": "Subject ID Example 3",
-                "description": "Example subject ID for Procedures",
-                "value": "804998",
-            },
+            "example1": Example(
+                summary="Subject ID Example 1",
+                description="Example subject ID for Procedures",
+                value="632269",
+            ),
+            "example2": Example(
+                summary="Subject ID Example 2",
+                description="Example subject ID for Procedures",
+                value="656374",
+            ),
+            "example3": Example(
+                summary="Subject ID Example 3",
+                description="Example subject ID for Procedures",
+                value="804998",
+            ),
         },
     ),
     labtracks_api_instance=Depends(get_labtracks_api_instance),
     sharepoint_api_instance=Depends(get_sharepoint_api_instance),
     smartsheet_api_instance=Depends(get_smartsheet_api_instance),
     tars_api_instance=Depends(get_tars_api_instance),
+    dataverse_api_instance=Depends(get_dataverse_api_instance),
 ):
     """
     ## Procedures
     Return Procedure metadata.
     """
-    labtracks_response = await labtracks_api_instance.get_tasks(
-        subject_id, _request_timeout=20
+
+    tasks = list()
+    tasks.append(
+        labtracks_api_instance.get_tasks(subject_id, _request_timeout=20)
     )
-    nsb_2019_response = await sharepoint_api_instance.get_nsb2019(
-        subject_id, _request_timeout=20
+    tasks.append(
+        sharepoint_api_instance.get_nsb2019(subject_id, _request_timeout=20)
     )
-    nsb_2023_response = await sharepoint_api_instance.get_nsb2023(
-        subject_id, _request_timeout=20
+    tasks.append(
+        sharepoint_api_instance.get_nsb2023(subject_id, _request_timeout=20)
     )
-    nsb_present_response = await sharepoint_api_instance.get_nsb_present(
-        subject_id, _request_timeout=20
-    )
-    las_2020_response = await sharepoint_api_instance.get_las2020(
-        subject_id, _request_timeout=30
-    )
-    smartsheet_perfusion_response = (
-        await smartsheet_api_instance.get_perfusions(
+    tasks.append(
+        sharepoint_api_instance.get_nsb_present(
             subject_id, _request_timeout=20
         )
     )
+    tasks.append(
+        sharepoint_api_instance.get_las2020(subject_id, _request_timeout=30)
+    )
+    tasks.append(
+        smartsheet_api_instance.get_perfusions(subject_id, _request_timeout=20)
+    )
+    tasks.append(
+        dataverse_api_instance.get_water_restriction(
+            mouse_id=subject_id, _request_timeout=30
+        )
+    )
+    (
+        labtracks_response,
+        nsb_2019_response,
+        nsb_2023_response,
+        nsb_present_response,
+        las_2020_response,
+        smartsheet_perfusion_response,
+        dataverse_wr_response,
+    ) = await gather(*tasks)
     mapper = ProceduresMapper(
         labtracks_tasks=labtracks_response,
         nsb_2019=nsb_2019_response,
@@ -76,6 +97,7 @@ async def get_procedures(
         nsb_present=nsb_present_response,
         las_2020=las_2020_response,
         smartsheet_perfusion=smartsheet_perfusion_response,
+        dataverse_water_restriction=dataverse_wr_response,
     )
     procedures = mapper.map_responses_to_aind_procedures(subject_id)
     if procedures is None:
