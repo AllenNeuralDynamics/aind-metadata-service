@@ -48,8 +48,6 @@ services:
       - sharepoint
       - tars
       - dataverse
-      - orcid
-      - active_directory
       - redis
     env_file: "env/webapp_v1.env"
   redis:
