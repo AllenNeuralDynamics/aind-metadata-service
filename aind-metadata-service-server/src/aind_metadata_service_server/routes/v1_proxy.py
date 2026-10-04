@@ -83,9 +83,7 @@ async def get_v1_funding(
             "default": {
                 "summary": "A sample project name",
                 "description": "Example project name for smartsheet",
-                "value": (
-                    "Discovery-Neuromodulator circuit dynamics during foraging"
-                ),
+                "value": ("Cell Type Lookup Table"),
             }
         },
     ),
