@@ -83,7 +83,7 @@ async def get_v1_funding(
             "default": {
                 "summary": "A sample project name",
                 "description": "Example project name for smartsheet",
-                "value": ("Cell Type Lookup Table"),
+                "value": "Cell Type Lookup Table",
             }
         },
     ),
