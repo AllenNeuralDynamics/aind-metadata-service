@@ -230,7 +230,7 @@ class ProceduresMapper:
     def _map_dataverse_to_aind_water_restrictions(
         self,
     ) -> List[WaterRestriction]:
-        """Maps response from slims into WaterRestriction models"""
+        """Maps response from dataverse into WaterRestriction models"""
         self.dataverse_water_restriction.sort(key=lambda x: x.change_date_time)
         record_list = []
         current_record = None

@@ -40,7 +40,7 @@ services:
     image: "ghcr.io/allenneuraldynamics/aind-active-directory-service-server:0.1.5"
     env_file: "env/active_directory.env"
   aind_metadata_service_v1:
-    image: "ghcr.io/allenneuraldynamics/aind-metadata-service-server:1.8.1"
+    image: "ghcr.io/allenneuraldynamics/aind-metadata-service-server:1.8.2"
     depends_on:
       - labtracks
       - mgi
