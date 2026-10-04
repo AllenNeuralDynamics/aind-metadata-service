@@ -122,41 +122,75 @@ class ProceduresMapper:
     def _map_dataverse_to_aind_water_restrictions(
         self,
     ) -> List[WaterRestriction]:
-        """Maps response from slims into WaterRestriction models"""
-        water_restriction_groups = dict()
+        """Maps response from dataverse into WaterRestriction models"""
+        self.dataverse_water_restriction.sort(key=lambda x: x.change_date_time)
+        record_list = []
+        current_record = None
         for record in self.dataverse_water_restriction:
-            record_key = record.record_name
-            if water_restriction_groups.get(record_key) is None:
-                baseline_weight = (
-                    None
-                    if record.baseline_weight is None
-                    else Decimal(record.baseline_weight)
-                )
-                protocol_id = record.protocol_id
-                target_fraction_weight = (
-                    None
-                    if record.targeted_weight_percentage is None
-                    else int(Decimal(record.targeted_weight_percentage) * 100)
-                )
-                minimum_water_per_day = Decimal("1.0")
-                water_restriction_groups[record_key] = {
-                    "iacuc_protocol": protocol_id,
-                    "baseline_weight": baseline_weight,
-                    "target_fraction_weight": target_fraction_weight,
-                    "minimum_water_per_day": minimum_water_per_day,
-                }
-            water_restriction_record = water_restriction_groups[record_key]
+            baseline_weight = (
+                None
+                if record.baseline_weight is None
+                else float(Decimal(record.baseline_weight))
+            )
+            protocol_id = record.protocol_id
+            target_fraction_weight = (
+                None
+                if record.targeted_weight_percentage is None
+                else int(Decimal(record.targeted_weight_percentage) * 100)
+            )
+            minimum_water_per_day = Decimal("1.0")
             change_date = (
                 None
                 if record.change_date_time is None
                 else record.change_date_time.date()
             )
-            if record.new_value == "active water restriction":
-                water_restriction_record["start_date"] = change_date
-            elif record.old_value == "active water restriction":
-                water_restriction_record["end_date"] = change_date
+            if (
+                record.new_value == "active water restriction"
+                and current_record is None
+            ):
+                current_record = {
+                    "iacuc_protocol": protocol_id,
+                    "baseline_weight": baseline_weight,
+                    "target_fraction_weight": target_fraction_weight,
+                    "minimum_water_per_day": minimum_water_per_day,
+                    "start_date": change_date,
+                    "end_date": None,
+                }
+            elif (
+                record.new_value == "active water restriction"
+                and current_record is not None
+            ):
+                record_list.append(current_record)
+                current_record = {
+                    "iacuc_protocol": protocol_id,
+                    "baseline_weight": baseline_weight,
+                    "target_fraction_weight": target_fraction_weight,
+                    "minimum_water_per_day": minimum_water_per_day,
+                    "start_date": change_date,
+                    "end_date": None,
+                }
+            elif (
+                record.old_value == "active water restriction"
+                and current_record is None
+            ):
+                current_record = {
+                    "iacuc_protocol": protocol_id,
+                    "baseline_weight": baseline_weight,
+                    "target_fraction_weight": target_fraction_weight,
+                    "minimum_water_per_day": minimum_water_per_day,
+                    "start_date": None,
+                    "end_date": change_date,
+                }
+                record_list.append(current_record)
+                current_record = None
+            else:
+                current_record["end_date"] = change_date
+                record_list.append(current_record)
+                current_record = None
+        if current_record is not None:
+            record_list.append(current_record)
         water_restrictions = []
-        for data in water_restriction_groups.values():
+        for data in record_list:
             try:
                 wr = WaterRestriction.model_validate(data)
             except ValidationError:

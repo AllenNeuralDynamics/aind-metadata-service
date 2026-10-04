@@ -131,6 +131,40 @@ class TestProcedures(unittest.TestCase):
         water_restriction = mapper._map_dataverse_to_aind_water_restrictions()
         self.assertEqual(1, len(water_restriction))
 
+    def test_map_dataverse_to_aind_water_restrictions_edge_cases(self):
+        """Tests _map_dataverse_to_aind_water_restrictions edge cases."""
+
+        # Assume we get a list of responses like stop, start, start.
+        # We usually expect start, stop, start, stop, etc.
+        edge_case_response = [
+            {
+                "mouse_id": "1",
+                "change_date_time": "2026-08-11T23:32:30Z",
+                "new_value": "adlib: paused water restriction",
+                "old_value": "active water restriction",
+            },
+            {
+                "mouse_id": "1",
+                "change_date_time": "2026-08-12T22:08:28Z",
+                "new_value": "active water restriction",
+                "old_value": "adlib: baseline weight establishment",
+            },
+            {
+                "mouse_id": "1",
+                "change_date_time": "2026-08-13T22:08:28Z",
+                "new_value": "active water restriction",
+                "old_value": "adlib: baseline weight establishment",
+            },
+        ]
+        mapper = ProceduresMapper(
+            dataverse_water_restriction=[
+                WaterRestrictionModel.model_validate(r)
+                for r in edge_case_response
+            ],
+        )
+        water_restriction = mapper._map_dataverse_to_aind_water_restrictions()
+        self.assertEqual(3, len(water_restriction))
+
     def test_map_labtracks_unknown_task_to_none(self):
         """Test mapping LabTracksTask to None"""
         task = self.labtracks_tasks[0]
