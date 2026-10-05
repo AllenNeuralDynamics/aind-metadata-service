@@ -4,8 +4,10 @@ All URIs are relative to *https://aind-metadata-service*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**get_dataverse_funding**](DefaultApi.md#get_dataverse_funding) | **GET** /api/v2/dataverse/funding | Get Dataverse Funding
 [**get_dataverse_table**](DefaultApi.md#get_dataverse_table) | **GET** /api/v2/dataverse/tables/{entity_set_table_name} | Get Dataverse Table
 [**get_dataverse_table_info**](DefaultApi.md#get_dataverse_table_info) | **GET** /api/v2/dataverse/tables | Get Dataverse Table Info
+[**get_dataverse_water_restriction**](DefaultApi.md#get_dataverse_water_restriction) | **GET** /api/v2/dataverse/water_restriction | Get Dataverse Water Restriction
 [**get_exaspim_procedures**](DefaultApi.md#get_exaspim_procedures) | **GET** /api/v2/smartsheet/exaspim_procedures/{subject_id} | Get Exaspim Procedures
 [**get_funding**](DefaultApi.md#get_funding) | **GET** /api/v2/funding/{project_name} | Get Funding
 [**get_injection_materials**](DefaultApi.md#get_injection_materials) | **GET** /api/v2/tars_injection_materials/{prep_lot_number} | Get Injection Materials
@@ -16,16 +18,13 @@ Method | HTTP request | Description
 [**get_labtracks_subject_by_protocol_number**](DefaultApi.md#get_labtracks_subject_by_protocol_number) | **GET** /api/v2/labtracks/subject_by_protocol_number | Get Labtracks Subject By Protocol Number
 [**get_mgi_allele**](DefaultApi.md#get_mgi_allele) | **GET** /api/v2/mgi_allele/{allele_name} | Get Mgi Allele
 [**get_mouse_weight_records**](DefaultApi.md#get_mouse_weight_records) | **GET** /api/v2/dataverse/mouse_weight_records/{subject_id} | Get Mouse Weight Records
+[**get_orcid**](DefaultApi.md#get_orcid) | **GET** /api/v2/orcid/{name} | Get Orcid
 [**get_perfusions**](DefaultApi.md#get_perfusions) | **GET** /api/v2/perfusions/{subject_id} | Get Perfusions
 [**get_procedures**](DefaultApi.md#get_procedures) | **GET** /api/v2/procedures/{subject_id} | Get Procedures
 [**get_project_names**](DefaultApi.md#get_project_names) | **GET** /api/v2/project_names | Get Project Names
 [**get_protocols**](DefaultApi.md#get_protocols) | **GET** /api/v2/protocols/{protocol_name} | Get Protocols
-[**get_rig**](DefaultApi.md#get_rig) | **GET** /api/v2/rig/{rig_id} | Get Rig
-[**get_slims_workflow**](DefaultApi.md#get_slims_workflow) | **GET** /api/v2/slims/{workflow} | Get Slims Workflow
-[**get_smartsheet_funding**](DefaultApi.md#get_smartsheet_funding) | **GET** /api/v2/smartsheet/funding | Get Smartsheet Funding
 [**get_subject**](DefaultApi.md#get_subject) | **GET** /api/v2/subject/{subject_id} | Get Subject
 [**get_user_from_active_directory**](DefaultApi.md#get_user_from_active_directory) | **GET** /api/v2/active_directory/{username} | Get User From Active Directory
-[**get_v1_bergamo_session**](DefaultApi.md#get_v1_bergamo_session) | **POST** /bergamo_session | Get V1 Bergamo Session
 [**get_v1_funding**](DefaultApi.md#get_v1_funding) | **GET** /funding/{project_name} | Get V1 Funding
 [**get_v1_injection_materials**](DefaultApi.md#get_v1_injection_materials) | **GET** /tars_injection_materials/{prep_lot_number} | Get V1 Injection Materials
 [**get_v1_instrument**](DefaultApi.md#get_v1_instrument) | **GET** /instrument/{instrument_id} | Get V1 Instrument
@@ -35,12 +34,73 @@ Method | HTTP request | Description
 [**get_v1_procedures**](DefaultApi.md#get_v1_procedures) | **GET** /procedures/{subject_id} | Get V1 Procedures
 [**get_v1_project_names**](DefaultApi.md#get_v1_project_names) | **GET** /project_names | Get V1 Project Names
 [**get_v1_protocols**](DefaultApi.md#get_v1_protocols) | **GET** /protocols/{protocol_name} | Get V1 Protocols
-[**get_v1_rig**](DefaultApi.md#get_v1_rig) | **GET** /rig/{rig_id} | Get V1 Rig
-[**get_v1_slims_workflow**](DefaultApi.md#get_v1_slims_workflow) | **GET** /slims/{workflow} | Get V1 Slims Workflow
 [**get_v1_subject**](DefaultApi.md#get_v1_subject) | **GET** /subject/{subject_id} | Get V1 Subject
 [**index**](DefaultApi.md#index) | **GET** / | Index
 [**post_instrument**](DefaultApi.md#post_instrument) | **POST** /api/v2/instrument | Post Instrument
 
+
+# **get_dataverse_funding**
+> object get_dataverse_funding()
+
+Get Dataverse Funding
+
+Get raw funding data from Dataverse.
+
+### Example
+
+
+```python
+import aind_metadata_service_async_client
+from aind_metadata_service_async_client.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to https://aind-metadata-service
+# See configuration.py for a list of all supported configuration parameters.
+configuration = aind_metadata_service_async_client.Configuration(
+    host = "https://aind-metadata-service"
+)
+
+
+# Enter a context with an instance of the API client
+async with aind_metadata_service_async_client.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = aind_metadata_service_async_client.DefaultApi(api_client)
+
+    try:
+        # Get Dataverse Funding
+        api_response = await api_instance.get_dataverse_funding()
+        print("The response of DefaultApi->get_dataverse_funding:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling DefaultApi->get_dataverse_funding: %s\n" % e)
+```
+
+
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+**object**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Successful Response |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_dataverse_table**
 > object get_dataverse_table(entity_set_table_name, columns=columns, filter=filter)
@@ -178,6 +238,74 @@ No authorization required
 |-------------|-------------|------------------|
 **200** | Successful Response |  -  |
 **404** | Not found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **get_dataverse_water_restriction**
+> object get_dataverse_water_restriction(mouse_id)
+
+Get Dataverse Water Restriction
+
+Get raw water restriction data from Dataverse.
+
+### Example
+
+
+```python
+import aind_metadata_service_async_client
+from aind_metadata_service_async_client.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to https://aind-metadata-service
+# See configuration.py for a list of all supported configuration parameters.
+configuration = aind_metadata_service_async_client.Configuration(
+    host = "https://aind-metadata-service"
+)
+
+
+# Enter a context with an instance of the API client
+async with aind_metadata_service_async_client.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = aind_metadata_service_async_client.DefaultApi(api_client)
+    mouse_id = '858802' # str | Mouse ID to fetch water restriction data for.
+
+    try:
+        # Get Dataverse Water Restriction
+        api_response = await api_instance.get_dataverse_water_restriction(mouse_id)
+        print("The response of DefaultApi->get_dataverse_water_restriction:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling DefaultApi->get_dataverse_water_restriction: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **mouse_id** | **str**| Mouse ID to fetch water restriction data for. | 
+
+### Return type
+
+**object**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Successful Response |  -  |
+**422** | Validation Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -401,7 +529,7 @@ No authorization required
 Get Instrument
 
 ## Instrument
-Return an Instrument.
+Return an Instrument from DocDB.
 
 ### Example
 
@@ -606,7 +734,6 @@ No authorization required
 **200** | Successful Response |  -  |
 **400** | Validation error in response model. |  * X-Error-Message - A JSON-encoded list of Pydantic validation errors. <br>  |
 **404** | Not found |  -  |
-**406** | Project has subprojects, specify subproject |  -  |
 **422** | Validation Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -896,6 +1023,76 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **get_orcid**
+> object get_orcid(name)
+
+Get Orcid
+
+## ORCID
+Return an Allen Institute researcher's ORCID iD, or 404 when the match
+is not definitive. See orcid-service for how the match is made.
+
+### Example
+
+
+```python
+import aind_metadata_service_async_client
+from aind_metadata_service_async_client.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to https://aind-metadata-service
+# See configuration.py for a list of all supported configuration parameters.
+configuration = aind_metadata_service_async_client.Configuration(
+    host = "https://aind-metadata-service"
+)
+
+
+# Enter a context with an instance of the API client
+async with aind_metadata_service_async_client.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = aind_metadata_service_async_client.DefaultApi(api_client)
+    name = 'name_example' # str | 
+
+    try:
+        # Get Orcid
+        api_response = await api_instance.get_orcid(name)
+        print("The response of DefaultApi->get_orcid:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling DefaultApi->get_orcid: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **name** | **str**|  | 
+
+### Return type
+
+**object**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Successful Response |  -  |
+**422** | Validation Error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **get_perfusions**
 > object get_perfusions(subject_id)
 
@@ -1172,222 +1369,6 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **get_rig**
-> object get_rig(rig_id, partial_match=partial_match)
-
-Get Rig
-
-## Rig
-Return a Rig.
-
-### Example
-
-
-```python
-import aind_metadata_service_async_client
-from aind_metadata_service_async_client.rest import ApiException
-from pprint import pprint
-
-# Defining the host is optional and defaults to https://aind-metadata-service
-# See configuration.py for a list of all supported configuration parameters.
-configuration = aind_metadata_service_async_client.Configuration(
-    host = "https://aind-metadata-service"
-)
-
-
-# Enter a context with an instance of the API client
-async with aind_metadata_service_async_client.ApiClient(configuration) as api_client:
-    # Create an instance of the API class
-    api_instance = aind_metadata_service_async_client.DefaultApi(api_client)
-    rig_id = '323_EPHYS1_20250205' # str | 
-    partial_match = False # bool |  (optional) (default to False)
-
-    try:
-        # Get Rig
-        api_response = await api_instance.get_rig(rig_id, partial_match=partial_match)
-        print("The response of DefaultApi->get_rig:\n")
-        pprint(api_response)
-    except Exception as e:
-        print("Exception when calling DefaultApi->get_rig: %s\n" % e)
-```
-
-
-
-### Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **rig_id** | **str**|  | 
- **partial_match** | **bool**|  | [optional] [default to False]
-
-### Return type
-
-**object**
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-### HTTP response details
-
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-**200** | Successful Response |  -  |
-**400** | Validation error in response model. |  * X-Error-Message - A JSON-encoded list of Pydantic validation errors. <br>  |
-**404** | Not found |  -  |
-**422** | Validation Error |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **get_slims_workflow**
-> object get_slims_workflow(workflow, subject_id=subject_id, session_name=session_name, start_date_gte=start_date_gte, end_date_lte=end_date_lte)
-
-Get Slims Workflow
-
-## SLIMS
-Return information from SLIMS.
-
-### Example
-
-
-```python
-import aind_metadata_service_async_client
-from aind_metadata_service_async_client.models.slims_workflow import SlimsWorkflow
-from aind_metadata_service_async_client.rest import ApiException
-from pprint import pprint
-
-# Defining the host is optional and defaults to https://aind-metadata-service
-# See configuration.py for a list of all supported configuration parameters.
-configuration = aind_metadata_service_async_client.Configuration(
-    host = "https://aind-metadata-service"
-)
-
-
-# Enter a context with an instance of the API client
-async with aind_metadata_service_async_client.ApiClient(configuration) as api_client:
-    # Create an instance of the API class
-    api_instance = aind_metadata_service_async_client.DefaultApi(api_client)
-    workflow = aind_metadata_service_async_client.SlimsWorkflow() # SlimsWorkflow | The SLIMS workflow to query.
-    subject_id = '744742' # str | Subject ID to filter the data. (optional)
-    session_name = 'session_name_example' # str | Name of the session (only for ecephys sessions). (optional)
-    start_date_gte = '2025-02-12' # str | Experiment run created on or after. (ISO format) (optional)
-    end_date_lte = '2025-02-13' # str | Experiment run created on or before. (ISO format) (optional)
-
-    try:
-        # Get Slims Workflow
-        api_response = await api_instance.get_slims_workflow(workflow, subject_id=subject_id, session_name=session_name, start_date_gte=start_date_gte, end_date_lte=end_date_lte)
-        print("The response of DefaultApi->get_slims_workflow:\n")
-        pprint(api_response)
-    except Exception as e:
-        print("Exception when calling DefaultApi->get_slims_workflow: %s\n" % e)
-```
-
-
-
-### Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **workflow** | [**SlimsWorkflow**](.md)| The SLIMS workflow to query. | 
- **subject_id** | **str**| Subject ID to filter the data. | [optional] 
- **session_name** | **str**| Name of the session (only for ecephys sessions). | [optional] 
- **start_date_gte** | **str**| Experiment run created on or after. (ISO format) | [optional] 
- **end_date_lte** | **str**| Experiment run created on or before. (ISO format) | [optional] 
-
-### Return type
-
-**object**
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-### HTTP response details
-
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-**200** | Successful Response |  -  |
-**400** | Validation error in response model. |  * X-Error-Message - A JSON-encoded list of Pydantic validation errors. <br>  |
-**404** | Not found |  -  |
-**422** | Validation Error |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **get_smartsheet_funding**
-> object get_smartsheet_funding()
-
-Get Smartsheet Funding
-
-Get raw funding data from Smartsheet.
-
-### Example
-
-
-```python
-import aind_metadata_service_async_client
-from aind_metadata_service_async_client.rest import ApiException
-from pprint import pprint
-
-# Defining the host is optional and defaults to https://aind-metadata-service
-# See configuration.py for a list of all supported configuration parameters.
-configuration = aind_metadata_service_async_client.Configuration(
-    host = "https://aind-metadata-service"
-)
-
-
-# Enter a context with an instance of the API client
-async with aind_metadata_service_async_client.ApiClient(configuration) as api_client:
-    # Create an instance of the API class
-    api_instance = aind_metadata_service_async_client.DefaultApi(api_client)
-
-    try:
-        # Get Smartsheet Funding
-        api_response = await api_instance.get_smartsheet_funding()
-        print("The response of DefaultApi->get_smartsheet_funding:\n")
-        pprint(api_response)
-    except Exception as e:
-        print("Exception when calling DefaultApi->get_smartsheet_funding: %s\n" % e)
-```
-
-
-
-### Parameters
-
-This endpoint does not need any parameter.
-
-### Return type
-
-**object**
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-### HTTP response details
-
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-**200** | Successful Response |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
 # **get_subject**
 > object get_subject(subject_id)
 
@@ -1528,75 +1509,6 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **get_v1_bergamo_session**
-> object get_v1_bergamo_session(request_body)
-
-Get V1 Bergamo Session
-
-## Session
-Return session metadata computed from aind-metadata-mapper.
-
-### Example
-
-
-```python
-import aind_metadata_service_async_client
-from aind_metadata_service_async_client.rest import ApiException
-from pprint import pprint
-
-# Defining the host is optional and defaults to https://aind-metadata-service
-# See configuration.py for a list of all supported configuration parameters.
-configuration = aind_metadata_service_async_client.Configuration(
-    host = "https://aind-metadata-service"
-)
-
-
-# Enter a context with an instance of the API client
-async with aind_metadata_service_async_client.ApiClient(configuration) as api_client:
-    # Create an instance of the API class
-    api_instance = aind_metadata_service_async_client.DefaultApi(api_client)
-    request_body = None # Dict[str, object] | 
-
-    try:
-        # Get V1 Bergamo Session
-        api_response = await api_instance.get_v1_bergamo_session(request_body)
-        print("The response of DefaultApi->get_v1_bergamo_session:\n")
-        pprint(api_response)
-    except Exception as e:
-        print("Exception when calling DefaultApi->get_v1_bergamo_session: %s\n" % e)
-```
-
-
-
-### Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **request_body** | [**Dict[str, object]**](object.md)|  | 
-
-### Return type
-
-**object**
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-### HTTP response details
-
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-**200** | Successful Response |  -  |
-**422** | Validation Error |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
 # **get_v1_funding**
 > object get_v1_funding(project_name)
 
@@ -1623,7 +1535,7 @@ configuration = aind_metadata_service_async_client.Configuration(
 async with aind_metadata_service_async_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = aind_metadata_service_async_client.DefaultApi(api_client)
-    project_name = 'Discovery-Neuromodulator circuit dynamics during foraging' # str | 
+    project_name = 'Cell Type Lookup Table' # str | 
 
     try:
         # Get V1 Funding
@@ -2190,155 +2102,6 @@ async with aind_metadata_service_async_client.ApiClient(configuration) as api_cl
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **protocol_name** | **str**|  | 
-
-### Return type
-
-**object**
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-### HTTP response details
-
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-**200** | Successful Response |  -  |
-**422** | Validation Error |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **get_v1_rig**
-> object get_v1_rig(rig_id, partial_match=partial_match)
-
-Get V1 Rig
-
-## Rig V1
-Return a Rig.
-
-### Example
-
-
-```python
-import aind_metadata_service_async_client
-from aind_metadata_service_async_client.rest import ApiException
-from pprint import pprint
-
-# Defining the host is optional and defaults to https://aind-metadata-service
-# See configuration.py for a list of all supported configuration parameters.
-configuration = aind_metadata_service_async_client.Configuration(
-    host = "https://aind-metadata-service"
-)
-
-
-# Enter a context with an instance of the API client
-async with aind_metadata_service_async_client.ApiClient(configuration) as api_client:
-    # Create an instance of the API class
-    api_instance = aind_metadata_service_async_client.DefaultApi(api_client)
-    rig_id = '323_EPHYS1_20250205' # str | 
-    partial_match = False # bool |  (optional) (default to False)
-
-    try:
-        # Get V1 Rig
-        api_response = await api_instance.get_v1_rig(rig_id, partial_match=partial_match)
-        print("The response of DefaultApi->get_v1_rig:\n")
-        pprint(api_response)
-    except Exception as e:
-        print("Exception when calling DefaultApi->get_v1_rig: %s\n" % e)
-```
-
-
-
-### Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **rig_id** | **str**|  | 
- **partial_match** | **bool**|  | [optional] [default to False]
-
-### Return type
-
-**object**
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-### HTTP response details
-
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-**200** | Successful Response |  -  |
-**422** | Validation Error |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **get_v1_slims_workflow**
-> object get_v1_slims_workflow(workflow, subject_id=subject_id, session_name=session_name, start_date_gte=start_date_gte, end_date_lte=end_date_lte)
-
-Get V1 Slims Workflow
-
-## SLIMS V1
-Return information from SLIMS.
-
-### Example
-
-
-```python
-import aind_metadata_service_async_client
-from aind_metadata_service_async_client.models.slims_workflow import SlimsWorkflow
-from aind_metadata_service_async_client.rest import ApiException
-from pprint import pprint
-
-# Defining the host is optional and defaults to https://aind-metadata-service
-# See configuration.py for a list of all supported configuration parameters.
-configuration = aind_metadata_service_async_client.Configuration(
-    host = "https://aind-metadata-service"
-)
-
-
-# Enter a context with an instance of the API client
-async with aind_metadata_service_async_client.ApiClient(configuration) as api_client:
-    # Create an instance of the API class
-    api_instance = aind_metadata_service_async_client.DefaultApi(api_client)
-    workflow = aind_metadata_service_async_client.SlimsWorkflow() # SlimsWorkflow | The SLIMS workflow to query.
-    subject_id = '744742' # str | Subject ID to filter the data. (optional)
-    session_name = 'session_name_example' # str | Name of the session (only for ecephys sessions). (optional)
-    start_date_gte = '2025-02-12' # str | Experiment run created on or after. (ISO format) (optional)
-    end_date_lte = '2025-02-13' # str | Experiment run created on or before. (ISO format) (optional)
-
-    try:
-        # Get V1 Slims Workflow
-        api_response = await api_instance.get_v1_slims_workflow(workflow, subject_id=subject_id, session_name=session_name, start_date_gte=start_date_gte, end_date_lte=end_date_lte)
-        print("The response of DefaultApi->get_v1_slims_workflow:\n")
-        pprint(api_response)
-    except Exception as e:
-        print("Exception when calling DefaultApi->get_v1_slims_workflow: %s\n" % e)
-```
-
-
-
-### Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **workflow** | [**SlimsWorkflow**](.md)| The SLIMS workflow to query. | 
- **subject_id** | **str**| Subject ID to filter the data. | [optional] 
- **session_name** | **str**| Name of the session (only for ecephys sessions). | [optional] 
- **start_date_gte** | **str**| Experiment run created on or after. (ISO format) | [optional] 
- **end_date_lte** | **str**| Experiment run created on or before. (ISO format) | [optional] 
 
 ### Return type
 
