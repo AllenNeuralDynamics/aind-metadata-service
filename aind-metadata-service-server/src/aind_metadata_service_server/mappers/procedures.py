@@ -1,6 +1,7 @@
 """Maps information to aind-data-schema Procedures model."""
 
 import logging
+from decimal import Decimal
 from enum import Enum
 from typing import List, Optional, Union
 
@@ -26,15 +27,12 @@ from aind_data_schema_models.specimen_procedure_types import (
     SpecimenProcedureType,
 )
 from aind_data_schema_models.units import MassUnit
+from aind_dataverse_service_async_client.models import WaterRestrictionModel
 from aind_labtracks_service_async_client.models import Task as LabTracksTask
 from aind_sharepoint_service_async_client.models import (
     Las2020List,
     NSB2019List,
     NSB2023List,
-)
-from aind_slims_service_async_client.models import (
-    SlimsHistologyData,
-    SlimsWaterRestrictionData,
 )
 from aind_smartsheet_service_async_client.models import (
     ExaSPIMInfo,
@@ -55,9 +53,6 @@ from aind_metadata_service_server.mappers.nsb2023 import (
     MappedNSBList as MappedNSB2023,
 )
 from aind_metadata_service_server.mappers.perfusion import PerfusionMapper
-from aind_metadata_service_server.mappers.specimen_procedures import (
-    SpecimenProcedureMapper,
-)
 
 
 class LabTracksTaskStatuses(Enum):
@@ -132,8 +127,7 @@ class ProceduresMapper:
         nsb_2023: List[NSB2023List] = [],
         nsb_present: List[NSB2023List] = [],
         smartsheet_perfusion: List[PerfusionsModel] = [],
-        slims_water_restriction: List[SlimsWaterRestrictionData] = [],
-        slims_histology: List[SlimsHistologyData] = [],
+        dataverse_water_restriction: List[WaterRestrictionModel] = [],
         smartsheet_exaspim: Optional[ExaSPIMInfo] = None,
     ):
         """
@@ -151,8 +145,7 @@ class ProceduresMapper:
         self.nsb_2023 = nsb_2023
         self.nsb_present = nsb_present
         self.smartsheet_perfusion = smartsheet_perfusion
-        self.slims_water_restriction = slims_water_restriction
-        self.slims_histology = slims_histology
+        self.dataverse_water_restriction = dataverse_water_restriction
         self.smartsheet_exaspim = smartsheet_exaspim
 
     @staticmethod
@@ -234,54 +227,88 @@ class ProceduresMapper:
 
         return None
 
-    def _map_slims_response_to_aind_water_restrictions(
+    def _map_dataverse_to_aind_water_restrictions(
         self,
     ) -> List[WaterRestriction]:
-        """Maps response from slims into WaterRestriction models"""
-        water_restrictions = []
-        for data in self.slims_water_restriction:
-            wr = WaterRestriction.model_construct(
-                start_date=data.start_date.date() if data.start_date else None,
-                end_date=data.end_date.date() if data.end_date else None,
-                target_fraction_weight=(
-                    int(float(data.target_weight_fraction) * 100)
-                    if data.target_weight_fraction
-                    else None
-                ),
-                baseline_weight=(
-                    float(data.baseline_weight)
-                    if data.baseline_weight
-                    else None
-                ),
-                weight_unit=self._parse_mass_unit(data.weight_unit),
-                minimum_water_per_day=float("1.0"),
+        """Maps response from dataverse into WaterRestriction models"""
+        self.dataverse_water_restriction.sort(key=lambda x: x.change_date_time)
+        record_list = []
+        current_record = None
+        for record in self.dataverse_water_restriction:
+            baseline_weight = (
+                None
+                if record.baseline_weight is None
+                else float(Decimal(record.baseline_weight))
             )
+            protocol_id = record.protocol_id
+            target_fraction_weight = (
+                None
+                if record.targeted_weight_percentage is None
+                else int(Decimal(record.targeted_weight_percentage) * 100)
+            )
+            weight_unit = MassUnit.G
+            minimum_water_per_day = float(1.0)
+            change_date = (
+                None
+                if record.change_date_time is None
+                else record.change_date_time.date()
+            )
+            if (
+                record.new_value == "active water restriction"
+                and current_record is None
+            ):
+                current_record = {
+                    "ethics_review_id": protocol_id,
+                    "baseline_weight": baseline_weight,
+                    "target_fraction_weight": target_fraction_weight,
+                    "weight_unit": weight_unit,
+                    "minimum_water_per_day": minimum_water_per_day,
+                    "start_date": change_date,
+                    "end_date": None,
+                }
+            elif (
+                record.new_value == "active water restriction"
+                and current_record is not None
+            ):
+                record_list.append(current_record)
+                current_record = {
+                    "ethics_review_id": protocol_id,
+                    "baseline_weight": baseline_weight,
+                    "target_fraction_weight": target_fraction_weight,
+                    "weight_unit": weight_unit,
+                    "minimum_water_per_day": minimum_water_per_day,
+                    "start_date": change_date,
+                    "end_date": None,
+                }
+            elif (
+                record.old_value == "active water restriction"
+                and current_record is None
+            ):
+                current_record = {
+                    "ethics_review_id": protocol_id,
+                    "baseline_weight": baseline_weight,
+                    "target_fraction_weight": target_fraction_weight,
+                    "weight_unit": weight_unit,
+                    "minimum_water_per_day": minimum_water_per_day,
+                    "start_date": None,
+                    "end_date": change_date,
+                }
+                record_list.append(current_record)
+                current_record = None
+            else:
+                current_record["end_date"] = change_date
+                record_list.append(current_record)
+                current_record = None
+        if current_record is not None:
+            record_list.append(current_record)
+        water_restrictions = []
+        for data in record_list:
+            try:
+                wr = WaterRestriction.model_validate(data)
+            except ValidationError:
+                wr = WaterRestriction.model_construct(**data)
             water_restrictions.append(wr)
         return water_restrictions
-
-    @staticmethod
-    def _parse_mass_unit(
-        value: Optional[str],
-    ) -> Optional[Union[MassUnit, str]]:
-        """Parse mass unit from string to MassUnit enum."""
-        mass_unit_abbreviations = {
-            "kg": MassUnit.KG,
-            "g": MassUnit.G,
-            "mg": MassUnit.MG,
-            "ug": MassUnit.UG,
-            "µg": MassUnit.UG,
-            "ng": MassUnit.NG,
-        }
-        if not value:
-            return MassUnit.G
-        else:
-            try:
-                return mass_unit_abbreviations[value.lower()]
-            except KeyError:
-                logging.warning(
-                    f"Mass unit {value} not recognized. Returning it as is."
-                )
-                return value
 
     @staticmethod
     def map_sharepoint_response_to_aind_surgeries(
@@ -411,27 +438,14 @@ class ProceduresMapper:
                 f"from Smartsheet for {subject_id}"
             )
 
-        if self.slims_water_restriction:
-            slims_water_restrictions = (
-                self._map_slims_response_to_aind_water_restrictions()
+        if self.dataverse_water_restriction:
+            dv_water_restrictions = (
+                self._map_dataverse_to_aind_water_restrictions()
             )
-            subject_procedures.extend(slims_water_restrictions)
+            subject_procedures.extend(dv_water_restrictions)
             logging.info(
-                f"Found {len(slims_water_restrictions)} water restrictions "
-                f"from SLIMS for {subject_id}"
-            )
-
-        if self.slims_histology:
-            sp_mapper = SpecimenProcedureMapper(
-                slims_histology=self.slims_histology
-            )
-            slims_specimen_procedures = (
-                sp_mapper.map_slims_response_to_aind_specimen_procedures()
-            )
-            specimen_procedures.extend(slims_specimen_procedures)
-            logging.info(
-                f"Found {len(slims_specimen_procedures)} specimen procedures "
-                f"from SLIMS for {subject_id}"
+                f"Found {len(dv_water_restrictions)} water restrictions "
+                f"from Dataverse for {subject_id}"
             )
 
         if self.smartsheet_exaspim:

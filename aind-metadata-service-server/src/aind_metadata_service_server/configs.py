@@ -16,9 +16,6 @@ class Settings(BaseSettings):
         ..., description="Host address for labtracks endpoint"
     )
     mgi_host: HttpUrl = Field(..., description="Host address for mgi endpoint")
-    slims_host: HttpUrl = Field(
-        ..., description="Host address for slims endpoint"
-    )
     sharepoint_host: HttpUrl = Field(
         ..., description="Host address for sharepoint endpoint"
     )
@@ -27,9 +24,6 @@ class Settings(BaseSettings):
     )
     smartsheet_host: HttpUrl = Field(
         ..., description="Host address for smartsheet endpoint"
-    )
-    session_json_host: HttpUrl = Field(
-        ..., description="Host address for metadata mapper service"
     )
     aind_data_schema_v1_host: HttpUrl = Field(
         ..., description="Host address for v1 service"
@@ -42,6 +36,9 @@ class Settings(BaseSettings):
     )
     active_directory_host: HttpUrl = Field(
         ..., description="Host address for active directory endpoint"
+    )
+    orcid_host: HttpUrl = Field(
+        ..., description="Host address for orcid endpoint"
     )
 
 

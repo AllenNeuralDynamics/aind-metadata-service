@@ -1,6 +1,11 @@
 # aind-metadata-service
 REST service to compile and return aind-data-schema metadata from databases.
 
+## Documentation
+
+Full documentation — architecture, user guide, and contributor guidelines — is available at:
+**https://aind-metadata-service.readthedocs.io**
+
 ## Usage
 
 ### Create the server.

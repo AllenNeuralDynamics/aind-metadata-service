@@ -20,7 +20,6 @@ class TestSettings(unittest.TestCase):
             "AIND_METADATA_SERVICE_SMARTSHEET_HOST": (
                 "http://example.com/smartsheet"
             ),
-            "AIND_METADATA_SERVICE_SLIMS_HOST": "http://example.com/slims",
             "AIND_METADATA_SERVICE_TARS_HOST": "http://example.com/tars",
             "AIND_METADATA_SERVICE_SHAREPOINT_HOST": (
                 "http://example.com/sharepoint"
@@ -40,6 +39,7 @@ class TestSettings(unittest.TestCase):
             "AIND_METADATA_SERVICE_ACTIVE_DIRECTORY_HOST": (
                 "http://example.com/active_directory"
             ),
+            "AIND_METADATA_SERVICE_ORCID_HOST": "http://example.com/orcid",
         },
         clear=True,
     )
@@ -50,13 +50,12 @@ class TestSettings(unittest.TestCase):
             labtracks_host="http://example.com/labtracks",
             mgi_host="http://example.com/mgi",
             smartsheet_host="http://example.com/smartsheet",
-            slims_host="http://example.com/slims",
             tars_host="http://example.com/tars",
             sharepoint_host="http://example.com/sharepoint",
             dataverse_host="http://example.com/dataverse",
-            session_json_host="http://example.com/session_json",
             docdb_api_host="http://example.com/docdb",
             active_directory_host="http://example.com/active_directory",
+            orcid_host="http://example.com/orcid",
         )
         self.assertEqual(expected_settings, settings)
 
