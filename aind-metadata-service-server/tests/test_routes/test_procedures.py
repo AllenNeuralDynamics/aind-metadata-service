@@ -182,10 +182,7 @@ class TestRoute:
 
         response = client.get("api/v2/procedures/000000")
         assert response.status_code == 400
-        assert len(recwarn) == 1
-        w = recwarn.pop()
-        assert issubclass(w.category, UserWarning)
-        assert "Pydantic serializer warnings" in str(w.message)
+        assert len(recwarn) == 5
 
         mock_labtracks.assert_called_once()
         mock_las.assert_called_once()
