@@ -33,7 +33,8 @@ async def get_funding(
     Return Funding metadata.
     """
     funding_response = await dataverse_api_instance.get_funding()
-    mapper = FundingMapper(dataverse_funding=funding_response)
+    fixed_response = FundingMapper.fix_names(funding_response)
+    mapper = FundingMapper(dataverse_funding=fixed_response)
     funding_information = mapper.get_funding_list(project_name=project_name)
     response_handler = ModelResponse(
         aind_models=funding_information, status_code=StatusCodes.DB_RESPONDED
