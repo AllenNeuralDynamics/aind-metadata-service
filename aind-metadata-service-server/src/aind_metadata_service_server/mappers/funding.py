@@ -27,6 +27,20 @@ class FundingMapper:
         self.dataverse_funding = dataverse_funding
 
     @staticmethod
+    def fix_names(funding_models: List[FundingModel]) -> List[FundingModel]:
+        """Strips out '#' and white spaces around names. Dataverse will
+        return these characters sometimes.
+        """
+        for funding_model in funding_models:
+            if funding_model.fundees is not None:
+                funding_model.fundees = funding_model.fundees.strip("# ")
+            if funding_model.investigators is not None:
+                funding_model.investigators = (
+                    funding_model.investigators.strip("# ")
+                )
+        return funding_models
+
+    @staticmethod
     def _parse_institution(
         input_name: Optional[str],
     ) -> Union[Organization, str, None]:
