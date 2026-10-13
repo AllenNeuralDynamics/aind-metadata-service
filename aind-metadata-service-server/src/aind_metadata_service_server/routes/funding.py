@@ -77,7 +77,8 @@ async def get_funding(
     funding_response = await dataverse_api_instance.get_funding(
         _request_timeout=30,
     )
-    mapper = FundingMapper(dataverse_funding=funding_response)
+    fixed_response = FundingMapper.fix_names(funding_models=funding_response)
+    mapper = FundingMapper(dataverse_funding=fixed_response)
     people = mapper.get_people_list(project_name=project_name)
     tasks = [
         resolve_orcid(person=p, orcid_api_instance=orcid_api_instance)
@@ -128,7 +129,8 @@ async def get_investigators(
     Return Funding metadata.
     """
     funding_response = await dataverse_api_instance.get_funding()
-    mapper = FundingMapper(dataverse_funding=funding_response)
+    fixed_response = FundingMapper.fix_names(funding_models=funding_response)
+    mapper = FundingMapper(dataverse_funding=fixed_response)
     investigators = mapper.get_investigators_list(project_name=project_name)
 
     if len(investigators) == 0:
