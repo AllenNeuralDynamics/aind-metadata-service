@@ -28,7 +28,7 @@ services:
     image: "ghcr.io/allenneuraldynamics/aind-smartsheet-service-server:1.1.0"
     env_file: "env/smartsheet.env"
   sharepoint:
-    image: "ghcr.io/allenneuraldynamics/aind-sharepoint-service-server:0.3.0"
+    image: "ghcr.io/allenneuraldynamics/aind-sharepoint-service-server:0.3.1"
     env_file: "env/sharepoint.env"
   tars:
     image: "ghcr.io/allenneuraldynamics/aind-tars-service-server:0.1.5"
