@@ -1598,7 +1598,7 @@ class MappedNSBList:
             else {
                 self._nsb.burr_x0020_hole_x0020_2.SELECT: None,
                 self._nsb.burr_x0020_hole_x0020_2.STEREOTAXIC_INJECTION: (
-                    BurrHoleProcedure.INJECTION,
+                    BurrHoleProcedure.INJECTION
                 ),
                 self._nsb.burr_x0020_hole_x0020_2.SPINAL_INJECTION: (
                     BurrHoleProcedure.SPINAL_INJECTION
