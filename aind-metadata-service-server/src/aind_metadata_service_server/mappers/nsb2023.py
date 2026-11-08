@@ -3345,23 +3345,25 @@ class MappedNSBList:
         -------
         List[List[Union[Translation, Rotation]]]
         """
+
+        def with_rotation(
+            translation: Translation,
+        ) -> List[Union[Translation, Rotation]]:
+            """Only add a rotation if an angle was provided"""
+            if angle is None:
+                return [translation]
+            rotation = Rotation(
+                angles=[float(angle), 0, 0], angles_unit=AngleUnit.DEG
+            )
+            return [translation, rotation]
+
         # If all coordinates are None, return empty translation
         if ap is None and ml is None and depth is None:
-            angle_val = float(angle) if angle is not None else 0.0
-            is_ard = (
-                surgery_coordinate_system is not None
-                and surgery_coordinate_system.name.endswith("ARD")
-            )
-            rotation = Rotation(
-                angles=[angle_val, 0, 0] if is_ard else [angle_val, 0, 0],
-                angles_unit=AngleUnit.DEG,
-            )
-            return [[Translation.model_construct(translation=[]), rotation]]
+            return [with_rotation(Translation.model_construct(translation=[]))]
 
         # Convert Decimal to float when not None
         ap_val = float(ap) if ap is not None else None
         ml_val = float(ml) if ml is not None else None
-        angle_val = float(angle) if angle is not None else 0.0
         is_ard = (
             surgery_coordinate_system is not None
             and surgery_coordinate_system.name.endswith("ARD")
@@ -3374,11 +3376,7 @@ class MappedNSBList:
                     [ap_val, ml_val, None] if is_ard else [ap_val, ml_val, 0]
                 )
             )
-            rotation = Rotation(
-                angles=[angle_val, 0, 0] if is_ard else [angle_val, 0, 0],
-                angles_unit=AngleUnit.DEG,
-            )
-            transforms.append([translation, rotation])
+            transforms.append(with_rotation(translation))
         else:
             for d in depth:
                 d_val = float(d) if d is not None else None
@@ -3389,13 +3387,7 @@ class MappedNSBList:
                         else [ap_val, ml_val, 0]
                     )
                 )
-                rotation = Rotation(
-                    angles=(
-                        [angle_val, 0, 0] if is_ard else [angle_val, 0, 0]
-                    ),
-                    angles_unit=AngleUnit.DEG,
-                )
-                transforms.append([translation, rotation])
+                transforms.append(with_rotation(translation))
         return transforms
 
     @staticmethod

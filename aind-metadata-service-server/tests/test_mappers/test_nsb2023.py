@@ -1215,13 +1215,12 @@ class TestNSB2023FiberImplantMapping(TestCase):
             self.assertEqual(coord_sys.axes[0].direction, Direction.UD)
             self.assertIsNotNone(probe_implant.device_config.transform)
             transform = probe_implant.device_config.transform
-            self.assertEqual(len(transform), 2)
+            # No angle in the source data, so no Rotation
+            self.assertEqual(len(transform), 1)
 
-            translation, rotation = transform
+            translation = transform[0]
             self.assertIsInstance(translation, Translation)
             self.assertEqual(len(translation.translation), 3)
-            self.assertIsInstance(rotation, Rotation)
-            self.assertEqual(len(rotation.angles), 3)
             self.assertIsNotNone(surgery.coordinate_system)
             self.assertEqual(surgery.coordinate_system.name, "BREGMA_ARD")
 
@@ -1874,6 +1873,43 @@ class TestNSB2023CoordinateMapping(TestCase):
         self.assertEqual(translation.translation, [])
         # ARD system should have 3 rotation angles
         self.assertEqual(rotation.angles, [10.0, 0.0, 0.0])
+
+    def test_map_burr_hole_transforms_missing_angle(self):
+        """If angle is None, no Rotation is added to any transform."""
+        for depth in [[Decimal("3.0"), Decimal("4.0")], None]:
+            with self.subTest(depth=depth):
+                transforms = MappedNSBList._map_burr_hole_transforms(
+                    angle=None,
+                    ml=Decimal("2.0"),
+                    ap=Decimal("1.5"),
+                    depth=depth,
+                    surgery_coordinate_system=BREGMA_ARD,
+                )
+                for transform in transforms:
+                    self.assertEqual(len(transform), 1)
+                    self.assertIsInstance(transform[0], Translation)
+        transforms = MappedNSBList._map_burr_hole_transforms(
+            angle=None,
+            ml=None,
+            ap=None,
+            depth=None,
+            surgery_coordinate_system=BREGMA_ARD,
+        )
+        self.assertEqual(len(transforms), 1)
+        self.assertEqual(len(transforms[0]), 1)
+        self.assertEqual(transforms[0][0].translation, [])
+
+    def test_map_burr_hole_transforms_zero_angle(self):
+        """An explicit 0 angle still produces a Rotation."""
+        transforms = MappedNSBList._map_burr_hole_transforms(
+            angle=Decimal("0"),
+            ml=Decimal("2.0"),
+            ap=Decimal("1.5"),
+            depth=[Decimal("3.0")],
+            surgery_coordinate_system=BREGMA_ARD,
+        )
+        self.assertEqual(len(transforms[0]), 2)
+        self.assertEqual(transforms[0][1].angles, [0.0, 0.0, 0.0])
 
     def test_map_burr_hole_transforms_missing_ap_ml_with_dv(self):
         """If any coordinate exists, keep missing values as None, not zero."""

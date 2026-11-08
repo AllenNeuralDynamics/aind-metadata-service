@@ -1190,18 +1190,17 @@ class MappedNSBList:
 
         ap = ap if ap is not None else 0
         ml = ml if ml is not None else 0
-        angle = angle if angle is not None else 0
 
         if depth is None:
             translation = Translation(translation=[ap, ml, 0])
-            rotation = Rotation(
-                angles=[angle, 0, 0], angles_unit=AngleUnit.DEG
-            )
+            angles = [angle, 0, 0]
         else:
             translation = Translation(translation=[ap, ml, 0, depth])
-            rotation = Rotation(
-                angles=[angle, 0, 0, 0], angles_unit=AngleUnit.DEG
-            )
+            angles = [angle, 0, 0, 0]
+        # Only add a rotation if an angle was provided
+        if angle is None:
+            return [translation]
+        rotation = Rotation(angles=angles, angles_unit=AngleUnit.DEG)
         return [translation, rotation]
 
     def get_first_injection_procedure(self) -> BrainInjection:
