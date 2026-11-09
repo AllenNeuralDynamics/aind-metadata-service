@@ -325,6 +325,87 @@ class TestRoute:
         )
         assert mock_get_viruses.call_count == 0
 
+    @patch("aind_labtracks_service_async_client.DefaultApi.get_tasks")
+    @patch("aind_sharepoint_service_async_client.DefaultApi.get_las2020")
+    @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2019")
+    @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2023")
+    @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb_present")
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_exaspim_info")
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
+    @patch("aind_tars_service_async_client.DefaultApi.get_viral_prep_lots")
+    @patch("aind_tars_service_async_client.DefaultApi.get_viruses")
+    @patch(
+        "aind_dataverse_service_async_client.DefaultApi.get_water_restriction"
+    )
+    def test_get_procedures_maps_tars_virus_data(
+        self,
+        mock_get_water_restriction: AsyncMock,
+        mock_get_viruses: AsyncMock,
+        mock_get_viral_prep_lots: AsyncMock,
+        mock_get_protocols: AsyncMock,
+        mock_get_exaspim_info: AsyncMock,
+        mock_get_perfusions: AsyncMock,
+        mock_nsb_present: AsyncMock,
+        mock_nsb2023: AsyncMock,
+        mock_nsb2019: AsyncMock,
+        mock_las: AsyncMock,
+        mock_labtracks: AsyncMock,
+        client: TestClient,
+        mock_tars_prep_lot_230929,
+        mock_tars_virus_v123,
+    ):
+        """Tests virus name and plasmid alias from TARS virus data are
+        mapped into the injection materials."""
+        mock_labtracks.return_value = []
+        mock_las.return_value = []
+        mock_get_perfusions.return_value = []
+        mock_get_exaspim_info.return_value = None
+        mock_get_protocols.return_value = []
+        mock_get_viral_prep_lots.return_value = [mock_tars_prep_lot_230929]
+        mock_tars_virus_v123.molecules = [
+            {
+                "fullName": "pAAV-test-virus",
+                "aliases": [{"isPreferred": True, "name": "AiP123"}],
+            }
+        ]
+        mock_get_viruses.return_value = [mock_tars_virus_v123]
+        mock_nsb2019.return_value = []
+        mock_nsb2023.return_value = [
+            NSB2023List(
+                Date_x0020_of_x0020_Surgery="2022-01-03T00:00:00Z",
+                IACUC_x0020_Protocol_x0020__x002="2103",
+                Procedure="Sx-01 Visual Ctx 2P",
+                Burr_x0020_hole_x0020_1="Injection",
+                Burr1_x0020_Perform_x0020_During="Initial Surgery",
+                Virus_x0020_M_x002f_L=2.0,
+                Virus_x0020_A_x002f_P=-1.5,
+                Virus_x0020_D_x002f_V=3.0,
+                Virus_x0020_Hemisphere="Right",
+                Inj1Type="Nanoject (Pressure)",
+                inj1volperdepth=500.0,
+                Burr_x0020_1_x0020_Injectable_x0="230929-12",
+                Burr_x0020_1_x0020_Injectable_x03="1e12",
+                SurgeryStatus="Ready for Feedback",
+            )
+        ]
+        mock_nsb_present.return_value = []
+        mock_get_water_restriction.return_value = []
+
+        response = client.get("api/v2/procedures/000000")
+        injection_materials = [
+            material
+            for subject_procedure in response.json()["subject_procedures"]
+            for procedure in subject_procedure.get("procedures", [])
+            for material in procedure.get("injection_materials") or []
+        ]
+        assert injection_materials
+        for material in injection_materials:
+            assert material["name"] == "pAAV-test-virus"
+            assert material["tars_identifiers"]["plasmid_tars_alias"] == [
+                "AiP123"
+            ]
+
     @patch("aind_smartsheet_service_async_client.DefaultApi.get_exaspim_info")
     def test_get_exaspim_procedures_success(
         self,

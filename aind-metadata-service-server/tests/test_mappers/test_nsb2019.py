@@ -965,6 +965,24 @@ class TestNSB2019CoordinateMapping(TestCase):
         self.assertIsInstance(transform, list)
         self.assertEqual(len(transform), 2)
 
+    def test_map_transform_missing_angle(self):
+        """Test no Rotation is added when angle is None"""
+        for depth in [None, 3.0]:
+            with self.subTest(depth=depth):
+                transform = MappedNSBList._get_transform(
+                    angle=None, ml=2.0, ap=1.5, depth=depth
+                )
+                self.assertEqual(len(transform), 1)
+                self.assertEqual(transform[0].object_type, "Translation")
+
+    def test_map_transform_zero_angle(self):
+        """Test an explicit 0 angle still produces a Rotation"""
+        transform = MappedNSBList._get_transform(
+            angle=0, ml=2.0, ap=1.5, depth=None
+        )
+        self.assertEqual(len(transform), 2)
+        self.assertEqual(transform[1].angles, [0, 0, 0])
+
 
 class TestNSB2019StringParsers(TestCase):
     """Tests text field parsers in NSB2019Mapping class."""

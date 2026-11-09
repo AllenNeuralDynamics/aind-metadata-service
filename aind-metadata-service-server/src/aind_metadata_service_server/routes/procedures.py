@@ -189,7 +189,7 @@ async def get_procedures(
         for (virus_strain, tars_mapper), virus_response in zip(
             virus_id_to_strain_mapper, virus_responses
         ):
-            tars_mapper.tars_virus_data = virus_response
+            tars_mapper.virus_data = virus_response
 
     tars_mapping = {}
     for virus_strain, mappers in virus_mappers_by_strain.items():
