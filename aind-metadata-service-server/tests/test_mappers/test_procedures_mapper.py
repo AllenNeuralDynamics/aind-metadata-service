@@ -34,7 +34,10 @@ from aind_data_schema_models.mouse_anatomy import InjectionTargets
 from aind_data_schema_models.specimen_procedure_types import (
     SpecimenProcedureType,
 )
-from aind_dataverse_service_async_client.models import WaterRestrictionModel
+from aind_dataverse_service_async_client.models import (
+    HistologyModel,
+    WaterRestrictionModel,
+)
 from aind_labtracks_service_async_client.models.task import (
     Task as LabTracksTask,
 )
@@ -226,6 +229,13 @@ class TestProceduresMapper(unittest.TestCase):
         cls.dataverse_water_restriction = [
             WaterRestrictionModel.model_validate(r) for r in wr_raw
         ]
+        with open(
+            RESOURCES_DIR / "dataverse" / "histology_response.json", "r"
+        ) as f:
+            histology_raw = json.load(f)
+        cls.dataverse_histology = [
+            HistologyModel.model_validate(r) for r in histology_raw
+        ]
 
     def test_map_dataverse_to_aind_water_restrictions(self):
         """Tests _map_dataverse_to_aind_water_restrictions method."""
@@ -330,6 +340,7 @@ class TestProceduresMapper(unittest.TestCase):
             nsb_present=self.nsb_2023,
             smartsheet_exaspim=self.smartsheet_exaspim[0],
             dataverse_water_restriction=self.dataverse_water_restriction,
+            dataverse_histology=self.dataverse_histology,
         )
         with suppress_pydantic_serialization_warnings():
             procedures = mapper.map_responses_to_aind_procedures("115977")
@@ -337,7 +348,7 @@ class TestProceduresMapper(unittest.TestCase):
             self.assertIsInstance(procedures, Procedures)
             self.assertEqual(procedures.subject_id, "115977")
             self.assertEqual(len(procedures.subject_procedures), 10)
-            self.assertEqual(len(procedures.specimen_procedures), 3)
+            self.assertEqual(len(procedures.specimen_procedures), 5)
 
     def test_map_responses_no_data(self):
         """Test mapping when no data sources have content"""

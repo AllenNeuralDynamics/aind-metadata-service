@@ -1,0 +1,87 @@
+[
+  {
+    "procedure_name": "SmartSPIM Delipidation",
+    "experiment_run_created_on": "2025-02-04T17:00:00Z",
+    "specimen_id": "744742-01",
+    "subject_id": "744742",
+    "protocol_id": "https://www.protocols.io/edit/refractive-index-matching-ethyl-cinnamate-cukpwuvn",
+    "protocol_name": "iDISCO: Dichloromethane Whole Mouse Brain Delipidation",
+    "washes": [
+      {
+        "wash_name": "Wash 1",
+        "wash_type": "Methanol Gradient",
+        "start_time": "2025-02-04T17:00:00Z",
+        "end_time": "2025-02-04T23:00:00Z",
+        "modified_by": "PersonM",
+        "reagents": [
+          {"name": "34860-1L-R", "source": "Sigma-Aldrich", "lot_number": "SHBR4455"}
+        ]
+      },
+      {
+        "wash_name": "Wash 2",
+        "wash_type": "Methanol + DCM",
+        "start_time": "2025-02-04T23:00:00Z",
+        "end_time": "2025-02-05T18:50:00Z",
+        "modified_by": "PersonM",
+        "reagents": [
+          {"name": "270997-1L", "source": "Sigma-Aldrich", "lot_number": "SHBQ9167"},
+          {"name": "34860-1L-R", "source": "Sigma-Aldrich", "lot_number": "SHBR4455"}
+        ]
+      },
+      {
+        "wash_name": "Wash 3",
+        "wash_type": null,
+        "start_time": null,
+        "end_time": null,
+        "modified_by": "PersonM",
+        "reagents": []
+      }
+    ]
+  },
+  {
+    "procedure_name": "SmartSPIM Labeling",
+    "experiment_run_created_on": "2025-02-04T17:00:00Z",
+    "specimen_id": "744742-01",
+    "subject_id": "744742",
+    "protocol_id": null,
+    "protocol_name": null,
+    "washes": [
+      {
+        "wash_name": "Primary Antibody Wash",
+        "wash_type": null,
+        "start_time": "2025-02-04T17:00:00Z",
+        "end_time": "2025-02-05T18:50:00Z",
+        "modified_by": "PersonM",
+        "reagents": []
+      },
+      {
+        "wash_name": "Secondary Antibody Wash",
+        "wash_type": null,
+        "start_time": "2025-02-04T17:00:00Z",
+        "end_time": "2025-02-05T18:50:00Z",
+        "modified_by": "PersonM",
+        "reagents": []
+      }
+    ]
+  },
+  {
+    "procedure_name": "SmartSPIM Refractive Index Matching",
+    "experiment_run_created_on": "2025-02-05T19:35:00Z",
+    "specimen_id": "744742-01",
+    "subject_id": "744742",
+    "protocol_id": null,
+    "protocol_name": null,
+    "washes": [
+      {
+        "wash_name": "Refractive Index Matching Wash",
+        "wash_type": "Refractive Index Matching",
+        "start_time": "2025-02-05T19:35:00Z",
+        "end_time": "2025-02-07T19:35:00Z",
+        "modified_by": "PersonM",
+        "reagents": [
+          {"name": "112372-100G", "source": "Sigma-Aldrich", "lot_number": "stbk5149"}
+        ]
+      }
+    ]
+  }
+]
