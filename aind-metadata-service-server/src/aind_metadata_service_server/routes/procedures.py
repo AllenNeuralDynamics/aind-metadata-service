@@ -10,7 +10,7 @@ from aind_metadata_service_server.mappers.injection_materials import (
 )
 from aind_metadata_service_server.mappers.procedures import ProceduresMapper
 from aind_metadata_service_server.mappers.responses import map_to_response
-from aind_metadata_service_server.sessions import (  # get_slims_api_instance,
+from aind_metadata_service_server.sessions import (
     get_dataverse_api_instance,
     get_labtracks_api_instance,
     get_sharepoint_api_instance,
@@ -103,6 +103,11 @@ async def get_procedures(
         )
     )
     tasks.append(
+        dataverse_api_instance.get_histology(
+            subject_id=subject_id, _request_timeout=30
+        )
+    )
+    tasks.append(
         smartsheet_api_instance.get_perfusions(subject_id, _request_timeout=20)
     )
     tasks.append(
@@ -117,6 +122,7 @@ async def get_procedures(
         nsb_2023_response,
         nsb_present_response,
         dataverse_wr_response,
+        dataverse_histology_response,
         smartsheet_perfusion_response,
         smartsheet_exaspim_response,
     ) = await gather(*tasks)
@@ -129,6 +135,7 @@ async def get_procedures(
         nsb_present=nsb_present_response,
         smartsheet_perfusion=smartsheet_perfusion_response,
         dataverse_water_restriction=dataverse_wr_response,
+        dataverse_histology=dataverse_histology_response,
         smartsheet_exaspim=smartsheet_exaspim_response,
     )
     procedures = mapper.map_responses_to_aind_procedures(subject_id)
