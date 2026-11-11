@@ -10,7 +10,10 @@ from unittest.mock import AsyncMock, patch
 
 import orcid_service_async_client.exceptions
 import pytest
-from aind_dataverse_service_async_client import FundingModel
+from aind_dataverse_service_async_client import (
+    FundingModel,
+    HistologyModel,
+)
 from aind_smartsheet_service_async_client.models import ExaSPIMInfo
 from aind_tars_service_async_client import (
     Alias,
@@ -106,6 +109,19 @@ def mock_dataverse_water_restriction(mocker):
     return mocker.patch(
         "aind_dataverse_service_async_client.DefaultApi.get_water_restriction",
         side_effect=_dynamic_response,
+    )
+
+
+@pytest.fixture()
+def mock_dataverse_histology(mocker):
+    """Mock response to dataverse histology request."""
+    with open(
+        RESOURCES_DIR / "dataverse" / "histology_response.json", "r"
+    ) as f:
+        response = json.load(f)
+    return mocker.patch(
+        "aind_dataverse_service_async_client.DefaultApi.get_histology",
+        return_value=[HistologyModel.model_validate(r) for r in response],
     )
 
 
