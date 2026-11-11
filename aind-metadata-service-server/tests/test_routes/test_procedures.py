@@ -6,6 +6,7 @@ from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from aind_dataverse_service_async_client.models import HistologyModel
 from aind_labtracks_service_async_client.models import Task as LabTracksTask
 from aind_sharepoint_service_async_client.models import (
     NSB2019List,
@@ -26,6 +27,9 @@ EXAMPLE_NSB2019_JSON = (
 EXAMPLE_NSB2023_JSON = (
     TEST_DIR / "resources" / "nsb2023" / "raw" / "list_item2.json"
 )
+EXAMPLE_HISTOLOGY_JSON = (
+    TEST_DIR / "resources" / "dataverse" / "histology_response.json"
+)
 
 
 class TestRoute:
@@ -43,8 +47,10 @@ class TestRoute:
     @patch(
         "aind_dataverse_service_async_client.DefaultApi.get_water_restriction"
     )
+    @patch("aind_dataverse_service_async_client.DefaultApi.get_histology")
     def test_get_procedures_success(
         self,
+        mock_get_histology: AsyncMock,
         mock_get_water_restriction: AsyncMock,
         mock_get_viruses: AsyncMock,
         mock_get_viral_prep_lots: AsyncMock,
@@ -96,9 +102,17 @@ class TestRoute:
         ]
         mock_get_viruses.return_value = []
         mock_get_water_restriction.return_value = []
+        with open(EXAMPLE_HISTOLOGY_JSON) as f:
+            contents_histology = json.load(f)
+        mock_get_histology.return_value = [
+            HistologyModel.model_validate(r) for r in contents_histology
+        ]
 
         response = client.get("/procedures/000000")
         assert response.status_code == 406
+        mock_get_histology.assert_awaited_once_with(
+            subject_id="000000", _request_timeout=30
+        )
         assert (
             "Procedures" in response.json()["message"]
             or "procedures" in response.json()
@@ -116,8 +130,10 @@ class TestRoute:
     @patch(
         "aind_dataverse_service_async_client.DefaultApi.get_water_restriction"
     )
+    @patch("aind_dataverse_service_async_client.DefaultApi.get_histology")
     def test_get_procedures_no_data(
         self,
+        mock_get_histology: AsyncMock,
         mock_get_water_restriction: AsyncMock,
         mock_get_viruses: AsyncMock,
         mock_get_viral_prep_lots: AsyncMock,
@@ -141,6 +157,7 @@ class TestRoute:
         mock_get_viral_prep_lots.return_value = []
         mock_get_viruses.return_value = []
         mock_get_water_restriction.return_value = []
+        mock_get_histology.return_value = []
 
         response = client.get("/procedures/nonexistent_subject")
         assert response.status_code == 404
