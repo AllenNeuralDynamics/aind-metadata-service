@@ -13,6 +13,7 @@
         "start_time": "2025-02-04T17:00:00Z",
         "end_time": "2025-02-04T23:00:00Z",
         "modified_by": "PersonM",
+        "notes": null,
         "reagents": [
           {"name": "34860-1L-R", "source": "Sigma-Aldrich", "lot_number": "SHBR4455"}
         ]
@@ -23,6 +24,7 @@
         "start_time": "2025-02-04T23:00:00Z",
         "end_time": "2025-02-05T18:50:00Z",
         "modified_by": "PersonM",
+        "notes": null,
         "reagents": [
           {"name": "270997-1L", "source": "Sigma-Aldrich", "lot_number": "SHBQ9167"},
           {"name": "34860-1L-R", "source": "Sigma-Aldrich", "lot_number": "SHBR4455"}
@@ -34,6 +36,7 @@
         "start_time": null,
         "end_time": null,
         "modified_by": "PersonM",
+        "notes": null,
         "reagents": []
       }
     ]
@@ -52,6 +55,7 @@
         "start_time": "2025-02-04T17:00:00Z",
         "end_time": "2025-02-05T18:50:00Z",
         "modified_by": "PersonM",
+        "notes": null,
         "reagents": []
       },
       {
@@ -60,6 +64,7 @@
         "start_time": "2025-02-04T17:00:00Z",
         "end_time": "2025-02-05T18:50:00Z",
         "modified_by": "PersonM",
+        "notes": null,
         "reagents": []
       }
     ]
@@ -78,6 +83,7 @@
         "start_time": "2025-02-05T19:35:00Z",
         "end_time": "2025-02-07T19:35:00Z",
         "modified_by": "PersonM",
+        "notes": null,
         "reagents": [
           {"name": "112372-100G", "source": "Sigma-Aldrich", "lot_number": "stbk5149"}
         ]
