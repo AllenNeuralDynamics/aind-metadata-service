@@ -81,6 +81,11 @@ async def get_procedures(
             mouse_id=subject_id, _request_timeout=30
         )
     )
+    tasks.append(
+        dataverse_api_instance.get_histology(
+            subject_id=subject_id, _request_timeout=30
+        )
+    )
     (
         labtracks_response,
         nsb_2019_response,
@@ -89,6 +94,7 @@ async def get_procedures(
         las_2020_response,
         smartsheet_perfusion_response,
         dataverse_wr_response,
+        dataverse_histology_response,
     ) = await gather(*tasks)
     mapper = ProceduresMapper(
         labtracks_tasks=labtracks_response,
@@ -98,6 +104,7 @@ async def get_procedures(
         las_2020=las_2020_response,
         smartsheet_perfusion=smartsheet_perfusion_response,
         dataverse_water_restriction=dataverse_wr_response,
+        dataverse_histology=dataverse_histology_response,
     )
     procedures = mapper.map_responses_to_aind_procedures(subject_id)
     if procedures is None:

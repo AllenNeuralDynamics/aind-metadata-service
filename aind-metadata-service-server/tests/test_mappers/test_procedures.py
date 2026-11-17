@@ -17,7 +17,10 @@ from aind_data_schema.core.procedures import (
     ViralMaterial,
     VirusPrepType,
 )
-from aind_dataverse_service_async_client.models import WaterRestrictionModel
+from aind_dataverse_service_async_client.models import (
+    HistologyModel,
+    WaterRestrictionModel,
+)
 from aind_labtracks_service_async_client.models.task import (
     Task as LabTracksTask,
 )
@@ -53,6 +56,9 @@ EXAMPLE_LAS2020_JSON = (
 )
 EXAMPLE_DATAVERSE_JSON = (
     TEST_DIR / "resources" / "dataverse" / "wr_response.json"
+)
+EXAMPLE_HISTOLOGY_JSON = (
+    TEST_DIR / "resources" / "dataverse" / "histology_response.json"
 )
 
 
@@ -121,6 +127,11 @@ class TestProcedures(unittest.TestCase):
             wr_raw = json.load(f)
         self.dataverse_water_restriction = [
             WaterRestrictionModel.model_validate(r) for r in wr_raw
+        ]
+        with open(EXAMPLE_HISTOLOGY_JSON, "r") as f:
+            histology_raw = json.load(f)
+        self.dataverse_histology = [
+            HistologyModel.model_validate(r) for r in histology_raw
         ]
 
     def test_map_dataverse_to_aind_water_restrictions(self):
@@ -227,13 +238,14 @@ class TestProcedures(unittest.TestCase):
             las_2020=self.las2020,
             smartsheet_perfusion=self.perfusions_sheet,
             dataverse_water_restriction=self.dataverse_water_restriction,
+            dataverse_histology=self.dataverse_histology,
         )
         procedures = mapper.map_responses_to_aind_procedures("115977")
 
         self.assertIsInstance(procedures, Procedures)
         self.assertEqual(procedures.subject_id, "115977")
         self.assertEqual(len(procedures.subject_procedures), 10)
-        self.assertEqual(len(procedures.specimen_procedures), 0)
+        self.assertEqual(len(procedures.specimen_procedures), 4)
 
     def test_map_responses_no_data(self):
         """Test mapping when no data sources have content"""
