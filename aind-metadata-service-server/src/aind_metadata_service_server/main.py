@@ -10,7 +10,6 @@ from fastapi.routing import APIRoute
 
 from aind_metadata_service_server import __version__ as service_version
 from aind_metadata_service_server.routes import (
-    acquisition,
     dataverse,
     funding,
     healthcheck,
@@ -83,7 +82,6 @@ routers = [
     funding.router,
     intended_measurements.router,
     procedures.router,
-    acquisition.router,
     protocol.router,
     rig_and_instrument.router,
     subject.router,
