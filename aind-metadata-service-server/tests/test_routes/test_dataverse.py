@@ -1,5 +1,7 @@
 """Tests for dataverse routes"""
 
+import json
+from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -8,6 +10,8 @@ from aind_dataverse_service_async_client.exceptions import (
 )
 from fastapi import status
 from fastapi.testclient import TestClient
+
+RESOURCES_DIR = Path(__file__).parent / ".." / "resources"
 
 
 class TestDataverseRoutes:
@@ -289,6 +293,26 @@ class TestDataverseRoutes:
         ]
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == expected_response
+
+    def test_get_dataverse_histology(
+        self,
+        client: TestClient,
+        mock_dataverse_histology: MagicMock,
+    ):
+        """Test response for histology data."""
+        response = client.get(
+            "/api/v2/dataverse/histology",
+            params={"subject_id": "744742"},
+        )
+        with open(
+            RESOURCES_DIR / "dataverse" / "histology_response.json", "r"
+        ) as f:
+            expected_response = json.load(f)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == expected_response
+        mock_dataverse_histology.assert_awaited_once_with(
+            subject_id="744742", _request_timeout=30
+        )
 
 
 if __name__ == "__main__":

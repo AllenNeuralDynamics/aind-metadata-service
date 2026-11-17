@@ -208,3 +208,27 @@ async def get_dataverse_water_restriction(
         mouse_id=mouse_id, _request_timeout=30
     )
     return water_r_response
+
+
+@router.get("/api/v2/dataverse/histology")
+async def get_dataverse_histology(
+    subject_id: str = Query(
+        ...,
+        description="Subject ID to fetch histology data for.",
+        openapi_examples={
+            "default": Example(
+                summary="An example subject id from LabTracks",
+                description="Example Subject ID",
+                value="823508",
+            )
+        },
+    ),
+    dataverse_api_instance=Depends(get_dataverse_api_instance),
+) -> JSONResponse:
+    """
+    Get raw histology data from Dataverse.
+    """
+    histology_response = await dataverse_api_instance.get_histology(
+        subject_id=subject_id, _request_timeout=30
+    )
+    return histology_response
