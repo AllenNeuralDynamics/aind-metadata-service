@@ -13,6 +13,7 @@ import pytest
 from aind_dataverse_service_async_client import (
     FundingModel,
     HistologyModel,
+    SmartSpimImagingModel,
 )
 from aind_smartsheet_service_async_client.models import ExaSPIMInfo
 from aind_tars_service_async_client import (
@@ -122,6 +123,22 @@ def mock_dataverse_histology(mocker):
     return mocker.patch(
         "aind_dataverse_service_async_client.DefaultApi.get_histology",
         return_value=[HistologyModel.model_validate(r) for r in response],
+    )
+
+
+@pytest.fixture()
+def mock_dataverse_smartspim_imaging(mocker):
+    """Mock response to dataverse smartspim imaging request."""
+    with open(
+        RESOURCES_DIR / "dataverse" / "smartspim_imaging_response.json", "r"
+    ) as f:
+        response = json.load(f)
+    return mocker.patch(
+        "aind_dataverse_service_async_client.DefaultApi"
+        ".get_smartspim_imaging",
+        return_value=[
+            SmartSpimImagingModel.model_validate(r) for r in response
+        ],
     )
 
 

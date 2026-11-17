@@ -20,6 +20,8 @@ The SLIMS data provider has been shut down and all SLIMS-related functionality h
 - Rig and Instruments endpoints; `get_instrument` fetches only from DocDB
 - SLIMS data mapping in procedures and specimen procedures
 
+SmartSPIM imaging and histology data are now available from Dataverse at `/api/v2/dataverse/smartspim_imaging` and `/api/v2/dataverse/histology`. SmartSPIM imaging is also mapped to Acquisition models at `/api/v2/acquisition/{subject_id}`.
+
 ## Local Development
 
 Requires docker and docker compose to build and run package locally.

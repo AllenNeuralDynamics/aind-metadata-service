@@ -1,0 +1,26 @@
+[
+  {
+    "experiment_run_created_on": "2026-09-17T21:31:42Z",
+    "order_created_by": "Person 2",
+    "order_project_id": "Thalamus - Project 1 Mesoscale thalamic circuits",
+    "specimen_id": "886598",
+    "subject_id": "886598",
+    "protocol_name": null,
+    "protocol_id": null,
+    "date_performed": "2026-10-13T00:00:00Z",
+    "chamber_immersion_medium": "Cargille oil",
+    "sample_immersion_medium": "EasyIndex",
+    "chamber_refractive_index": "1.52",
+    "sample_refractive_index": "1.52",
+    "instrument_id": null,
+    "instrument_nickname": "Heffer",
+    "experimenter_name": "Person 1",
+    "z_direction": "Superior_to_inferior",
+    "y_direction": "Anterior_to_posterior",
+    "x_direction": "Left_to_right",
+    "imaging_channels": ["488", "639"],
+    "stitching_channels": "488",
+    "ccf_registration_channels": "639",
+    "cell_segmentation_channels": null
+  }
+]
