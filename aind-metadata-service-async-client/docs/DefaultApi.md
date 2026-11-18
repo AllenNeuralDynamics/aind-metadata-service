@@ -5,6 +5,8 @@ All URIs are relative to *https://aind-metadata-service*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**get_dataverse_funding**](DefaultApi.md#get_dataverse_funding) | **GET** /api/v2/dataverse/funding | Get Dataverse Funding
+[**get_dataverse_histology**](DefaultApi.md#get_dataverse_histology) | **GET** /api/v2/dataverse/histology | Get Dataverse Histology
+[**get_dataverse_smartspim_imaging**](DefaultApi.md#get_dataverse_smartspim_imaging) | **GET** /api/v2/dataverse/smartspim_imaging | Get Dataverse Smartspim Imaging
 [**get_dataverse_table**](DefaultApi.md#get_dataverse_table) | **GET** /api/v2/dataverse/tables/{entity_set_table_name} | Get Dataverse Table
 [**get_dataverse_table_info**](DefaultApi.md#get_dataverse_table_info) | **GET** /api/v2/dataverse/tables | Get Dataverse Table Info
 [**get_dataverse_water_restriction**](DefaultApi.md#get_dataverse_water_restriction) | **GET** /api/v2/dataverse/water_restriction | Get Dataverse Water Restriction
@@ -99,6 +101,146 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | Successful Response |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **get_dataverse_histology**
+> object get_dataverse_histology(subject_id)
+
+Get Dataverse Histology
+
+Get raw histology data from Dataverse.
+
+### Example
+
+
+```python
+import aind_metadata_service_async_client
+from aind_metadata_service_async_client.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to https://aind-metadata-service
+# See configuration.py for a list of all supported configuration parameters.
+configuration = aind_metadata_service_async_client.Configuration(
+    host = "https://aind-metadata-service"
+)
+
+
+# Enter a context with an instance of the API client
+async with aind_metadata_service_async_client.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = aind_metadata_service_async_client.DefaultApi(api_client)
+    subject_id = '823508' # str | Subject ID to fetch histology data for.
+
+    try:
+        # Get Dataverse Histology
+        api_response = await api_instance.get_dataverse_histology(subject_id)
+        print("The response of DefaultApi->get_dataverse_histology:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling DefaultApi->get_dataverse_histology: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **subject_id** | **str**| Subject ID to fetch histology data for. | 
+
+### Return type
+
+**object**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Successful Response |  -  |
+**422** | Validation Error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **get_dataverse_smartspim_imaging**
+> object get_dataverse_smartspim_imaging(subject_id, start_date_gte=start_date_gte, end_date_lte=end_date_lte)
+
+Get Dataverse Smartspim Imaging
+
+Get raw SmartSPIM imaging data from Dataverse.
+
+### Example
+
+
+```python
+import aind_metadata_service_async_client
+from aind_metadata_service_async_client.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to https://aind-metadata-service
+# See configuration.py for a list of all supported configuration parameters.
+configuration = aind_metadata_service_async_client.Configuration(
+    host = "https://aind-metadata-service"
+)
+
+
+# Enter a context with an instance of the API client
+async with aind_metadata_service_async_client.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = aind_metadata_service_async_client.DefaultApi(api_client)
+    subject_id = '886598' # str | Subject ID to fetch SmartSPIM imaging data for.
+    start_date_gte = '2026-09-01' # datetime | Created on or after (ISO format). (optional)
+    end_date_lte = '2026-10-01' # datetime | Created on or before (ISO format). (optional)
+
+    try:
+        # Get Dataverse Smartspim Imaging
+        api_response = await api_instance.get_dataverse_smartspim_imaging(subject_id, start_date_gte=start_date_gte, end_date_lte=end_date_lte)
+        print("The response of DefaultApi->get_dataverse_smartspim_imaging:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling DefaultApi->get_dataverse_smartspim_imaging: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **subject_id** | **str**| Subject ID to fetch SmartSPIM imaging data for. | 
+ **start_date_gte** | **datetime**| Created on or after (ISO format). | [optional] 
+ **end_date_lte** | **datetime**| Created on or before (ISO format). | [optional] 
+
+### Return type
+
+**object**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Successful Response |  -  |
+**422** | Validation Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
