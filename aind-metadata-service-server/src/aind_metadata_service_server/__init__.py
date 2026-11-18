@@ -8,7 +8,7 @@ from logging import LogRecord
 import yaml
 from pythonjsonlogger import json as log_json
 
-__version__ = "2.12.3"
+__version__ = "2.13.0"
 
 
 # We want to standardize the timestamp format to UTC and ISO-8601, which

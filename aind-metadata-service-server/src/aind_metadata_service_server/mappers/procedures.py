@@ -27,7 +27,10 @@ from aind_data_schema_models.specimen_procedure_types import (
     SpecimenProcedureType,
 )
 from aind_data_schema_models.units import MassUnit
-from aind_dataverse_service_async_client.models import WaterRestrictionModel
+from aind_dataverse_service_async_client.models import (
+    HistologyModel,
+    WaterRestrictionModel,
+)
 from aind_labtracks_service_async_client.models import Task as LabTracksTask
 from aind_sharepoint_service_async_client.models import (
     Las2020List,
@@ -53,6 +56,9 @@ from aind_metadata_service_server.mappers.nsb2023 import (
     MappedNSBList as MappedNSB2023,
 )
 from aind_metadata_service_server.mappers.perfusion import PerfusionMapper
+from aind_metadata_service_server.mappers.specimen_procedures import (
+    SpecimenProcedureMapper,
+)
 
 
 class LabTracksTaskStatuses(Enum):
@@ -128,6 +134,7 @@ class ProceduresMapper:
         nsb_present: List[NSB2023List] = [],
         smartsheet_perfusion: List[PerfusionsModel] = [],
         dataverse_water_restriction: List[WaterRestrictionModel] = [],
+        dataverse_histology: List[HistologyModel] = [],
         smartsheet_exaspim: Optional[ExaSPIMInfo] = None,
     ):
         """
@@ -146,6 +153,7 @@ class ProceduresMapper:
         self.nsb_present = nsb_present
         self.smartsheet_perfusion = smartsheet_perfusion
         self.dataverse_water_restriction = dataverse_water_restriction
+        self.dataverse_histology = dataverse_histology
         self.smartsheet_exaspim = smartsheet_exaspim
 
     @staticmethod
@@ -445,6 +453,19 @@ class ProceduresMapper:
             subject_procedures.extend(dv_water_restrictions)
             logging.info(
                 f"Found {len(dv_water_restrictions)} water restrictions "
+                f"from Dataverse for {subject_id}"
+            )
+
+        if self.dataverse_histology:
+            sp_mapper = SpecimenProcedureMapper(
+                dataverse_histology=self.dataverse_histology
+            )
+            dv_specimen_procedures = (
+                sp_mapper.map_dataverse_response_to_aind_specimen_procedures()
+            )
+            specimen_procedures.extend(dv_specimen_procedures)
+            logging.info(
+                f"Found {len(dv_specimen_procedures)} specimen procedures "
                 f"from Dataverse for {subject_id}"
             )
 

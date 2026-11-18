@@ -1,5 +1,8 @@
 """Tests for dataverse routes"""
 
+import json
+from datetime import datetime, timezone
+from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -8,6 +11,8 @@ from aind_dataverse_service_async_client.exceptions import (
 )
 from fastapi import status
 from fastapi.testclient import TestClient
+
+RESOURCES_DIR = Path(__file__).parent / ".." / "resources"
 
 
 class TestDataverseRoutes:
@@ -289,6 +294,89 @@ class TestDataverseRoutes:
         ]
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == expected_response
+
+    def test_get_dataverse_histology(
+        self,
+        client: TestClient,
+        mock_dataverse_histology: MagicMock,
+    ):
+        """Test response for histology data."""
+        response = client.get(
+            "/api/v2/dataverse/histology",
+            params={"subject_id": "744742"},
+        )
+        with open(
+            RESOURCES_DIR / "dataverse" / "histology_response.json", "r"
+        ) as f:
+            expected_response = json.load(f)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == expected_response
+        mock_dataverse_histology.assert_awaited_once_with(
+            subject_id="744742", _request_timeout=30
+        )
+
+    def test_get_dataverse_smartspim_imaging(
+        self,
+        client: TestClient,
+        mock_dataverse_smartspim_imaging: MagicMock,
+    ):
+        """Test response for SmartSPIM imaging data."""
+        response = client.get(
+            "/api/v2/dataverse/smartspim_imaging",
+            params={"subject_id": "886598"},
+        )
+        with open(
+            RESOURCES_DIR / "dataverse" / "smartspim_imaging_response.json",
+            "r",
+        ) as f:
+            expected_response = json.load(f)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == expected_response
+        mock_dataverse_smartspim_imaging.assert_awaited_once_with(
+            subject_id="886598",
+            start_date_gte=None,
+            end_date_lte=None,
+            _request_timeout=30,
+        )
+
+    def test_get_dataverse_smartspim_imaging_date_filters(
+        self,
+        client: TestClient,
+        mock_dataverse_smartspim_imaging: MagicMock,
+    ):
+        """Test the date filters are passed to Dataverse."""
+        response = client.get(
+            "/api/v2/dataverse/smartspim_imaging",
+            params={
+                "subject_id": "886598",
+                "start_date_gte": "2026-09-01T00:00:00Z",
+                "end_date_lte": "2026-10-31T00:00:00Z",
+            },
+        )
+        assert response.status_code == status.HTTP_200_OK
+        mock_dataverse_smartspim_imaging.assert_awaited_once_with(
+            subject_id="886598",
+            start_date_gte=datetime(2026, 9, 1, tzinfo=timezone.utc),
+            end_date_lte=datetime(2026, 10, 31, tzinfo=timezone.utc),
+            _request_timeout=30,
+        )
+
+    @patch(
+        "aind_dataverse_service_async_client.DefaultApi.get_smartspim_imaging"
+    )
+    def test_get_dataverse_smartspim_imaging_empty(
+        self,
+        mock_get_smartspim_imaging: AsyncMock,
+        client: TestClient,
+    ):
+        """Test an empty list is returned when there is no imaging data."""
+        mock_get_smartspim_imaging.return_value = []
+        response = client.get(
+            "/api/v2/dataverse/smartspim_imaging",
+            params={"subject_id": "000000"},
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == []
 
 
 if __name__ == "__main__":

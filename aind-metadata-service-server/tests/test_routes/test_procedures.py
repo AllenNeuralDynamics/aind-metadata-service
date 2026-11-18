@@ -1,15 +1,26 @@
 """Tests procedures route"""
 
+import json
 from datetime import datetime
+from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from aind_dataverse_service_async_client.models import HistologyModel
 from aind_labtracks_service_async_client.models import Task as LabTracksTask
 from aind_sharepoint_service_async_client.models import (
     NSB2023List,
 )
 from aind_smartsheet_service_async_client.models import ProtocolsModel
 from fastapi.testclient import TestClient
+
+EXAMPLE_HISTOLOGY_JSON = (
+    Path(__file__).parent
+    / ".."
+    / "resources"
+    / "dataverse"
+    / "histology_response.json"
+)
 
 
 class TestRoute:
@@ -28,8 +39,10 @@ class TestRoute:
     @patch(
         "aind_dataverse_service_async_client.DefaultApi.get_water_restriction"
     )
+    @patch("aind_dataverse_service_async_client.DefaultApi.get_histology")
     def test_get_procedures_valid_data_only_labtracks(
         self,
+        mock_get_histology: AsyncMock,
         mock_get_water_restriction: AsyncMock,
         mock_get_viruses: AsyncMock,
         mock_get_viral_prep_lots: AsyncMock,
@@ -57,6 +70,7 @@ class TestRoute:
             )
         ]
         mock_get_water_restriction.return_value = []
+        mock_get_histology.return_value = []
         mock_las.return_value = []
         mock_nsb2019.return_value = []
         mock_get_perfusions.return_value = []
@@ -88,7 +102,64 @@ class TestRoute:
         mock_get_perfusions.assert_called_once()
         mock_get_exaspim_info.assert_called_once()
         mock_get_water_restriction.assert_called_once()
+        mock_get_histology.assert_awaited_once_with(
+            subject_id="000000", _request_timeout=30
+        )
         assert mock_get_protocols.call_count >= 1
+
+    @patch("aind_labtracks_service_async_client.DefaultApi.get_tasks")
+    @patch("aind_sharepoint_service_async_client.DefaultApi.get_las2020")
+    @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2019")
+    @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb2023")
+    @patch("aind_sharepoint_service_async_client.DefaultApi.get_nsb_present")
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_perfusions")
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_exaspim_info")
+    @patch("aind_smartsheet_service_async_client.DefaultApi.get_protocols")
+    @patch(
+        "aind_dataverse_service_async_client.DefaultApi.get_water_restriction"
+    )
+    @patch("aind_dataverse_service_async_client.DefaultApi.get_histology")
+    def test_get_procedures_dataverse_histology(
+        self,
+        mock_get_histology: AsyncMock,
+        mock_get_water_restriction: AsyncMock,
+        mock_get_protocols: AsyncMock,
+        mock_get_exaspim_info: AsyncMock,
+        mock_get_perfusions: AsyncMock,
+        mock_nsb_present: AsyncMock,
+        mock_nsb2023: AsyncMock,
+        mock_nsb2019: AsyncMock,
+        mock_las: AsyncMock,
+        mock_labtracks: AsyncMock,
+        client: TestClient,
+    ):
+        """Tests histology from dataverse is mapped to specimen procedures"""
+        with open(EXAMPLE_HISTOLOGY_JSON) as f:
+            contents_histology = json.load(f)
+        mock_get_histology.return_value = [
+            HistologyModel.model_validate(r) for r in contents_histology
+        ]
+        mock_labtracks.return_value = []
+        mock_las.return_value = []
+        mock_nsb2019.return_value = []
+        mock_nsb2023.return_value = []
+        mock_nsb_present.return_value = []
+        mock_get_perfusions.return_value = []
+        mock_get_exaspim_info.return_value = None
+        mock_get_water_restriction.return_value = []
+        mock_get_protocols.return_value = []
+
+        response = client.get("api/v2/procedures/744742")
+        assert response.status_code == 200
+        mock_get_histology.assert_awaited_once_with(
+            subject_id="744742", _request_timeout=30
+        )
+        specimen_procedures = response.json()["specimen_procedures"]
+        assert [p["procedure_type"] for p in specimen_procedures] == [
+            "Delipidation",
+            "Refractive index matching",
+        ]
+        assert {p["specimen_id"] for p in specimen_procedures} == {"744742-01"}
 
     @patch("aind_labtracks_service_async_client.DefaultApi.get_tasks")
     @patch("aind_sharepoint_service_async_client.DefaultApi.get_las2020")
@@ -103,8 +174,10 @@ class TestRoute:
     @patch(
         "aind_dataverse_service_async_client.DefaultApi.get_water_restriction"
     )
+    @patch("aind_dataverse_service_async_client.DefaultApi.get_histology")
     def test_get_procedures_invalid_data(
         self,
+        mock_get_histology: AsyncMock,
         mock_get_water_restriction: AsyncMock,
         mock_get_viruses: AsyncMock,
         mock_get_viral_prep_lots: AsyncMock,
@@ -139,6 +212,7 @@ class TestRoute:
             )
         ]
         mock_get_water_restriction.return_value = []
+        mock_get_histology.return_value = []
         mock_las.return_value = []
         mock_get_protocols.return_value = []
         mock_get_perfusions.return_value = []
@@ -213,8 +287,10 @@ class TestRoute:
     @patch(
         "aind_dataverse_service_async_client.DefaultApi.get_water_restriction"
     )
+    @patch("aind_dataverse_service_async_client.DefaultApi.get_histology")
     def test_get_procedures_no_data(
         self,
+        mock_get_histology: AsyncMock,
         mock_get_water_restriction: AsyncMock,
         mock_get_viruses: AsyncMock,
         mock_get_viral_prep_lots: AsyncMock,
@@ -230,6 +306,7 @@ class TestRoute:
     ):
         """Tests no data found and verifies concurrent API calls."""
         mock_get_water_restriction.return_value = []
+        mock_get_histology.return_value = []
         mock_labtracks.return_value = []
         mock_las.return_value = []
         mock_nsb2019.return_value = []
@@ -257,8 +334,10 @@ class TestRoute:
     @patch(
         "aind_dataverse_service_async_client.DefaultApi.get_water_restriction"
     )
+    @patch("aind_dataverse_service_async_client.DefaultApi.get_histology")
     def test_get_procedures_virus_strain_not_found_in_tars(
         self,
+        mock_get_histology: AsyncMock,
         mock_get_water_restriction: AsyncMock,
         mock_get_viruses: AsyncMock,
         mock_get_viral_prep_lots: AsyncMock,
@@ -316,6 +395,7 @@ class TestRoute:
         ]
         mock_nsb_present.return_value = []
         mock_get_water_restriction.return_value = []
+        mock_get_histology.return_value = []
 
         response = client.get("api/v2/procedures/000000")
         assert response.status_code == 200
@@ -338,8 +418,10 @@ class TestRoute:
     @patch(
         "aind_dataverse_service_async_client.DefaultApi.get_water_restriction"
     )
+    @patch("aind_dataverse_service_async_client.DefaultApi.get_histology")
     def test_get_procedures_maps_tars_virus_data(
         self,
+        mock_get_histology: AsyncMock,
         mock_get_water_restriction: AsyncMock,
         mock_get_viruses: AsyncMock,
         mock_get_viral_prep_lots: AsyncMock,
@@ -391,6 +473,7 @@ class TestRoute:
         ]
         mock_nsb_present.return_value = []
         mock_get_water_restriction.return_value = []
+        mock_get_histology.return_value = []
 
         response = client.get("api/v2/procedures/000000")
         injection_materials = [

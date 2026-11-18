@@ -208,3 +208,76 @@ async def get_dataverse_water_restriction(
         mouse_id=mouse_id, _request_timeout=30
     )
     return water_r_response
+
+
+@router.get("/api/v2/dataverse/histology")
+async def get_dataverse_histology(
+    subject_id: str = Query(
+        ...,
+        description="Subject ID to fetch histology data for.",
+        openapi_examples={
+            "default": Example(
+                summary="An example subject id from LabTracks",
+                description="Example Subject ID",
+                value="823508",
+            )
+        },
+    ),
+    dataverse_api_instance=Depends(get_dataverse_api_instance),
+) -> JSONResponse:
+    """
+    Get raw histology data from Dataverse.
+    """
+    histology_response = await dataverse_api_instance.get_histology(
+        subject_id=subject_id, _request_timeout=30
+    )
+    return histology_response
+
+
+@router.get("/api/v2/dataverse/smartspim_imaging")
+async def get_dataverse_smartspim_imaging(
+    subject_id: str = Query(
+        ...,
+        description="Subject ID to fetch SmartSPIM imaging data for.",
+        openapi_examples={
+            "default": Example(
+                summary="An example subject id from LabTracks",
+                description="Example Subject ID",
+                value="886598",
+            )
+        },
+    ),
+    start_date_gte: datetime | None = Query(
+        default=None,
+        description="Created on or after (ISO format).",
+        openapi_examples={
+            "default": Example(
+                summary="A sample start date",
+                description="Example start date",
+                value="2026-09-01",
+            )
+        },
+    ),
+    end_date_lte: datetime | None = Query(
+        default=None,
+        description="Created on or before (ISO format).",
+        openapi_examples={
+            "default": Example(
+                summary="A sample end date",
+                description="Example end date",
+                value="2026-10-01",
+            )
+        },
+    ),
+    dataverse_api_instance=Depends(get_dataverse_api_instance),
+) -> JSONResponse:
+    """
+    Get raw SmartSPIM imaging data from Dataverse.
+    """
+    imaging_response = await dataverse_api_instance.get_smartspim_imaging(
+        subject_id=subject_id,
+        start_date_gte=start_date_gte,
+        end_date_lte=end_date_lte,
+        _request_timeout=30,
+    )
+    return imaging_response
