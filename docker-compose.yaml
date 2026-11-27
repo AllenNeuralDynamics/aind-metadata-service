@@ -25,7 +25,7 @@ services:
   orcid:
     image: "ghcr.io/allenneuraldynamics/orcid-service-server:0.1.0"
   smartsheet:
-    image: "ghcr.io/allenneuraldynamics/aind-smartsheet-service-server:1.1.0"
+    image: "ghcr.io/allenneuraldynamics/aind-smartsheet-service-server:1.1.1"
     env_file: "env/smartsheet.env"
   sharepoint:
     image: "ghcr.io/allenneuraldynamics/aind-sharepoint-service-server:0.3.1"
